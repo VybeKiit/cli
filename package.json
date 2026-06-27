@@ -13,6 +13,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@vybekiit/agent-kit": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "tsup": "^8.3.5",
