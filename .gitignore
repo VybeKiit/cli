@@ -8,6 +8,7 @@ dist/
 .turbo/
 out/
 *.tsbuildinfo
+next-env.d.ts
 
 # env / secrets — NEVER commit real values (only .env.example is tracked)
 .env
@@ -18,3 +19,6 @@ out/
 *.log
 .DS_Store
 coverage/
+
+# local / private (operator notes — not for the repo)
+docs/checklist.md

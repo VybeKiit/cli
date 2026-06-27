@@ -1,16 +1,17 @@
 # VybeKiit monorepo workspaces.
 #
-# Only code we develop + build here is a workspace member:
-#   - packages/*  → MAINTAINED, published to npm as @vybekiit/* (headless logic)
-#   - cli         → the `vybekiit` scaffolder
+# Workspace members = code we develop, build, and gate here:
+#   - packages/*    → MAINTAINED, published to npm as @vybekiit/* (headless logic)
+#   - cli           → the `vybekiit` scaffolder
+#   - templates/web → OWNED scaffold payload, but a real Next app we now build +
+#     typecheck in CI so the reference app can't rot. On scaffold the CLI rewrites
+#     its `@vybekiit/*` `workspace:*` deps → npm versions (see cli/src/rewrite-deps).
 #
-# templates/* and apps/* are intentionally NOT workspace members yet:
-#   - templates/* are OWNED scaffold *payload* — copied verbatim into a buyer's
-#     repo by the CLI (their `@vybekiit/*` deps are rewritten to npm versions on
-#     scaffold), so they aren't installed/built in this monorepo.
-#   - apps/landing is a v1.0 build target that will dogfood templates/web.
-# Both get promoted to workspace members during the v1.0 web build (see CONTEXT.md
-# → Build order); keeping them out now keeps install light and the gate honest.
+# Still excluded on purpose:
+#   - templates/{mobile,extension} → v2/v3 placeholders, nothing to build yet.
+#   - apps/landing → currently a stub (webhook + gate only). It joins the workspace
+#     alongside its real UI in issue #3, so we don't gate an empty shell now.
 packages:
   - "packages/*"
   - "cli"
+  - "templates/web"

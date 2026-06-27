@@ -77,13 +77,15 @@ you can take $1 and auto-invite yourself, the business is real.
 ## Current state (after the v1.0 scaffold)
 
 - **Built + green** (workspace members, in the CI gate): `packages/core`,
-  `packages/payments`, `packages/auth`, `packages/db`, `packages/extension-publish`, and `cli`
-  (the `vybekiit` scaffolder). These are real, typed, tested.
-- **Payload / build-target** (NOT yet workspace members — see `pnpm-workspace.yaml`):
-  `templates/*` and `apps/landing`. `templates/web` is a real Next.js skeleton + the full
-  buyer-facing agent layer (`AGENTS.md`, `language.md`, `.vybekiit/skills`), copied verbatim by the
-  CLI. `apps/landing` holds the **gate** (GitHub invite/remove) — our store's only addition over
-  the template. Both get promoted to built workspace members during the v1.0 web build.
+  `packages/payments`, `packages/auth`, `packages/db`, `packages/extension-publish`, `cli`
+  (the `vybekiit` scaffolder), and `templates/web` (a real Next.js app, `next build` + `tsc`
+  gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
+  the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —
+  it just no longer ships untyped/unbuilt.
+- **Payload, NOT yet workspace members** (see `pnpm-workspace.yaml`): `templates/{mobile,extension}`
+  (v2/v3 placeholders, nothing to build) and `apps/landing`, which today is a stub (webhook + the
+  GitHub-invite **gate** only). `apps/landing` joins the workspace alongside its real UI in issue #3,
+  so we don't gate an empty shell.
 - **The gate lives in `apps/landing`, not in the buyer template.** A buyer's app fulfills its own
   orders (`templates/web/src/lib/fulfillment.ts` → records the order); inviting to our private repo
   is *our* business logic.
