@@ -22,3 +22,5 @@ coverage/
 
 # local / private (operator notes — not for the repo)
 docs/checklist.md
+.bridge/
+downloads/

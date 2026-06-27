@@ -3,7 +3,16 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["dist", ".next", ".turbo", "node_modules", ".vybekiit/changelog.json"]
+    "ignore": [
+      "dist",
+      ".next",
+      ".turbo",
+      "node_modules",
+      ".vybekiit/changelog.json",
+      ".bridge",
+      "downloads",
+      "**/.agents/skills/**"
+    ]
   },
   "formatter": {
     "enabled": true,
