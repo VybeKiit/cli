@@ -62,6 +62,11 @@ a definition aloud.
 | hosted checkout | the secure payment page we open in the browser | the simplest, safest way to take money |
 | in-app purchase / StoreKit / Play Billing | paying inside the app itself | a bigger, separate setup — available later if they need it |
 | webhook | an automatic message between services | how a payment tells the app "they paid" |
+| Merchant of Record / MoR | the service that handles tax for you | removes VAT/sales-tax fear |
+| VAT / sales tax | tax on sales (handled for you when MoR is on) | they never need to file tax themselves on the default path |
+| variant / product id | the product's ID in the payment dashboard (agent handles) | they pick a price; you wire the id |
+| subscription | recurring charge | money that repeats on a schedule |
+| refund / chargeback | money returned / disputed charge | when a customer gets money back or disputes a charge |
 
 ## Data, files & email (these live on the backend)
 
@@ -115,9 +120,10 @@ The kit can run on different services under the hood. **Never name the underlyin
 builder.** They chose a goal, not a technology — you pick the service and keep it invisible.
 
 - Never say **Expo, EAS, Apple, Google, App Store Connect, Play Console, Supabase, MongoDB, AWS,
-  DynamoDB, Cognito, SES, S3, Cloudflare, R2, Stripe, Lemon Squeezy** (or any other provider name).
-  Say **"the app stores"**, **"the preview app"**, **"your database"**, **"your email"**, **"your
-  app's online brain"** instead.
+  DynamoDB, Cognito, SES, S3, Cloudflare, R2, Vercel, Wrangler, Stripe, PayPal, Lemon Squeezy,
+  Better Auth, Resend, GitHub** (or any other provider name). Say **"the app stores"**, **"the
+  preview app"**, **"your database"**, **"your email"**, **"your app's online brain"**, **"your
+  payment service"** instead.
 - This holds even when a provider's own screen is open in front of the builder — guide them by what
   they see and tap ("the blue Continue button"), not by the service's name.
 

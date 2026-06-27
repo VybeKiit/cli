@@ -12,6 +12,9 @@ translate errors · celebrate.
 | "let people sign in / log in / create accounts / add users" | `skills/connect-account.md` |
 | "save my data", "remember this", "store info", "add a database" | `skills/save-data.md` |
 | "add payments", "let me take money", "sell something", "charge people" | `skills/setup-payments.md` |
+| "invite teammates", "add my team", "work with others" | `skills/add-teams.md` |
+| "notify users", "send alerts", "email when something happens" | `skills/add-notifications.md` |
+| "see who uses my app", "visitor stats", "analytics" | `skills/add-analytics.md` |
 | "update the kit", "get the latest", "upgrade" | `skills/update-kit.md` |
 | "it's broken", "nothing works", "I get an error", "check my app" | `skills/doctor.md` |
 | "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
