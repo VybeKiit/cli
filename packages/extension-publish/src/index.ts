@@ -1,5 +1,5 @@
 /**
- * Public surface of `@vybekiit/browser-automation`.
+ * Public surface of `@vybekiit/extension-publish`.
  *
  * The callable verb allowlist lives in `CWS_AUTOMATION_VERBS` per ADR-0012.
  * Helper exports below are available for tooling, but they are not CWS verbs.

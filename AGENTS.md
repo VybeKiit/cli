@@ -77,7 +77,7 @@ you can take $1 and auto-invite yourself, the business is real.
 ## Current state (after the v1.0 scaffold)
 
 - **Built + green** (workspace members, in the CI gate): `packages/core`,
-  `packages/payments`, `packages/auth`, `packages/db`, `packages/browser-automation`, and `cli`
+  `packages/payments`, `packages/auth`, `packages/db`, `packages/extension-publish`, and `cli`
   (the `vybekiit` scaffolder). These are real, typed, tested.
 - **Payload / build-target** (NOT yet workspace members — see `pnpm-workspace.yaml`):
   `templates/*` and `apps/landing`. `templates/web` is a real Next.js skeleton + the full

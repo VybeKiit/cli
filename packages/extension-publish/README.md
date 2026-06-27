@@ -1,4 +1,4 @@
-# @vybekiit/browser-automation
+# @vybekiit/extension-publish
 
 Chrome Web Store Developer Console automation for actions that the official upload API does not cover.
 
@@ -35,7 +35,7 @@ Do not use it for routine local extension builds, generic Playwright tests, or n
 ```txt
 pnpm cws <verb> <extension>
   -> scripts/cws/index.ts
-  -> @vybekiit/browser-automation verb allowlist
+  -> @vybekiit/extension-publish verb allowlist
   -> connectToCwsChrome()
   -> CWS page selectors + safeClick()
   -> read state or apply the requested CWS change
@@ -82,7 +82,7 @@ extensions/<id>/cws-listing.ts
 ## Verification
 
 ```bash
-pnpm --filter @vybekiit/browser-automation typecheck
-pnpm --filter @vybekiit/browser-automation test
-pnpm --filter @vybekiit/browser-automation lint
+pnpm --filter @vybekiit/extension-publish typecheck
+pnpm --filter @vybekiit/extension-publish test
+pnpm --filter @vybekiit/extension-publish lint
 ```

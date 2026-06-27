@@ -1,5 +1,5 @@
 /**
- * Error classes for `@vybekiit/browser-automation`. All verbs throw one of these on
+ * Error classes for `@vybekiit/extension-publish`. All verbs throw one of these on
  * failure so callers (CLI, agents) can switch on `instanceof` without parsing
  * messages.
  *

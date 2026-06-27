@@ -66,10 +66,10 @@ function renderListingFile(listing: CwsListing): string {
   const usesAllRegions = isCwsAllRegions(listing.distribution.regions);
   const body = renderListingBody(listing, usesAllRegions);
   const regionsImport = usesAllRegions
-    ? "import { CWS_ALL_REGIONS } from '@vybekiit/browser-automation/regions';\n"
+    ? "import { CWS_ALL_REGIONS } from '@vybekiit/extension-publish/regions';\n"
     : '';
 
-  return `import type { CwsListing } from '@vybekiit/browser-automation/schema';
+  return `import type { CwsListing } from '@vybekiit/extension-publish/schema';
 ${regionsImport}
 
 /**
