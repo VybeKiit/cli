@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/toaster';
 import { resolveDirection } from '@/lib/direction';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -18,7 +19,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const { lang, dir } = resolveDirection((await headers()).get('accept-language'));
   return (
     <html lang={lang} dir={dir}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

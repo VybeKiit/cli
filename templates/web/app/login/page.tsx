@@ -4,6 +4,7 @@ import { AuthShell } from '@/components/auth-shell';
 import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useAsync } from '@/hooks/use-async';
 import { signInWithPassword } from '@/lib/auth-client';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
@@ -15,19 +16,12 @@ import { type FormEvent, useState } from 'react';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [pending, setPending] = useState(false);
+  const { loading: pending, error, run: signIn } = useAsync(signInWithPassword);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError('');
-    setPending(true);
-    const result = await signInWithPassword(email, password);
-    setPending(false);
-    if (!result.ok) {
-      setError(result.error.message);
-      return;
-    }
+    const result = await signIn(email, password);
+    if (!result.ok) return;
     // TODO(vybekiit): send the signed-in builder to their dashboard — skill: add-signin
     window.location.href = '/dashboard';
   }

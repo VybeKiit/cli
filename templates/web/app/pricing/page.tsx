@@ -4,6 +4,7 @@ import { MarketingShell } from '@/components/marketing-shell';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAsync } from '@/hooks/use-async';
 import { startCheckout } from '@/lib/billing-client';
 import { PLANS } from '@/lib/plans';
 import { cn } from '@/lib/utils';
@@ -15,15 +16,15 @@ import { useState } from 'react';
  * skill connects a provider.
  */
 export default function PricingPage() {
+  // `pendingId` drives the per-card spinner (which plan is loading); useAsync owns
+  // the shared error so a failed checkout reuses the same Alert as the form pages.
   const [pendingId, setPendingId] = useState('');
-  const [error, setError] = useState('');
+  const { error, run: checkout } = useAsync(startCheckout);
 
   async function handleSelect(planId: string) {
-    setError('');
     setPendingId(planId);
-    const result = await startCheckout(planId);
+    const result = await checkout(planId);
     if (!result.ok) {
-      setError(result.error.message);
       setPendingId('');
       return;
     }
