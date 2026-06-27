@@ -3,8 +3,10 @@
 > The domain map for VybeKiit. Read this first. It captures **what** we're building, the
 > **decisions** behind it, and the **language** we use. Implementation details live in code;
 > this file is the why and the shape. Authored from a `/grill-me` session on 2026-06-27,
-> extended by a `/grill-with-docs` session the same day (see "Agentic toolchain & dev workflow").
-> **Status: v1.0 scaffold built + green + pushed; building out the web tracer bullet.**
+> extended by `/grill-with-docs` sessions the same day (see "Agentic toolchain & dev workflow"
+> and the multi-provider widening below).
+> **Status: v1.0 scaffold built + green + pushed; widening to multi-provider adapters + mobile
+> parity (grill 2026-06-27); building out the web tracer bullet.**
 
 ---
 
@@ -52,16 +54,23 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ core/                   env+config loader (the single .env source of truth), types, utils
 │  ├─ payments/               one PaymentProvider interface · providers/{lemon-squeezy,stripe,
 │  │                          paypal} (official SDKs) · LS is the v1 default (MoR) · no UI
-│  ├─ auth/                   headless auth logic (Supabase)
-│  ├─ db/                     typed Supabase client + schema helpers
+│  ├─ auth/                   one AuthProvider interface · better-auth bound to the chosen DB
+│  │                          (Postgres/Mongo) · Cognito for AWS — multi-DB, no UI (ADR-0003)
+│  ├─ db/                     one DataProvider interface · providers/{supabase,mongodb,aws} +
+│  │                          StorageProvider {supabase/R2,s3} — provider-agnostic (ADR-0002)
+│  ├─ deploy/                 NEW · one Hosting interface · providers/{cloudflare,aws} (Amplify/SST)
+│  │                          — hosting/deploy behind one contract (ADR-0002)
+│  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
+│  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
 │  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
 │  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
 │  │                          the OWNED templates/extension consumes it (v3)
-│  ├─ email/                  send via Cloudflare email behind one interface          ← later
+│  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
 │  └─ agent-kit/              the kit-update logic + scripts the agents run            ← later
 ├─ templates/                 OWNED · NOT published · copied by the scaffolder · frozen
 │  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
-│  ├─ mobile/                 Expo + NativeWind/react-native-reusables       ← v2
+│  ├─ mobile/                 Expo + plain StyleSheet primitives + shared tokens (NativeWind
+│  │                          dropped) — full web parity                     ← pulled forward
 │  └─ extension/              WXT + shadcn                                    ← v3
 ├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages
 ├─ cli/                       npx vybekiit — scaffolds a template into the buyer's own repo
@@ -73,15 +82,23 @@ technical — for us) vs the **buyer** layer (inside `templates/*`, jargon-free 
 
 ## Stack decisions
 
-| Concern | Choice | Dropped / why |
+**One interface per concern, swappable adapters, one default ⭐** — the proven `@vybekiit/payments`
+shape applied to every concern. Defaults below are unchanged (Supabase + Cloudflare); the other
+adapters are opt-in escape hatches the builder never picks (the agent routes via one `.env` setting).
+See ADR-0002/0003/0004.
+
+| Concern | Choice (default ⭐ · adapters) | Dropped / why |
 |---|---|---|
 | Monorepo | pnpm workspaces + Turborepo | — |
 | Web UI | shadcn/ui (web + extension share it) | MUI etc. — can't mix design systems; shadcn is best for agents |
-| Mobile UI | NativeWind + react-native-reusables (shadcn-parity) | — shadcn is web-only |
-| Hosting/edge | Cloudflare (Pages/Workers, CDN, domains, cron, R2, email) | AWS — bill-shock + non-coder-hostile |
-| DB / Auth | Supabase (Postgres + Auth + Storage) | — batteries-included beats assembling D1 + auth |
-| Email | Cloudflare Email | AWS SES (sandbox approval pain), Resend (kept as fallback) |
-| Payments | swappable packages; **Lemon Squeezy first** | LS is Merchant-of-Record → handles tax/VAT (the scary part) |
+| Mobile UI | plain RN `StyleSheet` primitives (Button/Input/Card/Label/Alert) reading shared `@vybekiit/tokens` | NativeWind dropped (too buggy) + react-native-reusables (depends on it); React Native Paper (Material clashes with shadcn) — ADR-0004 |
+| Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · aws (Amplify/SST) | AWS no longer dropped — now an opt-in adapter, never the default — ADR-0002 |
+| Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
+| Auth | `@vybekiit/auth` (`AuthProvider`): **better-auth⭐** bound to the chosen DB (Postgres/Mongo) · Cognito for AWS | "auth = Supabase-only" — new DB adapters have no built-in auth — ADR-0003 |
+| Storage | `StorageProvider`: **supabase/R2⭐** · s3 | — same one-interface pattern (in `@vybekiit/db` or its own pkg) |
+| Email | `@vybekiit/email` (`EmailProvider`): **cloudflare⭐** · ses · resend | AWS SES now an adapter (was sandbox-approval pain); Resend an adapter (was fallback) |
+| Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS is Merchant-of-Record → handles tax/VAT (the scary part) |
+| Design tokens | `@vybekiit/tokens`: one shared map (colors/spacing/radius/type) — web as CSS vars, mobile as `StyleSheet` | — DRY look across web + mobile — ADR-0004 |
 
 ## The agent layer (the actual product)
 
@@ -93,15 +110,18 @@ technical — for us) vs the **buyer** layer (inside `templates/*`, jargon-free 
 - **Docs (single source + pointers):** `AGENTS.md` is the one source of truth; `CLAUDE.md` /
   Copilot / Codex configs are thin redirects. `CONTEXT.md` = domain map. `language.md` =
   voice/jargon glossary ("secret setting" not "env var").
-- **9 skills, one strict shared template.** Every skill obeys: ① one action at a time ·
-  ② **verify-before-advance** (test the step worked before continuing — this prevents the
-  silent-stuck → refund death) · ③ plain language · ④ errors translated to "what happened + the
-  one fix" · ⑤ celebrate progress. Routed via an AGENTS.md goal-index (buyer speaks goals, agent
-  picks the skill).
+- **Skills are goal-named, never tech-named, and one strict shared template.** Every skill obeys:
+  ① one action at a time · ② **verify-before-advance** (test the step worked before continuing —
+  this prevents the silent-stuck → refund death) · ③ plain language · ④ errors translated to
+  "what happened + the one fix" · ⑤ celebrate progress. Routed via an AGENTS.md goal-index (buyer
+  speaks goals, agent picks the skill). A goal-named skill routes to the right adapter underneath —
+  "save my data" wires whichever DB the builder uses; the vibe coder never hears "MongoDB" or "AWS".
   - **Tier 1** (agent would botch without these): `onboarding` · `go-live` · `setup-payments` ·
     `update-kit` · `doctor`
-  - **Tier 2**: `setup-auth` · `add-data` · `buy-domain` · `setup-email`
+  - **Tier 2**: `add-signin` · `save-data` · `add-files` · `buy-domain` · `setup-email`
   - **Not skills** (agent + AGENTS.md handle them): generic coding, design tweaks, CRUD.
+  - **Adding a provider never adds a skill — skills are written once against the interface.** A new
+    adapter (Mongo, AWS, SES, S3, Cognito) is wiring behind the same goal-named skill, not a new one.
 - **Keystone:** `onboarding` ends with the buyer's app **LIVE** in session #1. That "aha" kills
   refund-regret and is also the marketing demo.
 
@@ -143,6 +163,12 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 
 ## Build order — the tracer bullet
 
+> **Widened 2026-06-27 (grill).** v1.0 now also includes the multi-provider data / auth / hosting /
+> storage / email adapters (ADR-0002/0003) and pulls the **mobile template forward to full web
+> parity** (ADR-0004) — it was deferred to v2. The **defaults** (Supabase + Cloudflare) and the
+> tracer-bullet **money pipeline** are unchanged; the new clouds are opt-in escape hatches layered
+> on top of the same proven slice.
+
 Build **one thin vertical slice through every layer**, cutting the riskiest unknowns first.
 
 - **v1.0** — WEB only + the **money pipeline** (LS → invite, *de-risk this first*) +
@@ -151,7 +177,8 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
   scaffolds a web app → wires payments → deploys **live**.
 - **v1.1** — `update-kit`, `setup-auth`, `add-data`, `buy-domain`, `setup-email` (Stripe + PayPal
   adapters already ship in `@vybekiit/payments`).
-- **v2** — mobile template (Expo + the author's `launch-store` for deploy).
+- **mobile template** (Expo + the author's `launch-store` for deploy) — **pulled into v1.0 at full
+  web parity** by the 2026-06-27 grill (was v2; see banner above and ADR-0004).
 - **v3** — extension template (WXT).
 
 ## Agentic toolchain & dev workflow
@@ -159,13 +186,20 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
 Resolved in the `/grill-with-docs` session (2026-06-27). What makes the agent "real agentic" is
 that the CLIs it needs are actually present and usable — the buyer never configures tooling.
 
-- **The v1 toolchain is `supabase` + `wrangler`** (the only CLIs the web + money pipeline use).
-  Expo + the author's `launch` CLI arrive with the mobile template (v2); Playwright/extension-publish
-  with the extension template (v3). No tool is wired before the template that drives it exists.
+- **The default toolchain is `supabase` + `wrangler`** (the CLIs the default web + money pipeline
+  use). Expo + the author's `launch` CLI arrive with the mobile template (now in v1.0 — see banner);
+  Playwright/extension-publish with the extension template (v3); the MongoDB Atlas + AWS CLIs only
+  when those opt-in adapters are selected. No tool is wired before the template/adapter that drives
+  it is in use.
 - **Provisioned globally, OS-aware, by `vybekiit doctor`** — a maintained CLI subcommand (not
   project-local devDeps, not a postinstall). It installs each CLI the right way per OS, is
   idempotent, and verifies the toolchain. The agent (onboarding / `doctor` skills) calls it and
   translates its output. Fixes ship via an npm bump of the CLI — one updatable home.
+- **`doctor` provisions per active adapter/template, only when needed.** Same OS-aware, idempotent
+  pattern, it also installs/verifies the **MongoDB Atlas CLI** (when the mongodb data adapter is in
+  use), the **AWS CLI** (aws data/hosting/storage/email adapters), and the **Expo/EAS CLI** + the
+  author's **`launch` CLI** (when the mobile template is in use). Nothing is wired before the adapter
+  or template that drives it is selected.
 - **Auth = interactive browser login** (`wrangler login`, `supabase login`), not env tokens. This
   **amends the single-`.env` rule**: `.env` is the source of truth for *runtime* secrets
   (SUPABASE_URL/ANON/SERVICE_ROLE, payment keys), but *CLI/deploy auth* lives in each tool's native
@@ -200,9 +234,20 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
   provisioned globally by `vybekiit doctor` so the buyer never configures tooling.
 - **`vybekiit doctor`** — the maintained CLI subcommand that installs + verifies the toolchain
   (OS-aware, idempotent) and diagnoses a broken project; the human-facing `doctor` *skill* wraps it.
+- **Provider adapter** — one concrete backend behind a concern's interface (e.g. `mongodb` behind
+  `DataProvider`); the proven `@vybekiit/payments` shape — one interface, swappable backends, one
+  default ⭐. The builder never picks one; the agent routes via one `.env` setting.
+- **DataProvider / AuthProvider / Hosting / StorageProvider / EmailProvider** — the per-concern
+  interfaces (data, auth, hosting/deploy, storage, email), each with swappable adapters and one
+  default; skills are written once against the interface, so a new adapter never adds a skill.
+- **Design tokens (`@vybekiit/tokens`)** — the one shared map of colors/spacing/radius/type that web
+  (as CSS vars) and mobile (as `StyleSheet` values) both consume, so the two look consistent.
 
 ## Open / parked
 
 - **$29 pricing** (parked — revisit before launch).
 - Brand name `vybekiit` is **pending availability** (npm `@vybekiit/*`, org, `.com`/`.dev`).
 - GTM execution (owned by a friend, not yet engaged).
+- **AWS/Mongo adapter maintenance surface** (watch) — each opt-in adapter is real drift + its own
+  tests; a vendor SDK change can break an adapter without touching the default. Cost of breadth,
+  accepted in ADR-0002.
