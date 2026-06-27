@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runDoctor } from './doctor/run';
 import { ScaffoldError, TEMPLATES, isTemplateName, scaffold } from './scaffold';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -9,15 +10,21 @@ const HELP = `vybekiit — scaffold a VybeKiit template into your own repo
 
 Usage:
   vybekiit new <template> [directory]
+  vybekiit doctor
 
 Templates:
   web         Next.js + shadcn (RTL-ready) + the agent layer   [available]
   mobile      Expo                                             [ships in v2]
   extension   WXT                                              [ships in v3]
 
+Commands:
+  new         Scaffold a template into your own repo
+  doctor      Set up + check the tools your app needs (installs them, checks sign-in)
+
 Examples:
   vybekiit new web my-app
   vybekiit new web .
+  vybekiit doctor
 
 Options:
   -h, --help       Show this help
@@ -86,6 +93,9 @@ async function main(argv: string[]): Promise<number> {
   }
   if (command === 'new') {
     return runNew(rest);
+  }
+  if (command === 'doctor') {
+    return runDoctor();
   }
 
   console.error(`Unknown command "${command}".\n\n${HELP}`);
