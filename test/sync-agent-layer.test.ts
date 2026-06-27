@@ -37,7 +37,7 @@ describe('runSyncAgentLayer', () => {
     const result = await runSyncAgentLayer(['web'], buyer, {
       resolve: async () => ({ source: mirror }),
       copy: async (src, dest) => {
-        copied.push({ src, dest });
+        copied.push({ src: String(src), dest: String(dest) });
       },
       runSkillsUpdate: async () => {},
       pathExists: async () => true,
