@@ -55,8 +55,10 @@ Two hard constraints shape the answer:
   each mirror's README.
 - **Invite logic targets multiple repos.** The webhook adds/removes the buyer across the template
   mirrors rather than one repo; refund → removed from all. More API calls, cleaner blast radius.
-- **`update-kit` can `git pull` the mirror** (the scaffold keeps a `.git` from the clone), in
-  addition to npm version bumps for `@vybekiit/*` — a clean update path for the OWNED files too.
+- **Updates flow two ways:** npm version bumps for `@vybekiit/*` (the MAINTAINED packages), and
+  `update-kit` re-fetching the mirror for the OWNED template files (the CLI can re-pull on demand).
+  The initial scaffold copies files **clean** — the clone's `.git` is skipped — so the buyer starts a
+  fresh project rather than inheriting the mirror's shallow history + remote.
 
 ## Alternatives rejected
 
@@ -66,5 +68,5 @@ Two hard constraints shape the answer:
   works"): no mirror infra, but the buyer gets the maintainer monorepo — maintainer agent layer, all
   package source, `infra` — messy and leaks internals.
 - **PAT paste / tarball via API for auth:** PAT creation is the jargon wall this product removes; the
-  authenticated tarball download needs the same `gh` login yet drops the `.git` that makes
-  `update-kit` a simple `git pull`.
+  authenticated tarball download needs the same `gh` login yet is no simpler than `gh repo clone`,
+  while losing the option for `update-kit` to re-pull the mirror later.
