@@ -9,10 +9,15 @@
  * brittle install/auth orchestration be unit-tested instead of trusted. The actual
  * spawning lives in `run.ts`.
  *
- * It is now **provider-aware**: {@link selectToolchain} returns only the CLIs the
- * buyer's *active* adapters need, read from the `*_PROVIDER` env keys. With the
- * defaults (Supabase + Cloudflare) that's exactly `[wrangler, supabase]` — today's
- * behavior, unchanged. Selecting the Mongo data adapter adds the MongoDB Atlas CLI;
+ * `gh` is the always-present **base** tool: it's how a published install downloads the
+ * template files (it clones the private mirror — ADR-0005) and signs the buyer in to
+ * GitHub, so it's needed for *any* template regardless of provider. {@link selectToolchain}
+ * always leads with it; the default web set is then `[gh, wrangler, supabase]`.
+ *
+ * Beyond that base it is **provider-aware**: {@link selectToolchain} returns only the
+ * CLIs the buyer's *active* adapters need, read from the `*_PROVIDER` env keys. With the
+ * defaults (Supabase + Cloudflare) that's exactly `[gh, wrangler, supabase]` — today's
+ * behavior plus the base tool. Selecting the Mongo data adapter adds the MongoDB Atlas CLI;
  * any active AWS adapter (data / storage / email / auth / hosting) adds the AWS CLI
  * once. A **mobile** project (passed `mobile: true`) appends the build/publish tools
  * (`eas` + `launch`) on top of the env-selected web tools. Playwright arrives with the
@@ -57,6 +62,25 @@ export interface Tool {
   /** Absent for tools that need no sign-in. */
   readonly auth?: AuthProbe;
 }
+
+/**
+ * GitHub CLI — the always-present base tool. It downloads the buyer's starter files
+ * (clones the private template mirror — ADR-0005) and signs them in to GitHub, so it's
+ * required for every template no matter the provider. Installs via Homebrew (macOS /
+ * Linux) or Scoop (Windows), mirroring the Supabase/Atlas channels; sign-in lives in
+ * `gh`'s own store and is probed with `gh auth status`.
+ */
+const GH: Tool = {
+  name: 'gh',
+  purpose: "download your app's starter files and sign you in to GitHub",
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
+    win32: { command: 'scoop', args: ['install', 'gh'], requires: 'Scoop' },
+    linux: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
+  },
+  auth: { command: 'gh', args: ['auth', 'status'], loginHint: 'gh auth login --web' },
+};
 
 /** Default hosting CLI — Cloudflare. Installs the same way everywhere (npm). */
 const WRANGLER: Tool = {
@@ -151,11 +175,11 @@ const LAUNCH: Tool = {
 };
 
 /**
- * The default toolchain (Supabase + Cloudflare) — the result {@link selectToolchain}
- * returns when every `*_PROVIDER` key is at its default. Exported as the stable
- * baseline for callers and tests.
+ * The default toolchain — `gh` (the always-present base tool) plus the default web set
+ * (Cloudflare + Supabase). The result {@link selectToolchain} returns when every
+ * `*_PROVIDER` key is at its default. Exported as the stable baseline for callers and tests.
  */
-export const TOOLCHAIN: readonly Tool[] = [WRANGLER, SUPABASE];
+export const TOOLCHAIN: readonly Tool[] = [GH, WRANGLER, SUPABASE];
 
 /**
  * Extra context {@link selectToolchain} can't read from the `*_PROVIDER` env keys.
@@ -169,14 +193,17 @@ export interface ToolchainOptions {
 
 /**
  * Pick the CLIs the buyer's *active* providers need, read from the `*_PROVIDER` env
- * keys (defaults preserved). The order is hosting → data → AWS, then the mobile
- * build/publish tools when this is an Expo project. The AWS CLI is added at most once
- * however many AWS adapters are in use, and `eas`/`launch` are deduped the same way.
+ * keys (defaults preserved). `gh` always leads — it's the base tool that downloads the
+ * template files and signs the buyer in to GitHub (ADR-0005), needed for every template.
+ * After it the order is hosting → data → AWS, then the mobile build/publish tools when
+ * this is an Expo project. The AWS CLI is added at most once however many AWS adapters
+ * are in use, and `eas`/`launch` are deduped the same way.
  *
- * Returning the tools per active provider — rather than installing every CLI for
- * every backend — is what keeps `doctor` to "no tool before its template/adapter is
- * in use" (ADR-0001): a default web buyer is never asked to install the MongoDB, AWS,
- * or mobile CLIs they'll never touch.
+ * Returning the per-provider tools on top of the `gh` base — rather than installing
+ * every CLI for every backend — is what keeps `doctor` to "no tool before its
+ * template/adapter is in use" (ADR-0001): a default web buyer gets `[gh, wrangler,
+ * supabase]` and is never asked to install the MongoDB, AWS, or mobile CLIs they'll
+ * never touch.
  *
  * @param env - environment source (typically `process.env`)
  * @param options - extra context the env keys don't carry (e.g. mobile project)
@@ -197,6 +224,7 @@ export function selectToolchain(
     if (!tools.includes(tool)) tools.push(tool);
   };
 
+  add(GH);
   add(env.HOSTING_PROVIDER === 'aws' ? AWS : WRANGLER);
 
   switch (env.DATA_PROVIDER) {
