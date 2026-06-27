@@ -58,8 +58,8 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  │                          (Postgres/Mongo) · Cognito for AWS — multi-DB, no UI (ADR-0003)
 │  ├─ db/                     one DataProvider interface · providers/{supabase,mongodb,aws} +
 │  │                          StorageProvider {supabase/R2,s3} — provider-agnostic (ADR-0002)
-│  ├─ deploy/                 NEW · one Hosting interface · providers/{cloudflare,aws} (Amplify/SST)
-│  │                          — hosting/deploy behind one contract (ADR-0002)
+│  ├─ deploy/                 NEW · one Hosting interface · providers/{cloudflare,vercel,aws}
+│  │                          — hosting/deploy behind one contract (ADR-0002/0006)
 │  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
 │  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
 │  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
@@ -98,7 +98,7 @@ See ADR-0002/0003/0004.
 | Monorepo | pnpm workspaces + Turborepo | — |
 | Web UI | shadcn/ui (web + extension share it) | MUI etc. — can't mix design systems; shadcn is best for agents |
 | Mobile UI | plain RN `StyleSheet` primitives (Button/Input/Card/Label/Alert) reading shared `@vybekiit/tokens` | NativeWind dropped (too buggy) + react-native-reusables (depends on it); React Native Paper (Material clashes with shadcn) — ADR-0004 |
-| Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · aws (Amplify/SST) | AWS no longer dropped — now an opt-in adapter, never the default — ADR-0002 |
+| Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · vercel · aws (Amplify/SST) | Vercel is opt-in (ADR-0006); AWS never the default — ADR-0002 |
 | Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
 | Auth | `@vybekiit/auth` (`AuthProvider`): **better-auth⭐** bound to the chosen DB (Postgres/Mongo) · Cognito for AWS | "auth = Supabase-only" — new DB adapters have no built-in auth — ADR-0003 |
 | Storage | `StorageProvider`: **supabase/R2⭐** · s3 | — same one-interface pattern (in `@vybekiit/db` or its own pkg) |
@@ -194,8 +194,8 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
     bits, the `.cursor/rules/vybekiit.mdc` redirect + `language.md` tool-vocabulary section.
   - **Wave B (needs the owner's secrets):** the live spine — Supabase → LS→invite money pipeline →
     npm publish → Cloudflare deploy → e2e dry-run.
-- **v1.1** — `update-kit`, `setup-auth`, `add-data`, `buy-domain`, `setup-email` (Stripe + PayPal
-  adapters already ship in `@vybekiit/payments`).
+- **v1.1** — shipped early as Tier 2 in v1.0 widening: `update-kit`, `add-signin`, `save-data`,
+  `buy-domain`, `setup-email` (Stripe + PayPal adapters already ship in `@vybekiit/payments`).
 - **mobile template** (Expo + the author's `launch-store` for deploy) — **pulled into v1.0 at full
   web parity** by the 2026-06-27 grill (was v2; see banner above and ADR-0004).
 - **v3** — extension template (WXT).
@@ -242,6 +242,101 @@ Near-free if done from the first commit, brutal to retrofit. Dev-environment RTL
 (VSCode/Cursor/terminal bidi) is **guidance only** in `language.md` — it cannot be shipped as a
 plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 
+## Skills inventory & source of truth
+
+> Authored from a `/grill-me` session on 2026-06-27. Two layers: **buyer goal skills** (what the
+> vibe coder asks for) and **platform execution skills** (what the agent needs behind the scenes).
+> Buyer never sees Layer B names.
+
+### Two-layer model
+
+| Layer | Lives at | Audience | Naming |
+|---|---|---|---|
+| **A — Buyer goals** | `templates/*/`.vybekiit/skills/*.md` | Vibe coder (via agent) | Goal-named (`go-live`, not `deploy-to-cloudflare`) |
+| **B — Platform execution** | `.vybekiit/platform-skills/*.md` + pinned official `SKILL.md` | Agent only | Tech-named; references official docs/skills |
+
+**Hybrid distribution:** pin official upstream skills (Expo, Vercel-labs, Cloudflare) via the
+[skills CLI](https://skills.sh) into `.agents/skills/`, plus thin VybeKiit wrappers that wire
+`resolve*Provider()`, `TODO(vybekiit)` markers, and verify-before-advance. Maintainer CI re-pins
+via `scripts/pin-platform-skills.mjs` + `platform-skills.manifest.json` before mirror sync (ADR-0007).
+
+### Three-channel update (buyer `update-kit`)
+
+| Channel | Mechanism | Buyer hears |
+|---|---|---|
+| **1 — npm** | `planKitUpdate()` → bump `@vybekiit/*` | "latest improvements" |
+| **2 — agent layer** | `vybekiit sync-agent-layer` → `AGENT_LAYER_PATHS` allowlist | "refreshing my instructions" |
+| **3 — platform skills** | `npx skills update -y` when `skills-lock.json` exists | same sentence — never name Expo/Vercel |
+
+No background daemon — all three run only when the builder says "update the kit".
+
+### Source-of-truth hierarchy
+
+1. **VybeKiit buyer layer** — `AGENTS.md`, `language.md`, `goal-index.md`, buyer skills
+2. **`@vybekiit/*` packages** — TypeScript interfaces + package READMEs
+3. **Official platform docs** — always win on API facts
+4. **Official platform skills** — preferred over custom when they exist (expo/skills, vercel-labs)
+5. **VybeKiit wrapper skills** — kit-specific wiring Layer A cannot express
+
+### Layer A — buyer goal skills
+
+Path: `templates/{web,mobile,extension}/.vybekiit/skills/<goal>.md`
+
+| Template | Written | Missing / notes |
+|---|---|---|
+| **Web** | 13/13 (`onboarding`, `setup-payments`, `go-live`, `doctor`, `update-kit`, `add-signin`, `save-data`, `add-files`, `setup-email`, `buy-domain`, `add-teams`, `add-notifications`, `add-analytics`) | `go-live` routes Vercel when `HOSTING_PROVIDER=vercel` (ADR-0006); `update-kit` runs three channels (ADR-0007) |
+| **Mobile** | 10/10 (+ `add-teams`, `add-notifications`, `add-analytics` defer to web backend) | No `add-files` / `setup-email` / `buy-domain` (backend-only) |
+| **Extension (v3)** | 10/10 (+ tier-2 defer-to-backend variants) | WXT scaffold v3; extension `language.md` at full parity |
+
+**Not skills** (agent + `AGENTS.md`): generic coding, design tweaks, CRUD — unless a goal skill above
+matches.
+
+### Layer B — platform execution skills
+
+#### Web / Next.js
+
+| Concern | Official upstream | VybeKiit wrapper | Pin command (from template root) |
+|---|---|---|---|
+| Next.js App Router | [nextjs.org/docs](https://nextjs.org/docs) · vercel-labs | `nextjs-vybekiit.md` | `npx skills add vercel-labs/agent-skills --skill vercel-react-best-practices --skill vercel-composition-patterns -y` |
+| shadcn/ui | [ui.shadcn.com](https://ui.shadcn.com) | `shadcn-vybekiit.md` | shadcn MCP at edit time |
+| Deploy — Cloudflare ⭐ | [developers.cloudflare.com](https://developers.cloudflare.com) | `deploy-cloudflare-vybekiit.md` | Cloudflare plugin skills or global install |
+| Deploy — Vercel | [vercel.com/docs](https://vercel.com/docs) | `deploy-vercel-vybekiit.md` | `vercel` CLI via `doctor` when `HOSTING_PROVIDER=vercel` |
+| Supabase ⭐ | [supabase.com/docs](https://supabase.com/docs) | `supabase-vybekiit.md` | `supabase` CLI via `doctor` |
+| better-auth ⭐ | [better-auth.com/docs](https://www.better-auth.com/docs) | `better-auth-vybekiit.md` | — |
+| Lemon Squeezy ⭐ | [docs.lemonsqueezy.com](https://docs.lemonsqueezy.com) | `lemon-squeezy-vybekiit.md` | — |
+| Stripe (opt-in) | [docs.stripe.com](https://docs.stripe.com) | `stripe-vybekiit.md` | `PAYMENTS_PROVIDER=stripe` |
+| PayPal (opt-in) | [developer.paypal.com](https://developer.paypal.com) | `paypal-vybekiit.md` | `PAYMENTS_PROVIDER=paypal` |
+| Email — Resend | [resend.com/docs](https://resend.com/docs) | `resend-vybekiit.md` | `EMAIL_PROVIDER=resend` |
+| Email — SES | [docs.aws.amazon.com/ses](https://docs.aws.amazon.com/ses/) | `ses-vybekiit.md` | `EMAIL_PROVIDER=ses` |
+
+#### Mobile / Expo
+
+| Concern | Official upstream | VybeKiit wrapper | Pin command |
+|---|---|---|---|
+| Full Expo stack | [docs.expo.dev/skills](https://docs.expo.dev/skills/) · [expo/skills](https://github.com/expo/skills) | per-skill wrappers as needed | `npx skills add expo/skills --skill '*' -y` |
+| Store publish | `launch-store` npm CLI | `launch-store-vybekiit.md` | `doctor` installs `launch` when mobile |
+
+#### Extension / Chrome (v3)
+
+| Concern | Official upstream | VybeKiit wrapper |
+|---|---|---|
+| WXT | [wxt.dev](https://wxt.dev) | docs-only in wrapper (no custom WXT skill yet) |
+| Chrome Extension APIs | [developer.chrome.com/docs/extensions](https://developer.chrome.com/docs/extensions) | `chrome-extension-vybekiit.md` |
+| CWS publish | `@vybekiit/extension-publish` + CWS docs | invoked by `publish-extension` buyer skill |
+
+### Scorecard
+
+| Area | Layer A | Layer B |
+|---|---|---|
+| Web | 13/13 written | Wrappers shipped (incl. stripe/paypal/resend/ses); Vercel-labs skills pinned; manifest + CI pin |
+| Mobile | 10/10 written | Full expo/skills pinned; `launch-store` wrapper |
+| Extension | 10/10 written | Full `language.md`; Chrome API wrapper; no platform skills pinned yet |
+| Deploy | `go-live` + Vercel branch | `@vybekiit/deploy` vercel provider (ADR-0006) |
+| Update | Three-channel `update-kit` | `sync-agent-layer` CLI + ADR-0007 |
+
+Install details and wrapper contents live in each template's
+`.vybekiit/platform-skills/README.md` and `platform-skills.manifest.json`.
+
 ## Glossary (domain language)
 
 - **Owned / Maintained** — the two-bucket split every buyer file falls into (see backbone above).
@@ -270,6 +365,8 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
   embedded per template, which is why there is no separate skills repo.
 - **Supported agent tools** — Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a
   thin redirect (`CLAUDE.md`, native `AGENTS.md`, `.cursor/rules/vybekiit.mdc`); Copilot is out of scope.
+- **Platform skill / wrapper skill** — Layer B execution knowledge (official upstream + thin
+  VybeKiit wiring in `.vybekiit/platform-skills/`); never shown to the builder.
 
 ## Open / parked
 
