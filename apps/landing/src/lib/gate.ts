@@ -7,6 +7,11 @@ import { GITHUB_API_BASE, type GithubGateConfig, type Result, fail, ok } from '@
  * product repo; a refund removes it. This is *our* store's logic, not part of the
  * buyer template (a buyer fulfills orders for their own product instead). Server-
  * only — the gate token must never reach the browser.
+ *
+ * NOTE (ADR-0005, issue #4): the live gate invites to the per-template *mirrors*
+ * (`web` + `mobile` + `extension`, one bundle), not a single repo. That multi-repo
+ * wiring lands with the live webhook secrets under issue #4; this PR keeps the
+ * single-repo gate model unchanged.
  */
 
 function gateHeaders(config: GithubGateConfig): HeadersInit {

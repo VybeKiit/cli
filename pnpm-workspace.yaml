@@ -9,13 +9,15 @@
 #   - templates/mobile → OWNED scaffold payload, a real Expo app we now typecheck +
 #     test in CI for the same reason. It has no `build` task (Expo builds run remotely
 #     via EAS/launch), so the turbo gate runs only its typecheck + test.
+#   - apps/landing → the VybeKiit store. A real Next.js marketing + checkout site that
+#     dogfoods templates/web; now a workspace member in the gate (next build + tsc +
+#     tests), joining alongside its real UI (issue #3, closing #2 — no more empty shell).
 #
 # Still excluded on purpose:
 #   - templates/extension → v3 placeholder, nothing to build yet.
-#   - apps/landing → currently a stub (webhook + gate only). It joins the workspace
-#     alongside its real UI in issue #3, so we don't gate an empty shell now.
 packages:
   - "packages/*"
   - "cli"
   - "templates/web"
   - "templates/mobile"
+  - "apps/landing"
