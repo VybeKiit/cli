@@ -66,19 +66,25 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
 │  │                          the OWNED templates/extension consumes it (v3)
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
-│  └─ agent-kit/              the kit-update logic + scripts the agents run            ← later
-├─ templates/                 OWNED · NOT published · copied by the scaffolder · frozen
+│  └─ agent-kit/              shared agent-layer source — the skill contract, language.md core,
+│                             goal-index format, update-kit logic (templates embed the rest)  ← Wave A
+├─ templates/                 OWNED · NOT published · delivered via private mirrors (ADR-0005) · frozen
 │  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
 │  ├─ mobile/                 Expo + plain StyleSheet primitives + shared tokens (NativeWind
 │  │                          dropped) — full web parity                     ← pulled forward
 │  └─ extension/              WXT + shadcn                                    ← v3
 ├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages
-├─ cli/                       npx vybekiit — scaffolds a template into the buyer's own repo
+├─ cli/                       npx vybekiit — clones a template mirror into the buyer's repo (ADR-0005)
 └─ AGENTS.md CLAUDE.md CONTEXT.md   ← MAINTAINER agent layer (this repo, technical voice)
 ```
 
 Two agent layers, same filenames, different audiences: the **maintainer** layer (repo root,
 technical — for us) vs the **buyer** layer (inside `templates/*`, jargon-free — ships to buyers).
+
+Each template ships thin **redirect configs** so any supported agent tool loads the same buyer
+`AGENTS.md`: `CLAUDE.md` (Claude Code), `AGENTS.md` itself (Codex, native), and
+`.cursor/rules/vybekiit.mdc` (Cursor). Supported tools = **Claude Code · Codex · Cursor**
+(Copilot deliberately out of scope). See ADR-0005 and the "Distribution" section.
 
 ## Stack decisions
 
@@ -143,8 +149,15 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 ## Distribution, gating & updates
 
 - Packages are **public** (free updates via npm, double as marketing). The wall is the **private
-  repo**: Lemon Squeezy checkout collects the buyer's GitHub username → webhook → **invite** =
-  the single gate. Refund → access removed. One bundle (all platforms).
+  template mirrors**: Lemon Squeezy checkout collects the buyer's GitHub username → webhook →
+  **invite to the per-template mirrors** (`web` + `mobile` + `extension`, one bundle) = the single
+  gate. Refund → access removed. The buyer is **never** invited to the maintainer monorepo.
+- **Templates reach the buyer via private per-template mirror repos, not the npm CLI** (ADR-0005).
+  A monorepo CI job mirrors `templates/<name>` → `VybeKiit/<name>` on release (one-way subtree
+  split → force-push). `npx vybekiit <name>` clones the matching mirror with the buyer's `gh`
+  device-flow login (so the proprietary OWNED code never ships inside the public npm package — the
+  gate holds). The scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition
+  to npm version bumps for `@vybekiit/*`.
 - Moat is **not** code secrecy (boilerplate is always pirateable) — it's updates + the agent
   layer + convenience + brand.
 
@@ -175,6 +188,12 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
   packages `core` / `payments` / `auth` / `db` + skills `onboarding` / `setup-payments`
   / `go-live` / `doctor` + the dogfooded landing page. Goal: a stranger pays → gets invited →
   scaffolds a web app → wires payments → deploys **live**.
+  - **Wave A (pure code, 2026-06-27 grill #2 — no secrets):** the landing page **plus** the delivery
+    spine that makes the gate real — mirror-sync CI + populate the `web`/`mobile`/`extension` mirrors,
+    CLI clone-from-mirror with `gh` device-flow (ADR-0005), `@vybekiit/agent-kit` for shared agent-layer
+    bits, the `.cursor/rules/vybekiit.mdc` redirect + `language.md` tool-vocabulary section.
+  - **Wave B (needs the owner's secrets):** the live spine — Supabase → LS→invite money pipeline →
+    npm publish → Cloudflare deploy → e2e dry-run.
 - **v1.1** — `update-kit`, `setup-auth`, `add-data`, `buy-domain`, `setup-email` (Stripe + PayPal
   adapters already ship in `@vybekiit/payments`).
 - **mobile template** (Expo + the author's `launch-store` for deploy) — **pulled into v1.0 at full
@@ -242,6 +261,15 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
   default; skills are written once against the interface, so a new adapter never adds a skill.
 - **Design tokens (`@vybekiit/tokens`)** — the one shared map of colors/spacing/radius/type that web
   (as CSS vars) and mobile (as `StyleSheet` values) both consume, so the two look consistent.
+- **Template mirror** — a private per-template org repo (`VybeKiit/web` etc.) that the CLI clones to
+  deliver a template; a derived, force-pushed copy of `templates/<name>`, never hand-edited (ADR-0005).
+- **Mirror sync** — the one-way monorepo→mirror CI job (`git subtree split` → force-push on release)
+  that keeps each template mirror current; the monorepo is the single source of truth.
+- **`@vybekiit/agent-kit`** — the MAINTAINED package holding the *shared* agent-layer source (skill
+  contract, `language.md` core, goal-index format, `update-kit` logic); template-specific skills stay
+  embedded per template, which is why there is no separate skills repo.
+- **Supported agent tools** — Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a
+  thin redirect (`CLAUDE.md`, native `AGENTS.md`, `.cursor/rules/vybekiit.mdc`); Copilot is out of scope.
 
 ## Open / parked
 
