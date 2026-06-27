@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { access, cp, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import process from 'node:process';
 import { promisify } from 'node:util';
 import {
   AGENT_LAYER_PATHS,
@@ -8,7 +9,7 @@ import {
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
 import { cloneMirror, resolveTemplatesSource } from './resolve-templates';
-import { ScaffoldError, type TemplateName, isTemplateName } from './scaffold';
+import { isTemplateName, ScaffoldError, type TemplateName } from './scaffold';
 
 const execFileAsync = promisify(execFile);
 
@@ -43,8 +44,12 @@ export async function detectTemplateName(cwd: string): Promise<TemplateName | nu
   try {
     const raw = await readFile(join(cwd, 'package.json'), 'utf8');
     const pkg = JSON.parse(raw) as { dependencies?: Record<string, string>; main?: string };
-    if (pkg.dependencies?.expo || pkg.main?.includes('expo-router')) return 'mobile';
-    if (pkg.dependencies?.next) return 'web';
+    if (pkg.dependencies?.expo || pkg.main?.includes('expo-router')) {
+      return 'mobile';
+    }
+    if (pkg.dependencies?.next) {
+      return 'web';
+    }
   } catch {
     // no package.json — fall through
   }
@@ -62,7 +67,9 @@ async function listMirrorAgentPaths(
 ): Promise<string[]> {
   const found: string[] = [];
   for (const path of AGENT_LAYER_PATHS) {
-    if (await pathExists(join(mirrorRoot, path))) found.push(path);
+    if (await pathExists(join(mirrorRoot, path))) {
+      found.push(path);
+    }
   }
   return found;
 }

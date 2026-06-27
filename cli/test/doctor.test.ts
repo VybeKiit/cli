@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type ToolReport,
   formatReport,
   isToolchainReady,
   planInstall,
   selectToolchain,
+  type ToolReport,
 } from '../src/doctor/toolchain';
 
 describe('selectToolchain', () => {

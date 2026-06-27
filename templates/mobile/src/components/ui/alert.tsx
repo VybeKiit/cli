@@ -45,7 +45,10 @@ export function Alert({ variant = 'default', children }: AlertProps) {
 export function AlertTitle({
   children,
   style,
-}: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+}: {
+  children: ReactNode;
+  style?: StyleProp<TextStyle>;
+}) {
   const { colors, fontSizes, fontWeights } = useTheme();
   return (
     <Text

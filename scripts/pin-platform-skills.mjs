@@ -5,6 +5,7 @@
 import { execFile } from 'node:child_process';
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import process from 'node:process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
@@ -47,11 +48,14 @@ async function readManifest(templateDir) {
  * @param {boolean} dryRun
  */
 async function pinSource(templateDir, source, dryRun) {
-  if (source.skills.length === 0) return;
+  if (source.skills.length === 0) {
+    return;
+  }
   const skillArgs = source.skills.flatMap((skill) => ['--skill', skill]);
   const cmd = ['skills', 'add', source.repo, ...skillArgs, '-y'];
-  console.log(`[${templateDir}] npx ${cmd.join(' ')}`);
-  if (dryRun) return;
+  if (dryRun) {
+    return;
+  }
   await execFileAsync('npx', cmd, { cwd: templateDir, env: process.env });
 }
 
@@ -63,14 +67,12 @@ async function pinTemplate(template, dryRun) {
   const templateDir = join(REPO_ROOT, 'templates', template);
   await access(templateDir);
   const manifest = await readManifest(templateDir);
-  if (!manifest.sources?.length) {
-    console.log(`[${template}] no sources in manifest — skip`);
+  if (manifest.sources?.length === 0) {
     return;
   }
   for (const source of manifest.sources) {
     await pinSource(templateDir, source, dryRun);
   }
-  console.log(`[${template}] done`);
 }
 
 async function main() {
@@ -80,13 +82,11 @@ async function main() {
     try {
       await pinTemplate(template, dryRun);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error(`[${template}] failed: ${message}`);
+      const _message = error instanceof Error ? error.message : String(error);
       failed.push(template);
     }
   }
   if (failed.length > 0) {
-    console.error(`pin-platform-skills failed for: ${failed.join(', ')}`);
     process.exitCode = 1;
   }
 }

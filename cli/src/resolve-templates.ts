@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { access, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { ScaffoldError, type TemplateName } from './scaffold';
@@ -96,10 +97,14 @@ export async function resolveTemplatesSource(
   deps: ResolveDeps = { clone: cloneMirror, exists: pathExists },
 ): Promise<ResolvedSource> {
   const override = process.env.VYBEKIIT_TEMPLATES_DIR;
-  if (override) return { source: override };
+  if (override) {
+    return { source: override };
+  }
 
   const localRoot = resolve(HERE, '..', '..', 'templates');
-  if (await deps.exists(join(localRoot, template))) return { source: localRoot };
+  if (await deps.exists(join(localRoot, template))) {
+    return { source: localRoot };
+  }
 
   const tempRoot = await mkdtemp(join(tmpdir(), 'vybekiit-'));
   try {

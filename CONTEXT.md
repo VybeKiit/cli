@@ -66,7 +66,7 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
 │  │                          the OWNED templates/extension consumes it (v3)
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
-│  └─ agent-kit/              shared agent-layer source — the skill contract, language.md core,
+│  └─ agent-kit/              shared agent-layer source — the skill contract, BUILDER-VOICE.md core,
 │                             goal-index format, update-kit logic (templates embed the rest)  ← Wave A
 ├─ templates/                 OWNED · NOT published · delivered via private mirrors (ADR-0005) · frozen
 │  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
@@ -114,7 +114,7 @@ See ADR-0002/0003/0004.
   understand or decide — just follow simple steps.* (Not "you never see anything technical" —
   that's impossible and breeds refunds.)
 - **Docs (single source + pointers):** `AGENTS.md` is the one source of truth; `CLAUDE.md` /
-  Copilot / Codex configs are thin redirects. `CONTEXT.md` = domain map. `language.md` =
+  Copilot / Codex configs are thin redirects. `CONTEXT.md` = domain map. `BUILDER-VOICE.md` =
   voice/jargon glossary ("secret setting" not "env var").
 - **Skills are goal-named, never tech-named, and one strict shared template.** Every skill obeys:
   ① one action at a time · ② **verify-before-advance** (test the step worked before continuing —
@@ -191,7 +191,7 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
   - **Wave A (pure code, 2026-06-27 grill #2 — no secrets):** the landing page **plus** the delivery
     spine that makes the gate real — mirror-sync CI + populate the `web`/`mobile`/`extension` mirrors,
     CLI clone-from-mirror with `gh` device-flow (ADR-0005), `@vybekiit/agent-kit` for shared agent-layer
-    bits, the `.cursor/rules/vybekiit.mdc` redirect + `language.md` tool-vocabulary section.
+    bits, the `.cursor/rules/vybekiit.mdc` redirect + `BUILDER-VOICE.md` tool-vocabulary section.
   - **Wave B (needs the owner's secrets):** the live spine — Supabase → LS→invite money pipeline →
     npm publish → Cloudflare deploy → e2e dry-run.
 - **v1.1** — shipped early as Tier 2 in v1.0 widening: `update-kit`, `add-signin`, `save-data`,
@@ -239,7 +239,7 @@ Docs/marketing are **English-only**. The in-product *experience* is auto-localiz
 (agents are multilingual). The **web template is RTL-ready from v1** — CSS logical properties
 (`ms-/me-/ps-/pe-/start-/end-`, `rtl:` variants) + end-user locale auto-detect → `dir="rtl"`.
 Near-free if done from the first commit, brutal to retrofit. Dev-environment RTL
-(VSCode/Cursor/terminal bidi) is **guidance only** in `language.md` — it cannot be shipped as a
+(VSCode/Cursor/terminal bidi) is **guidance only** in `BUILDER-VOICE.md` — it cannot be shipped as a
 plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 
 ## Skills inventory & source of truth
@@ -272,7 +272,7 @@ No background daemon — all three run only when the builder says "update the ki
 
 ### Source-of-truth hierarchy
 
-1. **VybeKiit buyer layer** — `AGENTS.md`, `language.md`, `goal-index.md`, buyer skills
+1. **VybeKiit buyer layer** — `AGENTS.md`, `BUILDER-VOICE.md`, `goal-index.md`, buyer skills
 2. **`@vybekiit/*` packages** — TypeScript interfaces + package READMEs
 3. **Official platform docs** — always win on API facts
 4. **Official platform skills** — preferred over custom when they exist (expo/skills, vercel-labs)
@@ -286,7 +286,7 @@ Path: `templates/{web,mobile,extension}/.vybekiit/skills/<goal>.md`
 |---|---|---|
 | **Web** | 13/13 (`onboarding`, `setup-payments`, `go-live`, `doctor`, `update-kit`, `add-signin`, `save-data`, `add-files`, `setup-email`, `buy-domain`, `add-teams`, `add-notifications`, `add-analytics`) | `go-live` routes Vercel when `HOSTING_PROVIDER=vercel` (ADR-0006); `update-kit` runs three channels (ADR-0007) |
 | **Mobile** | 10/10 (+ `add-teams`, `add-notifications`, `add-analytics` defer to web backend) | No `add-files` / `setup-email` / `buy-domain` (backend-only) |
-| **Extension (v3)** | 10/10 (+ tier-2 defer-to-backend variants) | WXT scaffold v3; extension `language.md` at full parity |
+| **Extension (v3)** | 10/10 (+ tier-2 defer-to-backend variants) | WXT scaffold v3; extension `BUILDER-VOICE.md` at full parity |
 
 **Not skills** (agent + `AGENTS.md`): generic coding, design tweaks, CRUD — unless a goal skill above
 matches.
@@ -330,43 +330,105 @@ matches.
 |---|---|---|
 | Web | 13/13 written | Wrappers shipped (incl. stripe/paypal/resend/ses); Vercel-labs skills pinned; manifest + CI pin |
 | Mobile | 10/10 written | Full expo/skills pinned; `launch-store` wrapper |
-| Extension | 10/10 written | Full `language.md`; Chrome API wrapper; no platform skills pinned yet |
+| Extension | 10/10 written | Full `BUILDER-VOICE.md`; Chrome API wrapper; no platform skills pinned yet |
 | Deploy | `go-live` + Vercel branch | `@vybekiit/deploy` vercel provider (ADR-0006) |
 | Update | Three-channel `update-kit` | `sync-agent-layer` CLI + ADR-0007 |
 
 Install details and wrapper contents live in each template's
 `.vybekiit/platform-skills/README.md` and `platform-skills.manifest.json`.
 
-## Glossary (domain language)
+## Language
 
-- **Owned / Maintained** — the two-bucket split every buyer file falls into (see backbone above).
-- **The gate** — the private-repo GitHub invite that grants paid access.
-- **Tracer bullet** — the v1.0 thin end-to-end slice that proves the whole machine.
-- **Decide + Guide** — the agent contract: decide all tech, guide the few manual steps, zero jargon.
-- **Verify-before-advance** — every skill tests a step worked before moving on.
-- **Agentic toolchain** — the CLIs the agent must have to act (`supabase`, `wrangler`, …),
-  provisioned globally by `vybekiit doctor` so the buyer never configures tooling.
-- **`vybekiit doctor`** — the maintained CLI subcommand that installs + verifies the toolchain
-  (OS-aware, idempotent) and diagnoses a broken project; the human-facing `doctor` *skill* wraps it.
-- **Provider adapter** — one concrete backend behind a concern's interface (e.g. `mongodb` behind
-  `DataProvider`); the proven `@vybekiit/payments` shape — one interface, swappable backends, one
-  default ⭐. The builder never picks one; the agent routes via one `.env` setting.
-- **DataProvider / AuthProvider / Hosting / StorageProvider / EmailProvider** — the per-concern
-  interfaces (data, auth, hosting/deploy, storage, email), each with swappable adapters and one
-  default; skills are written once against the interface, so a new adapter never adds a skill.
-- **Design tokens (`@vybekiit/tokens`)** — the one shared map of colors/spacing/radius/type that web
-  (as CSS vars) and mobile (as `StyleSheet` values) both consume, so the two look consistent.
-- **Template mirror** — a private per-template org repo (`VybeKiit/web` etc.) that the CLI clones to
-  deliver a template; a derived, force-pushed copy of `templates/<name>`, never hand-edited (ADR-0005).
-- **Mirror sync** — the one-way monorepo→mirror CI job (`git subtree split` → force-push on release)
-  that keeps each template mirror current; the monorepo is the single source of truth.
-- **`@vybekiit/agent-kit`** — the MAINTAINED package holding the *shared* agent-layer source (skill
-  contract, `language.md` core, goal-index format, `update-kit` logic); template-specific skills stay
-  embedded per template, which is why there is no separate skills repo.
-- **Supported agent tools** — Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a
-  thin redirect (`CLAUDE.md`, native `AGENTS.md`, `.cursor/rules/vybekiit.mdc`); Copilot is out of scope.
-- **Platform skill / wrapper skill** — Layer B execution knowledge (official upstream + thin
-  VybeKiit wiring in `.vybekiit/platform-skills/`); never shown to the builder.
+**Owned**:
+App shell, all UI, and the buyer agent layer — files copied into the buyer's scaffolded repo. The
+buyer edits freely; updates are frozen and never auto-clobbered. Examples: web/mobile/extension
+templates, UI components, screens, buyer skills.
+_Avoid_: maintained (see **Maintained**).
+
+**Maintained**:
+Headless logic shipped as public npm packages. The buyer never edits these directly; updates flow as
+version bumps (conflict-free). Examples: core config, payments, auth, email, db, agent-kit.
+_Avoid_: owned (see **Owned**).
+
+**Agent layer**:
+The skills, docs, and contracts that let Claude/Codex carry a vibe coder from purchase to a live,
+money-making app — making every technical decision for them and translating manual steps into plain
+language. Two layers, same filenames, different audiences: the **maintainer** layer (repo root,
+technical voice) vs the **buyer** layer (inside templates, jargon-free, ships to buyers).
+
+**Buyer layer**:
+The agent-facing docs and skills inside each template — goal-named skills, `AGENTS.md`, and
+`BUILDER-VOICE.md` for plain-language rules. Never speaks jargon to the builder.
+
+**Goal-named skill**:
+A buyer skill named for what the builder wants ("go live", "save my data"), never for the tech
+("deploy to Cloudflare", "set up MongoDB"). Routes to the right adapter underneath; the builder
+never hears backend names. Adding a provider never adds a skill — skills are written once against
+the interface.
+_Avoid_: tech-named skill, platform skill (Layer B names are agent-only).
+
+**Decide + Guide**:
+The agent contract — make all technical decisions, guide the few steps only the buyer can do (paste a
+key, approve a store submission) in exact plain-language one-step-at-a-time instructions. Promise:
+you never have to understand or decide; just follow simple steps.
+_Avoid_: "you never see anything technical" (impossible and breeds refunds).
+
+**Verify-before-advance**:
+Every skill tests that a step worked before continuing. Prevents the silent-stuck → refund death
+spiral.
+
+**Adapter**:
+One concrete backend behind a concern's interface — the proven payments shape applied everywhere:
+one interface, swappable backends, one default. The builder never picks one; the agent routes via
+one secret setting.
+_Avoid_: provider (in buyer voice — say "the service your app uses" not "the MongoDB adapter").
+
+**Provider interface**:
+The per-concern contract (data, auth, hosting/deploy, storage, email, payments) with swappable
+adapters and one default. Skills are written once against the interface, so a new adapter never adds
+a skill.
+
+**Design tokens**:
+The one shared map of colors, spacing, radius, and type that web (as CSS vars) and mobile (as
+StyleSheet values) both consume, so the two platforms look consistent.
+
+**The gate**:
+The private-repo GitHub invite that grants paid access after Lemon Squeezy checkout collects the
+buyer's username. Refund → access removed. The buyer is never invited to the maintainer monorepo.
+
+**Template mirror**:
+A private per-template org repo the CLI clones to deliver a template — a derived, force-pushed copy
+of the template folder, never hand-edited (ADR-0005).
+
+**Mirror sync**:
+The one-way monorepo→mirror CI job on release that keeps each template mirror current; the monorepo
+is the single source of truth.
+
+**Tracer bullet**:
+The v1.0 thin end-to-end slice through every layer that proves the whole machine — a stranger pays,
+gets invited, scaffolds a web app, wires payments, deploys live.
+
+**Agentic toolchain**:
+The CLIs the agent must have to act (supabase, wrangler, Expo/EAS, etc.), provisioned globally by
+`vybekiit doctor` so the buyer never configures tooling. Nothing is wired before the template or
+adapter that drives it is selected.
+
+**Doctor**:
+The maintained CLI subcommand that installs and verifies the toolchain (OS-aware, idempotent) and
+diagnoses a broken project. The human-facing doctor *skill* wraps it for the buyer.
+
+**Platform skill**:
+Layer B execution knowledge — official upstream docs/skills plus thin VybeKiit wrappers that wire
+provider resolution and verify-before-advance. Never shown to the builder.
+_Avoid_: goal-named skill (Layer A is what the buyer asks for).
+
+**Supported agent tools**:
+Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a thin redirect; Copilot is
+out of scope.
+
+**Agent-kit**:
+The maintained package holding the shared agent-layer source — skill contract, BUILDER-VOICE.md
+core, goal-index format, update-kit logic. Template-specific skills stay embedded per template.
 
 ## Open / parked
 

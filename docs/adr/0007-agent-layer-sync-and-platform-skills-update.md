@@ -9,7 +9,7 @@
 Buyers update the kit by saying "get the latest" — not by merging git or running maintainer scripts.
 The original `update-kit` skill only bumped `@vybekiit/*` npm packages. Official upstream skills
 (Expo, Vercel-labs) were pinned once with no buyer-facing refresh path. Agent instructions
-(`.vybekiit/`, `AGENTS.md`, `language.md`) could drift from the template mirror.
+(`.vybekiit/`, `AGENTS.md`, `BUILDER-VOICE.md`) could drift from the template mirror.
 
 A grill session locked **three update channels** inside one buyer skill, with maintainer CI re-pinning
 upstream before mirror sync.
@@ -23,7 +23,7 @@ upstream before mirror sync.
    - **Channel 3 — platform skills:** `npx skills update -y` when `skills-lock.json` exists.
 
 2. **Allowlist** (`AGENT_LAYER_PATHS` in `@vybekiit/agent-kit`):
-   `.vybekiit/`, `AGENTS.md`, `CLAUDE.md`, `language.md`, `.cursor/rules/vybekiit.mdc`,
+   `.vybekiit/`, `AGENTS.md`, `CLAUDE.md`, `BUILDER-VOICE.md`, `.cursor/rules/vybekiit.mdc`,
    `platform-skills.manifest.json`, `skills-lock.json`, `.agents/skills/`.
    Never `src/`, `.env`, or buyer customizations.
 
