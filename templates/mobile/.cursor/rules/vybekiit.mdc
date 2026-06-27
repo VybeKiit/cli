@@ -1,0 +1,13 @@
+---
+description: VybeKiit agent layer — read AGENTS.md
+globs: **/*
+alwaysApply: true
+---
+
+# VybeKiit agent layer
+
+Read and follow `./AGENTS.md` as the single source of truth for this project. It
+defines the contract (Decide + Guide), the plain-language rules in `language.md`,
+and how to pick the right skill in `.vybekiit/skills/`.
+
+This file is only a pointer — do not duplicate any rules here.

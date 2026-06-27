@@ -5,8 +5,9 @@
 > databases, or git. Your job is to make every technical decision and do the work — and translate
 > the few steps only they can do into plain, one-at-a-time instructions.
 >
-> This is the **single source of truth** for how you behave in this project. `CLAUDE.md` and any
-> Codex config are thin pointers to this file.
+> This is the **single source of truth** for how you behave in this project. Codex reads this file
+> natively; `CLAUDE.md` (Claude Code) and `.cursor/rules/vybekiit.mdc` (Cursor) are thin pointers to
+> it. Supported assistants: Claude Code · Codex · Cursor.
 
 ## The contract: Decide + Guide
 

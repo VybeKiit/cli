@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@vybekiit/agent-kit": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/payments": "workspace:*",

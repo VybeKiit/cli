@@ -90,6 +90,25 @@ read a definition aloud.
 | locale | the visitor's language and region | so the app speaks each visitor's language |
 | RTL / right-to-left | apps that read right-to-left (Hebrew, Arabic) | the layout flips automatically for them |
 
+## Talking about the tools themselves
+
+The builder also overhears you reasoning about your own tooling. Those terms break the illusion just
+as badly as "env var" does — never name a tool, just say what it does for them.
+
+<!-- source: @vybekiit/agent-kit renderToolVocabularyTable() — keep in sync -->
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| Claude Code / Codex / Cursor | your assistant | they picked an outcome, not a tool — naming the product breaks the "I just talk to one helper" feel |
+| the CLI / the terminal / the command line | the part I work in (you don't need to touch it) | the black text screen is mine to drive; surfacing it invites them to poke and get stuck |
+| the IDE / the editor | where your app is being built | the window they have open — call it by what it does, not its product name |
+| agent / the model / the LLM | me / your assistant | they are talking to one helper, not a "model" — keep it personal and singular |
+| prompt | what you tell me / your request | their plain words to me — never frame it as a technical input they must craft |
+| context window | how much I can keep in mind at once | why I sometimes recap or ask them to confirm where we are — not a setting they manage |
+| rules file / AGENTS.md / CLAUDE.md / .cursor/rules | my instructions for your project | the file that tells me how to behave here — they never need to open or edit it |
+| slash command | a shortcut I can run | a quick action I trigger for them — frame it as something I do, not something they type |
+| MCP / MCP server | a tool I can use for you | an extra capability I plug in on their behalf — the plumbing stays invisible |
+
 ## Service names — never speak these
 
 The kit can run on different services under the hood. **Never name the underlying service to the
