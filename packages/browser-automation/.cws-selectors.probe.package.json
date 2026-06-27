@@ -1,0 +1,97 @@
+{
+  "url": "https://chrome.google.com/webstore/devconsole/7d4562aa-3ad4-49c0-8740-3ce4c2932927/ehfgkefblcgaaloepfnpdobnkfjbpjje/edit/package?hl=en",
+  "capturedAt": "2026-05-08T09:13:44.790Z",
+  "candidates": [
+    {
+      "tag": "button",
+      "role": "button",
+      "ariaLabel": null,
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "Roll back to previous version",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Wavey",
+      "domPath": "div.GFdDid.tA4K9d > c-wiz.Bh5Vy > header.cEjp9d > div.A4GwCd > div.VfPpkd-dgl2Hf-ppHlrf-sM5MNb > button.VfPpkd-LgbsSe.VfPpkd-LgbsSe-OWXEXe-INsAgc"
+    },
+    {
+      "tag": "button",
+      "role": "button",
+      "ariaLabel": null,
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "Upload new package",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Wavey",
+      "domPath": "div.GFdDid.tA4K9d > c-wiz.Bh5Vy > header.cEjp9d > div.A4GwCd > div.VfPpkd-dgl2Hf-ppHlrf-sM5MNb > button.VfPpkd-LgbsSe.VfPpkd-LgbsSe-OWXEXe-k8QpJ"
+    },
+    {
+      "tag": "button",
+      "role": "button",
+      "ariaLabel": "Learn more about verified CRX uploads",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "info_outline",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Draft",
+      "domPath": "table > tbody > tr > th.xhW4Sb.sPGTae > span.VfPpkd-suEOdc-sM5MNb-OWXEXe-nzrxxc > button.VfPpkd-Bz112c-LgbsSe.yHy1rc"
+    },
+    {
+      "tag": "button",
+      "role": "button",
+      "ariaLabel": "Opt in to verified CRX uploads",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "Opt in",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Draft",
+      "domPath": "table > tbody > tr > td.xhW4Sb.rjMrHb > div.VfPpkd-dgl2Hf-ppHlrf-sM5MNb > button.VfPpkd-LgbsSe.VfPpkd-LgbsSe-OWXEXe-INsAgc"
+    },
+    {
+      "tag": "div",
+      "role": "button",
+      "ariaLabel": "Main menu",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div#yDmH0d > div.pGxpHc > header#gb > div.gb_Pd.gb_Sd > div.gb_Xd.gb_wd > div.gb_6c"
+    },
+    {
+      "tag": "a",
+      "role": "button",
+      "ariaLabel": "Google apps",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div.gb_7d.gb_Bb > div.gb_Id > div.gb_od > div#gbwa > div.gb_D > a.gb_C"
+    },
+    {
+      "tag": "a",
+      "role": "button",
+      "ariaLabel": "Google Account: ‫יוסף סבג‬‎  \n(yosefisabag@gmail.com)",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div.gb_Pd.gb_Sd > div.gb_7d.gb_Bb > div.gb_Id > div.gb_z.gb_Ad > div.gb_D.gb_Ab > a.gb_C.gb_5a"
+    }
+  ]
+}

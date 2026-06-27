@@ -1,6 +1,6 @@
 import { type Result, fail, ok, parseEnv, supabaseConfigSchema } from '@vybekiit/core';
 import { createDbClient } from '@vybekiit/db';
-import type { LemonSqueezyOrderEvent } from '@vybekiit/pay-lemonsqueezy';
+import type { OrderEvent } from '@vybekiit/payments';
 
 /**
  * What happens after a verified payment — the one place a buyer customizes per
@@ -10,7 +10,7 @@ import type { LemonSqueezyOrderEvent } from '@vybekiit/pay-lemonsqueezy';
  *
  * The `orders` table is created by the `add-data` skill — see `.vybekiit/skills`.
  */
-export async function fulfillOrder(event: LemonSqueezyOrderEvent): Promise<Result<true>> {
+export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
   const db = createDbClient(parseEnv(supabaseConfigSchema));
   const { error } = await db
     .from('orders')

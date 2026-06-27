@@ -14,7 +14,7 @@
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
-    "@vybekiit/pay-lemonsqueezy": "workspace:*",
+    "@vybekiit/payments": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",

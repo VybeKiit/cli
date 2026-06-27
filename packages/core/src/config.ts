@@ -21,11 +21,40 @@ export const appConfigSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
 });
 
-/** Lemon Squeezy credentials — used by `@vybekiit/pay-lemonsqueezy`. */
+/**
+ * Which payment adapter `@vybekiit/payments` constructs. A buyer runs one provider
+ * at a time; the agent swaps by changing this single value. Lemon Squeezy is the
+ * v1 default (Merchant of Record — it handles tax/VAT for the seller).
+ */
+export const paymentsConfigSchema = z.object({
+  PAYMENTS_PROVIDER: z.enum(['lemon-squeezy', 'stripe', 'paypal']).default('lemon-squeezy'),
+});
+
+/** Lemon Squeezy credentials — used by `@vybekiit/payments` (lemon-squeezy adapter). */
 export const lemonSqueezyConfigSchema = z.object({
   LEMONSQUEEZY_API_KEY: z.string().min(1, 'LEMONSQUEEZY_API_KEY is required'),
   LEMONSQUEEZY_STORE_ID: z.string().min(1, 'LEMONSQUEEZY_STORE_ID is required'),
   LEMONSQUEEZY_WEBHOOK_SECRET: z.string().min(1, 'LEMONSQUEEZY_WEBHOOK_SECRET is required'),
+});
+
+/** Stripe credentials — used by `@vybekiit/payments` (stripe adapter). */
+export const stripeConfigSchema = z.object({
+  STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
+});
+
+/**
+ * PayPal credentials — used by `@vybekiit/payments` (paypal adapter).
+ *
+ * `PAYPAL_WEBHOOK_ID` is required because PayPal verifies webhooks server-side: the
+ * adapter posts the event back to PayPal keyed by this id rather than checking a
+ * local HMAC. `PAYPAL_ENV` switches between the sandbox and live API hosts.
+ */
+export const paypalConfigSchema = z.object({
+  PAYPAL_CLIENT_ID: z.string().min(1, 'PAYPAL_CLIENT_ID is required'),
+  PAYPAL_CLIENT_SECRET: z.string().min(1, 'PAYPAL_CLIENT_SECRET is required'),
+  PAYPAL_WEBHOOK_ID: z.string().min(1, 'PAYPAL_WEBHOOK_ID is required'),
+  PAYPAL_ENV: z.enum(['sandbox', 'live']).default('sandbox'),
 });
 
 /** Supabase credentials — used by `@vybekiit/auth` and `@vybekiit/db`. */
@@ -50,7 +79,10 @@ export const githubGateConfigSchema = z.object({
 });
 
 export type AppConfig = z.infer<typeof appConfigSchema>;
+export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
 export type LemonSqueezyConfig = z.infer<typeof lemonSqueezyConfigSchema>;
+export type StripeConfig = z.infer<typeof stripeConfigSchema>;
+export type PaypalConfig = z.infer<typeof paypalConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
@@ -63,10 +95,16 @@ export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
  * limp along and surface a confusing failure deep in a request (the `doctor`
  * skill relies on this clarity to translate the problem for a non-coder).
  *
+ * Returns the schema's *output* type, so fields with `.default(...)` are
+ * non-optional for callers (the env may omit them; the parsed result never does).
+ *
  * @param schema - one of the per-concern schemas in this module
  * @param env - environment source (defaults to `process.env`)
  */
-export function parseEnv<T>(schema: z.ZodType<T>, env: EnvSource = process.env): T {
+export function parseEnv<S extends z.ZodTypeAny>(
+  schema: S,
+  env: EnvSource = process.env,
+): z.infer<S> {
   const parsed = schema.safeParse(env);
   if (parsed.success) return parsed.data;
 

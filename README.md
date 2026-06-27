@@ -1,5 +1,7 @@
 # VybeKiit
 
+[![CI](https://github.com/VybeKiit/vybekiit/actions/workflows/ci.yml/badge.svg)](https://github.com/VybeKiit/vybekiit/actions/workflows/ci.yml)
+
 > **Status: blueprint + v1.0 scaffold.** This is the maintainer monorepo for VybeKiit — the paid,
 > agent-driven starter kit. If you're a buyer, you never read this; your agent does.
 
@@ -16,9 +18,10 @@ how agents work in this repo.
 ```
 packages/   MAINTAINED · published to npm as @vybekiit/* · headless logic (no UI)
   core/             env + Zod-validated config (the single source of truth) + Result type
-  pay-lemonsqueezy/ headless Lemon Squeezy client (checkout + webhook verification)
+  payments/         one PaymentProvider interface · Lemon Squeezy + Stripe + PayPal adapters
   auth/             headless Supabase auth
   db/               typed Supabase data client
+  browser-automation/ Playwright automation to publish/submit extensions for the builder
 templates/  OWNED · NOT published · copied into a buyer's repo by the CLI
   web/              Next.js + shadcn (RTL-ready) + the buyer-facing agent layer   ← v1.0
   mobile/           Expo                                                          ← v2

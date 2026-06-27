@@ -1,7 +1,7 @@
 {
-  "name": "@vybekiit/pay-lemonsqueezy",
+  "name": "@vybekiit/payments",
   "version": "0.1.0",
-  "description": "Headless Lemon Squeezy client for VybeKiit — create checkouts and verify/parse order webhooks. No UI.",
+  "description": "Headless, provider-agnostic payments for VybeKiit — one PaymentProvider interface with Lemon Squeezy, Stripe, and PayPal adapters (checkout + webhook verification). No UI.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -22,7 +22,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
+    "@paypal/paypal-server-sdk": "^2.4.0",
     "@vybekiit/core": "workspace:*",
+    "stripe": "^22.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -31,5 +34,7 @@
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }

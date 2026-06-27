@@ -1,21 +1,20 @@
 import { fulfillOrder } from '@/lib/fulfillment';
-import { lemonSqueezyConfigSchema, parseEnv } from '@vybekiit/core';
-import { parseWebhook } from '@vybekiit/pay-lemonsqueezy';
+import { resolvePaymentProvider } from '@vybekiit/payments';
 import { NextResponse } from 'next/server';
 
 /**
- * Payment webhook: Lemon Squeezy → fulfillment.
+ * Payment webhook: provider → fulfillment.
  *
- * Verifies the signature over the exact raw body, then hands the normalized order
- * to {@link fulfillOrder} (which the buyer customizes for their product). Failures
- * return 4xx/5xx so Lemon Squeezy retries appropriately.
+ * Verifies the signature over the exact raw body (the provider knows which header
+ * holds it), then hands the normalized order to {@link fulfillOrder} (which the
+ * buyer customizes for their product). Failures return 4xx/5xx so the provider
+ * retries appropriately.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const rawBody = await request.text();
-  const signature = request.headers.get('x-signature') ?? '';
+  const headers = Object.fromEntries(request.headers);
 
-  const { LEMONSQUEEZY_WEBHOOK_SECRET } = parseEnv(lemonSqueezyConfigSchema);
-  const event = parseWebhook(rawBody, signature, LEMONSQUEEZY_WEBHOOK_SECRET);
+  const event = await resolvePaymentProvider().parseWebhook(rawBody, headers);
   if (!event.ok) {
     return NextResponse.json({ error: event.error.message }, { status: 400 });
   }

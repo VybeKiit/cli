@@ -1,6 +1,9 @@
 import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { parseWebhook, verifyWebhookSignature } from '../src/webhook';
+import {
+  parseLemonSqueezyWebhook,
+  verifyLemonSqueezySignature,
+} from '../src/providers/lemon-squeezy/webhook';
 
 const SECRET = 'test-secret';
 
@@ -13,21 +16,22 @@ const orderCreated = JSON.stringify({
   data: { id: 'order_1', attributes: { user_email: 'buyer@example.com' } },
 });
 
-describe('verifyWebhookSignature', () => {
+describe('verifyLemonSqueezySignature', () => {
   it('accepts a correct signature', () => {
-    expect(verifyWebhookSignature(orderCreated, sign(orderCreated), SECRET)).toBe(true);
+    expect(verifyLemonSqueezySignature(orderCreated, sign(orderCreated), SECRET)).toBe(true);
   });
 
   it('rejects a forged signature', () => {
-    expect(verifyWebhookSignature(orderCreated, sign('tampered'), SECRET)).toBe(false);
+    expect(verifyLemonSqueezySignature(orderCreated, sign('tampered'), SECRET)).toBe(false);
   });
 });
 
-describe('parseWebhook', () => {
+describe('parseLemonSqueezyWebhook', () => {
   it('normalizes a verified order_created event', () => {
-    const result = parseWebhook(orderCreated, sign(orderCreated), SECRET);
+    const result = parseLemonSqueezyWebhook(orderCreated, sign(orderCreated), SECRET);
     expect(result.ok).toBe(true);
     if (result.ok) {
+      expect(result.value.provider).toBe('lemon-squeezy');
       expect(result.value.githubUsername).toBe('octocat');
       expect(result.value.customerEmail).toBe('buyer@example.com');
       expect(result.value.isRefund).toBe(false);
@@ -39,12 +43,12 @@ describe('parseWebhook', () => {
       meta: { event_name: 'order_refunded', custom_data: { github_username: 'octocat' } },
       data: { id: 'order_1', attributes: { refunded: true } },
     });
-    const result = parseWebhook(refund, sign(refund), SECRET);
+    const result = parseLemonSqueezyWebhook(refund, sign(refund), SECRET);
     expect(result.ok && result.value.isRefund).toBe(true);
   });
 
   it('fails closed on a bad signature', () => {
-    const result = parseWebhook(orderCreated, 'deadbeef', SECRET);
+    const result = parseLemonSqueezyWebhook(orderCreated, 'deadbeef', SECRET);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe('invalid_signature');
   });

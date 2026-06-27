@@ -49,13 +49,14 @@ apply safely every time.
 vybekiit/                      private monorepo · pnpm + Turborepo
 ├─ packages/                  MAINTAINED · public npm @vybekiit/* · headless · updates flow
 │  ├─ core/                   env+config loader (the single .env source of truth), types, utils
-│  ├─ pay-lemonsqueezy/  ┐
-│  ├─ pay-stripe/        ├─  headless payment clients (no UI) — LS is the v1 default (MoR)
-│  ├─ pay-paypal/        ┘
+│  ├─ payments/               one PaymentProvider interface · providers/{lemon-squeezy,stripe,
+│  │                          paypal} (official SDKs) · LS is the v1 default (MoR) · no UI
 │  ├─ auth/                   headless auth logic (Supabase)
-│  ├─ email/                  send via Cloudflare email behind one interface
 │  ├─ db/                     typed Supabase client + schema helpers
-│  └─ agent-kit/              the kit-update logic + scripts the agents run
+│  ├─ browser-automation/     Playwright dashboard automation (publish/submit extensions for the
+│  │                          builder) — ported from the extensions monorepo's cws-automation
+│  ├─ email/                  send via Cloudflare email behind one interface          ← later
+│  └─ agent-kit/              the kit-update logic + scripts the agents run            ← later
 ├─ templates/                 OWNED · NOT published · copied by the scaffolder · frozen
 │  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
 │  ├─ mobile/                 Expo + NativeWind/react-native-reusables       ← v2
@@ -135,10 +136,11 @@ wall the *buyer* hits.
 Build **one thin vertical slice through every layer**, cutting the riskiest unknowns first.
 
 - **v1.0** — WEB only + the **money pipeline** (LS → invite, *de-risk this first*) +
-  packages `core` / `pay-lemonsqueezy` / `auth` / `db` + skills `onboarding` / `setup-payments`
+  packages `core` / `payments` / `auth` / `db` + skills `onboarding` / `setup-payments`
   / `go-live` / `doctor` + the dogfooded landing page. Goal: a stranger pays → gets invited →
   scaffolds a web app → wires payments → deploys **live**.
-- **v1.1** — `update-kit`, `setup-auth`, `add-data`, `buy-domain`, `setup-email`, `pay-stripe`.
+- **v1.1** — `update-kit`, `setup-auth`, `add-data`, `buy-domain`, `setup-email` (Stripe + PayPal
+  adapters already ship in `@vybekiit/payments`).
 - **v2** — mobile template (Expo + the author's `launch-store` for deploy).
 - **v3** — extension template (WXT).
 

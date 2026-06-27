@@ -1,21 +1,21 @@
 import { inviteToRepo, removeFromRepo } from '@/lib/gate';
-import { githubGateConfigSchema, lemonSqueezyConfigSchema, parseEnv } from '@vybekiit/core';
-import { parseWebhook } from '@vybekiit/pay-lemonsqueezy';
+import { githubGateConfigSchema, parseEnv } from '@vybekiit/core';
+import { resolvePaymentProvider } from '@vybekiit/payments';
 import { NextResponse } from 'next/server';
 
 /**
- * The VybeKiit store's money pipeline: Lemon Squeezy → the gate.
+ * The VybeKiit store's money pipeline: payment provider → the gate.
  *
  * Verifies the signature, then invites the buyer's GitHub account on a paid order
  * or removes it on a refund. This is the v1.0 "stranger pays → gets invited"
- * keystone (see CONTEXT.md → Build order).
+ * keystone (see CONTEXT.md → Build order). Provider-agnostic via
+ * {@link resolvePaymentProvider} — Lemon Squeezy is the default.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const rawBody = await request.text();
-  const signature = request.headers.get('x-signature') ?? '';
+  const headers = Object.fromEntries(request.headers);
 
-  const { LEMONSQUEEZY_WEBHOOK_SECRET } = parseEnv(lemonSqueezyConfigSchema);
-  const event = parseWebhook(rawBody, signature, LEMONSQUEEZY_WEBHOOK_SECRET);
+  const event = await resolvePaymentProvider().parseWebhook(rawBody, headers);
   if (!event.ok) {
     return NextResponse.json({ error: event.error.message }, { status: 400 });
   }

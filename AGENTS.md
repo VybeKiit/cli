@@ -29,7 +29,9 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 - **Monorepo:** pnpm workspaces + Turborepo. Packages publish to npm under `@vybekiit/*` (MIT).
 - **Web/extension UI:** shadcn/ui. **Mobile UI:** NativeWind + react-native-reusables.
 - **Infra the templates target:** Cloudflare (host/edge/cron/storage/email) + Supabase (db/auth).
-- **Payments:** swappable packages; `pay-lemonsqueezy` is the v1 default (Merchant of Record).
+- **Payments:** one `@vybekiit/payments` package, one `PaymentProvider` interface, provider
+  adapters under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the
+  v1 default (Merchant of Record); the agent swaps providers via the `PAYMENTS_PROVIDER` env.
 
 ## Conventions
 
@@ -75,8 +77,8 @@ you can take $1 and auto-invite yourself, the business is real.
 ## Current state (after the v1.0 scaffold)
 
 - **Built + green** (workspace members, in the CI gate): `packages/core`,
-  `packages/pay-lemonsqueezy`, `packages/auth`, `packages/db`, and `cli` (the `vybekiit`
-  scaffolder). These are real, typed, tested.
+  `packages/payments`, `packages/auth`, `packages/db`, `packages/browser-automation`, and `cli`
+  (the `vybekiit` scaffolder). These are real, typed, tested.
 - **Payload / build-target** (NOT yet workspace members — see `pnpm-workspace.yaml`):
   `templates/*` and `apps/landing`. `templates/web` is a real Next.js skeleton + the full
   buyer-facing agent layer (`AGENTS.md`, `language.md`, `.vybekiit/skills`), copied verbatim by the
