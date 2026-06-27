@@ -1,0 +1,28 @@
+# CI is the HEAVY gate (full tests + typecheck + lint + build).
+# Pre-commit stays lenient (format/lint-fix only) so it can be inherited by buyer repos
+# without trapping a non-coder behind red — see AGENTS.md → "TDD & quality gate".
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build

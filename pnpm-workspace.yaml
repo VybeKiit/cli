@@ -1,0 +1,16 @@
+# VybeKiit monorepo workspaces.
+#
+# Only code we develop + build here is a workspace member:
+#   - packages/*  → MAINTAINED, published to npm as @vybekiit/* (headless logic)
+#   - cli         → the `vybekiit` scaffolder
+#
+# templates/* and apps/* are intentionally NOT workspace members yet:
+#   - templates/* are OWNED scaffold *payload* — copied verbatim into a buyer's
+#     repo by the CLI (their `@vybekiit/*` deps are rewritten to npm versions on
+#     scaffold), so they aren't installed/built in this monorepo.
+#   - apps/landing is a v1.0 build target that will dogfood templates/web.
+# Both get promoted to workspace members during the v1.0 web build (see CONTEXT.md
+# → Build order); keeping them out now keeps install light and the gate honest.
+packages:
+  - "packages/*"
+  - "cli"
