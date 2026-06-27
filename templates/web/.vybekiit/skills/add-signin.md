@@ -7,8 +7,7 @@ translate every error · celebrate. You wire all the code; the builder only past
 "approve" when a step truly needs it.
 
 > (Under the hood — agent-only) Sign-in routes through `@vybekiit/auth`'s `resolveAuthProvider()`.
-> The default is better-auth bound to the builder's database (so it follows `DATA_PROVIDER`); AWS
-> apps resolve to Cognito automatically. Never name any of this to the builder.
+> Follow `platform-skills/better-auth-vybekiit.md` and `supabase-vybekiit.md` when wiring.
 
 ## Steps
 

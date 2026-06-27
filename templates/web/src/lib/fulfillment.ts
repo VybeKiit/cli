@@ -8,7 +8,7 @@ import type { OrderEvent } from '@vybekiit/payments';
  * queryable; the agent reshapes this to the buyer's product (unlock a feature,
  * start a subscription, send a download). On refund it marks the order refunded.
  *
- * The `orders` table is created by the `add-data` skill — see `.vybekiit/skills`.
+ * The `orders` table is created by the `save-data` skill — see `.vybekiit/skills`.
  */
 export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
   const db = createDbClient(parseEnv(supabaseConfigSchema));

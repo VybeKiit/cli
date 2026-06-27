@@ -7,8 +7,7 @@ translate every error · celebrate. You do all the wiring; the builder only past
 or describes, in plain words, what the app should remember.
 
 > (Under the hood — agent-only) Use `@vybekiit/db`'s `resolveDataProvider()` for every read/write.
-> The default is Supabase (Postgres); `mongodb` (Atlas) and `aws` are opt-in via `DATA_PROVIDER`.
-> The same skill wires whichever one is set — never name the service to the builder.
+> Follow `platform-skills/supabase-vybekiit.md` for default Supabase wiring.
 
 ## Steps
 
