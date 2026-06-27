@@ -1,4 +1,6 @@
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   type InstallAction,
   type Platform,
@@ -17,7 +19,8 @@ import {
  * globally and signed in, without the buyer configuring anything. It is
  * provider-aware: {@link selectToolchain} reads the `*_PROVIDER` env keys so only the
  * CLIs the buyer's active adapters use get installed (defaults → `supabase` +
- * `wrangler`). This file is the side-effecting half: it detects what's present,
+ * `wrangler`), plus the mobile build/publish tools (`eas` + `launch`) when the cwd is
+ * an Expo project. This file is the side-effecting half: it detects what's present,
  * installs what's missing the OS-correct way, probes sign-in, and prints
  * buyer-readable lines. All decision logic lives in the pure `toolchain.ts` so it
  * stays testable.
@@ -26,6 +29,26 @@ import {
 /** Map node's `process.platform` onto a supported {@link Platform}, or null if we can't install there. */
 function toPlatform(platform: NodeJS.Platform): Platform | null {
   return platform === 'darwin' || platform === 'win32' || platform === 'linux' ? platform : null;
+}
+
+/**
+ * True when `dir` is an Expo project — the signal that the mobile build/publish tools
+ * (`eas` + `launch`) belong in the toolchain. We treat an `app.json` (or
+ * `app.config.json`) carrying an `expo` key as the marker; a parse failure or a plain
+ * config without that key reads as "not mobile", keeping the web default untouched.
+ */
+function isMobileProject(dir: string): boolean {
+  for (const file of ['app.json', 'app.config.json']) {
+    const path = join(dir, file);
+    if (!existsSync(path)) continue;
+    try {
+      const config: unknown = JSON.parse(readFileSync(path, 'utf8'));
+      if (typeof config === 'object' && config !== null && 'expo' in config) return true;
+    } catch {
+      // Unreadable/invalid config → not a recognized mobile project.
+    }
+  }
+  return false;
 }
 
 /** Run a command silently and report whether it exited cleanly — the basis of every probe. */
@@ -99,7 +122,7 @@ export function runDoctor(log: Console = console): number {
     return 1;
   }
 
-  const toolchain = selectToolchain(process.env);
+  const toolchain = selectToolchain(process.env, { mobile: isMobileProject(process.cwd()) });
   const presence: ToolPresence[] = toolchain.map((tool) => ({
     tool: tool.name,
     present: succeeds(tool.name, tool.versionArgs),
