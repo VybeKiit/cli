@@ -1,3 +1,4 @@
+import { FOOTER_LINKS } from '@/data/nav';
 import Link from 'next/link';
 
 const YEAR = new Date().getFullYear();
@@ -9,12 +10,11 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-5xl flex-col gap-2 px-6 py-8 text-muted-foreground text-sm sm:flex-row sm:items-center sm:justify-between">
         <p>© {YEAR} My App. All rights reserved.</p>
         <div className="flex gap-4">
-          <Link href="/terms" className="hover:text-foreground">
-            Terms
-          </Link>
-          <Link href="/privacy" className="hover:text-foreground">
-            Privacy
-          </Link>
+          {FOOTER_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} className="hover:text-foreground">
+              {link.label}
+            </Link>
+          ))}
         </div>
       </div>
     </footer>
