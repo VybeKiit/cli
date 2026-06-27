@@ -12,7 +12,7 @@ import { Text } from 'react-native';
 /**
  * Sign-in screen — the RN parallel of the web login page, with the same copy,
  * loading, and inline error states. The actual sign-in is a marked stub until the
- * `add-signin` skill wires `@vybekiit/auth`.
+ * `connect-account` skill wires `@vybekiit/auth`.
  */
 export default function LoginScreen() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function LoginScreen() {
   async function handleSubmit() {
     const result = await signIn(email, password);
     if (!result.ok) return;
-    // TODO(vybekiit): send the signed-in builder to their dashboard — skill: add-signin
+    // TODO(vybekiit): send the signed-in builder to their dashboard — skill: connect-account
     router.replace('/dashboard');
   }
 

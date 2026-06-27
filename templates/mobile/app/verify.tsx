@@ -28,7 +28,7 @@ function runAuthAction(action: AuthAction): Promise<Result<AuthUser | true>> {
 /**
  * Email verification (one-time code) screen — the RN parallel of the web verify
  * page, with the same verify + resend states and copy. Sending and checking codes
- * are marked stubs until the `add-signin` skill wires email OTP.
+ * are marked stubs until the `connect-account` skill wires email OTP.
  */
 export default function VerifyScreen() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function VerifyScreen() {
     setMessage('');
     const result = await submit({ kind: 'verify', email, code });
     if (!result.ok) return;
-    // TODO(vybekiit): send the verified builder to their dashboard — skill: add-signin
+    // TODO(vybekiit): send the verified builder to their dashboard — skill: connect-account
     router.replace('/dashboard');
   }
 

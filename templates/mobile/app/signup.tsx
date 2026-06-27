@@ -12,7 +12,7 @@ import { Text } from 'react-native';
 /**
  * Sign-up screen — the RN parallel of the web signup page, with the same copy,
  * loading, and inline error states. Account creation is a marked stub until the
- * `add-signin` skill wires `@vybekiit/auth`.
+ * `connect-account` skill wires `@vybekiit/auth`.
  */
 export default function SignupScreen() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function SignupScreen() {
   async function handleSubmit() {
     const result = await signUp(email, password);
     if (!result.ok) return;
-    // TODO(vybekiit): after sign-up, send the builder to verify their email — skill: add-signin
+    // TODO(vybekiit): after sign-up, send the builder to verify their email — skill: connect-account
     router.replace('/verify');
   }
 

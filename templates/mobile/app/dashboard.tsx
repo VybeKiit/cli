@@ -7,7 +7,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
  * Minimal signed-in dashboard — the RN parallel of the web dashboard page. The
  * route guard and real data are marked stubs the agent wires next.
  *
- * TODO(vybekiit): protect this route — redirect to /login when there is no session — skill: add-signin
+ * TODO(vybekiit): protect this route — redirect to /login when there is no session — skill: connect-account
  * TODO(vybekiit): replace the placeholder stats with the builder's real data — skill: save-data
  */
 export default function DashboardScreen() {

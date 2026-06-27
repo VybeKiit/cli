@@ -14,9 +14,9 @@
  * defaults (Supabase + Cloudflare) that's exactly `[wrangler, supabase]` — today's
  * behavior, unchanged. Selecting the Mongo data adapter adds the MongoDB Atlas CLI;
  * any active AWS adapter (data / storage / email / auth / hosting) adds the AWS CLI
- * once. Expo/`launch` (mobile) arrive with the mobile template in v2; Playwright with
- * the extension template in v3 — no tool ships before the template/adapter that uses
- * it.
+ * once. A **mobile** project (passed `mobile: true`) appends the build/publish tools
+ * (`eas` + `launch`) on top of the env-selected web tools. Playwright arrives with the
+ * extension template in v3 — no tool ships before the template/adapter that uses it.
  */
 
 /** OS families we know how to install on. `process.platform` maps onto this. */
@@ -117,6 +117,40 @@ const AWS: Tool = {
 };
 
 /**
+ * EAS CLI — builds a mobile project into an installable app for the stores. Ships
+ * only with a mobile project; installs via npm global on every OS. Sign-in is its own
+ * native store (an Expo account), probed with `eas whoami`.
+ */
+const EAS: Tool = {
+  name: 'eas',
+  purpose: 'build your app for the app stores',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
+    win32: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
+    linux: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
+  },
+  auth: { command: 'eas', args: ['whoami'], loginHint: 'eas login' },
+};
+
+/**
+ * Launch CLI (launch-store) — submits a built app to the App Store and Google Play.
+ * Ships only with a mobile project; installs via npm global on every OS. It has no
+ * sign-in of its own — it drives the store accounts through the keychain credentials
+ * the build tools provision — so no `auth` probe is declared.
+ */
+const LAUNCH: Tool = {
+  name: 'launch',
+  purpose: 'publish your app to the app stores',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'launch-store'] },
+    win32: { command: 'npm', args: ['install', '-g', 'launch-store'] },
+    linux: { command: 'npm', args: ['install', '-g', 'launch-store'] },
+  },
+};
+
+/**
  * The default toolchain (Supabase + Cloudflare) — the result {@link selectToolchain}
  * returns when every `*_PROVIDER` key is at its default. Exported as the stable
  * baseline for callers and tests.
@@ -124,18 +158,33 @@ const AWS: Tool = {
 export const TOOLCHAIN: readonly Tool[] = [WRANGLER, SUPABASE];
 
 /**
+ * Extra context {@link selectToolchain} can't read from the `*_PROVIDER` env keys.
+ *
+ * @property mobile - true for an Expo project; appends the build/publish tools
+ *   (`eas` + `launch`) on top of the env-selected web tools. `run.ts` detects this.
+ */
+export interface ToolchainOptions {
+  readonly mobile?: boolean;
+}
+
+/**
  * Pick the CLIs the buyer's *active* providers need, read from the `*_PROVIDER` env
- * keys (defaults preserved). The order is hosting → data → AWS, and the AWS CLI is
- * added at most once however many AWS adapters are in use.
+ * keys (defaults preserved). The order is hosting → data → AWS, then the mobile
+ * build/publish tools when this is an Expo project. The AWS CLI is added at most once
+ * however many AWS adapters are in use, and `eas`/`launch` are deduped the same way.
  *
  * Returning the tools per active provider — rather than installing every CLI for
  * every backend — is what keeps `doctor` to "no tool before its template/adapter is
- * in use" (ADR-0001): a default web buyer is never asked to install the MongoDB or
- * AWS CLI they'll never touch.
+ * in use" (ADR-0001): a default web buyer is never asked to install the MongoDB, AWS,
+ * or mobile CLIs they'll never touch.
  *
  * @param env - environment source (typically `process.env`)
+ * @param options - extra context the env keys don't carry (e.g. mobile project)
  */
-export function selectToolchain(env: Record<string, string | undefined>): Tool[] {
+export function selectToolchain(
+  env: Record<string, string | undefined>,
+  options: ToolchainOptions = {},
+): Tool[] {
   const usesAws =
     env.DATA_PROVIDER === 'aws' ||
     env.STORAGE_PROVIDER === 's3' ||
@@ -162,6 +211,11 @@ export function selectToolchain(env: Record<string, string | undefined>): Tool[]
   }
 
   if (usesAws) add(AWS);
+
+  if (options.mobile) {
+    add(EAS);
+    add(LAUNCH);
+  }
 
   return tools;
 }

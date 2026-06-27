@@ -9,6 +9,6 @@ import { DEFAULT_APP_URL } from '@vybekiit/core';
  * the kit's shared `DEFAULT_APP_URL` for local dev. Centralized here so a backend
  * URL change is a one-line edit, not a scatter of raw strings (project standard).
  *
- * TODO(vybekiit): set EXPO_PUBLIC_APP_URL in `.env` to your deployed API origin — skill: go-live
+ * TODO(vybekiit): set EXPO_PUBLIC_APP_URL in `.env` to your deployed backend's address — skill: connect-account
  */
 export const APP_URL: string = process.env.EXPO_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
