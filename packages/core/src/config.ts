@@ -122,6 +122,20 @@ export const awsConfigSchema = z.object({
   AWS_DYNAMODB_TABLE_PREFIX: z.string().default(''),
 });
 
+/**
+ * AWS Amplify Hosting target — used by `@vybekiit/deploy` (aws adapter) on top of
+ * the region/credentials in {@link awsConfigSchema}.
+ *
+ * `AWS_AMPLIFY_APP_ID` names the Amplify app the go-live skill provisions; it is
+ * optional here so the package imports + the `doctor` skill run before the app
+ * exists, with the adapter failing loud at deploy time when it is still blank.
+ * `AWS_AMPLIFY_BRANCH` is the Amplify branch to deploy (defaults to `main`).
+ */
+export const awsHostingConfigSchema = z.object({
+  AWS_AMPLIFY_APP_ID: z.string().min(1).optional(),
+  AWS_AMPLIFY_BRANCH: z.string().min(1).default('main'),
+});
+
 /** Supabase credentials — used by `@vybekiit/auth` and `@vybekiit/db`. */
 export const supabaseConfigSchema = z.object({
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
@@ -166,6 +180,7 @@ export type StripeConfig = z.infer<typeof stripeConfigSchema>;
 export type PaypalConfig = z.infer<typeof paypalConfigSchema>;
 export type MongoConfig = z.infer<typeof mongoConfigSchema>;
 export type AwsConfig = z.infer<typeof awsConfigSchema>;
+export type AwsHostingConfig = z.infer<typeof awsHostingConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;

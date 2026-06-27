@@ -1,5 +1,11 @@
-import { cloudflareConfigSchema, emailConfigSchema, parseEnv } from '@vybekiit/core';
+import {
+  awsConfigSchema,
+  cloudflareConfigSchema,
+  emailConfigSchema,
+  parseEnv,
+} from '@vybekiit/core';
 import { type FetchLike, createCloudflareEmail } from './providers/cloudflare';
+import { createSesEmail } from './providers/ses';
 import type { EmailProvider } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
@@ -15,7 +21,7 @@ type EnvSource = Record<string, string | undefined>;
  * @param fetchImpl - passed through to the Cloudflare adapter so tests can inject a
  *   transport; omit to use `globalThis.fetch`
  * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}),
- *   or, for `ses`/`resend`, a not-implemented error until those adapters ship.
+ *   or, for `resend`, a not-implemented error until that adapter ships.
  */
 export function resolveEmailProvider(
   env: EnvSource = process.env,
@@ -24,7 +30,7 @@ export function resolveEmailProvider(
   const { EMAIL_PROVIDER } = parseEnv(emailConfigSchema, env);
   switch (EMAIL_PROVIDER) {
     case 'ses':
-      throw new Error('ses email adapter ships in a later step'); // TODO(step-5)
+      return createSesEmail(parseEnv(awsConfigSchema, env));
     case 'resend':
       throw new Error('resend email adapter ships in a later step'); // TODO(later)
     default:

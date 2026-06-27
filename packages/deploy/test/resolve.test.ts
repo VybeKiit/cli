@@ -1,5 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { resolveHosting } from '../src/resolve';
+
+// Stub the Amplify client so resolving the aws adapter never builds a real client or
+// touches the network — construction must succeed offline and deterministically.
+vi.mock('@aws-sdk/client-amplify', () => ({ AmplifyClient: class {} }));
 
 const cloudflareEnv = {
   CLOUDFLARE_ACCOUNT_ID: 'acct',
@@ -11,9 +15,18 @@ describe('resolveHosting', () => {
     expect(resolveHosting(cloudflareEnv).name).toBe('cloudflare');
   });
 
-  it('throws not-implemented for the aws adapter', () => {
+  it('constructs the aws adapter from its config', () => {
+    const provider = resolveHosting({
+      ...cloudflareEnv,
+      HOSTING_PROVIDER: 'aws',
+      AWS_REGION: 'us-east-1',
+    });
+    expect(provider.name).toBe('aws');
+  });
+
+  it('fails loud when the aws adapter is selected without its region', () => {
     expect(() => resolveHosting({ ...cloudflareEnv, HOSTING_PROVIDER: 'aws' })).toThrow(
-      /aws hosting adapter ships in a later step/,
+      /AWS_REGION/,
     );
   });
 });

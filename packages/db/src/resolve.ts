@@ -8,6 +8,7 @@ import {
 } from '@vybekiit/core';
 import { createAwsDataProvider } from './providers/aws';
 import { createMongoDataProvider } from './providers/mongodb';
+import { createS3StorageProvider } from './providers/s3';
 import { createSupabaseDataProvider, createSupabaseStorageProvider } from './providers/supabase';
 import type { DataProvider, StorageProvider } from './types';
 
@@ -36,16 +37,16 @@ export function resolveDataProvider(env: EnvSource = process.env): DataProvider 
 
 /**
  * Construct the configured storage provider from the environment. Reads
- * `STORAGE_PROVIDER` (defaults to `supabase`); the `s3` adapter ships later.
+ * `STORAGE_PROVIDER` (defaults to `supabase`); `s3` reuses the same AWS region +
+ * credentials as the DynamoDB data adapter.
  *
- * @throws if the chosen adapter's required keys are missing, or a not-implemented
- *   error for `s3` until that adapter ships.
+ * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}).
  */
 export function resolveStorageProvider(env: EnvSource = process.env): StorageProvider {
   const { STORAGE_PROVIDER } = parseEnv(storageConfigSchema, env);
   switch (STORAGE_PROVIDER) {
     case 's3':
-      throw new Error('s3 storage adapter ships in a later step'); // TODO(step-5)
+      return createS3StorageProvider(parseEnv(awsConfigSchema, env));
     default:
       return createSupabaseStorageProvider(parseEnv(supabaseConfigSchema, env));
   }
