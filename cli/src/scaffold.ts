@@ -9,8 +9,13 @@ export type TemplateName = (typeof TEMPLATES)[number];
 /** Thrown for expected, user-facing failures so the entrypoint can print one clean line. */
 export class ScaffoldError extends Error {}
 
-/** Directories never copied into a buyer's repo (build artifacts / installed deps). */
-const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', '.turbo']);
+/**
+ * Directories never copied into a buyer's repo (build artifacts / installed deps).
+ * `.git` is here because a published install scaffolds from a *cloned* mirror — the
+ * buyer must start a clean project, not inherit the mirror's shallow history + remote
+ * (ADR-0005).
+ */
+const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', '.turbo', '.git']);
 
 export function isTemplateName(value: string): value is TemplateName {
   return (TEMPLATES as readonly string[]).includes(value);

@@ -8,8 +8,8 @@ import {
 } from '../src/doctor/toolchain';
 
 describe('selectToolchain', () => {
-  it('returns [wrangler, supabase] for the defaults (empty env)', () => {
-    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['wrangler', 'supabase']);
+  it('returns [gh, wrangler, supabase] for the defaults (empty env)', () => {
+    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['gh', 'wrangler', 'supabase']);
   });
 
   it('matches the exported default TOOLCHAIN for explicit defaults', () => {
@@ -17,26 +17,46 @@ describe('selectToolchain', () => {
       HOSTING_PROVIDER: 'cloudflare',
       DATA_PROVIDER: 'supabase',
     }).map((tool) => tool.name);
-    expect(names).toEqual(['wrangler', 'supabase']);
+    expect(names).toEqual(['gh', 'wrangler', 'supabase']);
+  });
+
+  it('always leads with gh, the base tool, regardless of provider', () => {
+    expect(selectToolchain({}).map((tool) => tool.name)[0]).toBe('gh');
+    expect(
+      selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' }).map(
+        (tool) => tool.name,
+      )[0],
+    ).toBe('gh');
+    expect(selectToolchain({}, { mobile: true }).map((tool) => tool.name)[0]).toBe('gh');
+  });
+
+  it('the gh base tool probes sign-in with `gh auth status` / `gh auth login --web`', () => {
+    const gh = selectToolchain({}).find((tool) => tool.name === 'gh');
+    expect(gh?.auth?.command).toBe('gh');
+    expect(gh?.auth?.args).toEqual(['auth', 'status']);
+    expect(gh?.auth?.loginHint).toBe('gh auth login --web');
   });
 
   it('includes the Atlas CLI when the Mongo data adapter is active', () => {
     const names = selectToolchain({ DATA_PROVIDER: 'mongodb' }).map((tool) => tool.name);
-    expect(names).toEqual(['wrangler', 'atlas']);
+    expect(names).toEqual(['gh', 'wrangler', 'atlas']);
   });
 
   it('includes the AWS CLI (once) when any single AWS adapter is set', () => {
     expect(selectToolchain({ STORAGE_PROVIDER: 's3' }).map((tool) => tool.name)).toEqual([
+      'gh',
       'wrangler',
       'supabase',
       'aws',
     ]);
     expect(selectToolchain({ EMAIL_PROVIDER: 'ses' }).map((tool) => tool.name)).toEqual([
+      'gh',
       'wrangler',
       'supabase',
       'aws',
     ]);
     expect(selectToolchain({ AUTH_PROVIDER: 'cognito' }).map((tool) => tool.name)).toEqual([
+      'gh',
       'wrangler',
       'supabase',
       'aws',
@@ -47,19 +67,19 @@ describe('selectToolchain', () => {
     const allAws = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' }).map(
       (tool) => tool.name,
     );
-    expect(allAws).toEqual(['aws']);
+    expect(allAws).toEqual(['gh', 'aws']);
   });
 
   it('handles a mixed combo: AWS hosting + Mongo data', () => {
     const names = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'mongodb' }).map(
       (tool) => tool.name,
     );
-    expect(names).toEqual(['aws', 'atlas']);
+    expect(names).toEqual(['gh', 'aws', 'atlas']);
   });
 
   it('appends the mobile tools (eas, launch) on top of the env tools when mobile', () => {
     const names = selectToolchain({}, { mobile: true }).map((tool) => tool.name);
-    expect(names).toEqual(['wrangler', 'supabase', 'eas', 'launch']);
+    expect(names).toEqual(['gh', 'wrangler', 'supabase', 'eas', 'launch']);
   });
 
   it('appends the mobile tools after AWS adapters, deduped once each', () => {
@@ -67,17 +87,18 @@ describe('selectToolchain', () => {
       { HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' },
       { mobile: true },
     ).map((tool) => tool.name);
-    expect(names).toEqual(['aws', 'eas', 'launch']);
+    expect(names).toEqual(['gh', 'aws', 'eas', 'launch']);
     expect(names.filter((name) => name === 'eas')).toHaveLength(1);
     expect(names.filter((name) => name === 'launch')).toHaveLength(1);
   });
 
   it('leaves the web default identical when mobile is false or omitted', () => {
     expect(selectToolchain({}, { mobile: false }).map((tool) => tool.name)).toEqual([
+      'gh',
       'wrangler',
       'supabase',
     ]);
-    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['wrangler', 'supabase']);
+    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['gh', 'wrangler', 'supabase']);
   });
 
   it('the launch tool needs no sign-in probe (no auth)', () => {
