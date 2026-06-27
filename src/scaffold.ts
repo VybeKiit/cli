@@ -1,4 +1,4 @@
-import { access, cp, readFile, readdir, writeFile } from 'node:fs/promises';
+import { access, cp, readdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { type DependencyMap, rewriteWorkspaceDeps } from './rewrite-deps';
 
@@ -73,7 +73,9 @@ export async function scaffold(options: ScaffoldOptions): Promise<{ dest: string
       throw new ScaffoldError(`Destination ${options.dest} already exists and is not empty.`);
     }
   } catch (error) {
-    if (error instanceof ScaffoldError) throw error;
+    if (error instanceof ScaffoldError) {
+      throw error;
+    }
     // ENOENT — destination doesn't exist yet, which is what we want.
   }
 

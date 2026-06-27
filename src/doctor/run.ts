@@ -1,15 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import process from 'node:process';
 import {
+  formatReport,
   type InstallAction,
   type Platform,
+  planInstall,
+  selectToolchain,
   type Tool,
   type ToolPresence,
   type ToolReport,
-  formatReport,
-  planInstall,
-  selectToolchain,
 } from './toolchain';
 
 /**
@@ -40,10 +41,14 @@ function toPlatform(platform: NodeJS.Platform): Platform | null {
 function isMobileProject(dir: string): boolean {
   for (const file of ['app.json', 'app.config.json']) {
     const path = join(dir, file);
-    if (!existsSync(path)) continue;
+    if (!existsSync(path)) {
+      continue;
+    }
     try {
       const config: unknown = JSON.parse(readFileSync(path, 'utf8'));
-      if (typeof config === 'object' && config !== null && 'expo' in config) return true;
+      if (typeof config === 'object' && config !== null && 'expo' in config) {
+        return true;
+      }
     } catch {
       // Unreadable/invalid config → not a recognized mobile project.
     }

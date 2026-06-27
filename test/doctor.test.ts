@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type ToolReport,
   formatReport,
   isToolchainReady,
   planInstall,
   selectToolchain,
+  type ToolReport,
 } from '../src/doctor/toolchain';
 
 describe('selectToolchain', () => {
@@ -61,6 +61,11 @@ describe('selectToolchain', () => {
       'supabase',
       'aws',
     ]);
+  });
+
+  it('uses the Vercel CLI when the vercel hosting adapter is active', () => {
+    const names = selectToolchain({ HOSTING_PROVIDER: 'vercel' }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'vercel', 'supabase']);
   });
 
   it('uses the AWS CLI for hosting and dedupes when data is also AWS', () => {
