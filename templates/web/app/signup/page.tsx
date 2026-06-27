@@ -4,6 +4,7 @@ import { AuthShell } from '@/components/auth-shell';
 import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useAsync } from '@/hooks/use-async';
 import { signUpWithPassword } from '@/lib/auth-client';
 import Link from 'next/link';
 import { type FormEvent, useState } from 'react';
@@ -15,19 +16,12 @@ import { type FormEvent, useState } from 'react';
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [pending, setPending] = useState(false);
+  const { loading: pending, error, run: signUp } = useAsync(signUpWithPassword);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError('');
-    setPending(true);
-    const result = await signUpWithPassword(email, password);
-    setPending(false);
-    if (!result.ok) {
-      setError(result.error.message);
-      return;
-    }
+    const result = await signUp(email, password);
+    if (!result.ok) return;
     // TODO(vybekiit): after sign-up, send the builder to verify their email — skill: add-signin
     window.location.href = '/verify';
   }
