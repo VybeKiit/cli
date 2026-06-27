@@ -6,12 +6,16 @@
 #   - templates/web → OWNED scaffold payload, but a real Next app we now build +
 #     typecheck in CI so the reference app can't rot. On scaffold the CLI rewrites
 #     its `@vybekiit/*` `workspace:*` deps → npm versions (see cli/src/rewrite-deps).
+#   - templates/mobile → OWNED scaffold payload, a real Expo app we now typecheck +
+#     test in CI for the same reason. It has no `build` task (Expo builds run remotely
+#     via EAS/launch), so the turbo gate runs only its typecheck + test.
 #
 # Still excluded on purpose:
-#   - templates/{mobile,extension} → v2/v3 placeholders, nothing to build yet.
+#   - templates/extension → v3 placeholder, nothing to build yet.
 #   - apps/landing → currently a stub (webhook + gate only). It joins the workspace
 #     alongside its real UI in issue #3, so we don't gate an empty shell now.
 packages:
   - "packages/*"
   - "cli"
   - "templates/web"
+  - "templates/mobile"
