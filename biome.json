@@ -1,9 +1,15 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["dist", ".next", ".turbo", "node_modules", ".vybekiit/changelog.json"]
+    "includes": [
+      "**",
+      "!!**/.agents/skills",
+      "!!.vybekiit/changelog.json",
+      "!!.bridge",
+      "!!downloads"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -11,16 +17,89 @@
     "indentWidth": 2,
     "lineWidth": 100
   },
-  "organizeImports": { "enabled": true },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "useSortedKeys": "off",
+        "useSortedPackageJson": "off",
+        "useSortedAttributes": "off",
+        "organizeImports": "off"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "suspicious": { "noExplicitAny": "error" },
-      "style": { "useImportType": "error", "noNonNullAssertion": "warn" }
+      "preset": "all",
+      "nursery": {
+        "useSortedClasses": "warn"
+      },
+      "style": {
+        "noDefaultExport": "off",
+        "noJsxLiterals": "off",
+        "useComponentExportOnlyModules": "off",
+        "noTernary": "off",
+        "useNamingConvention": "off",
+        "noMagicNumbers": "off",
+        "noCommonJs": "off",
+        "useExportsLast": "warn",
+        "noIncrementDecrement": "off",
+        "noProcessEnv": "off",
+        "noExcessiveLinesPerFile": "warn"
+      },
+      "correctness": {
+        "noNodejsModules": "off",
+        "noUndeclaredDependencies": "warn",
+        "noUndeclaredVariables": "warn",
+        "noUnresolvedImports": "off",
+        "useQwikValidLexicalScope": "off",
+        "useHookAtTopLevel": "off",
+        "useUniqueElementIds": "warn"
+      },
+      "performance": {
+        "useSolidForComponent": "off",
+        "noJsxPropsBind": "warn",
+        "noAwaitInLoops": "warn",
+        "useTopLevelRegex": "warn"
+      },
+      "suspicious": {
+        "noUnknownAttribute": "off",
+        "noUnnecessaryConditions": "warn",
+        "noControlCharactersInRegex": "off",
+        "noNonNullAssertedOptionalChain": "warn",
+        "noAssignInExpressions": "off",
+        "noReturnAssign": "off",
+        "noReactSpecificProps": "off",
+        "noUnknownAtRules": "off",
+        "noConsole": "off"
+      },
+      "security": {
+        "noSecrets": "warn"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn",
+        "noExcessiveLinesPerFunction": "warn",
+        "noVoid": "off"
+      }
+    },
+    "domains": {
+      "react": "all",
+      "solid": "none",
+      "test": "all",
+      "project": "all"
     }
-  },
-  "javascript": {
-    "formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always" }
   }
 }

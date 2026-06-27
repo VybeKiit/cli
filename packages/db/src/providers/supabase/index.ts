@@ -9,7 +9,7 @@ import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '../..
  * Why this exists: `createDbClient` builds a `SupabaseClient` with no generated
  * `Database` type, so its `from()` resolves row shapes to `never`/`any` and fights
  * our generic `T extends DbRecord`. The kit's tables are buyer-defined at runtime
- * (the `add-data` skill creates them), so a compile-time schema isn't available here
+ * (the `save-data` skill creates them), so a compile-time schema isn't available here
  * regardless. We narrow `from()` to this record-oriented contract once, so method
  * bodies stay typed against `DbRecord` instead of leaking `any`.
  */

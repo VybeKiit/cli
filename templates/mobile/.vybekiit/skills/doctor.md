@@ -24,13 +24,18 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
    - **App identity (for publishing):** is the app's unique id set in `app.json`? Blank or still the
      example id blocks a store build.
    - **Code health:** run the tests. Read the first real error (not the noise).
+   - **Platform instructions stale?** If errors mention deprecated Expo or mobile patterns, run
+     `update-kit` first — tell the builder *"I'll refresh my instructions first"* (never name Expo).
    - **Backend reachable:** for sign-in / data / payment trouble, confirm the backend itself works
      (the web app responds) before suspecting the phone app.
 
 3. **Fix the one thing.** Make the smallest change that addresses the actual cause. If it's a value
    the builder must supply, ask for **just that one**, with exactly where to get it.
 
-4. **Verify the fix.** Re-run the thing that was broken on the device. Confirm it works now.
+4. **Still stuck on generated code?** Follow the maintainer **diagnose** workflow internally — never
+   expose that skill name to the builder.
+
+5. **Verify the fix.** Re-run the thing that was broken on the device. Confirm it works now.
    🎉 *Celebrate* — and tell them in one sentence what it was, in plain words.
 
 ## Rules

@@ -32,7 +32,8 @@ translate every error · celebrate. Decide all technical choices yourself.
    Ask what they want next and route via `goal-index.md`:
    - take money → `setup-payments`
    - put it online for real → `go-live`
-   - accounts/data → (coming soon; do the closest thing)
+   - let people sign in → `add-signin`
+   - save their data → `save-data`
 
 ## If anything breaks
 

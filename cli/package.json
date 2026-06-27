@@ -7,11 +7,16 @@
   "bin": {
     "vybekiit": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@vybekiit/agent-kit": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

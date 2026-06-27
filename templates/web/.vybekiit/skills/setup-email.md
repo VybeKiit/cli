@@ -6,9 +6,12 @@
 translate every error · celebrate. You wire all the sending; the builder only confirms one detail
 when asked.
 
-> (Under the hood — agent-only) Send through `@vybekiit/email`'s `resolveEmailProvider()`. The
-> default is Cloudflare; `ses` and `resend` are opt-in via `EMAIL_PROVIDER`. Same skill, whichever
-> is set — never name the service to the builder.
+> (Under the hood — agent-only) Send through `@vybekiit/email`'s `resolveEmailProvider()`. Read
+> `EMAIL_PROVIDER` and follow the matching platform wrapper:
+> - default / `cloudflare` → Cloudflare email via `resolveEmailProvider()` (no separate wrapper)
+> - `resend` → `platform-skills/resend-vybekiit.md`
+> - `ses` → `platform-skills/ses-vybekiit.md`
+> Same skill, whichever is set — never name the service to the builder.
 
 ## Steps
 
@@ -17,7 +20,8 @@ when asked.
    it to the secret settings file.
    **Verify:** the sender address is set and confirmed.
 
-2. **Wire sending.** Connect the app's email sending to `resolveEmailProvider()`.
+2. **Wire sending.** Connect the app's email sending to `resolveEmailProvider()` (see wrapper for
+   provider-specific keys).
    **Verify:** the code builds with no errors.
 
 3. **Send a test email to the builder.** Send one real email to the builder's own address.

@@ -8,12 +8,8 @@ translate every error · celebrate. You run the build and submit; the builder do
 account steps the stores legally require, one at a time.
 
 > (Under the hood — agent-only) Build + submit through the `launch` CLI (launch-store) using the
-> template's `launch.config.ts` (`buildEngine: 'eas'`, so builds run in the cloud — no Mac needed).
-> `launch build <ios|android>` runs the full pipeline and uploads to the testing track; add
-> `--no-submit` to build only. `launch release <ios|android>` submits the latest build to the public
-> store. `launch status` reads the review state. App facts (name, unique id, version) live in
-> `app.json`; store-listing details live in `launch.config.ts`. Never name Expo/Apple/Google/EAS to
-> the builder.
+> template's `launch.config.ts`. Follow `platform-skills/launch-store-vybekiit.md` and pinned
+> `.agents/skills/expo-deployment`.
 
 ## Steps
 

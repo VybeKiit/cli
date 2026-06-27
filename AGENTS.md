@@ -59,7 +59,7 @@ traceable code). Specifically:
 
 Anything that ships to buyers obeys the **Decide + Guide** contract and the strict skill template
 (see `CONTEXT.md` → agent layer): one action at a time · **verify-before-advance** · plain
-language (per `templates/*/language.md`) · errors translated · celebrate. If you catch yourself
+language (per `templates/*/BUILDER-VOICE.md`) · errors translated · celebrate. If you catch yourself
 writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate it.
 
 ## Releasing packages

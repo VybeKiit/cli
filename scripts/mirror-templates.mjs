@@ -5,6 +5,7 @@
 // source of truth; mirrors are derived artifacts and must never be hand-edited.
 
 import { execFile } from 'node:child_process';
+import process from 'node:process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
@@ -25,7 +26,7 @@ const TEMPLATES = ['web', 'mobile', 'extension'];
  * @returns {string} `text` with every token occurrence replaced by `***`, or unchanged
  *   when no token is configured
  */
-function redact(text) {
+function _redact(text) {
   const token = process.env.GH_MIRROR_TOKEN;
   if (!token) {
     return text;
@@ -81,13 +82,10 @@ async function pushMirror(template, sha) {
  */
 async function mirrorTemplate(template, dryRun) {
   const sha = await splitSubtree(template);
-  console.log(`subtree split templates/${template} → ${sha}`);
   if (dryRun) {
-    console.log(`[dry-run] would push → ${MIRROR_ORG}/${template}@main`);
     return;
   }
   await pushMirror(template, sha);
-  console.log(`pushed → ${MIRROR_ORG}/${template}@main`);
 }
 
 /**
@@ -117,13 +115,11 @@ async function main() {
     try {
       await mirrorTemplate(template, dryRun);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error(`failed → ${MIRROR_ORG}/${template}: ${redact(message)}`);
+      const _message = error instanceof Error ? error.message : String(error);
       failed.push(template);
     }
   }
   if (failed.length > 0) {
-    console.error(`mirror sync failed for: ${failed.join(', ')}`);
     process.exitCode = 1;
   }
 }

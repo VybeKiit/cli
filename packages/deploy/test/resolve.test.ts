@@ -15,6 +15,18 @@ describe('resolveHosting', () => {
     expect(resolveHosting(cloudflareEnv).name).toBe('cloudflare');
   });
 
+  it('constructs the vercel adapter from its config', () => {
+    const provider = resolveHosting({
+      HOSTING_PROVIDER: 'vercel',
+      VERCEL_TOKEN: 'token',
+    });
+    expect(provider.name).toBe('vercel');
+  });
+
+  it('fails loud when the vercel adapter is selected without its token', () => {
+    expect(() => resolveHosting({ HOSTING_PROVIDER: 'vercel' })).toThrow(/VERCEL_TOKEN/);
+  });
+
   it('constructs the aws adapter from its config', () => {
     const provider = resolveHosting({
       ...cloudflareEnv,

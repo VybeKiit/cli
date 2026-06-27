@@ -36,9 +36,7 @@ export interface BetterAuthInstance {
     signInEmailOTP(args: {
       body: { email: string; otp: string };
     }): Promise<{ token: string; user: { id: string; email: string } }>;
-    getSession(args: {
-      headers: Headers;
-    }): Promise<{ user: { id: string; email: string } } | null>;
+    getSession(args: { headers: Headers }): Promise<{ user: { id: string; email: string } } | null>;
   };
 }
 

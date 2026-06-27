@@ -1,0 +1,9 @@
+---
+description: VybeKiit agent layer — read AGENTS.md
+globs: **/*
+alwaysApply: true
+---
+
+# VybeKiit agent layer
+
+Read and follow `./AGENTS.md` as the single source of truth for this project.
