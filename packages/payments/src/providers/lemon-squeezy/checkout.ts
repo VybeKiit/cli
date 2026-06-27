@@ -27,10 +27,10 @@ export async function createLemonSqueezyCheckout(
       params.productId,
       {
         checkoutData: {
-          email: params.email,
-          custom: params.githubUsername ? { github_username: params.githubUsername } : undefined,
+          ...(params.email ? { email: params.email } : {}),
+          ...(params.githubUsername ? { custom: { github_username: params.githubUsername } } : {}),
         },
-        productOptions: params.successUrl ? { redirectUrl: params.successUrl } : undefined,
+        ...(params.successUrl ? { productOptions: { redirectUrl: params.successUrl } } : {}),
       },
     );
     if (response.error) {

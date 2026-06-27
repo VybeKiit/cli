@@ -32,6 +32,7 @@ export async function createPayPalCheckout(
 ): Promise<Result<CheckoutResult>> {
   const orders = new OrdersController(paypalClient(config));
 
+  const cancelUrl = params.cancelUrl ?? params.successUrl;
   let url: string | undefined;
   try {
     const { result } = await orders.createOrder({
@@ -40,13 +41,13 @@ export async function createPayPalCheckout(
         purchaseUnits: [
           {
             amount: { currencyCode: 'USD', value: params.productId },
-            customId: params.githubUsername,
+            ...(params.githubUsername ? { customId: params.githubUsername } : {}),
           },
         ],
         applicationContext: {
           brandName: 'VybeKiit',
-          returnUrl: params.successUrl,
-          cancelUrl: params.cancelUrl ?? params.successUrl,
+          ...(params.successUrl ? { returnUrl: params.successUrl } : {}),
+          ...(cancelUrl ? { cancelUrl } : {}),
         },
       },
       prefer: 'return=representation',

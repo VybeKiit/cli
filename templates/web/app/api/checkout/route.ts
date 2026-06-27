@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     productId,
     githubUsername,
     email,
-    successUrl: process.env.APP_URL,
+    ...(process.env.APP_URL ? { successUrl: process.env.APP_URL } : {}),
   });
 
   if (!result.ok) {

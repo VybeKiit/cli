@@ -2,8 +2,9 @@
 
 > The domain map for VybeKiit. Read this first. It captures **what** we're building, the
 > **decisions** behind it, and the **language** we use. Implementation details live in code;
-> this file is the why and the shape. Authored from a `/grill-me` session on 2026-06-27.
-> **Status: blueprint only — no code written yet.**
+> this file is the why and the shape. Authored from a `/grill-me` session on 2026-06-27,
+> extended by a `/grill-with-docs` session the same day (see "Agentic toolchain & dev workflow").
+> **Status: v1.0 scaffold built + green + pushed; building out the web tracer bullet.**
 
 ---
 
@@ -53,8 +54,9 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  │                          paypal} (official SDKs) · LS is the v1 default (MoR) · no UI
 │  ├─ auth/                   headless auth logic (Supabase)
 │  ├─ db/                     typed Supabase client + schema helpers
-│  ├─ browser-automation/     Playwright dashboard automation (publish/submit extensions for the
-│  │                          builder) — ported from the extensions monorepo's cws-automation
+│  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
+│  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
+│  │                          the OWNED templates/extension consumes it (v3)
 │  ├─ email/                  send via Cloudflare email behind one interface          ← later
 │  └─ agent-kit/              the kit-update logic + scripts the agents run            ← later
 ├─ templates/                 OWNED · NOT published · copied by the scaffolder · frozen
@@ -110,6 +112,14 @@ safe). Pre-commit is **lenient** (format + lint only — never traps a buyer beh
 gate (full tests + typecheck) runs in **CI**, where a failure is a check the *agent* fixes, not a
 wall the *buyer* hits.
 
+In the **maintainer monorepo only**, a husky **pre-push** mirrors CI exactly (lint → typecheck →
+test → build) — it's our stand-in for branch protection (unavailable on the free GitHub plan) and
+the guard that keeps `main` green when we land via tiny squash-PRs. It is **never** shipped to a
+buyer's scaffolded repo (a blocking pre-push would re-create the refund-trap CI was designed to
+avoid). TypeScript is **max-strict everywhere** (`exactOptionalPropertyTypes`, `noImplicitReturns`,
+`noUncheckedSideEffectImports` on top of `strict` + `noUncheckedIndexedAccess`); Biome owns
+unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
+
 ## Distribution, gating & updates
 
 - Packages are **public** (free updates via npm, double as marketing). The wall is the **private
@@ -144,6 +154,32 @@ Build **one thin vertical slice through every layer**, cutting the riskiest unkn
 - **v2** — mobile template (Expo + the author's `launch-store` for deploy).
 - **v3** — extension template (WXT).
 
+## Agentic toolchain & dev workflow
+
+Resolved in the `/grill-with-docs` session (2026-06-27). What makes the agent "real agentic" is
+that the CLIs it needs are actually present and usable — the buyer never configures tooling.
+
+- **The v1 toolchain is `supabase` + `wrangler`** (the only CLIs the web + money pipeline use).
+  Expo + the author's `launch` CLI arrive with the mobile template (v2); Playwright/extension-publish
+  with the extension template (v3). No tool is wired before the template that drives it exists.
+- **Provisioned globally, OS-aware, by `vybekiit doctor`** — a maintained CLI subcommand (not
+  project-local devDeps, not a postinstall). It installs each CLI the right way per OS, is
+  idempotent, and verifies the toolchain. The agent (onboarding / `doctor` skills) calls it and
+  translates its output. Fixes ship via an npm bump of the CLI — one updatable home.
+- **Auth = interactive browser login** (`wrangler login`, `supabase login`), not env tokens. This
+  **amends the single-`.env` rule**: `.env` is the source of truth for *runtime* secrets
+  (SUPABASE_URL/ANON/SERVICE_ROLE, payment keys), but *CLI/deploy auth* lives in each tool's native
+  store. `doctor` therefore verifies auth by **probing** (`wrangler whoami`, a Supabase call), not
+  by reading `.env`. The agent hands off the one browser click and waits. See ADR-0001.
+- **Database is fully programmatic** — after login the agent runs `supabase projects create`
+  (generates the DB password, picks the region from one plain question, polls to healthy, writes the
+  keys into `.env`, pushes the schema). Maximum hands-off; `doctor` owns the brittleness (provisioning
+  stalls, free-tier/org walls).
+- **Dev workflow is trunk-based via tiny squash-PRs.** Direct `git push origin main` is blocked in
+  our environment and branch protection needs GitHub Pro/Team, so changes land on a throwaway branch
+  → `gh pr merge --squash --delete-branch`. `main` stays the only long-lived branch with linear
+  history; CI + the pre-push hook gate every change.
+
 ## Localization & RTL
 
 Docs/marketing are **English-only**. The in-product *experience* is auto-localized for free
@@ -160,6 +196,10 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 - **Tracer bullet** — the v1.0 thin end-to-end slice that proves the whole machine.
 - **Decide + Guide** — the agent contract: decide all tech, guide the few manual steps, zero jargon.
 - **Verify-before-advance** — every skill tests a step worked before moving on.
+- **Agentic toolchain** — the CLIs the agent must have to act (`supabase`, `wrangler`, …),
+  provisioned globally by `vybekiit doctor` so the buyer never configures tooling.
+- **`vybekiit doctor`** — the maintained CLI subcommand that installs + verifies the toolchain
+  (OS-aware, idempotent) and diagnoses a broken project; the human-facing `doctor` *skill* wraps it.
 
 ## Open / parked
 

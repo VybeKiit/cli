@@ -22,8 +22,8 @@ export async function createStripeCheckout(
       line_items: [{ price: params.productId, quantity: 1 }],
       success_url: params.successUrl ?? '',
       cancel_url: params.cancelUrl ?? params.successUrl ?? '',
-      customer_email: params.email,
-      metadata: params.githubUsername ? { github_username: params.githubUsername } : undefined,
+      ...(params.email ? { customer_email: params.email } : {}),
+      ...(params.githubUsername ? { metadata: { github_username: params.githubUsername } } : {}),
     });
     url = session.url;
   } catch (error) {

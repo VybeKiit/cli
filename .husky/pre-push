@@ -1,0 +1,5 @@
+# Maintainer-only guard. We have no branch protection (GitHub Pro/Team-gated on private repos),
+# so this hook is the stand-in: it mirrors CI exactly (lint → typecheck → test → build) and blocks
+# the push if any step fails. Turbo caches typecheck/test/build, so unchanged packages are near-instant.
+# Never shipped to a buyer's scaffolded repo — a blocking pre-push would trap a non-coder behind red.
+pnpm lint && pnpm typecheck && pnpm test && pnpm build
