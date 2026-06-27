@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "repo": "expo/skills",
+      "skills": ["*"]
+    }
+  ]
+}

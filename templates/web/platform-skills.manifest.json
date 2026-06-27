@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "repo": "vercel-labs/agent-skills",
+      "skills": ["vercel-react-best-practices", "vercel-composition-patterns"]
+    }
+  ],
+  "_notes": {
+    "cloudflare": "No official skills.sh repo yet — use deploy-cloudflare-vybekiit.md + developers.cloudflare.com",
+    "web-perf": "Optional global skill — reference from doctor.md when Chrome DevTools MCP is available"
+  }
+}
