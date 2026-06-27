@@ -2,22 +2,25 @@ import { spawnSync } from 'node:child_process';
 import {
   type InstallAction,
   type Platform,
-  TOOLCHAIN,
   type Tool,
   type ToolPresence,
   type ToolReport,
   formatReport,
   planInstall,
+  selectToolchain,
 } from './toolchain';
 
 /**
  * `vybekiit doctor` — provision + verify the agentic toolchain (ADR-0001).
  *
- * The agent runs this on the buyer's machine so the CLIs it needs (`supabase`,
- * `wrangler`) are installed globally and signed in, without the buyer configuring
- * anything. This file is the side-effecting half: it detects what's present, installs
- * what's missing the OS-correct way, probes sign-in, and prints buyer-readable lines.
- * All decision logic lives in the pure `toolchain.ts` so it stays testable.
+ * The agent runs this on the buyer's machine so the CLIs it needs are installed
+ * globally and signed in, without the buyer configuring anything. It is
+ * provider-aware: {@link selectToolchain} reads the `*_PROVIDER` env keys so only the
+ * CLIs the buyer's active adapters use get installed (defaults → `supabase` +
+ * `wrangler`). This file is the side-effecting half: it detects what's present,
+ * installs what's missing the OS-correct way, probes sign-in, and prints
+ * buyer-readable lines. All decision logic lives in the pure `toolchain.ts` so it
+ * stays testable.
  */
 
 /** Map node's `process.platform` onto a supported {@link Platform}, or null if we can't install there. */
@@ -96,17 +99,18 @@ export function runDoctor(log: Console = console): number {
     return 1;
   }
 
-  const presence: ToolPresence[] = TOOLCHAIN.map((tool) => ({
+  const toolchain = selectToolchain(process.env);
+  const presence: ToolPresence[] = toolchain.map((tool) => ({
     tool: tool.name,
     present: succeeds(tool.name, tool.versionArgs),
   }));
 
   const installs = new Map<string, InstallOutcome>();
-  for (const action of planInstall(platform, presence)) {
+  for (const action of planInstall(platform, presence, toolchain)) {
     installs.set(action.tool, runInstall(action, log));
   }
 
-  const reports = TOOLCHAIN.map((tool) => buildReport(tool, presence, installs));
+  const reports = toolchain.map((tool) => buildReport(tool, presence, installs));
   for (const line of formatReport(reports)) {
     log.log(line);
   }
