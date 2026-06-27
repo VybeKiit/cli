@@ -11,6 +11,7 @@ translate errors · celebrate.
 | "add payments", "let me take money", "sell something", "charge people" | `skills/setup-payments.md` |
 | "put it online", "publish", "make it live", "ship it", "deploy" | `skills/go-live.md` |
 | "it's broken", "nothing works", "I get an error", "check my app" | `skills/doctor.md` |
+| "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
 
 Anything else (change the design, add a page, tweak text, general coding) is **not** a skill — just
 do it well per `AGENTS.md`, then offer the next relevant goal above.
