@@ -12,4 +12,10 @@ export {
   type CloudflareRunResult,
   type CloudflareRunner,
 } from './providers/cloudflare';
+export {
+  createVercelHosting,
+  type VercelDeployAction,
+  type VercelRunResult,
+  type VercelRunner,
+} from './providers/vercel';
 export { createAwsHosting, type AmplifyRunner } from './providers/aws';

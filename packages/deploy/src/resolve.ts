@@ -4,9 +4,11 @@ import {
   cloudflareConfigSchema,
   hostingConfigSchema,
   parseEnv,
+  vercelConfigSchema,
 } from '@vybekiit/core';
 import { type AmplifyRunner, createAwsHosting } from './providers/aws';
 import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare';
+import { type VercelRunner, createVercelHosting } from './providers/vercel';
 import type { Hosting } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
@@ -21,6 +23,8 @@ type EnvSource = Record<string, string | undefined>;
 export interface HostingRunners {
   /** Cloudflare deploy executor (`wrangler` action runner). */
   readonly cloudflare?: CloudflareRunner;
+  /** Vercel deploy executor (`vercel` action runner). */
+  readonly vercel?: VercelRunner;
   /** AWS Amplify client used to start/inspect deploy jobs. */
   readonly aws?: AmplifyRunner;
 }
@@ -48,6 +52,8 @@ export function resolveHosting(
         parseEnv(awsHostingConfigSchema, env),
         runners.aws,
       );
+    case 'vercel':
+      return createVercelHosting(parseEnv(vercelConfigSchema, env), runners.vercel);
     default:
       return createCloudflareHosting(parseEnv(cloudflareConfigSchema, env), runners.cloudflare);
   }

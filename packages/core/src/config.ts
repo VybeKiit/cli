@@ -89,11 +89,11 @@ export const storageConfigSchema = z.object({
 
 /**
  * Which hosting adapter `@vybekiit/deploy` constructs at go-live. Cloudflare is the
- * default; `aws` (Amplify/SST) is an opt-in adapter shipping later (ADR-0002). The
+ * default; `vercel` and `aws` (Amplify/SST) are opt-in adapters (ADR-0002/0006). The
  * agent's go-live skill drives the chosen adapter — the builder never picks.
  */
 export const hostingConfigSchema = z.object({
-  HOSTING_PROVIDER: z.enum(['cloudflare', 'aws']).default('cloudflare'),
+  HOSTING_PROVIDER: z.enum(['cloudflare', 'vercel', 'aws']).default('cloudflare'),
 });
 
 /**
@@ -211,11 +211,37 @@ export const cloudflareConfigSchema = z.object({
     .optional(),
 });
 
+/**
+ * Vercel credentials — used by `@vybekiit/deploy` (vercel adapter, ADR-0006).
+ *
+ * `VERCEL_TOKEN` is a personal/team token from the Vercel dashboard (Settings → Tokens).
+ * `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are optional until the go-live skill links the
+ * project; when set they pin deploy scope.
+ */
+export const vercelConfigSchema = z.object({
+  VERCEL_TOKEN: z.string().min(1, 'VERCEL_TOKEN is required'),
+  VERCEL_ORG_ID: z.string().min(1).optional(),
+  VERCEL_PROJECT_ID: z.string().min(1).optional(),
+});
+
 /** GitHub access automation — "the gate" that grants/revokes paid repo access. */
 export const githubGateConfigSchema = z.object({
   GITHUB_GATE_TOKEN: z.string().min(1, 'GITHUB_GATE_TOKEN is required'),
   GITHUB_GATE_ORG: z.string().min(1).default('VybeKiit'),
   GITHUB_GATE_REPO: z.string().min(1).default('vybekiit'),
+});
+
+/**
+ * The VybeKiit store's own checkout target — used by `apps/landing`'s checkout route
+ * to tell the payment provider *what* is being sold. `STORE_PRODUCT_ID` is the
+ * provider's purchasable id (a Lemon Squeezy *variant* id by default), passed
+ * straight to {@link CheckoutParams.productId}. This is store infrastructure (the
+ * id of the kit we sell), not part of a buyer's scaffolded app — a buyer's app
+ * carries its own product ids instead. Required, so a misconfigured store fails
+ * loud at checkout rather than creating an empty cart.
+ */
+export const storeConfigSchema = z.object({
+  STORE_PRODUCT_ID: z.string().min(1, 'STORE_PRODUCT_ID is required'),
 });
 
 export type AppConfig = z.infer<typeof appConfigSchema>;
@@ -235,7 +261,9 @@ export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
 export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
 export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
+export type VercelConfig = z.infer<typeof vercelConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
+export type StoreConfig = z.infer<typeof storeConfigSchema>;
 
 /**
  * Parse + validate one config slice from the environment, failing loud.

@@ -95,6 +95,19 @@ const WRANGLER: Tool = {
   auth: { command: 'wrangler', args: ['whoami'], loginHint: 'wrangler login' },
 };
 
+/** Opt-in hosting CLI — Vercel (ADR-0006). Installs via npm global on every OS. */
+const VERCEL: Tool = {
+  name: 'vercel',
+  purpose: 'put your app online',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'vercel'] },
+    win32: { command: 'npm', args: ['install', '-g', 'vercel'] },
+    linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
+  },
+  auth: { command: 'vercel', args: ['whoami'], loginHint: 'vercel login' },
+};
+
 /**
  * Default data CLI — Supabase. Follows Supabase's own guidance (native package
  * managers, not the discouraged npm global), so each OS gets the right channel.
@@ -225,7 +238,7 @@ export function selectToolchain(
   };
 
   add(GH);
-  add(env.HOSTING_PROVIDER === 'aws' ? AWS : WRANGLER);
+  add(env.HOSTING_PROVIDER === 'aws' ? AWS : env.HOSTING_PROVIDER === 'vercel' ? VERCEL : WRANGLER);
 
   switch (env.DATA_PROVIDER) {
     case 'mongodb':

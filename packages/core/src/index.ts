@@ -16,7 +16,9 @@ export {
   betterAuthConfigSchema,
   cognitoConfigSchema,
   cloudflareConfigSchema,
+  vercelConfigSchema,
   githubGateConfigSchema,
+  storeConfigSchema,
   parseEnv,
   type AppConfig,
   type PaymentsConfig,
@@ -35,7 +37,9 @@ export {
   type BetterAuthConfig,
   type CognitoConfig,
   type CloudflareConfig,
+  type VercelConfig,
   type GithubGateConfig,
+  type StoreConfig,
 } from './config';
 export {
   LEMONSQUEEZY_API_BASE,
