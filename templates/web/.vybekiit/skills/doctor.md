@@ -16,10 +16,11 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
 2. **Check the basics, in order:**
    - **Secret settings:** are the required values in `.env` present and non-empty? (Use
      `.env.example` as the checklist.) Missing/blank is the #1 cause.
-   - **Tools installed + signed in:** run `vybekiit doctor` — it installs any missing tools (for the
-     database and for putting the app online) and checks sign-in. If it reports "not signed in yet,"
-     walk the builder through the one sign-in command it prints (a browser window opens; they click
-     approve). Then make sure the project's dependencies are installed.
+   - **Tools installed + signed in:** run `vybekiit doctor` — it installs whichever tools the
+     builder's settings actually use (for their database and for putting the app online) and checks
+     sign-in. If it reports "not signed in yet," walk the builder through the one sign-in command it
+     prints (a browser window opens; they click approve). Then make sure the project's dependencies
+     are installed.
    - **Code health:** run the build/tests. Read the first real error (not the noise).
    - **Services reachable:** if it's data-related, check the database is reachable
      (`@vybekiit/db`'s `pingDatabase`). If payments, re-check the three Lemon Squeezy values.

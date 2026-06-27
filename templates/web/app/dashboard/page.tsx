@@ -1,11 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-/** Placeholder stat cards — wired to real data by the `save-data` skill. */
-const STATS = [
-  { label: 'Users', value: '—' },
-  { label: 'Revenue', value: '—' },
-  { label: 'Active today', value: '—' },
-];
+import { DASHBOARD_STATS, GETTING_STARTED } from '@/data/dashboard';
 
 /**
  * Minimal signed-in dashboard — pure layout. The route guard and real data are
@@ -22,7 +16,7 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Welcome back.</p>
       </header>
       <div className="grid gap-6 sm:grid-cols-3">
-        {STATS.map((stat) => (
+        {DASHBOARD_STATS.map((stat) => (
           <Card key={stat.label}>
             <CardHeader>
               <CardDescription>{stat.label}</CardDescription>
@@ -38,9 +32,9 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <ul className="flex flex-col gap-2 text-muted-foreground text-sm">
-            <li>Add sign-in so people can log in.</li>
-            <li>Add payments so you can charge for this.</li>
-            <li>Put your app online with a custom domain.</li>
+            {GETTING_STARTED.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ul>
         </CardContent>
       </Card>

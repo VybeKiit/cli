@@ -1,4 +1,5 @@
 import { MarketingShell } from '@/components/marketing-shell';
+import { PRIVACY_SECTIONS } from '@/data/legal';
 
 /**
  * Privacy Policy — a plain-language skeleton, ready to display. The specifics are
@@ -18,43 +19,12 @@ export default function PrivacyPage() {
         {/* TODO(vybekiit): fill in company name, contact email, and the data you actually
             collect (analytics, payments, etc.), then have a human review — skill: onboarding */}
 
-        <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-xl">1. What we collect</h2>
-          <p className="text-muted-foreground">
-            We collect the information you give us (such as your email when you sign up) and basic
-            usage data needed to run [Your Product].
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-xl">2. How we use it</h2>
-          <p className="text-muted-foreground">
-            We use your information to provide the service, process payments, and keep your account
-            secure. We do not sell your personal data.
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-xl">3. Sharing</h2>
-          <p className="text-muted-foreground">
-            We share data only with the providers that run the service (for example, hosting,
-            database, and payments) and only as needed to operate [Your Product].
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-xl">4. Your choices</h2>
-          <p className="text-muted-foreground">
-            You can ask us to access or delete your information at any time by contacting us.
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="font-semibold text-xl">5. Contact</h2>
-          <p className="text-muted-foreground">
-            Questions about your privacy? Email [your-email@example.com].
-          </p>
-        </section>
+        {PRIVACY_SECTIONS.map((section) => (
+          <section key={section.heading} className="flex flex-col gap-2">
+            <h2 className="font-semibold text-xl">{section.heading}</h2>
+            <p className="text-muted-foreground">{section.body}</p>
+          </section>
+        ))}
       </article>
     </MarketingShell>
   );

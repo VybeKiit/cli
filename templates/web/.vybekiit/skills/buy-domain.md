@@ -1,0 +1,38 @@
+# Skill: buy-domain
+
+**Goal:** the app uses the builder's own web address instead of a temporary one.
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) ·
+translate every error · celebrate. You do the connecting; the builder chooses the name and pays for
+it.
+
+> (Under the hood — agent-only) Register and connect through `@vybekiit/deploy`'s `resolveHosting()`
+> — Cloudflare by default, AWS if the builder's setup uses it. Never name the host to the builder.
+
+## Steps
+
+1. **Help them choose a name.** Talk through a web address they'd like. Check it's available and
+   guide registration **one step at a time** — they pay for it (it's their address).
+   **Verify:** the domain is registered to them.
+
+2. **Connect it to the live app.** Point the new address at their app for them.
+   **Verify:** the connection is set up. Note the address can take a little while to start
+   working — don't move on until it actually loads.
+
+3. **Update the app's web address settings.** Set `APP_URL` (and the sign-in addresses) to the new
+   domain for them — never make them hand-edit settings.
+   **Verify:** the settings point to the new address.
+
+4. **Open it for real.** Visit the new web address.
+   **Verify:** the app loads at their domain over a secure (padlock) connection.
+   🎉 *Celebrate* — the app lives at their own address now.
+
+## If anything breaks
+
+Run `doctor`. A new address often just needs a little more time to start working, or one setting
+still points at the old address — fix it for them, don't explain the internals.
+
+## Definition of done
+
+The app loads at the builder's own web address with the padlock showing, and its address settings
+match.
