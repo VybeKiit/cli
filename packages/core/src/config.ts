@@ -57,6 +57,42 @@ export const paypalConfigSchema = z.object({
   PAYPAL_ENV: z.enum(['sandbox', 'live']).default('sandbox'),
 });
 
+/**
+ * Which data adapter `@vybekiit/db` constructs. One backend runs at a time; the
+ * agent swaps by changing this single value. Supabase (Postgres) is the default;
+ * `mongodb` (Atlas) and `aws` (DynamoDB/DocumentDB) are opt-in escape hatches that
+ * ship in a later step (ADR-0002).
+ */
+export const dataConfigSchema = z.object({
+  DATA_PROVIDER: z.enum(['supabase', 'mongodb', 'aws']).default('supabase'),
+});
+
+/**
+ * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
+ * Storage is the default; `s3` is an opt-in adapter shipping later (ADR-0002).
+ */
+export const storageConfigSchema = z.object({
+  STORAGE_PROVIDER: z.enum(['supabase', 's3']).default('supabase'),
+});
+
+/**
+ * Which hosting adapter `@vybekiit/deploy` constructs at go-live. Cloudflare is the
+ * default; `aws` (Amplify/SST) is an opt-in adapter shipping later (ADR-0002). The
+ * agent's go-live skill drives the chosen adapter — the builder never picks.
+ */
+export const hostingConfigSchema = z.object({
+  HOSTING_PROVIDER: z.enum(['cloudflare', 'aws']).default('cloudflare'),
+});
+
+/**
+ * Which email adapter `@vybekiit/email` constructs. Cloudflare is the default
+ * (reuses {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in
+ * adapters shipping later (ADR-0002).
+ */
+export const emailConfigSchema = z.object({
+  EMAIL_PROVIDER: z.enum(['cloudflare', 'ses', 'resend']).default('cloudflare'),
+});
+
 /** Supabase credentials — used by `@vybekiit/auth` and `@vybekiit/db`. */
 export const supabaseConfigSchema = z.object({
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
@@ -65,10 +101,22 @@ export const supabaseConfigSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
 });
 
-/** Cloudflare credentials — used at deploy time and by `@vybekiit/email`. */
+/**
+ * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by
+ * `@vybekiit/email`.
+ *
+ * `CLOUDFLARE_EMAIL_ENDPOINT` is optional because Cloudflare has no general outbound
+ * email API: transactional sends run from the deployed Worker/Pages context, which
+ * exposes its own send route. The email adapter POSTs there; without it, `send`
+ * fails loud rather than silently dropping mail.
+ */
 export const cloudflareConfigSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string().min(1, 'CLOUDFLARE_ACCOUNT_ID is required'),
   CLOUDFLARE_API_TOKEN: z.string().min(1, 'CLOUDFLARE_API_TOKEN is required'),
+  CLOUDFLARE_EMAIL_ENDPOINT: z
+    .string()
+    .url('CLOUDFLARE_EMAIL_ENDPOINT must be a valid URL')
+    .optional(),
 });
 
 /** GitHub access automation — "the gate" that grants/revokes paid repo access. */
@@ -80,6 +128,10 @@ export const githubGateConfigSchema = z.object({
 
 export type AppConfig = z.infer<typeof appConfigSchema>;
 export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
+export type DataConfig = z.infer<typeof dataConfigSchema>;
+export type StorageConfig = z.infer<typeof storageConfigSchema>;
+export type HostingConfig = z.infer<typeof hostingConfigSchema>;
+export type EmailConfig = z.infer<typeof emailConfigSchema>;
 export type LemonSqueezyConfig = z.infer<typeof lemonSqueezyConfigSchema>;
 export type StripeConfig = z.infer<typeof stripeConfigSchema>;
 export type PaypalConfig = z.infer<typeof paypalConfigSchema>;
