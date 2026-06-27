@@ -1,5 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { resolveDataProvider, resolveStorageProvider } from '../src/resolve';
+
+// Stub the native drivers so resolving the mongodb/aws adapters never opens a real
+// connection — construction must succeed offline and deterministically.
+vi.mock('mongodb', () => ({
+  MongoClient: class {
+    db() {
+      return {};
+    }
+  },
+}));
+vi.mock('@aws-sdk/client-dynamodb', () => ({ DynamoDBClient: class {} }));
+vi.mock('@aws-sdk/lib-dynamodb', () => ({
+  DynamoDBDocumentClient: { from: () => ({}) },
+}));
 
 const supabaseEnv = {
   SUPABASE_URL: 'https://x.supabase.co',
@@ -11,15 +25,34 @@ describe('resolveDataProvider', () => {
     expect(resolveDataProvider(supabaseEnv).name).toBe('supabase');
   });
 
-  it('throws not-implemented for the mongodb adapter', () => {
+  it('constructs the mongodb adapter from its config', () => {
+    const provider = resolveDataProvider({
+      ...supabaseEnv,
+      DATA_PROVIDER: 'mongodb',
+      MONGODB_URI: 'mongodb+srv://x',
+      MONGODB_DB: 'app',
+    });
+    expect(provider.name).toBe('mongodb');
+  });
+
+  it('constructs the aws adapter from its config', () => {
+    const provider = resolveDataProvider({
+      ...supabaseEnv,
+      DATA_PROVIDER: 'aws',
+      AWS_REGION: 'us-east-1',
+    });
+    expect(provider.name).toBe('aws');
+  });
+
+  it('fails loud when the mongodb adapter is selected without its keys', () => {
     expect(() => resolveDataProvider({ ...supabaseEnv, DATA_PROVIDER: 'mongodb' })).toThrow(
-      /mongodb data adapter ships in a later step/,
+      /MONGODB_URI/,
     );
   });
 
-  it('throws not-implemented for the aws adapter', () => {
+  it('fails loud when the aws adapter is selected without its region', () => {
     expect(() => resolveDataProvider({ ...supabaseEnv, DATA_PROVIDER: 'aws' })).toThrow(
-      /aws data adapter ships in a later step/,
+      /AWS_REGION/,
     );
   });
 });
