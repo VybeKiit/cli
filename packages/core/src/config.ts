@@ -68,6 +68,18 @@ export const dataConfigSchema = z.object({
 });
 
 /**
+ * Which auth adapter `@vybekiit/auth` constructs. `better-auth` (DB-bound) is the
+ * default; `cognito` is the AWS path (ADR-0003). When `better-auth` is selected,
+ * the adapter follows `DATA_PROVIDER` ({@link dataConfigSchema}) to pick its
+ * database binding — and AWS-data apps auto-route to Cognito, since DynamoDB has no
+ * better-auth adapter. The agent's add-signin skill drives this; the builder never
+ * picks a name.
+ */
+export const authConfigSchema = z.object({
+  AUTH_PROVIDER: z.enum(['better-auth', 'cognito']).default('better-auth'),
+});
+
+/**
  * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
  * Storage is the default; `s3` is an opt-in adapter shipping later (ADR-0002).
  */
@@ -136,12 +148,49 @@ export const awsHostingConfigSchema = z.object({
   AWS_AMPLIFY_BRANCH: z.string().min(1).default('main'),
 });
 
-/** Supabase credentials — used by `@vybekiit/auth` and `@vybekiit/db`. */
+/** Supabase credentials — used by `@vybekiit/db` (supabase adapter). */
 export const supabaseConfigSchema = z.object({
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
   SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY is required'),
   // Server-only; the browser client never sets it.
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+});
+
+/**
+ * better-auth settings — used by `@vybekiit/auth` (better-auth adapter, ADR-0003).
+ *
+ * `BETTER_AUTH_SECRET` signs/encrypts sessions and is always required (a blank
+ * secret would silently weaken every session). `BETTER_AUTH_URL` is the app's base
+ * URL better-auth issues cookies/links against; it defaults to {@link DEFAULT_APP_URL}
+ * so local dev needs no value. `DATABASE_URL` is the **Postgres** connection string
+ * better-auth opens when `DATA_PROVIDER` is `supabase`/`postgres` — Supabase exposes
+ * this in Project Settings → Database; it is optional so the package imports + the
+ * `doctor` skill run before a project exists, with the adapter failing loud at first
+ * use when it is still blank. The Mongo binding reads {@link mongoConfigSchema}
+ * instead, so `DATABASE_URL` stays empty there.
+ */
+export const betterAuthConfigSchema = z.object({
+  BETTER_AUTH_SECRET: z.string().min(1, 'BETTER_AUTH_SECRET is required'),
+  BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL must be a valid URL').default(DEFAULT_APP_URL),
+  DATABASE_URL: z.string().min(1).optional(),
+});
+
+/**
+ * AWS Cognito credentials — used by `@vybekiit/auth` (cognito adapter, ADR-0003).
+ *
+ * `COGNITO_USER_POOL_ID` + `COGNITO_CLIENT_ID` name the user pool and its app client
+ * the adapter signs up / signs in against. `AWS_REGION` is required (Cognito is
+ * region-scoped) and intentionally matches the key the AWS data/S3/SES adapters use,
+ * so an AWS-only app sets one region for everything. The optional access keys mirror
+ * {@link awsConfigSchema}: when both are present the adapter passes explicit
+ * credentials, otherwise the SDK's default credential chain applies.
+ */
+export const cognitoConfigSchema = z.object({
+  COGNITO_USER_POOL_ID: z.string().min(1, 'COGNITO_USER_POOL_ID is required'),
+  COGNITO_CLIENT_ID: z.string().min(1, 'COGNITO_CLIENT_ID is required'),
+  AWS_REGION: z.string().min(1, 'AWS_REGION is required'),
+  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
 });
 
 /**
@@ -172,6 +221,7 @@ export const githubGateConfigSchema = z.object({
 export type AppConfig = z.infer<typeof appConfigSchema>;
 export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
 export type DataConfig = z.infer<typeof dataConfigSchema>;
+export type AuthConfig = z.infer<typeof authConfigSchema>;
 export type StorageConfig = z.infer<typeof storageConfigSchema>;
 export type HostingConfig = z.infer<typeof hostingConfigSchema>;
 export type EmailConfig = z.infer<typeof emailConfigSchema>;
@@ -182,6 +232,8 @@ export type MongoConfig = z.infer<typeof mongoConfigSchema>;
 export type AwsConfig = z.infer<typeof awsConfigSchema>;
 export type AwsHostingConfig = z.infer<typeof awsHostingConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
+export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
+export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
 
