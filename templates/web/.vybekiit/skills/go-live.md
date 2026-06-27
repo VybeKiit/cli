@@ -11,15 +11,17 @@ asked.
 
 ## Steps
 
-1. **Pre-flight check.** Run the project's checks (tests + build) yourself first. If anything is
-   red, fix it (or run `doctor`) **before** going online — never publish a broken app.
-   **Verify:** build passes locally.
+1. **Pre-flight check.** Run `vybekiit doctor` to make sure the deploy tool is installed, then run
+   the project's checks (tests + build) yourself. If anything is red, fix it (or run `doctor`)
+   **before** going online — never publish a broken app.
+   **Verify:** build passes locally and the deploy tool is installed.
 
 2. **Explain in one line.** *"I'm going to put your app online now. You'll click 'approve' once."*
 
-3. **Connect Cloudflare.** Guide them to sign in to Cloudflare (one step at a time). You create the
-   Pages project and connect the app.
-   **Verify:** Cloudflare shows the project.
+3. **Sign in + connect Cloudflare.** If `vybekiit doctor` said the deploy tool isn't signed in, have
+   the builder run the one sign-in command it printed — a browser window opens, they click "approve,"
+   and that's the only thing they do. Then you create the Pages project and connect the app.
+   **Verify:** the deploy tool reports they're signed in, and Cloudflare shows the project.
 
 4. **Move the secret settings over.** Copy the needed secret settings into Cloudflare for them
    (never paste secrets into chat or commit them). 

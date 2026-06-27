@@ -12,9 +12,11 @@ translate every error · celebrate. Decide all technical choices yourself.
    Greet warmly. Ask: *"In one sentence, what do you want to build?"* Use their answer to tailor the
    starter page later — don't turn it into a technical interview.
 
-2. **Get the preview running on their computer.**
-   Install what's needed and start the app yourself. Tell them, in plain words, that you're getting
-   a preview ready.
+2. **Set up the tools, then get the preview running.**
+   First run `vybekiit doctor` — it installs the tools the app will need (for the database and for
+   putting the app online) so the builder never configures anything. It may say a tool "isn't signed
+   in yet" — that's fine for now; sign-in happens later, only when a step needs it (one browser click
+   each). Then install the project's building blocks and start the app yourself, in plain words.
    **Verify:** the dev server is up with no errors. If it fails → run `doctor`.
 
 3. **Show them their app.**
