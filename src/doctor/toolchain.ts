@@ -234,7 +234,9 @@ export function selectToolchain(
 
   const tools: Tool[] = [];
   const add = (tool: Tool): void => {
-    if (!tools.includes(tool)) tools.push(tool);
+    if (!tools.includes(tool)) {
+      tools.push(tool);
+    }
   };
 
   add(GH);
@@ -251,7 +253,9 @@ export function selectToolchain(
       add(SUPABASE);
   }
 
-  if (usesAws) add(AWS);
+  if (usesAws) {
+    add(AWS);
+  }
 
   if (options.mobile) {
     add(EAS);

@@ -31,7 +31,7 @@ describe('runSyncAgentLayer', () => {
     const mirror = await mkdtemp(join(tmpdir(), 'vyb-mirror-'));
     await mkdir(join(mirror, 'web', '.vybekiit'), { recursive: true });
     await writeFile(join(mirror, 'web', 'AGENTS.md'), '# agent');
-    await writeFile(join(mirror, 'web', 'language.md'), '# lang');
+    await writeFile(join(mirror, 'web', 'BUILDER-VOICE.md'), '# lang');
 
     const copied: Array<{ src: string; dest: string }> = [];
     const result = await runSyncAgentLayer(['web'], buyer, {

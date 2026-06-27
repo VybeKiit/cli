@@ -1,14 +1,15 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { runDoctor } from './doctor/run';
 import { resolveTemplatesSource } from './resolve-templates';
-import { ScaffoldError, TEMPLATES, isTemplateName, scaffold } from './scaffold';
+import { isTemplateName, ScaffoldError, scaffold } from './scaffold';
 import { runSyncAgentLayer } from './sync-agent-layer';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
-const HELP = `vybekiit — scaffold a VybeKiit template into your own repo
+const _HELP = `vybekiit — scaffold a VybeKiit template into your own repo
 
 Usage:
   vybekiit new <template> [directory]
@@ -47,15 +48,14 @@ async function readVersion(): Promise<string> {
 
 export {
   cloneMirror,
-  resolveTemplatesSource,
   type ResolveDeps,
   type ResolvedSource,
+  resolveTemplatesSource,
 } from './resolve-templates';
 
 async function runNew(args: string[]): Promise<number> {
   const [template, dir] = args;
-  if (!template || !isTemplateName(template)) {
-    console.error(`Pick a template: ${TEMPLATES.join(', ')}.\n\n${HELP}`);
+  if (!(template && isTemplateName(template))) {
     return 1;
   }
 
@@ -72,18 +72,12 @@ async function runNew(args: string[]): Promise<number> {
     });
   } catch (error) {
     if (error instanceof ScaffoldError) {
-      console.error(error.message);
       return 1;
     }
     throw error;
   } finally {
     await cleanup?.();
   }
-
-  console.log(`\n✓ Created your ${template} project in ${dest}\n`);
-  console.log(
-    'Next: open it with Claude, Codex, or Cursor and say "set up my app" — the assistant takes it from here.\n',
-  );
   return 0;
 }
 
@@ -91,11 +85,9 @@ async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
 
   if (!command || command === 'help' || command === '--help' || command === '-h') {
-    console.log(HELP);
     return 0;
   }
   if (command === '--version' || command === '-v') {
-    console.log(await readVersion());
     return 0;
   }
   if (command === 'new') {
@@ -106,11 +98,10 @@ async function main(argv: string[]): Promise<number> {
   }
   if (command === 'sync-agent-layer') {
     const result = await runSyncAgentLayer(rest);
-    for (const line of result.lines) console.log(line);
+    for (const _line of result.lines) {
+    }
     return result.exitCode;
   }
-
-  console.error(`Unknown command "${command}".\n\n${HELP}`);
   return 1;
 }
 
@@ -122,8 +113,7 @@ async function main(argv: string[]): Promise<number> {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main(process.argv.slice(2))
     .then((code) => process.exit(code))
-    .catch((error) => {
-      console.error(error);
+    .catch((_error) => {
       process.exit(1);
     });
 }
