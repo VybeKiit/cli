@@ -22,8 +22,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1075.0",
+    "@aws-sdk/lib-dynamodb": "^3.1075.0",
     "@supabase/supabase-js": "^2.47.10",
-    "@vybekiit/core": "workspace:*"
+    "@vybekiit/core": "workspace:*",
+    "mongodb": "^7.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

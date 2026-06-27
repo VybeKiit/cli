@@ -93,6 +93,35 @@ export const emailConfigSchema = z.object({
   EMAIL_PROVIDER: z.enum(['cloudflare', 'ses', 'resend']).default('cloudflare'),
 });
 
+/**
+ * MongoDB Atlas credentials — used by `@vybekiit/db` (mongodb adapter).
+ *
+ * `MONGODB_URI` is the full SRV connection string Atlas hands out (it carries the
+ * cluster host + user/password), so it is validated as a non-empty string rather
+ * than a `url()` (Zod's url check rejects the `mongodb+srv://` scheme). `MONGODB_DB`
+ * names the database the adapter opens collections against.
+ */
+export const mongoConfigSchema = z.object({
+  MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
+  MONGODB_DB: z.string().min(1, 'MONGODB_DB is required'),
+});
+
+/**
+ * AWS DynamoDB credentials — used by `@vybekiit/db` (aws adapter).
+ *
+ * `AWS_REGION` is required so the SDK knows which endpoint to hit. The access keys
+ * are optional: when both are present the adapter passes explicit credentials,
+ * otherwise it falls back to the SDK's default credential chain (instance role,
+ * shared config, env vars), so a deploy on AWS infra needs no keys committed.
+ * `AWS_DYNAMODB_TABLE_PREFIX` optionally namespaces table names (e.g. `prod_`).
+ */
+export const awsConfigSchema = z.object({
+  AWS_REGION: z.string().min(1, 'AWS_REGION is required'),
+  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  AWS_DYNAMODB_TABLE_PREFIX: z.string().default(''),
+});
+
 /** Supabase credentials — used by `@vybekiit/auth` and `@vybekiit/db`. */
 export const supabaseConfigSchema = z.object({
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
@@ -135,6 +164,8 @@ export type EmailConfig = z.infer<typeof emailConfigSchema>;
 export type LemonSqueezyConfig = z.infer<typeof lemonSqueezyConfigSchema>;
 export type StripeConfig = z.infer<typeof stripeConfigSchema>;
 export type PaypalConfig = z.infer<typeof paypalConfigSchema>;
+export type MongoConfig = z.infer<typeof mongoConfigSchema>;
+export type AwsConfig = z.infer<typeof awsConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;

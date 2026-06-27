@@ -1,9 +1,13 @@
 import {
+  awsConfigSchema,
   dataConfigSchema,
+  mongoConfigSchema,
   parseEnv,
   storageConfigSchema,
   supabaseConfigSchema,
 } from '@vybekiit/core';
+import { createAwsDataProvider } from './providers/aws';
+import { createMongoDataProvider } from './providers/mongodb';
 import { createSupabaseDataProvider, createSupabaseStorageProvider } from './providers/supabase';
 import type { DataProvider, StorageProvider } from './types';
 
@@ -16,16 +20,15 @@ type EnvSource = Record<string, string | undefined>;
  * to `supabase`) and parses only that adapter's credentials. The agent swaps
  * backends by changing one env value.
  *
- * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}),
- *   or, for `mongodb`/`aws`, a not-implemented error until those adapters ship.
+ * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}).
  */
 export function resolveDataProvider(env: EnvSource = process.env): DataProvider {
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
   switch (DATA_PROVIDER) {
     case 'mongodb':
-      throw new Error('mongodb data adapter ships in a later step'); // TODO(step-4)
+      return createMongoDataProvider(parseEnv(mongoConfigSchema, env));
     case 'aws':
-      throw new Error('aws data adapter ships in a later step'); // TODO(step-4)
+      return createAwsDataProvider(parseEnv(awsConfigSchema, env));
     default:
       return createSupabaseDataProvider(parseEnv(supabaseConfigSchema, env));
   }
