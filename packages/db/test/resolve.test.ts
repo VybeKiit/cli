@@ -14,6 +14,7 @@ vi.mock('@aws-sdk/client-dynamodb', () => ({ DynamoDBClient: class {} }));
 vi.mock('@aws-sdk/lib-dynamodb', () => ({
   DynamoDBDocumentClient: { from: () => ({}) },
 }));
+vi.mock('@aws-sdk/client-s3', () => ({ S3Client: class {} }));
 
 const supabaseEnv = {
   SUPABASE_URL: 'https://x.supabase.co',
@@ -62,9 +63,18 @@ describe('resolveStorageProvider', () => {
     expect(resolveStorageProvider(supabaseEnv).name).toBe('supabase');
   });
 
-  it('throws not-implemented for the s3 adapter', () => {
+  it('constructs the s3 adapter from its AWS config', () => {
+    const provider = resolveStorageProvider({
+      ...supabaseEnv,
+      STORAGE_PROVIDER: 's3',
+      AWS_REGION: 'us-east-1',
+    });
+    expect(provider.name).toBe('s3');
+  });
+
+  it('fails loud when the s3 adapter is selected without its region', () => {
     expect(() => resolveStorageProvider({ ...supabaseEnv, STORAGE_PROVIDER: 's3' })).toThrow(
-      /s3 storage adapter ships in a later step/,
+      /AWS_REGION/,
     );
   });
 });
