@@ -1,0 +1,22 @@
+{
+  "name": "vybekiit",
+  "version": "0.1.0",
+  "description": "Scaffold a VybeKiit template into your own repo: `npx vybekiit new web my-app`.",
+  "license": "SEE LICENSE IN ../LICENSE.md",
+  "type": "module",
+  "bin": {
+    "vybekiit": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
