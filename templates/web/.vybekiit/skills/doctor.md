@@ -22,13 +22,20 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
      prints (a browser window opens; they click approve). Then make sure the project's dependencies
      are installed.
    - **Code health:** run the build/tests. Read the first real error (not the noise).
+   - **Platform instructions stale?** If symptoms match outdated framework patterns (old routing,
+     deprecated APIs), suggest running `update-kit` before deep debugging — say *"I'll refresh my
+     instructions first"* in plain words, never name upstream tools.
    - **Services reachable:** if it's data-related, check the database is reachable
-     (`@vybekiit/db`'s `pingDatabase`). If payments, re-check the three Lemon Squeezy values.
+     (`@vybekiit/db`'s `pingDatabase`). If payments, re-check payment secret values.
 
 3. **Fix the one thing.** Make the smallest change that addresses the actual cause. If it's a value
    the builder must supply, ask for **just that one**, with exactly where to get it.
 
-4. **Verify the fix.** Re-run the thing that was broken. Confirm it works now.
+4. **Still stuck on generated code?** If the fix lives in scaffolded kit code and basics are green,
+   follow the maintainer **diagnose** workflow internally (`~/.claude/skills/diagnose/SKILL.md` or
+   equivalent) — never expose that skill name to the builder. Translate the outcome to one plain fix.
+
+5. **Verify the fix.** Re-run the thing that was broken. Confirm it works now.
    🎉 *Celebrate* — and tell them in one sentence what it was, in plain words.
 
 ## Rules

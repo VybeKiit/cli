@@ -5,9 +5,12 @@
 **Contract:** one action at a time · verify-before-advance · plain language (`language.md`) ·
 translate every error · celebrate. You do the whole update; the builder just watches and confirms.
 
-> (Under the hood — agent-only) The kit's logic lives in the `@vybekiit/*` npm packages. Updates are
-> **version bumps, not git merges** — the builder's own files are never touched (see CONTEXT
-> Owned/Maintained). The passing test suite is what makes a bump safe.
+> (Under the hood — agent-only) Updates run through **three channels** inside this one skill:
+> npm package bumps (`@vybekiit/*`), agent-layer refresh from the template mirror, and platform
+> instruction files pinned in `.agents/skills/`. The builder's own app code is never touched — only
+> maintained kit files listed in ADR-0007. Use `planKitUpdate()` from `@vybekiit/agent-kit` for
+> channel 1; `vybekiit sync-agent-layer` for channel 2; `npx skills update -y` for channel 3 when
+> `skills-lock.json` exists.
 
 ## Steps
 
@@ -15,11 +18,23 @@ translate every error · celebrate. You do the whole update; the builder just wa
    before changing anything. This is the before-picture you'll compare against.
    **Verify:** all tests pass. If any are red, fix those first — never update on top of a broken app.
 
-2. **Explain in one line.** *"I'm going to pull in the latest improvements. Your own work won't be
-   touched, and I'll test everything after."*
+2. **Explain in one line.** *"I'm going to pull in the latest improvements — the kit packages and
+   my latest instructions. Your own work won't be touched, and I'll test everything after."*
 
-3. **Update the kit packages.** Bump the `@vybekiit/*` packages to their latest versions.
+3. **Update all three channels** (same plain sentence to the builder for each — never name tools):
+
+   **3a — Kit packages.** Bump the `@vybekiit/*` packages to their latest versions (use
+   `planKitUpdate()` to decide what to bump).
    **Verify:** the install finishes cleanly.
+
+   **3b — Agent instructions.** Run `vybekiit sync-agent-layer` (or pass `web` if detection fails).
+   Tell the builder: *"I'm refreshing my latest instructions for your project."*
+   **Verify:** command exits 0; allowlisted paths copied (`.vybekiit/`, `AGENTS.md`, `language.md`,
+   etc.).
+
+   **3c — Platform instructions.** If `skills-lock.json` exists, run `npx skills update -y`.
+   Use the same plain sentence — never name Expo, Vercel, or the skills CLI.
+   **Verify:** update completes or report a plain-language retry later.
 
 4. **Re-run the tests.** Run the full suite again.
    **Verify:** still green. If something broke, fix it — or roll back to the previous versions and
@@ -37,5 +52,6 @@ the kit packages back to the last working versions — the app keeps working whi
 
 ## Definition of done
 
-The kit packages are on their latest working versions, the tests are green, the app still works, and
-none of the builder's own files were changed.
+The kit packages are on their latest working versions, agent instructions are refreshed, platform
+skills are updated when pinned, the tests are green, the app still works, and none of the builder's
+own app files were changed.

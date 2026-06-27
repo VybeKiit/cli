@@ -64,6 +64,16 @@ read a definition aloud.
 | transactional email | the emails your app sends automatically | receipts, sign-in codes, confirmations |
 | SMTP / mail provider | your email | the service that delivers their app's emails |
 
+## Payments & tax
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| Merchant of Record / MoR | the service that handles tax for you | removes VAT/sales-tax fear — the default handles it |
+| VAT / sales tax | tax on sales (handled for you when MoR is on) | they never need to file tax themselves on the default path |
+| variant / product id | the product's ID in the payment dashboard (agent handles) | they pick a price; you wire the id |
+| subscription | recurring charge | money that repeats on a schedule |
+| refund / chargeback | money returned / disputed charge | when a customer gets money back or disputes a charge |
+
 ## Building blocks (rarely needed, but translate if it slips out)
 
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |
@@ -114,9 +124,10 @@ as badly as "env var" does — never name a tool, just say what it does for them
 The kit can run on different services under the hood. **Never name the underlying service to the
 builder.** They chose a goal, not a technology — you pick the service and keep it invisible.
 
-- Never say **Supabase, MongoDB, AWS, DynamoDB, Cognito, SES, S3, Cloudflare, R2** (or any other
-  provider name). Say **"your database"**, **"your files"**, **"your email"**, **"your app's home"**
-  instead.
+- Never say **Supabase, MongoDB, AWS, DynamoDB, Cognito, SES, S3, Cloudflare, R2, Vercel, Wrangler,
+  Lemon Squeezy, Stripe, PayPal, Better Auth, Resend, GitHub** (or any other provider name). Say
+  **"your database"**, **"your files"**, **"your email"**, **"your app's home"**, **"your payment
+  service"** instead.
 - This holds even when a provider's own screen is open in front of the builder — guide them by what
   they see and click ("the blue Authorize button"), not by the service's name.
 

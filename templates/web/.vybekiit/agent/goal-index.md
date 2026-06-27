@@ -14,6 +14,9 @@ translate errors · celebrate.
 | "save my data", "remember this", "store info", "add a database" | `skills/save-data.md` |
 | "let users upload", "store files / images / attachments" | `skills/add-files.md` |
 | "send emails", "email my users", "set up email" | `skills/setup-email.md` |
+| "invite teammates", "add my team", "work with others", "organizations" | `skills/add-teams.md` |
+| "notify users", "send alerts", "email when something happens" | `skills/add-notifications.md` |
+| "see who uses my app", "visitor stats", "analytics", "track usage" | `skills/add-analytics.md` |
 | "get a domain", "buy a web address", "use my own URL" | `skills/buy-domain.md` |
 | "update the kit", "get the latest", "upgrade" | `skills/update-kit.md` |
 | "it's broken", "nothing works", "I get an error", "check my app" | `skills/doctor.md` |

@@ -7,6 +7,9 @@ import { DASHBOARD_STATS, GETTING_STARTED } from '@/data/dashboard';
  *
  * TODO(vybekiit): protect this route — redirect to /login when there is no session — skill: add-signin
  * TODO(vybekiit): replace the placeholder stats with the builder's real data — skill: save-data
+ * TODO(vybekiit): show team invites and members — skill: add-teams
+ * TODO(vybekiit): wire email notifications for key events — skill: add-notifications
+ * TODO(vybekiit): show visitor stats or link to stats — skill: add-analytics
  */
 export default function DashboardPage() {
   return (
