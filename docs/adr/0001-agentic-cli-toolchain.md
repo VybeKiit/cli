@@ -49,3 +49,14 @@ ends in a refund.
   the exact friction this product exists to remove.
 - **Guide-create the Supabase project** (buyer makes it in the dashboard, agent links): more robust
   against org/billing walls, but less hands-off than the owner wanted.
+
+## Update (2026-06-29) — agent runtime + platform skills
+
+`vybekiit doctor` now checks two layers:
+
+1. **Agent runtime** — `claude` (Claude Code), `codex` (OpenAI Codex), `skills` (skills.sh CLI).
+   At least one of Claude or Codex must be installed (Cursor sessions are detected and skipped).
+2. **Cloud provision** — provider-aware CLIs unchanged (`gh`, `wrangler`, `supabase`, `aws`, `gcloud`, …).
+
+Doctor also verifies `platform-skills.manifest.json` skills exist under `.agents/skills/`.
+See ADR-0009 for security env toggles doctor-adjacent skills reference.

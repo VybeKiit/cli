@@ -121,6 +121,14 @@ a definition aloud.
 | RLS / row-level security | the rule that keeps each customer's data private to them | so one customer can never see another's information |
 | connection string | the private address your app uses to reach its storage | the secret address that points the web app at its real storage |
 
+## Safety & sign-in
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| chrome.identity | Chrome handles your Google login | the browser's built-in sign-in |
+| Continue with Google | sign in or sign up with Google | one tap from the extension |
+| rate limit | protection on your backend | the extension talks to a protected server |
+
 ## Settings & places
 
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |

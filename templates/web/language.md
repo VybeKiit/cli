@@ -125,6 +125,17 @@ read a definition aloud.
 | RLS / row-level security | the rule that keeps each customer's data private to them | so one customer can never see another's information |
 | connection string | the private address your app uses to reach its storage | the secret address that points the app at its real storage |
 
+## Safety & sign-in
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| rate limit | how fast someone can hammer your app before we slow them down | stops password-guessing and abuse |
+| origin lock / CORS | blocking requests pretending to come from another site | stops other websites from abusing your forms |
+| Continue with Google / OAuth | sign in or sign up with Google in one tap | no new password to remember |
+| SQL injection | your database only accepts safe, checked requests | their customers' data stays protected |
+| DDoS | your app slows down attackers before they overwhelm it | stays online under abuse |
+| contact form limit | your visitors can reach you without getting blocked | human-paced forms stay usable |
+
 ## Settings & places
 
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |

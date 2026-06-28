@@ -21,6 +21,72 @@ export const appConfigSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
 });
 
+/** An `on`/`off` env switch — the plain-language toggle a non-coder edits in `.env`. */
+const onOff = z.enum(['on', 'off']);
+
+/**
+ * Coerce an env string to a positive integer, treating blank/absent as the default.
+ *
+ * Env values are always strings; a key left empty in a copied `.env` would otherwise
+ * coerce to `0` and trip the `positive()` guard. Pre-mapping `''`/`undefined` to
+ * `undefined` lets the schema default apply, so a blank line means "use the safe
+ * default" rather than "fail to boot" — important when the consumer is a non-coder.
+ */
+const positiveIntEnv = (fallback: number) =>
+  z.preprocess(
+    (value) => (value === undefined || value === '' ? undefined : value),
+    z.coerce.number().int().positive().default(fallback),
+  );
+
+/**
+ * App-layer security — the protection every SaaS needs but a non-coder never thinks
+ * to ask for, so the kit ships it **on by default** and exposes plain toggles here.
+ * Read by `@vybekiit/security` (the headless engine), the web `middleware.ts`, and
+ * the Cloudflare edge config in `infra/` — one source of truth, three enforcement
+ * points, so a rule can never mean different things on different layers.
+ *
+ * - `SECURITY_RATE_LIMIT` / `_MAX` / `_WINDOW_SECONDS`: cap requests per client (by
+ *   IP) to blunt brute-force and abuse on the auth + checkout routes. Default: 60
+ *   requests / 60s.
+ * - `SECURITY_ORIGIN_LOCK`: reject cross-site POSTs whose `Origin` isn't the app
+ *   itself (basic CSRF / API-scraping defense). Same-origin always passes; the
+ *   browser sends no `Origin` on top-level navigations, so pages are unaffected.
+ * - `SECURITY_ALLOWED_ORIGINS`: comma-separated extra origins allowed past the lock
+ *   (e.g. a separate marketing site or a mobile web build). Blank = same-origin only,
+ *   the safe default. `@vybekiit/security` splits the CSV; core keeps the raw string.
+ */
+export const securityConfigSchema = z.object({
+  SECURITY_RATE_LIMIT: onOff.default('on'),
+  /** Default ceiling for routes that don't match a tier-specific override. */
+  SECURITY_RATE_LIMIT_MAX: positiveIntEnv(60),
+  SECURITY_RATE_LIMIT_WINDOW_SECONDS: positiveIntEnv(60),
+  /** Strict tier — auth/sign-up routes (brute-force targets). Default 10/min. */
+  SECURITY_RATE_LIMIT_AUTH_MAX: positiveIntEnv(10),
+  /** Lenient tier — human-paced public forms (contact, waitlist). Default 30/min. */
+  SECURITY_RATE_LIMIT_PUBLIC_FORM_MAX: positiveIntEnv(30),
+  SECURITY_ORIGIN_LOCK: onOff.default('on'),
+  SECURITY_ALLOWED_ORIGINS: z.string().default(''),
+});
+
+/**
+ * Google OAuth credentials — used by `@vybekiit/auth` (better-auth social provider)
+ * to power "sign in with Google". All optional because the agent provisions them for
+ * the builder: the `sign-in-with-google` skill runs `gcloud` (installed by
+ * `vybekiit doctor`, ADR-0001) to create the OAuth client, then writes these keys.
+ * The package imports + the `doctor` skill therefore run before the values exist;
+ * the adapter fails loud at first sign-in attempt while they're still blank, rather
+ * than half-enabling a broken login. `GOOGLE_OAUTH_REDIRECT_URI` defaults to the
+ * app's callback path so local dev needs no value.
+ */
+export const googleOAuthConfigSchema = z.object({
+  GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_OAUTH_CLIENT_SECRET: z.string().min(1).optional(),
+  GOOGLE_OAUTH_REDIRECT_URI: z
+    .string()
+    .url('GOOGLE_OAUTH_REDIRECT_URI must be a valid URL')
+    .optional(),
+});
+
 /**
  * Which payment adapter `@vybekiit/payments` constructs. A buyer runs one provider
  * at a time; the agent swaps by changing this single value. Lemon Squeezy is the
@@ -250,6 +316,8 @@ export const storeConfigSchema = z.object({
 });
 
 export type AppConfig = z.infer<typeof appConfigSchema>;
+export type SecurityConfig = z.infer<typeof securityConfigSchema>;
+export type GoogleOAuthConfig = z.infer<typeof googleOAuthConfigSchema>;
 export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
 export type DataConfig = z.infer<typeof dataConfigSchema>;
 export type AuthConfig = z.infer<typeof authConfigSchema>;

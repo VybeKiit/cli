@@ -1,5 +1,7 @@
 export {
   appConfigSchema,
+  securityConfigSchema,
+  googleOAuthConfigSchema,
   paymentsConfigSchema,
   dataConfigSchema,
   authConfigSchema,
@@ -21,6 +23,8 @@ export {
   storeConfigSchema,
   parseEnv,
   type AppConfig,
+  type SecurityConfig,
+  type GoogleOAuthConfig,
   type PaymentsConfig,
   type DataConfig,
   type AuthConfig,
