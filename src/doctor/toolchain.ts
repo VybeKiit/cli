@@ -19,7 +19,9 @@
  * defaults (Supabase + Cloudflare) that's exactly `[gh, wrangler, supabase]` — today's
  * behavior plus the base tool. Selecting the Mongo data adapter adds the MongoDB Atlas CLI;
  * any active AWS adapter (data / storage / email / auth / hosting) adds the AWS CLI
- * once. A **mobile** project (passed `mobile: true`) appends the build/publish tools
+ * once. When the app uses **sign in with Google** the Google Cloud CLI (`gcloud`) is added
+ * so the agent can provision the Google OAuth client without the buyer touching the Cloud
+ * console. A **mobile** project (passed `mobile: true`) appends the build/publish tools
  * (`eas` + `launch`) on top of the env-selected web tools. Playwright arrives with the
  * extension template in v3 — no tool ships before the template/adapter that uses it.
  */
@@ -154,6 +156,76 @@ const AWS: Tool = {
 };
 
 /**
+ * Google Cloud CLI — added only when the app uses **sign in with Google**, so the agent
+ * can provision the Google OAuth client (the `GOOGLE_OAUTH_CLIENT_ID` / consent screen)
+ * without the buyer opening the Cloud console. Installs via the documented community
+ * Homebrew cask (`gcloud-cli`, formerly `google-cloud-sdk`) on macOS/Linux — matching the
+ * file's Homebrew-on-Linux channel — and the Scoop `gcloud` manifest on Windows, mirroring
+ * the `gh`/`supabase`/`aws` channels. Sign-in lives in gcloud's own store: we probe for an
+ * active account with `gcloud auth list`, and the one-time login is the browser device
+ * flow `gcloud auth login` (consistent with ADR-0001's interactive-browser-login rule).
+ */
+const GCLOUD: Tool = {
+  name: 'gcloud',
+  purpose: 'set up sign in with Google for your app',
+  versionArgs: ['--version'],
+  install: {
+    // `--cask` because gcloud ships as a community cask, not a formula (the file's first cask).
+    darwin: { command: 'brew', args: ['install', '--cask', 'gcloud-cli'], requires: 'Homebrew' },
+    win32: { command: 'scoop', args: ['install', 'gcloud'], requires: 'Scoop' },
+    linux: { command: 'brew', args: ['install', '--cask', 'gcloud-cli'], requires: 'Homebrew' },
+  },
+  // `auth list` exits non-zero / prints nothing without an active account; login is the browser flow.
+  auth: { command: 'gcloud', args: ['auth', 'list'], loginHint: 'gcloud auth login' },
+};
+
+/**
+ * Claude Code — the primary agent runtime VybeKiit ships for. Installed globally via npm
+ * so `vybekiit doctor` can provision it without the buyer hunting installers.
+ */
+const CLAUDE: Tool = {
+  name: 'claude',
+  purpose: 'your AI coding assistant (Claude Code)',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
+    win32: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
+    linux: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
+  },
+};
+
+/**
+ * OpenAI Codex CLI — supported agent runtime alongside Claude Code and Cursor.
+ */
+const CODEX: Tool = {
+  name: 'codex',
+  purpose: 'your AI coding assistant (OpenAI Codex)',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
+    win32: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
+    linux: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
+  },
+};
+
+/**
+ * skills.sh CLI — pins official upstream platform skills into `.agents/skills/` (ADR-0007).
+ */
+const SKILLS: Tool = {
+  name: 'skills',
+  purpose: 'install the official platform skills your app needs',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'skills'] },
+    win32: { command: 'npm', args: ['install', '-g', 'skills'] },
+    linux: { command: 'npm', args: ['install', '-g', 'skills'] },
+  },
+};
+
+/** Agent-runtime CLIs always checked by doctor (Layer 1 — ADR-0001 update). */
+export const AGENT_TOOLS: readonly Tool[] = [CLAUDE, CODEX, SKILLS];
+
+/**
  * EAS CLI — builds a mobile project into an installable app for the stores. Ships
  * only with a mobile project; installs via npm global on every OS. Sign-in is its own
  * native store (an Expo account), probed with `eas whoami`.
@@ -199,18 +271,24 @@ export const TOOLCHAIN: readonly Tool[] = [GH, WRANGLER, SUPABASE];
  *
  * @property mobile - true for an Expo project; appends the build/publish tools
  *   (`eas` + `launch`) on top of the env-selected web tools. `run.ts` detects this.
+ * @property wantsGoogleAuth - true when the app uses sign in with Google; adds the
+ *   `gcloud` CLI so the agent can provision the Google OAuth client. A truthy
+ *   `GOOGLE_OAUTH_CLIENT_ID` in the env is treated as the same signal, so callers that
+ *   only have the env (not the flag) still get `gcloud`.
  */
 export interface ToolchainOptions {
   readonly mobile?: boolean;
+  readonly wantsGoogleAuth?: boolean;
 }
 
 /**
  * Pick the CLIs the buyer's *active* providers need, read from the `*_PROVIDER` env
  * keys (defaults preserved). `gh` always leads — it's the base tool that downloads the
  * template files and signs the buyer in to GitHub (ADR-0005), needed for every template.
- * After it the order is hosting → data → AWS, then the mobile build/publish tools when
- * this is an Expo project. The AWS CLI is added at most once however many AWS adapters
- * are in use, and `eas`/`launch` are deduped the same way.
+ * After it the order is hosting → data → AWS → `gcloud` (when the app uses sign in with
+ * Google), then the mobile build/publish tools when this is an Expo project. The AWS CLI
+ * is added at most once however many AWS adapters are in use, and `eas`/`launch` are
+ * deduped the same way.
  *
  * Returning the per-provider tools on top of the `gh` base — rather than installing
  * every CLI for every backend — is what keeps `doctor` to "no tool before its
@@ -257,12 +335,50 @@ export function selectToolchain(
     add(AWS);
   }
 
+  // Sign in with Google needs a provisioned OAuth client; the flag and the env key are
+  // the same signal so callers can pass either (e.g. run.ts has only the env at hand).
+  if (options.wantsGoogleAuth || env.GOOGLE_OAUTH_CLIENT_ID) {
+    add(GCLOUD);
+  }
+
   if (options.mobile) {
     add(EAS);
     add(LAUNCH);
   }
 
   return tools;
+}
+
+/**
+ * Merge agent-runtime tools (always) with provider-selected cloud CLIs.
+ * Agent tools lead so the report surfaces "your AI assistant" before infra CLIs.
+ */
+export function mergeAgentAndProviderTools(providerTools: readonly Tool[]): Tool[] {
+  const merged: Tool[] = [];
+  const add = (tool: Tool): void => {
+    if (!merged.some((t) => t.name === tool.name)) {
+      merged.push(tool);
+    }
+  };
+  for (const tool of AGENT_TOOLS) {
+    add(tool);
+  }
+  for (const tool of providerTools) {
+    add(tool);
+  }
+  return merged;
+}
+
+/** True when at least one agent runtime (Claude Code or Codex) is installed. */
+export function isAgentRuntimeReady(reports: readonly ToolReport[]): boolean {
+  const claude = reports.find((r) => r.tool === 'claude');
+  const codex = reports.find((r) => r.tool === 'codex');
+  return Boolean(claude?.installed || codex?.installed);
+}
+
+/** True when the skills.sh CLI is installed. */
+export function isSkillsCliReady(reports: readonly ToolReport[]): boolean {
+  return reports.find((r) => r.tool === 'skills')?.installed ?? false;
 }
 
 /** Presence of one tool, as observed by the executor. */
