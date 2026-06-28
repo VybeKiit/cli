@@ -86,6 +86,41 @@ a definition aloud.
 | frontend | the part people see and click | the popup, panel, and pages |
 | server | the always-on backend running your web app | where data and sign-in live |
 
+## Setting up (first run)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| GitHub invite / repo access | unlocking your copy of the kit | the one-time access that turns their purchase into a real project |
+| `npx vybekiit` / scaffold / generate the project | setting up your add-on's starting point | the moment a blank folder becomes their add-on |
+| clone / mirror | copying the starter into your project | how the starting point lands on their computer |
+| `pnpm install` / dependencies download | getting the building blocks ready | a one-time wait while the ready-made pieces arrive |
+| version bump / update the kit | getting the latest improvements (safe, nothing you built changes) | reassure them updates never touch their own work |
+
+## Practice mode (before a real backend is wired)
+
+> A freshly set-up project runs straight away on practice data — no accounts, no setup needed. The
+> practice data lives on the web app behind the add-on, the same place a real one will later.
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| local / in-memory data | practice data on your computer | temporary info so things work the moment it's set up — it resets, and that's expected while building |
+| dev user / fake session | a starter sign-in just for you while we build | they're "signed in" without a real account yet, so they can see the signed-in screens |
+| resets on restart | the practice info clears when we restart | reassure them nothing is broken — practice data is meant to come and go |
+| "wire a real backend" | now your app remembers things for real / for your customers | the upgrade from practice to a permanent home for their data |
+
+## Your app's real storage (when we set it up for real)
+
+> This lives on the web app behind the add-on (the add-on never holds secrets — see "Core" above).
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| provision / project create | creating your app's real storage | the step that gives their data a permanent home |
+| region | where your app's data lives (closest to your customers) | a one-question choice so things feel fast for the people who use it |
+| service-role key | the master key (kept secret, server-only) | the powerful key only the web app's behind-the-scenes part may ever hold |
+| anon / public key | the public key | the safe-to-share key the add-on's screens use |
+| RLS / row-level security | the rule that keeps each customer's data private to them | so one customer can never see another's information |
+| connection string | the private address your app uses to reach its storage | the secret address that points the web app at its real storage |
+
 ## Settings & places
 
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |
