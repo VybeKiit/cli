@@ -35,7 +35,9 @@ a definition aloud.
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |
 |---|---|---|
 | App Store / Google Play | the app stores | where people find and download their app |
-| TestFlight | the test version testers can try | hand the app to a few people before the public launch |
+| Expo / native build | turning your app into a real phone app | the step that makes a true installable phone app, not just the preview |
+| EAS / build service | the service that packages your phone app | builds the installable phone app for them — a wait they don't have to watch |
+| TestFlight / internal testing | the test version testers can try | hand the app to a few people before the public launch |
 | bundle id / package name | your app's unique id | the one permanent name the stores file the app under |
 | build (for the stores) | the installable version of your app | what gets uploaded for review |
 | over-the-air update / OTA | a quick fix sent straight to phones | small changes without a new store review |
@@ -87,6 +89,41 @@ a definition aloud.
 | CI | the automatic checker | catches problems before users ever see them |
 | endpoint | one address your app can talk to | one specific thing the backend can do for the app |
 | client | the app running on someone's phone | what the user actually sees and taps |
+
+## Setting up (first run)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| GitHub invite / repo access | unlocking your copy of the kit | the one-time access that turns their purchase into a real project |
+| `npx vybekiit` / scaffold / generate the project | setting up your app's starting point | the moment a blank folder becomes their app |
+| clone / mirror | copying the starter into your project | how the starting point lands on their computer |
+| `pnpm install` / dependencies download | getting the building blocks ready | a one-time wait while the ready-made pieces arrive |
+| version bump / update the kit | getting the latest improvements (safe, nothing you built changes) | reassure them updates never touch their own work |
+
+## Practice mode (before a real backend is wired)
+
+> A freshly set-up app runs straight away on practice data — no accounts, no setup needed. See "On
+> the phone" above for previewing it; this is the practice *data* that fills the screens.
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| local / in-memory data | practice data on your computer | temporary info so the app works the moment it's set up — it resets, and that's expected while building |
+| dev user / fake session | a starter sign-in just for you while we build | they're "signed in" without a real account yet, so they can see the signed-in screens |
+| resets on restart | the practice info clears when we restart | reassure them nothing is broken — practice data is meant to come and go |
+| "wire a real backend" | now your app remembers things for real / for your customers | the upgrade from practice to a permanent home for their data |
+
+## Your app's real storage (when we set it up for real)
+
+> This lives on the backend, not on the phone (the phone holds no secrets — see "Core" above).
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| provision / project create | creating your app's real storage | the step that gives their data a permanent home |
+| region | where your app's data lives (closest to your customers) | a one-question choice so the app feels fast for the people who use it |
+| service-role key | the master key (kept secret, server-only) | the powerful key only the app's behind-the-scenes part may ever hold |
+| anon / public key | the public key | the safe-to-share key the phone app uses |
+| RLS / row-level security | the rule that keeps each customer's data private to them | so one customer can never see another's information |
+| connection string | the private address your app uses to reach its storage | the secret address that points the app at its real storage |
 
 ## Settings & places
 

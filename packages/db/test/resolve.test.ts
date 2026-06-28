@@ -22,8 +22,22 @@ const supabaseEnv = {
 };
 
 describe('resolveDataProvider', () => {
-  it('defaults to the supabase adapter', () => {
+  it('falls back to the local adapter when nothing is configured', () => {
+    expect(resolveDataProvider({}).name).toBe('local');
+  });
+
+  it('resolves supabase when its keys are present (a real backend is intended)', () => {
+    // A Supabase anchor key alone is enough to mean "real backend, not local".
     expect(resolveDataProvider(supabaseEnv).name).toBe('supabase');
+  });
+
+  it('resolves supabase for an explicit DATA_PROVIDER=supabase with its keys', () => {
+    const provider = resolveDataProvider({ ...supabaseEnv, DATA_PROVIDER: 'supabase' });
+    expect(provider.name).toBe('supabase');
+  });
+
+  it('resolves the local adapter for an explicit DATA_PROVIDER=local', () => {
+    expect(resolveDataProvider({ DATA_PROVIDER: 'local' }).name).toBe('local');
   });
 
   it('constructs the mongodb adapter from its config', () => {

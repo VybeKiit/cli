@@ -7,8 +7,11 @@ import type { AuthUser } from './user';
  * active `DATA_PROVIDER`, ADR-0003). `better-auth` is the DB-bound default — its
  * tables live in the same database the builder's data uses — and `cognito` is the
  * AWS path for apps whose data lives in DynamoDB (which has no better-auth adapter).
+ * `local` is the zero-config dev fallback (ADR-0008): a single fixed dev identity
+ * that accepts any credentials/OTP, returned implicitly when nothing is configured
+ * so a fresh scaffold can sign in offline. The builder never picks it.
  */
-export type AuthProviderName = 'better-auth' | 'cognito';
+export type AuthProviderName = 'better-auth' | 'cognito' | 'local';
 
 /**
  * The swappable auth seam — the single interface every call site (and the

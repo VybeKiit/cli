@@ -26,6 +26,23 @@ const cognitoEnv = {
 };
 
 describe('resolveAuthProvider', () => {
+  it('falls back to the local adapter when nothing is configured', () => {
+    expect(resolveAuthProvider({}).name).toBe('local');
+  });
+
+  it('resolves the local adapter for an explicit AUTH_PROVIDER=local', () => {
+    expect(resolveAuthProvider({ AUTH_PROVIDER: 'local' }).name).toBe('local');
+  });
+
+  it('pairs local auth with an explicit DATA_PROVIDER=local (no secret required)', () => {
+    expect(resolveAuthProvider({ DATA_PROVIDER: 'local' }).name).toBe('local');
+  });
+
+  it('uses better-auth (not local) once its secret is present', () => {
+    const provider = resolveAuthProvider(betterAuthEnv, { betterAuthInstance });
+    expect(provider.name).toBe('better-auth');
+  });
+
   it('defaults to better-auth when DATA_PROVIDER is supabase', () => {
     const provider = resolveAuthProvider(betterAuthEnv, { betterAuthInstance });
     expect(provider.name).toBe('better-auth');

@@ -13,6 +13,7 @@ export {
 } from './providers/supabase';
 export { createMongoDataProvider } from './providers/mongodb';
 export { createAwsDataProvider } from './providers/aws';
+export { createLocalDataProvider } from './providers/local';
 export { createS3StorageProvider } from './providers/s3';
 // Low-level Supabase data code, for callers that want raw client access.
 export { createDbClient } from './client';
