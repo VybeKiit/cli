@@ -17,7 +17,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "mirror": "node scripts/mirror-templates.mjs",
+    "mirror": "node scripts/mirror-repos.mjs",
+    "test:scripts": "vitest run --root scripts",
     "prepare": "husky"
   },
   "devDependencies": {

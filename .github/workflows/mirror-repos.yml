@@ -1,14 +1,26 @@
-# Mirrors templates/* → VybeKiit/* one-way, force (ADR-0005). For each template,
-# `git subtree split` isolates its subtree and force-pushes it to the matching mirror's
-# main; the monorepo stays the single source of truth and mirrors are derived artifacts.
+# Mirrors monorepo paths → VybeKiit/* one-way, force (ADR-0005). For each delivery repo,
+# `git subtree split` isolates its mapped prefix and force-pushes it to the matching
+# mirror's main; the monorepo stays the single source of truth and mirrors are derived
+# artifacts. Covers web/mobile/extension (templates), cli, and infra (skipped until #7
+# creates its source).
 #
 # REQUIRES a `GH_MIRROR_TOKEN` repo secret: a PAT with `contents:write` on the mirror
 # repos. The default GITHUB_TOKEN is scoped to THIS repo only, so it cannot push to the
 # mirror repos. When the secret is absent (a fork or secret-less run) the job no-ops with
 # a clear message instead of hard-failing.
-name: mirror-templates
+name: mirror-repos
 
 on:
+  # Re-sync whenever mirrored source lands on main, so a buyer scaffolding mid-week gets
+  # current code (not the last tagged release). Paths-filtered to skip unrelated commits.
+  push:
+    branches: [main]
+    paths:
+      - "templates/**"
+      - "cli/**"
+      - "infra/**"
+      - "scripts/mirror-repos.mjs"
+      - "scripts/pin-platform-skills.mjs"
   release:
     types: [published]
   workflow_dispatch:
@@ -39,18 +51,12 @@ jobs:
         with:
           node-version: 22
 
-      - name: Configure git
-        if: steps.guard.outputs.enabled == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Pin platform skills
         if: steps.guard.outputs.enabled == 'true'
         run: node scripts/pin-platform-skills.mjs
 
-      - name: Mirror templates
+      - name: Mirror repos
         if: steps.guard.outputs.enabled == 'true'
         env:
           GH_MIRROR_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
-        run: node scripts/mirror-templates.mjs
+        run: node scripts/mirror-repos.mjs
