@@ -24,3 +24,6 @@ coverage/
 docs/checklist.md
 .bridge/
 downloads/
+
+# session scratch — agent worktrees + local harness settings (never tracked)
+.claude/

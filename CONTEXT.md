@@ -383,6 +383,15 @@ one interface, swappable backends, one default. The builder never picks one; the
 one secret setting.
 _Avoid_: provider (in buyer voice — say "the service your app uses" not "the MongoDB adapter").
 
+**Local dev adapter**:
+The zero-config, in-memory `local` adapter for `@vybekiit/db` and `@vybekiit/auth` that resolves
+**only when no backend is configured**, so a freshly scaffolded app runs on the first `pnpm dev`
+(fake dev user, session-scoped data) — making the **keystone** (live in session #1) real before any
+account exists. An explicit provider always wins; data resets on restart by design (ADR-0008). In
+buyer voice it is "practice data" / "a starter sign-in", never "the local adapter".
+_Avoid_: calling it a backend the buyer chooses (it is an invisible fallback, swapped out by
+[[add-signin]] / [[save-data]]).
+
 **Provider interface**:
 The per-concern contract (data, auth, hosting/deploy, storage, email, payments) with swappable
 adapters and one default. Skills are written once against the interface, so a new adapter never adds
