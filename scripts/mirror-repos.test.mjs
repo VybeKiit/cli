@@ -13,12 +13,13 @@ import { parseArgs, redact } from './mirror-repos.mjs';
  */
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** The mirrors whose source prefix must exist today (infra is dormant until issue #7). */
+/** The mirrors whose source prefix must exist today. */
 const PRESENT_MIRRORS = [
   { repo: 'web', path: 'templates/web' },
   { repo: 'mobile', path: 'templates/mobile' },
   { repo: 'extension', path: 'templates/extension' },
   { repo: 'cli', path: 'cli' },
+  { repo: 'infra', path: 'infra' },
 ];
 
 describe('parseArgs', () => {

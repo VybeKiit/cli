@@ -17,6 +17,7 @@ translate errors · celebrate.
 | "see who uses my app", "visitor stats", "analytics" | `skills/add-analytics.md` |
 | "update the kit", "get the latest", "upgrade" | `skills/update-kit.md` |
 | "it's broken", "nothing works", "I get an error", "check my extension" | `skills/doctor.md` |
+| "sign in with Google", "sign up with Google", "Continue with Google" | `skills/sign-in-with-google.md` |
 | "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
 
 Anything else (change the design, add a popup page, tweak text) is **not** a skill — just do it well

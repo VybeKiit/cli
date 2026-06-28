@@ -5,7 +5,13 @@
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  transpilePackages: ['@vybekiit/core', '@vybekiit/auth', '@vybekiit/db', '@vybekiit/payments'],
+  transpilePackages: [
+    '@vybekiit/core',
+    '@vybekiit/auth',
+    '@vybekiit/db',
+    '@vybekiit/payments',
+    '@vybekiit/security',
+  ],
 };
 
 export default nextConfig;

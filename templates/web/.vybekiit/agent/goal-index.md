@@ -20,6 +20,9 @@ translate errors · celebrate.
 | "get a domain", "buy a web address", "use my own URL" | `skills/buy-domain.md` |
 | "update the kit", "get the latest", "upgrade" | `skills/update-kit.md` |
 | "it's broken", "nothing works", "I get an error", "check my app" | `skills/doctor.md` |
+| "lock down my app", "make it safe", "protect from abuse" | `skills/harden.md` |
+| "sign in with Google", "sign up with Google", "Continue with Google" | `skills/sign-in-with-google.md` |
+| "am I ready to ship", "did we cover security", "is my app safe" | `skills/check-safety.md` |
 | "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
 
 Anything else (change the design, add a page, tweak text, general coding) is **not** a skill — just

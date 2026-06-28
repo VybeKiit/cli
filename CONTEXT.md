@@ -169,6 +169,8 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 - **The "skills-bag" is not a mirror either.** Official upstream platform skills are *pinned into* the
   templates before sync (`pin-platform-skills.mjs` + `platform-skills.manifest.json`, ADR-0007); they
   ride the template mirrors, not a separate delivery repo.
+- **Security is secure-by-default** (ADR-0009): `@vybekiit/security` + tiered rate limits in `.env`;
+  agent skills `harden` and `check-safety` confirm coverage before ship.
 - Moat is **not** code secrecy (boilerplate is always pirateable) — it's updates + the agent
   layer + convenience + brand.
 

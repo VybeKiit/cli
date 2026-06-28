@@ -18,3 +18,12 @@ Expo docs remain source of truth: https://docs.expo.dev/skills/
 |---|---|---|
 | `launch-store-vybekiit.md` | `publish-app` | launch-store npm CLI + `expo-deployment` skill |
 | Expo pinned skills | onboarding, UI, builds | expo/skills (auto-discovered) |
+
+## Google sign-in (Expo)
+
+Mobile Google OAuth is **native** — use Expo Auth Session + Google provider, then send the token to
+your backend verifier (same as web). Source of truth:
+
+- https://docs.expo.dev/guides/google-authentication/
+- Skill: `.vybekiit/skills/sign-in-with-google.md`
+- Env: `GOOGLE_OAUTH_*` on the **backend** `.env`, not in the mobile bundle

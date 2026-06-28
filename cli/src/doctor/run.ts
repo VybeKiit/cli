@@ -2,9 +2,14 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
+import { loadEnvFile, mergeEnv } from './env';
+import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-skills';
 import {
   formatReport,
   type InstallAction,
+  isAgentRuntimeReady,
+  isSkillsCliReady,
+  mergeAgentAndProviderTools,
   type Platform,
   planInstall,
   selectToolchain,
@@ -54,6 +59,11 @@ function isMobileProject(dir: string): boolean {
     }
   }
   return false;
+}
+
+/** True when running inside Cursor (IDE — no separate CLI install needed). */
+function isCursorSession(): boolean {
+  return Boolean(process.env.CURSOR_TRACE_ID || process.env.CURSOR_SESSION_ID);
 }
 
 /** Run a command silently and report whether it exited cleanly — the basis of every probe. */
@@ -127,7 +137,18 @@ export function runDoctor(log: Console = console): number {
     return 1;
   }
 
-  const toolchain = selectToolchain(process.env, { mobile: isMobileProject(process.cwd()) });
+  const cwd = process.cwd();
+  const env = mergeEnv(process.env, loadEnvFile(cwd));
+  const providerTools = selectToolchain(env, {
+    mobile: isMobileProject(cwd),
+    wantsGoogleAuth: Boolean(env.GOOGLE_OAUTH_CLIENT_ID),
+  });
+  const toolchain = mergeAgentAndProviderTools(providerTools);
+
+  if (isCursorSession()) {
+    log.log("✓ Cursor — you're in Cursor; no separate agent install needed.");
+  }
+
   const presence: ToolPresence[] = toolchain.map((tool) => ({
     tool: tool.name,
     present: succeeds(tool.name, tool.versionArgs),
@@ -143,5 +164,17 @@ export function runDoctor(log: Console = console): number {
     log.log(line);
   }
 
-  return reports.every((report) => report.installed) ? 0 : 1;
+  const skillsReport = verifyPlatformSkills(cwd);
+  for (const line of formatPlatformSkillsReport(skillsReport)) {
+    log.log(line);
+  }
+
+  const cloudReady = providerTools.every((tool) => {
+    const report = reports.find((r) => r.tool === tool.name);
+    return report?.installed === true;
+  });
+  const agentReady = isAgentRuntimeReady(reports) || isCursorSession();
+  const skillsReady = isSkillsCliReady(reports);
+
+  return cloudReady && agentReady && skillsReady ? 0 : 1;
 }

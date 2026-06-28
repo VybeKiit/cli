@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { appConfigSchema, lemonSqueezyConfigSchema, parseEnv } from '../src/config';
+import {
+  appConfigSchema,
+  googleOAuthConfigSchema,
+  lemonSqueezyConfigSchema,
+  parseEnv,
+  securityConfigSchema,
+} from '../src/config';
 import { err, fail, ok } from '../src/result';
 
 describe('parseEnv', () => {
@@ -22,6 +28,56 @@ describe('parseEnv', () => {
     expect(() => parseEnv(lemonSqueezyConfigSchema, {})).toThrowError(
       /LEMONSQUEEZY_API_KEY[\s\S]*LEMONSQUEEZY_STORE_ID[\s\S]*LEMONSQUEEZY_WEBHOOK_SECRET/,
     );
+  });
+});
+
+describe('securityConfigSchema', () => {
+  it('is secure by default — protection on, sane limits', () => {
+    const config = parseEnv(securityConfigSchema, {});
+    expect(config.SECURITY_RATE_LIMIT).toBe('on');
+    expect(config.SECURITY_ORIGIN_LOCK).toBe('on');
+    expect(config.SECURITY_RATE_LIMIT_MAX).toBe(60);
+    expect(config.SECURITY_RATE_LIMIT_AUTH_MAX).toBe(10);
+    expect(config.SECURITY_RATE_LIMIT_PUBLIC_FORM_MAX).toBe(30);
+    expect(config.SECURITY_RATE_LIMIT_WINDOW_SECONDS).toBe(60);
+    expect(config.SECURITY_ALLOWED_ORIGINS).toBe('');
+  });
+
+  it('treats a blank numeric env line as the default, not zero', () => {
+    const config = parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '' });
+    expect(config.SECURITY_RATE_LIMIT_MAX).toBe(60);
+  });
+
+  it('coerces a provided numeric string', () => {
+    const config = parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '120' });
+    expect(config.SECURITY_RATE_LIMIT_MAX).toBe(120);
+  });
+
+  it('rejects a non-positive or non-integer rate limit', () => {
+    expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '0' })).toThrowError(
+      /SECURITY_RATE_LIMIT_MAX/,
+    );
+    expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '1.5' })).toThrowError(
+      /SECURITY_RATE_LIMIT_MAX/,
+    );
+  });
+
+  it('rejects an unknown toggle value', () => {
+    expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT: 'yes' })).toThrowError(
+      /SECURITY_RATE_LIMIT/,
+    );
+  });
+});
+
+describe('googleOAuthConfigSchema', () => {
+  it('is fully optional — imports run before the agent provisions keys', () => {
+    expect(parseEnv(googleOAuthConfigSchema, {})).toEqual({});
+  });
+
+  it('rejects a malformed redirect URI', () => {
+    expect(() =>
+      parseEnv(googleOAuthConfigSchema, { GOOGLE_OAUTH_REDIRECT_URI: 'not-a-url' }),
+    ).toThrowError(/GOOGLE_OAUTH_REDIRECT_URI/);
   });
 });
 

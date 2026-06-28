@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AGENT_TOOLS,
   formatReport,
+  isAgentRuntimeReady,
+  isSkillsCliReady,
   isToolchainReady,
+  mergeAgentAndProviderTools,
   planInstall,
   selectToolchain,
   type ToolReport,
 } from '../src/doctor/toolchain';
+import { expectedSkillNames, verifyPlatformSkills } from '../src/doctor/platform-skills';
 
 describe('selectToolchain', () => {
   it('returns [gh, wrangler, supabase] for the defaults (empty env)', () => {
@@ -115,6 +120,117 @@ describe('selectToolchain', () => {
     const eas = selectToolchain({}, { mobile: true }).find((tool) => tool.name === 'eas');
     expect(eas?.auth?.command).toBe('eas');
     expect(eas?.auth?.loginHint).toBe('eas login');
+  });
+
+  it('is NOT selected by default — the web default stays [gh, wrangler, supabase]', () => {
+    expect(selectToolchain({}).map((tool) => tool.name)).not.toContain('gcloud');
+  });
+
+  it('includes gcloud when the app uses sign in with Google (wantsGoogleAuth flag)', () => {
+    const names = selectToolchain({}, { wantsGoogleAuth: true }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'wrangler', 'supabase', 'gcloud']);
+  });
+
+  it('includes gcloud when a GOOGLE_OAUTH_CLIENT_ID is present in the env', () => {
+    const names = selectToolchain({ GOOGLE_OAUTH_CLIENT_ID: 'abc.apps.googleusercontent.com' }).map(
+      (tool) => tool.name,
+    );
+    expect(names).toEqual(['gh', 'wrangler', 'supabase', 'gcloud']);
+  });
+
+  it('adds gcloud after AWS adapters and before the mobile tools, deduped once', () => {
+    const names = selectToolchain(
+      { STORAGE_PROVIDER: 's3', GOOGLE_OAUTH_CLIENT_ID: 'x' },
+      { wantsGoogleAuth: true, mobile: true },
+    ).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'wrangler', 'supabase', 'aws', 'gcloud', 'eas', 'launch']);
+    expect(names.filter((name) => name === 'gcloud')).toHaveLength(1);
+  });
+
+  it('the gcloud tool probes sign-in with `gcloud auth list` / `gcloud auth login`', () => {
+    const gcloud = selectToolchain({}, { wantsGoogleAuth: true }).find(
+      (tool) => tool.name === 'gcloud',
+    );
+    expect(gcloud?.auth?.command).toBe('gcloud');
+    expect(gcloud?.auth?.args).toEqual(['auth', 'list']);
+    expect(gcloud?.auth?.loginHint).toBe('gcloud auth login');
+  });
+
+  it('resolves a non-empty gcloud install command on every supported platform', () => {
+    const gcloud = selectToolchain({}, { wantsGoogleAuth: true }).find(
+      (tool) => tool.name === 'gcloud',
+    );
+    const presence = [{ tool: 'gcloud', present: false }];
+    for (const platform of ['darwin', 'win32', 'linux'] as const) {
+      const [action] = planInstall(platform, presence, gcloud ? [gcloud] : []);
+      expect(action?.command).toBeTruthy();
+      expect(action?.args.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('mergeAgentAndProviderTools', () => {
+  it('prepends agent tools before provider tools', () => {
+    const names = mergeAgentAndProviderTools(selectToolchain({})).map((t) => t.name);
+    expect(names.slice(0, 3)).toEqual(['claude', 'codex', 'skills']);
+    expect(names).toContain('gh');
+    expect(names).toContain('wrangler');
+  });
+
+  it('AGENT_TOOLS exports claude, codex, skills', () => {
+    expect(AGENT_TOOLS.map((t) => t.name)).toEqual(['claude', 'codex', 'skills']);
+  });
+});
+
+describe('isAgentRuntimeReady', () => {
+  it('is true when claude or codex is installed', () => {
+    expect(
+      isAgentRuntimeReady([
+        { tool: 'claude', purpose: '', installed: true, authed: null },
+        { tool: 'codex', purpose: '', installed: false, authed: null },
+      ]),
+    ).toBe(true);
+    expect(
+      isAgentRuntimeReady([
+        { tool: 'claude', purpose: '', installed: false, authed: null },
+        { tool: 'codex', purpose: '', installed: true, authed: null },
+      ]),
+    ).toBe(true);
+    expect(
+      isAgentRuntimeReady([
+        { tool: 'claude', purpose: '', installed: false, authed: null },
+        { tool: 'codex', purpose: '', installed: false, authed: null },
+      ]),
+    ).toBe(false);
+  });
+});
+
+describe('isSkillsCliReady', () => {
+  it('is true only when skills CLI is installed', () => {
+    expect(isSkillsCliReady([{ tool: 'skills', purpose: '', installed: true, authed: null }])).toBe(
+      true,
+    );
+    expect(
+      isSkillsCliReady([{ tool: 'skills', purpose: '', installed: false, authed: null }]),
+    ).toBe(false);
+  });
+});
+
+describe('verifyPlatformSkills', () => {
+  it('returns ok when no manifest exists', () => {
+    expect(verifyPlatformSkills('/nonexistent-path-xyz')).toEqual({
+      ok: true,
+      missing: [],
+      template: null,
+    });
+  });
+
+  it('expectedSkillNames flattens manifest sources', () => {
+    expect(
+      expectedSkillNames({
+        sources: [{ repo: 'vercel-labs/agent-skills', skills: ['a', 'b'] }],
+      }),
+    ).toEqual(['a', 'b']);
   });
 });
 
