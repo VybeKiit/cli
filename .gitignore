@@ -24,6 +24,8 @@ coverage/
 docs/checklist.md
 .bridge/
 downloads/
-# Per-developer Claude Code local overrides — never committed, so Biome's
-# useIgnoreFile keeps them out of the lint gate too (they exist only locally).
-.claude/settings.local.json
+
+# session scratch — agent worktrees + per-developer Claude Code local overrides
+# (never tracked). Ignoring the whole dir also keeps Biome's useIgnoreFile from
+# walking nested worktree configs into the lint gate.
+.claude/
