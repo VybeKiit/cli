@@ -24,3 +24,6 @@ coverage/
 docs/checklist.md
 .bridge/
 downloads/
+# Per-developer Claude Code local overrides — never committed, so Biome's
+# useIgnoreFile keeps them out of the lint gate too (they exist only locally).
+.claude/settings.local.json

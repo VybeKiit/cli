@@ -6,8 +6,12 @@ import type { Result } from '@vybekiit/core';
  * call site talks to the {@link DataProvider} interface rather than a specific
  * vendor. Supabase (Postgres) is the v1 default; `mongodb` (Atlas) and `aws`
  * (DynamoDB/DocumentDB) are opt-in adapters that ship in a later step (ADR-0002).
+ * `local` is the zero-config, in-memory dev fallback (ADR-0008): no secrets, data
+ * lives in a per-process `Map` and resets on restart, so a freshly scaffolded app
+ * runs on the first `pnpm dev`. The resolver selects it implicitly when nothing is
+ * configured — the builder never picks it.
  */
-export type DataProviderName = 'supabase' | 'mongodb' | 'aws';
+export type DataProviderName = 'supabase' | 'mongodb' | 'aws' | 'local';
 
 /**
  * The minimal shape every stored record shares: a string primary key under `id`.

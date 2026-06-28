@@ -1,64 +1,56 @@
+import { postJson } from '@/lib/fetch-json';
 import type { AuthUser } from '@vybekiit/auth';
-import { type Result, fail } from '@vybekiit/core';
+import { type Result, fail, ok } from '@vybekiit/core';
 
 /**
- * Buyer-facing auth wire points — the ONE file the `add-signin` skill edits.
+ * Buyer-facing auth wire points — the ONE file the `add-signin` skill touches.
  *
- * These ship as marked stubs so the sign-in / sign-up / verify *layouts* render
- * and the app builds with no secrets. When the builder asks to "add sign-in", the
- * agent replaces each body with a real `resolveAuthProvider()` call from
- * `@vybekiit/auth` (better-auth by default, mounted behind a server route),
- * keeping every wire point in one place instead of scattered across the screens.
- * Each returns a {@link Result} so the UI branches on `ok`.
+ * Each call POSTs to a server route under `/api/auth/*` that runs the real
+ * `resolveAuthProvider()` from `@vybekiit/auth`. The provider code stays on the
+ * server (those routes), so no secret or backend SDK ever reaches the client bundle.
+ *
+ * The no-secrets default is the **local** dev adapter (ADR-0008): with no `.env` the
+ * screens work end-to-end against a fixed dev user, so the app is clickable in
+ * session #1. The `add-signin` skill swaps to a real backend purely by setting env —
+ * the routes resolve the new provider and these wire points don't change. Each call
+ * returns a {@link Result} so the UI branches on `ok`.
  */
 
-/** Shared "not connected yet" failure shown until the add-signin skill runs. */
-const NOT_WIRED = fail(
-  'not_configured',
-  'Sign-in is not connected yet. Ask your AI agent to "add sign-in".',
-);
+/** Server routes these wire points call; one place so they never drift. */
+const ROUTES = {
+  signIn: '/api/auth/signin',
+  signUp: '/api/auth/signup',
+  sendCode: '/api/auth/send-code',
+  verify: '/api/auth/verify',
+} as const;
 
-/**
- * Email + password sign-in.
- * TODO(vybekiit): wire to resolveAuthProvider() from `@vybekiit/auth` via a server route — skill: add-signin
- */
+/** Email + password sign-in. */
 export async function signInWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
   if (!email || !password) return fail('invalid_input', 'Enter your email and password.');
-  return NOT_WIRED;
+  return postJson<AuthUser>(ROUTES.signIn, { email, password });
 }
 
-/**
- * Create an account with email + password.
- * TODO(vybekiit): wire to resolveAuthProvider() from `@vybekiit/auth` via a server route — skill: add-signin
- */
+/** Create an account with email + password. */
 export async function signUpWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
   if (!email || !password) return fail('invalid_input', 'Enter your email and password.');
-  return NOT_WIRED;
+  return postJson<AuthUser>(ROUTES.signUp, { email, password });
 }
 
-/**
- * Send a one-time sign-in code to an email address.
- * TODO(vybekiit): wire to `sendEmailCode` on resolveAuthProvider() from `@vybekiit/auth` — skill: add-signin
- */
+/** Send a one-time sign-in code to an email address. */
 export async function sendEmailCode(email: string): Promise<Result<true>> {
   if (!email) return fail('invalid_input', 'Enter your email.');
-  return fail(
-    'not_configured',
-    'Email codes are not connected yet. Ask your AI agent to "add sign-in".',
-  );
+  const result = await postJson<{ ok: true }>(ROUTES.sendCode, { email });
+  return result.ok ? ok(true) : result;
 }
 
-/**
- * Verify a one-time code and sign the builder in.
- * TODO(vybekiit): wire to `verifyEmailCode` on resolveAuthProvider() from `@vybekiit/auth` — skill: add-signin
- */
+/** Verify a one-time code and sign the builder in. */
 export async function verifyEmailCode(email: string, code: string): Promise<Result<AuthUser>> {
   if (!email || !code) return fail('invalid_input', 'Enter the code we sent you.');
-  return NOT_WIRED;
+  return postJson<AuthUser>(ROUTES.verify, { email, code });
 }

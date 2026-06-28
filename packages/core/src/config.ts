@@ -61,10 +61,13 @@ export const paypalConfigSchema = z.object({
  * Which data adapter `@vybekiit/db` constructs. One backend runs at a time; the
  * agent swaps by changing this single value. Supabase (Postgres) is the default;
  * `mongodb` (Atlas) and `aws` (DynamoDB/DocumentDB) are opt-in escape hatches that
- * ship in a later step (ADR-0002).
+ * ship in a later step (ADR-0002). `local` is the zero-config, in-memory dev
+ * fallback (ADR-0008) — never a name the builder picks: it exists in the enum so
+ * an explicit `DATA_PROVIDER=local` is valid, but `resolveDataProvider` selects it
+ * implicitly whenever nothing is configured, so a fresh scaffold runs with no `.env`.
  */
 export const dataConfigSchema = z.object({
-  DATA_PROVIDER: z.enum(['supabase', 'mongodb', 'aws']).default('supabase'),
+  DATA_PROVIDER: z.enum(['supabase', 'mongodb', 'aws', 'local']).default('supabase'),
 });
 
 /**
@@ -73,10 +76,12 @@ export const dataConfigSchema = z.object({
  * the adapter follows `DATA_PROVIDER` ({@link dataConfigSchema}) to pick its
  * database binding — and AWS-data apps auto-route to Cognito, since DynamoDB has no
  * better-auth adapter. The agent's add-signin skill drives this; the builder never
- * picks a name.
+ * picks a name. `local` is the zero-config dev fallback (ADR-0008): like the data
+ * enum, it is selectable explicitly but is chosen implicitly by `resolveAuthProvider`
+ * only when nothing is configured, so a fresh scaffold signs in as a fixed dev user.
  */
 export const authConfigSchema = z.object({
-  AUTH_PROVIDER: z.enum(['better-auth', 'cognito']).default('better-auth'),
+  AUTH_PROVIDER: z.enum(['better-auth', 'cognito', 'local']).default('better-auth'),
 });
 
 /**
