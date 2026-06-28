@@ -1,6 +1,6 @@
 # ADR-0005 — Template distribution: private per-template mirrors, CLI clones via `gh`
 
-- **Status:** Accepted
+- **Status:** Accepted (extended 2026-06-29 — see "Update")
 - **Date:** 2026-06-27
 - **Deciders:** Yosef (owner), via `/grill-with-docs`
 
@@ -70,3 +70,37 @@ Two hard constraints shape the answer:
 - **PAT paste / tarball via API for auth:** PAT creation is the jargon wall this product removes; the
   authenticated tarball download needs the same `gh` login yet is no simpler than `gh repo clone`,
   while losing the option for `update-kit` to re-pull the mirror later.
+
+## Update (2026-06-29) — generalized to all five repos, populated, triggers widened
+
+The original sync (`scripts/mirror-templates.mjs` + `mirror-templates.yml`) only ever covered the
+three templates, fired `on: release` only, and silently swallowed push failures. With zero releases
+cut, every mirror sat **empty** — so a real `npx vybekiit web` would clone an empty repo. This
+session closed that gap and reconciled the code with the prose above:
+
+1. **One registry, five repos.** `scripts/mirror-repos.mjs` replaces the templates-only script with a
+   `MIRRORS` map of `{ repo, path }`: `web`/`mobile`/`extension` (`templates/<name>`), `cli` (root
+   `cli/`), and `infra` (`infra/`). The split prefix is now the mapped `path`, so a mirror's source
+   need not sit under `templates/` — this is what lets `cli` mirror at all (its prefix is the repo
+   root, which the old hardcoded `templates/${name}` could never reach).
+2. **`cli` is public; everything else private.** Confirmed the prose's "cli public, it's on npm
+   anyway" over the org's then-private setting — the CLI source is scaffolding logic only (clone +
+   `workspace:*` rewrite), ships no templates and no secrets, so the gate (GitHub repo-access on the
+   *template* mirrors) is unaffected by publishing it.
+3. **`infra` is registered but dormant.** No `infra/` source exists yet (issue #7 creates the
+   Cloudflare + Supabase deploy config). A mirror whose mapped path is absent is **skipped with a
+   notice**, never force-pushed empty — a destructive push of a non-existent prefix would clobber the
+   repo. `infra` populates automatically once #7 lands its source.
+4. **Triggers widened to `push:main` (paths-filtered) + `release` + `workflow_dispatch`.** Mirrors
+   now re-sync whenever mirrored source lands on `main`, so a buyer scaffolding mid-week gets current
+   code rather than the last tag. The release trigger stays for deliberate versioned snapshots.
+5. **Failures now surface.** The previously dead `redact()` helper is wired into real per-mirror
+   success/failure logging (token-redacted), replacing the silent swallow.
+6. **Guarded by a test in CI.** `scripts/mirror-repos.test.mjs` (run via `pnpm test:scripts`) locks
+   the registry invariants: arg validation rejects typos, the token never leaks into a log line, and
+   every present mirror's source prefix exists on disk (drift guard).
+
+**Not mirrors:** `apps/landing` ships from the monorepo via its own deploy (issue #7), not a mirror —
+it is the store, not OWNED scaffold payload. The platform-skills "skills-bag" (`pin-platform-skills.mjs`
++ `platform-skills.manifest.json`, ADR-0007) pins upstream skills *into* the templates before sync; it
+is not a separate delivery repo.

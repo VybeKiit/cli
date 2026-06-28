@@ -73,8 +73,10 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ mobile/                 Expo + plain StyleSheet primitives + shared tokens (NativeWind
 │  │                          dropped) — full web parity                     ← pulled forward
 │  └─ extension/              WXT + shadcn                                    ← v3
-├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages
-├─ cli/                       npx vybekiit — clones a template mirror into the buyer's repo (ADR-0005)
+├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages ·
+│                             ships from the monorepo, NOT a delivery mirror (ADR-0005)
+├─ cli/                       npx vybekiit — clones a template mirror into the buyer's repo · itself
+│                             a PUBLIC delivery mirror (VybeKiit/cli — no templates/secrets) (ADR-0005)
 └─ AGENTS.md CLAUDE.md CONTEXT.md   ← MAINTAINER agent layer (this repo, technical voice)
 ```
 
@@ -153,11 +155,20 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   **invite to the per-template mirrors** (`web` + `mobile` + `extension`, one bundle) = the single
   gate. Refund → access removed. The buyer is **never** invited to the maintainer monorepo.
 - **Templates reach the buyer via private per-template mirror repos, not the npm CLI** (ADR-0005).
-  A monorepo CI job mirrors `templates/<name>` → `VybeKiit/<name>` on release (one-way subtree
-  split → force-push). `npx vybekiit <name>` clones the matching mirror with the buyer's `gh`
-  device-flow login (so the proprietary OWNED code never ships inside the public npm package — the
-  gate holds). The scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition
-  to npm version bumps for `@vybekiit/*`.
+  A **delivery mirror** is one `VybeKiit/<repo>` that a monorepo job force-pushes from a mapped
+  source path (one-way subtree split). There are **five**: the three template mirrors
+  (`web`/`mobile`/`extension` ← `templates/<name>`, private), `cli` (← root `cli/`, **public** — it
+  ships on npm anyway, carries no templates or secrets), and `infra` (← `infra/`, private, **dormant**
+  until issue #7 creates its source). Sync fires on push-to-`main` (paths-filtered) and on release.
+  `npx vybekiit <name>` clones the matching template mirror with the buyer's `gh` device-flow login
+  (so the proprietary OWNED code never ships inside the public npm package — the gate holds). The
+  scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition to npm version
+  bumps for `@vybekiit/*`.
+- **The landing site is not a mirror.** `apps/landing` is the store; it ships from the monorepo via
+  its own deploy (issue #7), not through a delivery mirror — it is never scaffolded into a buyer repo.
+- **The "skills-bag" is not a mirror either.** Official upstream platform skills are *pinned into* the
+  templates before sync (`pin-platform-skills.mjs` + `platform-skills.manifest.json`, ADR-0007); they
+  ride the template mirrors, not a separate delivery repo.
 - Moat is **not** code secrecy (boilerplate is always pirateable) — it's updates + the agent
   layer + convenience + brand.
 
