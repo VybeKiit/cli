@@ -23,8 +23,8 @@ export function Pricing() {
               </span>
             </CardTitle>
             <CardDescription>
-              The agent, the three-platform bundle, and a maintained update channel — for a
-              non-technical founder who wants it shipped and kept current.
+              {PRICE.earlyBirdNote}. The agent, the three-platform bundle, and a maintained update
+              channel — for a non-technical founder who wants it shipped and kept current.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-8">

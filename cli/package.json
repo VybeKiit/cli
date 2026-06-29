@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Scaffold a VybeKiit template into your own repo: `npx vybekiit new web my-app`.",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "bin": {
     "vybekiit": "./dist/index.js"

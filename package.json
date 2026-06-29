@@ -1,6 +1,6 @@
 {
   "name": "vybekiit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Paid, agent-driven monorepo starter kit that lets non-technical builders ship real, money-making products by describing them to an AI agent.",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -20,6 +20,8 @@
     "mirror": "node scripts/mirror-repos.mjs",
     "publish:packages": "node scripts/publish-packages.mjs",
     "publish:packages:dry-run": "node scripts/publish-packages.mjs --dry-run",
+    "bump-kit-version": "node scripts/bump-kit-version.mjs",
+    "tag-mirrors": "node scripts/tag-mirror-repos.mjs",
     "test:scripts": "vitest run --root scripts",
     "prepare": "husky"
   },

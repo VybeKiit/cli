@@ -630,6 +630,20 @@ _Avoid_: goal-named skill (Layer A is what the buyer asks for).
 Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a thin redirect; Copilot is
 out of scope.
 
+**Kit release**:
+A unified `vX.Y.Z` tag cut on the monorepo and stamped on every delivery mirror after sync.
+Maintainer-facing release line — not shown to buyers. See ADR-0013.
+_Avoid_: exposing git tags to vibe coders (they track npm semver via `update-kit`).
+
+**Release line**:
+The ordered sequence of kit releases on `VybeKiit/vybekiit` GitHub Releases — the canonical
+changelog for features, fixes, and implementations.
+_Avoid_: duplicate Release pages on mirror repos (mirrors get git tags only).
+
+**npm semver**:
+Per-package version on `@vybekiit/*` — what buyers' `update-kit` compares via `planKitUpdate()`.
+Bumped in lockstep with kit releases; may diverge on breaking adapter changes (major bump).
+
 ## Open / parked
 
 - **$29 pricing** (parked — revisit before launch).

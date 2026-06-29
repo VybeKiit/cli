@@ -68,6 +68,17 @@ writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate
 - Semver. Public npm publish under `@vybekiit/*`. Breaking changes to a package = major bump and a
   changelog note; the buyer's `update-kit` skill relies on semver to decide what's safe.
 - Templates are versioned but **not** published — they're distributed by the CLI/scaffolder.
+- **Kit releases:** unified `vX.Y.Z` tag on monorepo + all mirrors after each merged PR (unless
+  `no-release` label). GitHub Release notes on monorepo only. See ADR-0013 and `release.yml` /
+  `publish.yml` (OIDC trusted publishing — no `NPM_TOKEN`).
+
+## Merge policy (maintainer-only)
+
+- **Never** `git push origin main` directly — use throwaway branch → PR → squash merge.
+- **Never** `gh pr merge` until `gh pr checks --watch` shows all green (including `verify`).
+- Pre-push hook (`.husky/pre-push`) is the local gate; CI is the remote gate.
+- Red CI on `main` opens an auto-issue (`ci-failure-issue.yml`) — fix via PR, do not push to main.
+- Branch protection: run `./scripts/setup-branch-protection.sh` (needs GitHub Team/Pro on private repos).
 
 ## Delivery mirror sync (maintainer-only)
 
