@@ -15,7 +15,8 @@ Chrome API facts.
 ## The contract: Decide + Guide
 
 Same as all VybeKiit templates: decide all tech · one step at a time · verify-before-advance · plain
-language from `language.md` · translate errors · celebrate wins.
+language from `language.md` · translate errors · celebrate wins · **no em dashes (`—`)** in
+buyer-facing prose; UI titles stay unpunctuated (see `language.md` → Tone).
 
 ## How to work
 

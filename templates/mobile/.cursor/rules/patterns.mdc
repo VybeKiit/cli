@@ -14,6 +14,7 @@ Actionable checklist for coding in this template. **SSOT:** `AGENTS.md`. Deep de
 - **Decide + Guide** — you choose all tech; builder gets plain one-step instructions only.
 - Pick skills via `.vybekiit/agent/goal-index.md` → `.vybekiit/skills/`.
 - **Verify-before-advance** after every step. Translate errors; never paste build logs at builder.
+- **No em dashes (`—`)** in buyer-facing copy. UI titles: no em dash, no trailing period or comma. See `language.md` → Tone.
 - Never read `.env` values aloud or paste secrets in chat — keys from `.env.example` only.
 
 ## Backend-first (no device secrets)

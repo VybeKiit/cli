@@ -13,7 +13,7 @@
 
 | Area | Web | Mobile | Extension |
 |---|---|---|---|
-| UI kit | 15 shadcn primitives + Sonner | StyleSheet ports of new primitives | WXT popup: Button, Input, Card, Alert |
+| UI kit | 15 shadcn primitives + Sonner + 474 mirrored blocks (6 namespaces) | StyleSheet ports of new primitives | WXT popup: Button, Input, Card, Alert |
 | Marketing / auth UX | Normalized hero, legal defaults | Hero + feature cards | Popup + backend URL |
 | Signed-in guard | `useUser` dashboard layout | Dashboard redirect | N/A (calls web backend) |
 | Practice checkout | Local `/checkout/practice` + fulfillment | `billing-client` → web `/api/checkout` | N/A |
@@ -129,7 +129,7 @@ See ADR-0002/0003/0004.
 | Web UI | shadcn/ui (web + extension share it) | MUI etc. — can't mix design systems; shadcn is best for agents |
 | Mobile UI | plain RN `StyleSheet` primitives (Button/Input/Card/Label/Alert) reading shared `@vybekiit/tokens` | NativeWind dropped (too buggy) + react-native-reusables (depends on it); React Native Paper (Material clashes with shadcn) — ADR-0004 |
 | Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · vercel · aws (Amplify/SST) | Vercel is opt-in (ADR-0006); AWS never the default — ADR-0002 |
-| Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
+| Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · **neon** (serverless Postgres) · **firebase** (Firestore) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
 | Auth | `@vybekiit/auth` (`AuthProvider`): **better-auth⭐** bound to the chosen DB (Postgres/Mongo) · Cognito for AWS | "auth = Supabase-only" — new DB adapters have no built-in auth — ADR-0003 |
 | Storage | `StorageProvider`: **supabase/R2⭐** · s3 | R2 implemented; doctor provisions on CF stack (ADR-0010) |
 | Asset delivery | `@vybekiit/assets`: hybrid build optimize + CDN URLs · derived from hosting+storage | — ADR-0010 |
@@ -449,13 +449,68 @@ _Avoid_: "you never see anything technical" (impossible and breeds refunds).
 Every skill tests that a step worked before continuing. Prevents the silent-stuck → refund death
 spiral.
 
+**Reading-speed reveal**:
+Store homepage copy that appears character-by-character at natural reading pace when a section enters
+view; runs once per page load.
+_Avoid_: instant fade-in for marketing headlines and body copy on the store homepage.
+
+**Rolling stat**:
+A numeric value on the store homepage that animates from zero to its displayed value when visible
+(e.g. price, dashboard mockup figures).
+
+**Auto-scroll row**:
+A horizontal row of items that moves continuously on its own and loops (e.g. tech logos, product demo
+cards). Builders customize content inside the row, not the motion name “marquee.”
+_Avoid_: saying “marquee” or “carousel” when you mean this always-on horizontal loop.
+
 **Report Mode**:
 Dev-only overlay on the localhost preview (web, mobile, extension). The builder toggles inspect
 mode (Option+Shift+R on web/extension; **R** FAB on mobile), clicks or taps what looks wrong, types
 a one-line note, and the kit fires a native assistant deeplink with structured context. Never ships
-in production builds. In buyer voice: "point at what's wrong" — never "Report Mode" unless they ask
+in production builds. In buyer voice: use **Point & fix** — never "Report Mode" unless they ask
 about the hotkey.
 _Avoid_: exposing deeplinks, URI schemes, or DOM selectors to the builder.
+
+**Hold confirm**:
+Hover a dock menu option for ~2 seconds until a rounded border fills; the choice then locks in
+(position, chat target). Plain-language only — never "hold confirm" to the builder.
+_Avoid_: requiring a click when the UI is designed for hover-and-hold.
+
+**Report walkthrough**:
+First-visit guided tour of the localhost feedback bar. Skippable; celebrates completion so new
+builders know how to point at what's wrong.
+_Avoid_: calling it onboarding or a tutorial in buyer-facing copy.
+
+**Control hint**:
+Short plain-language tooltip after ~half a second hover on a dock control. Explains what it does and
+what to do next.
+_Avoid_: jargon (deeplink, selector, handoff target).
+
+**Spot label**:
+After the builder clicks what looks wrong, the kit shows a plain-language name for what they
+pointed at — starting from that element and its immediate text, not unrelated headings elsewhere on
+the page (e.g. the hero bundle label, not a showcase headline).
+_Avoid_: DOM, selector, shortest text node anywhere on the page.
+
+**Builder tools**:
+Assistants and dev tools the vibe coder already uses (Cursor, Claude Code, Codex, GitHub, Figma,
+TypeScript, Node.js, Playwright). Shown in the hero orbit only.
+_Avoid_: mixing product adapters (Cloudflare, Lemon Squeezy, Supabase) into the hero orbit.
+
+**Product stack**:
+Services and frameworks the shipped app runs on (Next.js, Supabase, Cloudflare, Lemon Squeezy,
+shadcn/ui, etc.). Shown in the pricing tech row only.
+_Avoid_: calling both lists "tech stack" or duplicating builder tools in the product row.
+
+**Brand mark**:
+The small official logo beside a builder-tool or product-stack name on the landing page — full-color
+at rest on the dark row, not a hand-drawn stand-in.
+_Avoid_: placeholder icons, monochrome fake paths, or calling Codex a different mark than OpenAI.
+
+**Proceed animation**:
+When the builder clicks Get VybeKiit, a cart icon flies toward the checkout direction as visual
+feedback before navigation — RTL-aware on the landing page.
+_Avoid_: static lock icon with no motion feedback.
 
 **Vibe coder report**:
 The structured handoff payload (route, element selector or tap coordinates, console errors, builder
@@ -536,8 +591,32 @@ etc. Read before adding helpers.
 `NODE_ENV`; optional `LOG_LEVEL` override for agents only.
 
 **UI source catalog**:
-Agent-only list of approved shadcn-compatible block libraries (Magic UI, Kokonut, 21st.dev, …) in
+Agent-only list of approved shadcn-compatible block libraries (BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack, 21st.dev, …) in
 `.vybekiit/agent/ui-sources.md`. The builder never picks; the agent normalizes every import.
+
+**UI namespace**:
+Per-source folder under `src/components/` (`bundui/`, `magicui/`, …) holding mirrored upstream components — not merged into kit `ui/`.
+
+**UI catalog index**:
+Machine-readable manifest (`.vybekiit/agent/ui-catalog-index.json`) agents and the VybeKiit UI catalog MCP search against.
+
+**Registry sync**:
+Maintainer script (`pnpm sync:ui`) that refreshes mirrored components from upstream registries; lock file at `scripts/ui-registry-lock.json`.
+
+**SaaS showcase bundle**:
+Curated subset of mirrored UI blocks (`scripts/saas-showcase-manifest.json`) rendered on the landing hero carousel — representative, not exhaustive.
+
+**Component preview card**:
+Landing hero frame showing source badge + block name for one mirrored component; live mount only when `renderMode: live`.
+
+**Platform MCP bundle**:
+Per-provider MCP configs under `.vybekiit/agent/` (`mcp-ui-catalog.json`, `mcp-neon.json`, `mcp-firebase.json`) merged into buyer `.cursor/mcp.json`.
+
+**Neon branching (dev)**:
+Neon MCP/CLI feature for safe schema experiments on disposable branches — dev/IDE only, never production.
+
+**Firebase agent skills**:
+Official `firebase/agent-skills` packages teaching agents Firebase CLI + MCP workflows alongside `@vybekiit/db` Firestore adapter.
 
 **Normalize-on-import**:
 When copying a third-party UI block, swap to kit `Button`/`Input`, map colors to `@vybekiit/tokens`,

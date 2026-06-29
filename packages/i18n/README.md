@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+</p>
+
 # @vybekiit/i18n
 
 Multiple languages without framework glue — locales and message catalogs, headless.

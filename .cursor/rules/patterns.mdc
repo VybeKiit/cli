@@ -51,6 +51,7 @@ When touching skills, `AGENTS.md`, `BUILDER-VOICE.md`, or `language.md` inside t
 - **Decide + Guide** contract: one action at a time, verify-before-advance, plain language.
 - Never use maintainer jargon ("env var", "deploy", "merge conflict") — translate per
   `templates/*/BUILDER-VOICE.md`.
+- **No em dashes (`—`)** in buyer-facing copy. UI titles and section headings: no em dash, no trailing period or comma. See `language.md` → Tone.
 - Skills are **goal-named** (`go-live`), never tech-named. Layer B platform-skills are agent-only.
 
 ## Workflow

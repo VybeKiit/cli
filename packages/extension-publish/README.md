@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+</p>
+
 # @vybekiit/extension-publish
 
 Publish your Chrome extension to the Web Store — your agent handles the dashboard clicks.
@@ -10,18 +14,15 @@ Playwright automation for Chrome Web Store Developer Console actions the upload 
 
 ## In your app
 
-Your template's `.vybekiit/skills/` folder holds most agent instructions. This package holds the **shared** pieces that must stay identical across web, mobile, and extension — the contract, vocabulary, and update planner.
+Your template already imports this package. Settings live in your **secret settings file** (.env); validation lives in @vybekiit/core. Change behavior by updating env values or asking your agent to enable a feature skill — not by editing files inside node_modules.
 
 ## For your agent
 
-- **Do not edit** `node_modules/@vybekiit/extension-publish` — fix bugs upstream or bump the package version.
-- **Verb allowlist:** `CWS_AUTOMATION_VERBS` in `src/verbRegistry.ts` — only registered verbs may run.
-- **Chrome profile:** dedicated profile at `$HOME/.cws-chrome-profile` — never attach to the operator's default browser.
-- **Before push verbs:** `verifyGate` runs `pnpm verify:release` — do not bypass.
-- **Flow:** `pnpm cws <verb> <extension>` → verb registry → `connectToCwsChrome()` → selectors + `safeClick()`.
-- **Listing updates:** `extensions/<id>/cws-listing.ts` → validate → read live CWS → diff → update → verify gate.
-- **Related skills:** extension publish skills, `refresh-cws-listing`
-- **Safety:** read ADR-0011/0012 before changing behavior; no destructive verbs without ADR amendment; no bypassing `safeClick`.
+- **Do not edit** node_modules/@vybekiit/extension-publish — fix bugs upstream or bump the package version.
+- **Entry point:** `publish`, `submitForReview`, `readListingState`, `CWS_AUTOMATION_VERBS`, `connectToCwsChrome`
+- **Config:** Dedicated Chrome profile at `$HOME/.cws-chrome-profile` — not env-based.
+- **Related skills:** Extension template publish skills, `refresh-cws-listing`
+- **Pattern:** resolve*Provider() reads env via @vybekiit/core and returns a headless adapter.
 
 ## Scope
 

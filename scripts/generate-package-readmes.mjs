@@ -8,6 +8,14 @@ import { join } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 
+const HERO_URL = 'https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp';
+
+const HERO = `<p align="center">
+  <img src="${HERO_URL}" width="1000" height="1000" alt="VybeKiit">
+</p>
+
+`;
+
 /** @type {Array<{ name: string; tagline: string; body: string; exports: string; config: string; skills: string; inScope: string; outScope?: string }>} */
 const PACKAGES = [
   {
@@ -276,7 +284,7 @@ function render(pkg) {
   const scope = `@vybekiit/${pkg.name}`;
   const outExtra = pkg.outScope ? `\n- ${pkg.outScope}` : '';
 
-  return `# ${scope}
+  return `${HERO}# ${scope}
 
 ${pkg.tagline}
 

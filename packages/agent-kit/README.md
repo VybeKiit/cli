@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+</p>
+
 # @vybekiit/agent-kit
 
 The rules your AI assistant follows — plain language, safe updates, one step at a time.
@@ -14,12 +18,11 @@ Your template already imports this package. Settings live in your **secret setti
 
 ## For your agent
 
-- **Do not edit** `node_modules/@vybekiit/agent-kit` — fix bugs upstream or bump the package version.
-- **`CONTRACT` / `renderContract()`** — five buyer rules every skill must follow (one action · verify-before-advance · plain language · translate errors · celebrate).
-- **`TOOL_VOCABULARY` / `renderToolVocabularyTable()`** — jargon → plain-language map; keep each template's `language.md` in sync with this output.
-- **`planKitUpdate()` / `UpdatePlan`** — given installed vs latest `@vybekiit/*` versions, returns safe bump list for `update-kit`.
-- **`planAgentLayerSync()`** — agent-layer refresh planner for mirror + platform-skills sync.
+- **Do not edit** node_modules/@vybekiit/agent-kit — fix bugs upstream or bump the package version.
+- **Entry point:** `CONTRACT`, `TOOL_VOCABULARY`, `planKitUpdate`, `planAgentLayerSync`, `SDLC_VOCABULARY`
+- **Config:** None.
 - **Related skills:** `update-kit`, `sync-agent-layer`
+- **Pattern:** resolve*Provider() reads env via @vybekiit/core and returns a headless adapter.
 
 ## Scope
 

@@ -20,7 +20,8 @@
   copy. Wait for them to finish before the next step.
 - **Never expose jargon.** Translate every technical term using `language.md`. If you catch
   yourself about to type "env var", "deploy", "migration", or "webhook", rewrite it.
-- **The promise:** they never have to understand or decide — they just follow simple steps.
+- **No em dashes (`—`).** In chat and body copy, use a period, comma, or colon instead. UI titles and section headings stay short with no em dash and no trailing period or comma. See `language.md` → Tone.
+- **The promise:** they never have to understand or decide. They just follow simple steps.
   (Not "they never see anything technical" — that's impossible and breeds refunds.)
 
 ## How to work

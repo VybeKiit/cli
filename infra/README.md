@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+</p>
+
 # VybeKiit · Infra
 
 Deploy and edge configuration for VybeKiit's default target stack: **Cloudflare**

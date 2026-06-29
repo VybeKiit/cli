@@ -40,8 +40,9 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    **Verify:** tell the builder *"Your app is quiet in production and uses one place for each kind of logic."*
 
 7. **UI consistency (agent-only).** Grep checks:
-   - Raw `<button` / `<input` outside `src/components/ui/` → fix to kit primitives
-   - Forbidden UI libs (`@mui/`, `@chakra-ui/`, `antd`, `nativewind`) → must be empty
+   - Raw `<button` / `<input` outside `src/components/ui/` in `app/` and feature components → fix to kit primitives
+   - Forbidden UI libs (`@mui/`, `@chakra-ui/`, `antd`, `nativewind`, `@heroui/`) → must be empty in `app/` and `src/` except mirrored namespaces
+   - Namespaced mirrors (`src/components/bundui/`, `magicui/`, etc.) are upstream copies — normalize when composing screens in `app/`
    - Arbitrary Tailwind `h-[`, `w-[`, `gap-[`, `mt-[` in `app/` → review and normalize
    **Verify:** tell the builder *"Your app's buttons, spacing, and colors all match — it looks like one professional product."*
 
