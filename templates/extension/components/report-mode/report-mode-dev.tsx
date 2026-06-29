@@ -356,7 +356,7 @@ export function ReportModeDev() {
                 onClick={resetHighlightColor}
                 size="sm"
                 type="button"
-                variant="ghost"
+                variant="outline"
               >
                 Reset
               </Button>

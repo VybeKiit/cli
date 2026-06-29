@@ -72,6 +72,22 @@ test.describe('Report Mode (dev)', () => {
     );
   });
 
+  test('inspect highlight color preset updates ring', async ({ page }) => {
+    await prepareReportDock(page);
+    await page.getByTestId('report-mode-toggle').click();
+
+    await page.getByRole('heading', { level: 1 }).first().hover();
+    await expect(page.getByTestId('report-mode-highlight')).toBeVisible();
+
+    await page.getByTestId('report-mode-highlight-color').hover();
+    await page.getByTestId('report-mode-highlight-preset-3b82f6').click();
+
+    const borderColor = await page.getByTestId('report-mode-highlight').evaluate((element) => {
+      return getComputedStyle(element).borderColor;
+    });
+    expect(borderColor).toBe('rgb(59, 130, 246)');
+  });
+
   test('note panel uses plain language only', async ({ page }) => {
     await prepareReportDock(page);
     const bodyText = await page.locator('body').innerText();
