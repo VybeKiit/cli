@@ -492,6 +492,11 @@ pointed at — starting from that element and its immediate text, not unrelated 
 the page (e.g. the hero bundle label, not a showcase headline).
 _Avoid_: DOM, selector, shortest text node anywhere on the page.
 
+**Inspect highlight**:
+The colored ring around the element the builder is pointing at during pick mode. Builders can change
+its color from the dock; the pick-mode banner stays fixed.
+_Avoid_: calling it hover color or tinting the banner when you mean the ring only.
+
 **Builder tools**:
 Assistants and dev tools the vibe coder already uses (Cursor, Claude Code, Codex, GitHub, Figma,
 TypeScript, Node.js, Playwright). Shown in the hero orbit only.
