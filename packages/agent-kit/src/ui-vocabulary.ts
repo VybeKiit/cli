@@ -111,6 +111,11 @@ export const AGENT_INTERNAL_VOCABULARY: readonly UiVocabularyEntry[] = [
     say: '',
     why: 'agent-internal — never say',
   },
+  {
+    jargon: 'DOM / CSS selector / element selector',
+    say: '',
+    why: 'agent-internal — say "what you clicked" or "location in code" in the handoff only',
+  },
 ];
 
 function escapeCell(text: string): string {
