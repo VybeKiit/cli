@@ -1,0 +1,124 @@
+export interface CatalogComponent {
+  source: string;
+  name: string;
+  paths: string[];
+  dependencies: string[];
+  tags: string[];
+  portable: boolean;
+  category: string;
+}
+
+export interface UiCatalogIndex {
+  version: number;
+  generatedAt: string;
+  componentCount: number;
+  sources: Record<string, number>;
+  components: CatalogComponent[];
+}
+
+const INTENT_ROUTING: ReadonlyArray<{
+  keywords: string[];
+  sources: string[];
+  category?: string;
+}> = [
+  {
+    keywords: ['hero', 'landing', 'wow', 'parallax'],
+    sources: ['aceternity', 'magicui'],
+    category: 'hero',
+  },
+  { keywords: ['bento', 'feature', 'grid'], sources: ['magicui', 'kokonutui', 'bundui'] },
+  { keywords: ['pricing', 'testimonial', 'faq'], sources: ['bundui', 'blocks/21st'] },
+  {
+    keywords: ['dashboard', 'kpi', 'chart', 'table'],
+    sources: ['bundui', 'untitled'],
+    category: 'data-display',
+  },
+  { keywords: ['form', 'input', 'settings'], sources: ['ui', 'bundui'], category: 'form' },
+  { keywords: ['chat', 'ai'], sources: ['kokonutui', 'bundui'] },
+  { keywords: ['admin', 'enterprise', 'dense'], sources: ['untitled', 'bundui'] },
+  {
+    keywords: ['background', 'beam', 'sparkle', 'animated'],
+    sources: ['aceternity', 'magicui'],
+    category: 'background',
+  },
+];
+
+export function loadCatalog(json: string): UiCatalogIndex {
+  return JSON.parse(json) as UiCatalogIndex;
+}
+
+export function searchComponents(
+  catalog: UiCatalogIndex,
+  query: string,
+  options?: { source?: string; category?: string; limit?: number },
+): CatalogComponent[] {
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const limit = options?.limit ?? 20;
+
+  const scored = catalog.components
+    .filter((component) => {
+      if (options?.source && component.source !== options.source) return false;
+      if (options?.category && component.category !== options.category) return false;
+      return true;
+    })
+    .map((component) => {
+      const haystack = [
+        component.name,
+        component.source,
+        component.category,
+        ...component.tags,
+        ...component.paths,
+      ]
+        .join(' ')
+        .toLowerCase();
+      const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+      return { component, score };
+    })
+    .filter(({ score }) => score > 0 || terms.length === 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map(({ component }) => component);
+}
+
+export function getComponent(
+  catalog: UiCatalogIndex,
+  source: string,
+  name: string,
+): CatalogComponent | undefined {
+  return catalog.components.find(
+    (component) => component.source === source && component.name === name,
+  );
+}
+
+export function listSources(catalog: UiCatalogIndex): Record<string, number> {
+  return catalog.sources;
+}
+
+export function suggestBlend(
+  catalog: UiCatalogIndex,
+  intent: string,
+  limit = 10,
+): Array<{ source: string; name: string; score: number; paths: string[] }> {
+  const lower = intent.toLowerCase();
+  const matchedRoutes = INTENT_ROUTING.filter((route) =>
+    route.keywords.some((keyword) => lower.includes(keyword)),
+  );
+  const preferredSources = matchedRoutes.flatMap((route) => route.sources);
+  const preferredCategories = matchedRoutes
+    .map((route) => route.category)
+    .filter((category): category is string => Boolean(category));
+
+  const results = searchComponents(catalog, intent, { limit: limit * 3 });
+  const ranked = results
+    .map((component) => {
+      let score = 1;
+      if (preferredSources.includes(component.source)) score += 3;
+      if (preferredCategories.includes(component.category)) score += 2;
+      if (component.tags.some((tag) => lower.includes(tag))) score += 1;
+      return { source: component.source, name: component.name, score, paths: component.paths };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+
+  return ranked;
+}

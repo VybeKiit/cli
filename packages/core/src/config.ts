@@ -138,7 +138,9 @@ export const paypalConfigSchema = z.object({
  * implicitly whenever nothing is configured, so a fresh scaffold runs with no `.env`.
  */
 export const dataConfigSchema = z.object({
-  DATA_PROVIDER: z.enum(['supabase', 'mongodb', 'aws', 'local']).default('supabase'),
+  DATA_PROVIDER: z
+    .enum(['supabase', 'neon', 'firebase', 'mongodb', 'aws', 'local'])
+    .default('supabase'),
 });
 
 /**
@@ -246,6 +248,33 @@ export const supabaseConfigSchema = z.object({
   // Server-only; the browser client never sets it.
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
 });
+
+/**
+ * Neon serverless Postgres — used by `@vybekiit/db` (neon adapter).
+ * Reuses `DATABASE_URL` (pooled connection string from Neon dashboard).
+ */
+export const neonConfigSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required for Neon'),
+});
+
+/**
+ * Firebase Firestore — used by `@vybekiit/db` (firebase adapter).
+ * Provide inline JSON or a credentials file path (server-only).
+ */
+export const firebaseConfigSchema = z
+  .object({
+    FIREBASE_PROJECT_ID: z.string().min(1, 'FIREBASE_PROJECT_ID is required'),
+    GOOGLE_APPLICATION_CREDENTIALS: z.string().min(1).optional(),
+    FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(1).optional(),
+  })
+  .refine(
+    (value) =>
+      Boolean(value.FIREBASE_SERVICE_ACCOUNT_JSON) || Boolean(value.GOOGLE_APPLICATION_CREDENTIALS),
+    {
+      message:
+        'FIREBASE_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS is required for Firebase',
+    },
+  );
 
 /**
  * better-auth settings — used by `@vybekiit/auth` (better-auth adapter, ADR-0003).
@@ -509,6 +538,8 @@ export type MongoConfig = z.infer<typeof mongoConfigSchema>;
 export type AwsConfig = z.infer<typeof awsConfigSchema>;
 export type AwsHostingConfig = z.infer<typeof awsHostingConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
+export type NeonConfig = z.infer<typeof neonConfigSchema>;
+export type FirebaseConfig = z.infer<typeof firebaseConfigSchema>;
 export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
 export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;

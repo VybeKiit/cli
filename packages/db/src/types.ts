@@ -11,7 +11,7 @@ import type { Result } from '@vybekiit/core';
  * runs on the first `pnpm dev`. The resolver selects it implicitly when nothing is
  * configured — the builder never picks it.
  */
-export type DataProviderName = 'supabase' | 'mongodb' | 'aws' | 'local';
+export type DataProviderName = 'supabase' | 'neon' | 'firebase' | 'mongodb' | 'aws' | 'local';
 
 /**
  * The minimal shape every stored record shares: a string primary key under `id`.

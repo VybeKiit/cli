@@ -34,6 +34,7 @@ const PACKAGES = [
   'tenancy',
   'ai',
   'cms',
+  'ui-catalog-mcp',
 ];
 
 const dryRun = process.argv.includes('--dry-run');

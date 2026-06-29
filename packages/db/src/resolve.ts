@@ -1,15 +1,19 @@
 import {
   awsConfigSchema,
   dataConfigSchema,
+  firebaseConfigSchema,
   mongoConfigSchema,
+  neonConfigSchema,
   parseEnv,
   r2ConfigSchema,
   storageConfigSchema,
   supabaseConfigSchema,
 } from '@vybekiit/core';
 import { createAwsDataProvider } from './providers/aws/index';
+import { createFirebaseDataProvider } from './providers/firebase/index';
 import { createLocalDataProvider } from './providers/local/index';
 import { createMongoDataProvider } from './providers/mongodb/index';
+import { createNeonDataProvider } from './providers/neon/index';
 import { createR2StorageProvider } from './providers/r2/index';
 import { createS3StorageProvider } from './providers/s3/index';
 import {
@@ -27,7 +31,13 @@ type EnvSource = Record<string, string | undefined>;
  * scaffold, nothing set." Each is the non-optional anchor of its adapter's schema:
  * Supabase's project URL, Mongo's connection string, AWS's region.
  */
-const BACKEND_ANCHOR_KEYS = ['SUPABASE_URL', 'MONGODB_URI', 'AWS_REGION'] as const;
+const BACKEND_ANCHOR_KEYS = [
+  'SUPABASE_URL',
+  'DATABASE_URL',
+  'FIREBASE_PROJECT_ID',
+  'MONGODB_URI',
+  'AWS_REGION',
+] as const;
 
 /**
  * True when the environment carries no data configuration at all — neither an
@@ -67,6 +77,10 @@ export function resolveDataProvider(env: EnvSource = process.env): DataProvider 
       return createMongoDataProvider(parseEnv(mongoConfigSchema, env));
     case 'aws':
       return createAwsDataProvider(parseEnv(awsConfigSchema, env));
+    case 'neon':
+      return createNeonDataProvider(parseEnv(neonConfigSchema, env));
+    case 'firebase':
+      return createFirebaseDataProvider(parseEnv(firebaseConfigSchema, env));
     default:
       return createSupabaseDataProvider(parseEnv(supabaseConfigSchema, env));
   }
