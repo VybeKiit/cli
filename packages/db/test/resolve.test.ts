@@ -15,6 +15,16 @@ vi.mock('@aws-sdk/lib-dynamodb', () => ({
   DynamoDBDocumentClient: { from: () => ({}) },
 }));
 vi.mock('@aws-sdk/client-s3', () => ({ S3Client: class {} }));
+vi.mock('firebase-admin/app', () => ({
+  cert: () => ({}),
+  getApps: () => [{}],
+  initializeApp: () => ({}),
+}));
+vi.mock('firebase-admin/firestore', () => ({
+  getFirestore: () => ({
+    collection: () => ({ doc: () => ({ get: async () => ({ exists: false }) }) }),
+  }),
+}));
 
 const supabaseEnv = {
   SUPABASE_URL: 'https://x.supabase.co',
@@ -57,6 +67,23 @@ describe('resolveDataProvider', () => {
       AWS_REGION: 'us-east-1',
     });
     expect(provider.name).toBe('aws');
+  });
+
+  it('constructs the neon adapter from DATABASE_URL', () => {
+    const provider = resolveDataProvider({
+      DATA_PROVIDER: 'neon',
+      DATABASE_URL: 'postgresql://user:pass@host/db',
+    });
+    expect(provider.name).toBe('neon');
+  });
+
+  it('constructs the firebase adapter from project id', () => {
+    const provider = resolveDataProvider({
+      DATA_PROVIDER: 'firebase',
+      FIREBASE_PROJECT_ID: 'my-app',
+      FIREBASE_SERVICE_ACCOUNT_JSON: '{"project_id":"my-app"}',
+    });
+    expect(provider.name).toBe('firebase');
   });
 
   it('fails loud when the mongodb adapter is selected without its keys', () => {

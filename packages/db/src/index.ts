@@ -11,6 +11,8 @@ export {
   createSupabaseDataProvider,
   createSupabaseStorageProvider,
 } from './providers/supabase/index';
+export { createNeonDataProvider } from './providers/neon/index';
+export { createFirebaseDataProvider } from './providers/firebase/index';
 export { createMongoDataProvider } from './providers/mongodb/index';
 export { createAwsDataProvider } from './providers/aws/index';
 export { createLocalDataProvider } from './providers/local/index';
