@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
 import { useConsoleErrorBuffer } from '@/components/report-mode/use-console-errors';
 import { useReportDockPosition } from '@/components/report-mode/use-report-dock';
+import { useReportInspectHighlightColor } from '@/components/report-mode/use-report-inspect-highlight-color';
 import {
   getAccessibleName,
   getCssPath,
@@ -14,6 +15,9 @@ import { submitExtensionReport } from '@/lib/report-mode/submit-report';
 import {
   DOCK_CORNER_LABELS,
   DOCK_CORNER_PRESETS,
+  DEFAULT_INSPECT_HIGHLIGHT_COLOR,
+  hexToRgba,
+  INSPECT_HIGHLIGHT_PRESETS,
   REPORT_MODE_HOTKEY_LABEL,
   getDockPlacementStyle,
   snapDockToNearestCorner,
@@ -29,6 +33,11 @@ function isReportHotkey(event: KeyboardEvent): boolean {
 export function ReportModeDev() {
   const errorBuffer = useConsoleErrorBuffer();
   const { position, savePosition, setCorner } = useReportDockPosition();
+  const {
+    color: highlightColor,
+    setColor: setHighlightColor,
+    resetColor: resetHighlightColor,
+  } = useReportInspectHighlightColor();
   const dockRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const [active, setActive] = useState(false);
@@ -39,6 +48,7 @@ export function ReportModeDev() {
   const [copyingSpot, setCopyingSpot] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showCorners, setShowCorners] = useState(false);
+  const [showColors, setShowColors] = useState(false);
 
   const spotLabel = useMemo(() => (selected ? getShortestUniqueLabel(selected) : ''), [selected]);
 
@@ -209,12 +219,15 @@ export function ReportModeDev() {
       {active && highlightRect ? (
         <div
           data-report-mode-ui={true}
-          className="pointer-events-none fixed z-[9997] rounded border-2 border-amber-500 bg-amber-400/20"
+          data-testid="report-mode-highlight"
+          className="pointer-events-none fixed z-[9997] rounded border-2"
           style={{
             top: highlightRect.top,
             left: highlightRect.left,
             width: highlightRect.width,
             height: highlightRect.height,
+            borderColor: highlightColor,
+            backgroundColor: hexToRgba(highlightColor, 0.2),
           }}
         />
       ) : null}
@@ -252,9 +265,30 @@ export function ReportModeDev() {
             variant="outline"
             aria-expanded={showCorners}
             data-testid="report-mode-corner-menu"
-            onClick={() => setShowCorners((value) => !value)}
+            onClick={() => {
+              setShowColors(false);
+              setShowCorners((value) => !value);
+            }}
           >
             Pin
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            aria-expanded={showColors}
+            data-testid="report-mode-highlight-color"
+            onClick={() => {
+              setShowCorners(false);
+              setShowColors((value) => !value);
+            }}
+          >
+            <span
+              aria-hidden="true"
+              className="mr-1 inline-block size-2.5 rounded-full border border-border"
+              style={{ backgroundColor: highlightColor }}
+            />
+            Color
           </Button>
           {active ? (
             <Button type="button" size="sm" variant="outline" onClick={deactivate}>
@@ -283,6 +317,50 @@ export function ReportModeDev() {
                 {DOCK_CORNER_LABELS[corner]}
               </Button>
             ))}
+          </div>
+        ) : null}
+
+        {showColors ? (
+          <div
+            className="flex flex-col gap-2 rounded-lg border bg-background p-1.5 shadow-lg"
+            data-testid="report-mode-highlight-color-menu"
+          >
+            <div className="flex flex-wrap gap-1">
+              {INSPECT_HIGHLIGHT_PRESETS.map((preset) => (
+                <button
+                  aria-label={`Highlight color ${preset}`}
+                  aria-pressed={highlightColor === preset}
+                  className="size-6 rounded-full border-2 border-border"
+                  data-testid={`report-mode-highlight-preset-${preset.slice(1)}`}
+                  key={preset}
+                  onClick={() => setHighlightColor(preset)}
+                  style={{ backgroundColor: preset }}
+                  type="button"
+                />
+              ))}
+            </div>
+            <label className="flex items-center justify-between gap-2 text-xs">
+              <span>Custom</span>
+              <input
+                aria-label="Custom highlight color"
+                className="h-6 w-8 cursor-pointer border-none bg-transparent p-0"
+                data-testid="report-mode-highlight-custom"
+                onChange={(event) => setHighlightColor(event.target.value)}
+                type="color"
+                value={highlightColor}
+              />
+            </label>
+            {highlightColor !== DEFAULT_INSPECT_HIGHLIGHT_COLOR ? (
+              <Button
+                data-testid="report-mode-highlight-reset"
+                onClick={resetHighlightColor}
+                size="sm"
+                type="button"
+                variant="ghost"
+              >
+                Reset
+              </Button>
+            ) : null}
           </div>
         ) : null}
 

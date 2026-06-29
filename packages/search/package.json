@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/search",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Full-text search adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",

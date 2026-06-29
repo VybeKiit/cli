@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/db",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Typed Supabase data client for VybeKiit — server-side client factory and a health check. No UI.",
   "license": "MIT",
   "type": "module",

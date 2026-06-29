@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
+import {
+  DEFAULT_INSPECT_HIGHLIGHT_COLOR,
+  hexToRgba,
+  INSPECT_HIGHLIGHT_PRESETS,
+  loadInspectHighlightColor,
+  saveInspectHighlightColor,
+} from '../src/inspect-highlight-color';
 import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoff-target';
 import { formatReportPrompt } from '../src/format-prompt';
 import { getDockInsetStyle, loadDockCornerOnly, snapDockToNearestCorner } from '../src/position';
@@ -132,6 +139,54 @@ describe('getDockInsetStyle', () => {
 
   it('returns top-left with custom margin', () => {
     expect(getDockInsetStyle('top-left', 24)).toEqual({ top: 24, left: 24 });
+  });
+});
+
+describe('loadInspectHighlightColor', () => {
+  it('defaults to amber', () => {
+    expect(loadInspectHighlightColor(null)).toBe(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
+  });
+
+  it('persists valid hex colors', () => {
+    const entries = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => entries.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        entries.set(key, value);
+      },
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
+    saveInspectHighlightColor(storage, '#3B82F6');
+    expect(loadInspectHighlightColor(storage)).toBe('#3b82f6');
+  });
+
+  it('ignores invalid stored values', () => {
+    const storage = {
+      getItem: () => 'not-a-color',
+      setItem: () => {},
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
+    expect(loadInspectHighlightColor(storage)).toBe(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
+  });
+
+  it('includes the default in presets', () => {
+    expect(INSPECT_HIGHLIGHT_PRESETS).toContain(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
+  });
+});
+
+describe('hexToRgba', () => {
+  it('converts hex to rgba with alpha', () => {
+    expect(hexToRgba('#f59e0b', 0.2)).toBe('rgba(245, 158, 11, 0.2)');
+  });
+
+  it('falls back to default for invalid hex', () => {
+    expect(hexToRgba('invalid', 0.2)).toBe('rgba(245, 158, 11, 0.2)');
   });
 });
 

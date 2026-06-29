@@ -21,6 +21,16 @@ export {
   type ReportHandoffTarget,
 } from './handoff-target';
 export {
+  DEFAULT_INSPECT_HIGHLIGHT_COLOR,
+  hexToRgba,
+  INSPECT_HIGHLIGHT_PRESETS,
+  isValidInspectHighlightColor,
+  loadInspectHighlightColor,
+  normalizeInspectHighlightColor,
+  REPORT_INSPECT_HIGHLIGHT_COLOR_STORAGE_KEY,
+  saveInspectHighlightColor,
+} from './inspect-highlight-color';
+export {
   DOCK_CORNER_LABELS,
   DOCK_CORNER_PRESETS,
   DEFAULT_DOCK_POSITION,

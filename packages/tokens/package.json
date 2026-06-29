@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/tokens",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Shared design tokens for VybeKiit — one source of truth for colors, spacing, radius, and type, consumed by web as CSS variables and by mobile as StyleSheet values. No UI.",
   "license": "MIT",
   "type": "module",

@@ -206,7 +206,8 @@
 }
 
 .report-mode-pin--open,
-.report-mode-handoff--open {
+.report-mode-handoff--open,
+.report-mode-highlight-color--open {
   z-index: 5;
 }
 
@@ -524,7 +525,8 @@
 }
 
 .report-mode-pin,
-.report-mode-handoff {
+.report-mode-handoff,
+.report-mode-highlight-color {
   position: relative;
   flex-shrink: 0;
   padding-top: 0.4rem;
@@ -563,6 +565,87 @@
   flex-direction: column;
   gap: 0.15rem;
   min-width: 7.5rem;
+}
+
+.report-mode-highlight-color-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 8.5rem;
+  padding: 0.45rem;
+}
+
+.report-mode-highlight-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1.5rem);
+  gap: 0.35rem;
+}
+
+.report-mode-highlight-preset {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.report-mode-highlight-preset:hover {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.report-mode-highlight-preset--active {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.report-mode-highlight-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.report-mode-highlight-custom-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.report-mode-highlight-custom-input {
+  width: 2rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.35rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.report-mode-highlight-reset {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+.report-mode-highlight-reset:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.report-mode-highlight-swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
 }
 
 .report-mode-settings-group {

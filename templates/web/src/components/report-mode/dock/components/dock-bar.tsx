@@ -2,6 +2,7 @@
 
 import { ReportModeBrandChip } from '@/components/report-mode/dock/components/brand-chip';
 import { ReportHandoffMenu } from '@/components/report-mode/dock/components/handoff-menu';
+import { ReportHighlightColorMenu } from '@/components/report-mode/dock/components/highlight-color-menu';
 import { ReportPinMenu } from '@/components/report-mode/dock/components/pin-menu';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
@@ -20,6 +21,9 @@ type ReportDockBarProps = {
   readonly assistant: VybeAssistant | null;
   readonly anchor: ReportDockAnchor;
   readonly handoffTarget: ReportHandoffTarget;
+  readonly highlightColor: string;
+  readonly onHighlightColorChange: (color: string) => void;
+  readonly onHighlightColorReset: () => void;
   readonly onToggleExpanded: () => void;
   readonly onToggleActive: () => void;
   readonly onDeactivate: () => void;
@@ -37,6 +41,9 @@ export function ReportDockBar({
   assistant,
   anchor,
   handoffTarget,
+  highlightColor,
+  onHighlightColorChange,
+  onHighlightColorReset,
   onToggleExpanded,
   onToggleActive,
   onDeactivate,
@@ -88,6 +95,13 @@ export function ReportDockBar({
 
         <div className="report-mode-settings-group" data-report-tutorial="settings">
           <ReportPinMenu anchor={anchor} onSelect={onSetCorner} tutorialActive={tutorialActive} />
+
+          <ReportHighlightColorMenu
+            color={highlightColor}
+            onChange={onHighlightColorChange}
+            onReset={onHighlightColorReset}
+            tutorialActive={tutorialActive}
+          />
 
           {assistant ? (
             <ReportHandoffMenu

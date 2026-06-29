@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/payments",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Headless, provider-agnostic payments for VybeKiit — one PaymentProvider interface with Lemon Squeezy, Stripe, and PayPal adapters (checkout + webhook verification). No UI.",
   "license": "MIT",
   "type": "module",

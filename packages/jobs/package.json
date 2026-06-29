@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/jobs",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Background jobs and scheduled tasks for VybeKiit.",
   "license": "MIT",
   "type": "module",

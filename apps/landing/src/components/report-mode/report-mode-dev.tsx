@@ -5,6 +5,7 @@ import { getBrandChevronDirection } from '@/components/report-mode/dock/utils/re
 import { useReportDockCollapse } from '@/components/report-mode/dock/hooks/use-report-dock-collapse';
 import { useReportDockPosition } from '@/components/report-mode/dock/hooks/use-report-dock';
 import { useReportHandoffTarget } from '@/components/report-mode/dock/hooks/use-report-handoff-target';
+import { useReportInspectHighlightColor } from '@/components/report-mode/dock/hooks/use-report-inspect-highlight-color';
 import { ReportModeBanner } from '@/components/report-mode/inspect/report-mode-banner';
 import { ReportModeHighlight } from '@/components/report-mode/inspect/report-mode-highlight';
 import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
@@ -40,6 +41,11 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
   const pathname = usePathname();
   const errorBuffer = useConsoleErrorBuffer();
   const { target: handoffTarget, setTarget: setHandoffTarget } = useReportHandoffTarget();
+  const {
+    color: highlightColor,
+    setColor: setHighlightColor,
+    resetColor: resetHighlightColor,
+  } = useReportInspectHighlightColor();
   const { position, savePosition, setCorner } = useReportDockPosition();
   const collapse = useReportDockCollapse();
   const tutorial = useReportTutorial();
@@ -166,7 +172,9 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
   return (
     <>
       {inspectActive ? <ReportModeBanner /> : null}
-      {inspectActive && highlightRect ? <ReportModeHighlight rect={highlightRect} /> : null}
+      {inspectActive && highlightRect ? (
+        <ReportModeHighlight color={highlightColor} rect={highlightRect} />
+      ) : null}
 
       <ReportModeTutorial
         active={tutorialActive}
@@ -197,9 +205,12 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
           assistant={assistant}
           chevronDirection={chevronDirection}
           handoffTarget={handoffTarget}
+          highlightColor={highlightColor}
           onDeactivate={deactivateInspect}
           onDragPointerDown={onDragHandlePointerDown}
           onHandoffChange={setHandoffTarget}
+          onHighlightColorChange={setHighlightColor}
+          onHighlightColorReset={resetHighlightColor}
           onSetCorner={setCorner}
           onToggleActive={toggleInspectActive}
           onToggleExpanded={collapse.toggleExpanded}

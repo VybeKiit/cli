@@ -14,11 +14,7 @@
     },
     {
       "repo": "aws/agent-toolkit-for-aws/skills",
-      "skills": [
-        "aws-cli",
-        "deploy-serverless-application",
-        "troubleshoot-cloudformation-deployments"
-      ]
+      "skills": ["aws-serverless", "aws-cdk", "aws-cloudformation"]
     }
   ],
   "_notes": {

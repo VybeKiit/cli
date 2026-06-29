@@ -8,6 +8,7 @@ export const REPORT_DOCK_TOOLTIPS = {
   handoffTrigger: 'Where your note goes — this chat or a fresh one.',
   handoffCurrentChat: 'Paste the report into the chat you already have open.',
   handoffNewChat: 'Open a new chat with the report ready to send.',
+  highlightColor: "Color of the box around what you're pointing at.",
   off: 'Turn off pick mode.',
 } as const;
 

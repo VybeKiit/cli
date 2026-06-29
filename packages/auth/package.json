@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/auth",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Headless auth for VybeKiit — one AuthProvider interface with a DB-bound better-auth default and a Cognito (AWS) adapter, normalized to a Result. No UI.",
   "license": "MIT",
   "type": "module",
