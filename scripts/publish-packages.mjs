@@ -20,6 +20,8 @@ const PACKAGES = [
   'security',
   'assets',
   'agent-kit',
+  'client-state',
+  'browser-automation',
   'extension-publish',
   'report-mode',
   'i18n',
