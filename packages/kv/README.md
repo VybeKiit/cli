@@ -35,6 +35,7 @@ Your template already imports this package. Settings live in your **secret setti
 
 - UI components, screens, or copy — those are **owned** by your app template.
 - Direct edits in node_modules — use update-kit instead.
+- **Redis / Upstash for buyers** — not a VybeKiit onboarding path (ADR-0014). Use `@vybekiit/client-state` for client cache; KV is agent-only via `harden`.
 
 ## Updates
 
