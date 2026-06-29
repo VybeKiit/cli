@@ -34,6 +34,7 @@
     "@vybekiit/db": "workspace:*",
     "@vybekiit/observability": "workspace:*",
     "@vybekiit/payments": "workspace:*",
+    "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/security": "workspace:*",
     "@vybekiit/analytics": "workspace:*",
     "@vybekiit/ai": "workspace:*",

@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/ui/sonner';
+import { ReportModeDevShell } from '@/components/report-mode/report-mode-shell';
 import { routing } from '@/i18n/routing';
 import { localeToDirection, localeToLang } from '@/lib/direction';
 import { NextIntlClientProvider } from 'next-intl';
@@ -45,6 +46,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <NextIntlClientProvider messages={messages}>
           {children}
           <Toaster />
+          <ReportModeDevShell />
         </NextIntlClientProvider>
       </body>
     </html>
