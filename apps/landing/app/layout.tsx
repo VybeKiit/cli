@@ -1,3 +1,4 @@
+import { ReportModeDevShell } from '@/components/report-mode/report-mode-shell';
 import { BRAND } from '@/data/site';
 import { resolveDirection } from '@/lib/direction';
 import type { Metadata } from 'next';
@@ -9,6 +10,10 @@ export const metadata: Metadata = {
   title: `${BRAND.name} — ${BRAND.tagline}`,
   description:
     'VybeKiit is the SaaS kit that ships itself. You describe the product in plain language; the agent builds it, deploys it, takes payments, and keeps it updated. Web, mobile, and a browser extension in one purchase.',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 /**
@@ -20,7 +25,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const { lang, dir } = resolveDirection((await headers()).get('accept-language'));
   return (
     <html lang={lang} dir={dir}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ReportModeDevShell />
+      </body>
     </html>
   );
 }

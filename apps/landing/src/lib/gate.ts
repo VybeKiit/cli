@@ -37,7 +37,9 @@ async function inviteOneRepo(
     return fail('network_error', `Could not reach GitHub: ${detail}`);
   }
 
-  if (response.status === 201 || response.status === 204) return ok(true);
+  if (response.status === 201 || response.status === 204) {
+    return ok(true);
+  }
   return fail(
     'invite_failed',
     `GitHub returned ${response.status} inviting ${username} to ${repo}.`,
@@ -60,7 +62,9 @@ async function removeOneRepo(
     return fail('network_error', `Could not reach GitHub: ${detail}`);
   }
 
-  if (response.status === 204) return ok(true);
+  if (response.status === 204) {
+    return ok(true);
+  }
   return fail(
     'remove_failed',
     `GitHub returned ${response.status} removing ${username} from ${repo}.`,
@@ -75,7 +79,9 @@ export async function inviteToRepo(
   const failures: string[] = [];
   for (const repo of config.GITHUB_GATE_REPOS) {
     const result = await inviteOneRepo(config, repo, username);
-    if (!result.ok) failures.push(result.error.message);
+    if (!result.ok) {
+      failures.push(result.error.message);
+    }
   }
   if (failures.length > 0) {
     return fail('invite_failed', failures.join('; '));
@@ -91,7 +97,9 @@ export async function removeFromRepo(
   const failures: string[] = [];
   for (const repo of config.GITHUB_GATE_REPOS) {
     const result = await removeOneRepo(config, repo, username);
-    if (!result.ok) failures.push(result.error.message);
+    if (!result.ok) {
+      failures.push(result.error.message);
+    }
   }
   if (failures.length > 0) {
     return fail('remove_failed', failures.join('; '));

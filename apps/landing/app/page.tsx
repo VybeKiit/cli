@@ -1,23 +1,25 @@
-import { MarketingShell } from '@/components/marketing-shell';
-import { Comparison } from '@/components/sections/comparison';
-import { Faq } from '@/components/sections/faq';
-import { Hero } from '@/components/sections/hero';
-import { Pillars } from '@/components/sections/pillars';
-import { Pricing } from '@/components/sections/pricing';
+import { FeatureStrip } from '@/components/landing/FeatureStrip';
+import { Footer } from '@/components/landing/Footer';
+import { Header } from '@/components/landing/Header';
+import { Hero } from '@/components/landing/Hero';
+import { LandingShell } from '@/components/landing/LandingShell';
+import { PricingCTA } from '@/components/landing/PricingCTA';
+import { ShowcaseCarousel } from '@/components/landing/ShowcaseCarousel';
+import { ZigZagSection } from '@/components/landing/ZigZagSection';
 
-/**
- * The VybeKiit store home page — the marketing site that dogfoods `templates/web`.
- * Composed from data-driven sections (each owns its copy in `src/data/*`): hero →
- * pillars → comparison → pricing → FAQ, inside the shared marketing shell.
- */
+/** VybeKiit cinematic store homepage — dark premium landing at `/`. */
 export default function HomePage() {
   return (
-    <MarketingShell>
-      <Hero />
-      <Pillars />
-      <Comparison />
-      <Pricing />
-      <Faq />
-    </MarketingShell>
+    <LandingShell>
+      <Header />
+      <main>
+        <Hero />
+        <FeatureStrip />
+        <ShowcaseCarousel />
+        <ZigZagSection />
+        <PricingCTA />
+      </main>
+      <Footer />
+    </LandingShell>
   );
 }

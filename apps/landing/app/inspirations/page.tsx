@@ -39,7 +39,7 @@ export default function InspirationsIndexPage() {
             }}
           >
             {direction.recommended ? (
-              <span className="absolute top-4 end-4 rounded-full bg-amber-500/20 px-2 py-0.5 font-medium text-amber-400 text-xs">
+              <span className="absolute end-4 top-4 rounded-full bg-amber-500/20 px-2 py-0.5 font-medium text-amber-400 text-xs">
                 A/B pick
               </span>
             ) : null}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="VybeKiit">
+  <rect width="32" height="32" rx="8" fill="#070b12"/>
+  <rect width="32" height="32" rx="8" fill="url(#vybe-glow)" opacity="0.35"/>
+  <path d="M6 9 L16 14.5 L26 9" fill="none" stroke="#f8fafc" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+  <path d="M6 14.5 L16 20 L26 14.5" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+  <path d="M6 20 L16 25.5 L26 20" fill="none" stroke="#f8fafc" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+  <defs>
+    <radialGradient id="vybe-glow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#2f80ff" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#2f80ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

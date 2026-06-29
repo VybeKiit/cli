@@ -1,4 +1,4 @@
-import { MarketingShell } from '@/components/marketing-shell';
+import { CheckoutShell } from '@/components/checkout-shell';
 import { Button } from '@/components/ui/button';
 import { SUPPORT } from '@/data/site';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ export const metadata = {
  */
 export default function SuccessPage() {
   return (
-    <MarketingShell>
+    <CheckoutShell>
       <section className="mx-auto flex max-w-xl flex-col items-start gap-6 px-6 py-24">
         <h1 className="font-bold text-4xl tracking-tight">Payment received. You are in.</h1>
         <p className="text-lg text-muted-foreground">
@@ -48,6 +48,6 @@ export default function SuccessPage() {
           <Link href="/">Back to home</Link>
         </Button>
       </section>
-    </MarketingShell>
+    </CheckoutShell>
   );
 }

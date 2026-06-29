@@ -14,7 +14,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const direction = getInspirationBySlug(slug);
-  if (!direction) return { title: 'Not found' };
+  if (!direction) {
+    return { title: 'Not found' };
+  }
   return {
     title: `VybeKiit inspiration — ${direction.name}`,
     description: direction.vibe,
@@ -25,10 +27,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function InspirationPreviewPage({ params }: PageProps) {
   const { slug } = await params;
   const direction = getInspirationBySlug(slug);
-  if (!direction) notFound();
+  if (!direction) {
+    notFound();
+  }
 
   const Layout = INSPIRATION_LAYOUTS[slug];
-  if (!Layout) notFound();
+  if (!Layout) {
+    notFound();
+  }
 
   return <Layout direction={direction} />;
 }

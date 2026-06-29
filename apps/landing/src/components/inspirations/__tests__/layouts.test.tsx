@@ -31,7 +31,9 @@ describe('inspiration layouts', () => {
     directions.map((d) => [d.slug, d] as const),
   )('renders the %s layout with its headline', (slug, direction) => {
     const Layout = INSPIRATION_LAYOUTS[slug];
-    if (!Layout) throw new Error(`No layout registered for slug "${slug}"`);
+    if (!Layout) {
+      throw new Error(`No layout registered for slug "${slug}"`);
+    }
     const { container, unmount } = render(<Layout direction={direction} />);
     expect(container).not.toBeEmptyDOMElement();
     expect(container.textContent).toContain(direction.headline);

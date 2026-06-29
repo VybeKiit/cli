@@ -1,6 +1,6 @@
 'use client';
 
-import { AgentSessionDemo } from '@/components/sections/agent-session-demo';
+import { AgentSessionDemo } from '@/components/inspirations/agent-session-demo';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InspirationDirection } from '@/data/inspirations';
 import { InspirationChrome, InspirationCta } from './inspiration-chrome';
@@ -298,7 +298,9 @@ export function ChecklistLayout({ direction }: { direction: InspirationDirection
   const [unlocked, setUnlocked] = useState(0);
 
   useEffect(() => {
-    if (unlocked >= VERIFY_STEPS.length) return;
+    if (unlocked >= VERIFY_STEPS.length) {
+      return;
+    }
     const t = setTimeout(() => setUnlocked((n) => n + 1), 700);
     return () => clearTimeout(t);
   }, [unlocked]);
@@ -414,7 +416,9 @@ export function BeforeAfterLayout({ direction }: { direction: InspirationDirecti
   const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
-    if (hasInteracted) return;
+    if (hasInteracted) {
+      return;
+    }
     const start = 20;
     const end = 78;
     const steps = 30;
@@ -422,7 +426,9 @@ export function BeforeAfterLayout({ direction }: { direction: InspirationDirecti
     const id = setInterval(() => {
       step += 1;
       setPosition(start + ((end - start) * step) / steps);
-      if (step >= steps) clearInterval(id);
+      if (step >= steps) {
+        clearInterval(id);
+      }
     }, 60);
     return () => clearInterval(id);
   }, [hasInteracted]);
@@ -430,7 +436,9 @@ export function BeforeAfterLayout({ direction }: { direction: InspirationDirecti
   const onMove = useCallback((clientX: number) => {
     setHasInteracted(true);
     const el = containerRef.current;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     const rect = el.getBoundingClientRect();
     setPosition(Math.min(95, Math.max(5, ((clientX - rect.left) / rect.width) * 100)));
   }, []);
@@ -456,7 +464,9 @@ export function BeforeAfterLayout({ direction }: { direction: InspirationDirecti
             e.currentTarget.setPointerCapture(e.pointerId);
           }}
           onPointerMove={(e) => {
-            if (e.buttons !== 1) return;
+            if (e.buttons !== 1) {
+              return;
+            }
             onMove(e.clientX);
           }}
         >
@@ -594,7 +604,7 @@ export function BoldStatementLayout({ direction }: { direction: InspirationDirec
           The SaaS kit that{' '}
           <span
             key={verbIndex}
-            className="vybe-line-in inline-block vybe-glow-accent italic"
+            className="vybe-line-in vybe-glow-accent inline-block italic"
             style={{ color: direction.palette.accent }}
           >
             {KINETIC_VERBS[verbIndex]}.

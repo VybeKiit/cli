@@ -69,7 +69,7 @@ export const TRUST_BADGES: readonly string[] = [
  * Loom or YouTube embed URL for the keystone demo. Empty until recorded — set before
  * cold email (see docs/gtm/loom-recording-guide.md).
  */
-export let DEMO_VIDEO_EMBED_URL = '';
+export const DEMO_VIDEO_EMBED_URL = '';
 
 /** Kit support channels — kit bugs only (see CONTEXT.md support boundary). */
 export const SUPPORT: {

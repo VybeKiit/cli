@@ -1,5 +1,5 @@
 import { CheckoutForm } from '@/components/checkout-form';
-import { MarketingShell } from '@/components/marketing-shell';
+import { CheckoutShell } from '@/components/checkout-shell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PRICE } from '@/data/site';
 
@@ -14,7 +14,7 @@ export const metadata = {
  */
 export default function CheckoutPage() {
   return (
-    <MarketingShell>
+    <CheckoutShell>
       <section className="mx-auto max-w-md px-6 py-20">
         <Card>
           <CardHeader>
@@ -28,6 +28,6 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
       </section>
-    </MarketingShell>
+    </CheckoutShell>
   );
 }

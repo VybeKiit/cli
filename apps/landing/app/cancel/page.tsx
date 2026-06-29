@@ -1,4 +1,4 @@
-import { MarketingShell } from '@/components/marketing-shell';
+import { CheckoutShell } from '@/components/checkout-shell';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -12,7 +12,7 @@ export const metadata = {
  */
 export default function CancelPage() {
   return (
-    <MarketingShell>
+    <CheckoutShell>
       <section className="mx-auto flex max-w-xl flex-col items-start gap-6 px-6 py-24">
         <h1 className="font-bold text-4xl tracking-tight">Checkout canceled</h1>
         <p className="text-lg text-muted-foreground">
@@ -22,6 +22,6 @@ export default function CancelPage() {
           <Link href="/checkout">Try again</Link>
         </Button>
       </section>
-    </MarketingShell>
+    </CheckoutShell>
   );
 }

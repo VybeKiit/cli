@@ -1,4 +1,4 @@
-import { MarketingShell } from '@/components/marketing-shell';
+import { CheckoutShell } from '@/components/checkout-shell';
 import { TERMS_SECTIONS } from '@/data/legal';
 
 export const metadata = {
@@ -12,7 +12,7 @@ export const metadata = {
  */
 export default function TermsPage() {
   return (
-    <MarketingShell>
+    <CheckoutShell>
       <article className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
         <header className="flex flex-col gap-1">
           <h1 className="font-bold text-3xl tracking-tight">Terms of Service</h1>
@@ -26,6 +26,6 @@ export default function TermsPage() {
           </section>
         ))}
       </article>
-    </MarketingShell>
+    </CheckoutShell>
   );
 }

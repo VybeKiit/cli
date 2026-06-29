@@ -51,7 +51,9 @@ export function CheckoutForm() {
 
     const errors = validate();
     setFieldErrors(errors);
-    if (errors.githubUsername || errors.email) return;
+    if (errors.githubUsername || errors.email) {
+      return;
+    }
 
     setSubmitting(true);
     const result = await postJson<CheckoutResponse>('/api/checkout', { githubUsername, email });
