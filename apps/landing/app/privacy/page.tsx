@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <header className="flex flex-col gap-1">
           <h1 className="font-bold text-3xl tracking-tight">Privacy Policy</h1>
           {/* TODO(vybekiit): set the effective date before launch. */}
-          <p className="text-muted-foreground text-sm">Last updated: [add date]</p>
+          <p className="text-muted-foreground text-sm">Last updated: June 29, 2026</p>
         </header>
         {PRIVACY_SECTIONS.map((section) => (
           <section key={section.heading} className="flex flex-col gap-2">

@@ -1,0 +1,90 @@
+name: Publish Package
+
+# Publishes @vybekiit/* + vybekiit CLI via OIDC trusted publishing (no NPM_TOKEN).
+# Workflow filename `publish.yml` must match npm Trusted Publisher config on each package.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_run:
+    workflows: ['Release']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v0.1.1). Defaults to main HEAD.'
+        required: false
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      INPUT_TAG: ${{ inputs.tag }}
+    steps:
+      - name: Resolve checkout ref
+        id: ref
+        run: |
+          case "$GITHUB_EVENT_NAME" in
+            workflow_dispatch)
+              if [ -n "$INPUT_TAG" ]; then
+                echo "ref=$INPUT_TAG" >> "$GITHUB_OUTPUT"
+              else
+                echo "ref=main" >> "$GITHUB_OUTPUT"
+              fi
+              ;;
+            workflow_run)
+              echo "ref=main" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "ref=$GITHUB_REF" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Verify npm supports OIDC Trusted Publishing
+        run: |
+          test "$(printf '%s\n' "11.5.1" "$(npm -v)" | sort -V | head -1)" = "11.5.1" || {
+            echo "::error::npm $(npm -v) is below 11.5.1; trusted publishing is not supported"
+            exit 1
+          }
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:scripts
+      - run: pnpm build
+
+      - name: Publish @vybekiit/* packages
+        run: pnpm publish:packages
+
+      - name: Publish vybekiit CLI
+        run: pnpm publish --no-git-checks --access public --provenance
+        working-directory: cli

@@ -21,6 +21,7 @@ const PACKAGES = [
   'assets',
   'agent-kit',
   'extension-publish',
+  'report-mode',
   'i18n',
   'seo',
   'compliance',
@@ -42,7 +43,7 @@ for (const name of PACKAGES) {
   console.log(`Publishing @vybekiit/${name}...`);
   const result = spawnSync(
     'pnpm',
-    ['publish', '--access', 'public', ...(dryRun ? ['--dry-run'] : ['--no-git-checks'])],
+    ['publish', '--access', 'public', '--no-git-checks', ...(dryRun ? ['--dry-run'] : [])],
     { cwd: dir, stdio: 'inherit', env: process.env },
   );
   if (result.status !== 0) {

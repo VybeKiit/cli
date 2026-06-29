@@ -7,10 +7,12 @@
 /** The product's one-time price, in whole US dollars. */
 const PRICE_USD = 29;
 
+/** Post-launch-week price (early bird ends after launch week). */
+const PRICE_AFTER_LAUNCH_USD = 49;
+
 /**
- * Single source of truth for the displayed price. The $29 is flagged as parked /
- * likely underpriced (see CONTEXT.md → Parked), so it lives here as ONE constant —
- * changing the number is a one-line edit and every section updates.
+ * Single source of truth for the displayed price. Early-bird $29 during launch week,
+ * then $49 — one constant edit updates every section.
  */
 export const PRICE = {
   /** Numeric amount in USD, for any math or schema markup. */
@@ -21,6 +23,8 @@ export const PRICE = {
   cadence: 'one-time',
   /** The risk-reversal window the offer promises. */
   refundDays: 14,
+  /** Early-bird messaging for launch week. */
+  earlyBirdNote: `$${PRICE_USD} launch week → $${PRICE_AFTER_LAUNCH_USD} after`,
 } as const;
 
 /** Brand identity strings shown in the header, footer, and metadata. */
@@ -52,8 +56,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: '/privacy', label: 'Privacy' },
 ];
 
-/**
- * Trust badges shown near the primary CTA — the concrete promises that reverse
+/** Trust badges shown near the primary CTA — the concrete promises that reverse
  * purchase risk (from the comparison matrix + landing-direction #10).
  */
 export const TRUST_BADGES: readonly string[] = [
@@ -61,3 +64,20 @@ export const TRUST_BADGES: readonly string[] = [
   `${PRICE.refundDays}-day refund`,
   'Web · mobile · extension',
 ];
+
+/**
+ * Loom or YouTube embed URL for the keystone demo. Empty until recorded — set before
+ * cold email (see docs/gtm/loom-recording-guide.md).
+ */
+export let DEMO_VIDEO_EMBED_URL = '';
+
+/** Kit support channels — kit bugs only (see CONTEXT.md support boundary). */
+export const SUPPORT: {
+  discordUrl: string;
+  kitEmail: string;
+} = {
+  /** Discord invite URL — set before launch. */
+  discordUrl: '',
+  /** Kit bug email — set before launch. */
+  kitEmail: 'support@vybekiit.com',
+};
