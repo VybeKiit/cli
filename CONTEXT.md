@@ -89,9 +89,9 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ observability/          NEW · one ObservabilityProvider · sentry + local no-op default
 │  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
 │  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
-│  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
-│  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
-│  │                          the OWNED templates/extension consumes it (v3)
+│  ├─ client-state/             TanStack Query + Zustand/MMKV via resolveClientState() — ADR-0014
+│  ├─ browser-automation/       unified Playwright CLI (cws + ls targets) — ADR-0015
+│  ├─ extension-publish/        deprecated shim → browser-automation CWS exports
 │  ├─ report-mode/            dev-only Report Mode — structured reports + assistant deeplink handoff
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
 │  └─ agent-kit/              shared agent-layer source — the skill contract, BUILDER-VOICE.md core,
@@ -134,7 +134,8 @@ See ADR-0002/0003/0004.
 | Storage | `StorageProvider`: **supabase/R2⭐** · s3 | R2 implemented; doctor provisions on CF stack (ADR-0010) |
 | Asset delivery | `@vybekiit/assets`: hybrid build optimize + CDN URLs · derived from hosting+storage | — ADR-0010 |
 | Email | `@vybekiit/email` (`EmailProvider`): **cloudflare⭐** · ses · resend | AWS SES now an adapter (was sandbox-approval pain); Resend an adapter (was fallback) |
-| Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS is Merchant-of-Record → handles tax/VAT (the scary part) |
+| Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS onboarding via `@vybekiit/browser-automation` `ls`; Stripe via MCP; LS is MoR for tax |
+| Client state | `@vybekiit/client-state`: TanStack Query + Zustand/MMKV | No Redis for buyers — ADR-0014 |
 | Design tokens | `@vybekiit/tokens`: one shared map (colors/spacing/radius/type) — web as CSS vars, mobile as `StyleSheet` | — DRY look across web + mobile — ADR-0004 |
 | Observability | `@vybekiit/observability` (`ObservabilityProvider`): **local⭐** (no-op) · sentry | `@vybekiit/core` `createLogger` — dev verbose, production silent |
 | Web UI blocks | shadcn/ui + shadcn-compatible registries (Magic UI, Kokonut, 21st.dev, …) | Agent picks from `.vybekiit/agent/ui-sources.md`; normalize to kit primitives |
@@ -365,7 +366,7 @@ matches.
 | Deploy — Vercel | [vercel.com/docs](https://vercel.com/docs) | `deploy-vercel-vybekiit.md` | `vercel` CLI via `doctor` when `HOSTING_PROVIDER=vercel` |
 | Supabase ⭐ | [supabase.com/docs](https://supabase.com/docs) | `supabase-vybekiit.md` | `supabase` CLI via `doctor` |
 | better-auth ⭐ | [better-auth.com/docs](https://www.better-auth.com/docs) | `better-auth-vybekiit.md` | — |
-| Lemon Squeezy ⭐ | [docs.lemonsqueezy.com](https://docs.lemonsqueezy.com) | `lemon-squeezy-vybekiit.md` | — |
+| Lemon Squeezy ⭐ | [docs.lemonsqueezy.com](https://docs.lemonsqueezy.com) | `lemon-squeezy-vybekiit.md` + `browser-automation-vybekiit.md` (`ls`) | — |
 | Stripe (opt-in) | [docs.stripe.com](https://docs.stripe.com) | `stripe-vybekiit.md` | `PAYMENTS_PROVIDER=stripe` |
 | PayPal (opt-in) | [developer.paypal.com](https://developer.paypal.com) | `paypal-vybekiit.md` | `PAYMENTS_PROVIDER=paypal` |
 | Email — Resend | [resend.com/docs](https://resend.com/docs) | `resend-vybekiit.md` | `EMAIL_PROVIDER=resend` |
@@ -393,7 +394,7 @@ matches.
 |---|---|---|
 | WXT | [wxt.dev](https://wxt.dev) | docs-only in wrapper (no custom WXT skill yet) |
 | Chrome Extension APIs | [developer.chrome.com/docs/extensions](https://developer.chrome.com/docs/extensions) | `chrome-extension-vybekiit.md` |
-| CWS publish | `@vybekiit/extension-publish` + CWS docs | invoked by `publish-extension` buyer skill |
+| CWS publish | `@vybekiit/browser-automation` (`cws`) + CWS docs | `publish-extension` buyer skill |
 
 ### Scorecard
 
@@ -691,7 +692,22 @@ Banner + export hooks — `@vybekiit/compliance`.
 Orgs and invites — `@vybekiit/tenancy`; buyer skill: `add-teams`.
 
 **Fast storage**:
-KV cache — `@vybekiit/kv` (Cloudflare default).
+KV cache — `@vybekiit/kv` (Cloudflare default). **Agent-only / harden** — not a buyer onboarding path. Redis is not a VybeKiit buyer path; use TanStack Query for client cache (ADR-0014).
+
+**Client cache**:
+What the app remembers from the server while browsing — TanStack Query via `@vybekiit/client-state` (never say the name to the builder).
+
+**Browser automation**:
+Agent-only Playwright CLI for dashboards without API/MCP (`@vybekiit/browser-automation`). Never say to the builder.
+
+**Fresh-squeezy**:
+Agent codename for the Lemon Squeezy `ls` target inside browser-automation.
+
+**Payment MCP tier**:
+Stripe via MCP; Lemon Squeezy via browser-automation CLI.
+
+**MCP tier (data)**:
+Supabase, Neon, Firebase — login-once agent tooling for database onboarding.
 
 **Message catalog loader**:
 Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs.
