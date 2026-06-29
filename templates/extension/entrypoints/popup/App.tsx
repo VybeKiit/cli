@@ -1,6 +1,7 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import { getActiveLocale, localeToDirection, t } from '@/lib/i18n';
 
 const appUrl = import.meta.env.WXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -11,6 +12,7 @@ export default function App() {
 
   return (
     <main className="w-80 bg-background p-4 text-foreground" dir={dir}>
+      <ReportModeDev />
       <Card>
         <CardHeader>
           <CardTitle>{t('popup.title')}</CardTitle>

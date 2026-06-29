@@ -25,6 +25,7 @@
     "@vybekiit/tokens": "workspace:*",
     "@vybekiit/analytics": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
+    "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/seo": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
