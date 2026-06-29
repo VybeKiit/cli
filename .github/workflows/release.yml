@@ -160,6 +160,8 @@ jobs:
 
       - name: Commit version bump and create tag
         if: steps.skip_check.outputs.skip != 'true'
+        env:
+          HUSKY: 0
         run: |
           git add package.json packages/*/package.json cli/package.json
           if ! git diff --cached --quiet; then
@@ -176,6 +178,8 @@ jobs:
 
       - name: Commit platform skill pins
         if: steps.skip_check.outputs.skip != 'true'
+        env:
+          HUSKY: 0
         run: |
           if ! git diff --quiet; then
             git add -A
