@@ -17,8 +17,9 @@
 2. Request **minimum host permissions** — default template uses narrow patterns only
 3. Sign-in, data, payments: extension calls the builder's **backend web app** (same as mobile) — no secrets in the extension bundle
 4. **Google sign-in:** use [`chrome.identity`](https://developer.chrome.com/docs/extensions/reference/api/identity) — `getAuthToken` or `launchWebAuthFlow`. OAuth client id in manifest [`oauth2`](https://developer.chrome.com/docs/extensions/mv3/manifest/oauth2/) — never secrets in code
-5. Store publish: `@vybekiit/browser-automation` (`cws` target) + `vybekiit-automate cws …` + listing source in `cws-listing.ts`
-6. Follow `@vybekiit/browser-automation` CONTEXT for CWS vocabulary
+5. Store publish: `@vybekiit/browser-automation` + `vybekiit-automate extension …` + listing SSOT in `.vybekiit/store/extension/cws-listing.ts`
+6. Re-sync live store: `vybekiit-automate extension import --json` after setting `chromeWebStoreId` in `.vybekiit/store/extension/cws.json`
+7. Capabilities: run `configure-capabilities` skill when adding features — least privilege, invisible to builder
 
 ## Verify-before-advance
 

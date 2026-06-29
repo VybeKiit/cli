@@ -37,6 +37,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@vybekiit/browser-automation": "workspace:*",
     "@biomejs/biome": "^2.5.1",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",

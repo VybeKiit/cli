@@ -33,4 +33,4 @@ Flags: `--json` (never prompt), `--yes` (skip confirms), `CI=1` or non-TTY requi
 
 ## Legacy
 
-`@vybekiit/extension-publish` re-exports CWS target; prefer `@vybekiit/browser-automation`.
+None — `@vybekiit/browser-automation` is the sole SSOT.

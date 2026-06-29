@@ -35,6 +35,7 @@ translate errors · celebrate.
 | "save my code", "back up my project", "put it on GitHub" | `skills/back-up-my-code.md` |
 | "make it Hebrew", "translate my app", "add Spanish", "speak my language" | `skills/add-language.md` |
 | "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
+| (agent-only) feature needs camera, location, photos, notifications, etc. | `skills/configure-capabilities.md` |
 
 Anything else (change the design, add a page, tweak text, general coding) is **not** a skill — just
 do it well per `AGENTS.md`, then offer the next relevant goal above.
