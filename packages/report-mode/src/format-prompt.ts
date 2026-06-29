@@ -13,6 +13,9 @@ export function formatReportPrompt(payload: ReportPayload): string {
     `Location in code: ${payload.selector}`,
   ];
 
+  if (payload.spotLabel) {
+    lines.push(`Spot on page: ${payload.spotLabel}`);
+  }
   if (payload.a11yName) {
     lines.push(`What they clicked (label): ${payload.a11yName}`);
   }

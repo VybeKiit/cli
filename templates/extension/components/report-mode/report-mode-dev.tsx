@@ -1,10 +1,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
 import { useConsoleErrorBuffer } from '@/components/report-mode/use-console-errors';
 import { useReportDockPosition } from '@/components/report-mode/use-report-dock';
-import { getAccessibleName, getCssPath, getVisibleText } from '@/lib/report-mode/dom-utils';
+import {
+  getAccessibleName,
+  getCssPath,
+  getShortestUniqueLabel,
+  getVisibleText,
+} from '@/lib/report-mode/dom-utils';
 import { submitExtensionReport } from '@/lib/report-mode/submit-report';
 import {
   DOCK_CORNER_LABELS,
@@ -13,7 +18,8 @@ import {
   getDockPlacementStyle,
   snapDockToNearestCorner,
 } from '@vybekiit/report-mode';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import '../../styles/report-mode-note.css';
 
 function isReportHotkey(event: KeyboardEvent): boolean {
   return event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
@@ -30,8 +36,11 @@ export function ReportModeDev() {
   const [selected, setSelected] = useState<Element | null>(null);
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [copyingSpot, setCopyingSpot] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [showCorners, setShowCorners] = useState(false);
+
+  const spotLabel = useMemo(() => (selected ? getShortestUniqueLabel(selected) : ''), [selected]);
 
   const deactivate = useCallback(() => {
     setActive(false);
@@ -142,6 +151,18 @@ export function ReportModeDev() {
     setDragging(true);
   }
 
+  async function handleCopySpot() {
+    if (!spotLabel.trim()) {
+      return;
+    }
+    setCopyingSpot(true);
+    try {
+      await navigator.clipboard.writeText(spotLabel);
+    } finally {
+      setCopyingSpot(false);
+    }
+  }
+
   async function handleSubmit() {
     if (!(selected && note.trim())) {
       return;
@@ -153,6 +174,7 @@ export function ReportModeDev() {
       await submitExtensionReport({
         route: 'extension-popup',
         selector: getCssPath(selected),
+        spotLabel,
         ...(a11yName === undefined ? {} : { a11yName }),
         ...(visibleText === undefined ? {} : { visibleText }),
         consoleErrors: errorBuffer.snapshot(),
@@ -265,45 +287,19 @@ export function ReportModeDev() {
         ) : null}
 
         {selected ? (
-          <div
-            data-testid="report-mode-note-panel"
-            className="rounded-lg border bg-background p-3 shadow-lg"
-          >
-            <p className="mb-2 text-xs font-medium">What looks wrong here?</p>
-            <div className="flex flex-col gap-2">
-              <Input
-                data-testid="report-mode-note-input"
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder="e.g. this button does nothing"
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    void handleSubmit();
-                  }
-                }}
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  data-testid="report-mode-send"
-                  disabled={submitting || !note.trim()}
-                  onClick={() => void handleSubmit()}
-                >
-                  Send
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected(null);
-                    setNote('');
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ReportModeNotePanel
+            copying={copyingSpot}
+            note={note}
+            onCancel={() => {
+              setSelected(null);
+              setNote('');
+            }}
+            onCopySpot={() => void handleCopySpot()}
+            onNoteChange={setNote}
+            onSubmit={() => void handleSubmit()}
+            spotLabel={spotLabel}
+            submitting={submitting}
+          />
         ) : null}
       </div>
     </>

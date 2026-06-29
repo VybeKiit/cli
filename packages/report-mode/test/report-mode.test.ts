@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
+import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoff-target';
 import { formatReportPrompt } from '../src/format-prompt';
 import { getDockInsetStyle, loadDockCornerOnly, snapDockToNearestCorner } from '../src/position';
 import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
@@ -15,6 +16,17 @@ describe('formatReportPrompt', () => {
     expect(prompt.startsWith(REPORT_PROMPT_PREFIX)).toBe(true);
     expect(prompt).toContain('Builder note: button does nothing');
     expect(prompt).toContain('Page: /dashboard');
+  });
+
+  it('includes spot label when present', () => {
+    const prompt = formatReportPrompt({
+      route: '/',
+      selector: 'p.tagline',
+      spotLabel: 'Join founders shipping faster with VybeKiit',
+      builderNote: 'typewriter too fast',
+      consoleErrors: [],
+    });
+    expect(prompt).toContain('Spot on page: Join founders shipping faster with VybeKiit');
   });
 
   it('includes console errors when present', () => {
@@ -123,12 +135,50 @@ describe('getDockInsetStyle', () => {
   });
 });
 
+describe('loadReportHandoffTarget', () => {
+  it('defaults to current chat', () => {
+    expect(loadReportHandoffTarget(null)).toBe('current-chat');
+  });
+
+  it('persists valid targets', () => {
+    const entries = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => entries.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        entries.set(key, value);
+      },
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
+    saveReportHandoffTarget(storage, 'new-chat');
+    expect(loadReportHandoffTarget(storage)).toBe('new-chat');
+  });
+
+  it('ignores invalid stored values', () => {
+    const storage = {
+      getItem: () => 'invalid',
+      setItem: () => {},
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
+    expect(loadReportHandoffTarget(storage)).toBe('current-chat');
+  });
+});
+
 describe('loadDockCornerOnly', () => {
   it('returns corner anchor from storage', () => {
     const storage = {
       getItem: () => JSON.stringify({ anchor: 'top-right' }),
       setItem: () => {},
-    };
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
     expect(loadDockCornerOnly(storage)).toBe('top-right');
   });
 
@@ -136,7 +186,11 @@ describe('loadDockCornerOnly', () => {
     const storage = {
       getItem: () => JSON.stringify({ anchor: 'custom', customX: 100, customY: 200 }),
       setItem: () => {},
-    };
+      removeItem: () => {},
+      clear: () => {},
+      key: () => null,
+      length: 0,
+    } as Storage;
     expect(loadDockCornerOnly(storage)).toBe('bottom-right');
   });
 });

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+</p>
+
 # @vybekiit/report-mode
 
 Report a bug in one hotkey — captures context and opens your AI assistant ready to fix it.

@@ -13,6 +13,14 @@ export {
   resolveVybeAssistant,
 } from './deeplink';
 export {
+  DEFAULT_REPORT_HANDOFF_TARGET,
+  loadReportHandoffTarget,
+  REPORT_HANDOFF_TARGET_LABELS,
+  REPORT_HANDOFF_TARGET_STORAGE_KEY,
+  saveReportHandoffTarget,
+  type ReportHandoffTarget,
+} from './handoff-target';
+export {
   DOCK_CORNER_LABELS,
   DOCK_CORNER_PRESETS,
   DEFAULT_DOCK_POSITION,

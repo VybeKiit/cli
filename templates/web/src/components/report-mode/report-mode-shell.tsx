@@ -1,6 +1,9 @@
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
+import '@/components/report-mode/dock/styles/report-mode-dock.css';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { resolveVybeAssistant } from '@vybekiit/report-mode';
 import process from 'node:process';
+import { Toaster } from 'sonner';
 
 /** Server wrapper — reads assistant + project root for dev-only Report Mode. */
 export function ReportModeDevShell() {
@@ -11,5 +14,10 @@ export function ReportModeDevShell() {
   const assistant = resolveVybeAssistant(process.env);
   const projectRoot = process.cwd();
 
-  return <ReportModeDev assistant={assistant} projectRoot={projectRoot} />;
+  return (
+    <TooltipProvider delayDuration={500} skipDelayDuration={0}>
+      <Toaster position="bottom-center" richColors={true} />
+      <ReportModeDev assistant={assistant} projectRoot={projectRoot} />
+    </TooltipProvider>
+  );
 }

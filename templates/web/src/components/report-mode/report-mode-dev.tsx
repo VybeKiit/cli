@@ -1,121 +1,78 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useConsoleErrorBuffer } from '@/components/report-mode/use-console-errors';
-import { useReportDockPosition } from '@/components/report-mode/use-report-dock';
-import { getAccessibleName, getCssPath, getVisibleText } from '@/lib/report-mode/dom-utils';
-import { submitReportHandoff } from '@/lib/report-mode/submit-report';
+import { ReportDockBar } from '@/components/report-mode/dock/components/dock-bar';
+import { getBrandChevronDirection } from '@/components/report-mode/dock/utils/report-dock-utils';
+import { useReportDockCollapse } from '@/components/report-mode/dock/hooks/use-report-dock-collapse';
+import { useReportDockPosition } from '@/components/report-mode/dock/hooks/use-report-dock';
+import { useReportHandoffTarget } from '@/components/report-mode/dock/hooks/use-report-handoff-target';
+import { ReportModeBanner } from '@/components/report-mode/inspect/report-mode-banner';
+import { ReportModeHighlight } from '@/components/report-mode/inspect/report-mode-highlight';
+import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
+import { useInspectMode } from '@/components/report-mode/inspect/use-inspect-mode';
+import { useReportHotkey } from '@/components/report-mode/inspect/use-report-hotkey';
+import { useConsoleErrorBuffer } from '@/components/report-mode/shared/use-console-errors';
+import { ReportModeTutorial } from '@/components/report-mode/tutorial/report-mode-tutorial';
+import { useReportTutorial } from '@/components/report-mode/tutorial/use-report-tutorial';
 import {
-  DOCK_CORNER_LABELS,
-  DOCK_CORNER_PRESETS,
-  REPORT_MODE_HOTKEY_LABEL,
+  getAccessibleName,
+  getCssPath,
+  getShortestUniqueLabel,
+  getVisibleText,
+} from '@/lib/report-mode/dom-utils';
+import { submitReportHandoff } from '@/lib/report-mode/submit-report';
+import { cn } from '@/lib/utils';
+import {
   getDockPlacementStyle,
   snapDockToNearestCorner,
   type VybeAssistant,
 } from '@vybekiit/report-mode';
 import { usePathname } from '@/i18n/navigation';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { toast } from 'sonner';
 
 type ReportModeDevProps = {
   readonly assistant: VybeAssistant | null;
   readonly projectRoot: string;
 };
 
-function isReportHotkey(event: KeyboardEvent): boolean {
-  return event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
-}
-
-/**
- * Dev-only Report Mode — persistent dock (drag or corner presets), click-to-report,
- * plain-language prompts only (no DOM jargon for the builder).
- */
+/** Dev-only Report Mode — click-to-report with structured assistant handoff. */
 export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
   const pathname = usePathname();
   const errorBuffer = useConsoleErrorBuffer();
+  const { target: handoffTarget, setTarget: setHandoffTarget } = useReportHandoffTarget();
   const { position, savePosition, setCorner } = useReportDockPosition();
+  const collapse = useReportDockCollapse();
+  const tutorial = useReportTutorial();
+  const inspect = useInspectMode();
+  const {
+    active: inspectActive,
+    activate: activateInspect,
+    selected: inspectSelected,
+    note: inspectNote,
+    setNote: setInspectNote,
+    highlightRect,
+    deactivate: deactivateInspect,
+    toggleActive: toggleInspectActive,
+    clearSelection: clearInspectSelection,
+  } = inspect;
   const dockRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
-  const [active, setActive] = useState(false);
-  const [hovered, setHovered] = useState<Element | null>(null);
-  const [selected, setSelected] = useState<Element | null>(null);
-  const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [copyingSpot, setCopyingSpot] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [showCorners, setShowCorners] = useState(false);
 
-  const deactivate = useCallback(() => {
-    setActive(false);
-    setSelected(null);
-    setHovered(null);
-    setNote('');
-  }, []);
-
-  const toggleActive = useCallback(() => {
-    setActive((value) => {
-      if (value) {
-        setSelected(null);
-        setHovered(null);
-        setNote('');
-      }
-      return !value;
-    });
-  }, []);
-
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (!isReportHotkey(event)) {
-        return;
-      }
-      event.preventDefault();
-      toggleActive();
-    }
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [toggleActive]);
-
-  const onMouseMove = useCallback(
-    (event: MouseEvent) => {
-      if (!active || selected) {
-        return;
-      }
-      const target = event.target;
-      if (!(target instanceof Element) || target.closest('[data-report-mode-ui]')) {
-        return;
-      }
-      setHovered(target);
-    },
-    [active, selected],
+  const spotLabel = useMemo(
+    () => (inspectSelected ? getShortestUniqueLabel(inspectSelected) : ''),
+    [inspectSelected],
   );
 
-  const onClick = useCallback(
-    (event: MouseEvent) => {
-      if (!active || selected) {
-        return;
-      }
-      const target = event.target;
-      if (!(target instanceof Element) || target.closest('[data-report-mode-ui]')) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      setSelected(target);
-      setHovered(null);
-    },
-    [active, selected],
-  );
+  useReportHotkey(toggleInspectActive);
 
   useEffect(() => {
-    if (!active) {
-      return;
+    if (tutorial.active && tutorial.stepIndex === 2 && !inspectActive) {
+      activateInspect();
     }
-    document.addEventListener('mousemove', onMouseMove, true);
-    document.addEventListener('click', onClick, true);
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove, true);
-      document.removeEventListener('click', onClick, true);
-    };
-  }, [active, onClick, onMouseMove]);
+  }, [tutorial.active, tutorial.stepIndex, inspectActive, activateInspect]);
 
   useEffect(() => {
     if (!dragging) {
@@ -153,172 +110,114 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     setDragging(true);
   }
 
+  async function handleCopySpot() {
+    if (!spotLabel.trim()) {
+      return;
+    }
+    setCopyingSpot(true);
+    try {
+      await navigator.clipboard.writeText(spotLabel);
+      toast.success('Copied spot');
+    } catch {
+      toast.error('Could not copy spot');
+    } finally {
+      setCopyingSpot(false);
+    }
+  }
+
   async function handleSubmit() {
-    if (!(selected && note.trim())) {
+    if (!(inspectSelected && inspectNote.trim())) {
       return;
     }
     setSubmitting(true);
     try {
-      const a11yName = getAccessibleName(selected);
-      const visibleText = getVisibleText(selected);
+      const a11yName = getAccessibleName(inspectSelected);
+      const visibleText = getVisibleText(inspectSelected);
       await submitReportHandoff({
         assistant,
         projectRoot,
+        target: handoffTarget,
         payload: {
           route: pathname,
-          selector: getCssPath(selected),
+          selector: getCssPath(inspectSelected),
+          spotLabel,
           ...(a11yName === undefined ? {} : { a11yName }),
           ...(visibleText === undefined ? {} : { visibleText }),
           consoleErrors: errorBuffer.snapshot(),
-          builderNote: note.trim(),
+          builderNote: inspectNote.trim(),
           platform: 'web',
         },
       });
-      deactivate();
+      deactivateInspect();
     } finally {
       setSubmitting(false);
     }
   }
 
-  const highlightTarget = selected ?? hovered;
-  const highlightRect =
-    highlightTarget && typeof highlightTarget.getBoundingClientRect === 'function'
-      ? highlightTarget.getBoundingClientRect()
-      : null;
-
   const dockStyle = getDockPlacementStyle(position) as CSSProperties;
+  const tutorialActive = tutorial.active;
+  const showControls = collapse.isExpanded;
+  const chevronDirection = getBrandChevronDirection(
+    position.anchor,
+    position.customX,
+    showControls,
+  );
 
   return (
     <>
-      {active ? (
-        <div
-          data-report-mode-ui={true}
-          data-testid="report-mode-banner"
-          className="pointer-events-none fixed inset-x-0 top-0 z-[9998] bg-amber-500/90 px-4 py-2 text-center text-sm font-medium text-amber-950"
-        >
-          Click what looks wrong ({REPORT_MODE_HOTKEY_LABEL} to turn off)
-        </div>
-      ) : null}
+      {inspectActive ? <ReportModeBanner /> : null}
+      {inspectActive && highlightRect ? <ReportModeHighlight rect={highlightRect} /> : null}
 
-      {active && highlightRect ? (
-        <div
-          data-report-mode-ui={true}
-          className="pointer-events-none fixed z-[9997] rounded border-2 border-amber-500 bg-amber-400/20"
-          style={{
-            top: highlightRect.top,
-            left: highlightRect.left,
-            width: highlightRect.width,
-            height: highlightRect.height,
-          }}
-        />
-      ) : null}
+      <ReportModeTutorial
+        active={tutorialActive}
+        onComplete={tutorial.complete}
+        onNext={() => tutorial.next(4)}
+        onSkip={tutorial.skip}
+        stepIndex={tutorial.stepIndex}
+      />
 
       <div
-        ref={dockRef}
-        data-report-mode-ui={true}
-        data-testid="report-mode-dock"
+        className={cn(
+          'report-mode-dock-root fixed z-[9999] flex flex-col gap-2',
+          !collapse.pinnedExpanded && !collapse.dockHovered && 'report-mode-dock-root--collapsed',
+          collapse.pinnedExpanded && 'report-mode-dock-root--pinned',
+        )}
         data-corner={position.anchor}
-        className="fixed z-[9999] flex w-[min(92vw,28rem)] flex-col gap-2"
+        data-report-mode-ui={true}
+        data-report-tutorial="welcome"
+        data-testid="report-mode-dock"
+        onMouseEnter={collapse.onDockEnter}
+        onMouseLeave={collapse.onDockLeave}
+        ref={dockRef}
         style={dockStyle}
       >
-        <div className="flex items-center gap-1 rounded-lg border bg-background p-2 shadow-lg">
-          <button
-            type="button"
-            aria-label="Drag to move"
-            data-testid="report-mode-drag-handle"
-            className="cursor-grab touch-none px-1 text-muted-foreground active:cursor-grabbing"
-            onPointerDown={onDragHandlePointerDown}
-          >
-            ⠿
-          </button>
-          <Button
-            type="button"
-            size="sm"
-            variant={active ? 'default' : 'secondary'}
-            data-testid="report-mode-toggle"
-            onClick={toggleActive}
-          >
-            {active ? 'Reporting…' : 'Report'}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            aria-expanded={showCorners}
-            data-testid="report-mode-corner-menu"
-            onClick={() => setShowCorners((value) => !value)}
-          >
-            Pin
-          </Button>
-          {active ? (
-            <Button type="button" size="sm" variant="ghost" onClick={deactivate}>
-              Off
-            </Button>
-          ) : null}
-        </div>
+        <ReportDockBar
+          active={inspectActive}
+          anchor={position.anchor}
+          assistant={assistant}
+          chevronDirection={chevronDirection}
+          handoffTarget={handoffTarget}
+          onDeactivate={deactivateInspect}
+          onDragPointerDown={onDragHandlePointerDown}
+          onHandoffChange={setHandoffTarget}
+          onSetCorner={setCorner}
+          onToggleActive={toggleInspectActive}
+          onToggleExpanded={collapse.toggleExpanded}
+          showControls={showControls}
+          tutorialActive={tutorialActive}
+        />
 
-        {showCorners ? (
-          <div
-            className="flex flex-wrap gap-1 rounded-lg border bg-background p-2 shadow-lg"
-            data-testid="report-mode-corner-picker"
-          >
-            {DOCK_CORNER_PRESETS.map((corner) => (
-              <Button
-                key={corner}
-                type="button"
-                size="sm"
-                variant={position.anchor === corner ? 'default' : 'outline'}
-                data-testid={`report-mode-corner-${corner}`}
-                onClick={() => {
-                  setCorner(corner);
-                  setShowCorners(false);
-                }}
-              >
-                {DOCK_CORNER_LABELS[corner]}
-              </Button>
-            ))}
-          </div>
-        ) : null}
-
-        {selected ? (
-          <div
-            data-testid="report-mode-note-panel"
-            className="rounded-lg border bg-background p-4 shadow-lg"
-          >
-            <p className="mb-2 text-sm font-medium">What looks wrong here?</p>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Input
-                autoFocus={true}
-                data-testid="report-mode-note-input"
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder="e.g. this button does nothing"
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    void handleSubmit();
-                  }
-                }}
-              />
-              <div className="flex gap-2">
-                <Button
-                  data-testid="report-mode-send"
-                  disabled={submitting || !note.trim()}
-                  onClick={() => void handleSubmit()}
-                >
-                  Send
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setSelected(null);
-                    setNote('');
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
+        {inspectSelected ? (
+          <ReportModeNotePanel
+            copying={copyingSpot}
+            note={inspectNote}
+            onCancel={clearInspectSelection}
+            onCopySpot={() => void handleCopySpot()}
+            onNoteChange={setInspectNote}
+            onSubmit={() => void handleSubmit()}
+            spotLabel={spotLabel}
+            submitting={submitting}
+          />
         ) : null}
       </div>
     </>

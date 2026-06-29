@@ -8,6 +8,7 @@ export type ReportPlatform = 'web' | 'mobile' | 'extension';
 export interface ReportPayload {
   readonly route: string;
   readonly selector: string;
+  readonly spotLabel?: string;
   readonly a11yName?: string;
   readonly visibleText?: string;
   readonly consoleErrors: readonly string[];
