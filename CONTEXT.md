@@ -92,6 +92,7 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
 │  │                          for the builder) — MAINTAINED so selector-drift fixes ship via npm;
 │  │                          the OWNED templates/extension consumes it (v3)
+│  ├─ report-mode/            dev-only Report Mode — structured reports + assistant deeplink handoff
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
 │  └─ agent-kit/              shared agent-layer source — the skill contract, BUILDER-VOICE.md core,
 │                             goal-index format, update-kit logic (templates embed the rest)  ← Wave A
@@ -447,6 +448,26 @@ _Avoid_: "you never see anything technical" (impossible and breeds refunds).
 **Verify-before-advance**:
 Every skill tests that a step worked before continuing. Prevents the silent-stuck → refund death
 spiral.
+
+**Report Mode**:
+Dev-only overlay on the localhost preview (web, mobile, extension). The builder toggles inspect
+mode (Option+Shift+R on web/extension; **R** FAB on mobile), clicks or taps what looks wrong, types
+a one-line note, and the kit fires a native assistant deeplink with structured context. Never ships
+in production builds. In buyer voice: "point at what's wrong" — never "Report Mode" unless they ask
+about the hotkey.
+_Avoid_: exposing deeplinks, URI schemes, or DOM selectors to the builder.
+
+**Vibe coder report**:
+The structured handoff payload (route, element selector or tap coordinates, console errors, builder
+note) prefixed with `[VybeKiit Report]`. Agent-internal — the builder never sees this term; `doctor`
+reads it and skips the reproduce question.
+_Avoid_: asking the builder to craft a prompt when Report Mode already captured context.
+
+**SEO**:
+Discoverability metadata — titles, descriptions, sitemaps, Open Graph — so search engines find the
+buyer's app. Wired via `@vybekiit/seo` and buyer skills; agent-handled. In buyer voice: "how
+search engines find you".
+_Avoid_: saying "SEO" to the builder.
 
 **Adapter**:
 One concrete backend behind a concern's interface — the proven payments shape applied everywhere:

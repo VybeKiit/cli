@@ -9,7 +9,9 @@ translate every error · celebrate.
 
 Work through these in order. Stop as soon as you find and fix the problem, then verify.
 
-1. **Reproduce** — one plain question about what they were doing.
+1. **Reproduce** — one plain question about what they were doing — **unless** the prompt starts with
+   `[VybeKiit Report]` or they used Report mode (Option+Shift+R in the popup, click an element, send
+   a note). Skip the question when context is pre-filled.
 
 2. **Check basics:**
    - `vybekiit doctor` — tools installed and signed in
@@ -25,6 +27,14 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
    expose that skill name to the builder.
 
 5. **Verify** on the extension preview. 🎉 Celebrate.
+
+## Report Mode handoff
+
+If the prompt starts with `[VybeKiit Report]` (or the builder used Report mode in the popup):
+
+- Context is pre-filled — skip "what were you doing?"
+- Use the selector, accessible name, and console errors in the prompt
+- Fix the smallest thing; verify; celebrate in plain words
 
 ## Definition of done
 

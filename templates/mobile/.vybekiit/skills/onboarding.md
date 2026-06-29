@@ -36,6 +36,9 @@ translate every error · celebrate. Decide all technical choices yourself.
    instead.) Give this as **one** step — exactly what to tap.
    **Verify:** ask them to confirm the app opened on their phone. Don't continue until they say yes.
    🎉 *Celebrate* — their app is running in their hand.
+   Mention Report mode once: *"If something looks wrong on the preview, tap **R**, tap what looks off,
+   tell me what's wrong — I'll get the details automatically. Tap **Pin** to move the **R** button to
+   a corner that feels comfortable."*
 
 4. **Make it theirs.**
    Edit the home screen to reflect the one sentence from step 1 (headline + intro). Keep it simple.

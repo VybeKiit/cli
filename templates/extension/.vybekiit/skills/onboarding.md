@@ -26,6 +26,9 @@ translate every error · celebrate.
 
 3. **Show them it works.** Walk them through opening the add-on once.
    **Verify:** they confirm they see it. 🎉 Celebrate.
+   Mention Report mode once: *"If something in the popup looks wrong, press Option+Shift+R (or tap
+   **Report**), click it, tell me what's off — I'll get the details automatically. Drag the dock or
+   tap **Pin** to move it out of your way."*
 
 4. **Make it theirs.** Tailor the starter UI to their one-sentence idea.
    **Verify:** preview reflects their idea.

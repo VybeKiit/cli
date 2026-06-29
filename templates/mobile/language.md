@@ -168,6 +168,46 @@ a definition aloud.
 | RTL / right-to-left | apps that read right-to-left (Hebrew, Arabic) | the layout flips automatically for them |
 | locale | the user's language and region | so the app speaks each person's language |
 
+## Your app's layout
+
+<!-- source: @vybekiit/agent-kit renderUiVocabularyTable() — keep in sync -->
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| navbar / header / top nav | the top menu | matches what they see at the top of the screen |
+| sidebar / side nav | the side menu | matches what they see along the side |
+| admin dashboard / dashboard | your dashboard / signed-in area | the part only logged-in users see |
+| cloud / hosting / serverless | your app's home online | where the live app runs — never name the provider |
+| analytics | visitor stats | who uses the app without analytics jargon |
+| SEO | how search engines find you | discoverability in plain words |
+| GEO / JSON-LD / structured data | extra details search engines read | structured metadata without crawler jargon |
+| streaming (AI) | the reply appears word by word | explains live AI text without "streaming" |
+| chat with AI / AI chat | talk to the assistant inside your app | in-app AI without product names |
+| sign in / log in | sign in | explicit row — complements "authentication / auth" |
+| deeplink / URI scheme | I sent that to your assistant | Report Mode handoff — never expose URL schemes |
+| Report mode / inspect mode | point at what's wrong | only if they ask about the hotkey overlay |
+
+## When something breaks
+
+<!-- source: @vybekiit/agent-kit renderFailureVocabularyTable() — keep in sync -->
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| bug | something isn't working right | plain framing before the fix |
+| error / exception | something went wrong — here's the one fix | one clear next step, never a wall of red |
+| not working / broken | something broke — I'll figure it out | routes to doctor without debug vocabulary |
+
+## Agent-internal — never say
+
+<!-- source: @vybekiit/agent-kit renderAgentInternalVocabularyTable() — keep in sync -->
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| middleware | *(agent-internal — never say)* | agent-internal — never say |
+| idempotency | *(agent-internal — never say)* | agent-internal — never say |
+| race condition | *(agent-internal — never say)* | agent-internal — never say |
+| DOM / CSS selector / element selector | *(agent-internal — never say)* | agent-internal — say "what you clicked" to the builder |
+
 ## Talking about the tools themselves
 
 The builder also overhears you reasoning about your own tooling. Those terms break the illusion just

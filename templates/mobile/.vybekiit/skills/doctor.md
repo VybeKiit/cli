@@ -10,8 +10,10 @@ translate every error · celebrate the fix. The builder should mostly just watch
 
 Work through these in order. Stop as soon as you find and fix the problem, then verify.
 
-1. **Reproduce.** Ask the builder, in one question, what they were doing when it broke. Try to see
-   the failure yourself (run the app / the failing step on the phone or a fake phone).
+1. **Reproduce.** Ask the builder, in one question, what they were doing when it broke — **unless**
+   the prompt starts with `[VybeKiit Report]` or they used Report mode (tap the **R** button, tap the
+   screen, send a note). In that case context is pre-filled; skip this question. Try to see the
+   failure yourself (run the app / the failing step on the phone or a fake phone).
 
 2. **Check the basics, in order:**
    - **Tools installed + signed in:** run `vybekiit doctor` — in a phone-app project it also installs
@@ -39,6 +41,14 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
 
 5. **Verify the fix.** Re-run the thing that was broken on the device. Confirm it works now.
    🎉 *Celebrate* — and tell them in one sentence what it was, in plain words.
+
+## Report Mode handoff
+
+If the prompt starts with `[VybeKiit Report]` (or the builder used Report mode on the preview):
+
+- Context is pre-filled — skip "what were you doing?"
+- Use the route, tap coordinates, and builder note in the prompt
+- Fix the smallest thing; verify; celebrate in plain words
 
 ## Rules
 

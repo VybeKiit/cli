@@ -10,8 +10,9 @@ translate every error · celebrate the fix. The builder should mostly just watch
 
 Work through these in order. Stop as soon as you find and fix the problem, then verify.
 
-1. **Reproduce.** Ask the builder, in one question, what they were doing when it broke. Try to see
-   the failure yourself (run the app / the failing step).
+1. **Reproduce.** Ask the builder, in one question, what they were doing when it broke — **unless**
+   the prompt starts with `[VybeKiit Report]` or they say they used Report mode (Option+Shift+R,
+   clicked an element, sent a note). In that case context is pre-filled; skip this question.
 
 2. **Check the basics, in order:**
    - **Secret settings:** are the required values in `.env` present and non-empty? (Use
@@ -38,6 +39,14 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
 
 5. **Verify the fix.** Re-run the thing that was broken. Confirm it works now.
    🎉 *Celebrate* — and tell them in one sentence what it was, in plain words.
+
+## Report Mode handoff
+
+If the prompt starts with `[VybeKiit Report]` (or the builder used Report mode on localhost):
+
+- Context is pre-filled — skip "what were you doing?"
+- Use the page, location in code, tap coordinates, and console errors in the prompt
+- Fix the smallest thing; verify; celebrate in plain words
 
 ## Rules
 

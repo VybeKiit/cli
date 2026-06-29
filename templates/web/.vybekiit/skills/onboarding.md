@@ -35,6 +35,8 @@ translate every error · celebrate. Decide all technical choices yourself.
    Give them the one link to open (`http://localhost:3000`) and tell them what they'll see.
    **Verify:** ask them to confirm they can see the page. Don't continue until they say yes.
    🎉 *Celebrate* — their app is alive.
+   Mention Report mode once: *"If something looks wrong, press Option+Shift+R (Alt+Shift+R on
+   Windows), click it, tell me what's off — I'll get the details automatically."*
 
 4. **Make it theirs.**
    Edit the starter page to reflect the one sentence from step 1 (headline + intro). Keep it simple.
