@@ -10,7 +10,7 @@
 
 ## Kit wiring
 
-1. Merge `agent/mcp-stripe.json` into buyer `.cursor/mcp.json` (or equivalent MCP config)
+1. Merge `agent/mcp-stripe.json` into buyer MCP config — see `agent/mcp-setup.md` (Cursor, Claude Desktop, Codex)
 2. Builder completes Stripe OAuth once when prompted by MCP
 3. Agent creates product + price via Stripe MCP write tools; write restricted `STRIPE_SECRET_KEY` and webhook secret to `.env`
 4. Payments via `@vybekiit/payments` → `resolvePaymentProvider()` when `PAYMENTS_PROVIDER=stripe`
@@ -20,5 +20,6 @@
 
 ## Verify-before-advance
 
+- MCP connected; test mode product/price visible in Stripe
 - Test checkout opens; webhook receives `checkout.session.completed` (test mode OK)
 - Order recorded; builder sees success in app

@@ -42,7 +42,7 @@ when the buyer selects Cloudflare hosting (default).
 | `better-auth-vybekiit.md` | `add-signin` | better-auth.com/docs + `@vybekiit/auth` |
 | `lemon-squeezy-vybekiit.md` | `setup-payments` (default) | docs.lemonsqueezy.com + `vybekiit-automate ls` |
 | `stripe-vybekiit.md` | `setup-payments` when `PAYMENTS_PROVIDER=stripe` | docs.stripe.com + Stripe MCP |
-| `paypal-vybekiit.md` | `setup-payments` when `PAYMENTS_PROVIDER=paypal` | developer.paypal.com + `@vybekiit/payments` |
+| `paypal-vybekiit.md` | `setup-payments` when `PAYMENTS_PROVIDER=paypal` | PayPal MCP + `@vybekiit/payments` |
 | `resend-vybekiit.md` | `setup-email` when `EMAIL_PROVIDER=resend` | resend.com/docs + `@vybekiit/email` |
 | `ses-vybekiit.md` | `setup-email` when `EMAIL_PROVIDER=ses` | docs.aws.amazon.com/ses + `@vybekiit/email` |
 | `code-hygiene-vybekiit.md` | generic coding (invisible) | DRY/SSOT/check-before-create guardrails |

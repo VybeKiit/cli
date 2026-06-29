@@ -27,19 +27,23 @@ translate every error · celebrate. You wire all the code; the builder only sign
    - Write JSON output to `.env` (`LEMONSQUEEZY_STORE_ID`, variant ID, API key, webhook secret).
    **Verify:** values saved; product exists in test mode.
 
-3. **Stripe (opt-in).** Merge `mcp-stripe.json` into buyer MCP config; builder OAuth once.
+3. **Stripe (opt-in).** Merge `mcp-stripe.json` via `agent/mcp-setup.md`; builder OAuth once.
    Agent creates product/price via Stripe MCP; write restricted API key to `.env`.
    **Verify:** test mode product visible in Stripe dashboard.
 
-4. **Connect the automatic payment message (webhook).** Webhook URL is `/api/webhook` on the deployed app
+4. **PayPal (opt-in).** Merge `mcp-paypal.json` via `agent/mcp-setup.md`; builder OAuth once (sandbox).
+   Agent provisions via PayPal MCP; write client id/secret and webhook id to `.env`.
+   **Verify:** sandbox checkout completes.
+
+5. **Connect the automatic payment message (webhook).** Webhook URL is `/api/webhook` on the deployed app
    (`app/api/webhook/route.ts` → `src/lib/fulfillment.ts`). For LS, `ls setup` configures this when given
    `--webhook-url`.
    **Verify:** provider shows webhook connected.
 
-5. **Test a purchase.** Use test mode for a fake purchase.
+6. **Test a purchase.** Use test mode for a fake purchase.
    **Verify:** order recorded (webhook success). 🎉 *Celebrate* — they can take money.
 
-6. **Customize what a purchase does.** Ask what should happen when someone pays. Implement in
+7. **Customize what a purchase does.** Ask what should happen when someone pays. Implement in
    `src/lib/fulfillment.ts`. Write a quick test and keep it green.
 
 ## If anything breaks

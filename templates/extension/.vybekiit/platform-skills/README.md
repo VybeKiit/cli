@@ -8,7 +8,7 @@ Layer B execution knowledge. Chrome Extension API docs are source of truth — n
 - Manifest V3: https://developer.chrome.com/docs/extensions/mv3/intro/
 - Chrome Web Store: https://developer.chrome.com/docs/webstore
 - WXT (framework): https://wxt.dev — reference only in wrapper until official skills exist
-- Publish automation: `@vybekiit/extension-publish` package
+- Publish automation: `@vybekiit/browser-automation` (`extension` / `cws` domain)
 
 ## Wrapper index
 

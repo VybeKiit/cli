@@ -32,7 +32,11 @@ translate every error · celebrate. Decide all technical choices yourself.
    **Verify:** the dev server is up with no errors. If it fails → run `doctor`.
 
    > (Agent-only) **Database MCP tier:** Supabase, Neon, and Firebase use login-once MCP configs
-   > (`mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`). MongoDB and AWS are advanced only.
+   > (`mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`) — merge via `agent/mcp-setup.md`
+   > (Cursor, Claude Desktop, Codex). MongoDB and AWS are advanced only.
+   >
+   > **Payment MCP tier:** Stripe and PayPal use `mcp-stripe.json` / `mcp-paypal.json` when
+   > `setup-payments` runs — same merge guide.
 
 3. **Show them their app.**
    Give them the one link to open (`http://localhost:3000`) and tell them what they'll see.

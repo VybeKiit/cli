@@ -16,7 +16,8 @@ or describes, in plain words, what the app should remember.
 ## Steps
 
 1. **Make sure the database is ready.** Run the database tool via `vybekiit doctor`. For MCP-tier providers
-   (Supabase, Neon, Firebase), merge the matching `agent/mcp-*.json` and use login-once onboarding.
+   (Supabase, Neon, Firebase), merge the matching `agent/mcp-*.json` via `agent/mcp-setup.md` and use
+   login-once onboarding.
    Collect any access keys **one at a time** and save them to the secret settings file.
    **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).
 

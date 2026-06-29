@@ -15,7 +15,7 @@
 1. Infer entities from product language (customers, orders, posts, etc.)
 2. `planDataModel(entities, DATA_PROVIDER)` — PK/FK stay in agent output only
 3. Read `buyerSummary` to builder; confirm
-4. `save-data` provisions via MCP path for active provider:
+4. `save-data` provisions via MCP path for active provider (merge via `agent/mcp-setup.md`):
    - Supabase → `mcp-supabase.json` + Supabase CLI
    - Neon → `mcp-neon.json`
    - Firebase → `mcp-firebase.json`
