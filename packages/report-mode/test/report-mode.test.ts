@@ -32,7 +32,7 @@ describe('buildAssistantDeepLink', () => {
   it('builds cursor deeplink with encoded text', () => {
     const url = buildAssistantDeepLink('cursor', '/proj', 'hello world');
     expect(url).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?text=/);
-    expect(decodeURIComponent(url.split('text=')[1] ?? '')).toBe('hello world');
+    expect(new URL(url).searchParams.get('text')).toBe('hello world');
   });
 
   it('builds claude-cli deeplink with cwd and q', () => {

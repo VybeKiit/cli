@@ -22,7 +22,9 @@ describe('renderUiVocabularyTable', () => {
   });
 
   it('translates Report mode for builders who ask', () => {
-    expect(renderUiVocabularyTable()).toContain("| Report mode / inspect mode | point at what's wrong |");
+    expect(renderUiVocabularyTable()).toContain(
+      "| Report mode / inspect mode | point at what's wrong |",
+    );
   });
 });
 
