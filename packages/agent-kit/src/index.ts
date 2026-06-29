@@ -10,6 +10,15 @@ export {
   type SdlcVocabularyEntry,
 } from './sdlc-vocabulary';
 export {
+  AGENT_INTERNAL_VOCABULARY,
+  FAILURE_VOCABULARY,
+  UI_VOCABULARY,
+  renderAgentInternalVocabularyTable,
+  renderFailureVocabularyTable,
+  renderUiVocabularyTable,
+  type UiVocabularyEntry,
+} from './ui-vocabulary';
+export {
   planKitUpdate,
   type KitPackageUpdate,
   type UpdatePlan,
