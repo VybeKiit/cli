@@ -9,15 +9,15 @@ export function formatReportPrompt(payload: ReportPayload): string {
     REPORT_PROMPT_PREFIX,
     '',
     `Platform: ${payload.platform ?? 'web'}`,
-    `Route: ${payload.route}`,
-    `Element selector: ${payload.selector}`,
+    `Page: ${payload.route}`,
+    `Location in code: ${payload.selector}`,
   ];
 
   if (payload.a11yName) {
-    lines.push(`Accessible name: ${payload.a11yName}`);
+    lines.push(`What they clicked (label): ${payload.a11yName}`);
   }
   if (payload.visibleText) {
-    lines.push(`Visible text: ${payload.visibleText.slice(0, 200)}`);
+    lines.push(`Visible text on screen: ${payload.visibleText.slice(0, 200)}`);
   }
   if (payload.consoleErrors.length > 0) {
     lines.push('', 'Recent console errors:');

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
 import { formatReportPrompt } from '../src/format-prompt';
+import { getDockInsetStyle, loadDockCornerOnly, snapDockToNearestCorner } from '../src/position';
 import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
 
 describe('formatReportPrompt', () => {
@@ -13,7 +14,7 @@ describe('formatReportPrompt', () => {
     });
     expect(prompt.startsWith(REPORT_PROMPT_PREFIX)).toBe(true);
     expect(prompt).toContain('Builder note: button does nothing');
-    expect(prompt).toContain('Route: /dashboard');
+    expect(prompt).toContain('Page: /dashboard');
   });
 
   it('includes console errors when present', () => {
@@ -31,7 +32,7 @@ describe('formatReportPrompt', () => {
 describe('buildAssistantDeepLink', () => {
   it('builds cursor deeplink with encoded text', () => {
     const url = buildAssistantDeepLink('cursor', '/proj', 'hello world');
-    expect(url).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?text=/);
+    expect(url).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?/);
     expect(new URL(url).searchParams.get('text')).toBe('hello world');
   });
 
@@ -58,6 +59,11 @@ describe('resolveVybeAssistant', () => {
   it('parses valid values', () => {
     expect(resolveVybeAssistant({ VYBE_ASSISTANT: 'cursor' })).toBe('cursor');
     expect(resolveVybeAssistant({ VYBE_ASSISTANT: ' Claude ' })).toBe('claude');
+  });
+
+  it('parses prefixed public env vars', () => {
+    expect(resolveVybeAssistant({ WXT_PUBLIC_VYBE_ASSISTANT: 'cursor' })).toBe('cursor');
+    expect(resolveVybeAssistant({ EXPO_PUBLIC_VYBE_ASSISTANT: 'codex' })).toBe('codex');
   });
 
   it('rejects invalid values', () => {
@@ -90,5 +96,47 @@ describe('ConsoleErrorBuffer', () => {
     buf.push('c');
     buf.push('d');
     expect(buf.snapshot()).toEqual(['b', 'c', 'd']);
+  });
+});
+
+describe('snapDockToNearestCorner', () => {
+  it('snaps near bottom-right corner', () => {
+    expect(snapDockToNearestCorner(950, 650, 1000, 700, 80)).toEqual({ anchor: 'bottom-right' });
+  });
+
+  it('keeps custom position when far from corners', () => {
+    expect(snapDockToNearestCorner(400, 300, 1000, 700, 80)).toEqual({
+      anchor: 'custom',
+      customX: 400,
+      customY: 300,
+    });
+  });
+});
+
+describe('getDockInsetStyle', () => {
+  it('returns bottom-right insets by default margin', () => {
+    expect(getDockInsetStyle('bottom-right')).toEqual({ bottom: 16, right: 16 });
+  });
+
+  it('returns top-left with custom margin', () => {
+    expect(getDockInsetStyle('top-left', 24)).toEqual({ top: 24, left: 24 });
+  });
+});
+
+describe('loadDockCornerOnly', () => {
+  it('returns corner anchor from storage', () => {
+    const storage = {
+      getItem: () => JSON.stringify({ anchor: 'top-right' }),
+      setItem: () => {},
+    };
+    expect(loadDockCornerOnly(storage)).toBe('top-right');
+  });
+
+  it('ignores custom anchor and falls back to default corner', () => {
+    const storage = {
+      getItem: () => JSON.stringify({ anchor: 'custom', customX: 100, customY: 200 }),
+      setItem: () => {},
+    };
+    expect(loadDockCornerOnly(storage)).toBe('bottom-right');
   });
 });

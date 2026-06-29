@@ -12,3 +12,20 @@ export {
   inferVybeAssistant,
   resolveVybeAssistant,
 } from './deeplink';
+export {
+  DOCK_CORNER_LABELS,
+  DOCK_CORNER_PRESETS,
+  DEFAULT_DOCK_POSITION,
+  REPORT_DOCK_STORAGE_KEY,
+  getDockInsetStyle,
+  getDockPlacementStyle,
+  loadDockCornerOnly,
+  loadDockPosition,
+  saveDockPosition,
+  snapDockToNearestCorner,
+  type DockInsetStyle,
+  type DockPlacementStyle,
+  type DockPositionStorage,
+  type ReportDockAnchor,
+  type ReportDockPosition,
+} from './position';

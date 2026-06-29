@@ -23,9 +23,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@vybekiit/core": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",

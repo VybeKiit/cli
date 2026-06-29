@@ -2,15 +2,16 @@ import type { VybeAssistant } from './types';
 
 const ASSISTANTS: readonly VybeAssistant[] = ['cursor', 'claude', 'codex'];
 
-/** Read `VYBE_ASSISTANT` from env; returns null when unset or invalid. */
+/** Read `VYBE_ASSISTANT` (or template-prefixed variants) from env; null when unset. */
 export function resolveVybeAssistant(
   env: Record<string, string | undefined>,
 ): VybeAssistant | null {
-  const raw = env.VYBE_ASSISTANT?.trim().toLowerCase();
-  if (!raw) {
+  const raw = env.VYBE_ASSISTANT ?? env.WXT_PUBLIC_VYBE_ASSISTANT ?? env.EXPO_PUBLIC_VYBE_ASSISTANT;
+  const normalized = raw?.trim().toLowerCase();
+  if (!normalized) {
     return null;
   }
-  return ASSISTANTS.includes(raw as VybeAssistant) ? (raw as VybeAssistant) : null;
+  return ASSISTANTS.includes(normalized as VybeAssistant) ? (normalized as VybeAssistant) : null;
 }
 
 /**
@@ -31,7 +32,9 @@ export function buildAssistantDeepLink(
     case 'claude': {
       const url = new URL('claude-cli://open');
       url.searchParams.set('q', prompt);
-      url.searchParams.set('cwd', cwd);
+      if (cwd) {
+        url.searchParams.set('cwd', cwd);
+      }
       return url.toString();
     }
     case 'codex': {
