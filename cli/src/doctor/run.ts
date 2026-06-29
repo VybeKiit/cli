@@ -2,7 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
-import { loadEnvFile, mergeEnv } from './env';
+import { inferVybeAssistant } from '@vybekiit/report-mode';
+import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
 import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-skills';
 import { formatProjectHealthReport, verifyProjectHealth } from './project-health';
 import { provisionR2Storage } from './storage-r2';
@@ -62,6 +63,22 @@ function isMobileProject(dir: string): boolean {
     }
   }
   return false;
+}
+
+/** True when `dir` is a WXT browser-extension project. */
+function isExtensionProject(dir: string): boolean {
+  return existsSync(join(dir, 'wxt.config.ts'));
+}
+
+/** Env keys Report Mode reads per template surface. */
+function reportModeEnvKeys(cwd: string, assistant: string): Record<string, string> {
+  if (isMobileProject(cwd)) {
+    return { EXPO_PUBLIC_VYBE_ASSISTANT: assistant };
+  }
+  if (isExtensionProject(cwd)) {
+    return { WXT_PUBLIC_VYBE_ASSISTANT: assistant };
+  }
+  return { VYBE_ASSISTANT: assistant };
 }
 
 /** True when running inside Cursor (IDE — no separate CLI install needed). */
@@ -188,8 +205,19 @@ export async function runDoctor(log: Console = console): Promise<number> {
     const report = reports.find((r) => r.tool === tool.name);
     return report?.installed === true;
   });
-  const agentReady = isAgentRuntimeReady(reports) || isCursorSession();
+  const cursorSession = isCursorSession();
+  const agentReady = isAgentRuntimeReady(reports) || cursorSession;
   const skillsReady = isSkillsCliReady(reports);
+
+  const assistant = inferVybeAssistant({
+    cursorSession,
+    claudeInstalled: reports.find((r) => r.tool === 'claude')?.installed === true,
+    codexInstalled: reports.find((r) => r.tool === 'codex')?.installed === true,
+  });
+  if (assistant) {
+    writeEnvKeys(cwd, reportModeEnvKeys(cwd, assistant));
+    log.log(`✓ Report Mode — your assistant is set to ${assistant}.`);
+  }
 
   return cloudReady && r2Result.ok && agentReady && skillsReady && projectHealth.ok ? 0 : 1;
 }
