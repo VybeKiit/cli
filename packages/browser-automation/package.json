@@ -1,0 +1,60 @@
+{
+  "name": "@vybekiit/browser-automation",
+  "version": "0.3.0",
+  "description": "Unified Playwright dashboard automation for Chrome Web Store and Lemon Squeezy — typed verb allowlists plus vybekiit-automate CLI.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "vybekiit-automate": "./dist/cli/index.cjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./regions": {
+      "types": "./dist/regions.d.ts",
+      "import": "./dist/regions.js",
+      "require": "./dist/regions.cjs"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "require": "./dist/schema.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "recorder:extension": "tsx dev/recorder/extension.ts",
+    "recorder:ls": "tsx dev/recorder/ls.ts"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.6.0",
+    "playwright": "^1.58.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

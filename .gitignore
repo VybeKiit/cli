@@ -24,8 +24,15 @@ coverage/
 docs/checklist.md
 .bridge/
 downloads/
+apps/landing/public/brand-marks-3d/
+apps/landing/downloads/
 
 # session scratch — agent worktrees + per-developer Claude Code local overrides
 # (never tracked). Ignoring the whole dir also keeps Biome's useIgnoreFile from
 # walking nested worktree configs into the lint gate.
 .claude/
+
+# browser-automation maintainer recorder drafts (local only)
+packages/browser-automation/.cws-selectors.draft.txt
+packages/browser-automation/.ls-selectors.draft.txt
+packages/browser-automation/dev/recorder/logs/

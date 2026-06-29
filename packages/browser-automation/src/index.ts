@@ -1,0 +1,8 @@
+/**
+ * @vybekiit/browser-automation — unified dashboard Playwright automation.
+ */
+
+export { connectToChrome } from './core/connect';
+export { DEFAULT_CDP_ENDPOINT, PROFILE_PATHS, type BaseVerbContext } from './core/types';
+export * from './domains/extension/index';
+export * from './domains/payments/index';

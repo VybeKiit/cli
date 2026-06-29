@@ -1,0 +1,71 @@
+{
+  "url": "https://chrome.google.com/webstore/devconsole/7d4562aa-3ad4-49c0-8740-3ce4c2932927/ehfgkefblcgaaloepfnpdobnkfjbpjje/edit/status?hl=en",
+  "capturedAt": "2026-05-08T09:15:33.580Z",
+  "candidates": [
+    {
+      "tag": "button",
+      "role": "tab",
+      "ariaLabel": null,
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "Draft",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Status",
+      "domPath": "div > div.VfPpkd-AznF2e-ZMv3u.sYvyxf > div.VfPpkd-AznF2e-vzJc7b > div.VfPpkd-AznF2e-LUERP-vJ7A6b > span.VfPpkd-AznF2e-LUERP-bN97Pc > button#ehfgkefblcgaaloepfnpdobnkfjbpjje-draftTab"
+    },
+    {
+      "tag": "button",
+      "role": "tab",
+      "ariaLabel": null,
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": "Published",
+      "type": null,
+      "visible": true,
+      "nearestHeading": "Status",
+      "domPath": "div > div.VfPpkd-AznF2e-ZMv3u.sYvyxf > div.VfPpkd-AznF2e-vzJc7b > div.VfPpkd-AznF2e-LUERP-vJ7A6b > span.VfPpkd-AznF2e-LUERP-bN97Pc > button#ehfgkefblcgaaloepfnpdobnkfjbpjje-publishTab"
+    },
+    {
+      "tag": "div",
+      "role": "button",
+      "ariaLabel": "Main menu",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div#yDmH0d > div.pGxpHc > header#gb > div.gb_Pd.gb_Sd > div.gb_Xd.gb_wd > div.gb_6c"
+    },
+    {
+      "tag": "a",
+      "role": "button",
+      "ariaLabel": "Google apps",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div.gb_7d.gb_Bb > div.gb_Id > div.gb_od > div#gbwa > div.gb_D > a.gb_C"
+    },
+    {
+      "tag": "a",
+      "role": "button",
+      "ariaLabel": "Google Account: ‫יוסף סבג‬‎  \n(yosefisabag@gmail.com)",
+      "ariaLabelledByText": null,
+      "placeholder": null,
+      "associatedLabel": null,
+      "textContent": null,
+      "type": null,
+      "visible": true,
+      "nearestHeading": null,
+      "domPath": "div.gb_Pd.gb_Sd > div.gb_7d.gb_Bb > div.gb_Id > div.gb_z.gb_Ad > div.gb_D.gb_Ab > a.gb_C.gb_5a"
+    }
+  ]
+}
