@@ -4,6 +4,9 @@ import { join } from 'node:path';
 import process from 'node:process';
 import { loadEnvFile, mergeEnv } from './env';
 import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-skills';
+import { formatProjectHealthReport, verifyProjectHealth } from './project-health';
+import { provisionR2Storage } from './storage-r2';
+import { formatProductSurfaceHints } from './product-surface';
 import {
   formatReport,
   type InstallAction,
@@ -130,7 +133,7 @@ function buildReport(
  * installed (sign-in still pending is fine — that's a guided next step the agent
  * handles), 1 when a tool couldn't be installed or the OS is unsupported.
  */
-export function runDoctor(log: Console = console): number {
+export async function runDoctor(log: Console = console): Promise<number> {
   const platform = toPlatform(process.platform);
   if (!platform) {
     log.error(`[doctor] This operating system (${process.platform}) isn't supported yet.`);
@@ -169,6 +172,18 @@ export function runDoctor(log: Console = console): number {
     log.log(line);
   }
 
+  const projectHealth = verifyProjectHealth(cwd);
+  for (const line of formatProjectHealthReport(projectHealth)) {
+    log.log(line);
+  }
+
+  const r2Result = await provisionR2Storage(cwd, env, log);
+  log.log(`[doctor] ${r2Result.message}`);
+
+  for (const line of formatProductSurfaceHints(env)) {
+    log.log(line);
+  }
+
   const cloudReady = providerTools.every((tool) => {
     const report = reports.find((r) => r.tool === tool.name);
     return report?.installed === true;
@@ -176,5 +191,5 @@ export function runDoctor(log: Console = console): number {
   const agentReady = isAgentRuntimeReady(reports) || isCursorSession();
   const skillsReady = isSkillsCliReady(reports);
 
-  return cloudReady && agentReady && skillsReady ? 0 : 1;
+  return cloudReady && r2Result.ok && agentReady && skillsReady && projectHealth.ok ? 0 : 1;
 }

@@ -94,7 +94,7 @@ async function main(argv: string[]): Promise<number> {
     return runNew(rest);
   }
   if (command === 'doctor') {
-    return runDoctor();
+    return await runDoctor();
   }
   if (command === 'sync-agent-layer') {
     const result = await runSyncAgentLayer(rest);

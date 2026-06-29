@@ -11,6 +11,7 @@ import {
   type ToolReport,
 } from '../src/doctor/toolchain';
 import { expectedSkillNames, verifyPlatformSkills } from '../src/doctor/platform-skills';
+import { verifyProjectHealth } from '../src/doctor/project-health';
 
 describe('selectToolchain', () => {
   it('returns [gh, wrangler, supabase] for the defaults (empty env)', () => {
@@ -307,5 +308,13 @@ describe('isToolchainReady', () => {
     expect(isToolchainReady([{ tool: 'a', purpose: '', installed: false, authed: null }])).toBe(
       false,
     );
+  });
+});
+
+describe('verifyProjectHealth', () => {
+  it('passes for web template with .cursorignore and .gitignore', () => {
+    const report = verifyProjectHealth(new URL('../../templates/web', import.meta.url).pathname);
+    expect(report.ok).toBe(true);
+    expect(report.lines.some((line) => line.startsWith('✓'))).toBe(true);
   });
 });
