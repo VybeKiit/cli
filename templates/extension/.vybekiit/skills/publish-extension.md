@@ -4,8 +4,9 @@
 
 **Contract:** one action at a time · verify-before-advance · plain language · celebrate.
 
-> (Agent-only) Use `@vybekiit/extension-publish` + `chrome-extension-vybekiit.md`. Listing source:
-> `cws-listing.ts`. Never say Chrome Web Store jargon to the builder — say "the extension store."
+> (Agent-only) Use `@vybekiit/browser-automation` (`cws` target) + `chrome-extension-vybekiit.md`.
+> CLI: `vybekiit-automate cws …` or programmatic CWS verb exports.
+> Listing source: `cws-listing.ts`. Never say Chrome Web Store jargon to the builder — say "the extension store."
 
 ## Steps
 
@@ -23,7 +24,8 @@
 4. **One-time developer account.** Plain words: paid Chrome developer registration; one step at a time.
    **Verify:** account exists.
 
-5. **Submit via automation.** Run extension-publish push verbs after verify gate.
+5. **Submit via automation.** Run CWS push verbs from `@vybekiit/browser-automation` after verify gate
+   (`vybekiit-automate cws` or programmatic `publish`, `uploadPackage`, etc.).
    **Verify:** store dashboard shows the submission. 🎉 Celebrate.
 
 ## Definition of done

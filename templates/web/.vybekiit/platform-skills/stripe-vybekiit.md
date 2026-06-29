@@ -6,14 +6,17 @@
 
 - Docs: https://docs.stripe.com
 - API reference: https://docs.stripe.com/api
+- Stripe MCP: https://docs.stripe.com/mcp
 
 ## Kit wiring
 
-1. Payments via `@vybekiit/payments` → `resolvePaymentProvider()` when `PAYMENTS_PROVIDER=stripe`
-2. Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and price/product ids in `.env`
-3. Webhook route at `app/api/webhook/route.ts`; fulfillment in `src/lib/fulfillment.ts`
-4. Replace `TODO(vybekiit): … — skill: setup-payments` markers
-5. **Note:** Stripe is not Merchant of Record — explain tax handling in plain words if the builder asks
+1. Merge `agent/mcp-stripe.json` into buyer `.cursor/mcp.json` (or equivalent MCP config)
+2. Builder completes Stripe OAuth once when prompted by MCP
+3. Agent creates product + price via Stripe MCP write tools; write restricted `STRIPE_SECRET_KEY` and webhook secret to `.env`
+4. Payments via `@vybekiit/payments` → `resolvePaymentProvider()` when `PAYMENTS_PROVIDER=stripe`
+5. Webhook route at `app/api/webhook/route.ts`; fulfillment in `src/lib/fulfillment.ts`
+6. Replace `TODO(vybekiit): … — skill: setup-payments` markers
+7. **Note:** Stripe is not Merchant of Record — explain tax handling in plain words if the builder asks
 
 ## Verify-before-advance
 
