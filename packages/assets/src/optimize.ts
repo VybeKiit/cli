@@ -94,7 +94,7 @@ export async function runOptimizeForBuild(
 
   if (!(await directoryExists(options.sourceDir))) {
     await mkdir(outputDir, { recursive: true });
-    await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+    await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
     return { manifest, manifestPath, processedCount };
   }
 
@@ -135,7 +135,7 @@ export async function runOptimizeForBuild(
   }
 
   await mkdir(outputDir, { recursive: true });
-  await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
   return { manifest, manifestPath, processedCount };
 }
