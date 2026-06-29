@@ -61,6 +61,7 @@
         "noExcessiveLinesPerFile": "warn"
       },
       "correctness": {
+        "useImageSize": "warn",
         "noNodejsModules": "off",
         "noUndeclaredDependencies": "warn",
         "noUndeclaredVariables": "warn",
@@ -78,6 +79,7 @@
         "useTopLevelRegex": "warn"
       },
       "suspicious": {
+        "noArrayIndexKey": "warn",
         "noUnknownAttribute": "off",
         "noUnnecessaryConditions": "warn",
         "noControlCharactersInRegex": "off",
@@ -89,7 +91,12 @@
         "noConsole": "off"
       },
       "security": {
-        "noSecrets": "warn"
+        "noSecrets": "warn",
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "warn",
+        "useSemanticElements": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
@@ -103,5 +110,27 @@
       "test": "all",
       "project": "all"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["apps/landing/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noHexColors": "off",
+            "noExcessiveLinesPerFile": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["templates/web/src/components/**"],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

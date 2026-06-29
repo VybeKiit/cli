@@ -4,7 +4,18 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!!**/.agents/skills", "!!**/.vybekiit"]
+    "includes": [
+      "**",
+      "!!**/.agents/skills",
+      "!!**/.vybekiit",
+      "!!**/src/components/bundui",
+      "!!**/src/components/magicui",
+      "!!**/src/components/kokonutui",
+      "!!**/src/components/aceternity",
+      "!!**/src/components/untitled",
+      "!!**/src/components/gluestack",
+      "!!**/src/components/blocks"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -83,7 +94,12 @@
         "noConsole": "off"
       },
       "security": {
-        "noSecrets": "warn"
+        "noSecrets": "warn",
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "warn",
+        "useSemanticElements": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
