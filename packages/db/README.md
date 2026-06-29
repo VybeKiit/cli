@@ -1,12 +1,12 @@
-# @vybekiit/agent-kit
+# @vybekiit/db
 
-The rules your AI assistant follows — plain language, safe updates, one step at a time.
+Where your app remembers things — database and file storage from one API.
 
 **Part of [VybeKiit](https://vybekiit.com)** — maintained logic your scaffolded app depends on. You don't edit this code. When VybeKiit ships fixes, your agent runs the **update-kit** skill and version bumps install automatically — no merge conflicts.
 
 ## What it does
 
-Shared agent-layer contract: the five buyer promises, jargon→plain vocabulary, and the kit-update planner. Template-specific skills stay in your app; this is what must never drift.
+Data and storage providers behind one interface. Supabase is the default. MongoDB, AWS, and R2/S3 adapters when you scale or change hosts.
 
 ## In your app
 
@@ -14,19 +14,18 @@ Your template already imports this package. Settings live in your **secret setti
 
 ## For your agent
 
-- **Do not edit** `node_modules/@vybekiit/agent-kit` — fix bugs upstream or bump the package version.
-- **`CONTRACT` / `renderContract()`** — five buyer rules every skill must follow (one action · verify-before-advance · plain language · translate errors · celebrate).
-- **`TOOL_VOCABULARY` / `renderToolVocabularyTable()`** — jargon → plain-language map; keep each template's `language.md` in sync with this output.
-- **`planKitUpdate()` / `UpdatePlan`** — given installed vs latest `@vybekiit/*` versions, returns safe bump list for `update-kit`.
-- **`planAgentLayerSync()`** — agent-layer refresh planner for mirror + platform-skills sync.
-- **Related skills:** `update-kit`, `sync-agent-layer`
+- **Do not edit** node_modules/@vybekiit/db — fix bugs upstream or bump the package version.
+- **Entry point:** `resolveDataProvider`, `resolveStorageProvider`, `pingDatabase`, `createDbClient`
+- **Config:** `DATA_PROVIDER` (default `supabase`), `STORAGE_PROVIDER` (default `supabase`)
+- **Related skills:** `save-data`, `add-files`, `check-safety`, `doctor`
+- **Pattern:** resolve*Provider() reads env via @vybekiit/core and returns a headless adapter.
 
 ## Scope
 
 **In scope**
 
-- Buyer skill contract, tool vocabulary, update planning.
-- Not template onboarding flows — those live in `.vybekiit/skills/`.
+- Typed data client, storage upload/read, health ping.
+- No ORM UI, no admin dashboards.
 
 **Out of scope**
 
@@ -36,7 +35,7 @@ Your template already imports this package. Settings live in your **secret setti
 ## Updates
 
 ```bash
-npm update @vybekiit/agent-kit
+npm update @vybekiit/db
 ```
 
 Or run the **update-kit** skill — it uses planKitUpdate() from @vybekiit/agent-kit to bump all @vybekiit/* packages safely.

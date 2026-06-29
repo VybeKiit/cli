@@ -1,12 +1,12 @@
-# @vybekiit/agent-kit
+# @vybekiit/seo
 
-The rules your AI assistant follows — plain language, safe updates, one step at a time.
+Help Google find you — sitemaps, robots.txt, and page metadata.
 
 **Part of [VybeKiit](https://vybekiit.com)** — maintained logic your scaffolded app depends on. You don't edit this code. When VybeKiit ships fixes, your agent runs the **update-kit** skill and version bumps install automatically — no merge conflicts.
 
 ## What it does
 
-Shared agent-layer contract: the five buyer promises, jargon→plain vocabulary, and the kit-update planner. Template-specific skills stay in your app; this is what must never drift.
+SEO primitives: metadata helpers, sitemap generation, JSON-LD blocks. Wired in template `seo.ts`.
 
 ## In your app
 
@@ -14,19 +14,18 @@ Your template already imports this package. Settings live in your **secret setti
 
 ## For your agent
 
-- **Do not edit** `node_modules/@vybekiit/agent-kit` — fix bugs upstream or bump the package version.
-- **`CONTRACT` / `renderContract()`** — five buyer rules every skill must follow (one action · verify-before-advance · plain language · translate errors · celebrate).
-- **`TOOL_VOCABULARY` / `renderToolVocabularyTable()`** — jargon → plain-language map; keep each template's `language.md` in sync with this output.
-- **`planKitUpdate()` / `UpdatePlan`** — given installed vs latest `@vybekiit/*` versions, returns safe bump list for `update-kit`.
-- **`planAgentLayerSync()`** — agent-layer refresh planner for mirror + platform-skills sync.
-- **Related skills:** `update-kit`, `sync-agent-layer`
+- **Do not edit** node_modules/@vybekiit/seo — fix bugs upstream or bump the package version.
+- **Entry point:** `resolveSeoProvider`, `createLocalSeo`, metadata and sitemap types
+- **Config:** `SEO_PROVIDER` (default `local`)
+- **Related skills:** `add-blog`, marketing pages
+- **Pattern:** resolve*Provider() reads env via @vybekiit/core and returns a headless adapter.
 
 ## Scope
 
 **In scope**
 
-- Buyer skill contract, tool vocabulary, update planning.
-- Not template onboarding flows — those live in `.vybekiit/skills/`.
+- Sitemap, robots, metadata, GEO/JSON-LD helpers.
+- No content writing — you describe pages to your agent.
 
 **Out of scope**
 
@@ -36,7 +35,7 @@ Your template already imports this package. Settings live in your **secret setti
 ## Updates
 
 ```bash
-npm update @vybekiit/agent-kit
+npm update @vybekiit/seo
 ```
 
 Or run the **update-kit** skill — it uses planKitUpdate() from @vybekiit/agent-kit to bump all @vybekiit/* packages safely.
