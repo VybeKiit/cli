@@ -55,3 +55,10 @@ export {
   type UiSourceEntry,
 } from './ui-sources';
 export { TONE_RULES, renderToneSection, type ToneRule } from './tone-rules';
+export {
+  planDataModel,
+  renderDataModelSummary,
+  type DataModelPlan,
+  type DataProviderName,
+  type EntityInput,
+} from './plan-data-model';

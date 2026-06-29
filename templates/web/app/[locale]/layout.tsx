@@ -1,3 +1,4 @@
+import { ClientStateProvider } from '@/lib/client-state';
 import { Toaster } from '@/components/ui/sonner';
 import { ReportModeDevShell } from '@/components/report-mode/report-mode-shell';
 import { routing } from '@/i18n/routing';
@@ -44,9 +45,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <html lang={lang} dir={dir}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
-          <Toaster />
-          <ReportModeDevShell />
+          <ClientStateProvider>
+            {children}
+            <Toaster />
+            <ReportModeDevShell />
+          </ClientStateProvider>
         </NextIntlClientProvider>
       </body>
     </html>

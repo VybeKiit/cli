@@ -500,6 +500,12 @@ export const kvConfigSchema = z.object({
   KV_PROVIDER: z.enum(['cloudflare', 'upstash', 'local']).default('cloudflare'),
 });
 
+/** Client-side cache + UI prefs — `@vybekiit/client-state`. */
+export const clientStateConfigSchema = z.object({
+  CLIENT_STATE_PERSIST: onOff.default('on'),
+  CLIENT_STATE_QUERY_STALE_SECONDS: positiveIntEnv(60),
+});
+
 export const upstashKvConfigSchema = z.object({
   UPSTASH_KV_REST_URL: z.string().url('UPSTASH_KV_REST_URL must be a valid URL'),
   UPSTASH_KV_REST_TOKEN: z.string().min(1, 'UPSTASH_KV_REST_TOKEN is required'),
@@ -570,6 +576,7 @@ export type ComplianceConfig = z.infer<typeof complianceConfigSchema>;
 export type SeoConfig = z.infer<typeof seoConfigSchema>;
 export type TenancyConfig = z.infer<typeof tenancyConfigSchema>;
 export type KvConfig = z.infer<typeof kvConfigSchema>;
+export type ClientStateConfig = z.infer<typeof clientStateConfigSchema>;
 export type UpstashKvConfig = z.infer<typeof upstashKvConfigSchema>;
 export type CloudflareKvConfig = z.infer<typeof cloudflareKvConfigSchema>;
 export type I18nConfig = z.infer<typeof i18nConfigSchema>;
