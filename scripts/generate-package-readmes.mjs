@@ -137,7 +137,7 @@ const PACKAGES = [
   {
     name: 'browser-automation',
     tagline: 'Dashboard automation CLI for Lemon Squeezy and Chrome Web Store.',
-    body: 'Unified Playwright package with `vybekiit-automate` bin. Targets: `ls` (payments onboarding) and `cws` (extension publish). Agent `--json` mode or interactive wizard.',
+    body: 'Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls. Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.',
     exports: 'CWS verbs, `runLsSetup`, `standbyLogin`, `vybekiit-automate` CLI',
     config: 'Chrome profiles: `$HOME/.ls-chrome-profile`, `$HOME/.cws-chrome-profile`',
     skills: 'setup-payments, publish-extension',
@@ -153,16 +153,6 @@ const PACKAGES = [
     skills: 'client-state-vybekiit.md',
     inScope: 'TanStack Query 5.101.x, Zustand scaffold.',
     outScope: 'Server-side Redis — not a buyer path.',
-  },
-  {
-    name: 'extension-publish',
-    tagline: 'Deprecated shim — re-exports browser-automation CWS target.',
-    body: 'Backward-compatible re-export of `@vybekiit/browser-automation`. Prefer browser-automation for new code.',
-    exports: 'Same CWS exports as browser-automation',
-    config: 'See `@vybekiit/browser-automation`',
-    skills: 'publish-extension',
-    inScope: 'Re-exports only.',
-    outScope: 'New features — use browser-automation.',
   },
   {
     name: 'report-mode',

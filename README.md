@@ -25,7 +25,7 @@ packages/   MAINTAINED · published to npm as @vybekiit/* · headless logic (no 
   payments/         one PaymentProvider interface · Lemon Squeezy + Stripe + PayPal adapters
   auth/             headless Supabase auth
   db/               typed Supabase data client
-  extension-publish/  Playwright Chrome-Web-Store automation to publish/submit extensions
+  browser-automation/  Unified dashboard Playwright CLI (CWS + Lemon Squeezy)
 templates/  OWNED · NOT published · copied into a buyer's repo by the CLI
   web/              Next.js + shadcn (RTL-ready) + the buyer-facing agent layer   ← v1.0
   mobile/           Expo                                                          ← v2

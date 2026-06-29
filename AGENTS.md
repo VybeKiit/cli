@@ -103,7 +103,7 @@ you can take $1 and auto-invite yourself, the business is real.
 ## Current state (after the v1.0 scaffold)
 
 - **Built + green** (workspace members, in the CI gate): `packages/core`,
-  `packages/payments`, `packages/auth`, `packages/db`, `packages/extension-publish`, `cli`
+  `packages/payments`, `packages/auth`, `packages/db`, `packages/browser-automation`, `packages/client-state`, `cli`
   (the `vybekiit` scaffolder), and `templates/web` (a real Next.js app, `next build` + `tsc`
   gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
   the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —

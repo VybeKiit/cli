@@ -90,8 +90,7 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
 │  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
 │  ├─ client-state/             TanStack Query + Zustand/MMKV via resolveClientState() — ADR-0014
-│  ├─ browser-automation/       unified Playwright CLI (cws + ls targets) — ADR-0015
-│  ├─ extension-publish/        deprecated shim → browser-automation CWS exports
+│  ├─ browser-automation/       unified Playwright CLI — domains: extension/, payments/ls, dbs/, infra/ — ADR-0015
 │  ├─ report-mode/            dev-only Report Mode — structured reports + assistant deeplink handoff
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
 │  └─ agent-kit/              shared agent-layer source — the skill contract, BUILDER-VOICE.md core,
@@ -134,7 +133,7 @@ See ADR-0002/0003/0004.
 | Storage | `StorageProvider`: **supabase/R2⭐** · s3 | R2 implemented; doctor provisions on CF stack (ADR-0010) |
 | Asset delivery | `@vybekiit/assets`: hybrid build optimize + CDN URLs · derived from hosting+storage | — ADR-0010 |
 | Email | `@vybekiit/email` (`EmailProvider`): **cloudflare⭐** · ses · resend | AWS SES now an adapter (was sandbox-approval pain); Resend an adapter (was fallback) |
-| Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS onboarding via `@vybekiit/browser-automation` `ls`; Stripe via MCP; LS is MoR for tax |
+| Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS onboarding via `@vybekiit/browser-automation` `ls`; Stripe and PayPal via MCP; LS is MoR for tax |
 | Client state | `@vybekiit/client-state`: TanStack Query + Zustand/MMKV | No Redis for buyers — ADR-0014 |
 | Design tokens | `@vybekiit/tokens`: one shared map (colors/spacing/radius/type) — web as CSS vars, mobile as `StyleSheet` | — DRY look across web + mobile — ADR-0004 |
 | Observability | `@vybekiit/observability` (`ObservabilityProvider`): **local⭐** (no-op) · sentry | `@vybekiit/core` `createLogger` — dev verbose, production silent |
@@ -259,7 +258,7 @@ that the CLIs it needs are actually present and usable — the buyer never confi
 
 - **The default toolchain is `supabase` + `wrangler`** (the CLIs the default web + money pipeline
   use). Expo + the author's `launch` CLI arrive with the mobile template (now in v1.0 — see banner);
-  Playwright/extension-publish with the extension template (v3); the MongoDB Atlas + AWS CLIs only
+  Playwright/browser-automation with the extension template (v3); the MongoDB Atlas + AWS CLIs only
   when those opt-in adapters are selected. No tool is wired before the template/adapter that drives
   it is in use.
 - **Provisioned globally, OS-aware, by `vybekiit doctor`** — a maintained CLI subcommand (not
@@ -704,7 +703,10 @@ Agent-only Playwright CLI for dashboards without API/MCP (`@vybekiit/browser-aut
 Agent codename for the Lemon Squeezy `ls` target inside browser-automation.
 
 **Payment MCP tier**:
-Stripe via MCP; Lemon Squeezy via browser-automation CLI.
+Stripe and PayPal via hosted MCP; Lemon Squeezy via browser-automation CLI.
+
+**MCP merge snippet**:
+Provider JSON under buyer `.vybekiit/agent/mcp-*.json` merged into Cursor, Claude Desktop, or Codex config — see `mcp-setup.md` in web template.
 
 **MCP tier (data)**:
 Supabase, Neon, Firebase — login-once agent tooling for database onboarding.

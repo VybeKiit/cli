@@ -10,10 +10,11 @@ Chrome Web Store publish lived in `@vybekiit/extension-publish`. Lemon Squeezy h
 
 ## Decision
 
-1. **Rename/consolidate** into `@vybekiit/browser-automation` with targets `cws` and `ls` (fresh-squeezy).
-2. **Unified bin** `vybekiit-automate` with agent mode (`--json`, `--yes`) and wizard mode (`@clack/prompts`).
-3. **`@vybekiit/extension-publish`** becomes a one-major-version re-export shim.
+1. **Single package** `@vybekiit/browser-automation` with domain folders under `src/domains/` (`extension`, `payments/ls`, `dbs/`, `infra/`).
+2. **Registry CLI** `vybekiit-automate` — each domain registers commands; aliases `cws` → `extension`, `ls` → `payments/ls`.
+3. **Buyer store SSOT** at `.vybekiit/store/extension/` (`cws.json`, `cws-listing.ts`).
 4. **Blind navigation only** — selector registries, no screenshots to agents.
+5. **No shim package** — `@vybekiit/extension-publish` removed from the monorepo; browser-automation is the only SSOT.
 
 ## Consequences
 

@@ -22,7 +22,6 @@ const PACKAGES = [
   'agent-kit',
   'client-state',
   'browser-automation',
-  'extension-publish',
   'report-mode',
   'i18n',
   'seo',
