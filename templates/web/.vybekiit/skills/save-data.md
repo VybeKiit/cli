@@ -7,19 +7,23 @@ translate every error · celebrate. You do all the wiring; the builder only past
 or describes, in plain words, what the app should remember.
 
 > (Under the hood — agent-only) Use `@vybekiit/db`'s `resolveDataProvider()` for every read/write.
-> Follow `platform-skills/supabase-vybekiit.md` for default Supabase wiring.
+> Follow the platform wrapper for the active `DATA_PROVIDER`:
+> - `supabase` (default) → `platform-skills/supabase-vybekiit.md`
+> - `neon` → `platform-skills/neon-vybekiit.md`
+> - `firebase` → `platform-skills/firebase-vybekiit.md`
+> - `mongodb` / `aws` → advanced; maintainer docs only
 
 ## Steps
 
-1. **Make sure the database is ready.** Run the database tool via `vybekiit doctor`. For the default,
-   you can create the project programmatically. Collect any access keys it needs **one at a time**
-   and save them to the secret settings file.
+1. **Make sure the database is ready.** Run the database tool via `vybekiit doctor`. For MCP-tier providers
+   (Supabase, Neon, Firebase), merge the matching `agent/mcp-*.json` and use login-once onboarding.
+   Collect any access keys **one at a time** and save them to the secret settings file.
    **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).
 
-2. **Agree on what to remember, in plain words.** Ask the builder what the app should save (e.g.
-   "each customer's name and order"). Turn their answer into a simple data shape yourself — don't
-   make them think about it.
-   **Verify:** read the shape back to them in one sentence and get a yes.
+2. **Agree on what to remember, in plain words.** If no prior `design-my-data` session, run that skill first
+   (or inline `planDataModel()` from `@vybekiit/agent-kit` for a single simple entity). Ask what the app
+   should save; turn their answer into a simple data shape yourself.
+   **Verify:** read the shape back in one sentence and get a yes.
 
 3. **Wire saving and reading.** Use `resolveDataProvider()` for insert / get / query / update /
    remove. Replace the dashboard's placeholder stats marker (`TODO(vybekiit): … — skill: save-data`;

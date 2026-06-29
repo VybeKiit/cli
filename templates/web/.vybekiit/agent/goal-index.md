@@ -14,6 +14,7 @@ translate errors · celebrate.
 | "put it online", "publish", "make it live", "ship it", "deploy" | `skills/go-live.md` |
 | "let people sign in / log in / create accounts / add users" | `skills/add-signin.md` |
 | "save my data", "remember this", "store info", "add a database" | `skills/save-data.md` |
+| "what should my app remember", "design my database", "what data do I need", "map my features to data" | `skills/design-my-data.md` |
 | "let users upload", "store files / images / attachments" | `skills/add-files.md` |
 | "add my logo", "hero image", "app icon", "add images", "put my picture" | `skills/add-images.md` |
 | "send emails", "email my users", "set up email" | `skills/setup-email.md` |

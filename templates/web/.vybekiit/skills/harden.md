@@ -60,6 +60,10 @@ translate every error · celebrate. You do all the work; the builder just approv
    or string-built queries and replace them. If Supabase: RLS enabled on buyer tables.
    **Verify:** no raw SQL in the app; zod on every API body.
 
+9. **Optional edge KV (agent-only).** `@vybekiit/kv` may back feature flags when you extend hardening —
+   never Redis or Upstash for buyers. Client-side cache is `@vybekiit/client-state` (TanStack Query).
+   **Verify:** no buyer-facing Redis setup docs or env keys added.
+
 ## If anything breaks
 
 Run `doctor`. If real visitors hit "too many requests", the limit is too low — raise

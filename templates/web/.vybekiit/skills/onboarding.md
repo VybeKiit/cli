@@ -31,6 +31,9 @@ translate every error · celebrate. Decide all technical choices yourself.
    Fix anything red before showing the preview. The builder hears: *"Everything checks out."*
    **Verify:** the dev server is up with no errors. If it fails → run `doctor`.
 
+   > (Agent-only) **Database MCP tier:** Supabase, Neon, and Firebase use login-once MCP configs
+   > (`mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`). MongoDB and AWS are advanced only.
+
 3. **Show them their app.**
    Give them the one link to open (`http://localhost:3000`) and tell them what they'll see.
    **Verify:** ask them to confirm they can see the page. Don't continue until they say yes.

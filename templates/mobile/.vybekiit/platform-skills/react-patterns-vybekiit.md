@@ -6,12 +6,14 @@
 
 | Concern | Use | Never |
 |---|---|---|
-| Async UI state | `useAsync` from `@/hooks/use-async` | Hand-rolled `useState` + `useEffect` for fetch |
+| Server / API data | TanStack Query via `@vybekiit/client-state` (`useQuery`, `useMutation`) | Raw `fetch` + `useState` for server records |
+| Async UI state | `useAsync` from `@/hooks/use-async` | Hand-rolled fetch for data that belongs in query cache |
 | User / session | `useUser` from `@/hooks/use-user` | Duplicate session logic in pages |
+| Client-only prefs | `useStorage` from `@/hooks/use-storage` | Zustand/MMKV for server data |
 | Toasts | `useToast` from `@/hooks/use-toast` | `alert()` or ad-hoc snackbars |
 | Forms | `FormField` + zod at submit boundary | Inline validation scattered in JSX |
 
-Read `src/hooks/README.md` before adding hooks.
+Read `client-state-vybekiit.md` and `src/hooks/README.md` before adding hooks.
 
 ## Soft limits (agent + Biome warn)
 
@@ -30,12 +32,11 @@ Read `src/hooks/README.md` before adding hooks.
 ## Folders
 
 ```
-app/                 screens + navigation (Expo Router)
+app/                 routes + API (Next.js App Router)
 src/components/ui/   kit primitives — do not duplicate
-src/components/      app-specific composed UI
+src/components/    app-specific composed UI
 src/hooks/           shared React hooks (see README)
-src/lib/             backend clients + config (see README)
-src/theme/           design tokens via useTheme()
+src/lib/             headless clients + utils (see README)
 ```
 
 ## Verify

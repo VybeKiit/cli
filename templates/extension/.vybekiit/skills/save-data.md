@@ -1,19 +1,47 @@
 # Skill: save-data
 
-**Goal:** the extension remembers things via the builder's backend.
+**Goal:** the app can remember things — save information and read it back later.
 
-**Contract:** one action at a time · verify-before-advance · plain language · celebrate.
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) ·
+translate every error · celebrate. You do all the wiring; the builder only pastes a value when asked
+or describes, in plain words, what the app should remember.
 
-> (Agent-only) No database in the extension — calls backend API. Web `save-data` must be wired first.
+> (Under the hood — agent-only) Use `@vybekiit/db`'s `resolveDataProvider()` for every read/write.
+> Follow the platform wrapper for the active `DATA_PROVIDER`:
+> - `supabase` (default) → `platform-skills/supabase-vybekiit.md`
+> - `neon` → `platform-skills/neon-vybekiit.md`
+> - `firebase` → `platform-skills/firebase-vybekiit.md`
+> - `mongodb` / `aws` → advanced; maintainer docs only
 
 ## Steps
 
-1. **Backend data ready.** Web app must persist data. Run web `save-data` if needed.
-   **Verify:** backend read/write works.
+1. **Make sure the database is ready.** Run the database tool via `vybekiit doctor`. For MCP-tier providers
+   (Supabase, Neon, Firebase), merge the matching `agent/mcp-*.json` and use login-once onboarding.
+   Collect any access keys **one at a time** and save them to the secret settings file.
+   **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).
 
-2. **Wire extension API client.** Replace `TODO(vybekiit): … — skill: save-data` markers.
-   **Verify:** extension saves and loads a test value through the backend.
+2. **Agree on what to remember, in plain words.** If no prior `design-my-data` session, run that skill first
+   (or inline `planDataModel()` from `@vybekiit/agent-kit` for a single simple entity). Ask what the app
+   should save; turn their answer into a simple data shape yourself.
+   **Verify:** read the shape back in one sentence and get a yes.
+
+3. **Wire saving and reading.** Use `resolveDataProvider()` for insert / get / query / update /
+   remove. Replace the dashboard's placeholder stats marker (`TODO(vybekiit): … — skill: save-data`;
+   grep them) with a real read.
+   **Verify:** the code builds with no errors.
+
+4. **Write a test** that saves a record and reads it back, and keep it green.
+
+5. **Try it for real.** Save something, then read it back in the app.
+   **Verify:** what was saved comes back exactly.
+   🎉 *Celebrate* — the app remembers things now.
+
+## If anything breaks
+
+Run `doctor`. Most issues are a missing access key or the database not reachable yet — fix it for
+them, don't explain the internals.
 
 ## Definition of done
 
-Extension reads/writes data through the deployed backend only.
+The app saves and reads back real data, a passing test covers it, and no save-data markers remain
+(re-grep `TODO(vybekiit)`).
