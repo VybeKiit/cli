@@ -19,7 +19,9 @@ export interface PlatformSkillsReport {
 /** Detect which VybeKiit template cwd is (web / mobile / extension). */
 export function detectTemplate(cwd: string): string | null {
   if (existsSync(join(cwd, 'platform-skills.manifest.json'))) {
-    if (existsSync(join(cwd, 'app.json'))) return 'mobile';
+    if (existsSync(join(cwd, 'app.json'))) {
+      return 'mobile';
+    }
     if (existsSync(join(cwd, 'wxt.config.ts')) || existsSync(join(cwd, 'extension.config.ts'))) {
       return 'extension';
     }
@@ -80,10 +82,27 @@ export function formatPlatformSkillsReport(report: PlatformSkillsReport): string
   if (report.template === null) {
     return [];
   }
-  if (report.ok) {
-    return ['✓ platform skills — all official skills are present.'];
+  const lines: string[] = [];
+  const lockPath = join(process.cwd(), 'skills-lock.json');
+  if (existsSync(lockPath)) {
+    try {
+      const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as {
+        skills?: Record<string, unknown>;
+      };
+      const count = Object.keys(lock.skills ?? {}).length;
+      lines.push(`✓ platform skills lock — ${count} pinned skill(s) in skills-lock.json.`);
+    } catch {
+      lines.push('→ platform skills lock — skills-lock.json unreadable.');
+    }
+  } else {
+    lines.push('→ platform skills lock — skills-lock.json missing (run pin-platform-skills).');
   }
-  return [
+  if (report.ok) {
+    lines.push('✓ platform skills — all explicit manifest skills are present.');
+    return lines;
+  }
+  lines.push(
     `→ platform skills — missing: ${report.missing.join(', ')}. Ask your agent to refresh platform skills (update-kit) or run the pin script.`,
-  ];
+  );
+  return lines;
 }
