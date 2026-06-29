@@ -39,3 +39,5 @@ npx vybekiit --help
 ```
 
 Future releases: merge PR → `Release` workflow → `publish.yml` (no OTP).
+
+See [release-ci-setup.md](./release-ci-setup.md) for `GH_MIRROR_TOKEN` and CI troubleshooting.

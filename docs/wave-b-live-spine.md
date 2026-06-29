@@ -5,7 +5,7 @@ Manual steps when maintainer secrets are available. Code + mocked tests ship in 
 ## 0. Prerequisites (Phase 0)
 
 - [ ] CI green on all repos (`VybeKiit/vybekiit`, `web`, `mobile`, `extension`, `cli`)
-- [ ] `publish.yml` + `release.yml` merged; `GH_MIRROR_TOKEN` secret set on monorepo
+- [ ] `publish.yml` + `release.yml` merged; `GH_MIRROR_TOKEN` secret set on monorepo ([release-ci-setup.md](./release-ci-setup.md))
 - [ ] npm Trusted Publishers configured (see §4 below)
 
 ## 1. Lemon Squeezy store (#4)
