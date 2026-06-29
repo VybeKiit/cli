@@ -54,6 +54,7 @@ export function useTypewriterSequence(
     if (activeIndex < lines.length - 1) {
       setActiveIndex((index) => index + 1);
     }
+    return;
   }, [typingActive, isComplete, activeIndex, lines.length, pauseAfterLineMs]);
 
   const displayLines = lines.map((line, index) => {

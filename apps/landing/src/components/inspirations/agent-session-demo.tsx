@@ -49,6 +49,7 @@ export function AgentSessionDemo() {
       const t = setTimeout(() => setRailIndex(1), 400);
       return () => clearTimeout(t);
     }
+    return;
   }, [typedChars, railIndex, animate]);
 
   useEffect(() => {
