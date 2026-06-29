@@ -16,7 +16,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vybekiit/agent-kit": "workspace:*"
+    "@vybekiit/agent-kit": "workspace:*",
+    "@vybekiit/report-mode": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
