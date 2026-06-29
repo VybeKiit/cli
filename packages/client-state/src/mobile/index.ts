@@ -5,7 +5,7 @@ export function createMmkvQueryPersister(storage: {
   getString: (key: string) => string | undefined;
   set: (key: string, value: string) => void;
   delete: (key: string) => void;
-}) {
+}): ReturnType<typeof createAsyncStoragePersister> {
   const asyncStorage = {
     getItem: async (key: string) => storage.getString(key) ?? null,
     setItem: async (key: string, value: string) => {
