@@ -3,9 +3,11 @@ import {
   cloudflareConfigSchema,
   emailConfigSchema,
   parseEnv,
+  resendConfigSchema,
 } from '@vybekiit/core';
-import { type FetchLike, createCloudflareEmail } from './providers/cloudflare';
-import { createSesEmail } from './providers/ses';
+import { type FetchLike, createCloudflareEmail } from './providers/cloudflare/index';
+import { createSesEmail } from './providers/ses/index';
+import { createResendEmail } from './providers/resend/index';
 import type { EmailProvider } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
@@ -32,7 +34,7 @@ export function resolveEmailProvider(
     case 'ses':
       return createSesEmail(parseEnv(awsConfigSchema, env));
     case 'resend':
-      throw new Error('resend email adapter ships in a later step'); // TODO(later)
+      return createResendEmail(parseEnv(resendConfigSchema, env));
     default:
       return createCloudflareEmail(parseEnv(cloudflareConfigSchema, env), fetchImpl);
   }

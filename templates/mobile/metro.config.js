@@ -17,7 +17,7 @@ const path = require('node:path');
  *
  * `unstable_enableSymlinks` lets Metro follow pnpm's symlinked packages.
  */
-const projectRoot = __dirname;
+const projectRoot = import.meta.dirname;
 const monorepoRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);

@@ -54,7 +54,7 @@ function parseVersion(version: string): SemverParts | null {
 function compareVersions(a: string, b: string): -1 | 0 | 1 | null {
   const left = parseVersion(a);
   const right = parseVersion(b);
-  if (!left || !right) return null;
+  if (!(left && right)) return null;
   const [leftMajor, leftMinor, leftPatch] = left;
   const [rightMajor, rightMinor, rightPatch] = right;
   if (leftMajor !== rightMajor) return leftMajor < rightMajor ? -1 : 1;

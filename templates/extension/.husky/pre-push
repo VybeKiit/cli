@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Agent-only push gate — the builder never runs git push.
+pnpm quality
+
+if [ "$PLAYWRIGHT_ENABLED" = "true" ]; then
+  pnpm test:e2e
+fi

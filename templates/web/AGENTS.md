@@ -7,7 +7,8 @@
 >
 > This is the **single source of truth** for how you behave in this project. Codex reads this file
 > natively; `CLAUDE.md` (Claude Code) and `.cursor/rules/vybekiit.mdc` (Cursor) are thin pointers to
-> it. Supported assistants: Claude Code · Codex · Cursor.
+> it; `.cursor/rules/patterns.mdc` summarizes code conventions (not SSOT). Supported assistants:
+> Claude Code · Codex · Cursor.
 
 ## The contract: Decide + Guide
 
@@ -35,6 +36,19 @@
 5. **Write tests as you build features** and keep them green — that green suite is the builder's
    safety net and the reason updates are safe to apply.
 
+## Planning before big builds
+
+When the builder asks for something **large or vague** (a whole product shape, "like X but for Y",
+many features at once) and you have not planned together this session:
+
+1. **Offer once** (never force): *"Want to think it through together first? I'll ask one question at
+   a time until we're totally aligned."*
+2. If they **accept** → follow `skills/plan-my-idea.md`.
+3. If they **decline** → build anyway. Impatient builders stay in control.
+
+During onboarding, the one-time planning offer is handled by `onboarding.md` — do not duplicate it
+if `.vybekiit/state/planning-intro-seen` exists.
+
 ## What you may decide without asking
 
 Generic coding, design tweaks, data shapes, file structure, and which kit package to use. These
@@ -45,10 +59,36 @@ are **not** skills — just do them well, following the conventions below.
 - The kit's logic lives in `@vybekiit/*` packages (payments, accounts, data). **Use them — don't
   reinvent them.** They update separately; the builder's customizations stay in this repo.
 - All secret settings live in **one** file: `.env` (documented by `.env.example`). One source of
-  truth.
+  truth. **Never read `.env` values aloud or paste them in chat** — reference keys from
+  `.env.example` only. If the builder pastes a secret in chat, warn them and have them paste into
+  `.env` on their machine instead. Read `env-secrets-vybekiit.md`.
 - Keep components small and readable. Use the kit's UI primitives in `src/components`.
 - Layout uses logical spacing (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) so the app mirrors
   automatically for Hebrew/Arabic visitors. Never hard-code `left`/`right`.
+- **All user-facing copy** lives in `messages/en.json` and is rendered via `t('flat.dotted.key')`
+  — never inline strings in JSX. New UI = new keys in the same PR. See `i18n-vybekiit.md`.
+
+### Before you write code (invisible quality — builder never hears this)
+
+1. **Check before create** — search `src/lib/README.md` and `@vybekiit/*` before adding a helper; extend existing code if ≥80% overlap.
+2. **One home per concern** — auth → `auth-client.ts`, billing → `billing-client.ts`, logging → `logger.ts`. Never add a second `utils-*.ts`.
+3. **Use the kit logger** — `import { log } from '@/lib/logger'`; never `console.log` in app/API code (tests may use console).
+4. **KISS** — no one-off wrappers around kit packages; validate API bodies with zod at the route boundary.
+5. **SSOT** — secrets in `.env` only; business constants in one file per domain (e.g. `plans.ts`).
+6. **Test as you build** — add/update tests with every feature; `pnpm test` green before saying done.
+7. **Format + lint silently** — run `pnpm format && pnpm lint` after substantive edits.
+8. **Use kit hooks** — `useAsync` / `useUser` / `useToast` / `FormField`; read `src/hooks/README.md`.
+9. **Keep functions small** (~5 lines) and props few (~5); split rather than grow.
+10. **Mobile-first web** — narrow layout first, then `md:`/`lg:`; preview at phone width (375px).
+
+Read `.vybekiit/platform-skills/code-hygiene-vybekiit.md`, `observability-vybekiit.md`, `testing-vybekiit.md`, `format-lint-vybekiit.md`, `react-patterns-vybekiit.md`, `responsive-vybekiit.md`, `env-secrets-vybekiit.md`, and `planning-vybekiit.md` (when running `plan-my-idea`) for details.
+
+### UI (professional & symmetric — you choose the source)
+
+- Pick blocks from `.vybekiit/agent/ui-sources.md` (shadcn, Magic UI, Kokonut, 21st.dev, etc.) — the builder never chooses.
+- **Always normalize** imports to `src/components/ui/*` and `@vybekiit/tokens` — matching button sizes, token colors, symmetric spacing.
+- Locked button/input sizes: `sm | default | lg | icon` only. No raw `<button>` for standard controls.
+- Read `.vybekiit/platform-skills/ui-consistency-vybekiit.md` before adding marketing or dashboard UI.
 
 ## Wire-up markers (how "finish setup" works)
 

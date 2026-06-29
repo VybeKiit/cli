@@ -1,0 +1,9 @@
+# Extended site documentation for AI crawlers
+
+This file expands on /llms.txt with more context for answer engines.
+
+## Product
+
+My App — built with VybeKiit. Replace this stub with your product summary, FAQs, and key pages.
+
+See also: /llms.txt

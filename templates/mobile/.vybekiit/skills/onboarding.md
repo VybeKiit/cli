@@ -12,11 +12,22 @@ translate every error · celebrate. Decide all technical choices yourself.
    Greet warmly. Ask: *"In one sentence, what do you want to build?"* Use their answer to tailor the
    home screen later — don't turn it into a technical interview.
 
+1b. **One-time planning offer** (skip if `.vybekiit/state/planning-intro-seen` exists).
+   Ask: *"Before we start building — want to **think it through together** first? I'll ask one question
+   at a time until we're totally aligned. Or we can jump straight to building."*
+   - **Yes** → run `plan-my-idea.md` with their one-sentence answer as seed; when done, continue to
+     step 2.
+   - **No** → continue to step 2.
+   Create `.vybekiit/state/planning-intro-seen` (any content) so this offer never repeats.
+
 2. **Set up the tools, then start the app.**
    First run `vybekiit doctor` — it installs the tools the app will need (including the ones that
    build and publish to the app stores) so the builder never configures anything. It may say a tool
    "isn't signed in yet" — that's fine for now; sign-in happens later, only when a step needs it.
    Then install the project's building blocks and start the app yourself, in plain words.
+   After dependencies install, run **quality smoke** yourself: `pnpm quality`. Confirm `.cursorignore`
+   hides `.env` (doctor checks this). Fix anything red before showing the preview code. The builder
+   hears: *"Everything checks out."*
    **Verify:** the app starts with no errors and shows a code (a square QR) to scan.
 
 3. **Get it onto their phone.**
@@ -36,6 +47,7 @@ translate every error · celebrate. Decide all technical choices yourself.
    - let people sign in → `connect-account`
    - take money → `setup-payments`
    - remember things → `save-data`
+   - save progress online → `back-up-my-code` (optional nudge after meaningful progress)
 
 ## If anything breaks
 

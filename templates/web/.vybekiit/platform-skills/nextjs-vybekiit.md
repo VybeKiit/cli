@@ -11,8 +11,9 @@
 
 - App Router under `app/`; API routes under `app/api/`
 - Use logical spacing (`ms-`, `me-`, `ps-`, `pe-`) for RTL — see `language.md`
-- UI primitives live in `src/components` (shadcn) — use `shadcn-vybekiit.md`
+- UI primitives live in `src/components` (shadcn) — use `shadcn-vybekiit.md` and `ui-consistency-vybekiit.md`
 - Business logic stays in `@vybekiit/*` packages, not reinvented in routes
+- Logging: `@/lib/logger` · errors: `@/lib/observability` · hygiene: `code-hygiene-vybekiit.md`
 
 ## Verify-before-advance
 

@@ -1,25 +1,21 @@
-/**
- * Marketing copy for the home screen, as data the screen renders via `.map`.
- *
- * Mirrors the web template's `FEATURES` array (which the web keeps inline in
- * `page.tsx`); here it lives in `data/` per the kit's "separate data from UI" rule
- * so the agent edits one array instead of screen JSX.
- */
-
-/** One feature highlight shown below the hero. */
-export interface Feature {
-  /** Short heading, e.g. "Payments built in". */
-  readonly title: string;
-  /** One-line supporting copy. */
-  readonly body: string;
+/** Feature highlight cards on the home screen — keys into `messages/en.json`. */
+export interface HomeFeature {
+  readonly titleKey: string;
+  readonly bodyKey: string;
 }
 
-/** The three feature highlights on the home screen — placeholder copy the agent reshapes. */
-export const FEATURES: readonly Feature[] = [
-  { title: 'Payments built in', body: 'Take money on day one — Lemon Squeezy, Stripe, or PayPal.' },
+/** The three feature highlights on the home screen. */
+export const HOME_FEATURES: readonly HomeFeature[] = [
   {
-    title: 'Your data, ready',
-    body: 'A database and sign-in wired up without the setup headache.',
+    titleKey: 'home.features.payments.title',
+    bodyKey: 'home.features.payments.body',
   },
-  { title: 'Live in minutes', body: 'Ship to the App Store and Play Store when you are ready.' },
+  {
+    titleKey: 'home.features.data.title',
+    bodyKey: 'home.features.data.body',
+  },
+  {
+    titleKey: 'home.features.deploy.title',
+    bodyKey: 'home.features.deploy.body',
+  },
 ];

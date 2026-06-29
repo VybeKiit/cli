@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { BetterAuthInstance } from '../src/providers/better-auth';
+import type { BetterAuthInstance } from '../src/providers/better-auth/index';
 import { resolveAuthProvider } from '../src/resolve';
 
 // Stub the Cognito client so resolving the cognito adapter never opens a real

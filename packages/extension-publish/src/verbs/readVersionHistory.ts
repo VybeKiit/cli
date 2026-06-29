@@ -39,7 +39,7 @@ export async function readVersionHistory(ctx: VerbContext): Promise<CwsVersionRo
 
     const groupId = await discoverDeveloperGroupId(session.page);
     await session.page.goto(packageUrl(groupId, ctx.extension.chromeWebStoreId));
-    await session.page.waitForTimeout(2_500);
+    await session.page.waitForTimeout(2500);
 
     const rows = (await session.page.evaluate(`(() => {
       const text = (el) => (el.innerText || el.textContent || '').trim().replace(/\\s+/g, ' ');

@@ -30,9 +30,11 @@ describe('resolveEmailProvider', () => {
     );
   });
 
-  it('throws not-implemented for the resend adapter', () => {
-    expect(() => resolveEmailProvider({ ...cloudflareEnv, EMAIL_PROVIDER: 'resend' })).toThrow(
-      /resend email adapter ships in a later step/,
-    );
+  it('constructs the resend adapter from its API key', () => {
+    const provider = resolveEmailProvider({
+      EMAIL_PROVIDER: 'resend',
+      RESEND_API_KEY: 're_test',
+    });
+    expect(provider.name).toBe('resend');
   });
 });

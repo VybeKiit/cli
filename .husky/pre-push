@@ -1,6 +1,7 @@
 # Maintainer-only guard. We have no branch protection (GitHub Pro/Team-gated on private repos),
-# so this hook is the stand-in: it mirrors CI exactly (lint → typecheck → test → build) and blocks
-# the push if any step fails. Turbo caches typecheck/test/build, so unchanged packages are near-instant.
+# so this hook is the stand-in: it mirrors CI exactly (lint → typecheck → test → build), syncs all
+# delivery mirrors (pin-platform-skills → pnpm mirror), and blocks the push if any step fails.
+# Turbo caches typecheck/test/build, so unchanged packages are near-instant.
 # Never shipped to a buyer's scaffolded repo — a blocking pre-push would trap a non-coder behind red.
 #
 # Gate ONLY pushes to the monorepo itself. `pnpm mirror` force-pushes derived subtree splits to the
@@ -17,3 +18,11 @@ case "$remote_url" in
 esac
 
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:scripts && pnpm build
+
+node scripts/pin-platform-skills.mjs
+# subtree split publishes committed history only — abort if pin left uncommitted changes
+if ! git diff --quiet; then
+  echo "pre-push: pin-platform-skills changed files — commit them, then push again." >&2
+  exit 1
+fi
+pnpm mirror

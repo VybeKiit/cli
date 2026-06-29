@@ -1,0 +1,15 @@
+---
+description: VybeKiit maintainer agent layer — read AGENTS.md
+globs: **/*
+alwaysApply: true
+---
+
+# VybeKiit maintainer agent layer
+
+Read and follow `./AGENTS.md` as the single source of truth for this monorepo. Read
+`CONTEXT.md` first for the blueprint, decisions, and domain language.
+
+For code-pattern checklists, see `.cursor/rules/patterns.mdc` — it summarizes AGENTS.md;
+do not treat it as a second source of truth.
+
+This file is only a pointer — do not duplicate rules here.

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMongoDataProvider } from '../src/providers/mongodb';
+import { createMongoDataProvider } from '../src/providers/mongodb/index';
 
 /**
  * Per-test handles to the mocked collection methods, so each case can stub a return

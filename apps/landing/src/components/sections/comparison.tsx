@@ -18,7 +18,7 @@ function CoverageCell({ value }: { value: Coverage }) {
   const { glyph, label, className } = COVERAGE_DISPLAY[value];
   return (
     <td className="px-4 py-3 text-center">
-      <span aria-hidden className={cn('text-base', className)}>
+      <span aria-hidden={true} className={cn('text-base', className)}>
         {glyph}
       </span>
       <span className="sr-only">{label}</span>

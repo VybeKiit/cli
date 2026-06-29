@@ -1,5 +1,5 @@
 import { type Mock, describe, expect, it, vi } from 'vitest';
-import { type AmplifyRunner, createAwsHosting } from '../src/providers/aws';
+import { type AmplifyRunner, createAwsHosting } from '../src/providers/aws/index';
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
 const hosting = { AWS_AMPLIFY_APP_ID: 'app123', AWS_AMPLIFY_BRANCH: 'main' };

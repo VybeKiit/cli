@@ -18,7 +18,7 @@ export default function CancelPage() {
         <p className="text-lg text-muted-foreground">
           No charge was made. Whenever you are ready, you can pick up right where you left off.
         </p>
-        <Button asChild size="lg">
+        <Button asChild={true} size="lg">
           <Link href="/checkout">Try again</Link>
         </Button>
       </section>

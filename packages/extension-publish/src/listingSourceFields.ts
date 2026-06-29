@@ -153,7 +153,7 @@ export async function applyRegions(page: Page, before: unknown, after: unknown):
   await page
     .getByRole('button', { name: 'Show more' })
     .first()
-    .click({ timeout: 1_500 })
+    .click({ timeout: 1500 })
     .catch(() => undefined);
 
   const idByLabel = (await page.evaluate(`(() => {
@@ -307,7 +307,7 @@ export async function readDataUseDisclosure(
   })()`)) as Record<string, boolean>;
 
   const allMissing = Object.values(DATA_USE_LABELS).every((label) => !(label in checkedByLabel));
-  if (allMissing) return undefined;
+  if (allMissing) return;
 
   const result = {} as DataUseDisclosure;
   for (const [field, label] of Object.entries(DATA_USE_LABELS) as [
@@ -613,6 +613,6 @@ async function setComboboxByLabel(page: Page, label: string, desired: unknown): 
   }
 
   const option = page.getByRole('option', { exact: true, name: target }).first();
-  await option.waitFor({ state: 'visible', timeout: 5_000 });
+  await option.waitFor({ state: 'visible', timeout: 5000 });
   await safeClick(option, 'updateListing');
 }

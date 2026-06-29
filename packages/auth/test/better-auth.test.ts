@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type BetterAuthInstance, createBetterAuthProvider } from '../src/providers/better-auth';
+import {
+  type BetterAuthInstance,
+  createBetterAuthProvider,
+} from '../src/providers/better-auth/index';
 
 /** The fixed set of `api` methods the adapter calls, each a `vi.fn` we drive per case. */
 type FakeApi = Record<keyof BetterAuthInstance['api'], ReturnType<typeof vi.fn>>;

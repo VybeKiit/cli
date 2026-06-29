@@ -69,9 +69,10 @@ export interface DataProvider {
 
 /**
  * The object-storage backends VybeKiit ships an adapter for, chosen via
- * `STORAGE_PROVIDER`. Supabase Storage is the default; `s3` ships later (ADR-0002).
+ * `STORAGE_PROVIDER`. Supabase Storage is the default; `r2` is the Cloudflare stack path;
+ * `s3` is the AWS opt-in adapter (ADR-0002).
  */
-export type StorageProviderName = 'supabase' | 's3';
+export type StorageProviderName = 'supabase' | 'r2' | 's3';
 
 /**
  * The swappable file-storage seam. `bucket` is the storage container (a Supabase

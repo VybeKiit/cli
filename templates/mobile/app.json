@@ -4,6 +4,12 @@
     "slug": "my-vybekiit-app",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
     "scheme": "myvybekiitapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -18,9 +24,13 @@
     "android": {
       "package": "com.example.myvybekiitapp",
       "versionCode": 1,
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0f172a"
+      }
     },
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", "expo-localization"],
     "experiments": {
       "typedRoutes": true
     },

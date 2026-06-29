@@ -13,28 +13,33 @@ account steps the stores legally require, one at a time.
 
 ## Steps
 
-1. **Confirm the app's identity.** Resolve the `TODO(vybekiit)` markers in `app.json`: a real app
+1. **Pre-flight (code readiness).** Run `check-safety` steps 3–4 (no debug console, kit logger, UI
+   consistency, no forbidden libs) and **quality smoke** (`pnpm quality`) before packaging. Fix
+   anything red before continuing.
+   **Verify:** code checks and quality smoke green.
+
+2. **Confirm the app's identity.** Resolve the `TODO(vybekiit)` markers in `app.json`: a real app
    **name**, a permanent **unique id** for each store (reverse-domain, e.g. `com.theirbrand.app`),
    and a tap-to-open address. Set the listing details in `launch.config.ts` (age rating, category,
    review contact). Decide sensible defaults; confirm the name with the builder.
    **Verify:** the app's identity is set and no `publish-app` markers remain (re-grep `TODO(vybekiit)`).
 
-2. **The one-time store accounts (they cost money — say so plainly).** Tell them, in plain words,
+3. **The one-time store accounts (they cost money — say so plainly).** Tell them, in plain words,
    that each store needs a paid developer account (Apple's is a yearly fee; Google's is a one-time
    fee) and walk them through creating each — **one step at a time**, where to tap. Then guide the
    one sign-in the build tool needs (a browser opens; they approve).
    **Verify:** both accounts exist and the tools report they're signed in (run `vybekiit doctor`).
 
-3. **Build the installable version.** Run the build yourself. Explain in one line: *"I'm packaging
+4. **Build the installable version.** Run the build yourself. Explain in one line: *"I'm packaging
    your app for the stores now — this runs in the cloud and can take a little while."*
    **Verify:** the build finishes green and an installable file is produced. If it fails, run `doctor`
    and read the one real cause — never paste the red log.
 
-4. **Submit to the stores.** Send the build in for review.
+5. **Submit to the stores.** Send the build in for review.
    **Verify:** each store confirms the submission was received. 🎉 *Celebrate this milestone* — it's
    submitted.
 
-5. **Set expectations on review.** Tell them plainly: the stores read every app before it goes
+6. **Set expectations on review.** Tell them plainly: the stores read every app before it goes
    public, which can take anywhere from a few hours to a few days — nothing is broken while they
    wait. Check the review state with `launch status` and report it in plain words; don't claim it's
    live until the store says so.

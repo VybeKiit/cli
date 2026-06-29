@@ -104,3 +104,21 @@ session closed that gap and reconciled the code with the prose above:
 it is the store, not OWNED scaffold payload. The platform-skills "skills-bag" (`pin-platform-skills.mjs`
 + `platform-skills.manifest.json`, ADR-0007) pins upstream skills *into* the templates before sync; it
 is not a separate delivery repo.
+
+## Update (2026-06-29) — pre-push primary, CI dispatch fallback
+
+Mirror sync triggers moved from CI push/release to the **maintainer pre-push hook** (after the
+quality gate). Rationale from `/grill-with-docs`:
+
+1. **Pre-push is the automatic path.** After lint → typecheck → test → build, the hook runs
+   `pin-platform-skills`, aborts if pin left uncommitted changes (subtree split uses commits only),
+   then `pnpm mirror` (all five repos, every monorepo push). Auth is the local `gh` credential
+   helper — no `GH_MIRROR_TOKEN` required on the maintainer machine.
+2. **CI push/release triggers removed.** The parallel `push:main` job raced with verify and could
+   publish to mirrors before CI failed; the maintainer always lands code via local `git push`, so
+   pre-push is authoritative.
+3. **`workflow_dispatch` kept as emergency fallback.** For `--no-verify`, a machine without husky,
+   or a failed mirror push — needs `GH_MIRROR_TOKEN` in GitHub Actions secrets.
+4. **Accepted trade-off:** mirrors update from local commits *before* the monorepo remote receives
+   the push. If the push fails after mirror succeeds, delivery mirrors can briefly lead GitHub
+   `main`. Chosen over CI-after-green for speed given the always-local-push maintainer workflow.

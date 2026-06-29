@@ -21,9 +21,11 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
    - **Backend address:** is `EXPO_PUBLIC_APP_URL` in `.env` present and pointing at the builder's
      **deployed** web app? A missing or wrong backend address is the #1 cause of sign-in / data /
      payment failures — the phone has nothing to talk to.
+   - **Secret settings redaction:** doctor verifies `.cursorignore` lists `.env` — follow
+     `env-secrets-vybekiit.md`; never read secret values aloud.
    - **App identity (for publishing):** is the app's unique id set in `app.json`? Blank or still the
      example id blocks a store build.
-   - **Code health:** run the tests. Read the first real error (not the noise).
+   - **Code health:** run `pnpm quality` (format, lint, typecheck, tests). Read the first real error (not the noise).
    - **Platform instructions stale?** If errors mention deprecated Expo or mobile patterns, run
      `update-kit` first — tell the builder *"I'll refresh my instructions first"* (never name Expo).
    - **Backend reachable:** for sign-in / data / payment trouble, confirm the backend itself works

@@ -15,10 +15,15 @@ import { DEFAULT_APP_URL } from './constants';
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
 type EnvSource = Record<string, string | undefined>;
 
+/** Minimum log level — optional override; {@link resolveDefaultLogLevel} applies when absent. */
+const logLevel = z.enum(['debug', 'info', 'warn', 'error', 'silent']);
+
 /** Core app settings — always available (both have safe defaults). */
 export const appConfigSchema = z.object({
   APP_URL: z.string().url().default(DEFAULT_APP_URL),
   NODE_ENV: z.enum(['development', 'production']).default('development'),
+  /** Agent-only advanced override — builder never sets this; defaults from `NODE_ENV`. */
+  LOG_LEVEL: logLevel.optional(),
 });
 
 /** An `on`/`off` env switch — the plain-language toggle a non-coder edits in `.env`. */
@@ -152,10 +157,11 @@ export const authConfigSchema = z.object({
 
 /**
  * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
- * Storage is the default; `s3` is an opt-in adapter shipping later (ADR-0002).
+ * Storage is the default; `r2` is the Cloudflare stack default once doctor provisions
+ * it; `s3` is an opt-in AWS adapter (ADR-0002).
  */
 export const storageConfigSchema = z.object({
-  STORAGE_PROVIDER: z.enum(['supabase', 's3']).default('supabase'),
+  STORAGE_PROVIDER: z.enum(['supabase', 'r2', 's3']).default('supabase'),
 });
 
 /**
@@ -217,6 +223,20 @@ export const awsConfigSchema = z.object({
 export const awsHostingConfigSchema = z.object({
   AWS_AMPLIFY_APP_ID: z.string().min(1).optional(),
   AWS_AMPLIFY_BRANCH: z.string().min(1).default('main'),
+});
+
+/**
+ * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and
+ * `@vybekiit/assets` (CDN delivery). Provisioned by `vybekiit doctor` on the default
+ * Cloudflare stack. `R2_PUBLIC_URL` is the public bucket origin (custom domain or
+ * r2.dev URL) used for readable object URLs and image transforms.
+ */
+export const r2ConfigSchema = z.object({
+  R2_ACCOUNT_ID: z.string().min(1, 'R2_ACCOUNT_ID is required'),
+  R2_BUCKET: z.string().min(1, 'R2_BUCKET is required'),
+  R2_ACCESS_KEY_ID: z.string().min(1, 'R2_ACCESS_KEY_ID is required'),
+  R2_SECRET_ACCESS_KEY: z.string().min(1, 'R2_SECRET_ACCESS_KEY is required'),
+  R2_PUBLIC_URL: z.string().url('R2_PUBLIC_URL must be a valid URL'),
 });
 
 /** Supabase credentials — used by `@vybekiit/db` (supabase adapter). */
@@ -299,7 +319,16 @@ export const vercelConfigSchema = z.object({
 export const githubGateConfigSchema = z.object({
   GITHUB_GATE_TOKEN: z.string().min(1, 'GITHUB_GATE_TOKEN is required'),
   GITHUB_GATE_ORG: z.string().min(1).default('VybeKiit'),
-  GITHUB_GATE_REPO: z.string().min(1).default('vybekiit'),
+  /** CSV of mirror repo names under {@link GITHUB_GATE_ORG} — ADR-0005 bundle invite. */
+  GITHUB_GATE_REPOS: z
+    .string()
+    .default('web,mobile,extension')
+    .transform((raw) =>
+      raw
+        .split(',')
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0),
+    ),
 });
 
 /**
@@ -315,6 +344,154 @@ export const storeConfigSchema = z.object({
   STORE_PRODUCT_ID: z.string().min(1, 'STORE_PRODUCT_ID is required'),
 });
 
+/**
+ * Which observability adapter `@vybekiit/observability` constructs. `local` is the
+ * no-op default (ADR-0008 pattern); `sentry` sends errors to Sentry when
+ * `SENTRY_DSN` is set. The agent's track-errors skill drives this — the builder
+ * never picks a name.
+ */
+export const observabilityConfigSchema = z.object({
+  OBSERVABILITY_PROVIDER: z.enum(['sentry', 'local']).default('local'),
+});
+
+/** Sentry credentials — used by `@vybekiit/observability` (sentry adapter). */
+export const sentryConfigSchema = z.object({
+  SENTRY_DSN: z.string().min(1).optional(),
+});
+
+/** Which background-jobs adapter `@vybekiit/jobs` constructs. */
+export const jobsConfigSchema = z.object({
+  JOBS_PROVIDER: z.enum(['cloudflare', 'trigger', 'qstash', 'local']).default('cloudflare'),
+});
+
+/** Cloudflare queue/cron bindings for `@vybekiit/jobs`. */
+export const cloudflareJobsConfigSchema = z.object({
+  CLOUDFLARE_QUEUE_NAME: z.string().min(1).optional(),
+  CLOUDFLARE_CRON_SECRET: z.string().min(1).optional(),
+});
+
+/** Which visitor-stats adapter `@vybekiit/analytics` constructs. */
+export const analyticsConfigSchema = z.object({
+  ANALYTICS_PROVIDER: z.enum(['plausible', 'posthog', 'local']).default('plausible'),
+});
+
+export const plausibleConfigSchema = z.object({
+  PLAUSIBLE_DOMAIN: z.string().min(1, 'PLAUSIBLE_DOMAIN is required'),
+  PLAUSIBLE_API_HOST: z.string().url().optional(),
+});
+
+export const posthogConfigSchema = z.object({
+  POSTHOG_API_KEY: z.string().min(1, 'POSTHOG_API_KEY is required'),
+  POSTHOG_HOST: z.string().url().optional(),
+});
+
+/** Which notifications adapter `@vybekiit/notifications` constructs. */
+export const notificationsConfigSchema = z.object({
+  NOTIFICATIONS_PROVIDER: z.enum(['expo', 'twilio', 'email', 'local']).default('expo'),
+});
+
+export const expoPushConfigSchema = z.object({
+  EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
+});
+
+export const twilioConfigSchema = z.object({
+  TWILIO_ACCOUNT_SID: z.string().min(1, 'TWILIO_ACCOUNT_SID is required'),
+  TWILIO_AUTH_TOKEN: z.string().min(1, 'TWILIO_AUTH_TOKEN is required'),
+  TWILIO_FROM_NUMBER: z.string().min(1, 'TWILIO_FROM_NUMBER is required'),
+});
+
+/** Which AI runtime adapter `@vybekiit/ai` constructs. */
+export const aiConfigSchema = z.object({
+  AI_PROVIDER: z.enum(['openai', 'anthropic', 'openrouter', 'local']).default('openai'),
+});
+
+export const openaiConfigSchema = z.object({
+  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+  OPENAI_MODEL: z.string().min(1).default('gpt-4o-mini'),
+});
+
+export const anthropicConfigSchema = z.object({
+  ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
+  ANTHROPIC_MODEL: z.string().min(1).default('claude-3-5-haiku-latest'),
+});
+
+export const openrouterConfigSchema = z.object({
+  OPENROUTER_API_KEY: z.string().min(1, 'OPENROUTER_API_KEY is required'),
+  OPENROUTER_MODEL: z.string().min(1).default('openai/gpt-4o-mini'),
+});
+
+/** Which search adapter `@vybekiit/search` constructs. */
+export const searchConfigSchema = z.object({
+  SEARCH_PROVIDER: z.enum(['supabase', 'typesense', 'algolia', 'local']).default('supabase'),
+});
+
+export const typesenseConfigSchema = z.object({
+  TYPESENSE_HOST: z.string().min(1, 'TYPESENSE_HOST is required'),
+  TYPESENSE_API_KEY: z.string().min(1, 'TYPESENSE_API_KEY is required'),
+});
+
+export const algoliaConfigSchema = z.object({
+  ALGOLIA_APP_ID: z.string().min(1, 'ALGOLIA_APP_ID is required'),
+  ALGOLIA_API_KEY: z.string().min(1, 'ALGOLIA_API_KEY is required'),
+  ALGOLIA_INDEX_NAME: z.string().min(1).default('default'),
+});
+
+/** Which live-update adapter `@vybekiit/realtime` constructs. */
+export const realtimeConfigSchema = z.object({
+  REALTIME_PROVIDER: z.enum(['supabase', 'cloudflare-do', 'local']).default('supabase'),
+});
+
+/** Which content adapter `@vybekiit/cms` constructs. */
+export const cmsConfigSchema = z.object({
+  CMS_PROVIDER: z.enum(['mdx', 'local']).default('mdx'),
+});
+
+export const mdxCmsConfigSchema = z.object({
+  CMS_CONTENT_DIR: z.string().min(1).default('content'),
+});
+
+/** Compliance / cookie consent — `@vybekiit/compliance`. */
+export const complianceConfigSchema = z.object({
+  COMPLIANCE_PROVIDER: z.enum(['local']).default('local'),
+  COOKIE_CONSENT_ENABLED: z.enum(['on', 'off']).default('on'),
+});
+
+/** SEO helpers — `@vybekiit/seo`. */
+export const seoConfigSchema = z.object({
+  SEO_PROVIDER: z.enum(['local']).default('local'),
+});
+
+/** Team workspaces — `@vybekiit/tenancy`. */
+export const tenancyConfigSchema = z.object({
+  TENANCY_PROVIDER: z.enum(['better-auth', 'local']).default('better-auth'),
+});
+
+/** Fast storage — `@vybekiit/kv`. */
+export const kvConfigSchema = z.object({
+  KV_PROVIDER: z.enum(['cloudflare', 'upstash', 'local']).default('cloudflare'),
+});
+
+export const upstashKvConfigSchema = z.object({
+  UPSTASH_KV_REST_URL: z.string().url('UPSTASH_KV_REST_URL must be a valid URL'),
+  UPSTASH_KV_REST_TOKEN: z.string().min(1, 'UPSTASH_KV_REST_TOKEN is required'),
+});
+
+export const cloudflareKvConfigSchema = z.object({
+  CLOUDFLARE_KV_NAMESPACE_ID: z.string().min(1).optional(),
+});
+
+/** Message catalogs — `@vybekiit/i18n`. */
+export const i18nConfigSchema = z.object({
+  I18N_PROVIDER: z.enum(['local']).default('local'),
+  DEFAULT_LOCALE: z.string().min(1).default('en'),
+  MESSAGES_DIR: z.string().min(1).default('messages'),
+});
+
+/** Resend transactional email — `@vybekiit/email` (resend adapter). */
+export const resendConfigSchema = z.object({
+  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
+});
+
 export type AppConfig = z.infer<typeof appConfigSchema>;
 export type SecurityConfig = z.infer<typeof securityConfigSchema>;
 export type GoogleOAuthConfig = z.infer<typeof googleOAuthConfigSchema>;
@@ -322,6 +499,7 @@ export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
 export type DataConfig = z.infer<typeof dataConfigSchema>;
 export type AuthConfig = z.infer<typeof authConfigSchema>;
 export type StorageConfig = z.infer<typeof storageConfigSchema>;
+export type R2Config = z.infer<typeof r2ConfigSchema>;
 export type HostingConfig = z.infer<typeof hostingConfigSchema>;
 export type EmailConfig = z.infer<typeof emailConfigSchema>;
 export type LemonSqueezyConfig = z.infer<typeof lemonSqueezyConfigSchema>;
@@ -337,6 +515,34 @@ export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
 export type VercelConfig = z.infer<typeof vercelConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
 export type StoreConfig = z.infer<typeof storeConfigSchema>;
+export type ObservabilityConfig = z.infer<typeof observabilityConfigSchema>;
+export type SentryConfig = z.infer<typeof sentryConfigSchema>;
+export type JobsConfig = z.infer<typeof jobsConfigSchema>;
+export type CloudflareJobsConfig = z.infer<typeof cloudflareJobsConfigSchema>;
+export type AnalyticsConfig = z.infer<typeof analyticsConfigSchema>;
+export type PlausibleConfig = z.infer<typeof plausibleConfigSchema>;
+export type PosthogConfig = z.infer<typeof posthogConfigSchema>;
+export type NotificationsConfig = z.infer<typeof notificationsConfigSchema>;
+export type ExpoPushConfig = z.infer<typeof expoPushConfigSchema>;
+export type TwilioConfig = z.infer<typeof twilioConfigSchema>;
+export type AiConfig = z.infer<typeof aiConfigSchema>;
+export type OpenaiConfig = z.infer<typeof openaiConfigSchema>;
+export type AnthropicConfig = z.infer<typeof anthropicConfigSchema>;
+export type OpenrouterConfig = z.infer<typeof openrouterConfigSchema>;
+export type SearchConfig = z.infer<typeof searchConfigSchema>;
+export type TypesenseConfig = z.infer<typeof typesenseConfigSchema>;
+export type AlgoliaConfig = z.infer<typeof algoliaConfigSchema>;
+export type RealtimeConfig = z.infer<typeof realtimeConfigSchema>;
+export type CmsConfig = z.infer<typeof cmsConfigSchema>;
+export type MdxCmsConfig = z.infer<typeof mdxCmsConfigSchema>;
+export type ComplianceConfig = z.infer<typeof complianceConfigSchema>;
+export type SeoConfig = z.infer<typeof seoConfigSchema>;
+export type TenancyConfig = z.infer<typeof tenancyConfigSchema>;
+export type KvConfig = z.infer<typeof kvConfigSchema>;
+export type UpstashKvConfig = z.infer<typeof upstashKvConfigSchema>;
+export type CloudflareKvConfig = z.infer<typeof cloudflareKvConfigSchema>;
+export type I18nConfig = z.infer<typeof i18nConfigSchema>;
+export type ResendConfig = z.infer<typeof resendConfigSchema>;
 
 /**
  * Parse + validate one config slice from the environment, failing loud.

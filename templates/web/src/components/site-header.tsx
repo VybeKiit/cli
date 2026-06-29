@@ -1,14 +1,19 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { HEADER_LINKS } from '@/data/nav';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 /** Top navigation for marketing pages. Logical spacing mirrors under RTL. */
 export function SiteHeader() {
+  const t = useTranslations();
+
   return (
     <header className="border-b">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <Link href="/" className="font-semibold text-lg">
-          My App
+          {t('common.productName')}
         </Link>
         <div className="flex items-center gap-4 text-sm">
           {HEADER_LINKS.map((link) => (
@@ -17,11 +22,11 @@ export function SiteHeader() {
               href={link.href}
               className="text-muted-foreground hover:text-foreground"
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
-          <Button asChild size="sm">
-            <Link href="/login">Sign in</Link>
+          <Button asChild={true} size="sm">
+            <Link href="/login">{t('common.nav.signIn')}</Link>
           </Button>
         </div>
       </nav>

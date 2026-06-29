@@ -6,9 +6,9 @@ import {
   mongoConfigSchema,
   parseEnv,
 } from '@vybekiit/core';
-import { type BetterAuthInstance, createBetterAuthProvider } from './providers/better-auth';
-import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito';
-import { createLocalAuthProvider } from './providers/local';
+import { type BetterAuthInstance, createBetterAuthProvider } from './providers/better-auth/index';
+import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito/index';
+import { createLocalAuthProvider } from './providers/local/index';
 import type { AuthProvider } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */

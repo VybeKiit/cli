@@ -6,9 +6,8 @@
 translate every error · celebrate. You wire sending; the builder describes when people should hear
 from the app.
 
-> (Under the hood — agent-only) Email notifications via `@vybekiit/email` → `resolveEmailProvider()`.
-> Run `setup-email` first if email is not wired. Follow the matching email platform wrapper when
-> `EMAIL_PROVIDER` is set.
+> (Under the hood — agent-only) Notifications via `@vybekiit/notifications` → `resolveNotificationsProvider()`
+> (`src/lib/notifications-client.ts`). Email channel still needs `setup-email` first.
 
 ## Steps
 

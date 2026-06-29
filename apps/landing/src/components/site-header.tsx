@@ -20,7 +20,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          <Button asChild size="sm">
+          <Button asChild={true} size="sm">
             <Link href="/checkout">Get it</Link>
           </Button>
         </div>

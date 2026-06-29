@@ -1,70 +1,59 @@
 /**
- * Legal copy for the Terms and Privacy pages, as data the page renders via `.map`.
+ * Legal section keys for Terms and Privacy pages.
  *
- * Why it lives here: the agent (and the builder) edit one array of sections instead
- * of hand-editing JSX on each page. The copy is a plain-language *skeleton* with
- * placeholders ([Your Product], [Your Company], [your-email@example.com]) the agent
- * fills from the builder's details — a human should review before launch (this is
- * not legal advice). The page keeps the date + intro markers; only the sections move
- * here.
+ * Copy lives in `messages/en.json`; pages resolve headings and bodies with `t()`.
  */
 
-/**
- * One numbered section on a legal page: a heading and a paragraph of body copy.
- * `heading` already includes its number (e.g. "1. Agreement to terms") so the page
- * renders it verbatim.
- */
+/** One numbered section on a legal page. */
 export interface LegalSection {
-  /** Section heading, including its leading number. */
-  readonly heading: string;
-  /** Plain-language paragraph shown under the heading. */
-  readonly body: string;
+  readonly headingKey: string;
+  readonly bodyKey: string;
 }
 
 /** Terms of Service sections, in display order. */
 export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
-    heading: '1. Agreement to terms',
-    body: 'By using [Your Product], you agree to these terms. If you do not agree, please do not use the service.',
+    headingKey: 'legal.terms.sections.agreement.heading',
+    bodyKey: 'legal.terms.sections.agreement.body',
   },
   {
-    heading: '2. Using the service',
-    body: 'You may use [Your Product] only as permitted by law and these terms. You are responsible for the activity in your account and for keeping your sign-in details secure.',
+    headingKey: 'legal.terms.sections.using.heading',
+    bodyKey: 'legal.terms.sections.using.body',
   },
   {
-    heading: '3. Payments',
-    body: 'Paid plans are billed in advance and are non-refundable except where required by law or stated otherwise. Prices may change with notice.',
+    headingKey: 'legal.terms.sections.payments.heading',
+    bodyKey: 'legal.terms.sections.payments.body',
   },
   {
-    heading: '4. Liability',
-    body: 'The service is provided "as is" without warranties. To the extent permitted by law, [Your Company] is not liable for indirect or incidental damages arising from your use.',
+    headingKey: 'legal.terms.sections.liability.heading',
+    bodyKey: 'legal.terms.sections.liability.body',
   },
   {
-    heading: '5. Contact',
-    body: 'Questions about these terms? Email [your-email@example.com].',
+    headingKey: 'legal.terms.sections.contact.heading',
+    bodyKey: 'legal.terms.sections.contact.body',
   },
 ];
 
 /** Privacy Policy sections, in display order. */
 export const PRIVACY_SECTIONS: readonly LegalSection[] = [
   {
-    heading: '1. What we collect',
-    body: 'We collect the information you give us (such as your email when you sign up) and basic usage data needed to run [Your Product].',
+    headingKey: 'legal.privacy.sections.collect.heading',
+    bodyKey: 'legal.privacy.sections.collect.body',
   },
   {
-    heading: '2. How we use it',
-    body: 'We use your information to provide the service, process payments, and keep your account secure. We do not sell your personal data.',
+    headingKey: 'legal.privacy.sections.use.heading',
+    bodyKey: 'legal.privacy.sections.use.body',
   },
   {
-    heading: '3. Sharing',
-    body: 'We share data only with the providers that run the service (for example, hosting, database, and payments) and only as needed to operate [Your Product].',
+    headingKey: 'legal.privacy.sections.sharing.heading',
+    bodyKey: 'legal.privacy.sections.sharing.body',
   },
   {
-    heading: '4. Your choices',
-    body: 'You can ask us to access or delete your information at any time by contacting us.',
+    headingKey: 'legal.privacy.sections.choices.heading',
+    bodyKey: 'legal.privacy.sections.choices.body',
   },
   {
-    heading: '5. Contact',
-    body: 'Questions about your privacy? Email [your-email@example.com].',
+    headingKey: 'legal.privacy.sections.contact.heading',
+    bodyKey: 'legal.privacy.sections.contact.body',
   },
 ];

@@ -11,11 +11,11 @@ export {
   type CloudflareDeployAction,
   type CloudflareRunResult,
   type CloudflareRunner,
-} from './providers/cloudflare';
+} from './providers/cloudflare/index';
 export {
   createVercelHosting,
   type VercelDeployAction,
   type VercelRunResult,
   type VercelRunner,
-} from './providers/vercel';
-export { createAwsHosting, type AmplifyRunner } from './providers/aws';
+} from './providers/vercel/index';
+export { createAwsHosting, type AmplifyRunner } from './providers/aws/index';

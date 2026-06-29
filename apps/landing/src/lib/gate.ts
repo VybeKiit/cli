@@ -4,14 +4,8 @@ import { GITHUB_API_BASE, type GithubGateConfig, type Result, fail, ok } from '@
  * "The gate" — VybeKiit's single paid wall (see CONTEXT.md → Distribution).
  *
  * A paid Lemon Squeezy order invites the buyer's GitHub account to the private
- * product repo; a refund removes it. This is *our* store's logic, not part of the
- * buyer template (a buyer fulfills orders for their own product instead). Server-
- * only — the gate token must never reach the browser.
- *
- * NOTE (ADR-0005, issue #4): the live gate invites to the per-template *mirrors*
- * (`web` + `mobile` + `extension`, one bundle), not a single repo. That multi-repo
- * wiring lands with the live webhook secrets under issue #4; this PR keeps the
- * single-repo gate model unchanged.
+ * template mirror repos; a refund removes access from each. Server-only — the gate
+ * token must never reach the browser.
  */
 
 function gateHeaders(config: GithubGateConfig): HeadersInit {
@@ -22,18 +16,18 @@ function gateHeaders(config: GithubGateConfig): HeadersInit {
   };
 }
 
-function collaboratorUrl(config: GithubGateConfig, username: string): string {
-  return `${GITHUB_API_BASE}/repos/${config.GITHUB_GATE_ORG}/${config.GITHUB_GATE_REPO}/collaborators/${username}`;
+function collaboratorUrl(config: GithubGateConfig, repo: string, username: string): string {
+  return `${GITHUB_API_BASE}/repos/${config.GITHUB_GATE_ORG}/${repo}/collaborators/${username}`;
 }
 
-/** Invite a buyer to the private repo (idempotent — re-inviting is harmless). */
-export async function inviteToRepo(
+async function inviteOneRepo(
   config: GithubGateConfig,
+  repo: string,
   username: string,
 ): Promise<Result<true>> {
   let response: Response;
   try {
-    response = await fetch(collaboratorUrl(config, username), {
+    response = await fetch(collaboratorUrl(config, repo, username), {
       method: 'PUT',
       headers: gateHeaders(config),
       body: JSON.stringify({ permission: 'pull' }),
@@ -43,19 +37,21 @@ export async function inviteToRepo(
     return fail('network_error', `Could not reach GitHub: ${detail}`);
   }
 
-  // 201 = invitation created, 204 = already a collaborator.
   if (response.status === 201 || response.status === 204) return ok(true);
-  return fail('invite_failed', `GitHub returned ${response.status} inviting ${username}.`);
+  return fail(
+    'invite_failed',
+    `GitHub returned ${response.status} inviting ${username} to ${repo}.`,
+  );
 }
 
-/** Revoke access on refund. */
-export async function removeFromRepo(
+async function removeOneRepo(
   config: GithubGateConfig,
+  repo: string,
   username: string,
 ): Promise<Result<true>> {
   let response: Response;
   try {
-    response = await fetch(collaboratorUrl(config, username), {
+    response = await fetch(collaboratorUrl(config, repo, username), {
       method: 'DELETE',
       headers: gateHeaders(config),
     });
@@ -65,5 +61,40 @@ export async function removeFromRepo(
   }
 
   if (response.status === 204) return ok(true);
-  return fail('remove_failed', `GitHub returned ${response.status} removing ${username}.`);
+  return fail(
+    'remove_failed',
+    `GitHub returned ${response.status} removing ${username} from ${repo}.`,
+  );
+}
+
+/** Invite a buyer to every configured mirror repo (idempotent per repo). */
+export async function inviteToRepo(
+  config: GithubGateConfig,
+  username: string,
+): Promise<Result<true>> {
+  const failures: string[] = [];
+  for (const repo of config.GITHUB_GATE_REPOS) {
+    const result = await inviteOneRepo(config, repo, username);
+    if (!result.ok) failures.push(result.error.message);
+  }
+  if (failures.length > 0) {
+    return fail('invite_failed', failures.join('; '));
+  }
+  return ok(true);
+}
+
+/** Revoke access on refund from every configured mirror repo. */
+export async function removeFromRepo(
+  config: GithubGateConfig,
+  username: string,
+): Promise<Result<true>> {
+  const failures: string[] = [];
+  for (const repo of config.GITHUB_GATE_REPOS) {
+    const result = await removeOneRepo(config, repo, username);
+    if (!result.ok) failures.push(result.error.message);
+  }
+  if (failures.length > 0) {
+    return fail('remove_failed', failures.join('; '));
+  }
+  return ok(true);
 }

@@ -32,7 +32,25 @@ API route classified correctly. Output a plain pass/fail summary for the builder
 5. **Edge (at go-live).** Confirm `infra/cloudflare/` edge worker uses the same `SECURITY_*` toggles.
    **Verify:** dual-layer protection documented in go-live.
 
+6. **Code readiness (agent-only checks).** Run silently; summarize in plain English:
+   - `node scripts/check-no-console.mjs` — no debug `console.log` in `app/` or `src/`
+   - Scan `src/lib/` for duplicate exported function names; merge duplicates
+   - Spot-check API routes use `@/lib/logger` instead of bare console
+   - If going live with alerts: when `OBSERVABILITY_PROVIDER=sentry`, confirm `SENTRY_DSN` is set
+   **Verify:** tell the builder *"Your app is quiet in production and uses one place for each kind of logic."*
+
+7. **UI consistency (agent-only).** Grep checks:
+   - Raw `<button` / `<input` outside `src/components/ui/` → fix to kit primitives
+   - Forbidden UI libs (`@mui/`, `@chakra-ui/`, `antd`, `nativewind`) → must be empty
+   - Arbitrary Tailwind `h-[`, `w-[`, `gap-[`, `mt-[` in `app/` → review and normalize
+   **Verify:** tell the builder *"Your app's buttons, spacing, and colors all match — it looks like one professional product."*
+
+8. **Quality smoke (soft).** Run `pnpm quality` — format, lint, typecheck, and tests. Report pass/fail
+   in plain English. On warn-only Biome issues: fix obvious ones; do not block ship on style warnings
+   unless egregious.
+   **Verify:** tell the builder *"Your app is tested and tidy."*
+
 ## Definition of done
 
-Plain-language summary: login protected, contact works, webhooks verified, database safe, doctor green.
-🎉 *Celebrate* when all layers pass.
+Plain-language summary: login protected, contact works, webhooks verified, database safe, code quiet in
+production, UI consistent, tests and lint green, doctor green. 🎉 *Celebrate* when all layers pass.

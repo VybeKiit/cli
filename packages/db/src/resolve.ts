@@ -3,14 +3,19 @@ import {
   dataConfigSchema,
   mongoConfigSchema,
   parseEnv,
+  r2ConfigSchema,
   storageConfigSchema,
   supabaseConfigSchema,
 } from '@vybekiit/core';
-import { createAwsDataProvider } from './providers/aws';
-import { createLocalDataProvider } from './providers/local';
-import { createMongoDataProvider } from './providers/mongodb';
-import { createS3StorageProvider } from './providers/s3';
-import { createSupabaseDataProvider, createSupabaseStorageProvider } from './providers/supabase';
+import { createAwsDataProvider } from './providers/aws/index';
+import { createLocalDataProvider } from './providers/local/index';
+import { createMongoDataProvider } from './providers/mongodb/index';
+import { createR2StorageProvider } from './providers/r2/index';
+import { createS3StorageProvider } from './providers/s3/index';
+import {
+  createSupabaseDataProvider,
+  createSupabaseStorageProvider,
+} from './providers/supabase/index';
 import type { DataProvider, StorageProvider } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
@@ -79,6 +84,8 @@ export function resolveStorageProvider(env: EnvSource = process.env): StoragePro
   switch (STORAGE_PROVIDER) {
     case 's3':
       return createS3StorageProvider(parseEnv(awsConfigSchema, env));
+    case 'r2':
+      return createR2StorageProvider(parseEnv(r2ConfigSchema, env));
     default:
       return createSupabaseStorageProvider(parseEnv(supabaseConfigSchema, env));
   }

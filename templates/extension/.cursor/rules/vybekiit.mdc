@@ -7,3 +7,5 @@ alwaysApply: true
 # VybeKiit agent layer
 
 Read and follow `./AGENTS.md` as the single source of truth for this project.
+
+Treat `.env` as redacted — never reproduce secret values from it in chat or commits.

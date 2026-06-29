@@ -5,8 +5,20 @@
 > this file is the why and the shape. Authored from a `/grill-me` session on 2026-06-27,
 > extended by `/grill-with-docs` sessions the same day (see "Agentic toolchain & dev workflow"
 > and the multi-provider widening below).
-> **Status: v1.0 scaffold built + green + pushed; widening to multi-provider adapters + mobile
-> parity (grill 2026-06-27); building out the web tracer bullet.**
+> **Status: v1.0 scaffold built + green + pushed; templates-first production readiness
+> shipped (expanded shadcn kit, dashboard guard, practice checkout, mobile parity,
+> extension WXT scaffold). Money pipeline (#4–#8) and npm publish (#17) remain parked.**
+
+## Template production readiness scorecard (2026-06-29)
+
+| Area | Web | Mobile | Extension |
+|---|---|---|---|
+| UI kit | 15 shadcn primitives + Sonner | StyleSheet ports of new primitives | WXT popup: Button, Input, Card, Alert |
+| Marketing / auth UX | Normalized hero, legal defaults | Hero + feature cards | Popup + backend URL |
+| Signed-in guard | `useUser` dashboard layout | Dashboard redirect | N/A (calls web backend) |
+| Practice checkout | Local `/checkout/practice` + fulfillment | `billing-client` → web `/api/checkout` | N/A |
+| Quality gate | vitest + Playwright smoke | vitest + typecheck | build + typecheck + vitest |
+| Open issues | **#6 closed** (screens) | — | **#20 scaffold shipped** (store publish still skill-driven) |
 
 ---
 
@@ -60,6 +72,21 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  │                          StorageProvider {supabase/R2,s3} — provider-agnostic (ADR-0002)
 │  ├─ deploy/                 NEW · one Hosting interface · providers/{cloudflare,vercel,aws}
 │  │                          — hosting/deploy behind one contract (ADR-0002/0006)
+│  ├─ assets/                 NEW · AssetDeliveryProvider — build-time optimize + CDN URLs
+│  │                          derived from HOSTING + STORAGE (ADR-0010)
+│  ├─ analytics/             visitor stats — Plausible default (ADR-0012)
+│  ├─ jobs/                  background jobs — Cloudflare Cron/Queues default
+│  ├─ notifications/         push/SMS/email alerts — Expo default
+│  ├─ ai/                    runtime LLM — OpenAI default
+│  ├─ search/                full-text search — Supabase default
+│  ├─ realtime/              live channels — Supabase default
+│  ├─ cms/                   MDX content pages
+│  ├─ compliance/            cookie consent + export hooks
+│  ├─ seo/                   sitemap, robots, metadata
+│  ├─ tenancy/               team workspaces — better-auth + db
+│  ├─ kv/                    fast KV — Cloudflare default
+│  ├─ i18n/                   shared locale + catalog loader
+│  ├─ observability/          NEW · one ObservabilityProvider · sentry + local no-op default
 │  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
 │  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
 │  ├─ extension-publish/      Playwright Chrome-Web-Store automation (publish/submit extensions
@@ -72,7 +99,7 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
 │  ├─ mobile/                 Expo + plain StyleSheet primitives + shared tokens (NativeWind
 │  │                          dropped) — full web parity                     ← pulled forward
-│  └─ extension/              WXT + shadcn                                    ← v3
+│  └─ extension/              WXT + shadcn popup scaffold + agent layer       ← v3
 ├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages ·
 │                             ships from the monorepo, NOT a delivery mirror (ADR-0005)
 ├─ cli/                       npx vybekiit — clones a template mirror into the buyer's repo · itself
@@ -103,10 +130,13 @@ See ADR-0002/0003/0004.
 | Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · vercel · aws (Amplify/SST) | Vercel is opt-in (ADR-0006); AWS never the default — ADR-0002 |
 | Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
 | Auth | `@vybekiit/auth` (`AuthProvider`): **better-auth⭐** bound to the chosen DB (Postgres/Mongo) · Cognito for AWS | "auth = Supabase-only" — new DB adapters have no built-in auth — ADR-0003 |
-| Storage | `StorageProvider`: **supabase/R2⭐** · s3 | — same one-interface pattern (in `@vybekiit/db` or its own pkg) |
+| Storage | `StorageProvider`: **supabase/R2⭐** · s3 | R2 implemented; doctor provisions on CF stack (ADR-0010) |
+| Asset delivery | `@vybekiit/assets`: hybrid build optimize + CDN URLs · derived from hosting+storage | — ADR-0010 |
 | Email | `@vybekiit/email` (`EmailProvider`): **cloudflare⭐** · ses · resend | AWS SES now an adapter (was sandbox-approval pain); Resend an adapter (was fallback) |
 | Payments | `@vybekiit/payments` (`PaymentProvider`): **lemon-squeezy⭐** · stripe · paypal | LS is Merchant-of-Record → handles tax/VAT (the scary part) |
 | Design tokens | `@vybekiit/tokens`: one shared map (colors/spacing/radius/type) — web as CSS vars, mobile as `StyleSheet` | — DRY look across web + mobile — ADR-0004 |
+| Observability | `@vybekiit/observability` (`ObservabilityProvider`): **local⭐** (no-op) · sentry | `@vybekiit/core` `createLogger` — dev verbose, production silent |
+| Web UI blocks | shadcn/ui + shadcn-compatible registries (Magic UI, Kokonut, 21st.dev, …) | Agent picks from `.vybekiit/agent/ui-sources.md`; normalize to kit primitives |
 
 ## The agent layer (the actual product)
 
@@ -126,25 +156,31 @@ See ADR-0002/0003/0004.
   "save my data" wires whichever DB the builder uses; the vibe coder never hears "MongoDB" or "AWS".
   - **Tier 1** (agent would botch without these): `onboarding` · `go-live` · `setup-payments` ·
     `update-kit` · `doctor`
-  - **Tier 2**: `add-signin` · `save-data` · `add-files` · `buy-domain` · `setup-email`
-  - **Not skills** (agent + AGENTS.md handle them): generic coding, design tweaks, CRUD.
+  - **Tier 2**: `add-signin` · `save-data` · `add-files` · `add-images` · `buy-domain` · `setup-email`
+  - **Not skills** (agent + AGENTS.md handle them): generic coding, design tweaks, CRUD — guarded
+    invisibly by **code hygiene guardrails** (DRY, check-before-create, kit logger, UI consistency).
   - **Adding a provider never adds a skill — skills are written once against the interface.** A new
-    adapter (Mongo, AWS, SES, S3, Cognito) is wiring behind the same goal-named skill, not a new one.
+    adapter (Mongo, AWS, SES, S3, Cognito, Sentry) is wiring behind the same goal-named skill, not a new one.
+- **AI agent anti-patterns (prevented invisibly):** duplicate helpers, bare `console.log` in production,
+  phantom validation, mismatched UI from random block libraries, no SSOT for lib files, untested features,
+  hand-rolled fetch state. Layer B skills (`code-hygiene-vybekiit`, `observability-vybekiit`,
+  `ui-consistency-vybekiit`, `testing-vybekiit`, `format-lint-vybekiit`, `react-patterns-vybekiit`,
+  `responsive-vybekiit`) + `check-safety` / `go-live` ship gates enforce these — the builder never hears the jargon.
 - **Keystone:** `onboarding` ends with the buyer's app **LIVE** in session #1. That "aha" kills
   refund-regret and is also the marketing demo.
 
 ## Quality
 
 Agent writes **tests-first** (that loop is the real "no bugs" gate, and what makes `update-kit`
-safe). Pre-commit is **lenient** (format + lint only — never traps a buyer behind red). The heavy
-gate (full tests + typecheck) runs in **CI**, where a failure is a check the *agent* fixes, not a
-wall the *buyer* hits.
-
-In the **maintainer monorepo only**, a husky **pre-push** mirrors CI exactly (lint → typecheck →
-test → build) — it's our stand-in for branch protection (unavailable on the free GitHub plan) and
-the guard that keeps `main` green when we land via tiny squash-PRs. It is **never** shipped to a
-buyer's scaffolded repo (a blocking pre-push would re-create the refund-trap CI was designed to
-avoid). TypeScript is **max-strict everywhere** (`exactOptionalPropertyTypes`, `noImplicitReturns`,
+safe). Buyer templates ship **Biome** (warn mode for style rules like function length); the agent runs
+the **quality smoke** loop (`pnpm quality`) after edits and at onboarding. Buyer repos also ship an
+**agent-only pre-push** hook (same `pnpm quality` gate) and **online checker** (GitHub Actions on
+ubuntu/macOS/Windows) — the vibe coder never runs `git push`; only the agent does, so these gates
+catch problems before code lands without trapping the builder. **Pre-commit stays off** in buyer repos
+(lenient local commits). In the **maintainer monorepo**, husky **pre-push** mirrors the full monorepo
+gate (lint → typecheck → test → build) and syncs all delivery mirrors — separate from the slimmer
+buyer hook. TypeScript is **max-strict everywhere**
+(`exactOptionalPropertyTypes`, `noImplicitReturns`,
 `noUncheckedSideEffectImports` on top of `strict` + `noUncheckedIndexedAccess`); Biome owns
 unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 
@@ -159,7 +195,8 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   source path (one-way subtree split). There are **five**: the three template mirrors
   (`web`/`mobile`/`extension` ← `templates/<name>`, private), `cli` (← root `cli/`, **public** — it
   ships on npm anyway, carries no templates or secrets), and `infra` (← `infra/`, private, **dormant**
-  until issue #7 creates its source). Sync fires on push-to-`main` (paths-filtered) and on release.
+  until issue #7 creates its source). **Mirror sync** runs in the maintainer pre-push hook on every
+  local push; GitHub Actions `workflow_dispatch` is the manual fallback (ADR-0005).
   `npx vybekiit <name>` clones the matching template mirror with the buyer's `gh` device-flow login
   (so the proprietary OWNED code never ships inside the public npm package — the gate holds). The
   scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition to npm version
@@ -248,9 +285,20 @@ that the CLIs it needs are actually present and usable — the buyer never confi
 
 ## Localization & RTL
 
-Docs/marketing are **English-only**. The in-product *experience* is auto-localized for free
-(agents are multilingual). The **web template is RTL-ready from v1** — CSS logical properties
-(`ms-/me-/ps-/pe-/start-/end-`, `rtl:` variants) + end-user locale auto-detect → `dir="rtl"`.
+Docs/marketing are **English-only**. The in-product *experience* uses **structured i18n from day
+one** — every user-facing string lives in a **message catalog** (flat-dotted keys → strings), not
+inline in JSX.
+
+- **Message catalog** — JSON file of keys → strings; sole source of user-facing copy.
+- **Locale** — language tag (e.g. `en`, `he`); drives both translations and RTL layout.
+- **Default locale** — `en` shipped in every template; other locales added via the `add-language`
+  buyer skill.
+- **Auto-localized** — agents add locales by duplicating the catalog and filling translations in
+  one shot (not by writing copy inline in components).
+
+Platform-native stacks: **next-intl** (web), **expo-localization + i18n-js** (mobile), **Chrome
+`_locales/`** (extension). RTL is derived from the **active locale** — CSS logical properties
+(`ms-/me-/ps-/pe-/start-/end-`, `rtl:` variants) on web/extension; `I18nManager` on mobile.
 Near-free if done from the first commit, brutal to retrofit. Dev-environment RTL
 (VSCode/Cursor/terminal bidi) is **guidance only** in `BUILDER-VOICE.md` — it cannot be shipped as a
 plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
@@ -297,9 +345,9 @@ Path: `templates/{web,mobile,extension}/.vybekiit/skills/<goal>.md`
 
 | Template | Written | Missing / notes |
 |---|---|---|
-| **Web** | 13/13 (`onboarding`, `setup-payments`, `go-live`, `doctor`, `update-kit`, `add-signin`, `save-data`, `add-files`, `setup-email`, `buy-domain`, `add-teams`, `add-notifications`, `add-analytics`) | `go-live` routes Vercel when `HOSTING_PROVIDER=vercel` (ADR-0006); `update-kit` runs three channels (ADR-0007) |
-| **Mobile** | 10/10 (+ `add-teams`, `add-notifications`, `add-analytics` defer to web backend) | No `add-files` / `setup-email` / `buy-domain` (backend-only) |
-| **Extension (v3)** | 10/10 (+ tier-2 defer-to-backend variants) | WXT scaffold v3; extension `BUILDER-VOICE.md` at full parity |
+| **Web** | 19/19 (+ `plan-my-idea`, `harden`, `check-safety`, `sign-in-with-google`, `track-errors`, `back-up-my-code`) | `go-live` pre-flight runs code/UI + quality checks; `track-errors` wires Sentry |
+| **Mobile** | 15/15 (+ `plan-my-idea`, `check-safety`, `track-errors`, `sign-in-with-google`, `back-up-my-code`) | UI ports from web catalog only (ADR-0004); backend safety via web |
+| **Extension (v3)** | 11/11 (+ `plan-my-idea`, tier-2 defer-to-backend variants) | WXT scaffold v3; shares web UI catalog when scaffold ships |
 
 **Not skills** (agent + `AGENTS.md`): generic coding, design tweaks, CRUD — unless a goal skill above
 matches.
@@ -321,6 +369,15 @@ matches.
 | PayPal (opt-in) | [developer.paypal.com](https://developer.paypal.com) | `paypal-vybekiit.md` | `PAYMENTS_PROVIDER=paypal` |
 | Email — Resend | [resend.com/docs](https://resend.com/docs) | `resend-vybekiit.md` | `EMAIL_PROVIDER=resend` |
 | Email — SES | [docs.aws.amazon.com/ses](https://docs.aws.amazon.com/ses/) | `ses-vybekiit.md` | `EMAIL_PROVIDER=ses` |
+| Code hygiene | AGENTS.md conventions | `code-hygiene-vybekiit.md` | invisible — every coding task |
+| Observability / logging | `@vybekiit/core` + `@vybekiit/observability` | `observability-vybekiit.md` | `track-errors` skill |
+| Sentry (opt-in) | [docs.sentry.io](https://docs.sentry.io/) | `sentry-vybekiit.md` | `OBSERVABILITY_PROVIDER=sentry` |
+| UI consistency | `.vybekiit/agent/ui-sources.md` | `ui-consistency-vybekiit.md` | shadcn ecosystem catalog |
+| Testing | vitest + Testing Library | `testing-vybekiit.md` | invisible — every coding task |
+| Format + lint | Biome in template | `format-lint-vybekiit.md` | `pnpm format` / `pnpm lint` |
+| React patterns | kit hooks + FormField | `react-patterns-vybekiit.md` | `src/hooks/README.md` |
+| Responsive (web) | mobile-first Tailwind | `responsive-vybekiit.md` | preview at 375px |
+| GitHub backup | `gh` CLI | `github-vybekiit.md` | `back-up-my-code` skill |
 
 #### Mobile / Expo
 
@@ -341,9 +398,10 @@ matches.
 
 | Area | Layer A | Layer B |
 |---|---|---|
-| Web | 13/13 written | Wrappers shipped (incl. stripe/paypal/resend/ses); Vercel-labs skills pinned; manifest + CI pin |
-| Mobile | 10/10 written | Full expo/skills pinned; `launch-store` wrapper |
-| Extension | 10/10 written | Full `BUILDER-VOICE.md`; Chrome API wrapper; no platform skills pinned yet |
+| Web | 18/18 written | Wrappers + hygiene/observability/ui-consistency/sentry + SDLC (testing, format-lint, react-patterns, responsive, github); Vercel-labs pinned |
+| Mobile | 14/14 written | Full expo/skills pinned; hygiene/observability/ui + SDLC wrappers copied |
+| Extension | 10/10 written | Chrome API wrapper; UI catalog docs; scaffold v3 |
+| Observability | `track-errors` | `@vybekiit/observability` + `@vybekiit/core` logger |
 | Deploy | `go-live` + Vercel branch | `@vybekiit/deploy` vercel provider (ADR-0006) |
 | Update | Three-channel `update-kit` | `sync-agent-layer` CLI + ADR-0007 |
 
@@ -360,7 +418,7 @@ _Avoid_: maintained (see **Maintained**).
 
 **Maintained**:
 Headless logic shipped as public npm packages. The buyer never edits these directly; updates flow as
-version bumps (conflict-free). Examples: core config, payments, auth, email, db, agent-kit.
+version bumps (conflict-free). Examples: core config, payments, auth, email, db, observability, agent-kit.
 _Avoid_: owned (see **Owned**).
 
 **Agent layer**:
@@ -414,6 +472,63 @@ a skill.
 The one shared map of colors, spacing, radius, and type that web (as CSS vars) and mobile (as
 StyleSheet values) both consume, so the two platforms look consistent.
 
+**GEO / answer-engine optimization**:
+Structured metadata so AI answer engines (ChatGPT, Perplexity, Claude, Google AI Mode) can discover
+and cite the buyer's app — JSON-LD (FAQ, Article), `/llms.txt`, Open Graph, and hub-spoke internal
+links. Wired via `@vybekiit/seo` and buyer skills (`add-blog`, `go-live`); not a separate package or
+buyer choice.
+_Avoid_: exposing "GEO" or "AEO" jargon to the builder — say "so AI search can find your site".
+
+**Code hygiene guardrails**:
+Invisible agent rules (AGENTS.md + Layer B) that prevent AI coding anti-patterns — check-before-create,
+one lib file per concern, kit logger instead of `console.log`, zod at API boundaries. Enforced at
+`check-safety` / `go-live` without a buyer-facing skill.
+
+**SDLC guardrails**:
+The invisible agent quality loop — tests with every feature, Biome format/lint after edits, kit hooks
+and React patterns, mobile-first web layout. Layer B skills (`testing-vybekiit`, `format-lint-vybekiit`,
+`react-patterns-vybekiit`, `responsive-vybekiit`) plus `pnpm quality` at onboarding and ship checks.
+The builder never runs vitest or the linter.
+
+**Quality smoke**:
+Agent-run `pnpm quality` (format → lint → typecheck → test) after first install and before calling
+work done or shipping. Failures are fixed by the agent; Biome style warnings are soft.
+
+**Mobile-first** (web):
+Default layouts for narrow/phone width first, then scale up with `md:`/`lg:` breakpoints. Preview at
+375px before telling the builder a page is done.
+
+**Agent push gate**:
+Husky **pre-push** in buyer templates — runs `pnpm quality` (and optional UI walkthrough tests) when
+the **agent** pushes. The builder never hits it; it stops bad code before it reaches the remote.
+
+**Online checker**:
+Buyer `.github/workflows/ci.yml` — the automatic checker on ubuntu/macOS/Windows. Builder hears
+*"the automatic checker online"*, never CI/CD or GitHub Actions.
+
+**Utility registry**:
+`src/lib/README.md` in each template — the agent-only map of which file owns auth, billing, logging,
+etc. Read before adding helpers.
+
+**Production-silent logging**:
+`@vybekiit/core` `createLogger` — verbose in development, quiet in production automatically via
+`NODE_ENV`; optional `LOG_LEVEL` override for agents only.
+
+**UI source catalog**:
+Agent-only list of approved shadcn-compatible block libraries (Magic UI, Kokonut, 21st.dev, …) in
+`.vybekiit/agent/ui-sources.md`. The builder never picks; the agent normalizes every import.
+
+**Normalize-on-import**:
+When copying a third-party UI block, swap to kit `Button`/`Input`, map colors to `@vybekiit/tokens`,
+and strip custom sizes before shipping.
+
+**Primitive-first**:
+Use `src/components/ui/*` for standard controls — never raw `<button>` / one-off styled inputs.
+
+**Agent-kit**:
+The maintained package holding the shared agent-layer source — skill contract, BUILDER-VOICE.md
+core, goal-index format, update-kit logic, ui-sources catalog. Template-specific skills stay embedded per template.
+
 **The gate**:
 The private-repo GitHub invite that grants paid access after Lemon Squeezy checkout collects the
 buyer's username. Refund → access removed. The buyer is never invited to the maintainer monorepo.
@@ -423,12 +538,58 @@ A private per-template org repo the CLI clones to deliver a template — a deriv
 of the template folder, never hand-edited (ADR-0005).
 
 **Mirror sync**:
-The one-way monorepo→mirror CI job on release that keeps each template mirror current; the monorepo
-is the single source of truth.
+Maintainer pre-push hook that force-pushes all delivery mirrors after the local quality gate;
+GitHub Actions `workflow_dispatch` is the manual fallback. The monorepo is the single source of truth.
 
 **Tracer bullet**:
 The v1.0 thin end-to-end slice through every layer that proves the whole machine — a stranger pays,
 gets invited, scaffolds a web app, wires payments, deploys live.
+
+**Project asset**:
+A file in the repo the builder ships with the app (`public/`, `assets/`, extension icons) —
+optimized automatically at build time.
+
+**User upload**:
+A file a user adds at runtime (avatar, attachment) — stored via `StorageProvider` and served through
+CDN transform URLs, not raw bucket links.
+
+**Asset delivery**:
+The kit's automatic optimize + CDN layer (`@vybekiit/assets`). The builder never picks a CDN;
+it follows hosting + storage settings (ADR-0010).
+
+**Background job**:
+Work the app runs later or on a schedule (cleanup, reminders) — `@vybekiit/jobs`; buyer skill: go-live
+checks bindings; agent wires cron/queue.
+
+**Visitor stats**:
+Plain-language analytics — `@vybekiit/analytics`; buyer skill: `add-analytics`.
+
+**Push notification**:
+Alert on phone — `@vybekiit/notifications` (Expo default); buyer skill: `add-notifications`.
+
+**AI feature**:
+Server-side smart replies or helpers — `@vybekiit/ai`; buyer skill: `add-ai` (not pre-built demo apps).
+
+**Search index**:
+Find-in-app data — `@vybekiit/search`; buyer skill: `add-search`.
+
+**Live update**:
+Real-time channels — `@vybekiit/realtime` (Supabase default).
+
+**Blog page**:
+Content from repo files — `@vybekiit/cms` + `@vybekiit/seo`; buyer skill: `add-blog`.
+
+**Cookie consent**:
+Banner + export hooks — `@vybekiit/compliance`.
+
+**Team workspace**:
+Orgs and invites — `@vybekiit/tenancy`; buyer skill: `add-teams`.
+
+**Fast storage**:
+KV cache — `@vybekiit/kv` (Cloudflare default).
+
+**Message catalog loader**:
+Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs.
 
 **Agentic toolchain**:
 The CLIs the agent must have to act (supabase, wrangler, Expo/EAS, etc.), provisioned globally by
@@ -447,10 +608,6 @@ _Avoid_: goal-named skill (Layer A is what the buyer asks for).
 **Supported agent tools**:
 Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a thin redirect; Copilot is
 out of scope.
-
-**Agent-kit**:
-The maintained package holding the shared agent-layer source — skill contract, BUILDER-VOICE.md
-core, goal-index format, update-kit logic. Template-specific skills stay embedded per template.
 
 ## Open / parked
 

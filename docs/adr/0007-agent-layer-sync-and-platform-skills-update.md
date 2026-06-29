@@ -24,6 +24,7 @@ upstream before mirror sync.
 
 2. **Allowlist** (`AGENT_LAYER_PATHS` in `@vybekiit/agent-kit`):
    `.vybekiit/`, `AGENTS.md`, `CLAUDE.md`, `BUILDER-VOICE.md`, `.cursor/rules/vybekiit.mdc`,
+   `.cursor/rules/patterns.mdc`,
    `platform-skills.manifest.json`, `skills-lock.json`, `.agents/skills/`.
    Never `src/`, `.env`, or buyer customizations.
 

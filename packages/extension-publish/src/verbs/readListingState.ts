@@ -100,7 +100,7 @@ async function readDistributionTab(
   await page
     .getByRole('button', { name: 'Show more' })
     .first()
-    .click({ timeout: 1_500 })
+    .click({ timeout: 1500 })
     .catch(() => undefined);
 
   const { payments, visibility } = await readDistributionRadios(page);

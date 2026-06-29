@@ -19,3 +19,6 @@ next-env.d.ts
 
 # os
 .DS_Store
+
+# local agent state (planning intro seen, etc.)
+.vybekiit/state/

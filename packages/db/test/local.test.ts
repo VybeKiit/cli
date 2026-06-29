@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createLocalDataProvider } from '../src/providers/local';
+import { createLocalDataProvider } from '../src/providers/local/index';
 
 interface Order {
   readonly id: string;

@@ -12,6 +12,14 @@ translate every error · celebrate.
 
 1. **Welcome + ask the one thing that matters.** Ask what they want the add-on to do in one sentence.
 
+1b. **One-time planning offer** (skip if `.vybekiit/state/planning-intro-seen` exists).
+   Ask: *"Before we start building — want to **think it through together** first? I'll ask one question
+   at a time until we're totally aligned. Or we can jump straight to building."*
+   - **Yes** → run `plan-my-idea.md` with their one-sentence answer as seed; when done, continue to
+     step 2.
+   - **No** → continue to step 2.
+   Create `.vybekiit/state/planning-intro-seen` (any content) so this offer never repeats.
+
 2. **Set up tools and load a preview.** Run `vybekiit doctor`, install deps, build/load unpacked in
    Chrome (Extensions → Developer mode → Load unpacked). Explain in plain words.
    **Verify:** popup or side panel opens without errors.

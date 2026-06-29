@@ -6,7 +6,9 @@
 translate every error · celebrate. You build the upload; the builder only pastes a value when asked.
 
 > (Under the hood — agent-only) Use `@vybekiit/db`'s `resolveStorageProvider()` for upload + read.
-> The default is Supabase Storage / R2; `s3` is opt-in via `STORAGE_PROVIDER`. Same skill, whichever
+> After upload, display URLs from `resolveAssetDelivery().url()` — not raw `getUrl()` — so images
+> are compressed and served via the kit's CDN layer. The default is Supabase Storage / R2 once
+> doctor provisions Cloudflare; `s3` is opt-in via `STORAGE_PROVIDER`. Same skill, whichever
 > is set — never name the service to the builder.
 
 ## Steps
@@ -19,8 +21,8 @@ translate every error · celebrate. You build the upload; the builder only paste
    the file through `resolveStorageProvider()`.
    **Verify:** the screen builds and shows the upload control.
 
-3. **Show the uploaded file back.** After upload, display the image/file (or a link to it) so the
-   user sees it worked.
+3. **Show the uploaded file back.** After upload, display the image/file via
+   `resolveAssetDelivery().url()` (use `VybeImage` for images) so the CDN serves an optimized variant.
    **Verify:** an uploaded file appears in the app.
 
 4. **Write a test** for the upload handler, and keep it green.

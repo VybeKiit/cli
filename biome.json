@@ -65,6 +65,8 @@
         "noUndeclaredDependencies": "warn",
         "noUndeclaredVariables": "warn",
         "noUnresolvedImports": "off",
+        "useImportExtensions": "off",
+        "noProcessGlobal": "off",
         "useQwikValidLexicalScope": "off",
         "useHookAtTopLevel": "off",
         "useUniqueElementIds": "warn"

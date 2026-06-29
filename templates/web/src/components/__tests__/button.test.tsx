@@ -14,7 +14,7 @@ describe('Button', () => {
 
   it('renders the child element via Slot when asChild is set', () => {
     render(
-      <Button asChild>
+      <Button asChild={true}>
         <a href="/pricing">Pricing</a>
       </Button>,
     );

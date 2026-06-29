@@ -8,6 +8,7 @@ export const AGENT_LAYER_PATHS: readonly string[] = [
   'CLAUDE.md',
   'language.md',
   '.cursor/rules/vybekiit.mdc',
+  '.cursor/rules/patterns.mdc',
   'platform-skills.manifest.json',
   'skills-lock.json',
   '.agents/skills',

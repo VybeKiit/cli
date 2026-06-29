@@ -14,7 +14,7 @@ import { NextResponse } from 'next/server';
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const { email, code } = await request.json();
-  if (!email || !code) {
+  if (!(email && code)) {
     return NextResponse.json({ error: 'Enter the code we sent you.' }, { status: 400 });
   }
 

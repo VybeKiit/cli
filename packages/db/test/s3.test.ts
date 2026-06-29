@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createS3StorageProvider } from '../src/providers/s3';
+import { createS3StorageProvider } from '../src/providers/s3/index';
 
 /**
  * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. Each

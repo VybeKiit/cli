@@ -15,9 +15,16 @@ asked.
 ## Steps
 
 1. **Pre-flight check.** Run `vybekiit doctor` to make sure the deploy tool is installed, then run
-   the project's checks (tests + build) yourself. If anything is red, fix it (or run `doctor`)
-   **before** going online — never publish a broken app.
-   **Verify:** build passes locally and the deploy tool is installed.
+   the project's checks (tests + build) yourself. Asset optimization runs in `prebuild` / start hooks
+   (`scripts/optimize-assets.mjs`) — confirm it completes without errors. Run code-readiness greps from `check-safety`
+   (step 6): `node scripts/check-no-console.mjs`, duplicate-helper scan, logger spot-check.
+   Run **quality smoke**: `pnpm quality` (format, lint, typecheck, tests). Fix anything red before
+   going online. Confirm production mode on the host will silence debug logs (`NODE_ENV=production`).
+   If anything is red, fix it (or run `doctor`) **before** going online — never publish a broken app.
+   **GEO pre-flight:** when the app has a blog or FAQ, confirm at least one public page includes JSON-LD
+   (view-source on a blog post) and `/llms.txt` returns 200 with curated page paths.
+   **Verify:** build passes locally, deploy tool installed, quality smoke green, no debug console noise,
+   `/llms.txt` reachable when blog/FAQ content exists.
 
 2. **Explain in one line.** *"I'm going to put your app online now. You'll click 'approve' once."*
 

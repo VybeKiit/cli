@@ -45,7 +45,7 @@ property that makes "lifetime updates" real for a buyer who can't resolve a conf
 
 | Product | Auth | Multi-tenant | RBAC | i18n | Email | Storage | Jobs | Admin panel | Blog/SEO | Tests/CI |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| **VybeKiit** | ✅ better-auth/Cognito | ❌ *(agent builds on request)* | ❌ *(agent builds)* | ✅ auto-localized + RTL | ✅ CF/SES/Resend | ✅ Supabase·R2/S3 | ⚠️ CF cron only | ❌ | ⚠️ landing dogfood, no blog engine | ✅ tests-first + CI |
+| **VybeKiit** | ✅ better-auth/Cognito | ❌ *(agent builds on request)* | ❌ *(agent builds)* | ✅ message catalogs + RTL (add-language skill) | ✅ CF/SES/Resend | ✅ Supabase·R2/S3 + auto CDN | ✅ `@vybekiit/jobs` (CF default) | ❌ | ⚠️ `@vybekiit/cms` MDX scaffold | ✅ tests-first + CI |
 | Open SaaS | ✅ +4 OAuth | ❌ | ❌ (isAdmin bool) | ❌ | ✅ | ✅ S3 | ✅ pg-boss | ✅ TailAdmin | ✅ | ⚠️ e2e only |
 | Next.js SaaS Starter | ⚠️ email/pw only | ✅ teams | ✅ Owner/Member | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | mickasmt | ✅ Auth.js v5 | ❌ | ✅ User/Admin | ❌ | ✅ Resend | ❌ | ❌ | ✅ | ✅ MDX | ⚠️ unverified |
@@ -64,8 +64,8 @@ property that makes "lifetime updates" real for a buyer who can't resolve a conf
 **Honest reading:** On a raw B2B feature checklist, **MakerKit, Supastarter, and SaaSykit are
 ahead** of VybeKiit — they ship multi-tenancy, RBAC, admin dashboards, and (Supastarter) background
 jobs pre-built. VybeKiit deliberately does **not** compete here; see `differentiation.md` → "The
-honest gap." Where VybeKiit *does* lead the feature table: **i18n by default** (auto-localized +
-RTL from v1), **provider-agnostic adapters** behind every concern, and a **tests-first CI gate**
+honest gap." Where VybeKiit *does* lead the feature table: **i18n by default** (structured message
+catalogs + RTL from v1; `add-language` skill scales locales in one shot), **provider-agnostic adapters** behind every concern, and a **tests-first CI gate**
 that most one-time kits skip entirely.
 
 ---

@@ -39,7 +39,7 @@ export function AgentSessionDemo() {
 
   useEffect(() => {
     if (!animate) {
-      return undefined;
+      return;
     }
     if (typedChars < USER_PROMPT.length) {
       const t = setTimeout(() => setTypedChars((n) => n + 1), 45);

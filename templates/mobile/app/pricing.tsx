@@ -1,7 +1,9 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAsync } from '@/hooks/use-async';
+import { displayError, useTranslations } from '@/hooks/use-translations';
 import { startCheckout } from '@/lib/billing-client';
 import { PLANS } from '@/lib/plans';
 import { useTheme } from '@/theme/use-theme';
@@ -9,15 +11,10 @@ import * as Linking from 'expo-linking';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/**
- * Pricing screen — the RN parallel of the web pricing page. Three starter tiers
- * wired to the kit's checkout; the loading and error states are fully built, while
- * buying is a marked stub until the `setup-payments` skill connects a provider.
- */
+/** Pricing screen — RN parallel of the web pricing page. */
 export default function PricingScreen() {
   const { colors, spacing, fontSizes, fontWeights } = useTheme();
-  // `pendingId` drives the per-card spinner (which plan is loading); useAsync owns
-  // the shared error so a failed checkout reuses the same Alert as the form screens.
+  const { t } = useTranslations();
   const [pendingId, setPendingId] = useState('');
   const { error, run: checkout } = useAsync(startCheckout);
 
@@ -28,7 +25,6 @@ export default function PricingScreen() {
       setPendingId('');
       return;
     }
-    // TODO(vybekiit): the wired skill sends the buyer to checkout — skill: setup-payments
     await Linking.openURL(result.value.url);
     setPendingId('');
   }
@@ -39,6 +35,7 @@ export default function PricingScreen() {
       contentContainerStyle={[styles.content, { padding: spacing.lg, gap: spacing.lg }]}
     >
       <View style={{ gap: spacing.xs, alignItems: 'center' }}>
+        <Badge variant="outline">{t('pricing.badge')}</Badge>
         <Text
           style={{
             color: colors.foreground,
@@ -46,16 +43,16 @@ export default function PricingScreen() {
             fontWeight: fontWeights.bold,
           }}
         >
-          Simple pricing
+          {t('pricing.title')}
         </Text>
         <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.base }}>
-          Start free. Upgrade when you grow.
+          {t('pricing.subtitle')}
         </Text>
       </View>
 
       {error ? (
         <Alert variant="destructive">
-          <AlertDescription destructive>{error}</AlertDescription>
+          <AlertDescription destructive={true}>{displayError(t, error)}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -63,8 +60,8 @@ export default function PricingScreen() {
         {PLANS.map((plan) => (
           <Card key={plan.id} style={plan.featured ? { borderColor: colors.primary } : undefined}>
             <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <CardDescription>{plan.description}</CardDescription>
+              <CardTitle>{t(plan.nameKey)}</CardTitle>
+              <CardDescription>{t(plan.descriptionKey)}</CardDescription>
               <View style={[styles.priceRow, { marginTop: spacing.xs }]}>
                 <Text
                   style={{
@@ -73,23 +70,26 @@ export default function PricingScreen() {
                     fontWeight: fontWeights.bold,
                   }}
                 >
-                  {plan.price}
+                  {t(plan.priceKey)}
                 </Text>
                 <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
-                  {plan.period}
+                  {t(plan.periodKey)}
                 </Text>
               </View>
             </CardHeader>
             <CardContent style={{ gap: spacing.md }}>
               <View style={{ gap: spacing.sm }}>
-                {plan.features.map((feature) => (
-                  <Text key={feature} style={{ color: colors.foreground, fontSize: fontSizes.sm }}>
-                    {feature}
+                {plan.featureKeys.map((featureKey) => (
+                  <Text
+                    key={featureKey}
+                    style={{ color: colors.foreground, fontSize: fontSizes.sm }}
+                  >
+                    {t(featureKey)}
                   </Text>
                 ))}
               </View>
               <Button
-                title={pendingId === plan.id ? 'Starting...' : 'Choose plan'}
+                title={pendingId === plan.id ? t('pricing.starting') : t('pricing.choosePlan')}
                 variant={plan.featured ? 'default' : 'outline'}
                 loading={pendingId === plan.id}
                 onPress={() => handleSelect(plan.id)}

@@ -1,25 +1,24 @@
 /**
  * Navigation + footer links as data the header and footer render via `.map`.
  *
- * Why it lives here: the agent (and builder) add or reorder links by editing one
- * array, not JSX in two components. Each entry is a `{ href, label }`; the header's
- * brand link and the "Sign in" button stay in the component because they're
- * structural (different markup), not list items.
+ * Labels are message-catalog keys — components resolve them with `t(labelKey)`.
  */
 
-/** One navigation link: where it points and the text shown. */
+/** One navigation link: where it points and the message key for its label. */
 export interface NavLink {
-  /** Destination path, e.g. "/pricing". Also used as the render key. */
+  /** Destination path without locale prefix, e.g. "/pricing". */
   readonly href: string;
-  /** Visible link text. */
-  readonly label: string;
+  /** Flat-dotted key in `messages/en.json`. */
+  readonly labelKey: string;
 }
 
 /** Primary marketing nav links shown in the header. */
-export const HEADER_LINKS: readonly NavLink[] = [{ href: '/pricing', label: 'Pricing' }];
+export const HEADER_LINKS: readonly NavLink[] = [
+  { href: '/pricing', labelKey: 'common.nav.pricing' },
+];
 
 /** Legal links shown in the footer — every product needs these. */
 export const FOOTER_LINKS: readonly NavLink[] = [
-  { href: '/terms', label: 'Terms' },
-  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', labelKey: 'common.nav.terms' },
+  { href: '/privacy', labelKey: 'common.nav.privacy' },
 ];

@@ -18,6 +18,8 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "mirror": "node scripts/mirror-repos.mjs",
+    "publish:packages": "node scripts/publish-packages.mjs",
+    "publish:packages:dry-run": "node scripts/publish-packages.mjs --dry-run",
     "test:scripts": "vitest run --root scripts",
     "prepare": "husky"
   },

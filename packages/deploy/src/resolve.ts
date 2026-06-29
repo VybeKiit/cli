@@ -6,9 +6,9 @@ import {
   parseEnv,
   vercelConfigSchema,
 } from '@vybekiit/core';
-import { type AmplifyRunner, createAwsHosting } from './providers/aws';
-import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare';
-import { type VercelRunner, createVercelHosting } from './providers/vercel';
+import { type AmplifyRunner, createAwsHosting } from './providers/aws/index';
+import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare/index';
+import { type VercelRunner, createVercelHosting } from './providers/vercel/index';
 import type { Hosting } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */

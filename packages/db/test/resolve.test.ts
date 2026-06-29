@@ -91,4 +91,16 @@ describe('resolveStorageProvider', () => {
       /AWS_REGION/,
     );
   });
+
+  it('constructs the r2 adapter from its config', () => {
+    const provider = resolveStorageProvider({
+      STORAGE_PROVIDER: 'r2',
+      R2_ACCOUNT_ID: 'acct',
+      R2_BUCKET: 'my-bucket',
+      R2_ACCESS_KEY_ID: 'key',
+      R2_SECRET_ACCESS_KEY: 'secret',
+      R2_PUBLIC_URL: 'https://pub.r2.dev/my-bucket',
+    });
+    expect(provider.name).toBe('r2');
+  });
 });

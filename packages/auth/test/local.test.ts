@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createLocalAuthProvider } from '../src/providers/local';
+import { createLocalAuthProvider } from '../src/providers/local/index';
 
 const DEV_USER = { id: 'local-dev-user', email: 'you@local.dev' };
 

@@ -1,8 +1,9 @@
 # AGENTS.md — VybeKiit (maintainer layer)
 
 > **Single source of truth** for any agent working on **this monorepo** (building/maintaining the
-> kit itself). `CLAUDE.md`, Copilot, and Codex configs are thin pointers to this file — keep
-> guidance here, not duplicated, or it drifts.
+> kit itself). `CLAUDE.md`, Copilot, Codex, and `.cursor/rules/vybekiit.mdc` (Cursor) are thin
+> pointers to this file — keep guidance here, not duplicated, or it drifts. Cursor also loads
+> `.cursor/rules/patterns.mdc` as a maintainer pattern summary (not SSOT).
 >
 > **Audience:** us / our agents (technical voice). This is the **maintainer** layer.
 > The **buyer-facing** agent layer (jargon-free, "decide + guide") lives in `templates/*` and is a
@@ -27,7 +28,7 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 
 - **Language:** TypeScript, strict. No `any`; narrow in `catch` (`instanceof Error`) before use.
 - **Monorepo:** pnpm workspaces + Turborepo. Packages publish to npm under `@vybekiit/*` (MIT).
-- **Web/extension UI:** shadcn/ui. **Mobile UI:** NativeWind + react-native-reusables.
+- **Web/extension UI:** shadcn/ui. **Mobile UI:** plain StyleSheet primitives + `@vybekiit/tokens`.
 - **Infra the templates target:** Cloudflare (host/edge/cron/storage/email) + Supabase (db/auth).
 - **Payments:** one `@vybekiit/payments` package, one `PaymentProvider` interface, provider
   adapters under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the
@@ -67,6 +68,19 @@ writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate
 - Semver. Public npm publish under `@vybekiit/*`. Breaking changes to a package = major bump and a
   changelog note; the buyer's `update-kit` skill relies on semver to decide what's safe.
 - Templates are versioned but **not** published — they're distributed by the CLI/scaffolder.
+
+## Delivery mirror sync (maintainer-only)
+
+Every push to this monorepo runs **mirror sync automatically** in the pre-push hook, after the
+quality gate: `pin-platform-skills` → dirty-tree guard → `pnpm mirror` (all five delivery repos).
+
+- Requires `gh auth login` with write access to `VybeKiit/*` mirrors (uses git credential helper;
+  no `GH_MIRROR_TOKEN` needed locally).
+- `git push --no-verify` skips mirror sync — re-run via the **mirror-repos** GitHub Actions workflow
+  (`workflow_dispatch`, needs `GH_MIRROR_TOKEN` secret) or `pnpm mirror` manually.
+- `pnpm mirror --dry-run` to debug subtree splits without force-pushing.
+- If `pin-platform-skills` changes tracked files, pre-push aborts — commit the pin results, then push
+  again (subtree split publishes committed history only).
 
 ## Where to start (build order)
 

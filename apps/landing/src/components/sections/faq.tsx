@@ -17,7 +17,7 @@ export function Faq() {
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
                 <h3 className="font-medium">{item.question}</h3>
                 <span
-                  aria-hidden
+                  aria-hidden={true}
                   className="text-muted-foreground transition-transform group-open:rotate-45"
                 >
                   +

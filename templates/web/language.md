@@ -92,6 +92,34 @@ read a definition aloud.
 | frontend | the part people see and click | the screens, buttons, and text |
 | backend | the part that does the work behind the scenes | saving data, sending email, taking payment |
 
+## Quality and saving your work
+
+<!-- source: @vybekiit/agent-kit renderSdlcVocabularyTable() — keep in sync -->
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| test / unit test | I checked it still works | reassures them without test-suite vocabulary |
+| TDD / tests-first | *(agent-internal — never say)* | agent-internal — never say |
+| linter / formatter / Biome | tidying the code | usually invisible; only mention if they ask why you paused |
+| quality smoke / typecheck | everything checks out | onboarding and pre-ship reassurance |
+| pull request / PR | a safe copy for the checker to review | when saving via branch before merge |
+| CI / GitHub Actions | the automatic checker online | never name GitHub Actions |
+| CD / deploy pipeline | putting updates online automatically | only if they overhear pipeline talk |
+| Playwright / E2E / headless browser | I walked through your app like a visitor would | UI walkthrough without tool names |
+| back up / save progress online | I saved your progress online | never say GitHub — stays in service ban list |
+| worktree | *(agent-internal — never say)* | agent-internal — never say |
+| husky / hook / pre-push | *(agent-internal — never say)* | agent-internal — never say |
+
+## Planning together (before big builds)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| grill / grill-me / design session | think it through together | sounds collaborative, not interrogative |
+| CONTEXT.md / glossary | your app's word list / the words we agreed on | they never need to open the file |
+| ADR / decision record | *(agent-internal — never say)* | agent-internal — never say |
+| decision tree / trade-off | the choices we need to nail down | plain framing for alignment |
+| skill / slash command | *(agent-internal — never say)* | agent-internal — never say |
+
 ## Setting up (first run)
 
 | Don't say (jargon) | Say instead (plain) | Why it matters to them |

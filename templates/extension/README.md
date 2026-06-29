@@ -3,10 +3,9 @@
 Built with **VybeKiit**. You don't need to read code to use this — just open the project
 in Claude or Codex and tell it what you want to build.
 
-> **Heads up — what's here today:** this template ships the **agent layer** now (the
-> instructions and skills your AI agent follows). The full extension app scaffold, built
-> on the **WXT** framework, lands in **v3**. If you're cloning today you get the agent
-> layer; the application code arrives with the v3 release.
+The template ships a **WXT + React popup**, a background entrypoint, and the full **agent layer**
+(skills, husky quality gate, CI). Point `WXT_PUBLIC_APP_URL` at your web app — sign-in, data, and
+payments stay on that backend (extensions never hold secrets).
 
 ## Start here
 

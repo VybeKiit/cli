@@ -61,12 +61,12 @@ export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResu
     }
 
     await session.page.waitForLoadState('networkidle', { timeout: 180_000 }).catch(() => undefined);
-    await session.page.waitForTimeout(5_000);
+    await session.page.waitForTimeout(5000);
     await session.page.goto(packageUrl(groupId, ctx.extension.chromeWebStoreId), {
       timeout: 60_000,
       waitUntil: 'load',
     });
-    await session.page.waitForTimeout(2_500);
+    await session.page.waitForTimeout(2500);
 
     return {
       packageText: await readPackageSummary(session.page),
@@ -79,5 +79,5 @@ export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResu
 
 async function readPackageSummary(page: Page): Promise<string> {
   const text = await page.locator('body').innerText();
-  return text.match(/Package[\s\S]*?Useful Resources/)?.[0] ?? text.slice(0, 5_000);
+  return text.match(/Package[\s\S]*?Useful Resources/)?.[0] ?? text.slice(0, 5000);
 }

@@ -6,8 +6,9 @@
 translate every error · celebrate. You wire analytics; the builder never sees provider dashboards
 unless you screen-share a summary.
 
-> (Under the hood — agent-only) Wire Plausible or PostHog via env + a small script tag or SDK stub.
-> Never name the provider to the builder — say "visitor stats". Replace dashboard analytics placeholder
+> (Under the hood — agent-only) Wire Plausible or PostHog via `resolveAnalyticsProvider()` from
+> `@vybekiit/analytics` (see `src/lib/analytics-client.ts` and `VybeAnalytics`). Never name the
+> provider to the builder — say "visitor stats". Replace dashboard analytics placeholder
 > (`TODO(vybekiit): … — skill: add-analytics`).
 
 ## Steps

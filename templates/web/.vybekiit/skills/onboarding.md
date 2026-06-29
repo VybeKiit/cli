@@ -12,11 +12,23 @@ translate every error · celebrate. Decide all technical choices yourself.
    Greet warmly. Ask: *"In one sentence, what do you want to build?"* Use their answer to tailor the
    starter page later — don't turn it into a technical interview.
 
+1b. **One-time planning offer** (skip if `.vybekiit/state/planning-intro-seen` exists).
+   Ask: *"Before we start building — want to **think it through together** first? I'll ask one question
+   at a time until we're totally aligned. Or we can jump straight to building."*
+   - **Yes** → run `plan-my-idea.md` with their one-sentence answer as seed; when done, continue to
+     step 2.
+   - **No** → continue to step 2.
+   Create `.vybekiit/state/planning-intro-seen` (any content) so this offer never repeats.
+
 2. **Set up the tools, then get the preview running.**
    First run `vybekiit doctor` — it installs the tools the app will need (for the database and for
    putting the app online) so the builder never configures anything. It may say a tool "isn't signed
    in yet" — that's fine for now; sign-in happens later, only when a step needs it (one browser click
    each). Then install the project's building blocks and start the app yourself, in plain words.
+   After dependencies install, run **quality smoke** yourself: `pnpm quality` (format, lint, typecheck,
+   tests). Confirm `.cursorignore` hides `.env` (doctor checks this). Optionally install UI walkthrough
+   browsers: `pnpm exec playwright install chromium` (agent-only — see `playwright-vybekiit.md`).
+   Fix anything red before showing the preview. The builder hears: *"Everything checks out."*
    **Verify:** the dev server is up with no errors. If it fails → run `doctor`.
 
 3. **Show them their app.**
@@ -34,6 +46,7 @@ translate every error · celebrate. Decide all technical choices yourself.
    - put it online for real → `go-live`
    - let people sign in → `add-signin`
    - save their data → `save-data`
+   - save progress online → `back-up-my-code` (optional nudge after meaningful progress)
 
 ## If anything breaks
 

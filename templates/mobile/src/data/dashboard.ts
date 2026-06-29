@@ -1,31 +1,24 @@
 /**
- * Dashboard content as data the screen renders via `.map`. Mirrors the web
- * template's `data/dashboard.ts`.
- *
- * Why it lives here: the agent (and builder) edit one array instead of dashboard
- * JSX. The stat cards ship as placeholders the `save-data` skill wires to real
- * numbers; the getting-started list is the plain-language menu of next goals. The
- * screen keeps its route-guard and real-data TODO markers.
+ * Dashboard content as data the screen renders via `.map`.
+ * Labels and steps are message-catalog keys resolved with `t()`.
  */
 
-/** One stat card on the dashboard: a label and its (placeholder) value. */
 export interface DashboardStat {
-  /** Card label, e.g. "Users". */
-  readonly label: string;
-  /** Display value; "—" until the save-data skill wires real numbers. */
-  readonly value: string;
+  readonly labelKey: string;
+  readonly valueKey: string;
 }
 
-/** Placeholder stat cards — wired to real data by the `save-data` skill. */
 export const DASHBOARD_STATS: readonly DashboardStat[] = [
-  { label: 'Users', value: '—' },
-  { label: 'Revenue', value: '—' },
-  { label: 'Active today', value: '—' },
+  { labelKey: 'dashboard.stats.users.label', valueKey: 'dashboard.stats.users.value' },
+  { labelKey: 'dashboard.stats.revenue.label', valueKey: 'dashboard.stats.revenue.value' },
+  {
+    labelKey: 'dashboard.stats.activeToday.label',
+    valueKey: 'dashboard.stats.activeToday.value',
+  },
 ];
 
-/** The plain-language "what to ask your agent next" list shown on the dashboard. */
-export const GETTING_STARTED: readonly string[] = [
-  'Add sign-in so people can log in.',
-  'Add payments so you can charge for this.',
-  'Put your app in the App Store and Play Store.',
+export const GETTING_STARTED_STEP_KEYS: readonly string[] = [
+  'dashboard.gettingStarted.steps.0',
+  'dashboard.gettingStarted.steps.1',
+  'dashboard.gettingStarted.steps.2',
 ];

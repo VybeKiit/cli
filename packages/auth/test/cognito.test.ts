@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createCognitoAuthProvider } from '../src/providers/cognito';
+import { createCognitoAuthProvider } from '../src/providers/cognito/index';
 
 /**
  * Fake Cognito command classes that capture their `input` and tag a `type`, so a test

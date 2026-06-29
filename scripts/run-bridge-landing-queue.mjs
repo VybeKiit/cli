@@ -21,6 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import process from 'node:process';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BRIDGE = process.env.BRIDGE ?? resolve(REPO_ROOT, '../ai-browser-bridge/dist/bridge.js');

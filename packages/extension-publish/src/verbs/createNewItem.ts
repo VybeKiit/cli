@@ -77,7 +77,7 @@ function parseItemIdFromUrl(url: string): string {
   const match = url.match(
     /\/devconsole\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/([a-z0-9]{32})\//,
   );
-  if (!match || !match[1]) {
+  if (!(match && match[1])) {
     throw new Error(`Could not parse CWS Item ID from URL: ${url}`);
   }
   return match[1];

@@ -1,27 +1,34 @@
 import { Toaster } from '@/components/toaster';
+import { initI18n, t } from '@/lib/i18n';
 import { useTheme } from '@/theme/use-theme';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+/** Stack screen titles — keys into `messages/en.json`. */
+const SCREEN_TITLES = {
+  index: 'navigation.screen.home',
+  login: 'navigation.screen.login',
+  signup: 'navigation.screen.signup',
+  verify: 'navigation.screen.verify',
+  pricing: 'navigation.screen.pricing',
+  dashboard: 'navigation.screen.dashboard',
+} as const;
+
 /**
- * Root layout for the expo-router app — the RN parallel of the web `app/layout.tsx`.
- *
- * Wraps every route in a `SafeAreaProvider` (so screens can inset around notches),
- * mounts the single `<Toaster />` once at the root (any screen fires toasts via
- * `useToast()`), and themes the navigation header + status bar from the shared
- * tokens. Dark mode follows the OS via {@link useTheme}; the `StatusBar` flips its
- * icon color to stay legible. RTL mirroring is handled by React Native's
- * `I18nManager` at the layout level, so screens use logical flex layout and don't
- * hardcode left/right.
- *
- * NOTE: the web template's `/terms` and `/privacy` pages are intentionally NOT
- * mirrored here — they are marketing/legal pages a store listing links to, not app
- * screens. App Store / Play privacy links live in the store listing (launch.config.ts),
- * not in the native navigation.
+ * Root layout — initializes i18n from the device locale, applies RTL when needed,
+ * and sets translated stack titles.
  */
 export default function RootLayout() {
   const { colors, scheme } = useTheme();
+  const [, setLocaleReady] = useState(false);
+
+  useEffect(() => {
+    initI18n();
+    setLocaleReady(true);
+  }, []);
+
   return (
     <SafeAreaProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
@@ -32,12 +39,12 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'Home' }} />
-        <Stack.Screen name="login" options={{ title: 'Sign in' }} />
-        <Stack.Screen name="signup" options={{ title: 'Create account' }} />
-        <Stack.Screen name="verify" options={{ title: 'Verify email' }} />
-        <Stack.Screen name="pricing" options={{ title: 'Pricing' }} />
-        <Stack.Screen name="dashboard" options={{ title: 'Dashboard' }} />
+        <Stack.Screen name="index" options={{ title: t(SCREEN_TITLES.index) }} />
+        <Stack.Screen name="login" options={{ title: t(SCREEN_TITLES.login) }} />
+        <Stack.Screen name="signup" options={{ title: t(SCREEN_TITLES.signup) }} />
+        <Stack.Screen name="verify" options={{ title: t(SCREEN_TITLES.verify) }} />
+        <Stack.Screen name="pricing" options={{ title: t(SCREEN_TITLES.pricing) }} />
+        <Stack.Screen name="dashboard" options={{ title: t(SCREEN_TITLES.dashboard) }} />
       </Stack>
       <Toaster />
     </SafeAreaProvider>

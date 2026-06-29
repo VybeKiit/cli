@@ -1,0 +1,67 @@
+---
+description: VybeKiit maintainer code patterns — details in AGENTS.md and CONTEXT.md
+globs: **/*
+alwaysApply: true
+---
+
+# VybeKiit maintainer patterns
+
+Quick checklist for agents working on **this monorepo**. Full detail lives in `AGENTS.md`,
+`CONTEXT.md`, and `docs/adr/`.
+
+## Owned vs Maintained — where code goes
+
+| Bucket | Path | Rule |
+|---|---|---|
+| **Maintained** | `packages/*` | Headless TS only. Published `@vybekiit/*`. Buyers never edit; updates = npm bumps. |
+| **Owned** | `templates/*` | All UI + buyer agent layer. Copied into buyer repos; frozen after scaffold. |
+| **Our app** | `apps/landing` | Marketing + gate logic. Not a buyer template. |
+| **CLI** | `cli/` | Public scaffolder. No templates or secrets inside. |
+
+Before adding code: logic the buyer shouldn't touch → `packages/`. UI, screens, copy → `templates/`.
+
+## Provider pattern (every `@vybekiit/*` concern)
+
+- One **interface** per concern (`PaymentProvider`, `DataProvider`, `AuthProvider`, …).
+- Concrete backends live under `providers/<name>/`.
+- One **default** adapter; others are opt-in via env (`PAYMENTS_PROVIDER`, `DATA_PROVIDER`, …).
+- Env keys typed + Zod-validated in `@vybekiit/core`; root `.env.example` is SSOT for all keys.
+- Adding an adapter never adds a buyer skill — skills target the interface once.
+
+## Package rules (`packages/*`)
+
+- Pure TypeScript. **No UI**, no framework lock.
+- Strict TS: no `any`; narrow in `catch` (`instanceof Error`) before use.
+- **JSDoc/TSDoc** on every export — document *why* and non-obvious constraints.
+- Zod at public boundaries. No scattered URLs or secrets.
+- Files ~200–400 lines; split when a file does multiple jobs.
+- Match nearest sibling style; reuse helpers before writing new ones.
+
+## TDD & quality gate
+
+- **Tests first:** red → green → refactor. Green suite = safe `update-kit` for buyers.
+- **Pre-commit:** lenient (format + lint-fix only) — must not block on failing tests.
+- **CI / pre-push:** heavy gate (lint → typecheck → test → build).
+- Run typecheck/test/lint after substantial changes.
+
+## Editing buyer-facing content (`templates/*`)
+
+When touching skills, `AGENTS.md`, `BUILDER-VOICE.md`, or `language.md` inside templates:
+
+- **Decide + Guide** contract: one action at a time, verify-before-advance, plain language.
+- Never use maintainer jargon ("env var", "deploy", "merge conflict") — translate per
+  `templates/*/BUILDER-VOICE.md`.
+- Skills are **goal-named** (`go-live`), never tech-named. Layer B platform-skills are agent-only.
+
+## Workflow
+
+- Trunk-based: squash-PR to `main` (no direct push to protected `main`).
+- Never commit secrets. `.env.example` documents keys; `.env` stays local.
+- Semver for `@vybekiit/*` publishes. Templates versioned but not npm-published.
+
+## Pointers
+
+- Blueprint & glossary → `CONTEXT.md`
+- Maintainer agent rules → `AGENTS.md`
+- Architecture decisions → `docs/adr/`
+- Buyer template patterns → `templates/*/.cursor/rules/patterns.mdc` (different voice)

@@ -1,18 +1,22 @@
-import { FOOTER_LINKS } from '@/data/nav';
-import Link from 'next/link';
+'use client';
 
-const YEAR = new Date().getFullYear();
+import { FOOTER_LINKS } from '@/data/nav';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 /** Marketing footer with the legal links every product needs (terms + privacy). */
 export function SiteFooter() {
+  const t = useTranslations();
+  const year = new Date().getFullYear();
+
   return (
     <footer className="border-t">
       <div className="mx-auto flex max-w-5xl flex-col gap-2 px-6 py-8 text-muted-foreground text-sm sm:flex-row sm:items-center sm:justify-between">
-        <p>© {YEAR} My App. All rights reserved.</p>
+        <p>{t('common.footer.copyright', { year })}</p>
         <div className="flex gap-4">
           {FOOTER_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className="hover:text-foreground">
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
         </div>

@@ -65,7 +65,7 @@ export function CheckoutForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} noValidate={true} className="flex flex-col gap-5">
       <FormField
         id="githubUsername"
         label="GitHub username"

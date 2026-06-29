@@ -1,0 +1,28 @@
+{
+  "ext.name": {
+    "message": "My VybeKiit Extension",
+    "description": "Extension name shown in browser toolbar and store listing."
+  },
+  "ext.description": {
+    "message": "Built with VybeKiit — calls your web app backend.",
+    "description": "Extension description for browser store listing."
+  },
+  "popup.title": {
+    "message": "My VybeKiit Extension"
+  },
+  "popup.description": {
+    "message": "Sign-in, data, and payments run on your web app — this popup stays secret-free."
+  },
+  "popup.backend": {
+    "message": "Backend: $URL$",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "http://localhost:3000"
+      }
+    }
+  },
+  "popup.openWebApp": {
+    "message": "Open web app"
+  }
+}

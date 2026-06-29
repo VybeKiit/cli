@@ -73,7 +73,6 @@ non-secret policy toggles only.
 
 - **Shipping now:** the security edge config — `security-worker.ts` + `wrangler.toml`,
   reading the same env toggles as the app layer.
-- **Lands with issue #7:** Supabase SQL migrations (`supabase/migrations/`) and the
-  provisioning/deploy helper scripts (`scripts/`), including automated provisioning of the
-  Cloudflare Ruleset/WAF rules documented in `wrangler.toml`. Those directories are
-  intentional placeholders today — no schema or deploy logic is invented ahead of #7.
+- **Lands with issue #7:** Supabase SQL migrations (`supabase/migrations/`) and deploy helper
+  scripts (`scripts/deploy-landing.mjs`). Cloudflare Ruleset/WAF automation still documented in
+  `wrangler.toml` for a later pass.

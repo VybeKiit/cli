@@ -5,9 +5,9 @@ import {
   paypalConfigSchema,
   stripeConfigSchema,
 } from '@vybekiit/core';
-import { createLemonSqueezyProvider } from './providers/lemon-squeezy';
-import { createPayPalProvider } from './providers/paypal';
-import { createStripeProvider } from './providers/stripe';
+import { createLemonSqueezyProvider } from './providers/lemon-squeezy/index';
+import { createPayPalProvider } from './providers/paypal/index';
+import { createStripeProvider } from './providers/stripe/index';
 import type { PaymentProvider } from './types';
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */

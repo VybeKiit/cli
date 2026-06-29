@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createVercelHosting } from '../src/providers/vercel';
+import { createVercelHosting } from '../src/providers/vercel/index';
 
 describe('createVercelHosting', () => {
   it('builds a vercel deploy action and returns the runner URL', async () => {

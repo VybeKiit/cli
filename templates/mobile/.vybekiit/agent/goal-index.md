@@ -8,16 +8,24 @@ translate errors · celebrate.
 | The builder says something like… | Use this skill |
 |---|---|
 | "set up my app", "I just bought this", "let's start", "get it on my phone" | `skills/onboarding.md` |
+| "help me plan", "I'm not sure what I want", "think it through with me", "figure out my idea first" | `skills/plan-my-idea.md` |
+| big vague feature ("build me a fitness app", "I want something like Uber") before specifics | `skills/plan-my-idea.md` |
 | "publish", "put it in the app store", "ship it", "submit my app", "go live" | `skills/publish-app.md` |
 | "let people sign in / log in / create accounts / add users" | `skills/connect-account.md` |
 | "save my data", "remember this", "store info", "add a database" | `skills/save-data.md` |
+| "let users upload", "store files / images" | `skills/add-files.md` |
+| "add my logo", "app icon", "splash screen", "add images" | `skills/add-images.md` |
 | "add payments", "let me take money", "sell something", "charge people" | `skills/setup-payments.md` |
 | "invite teammates", "add my team", "work with others" | `skills/add-teams.md` |
 | "notify users", "send alerts", "email when something happens" | `skills/add-notifications.md` |
 | "see who uses my app", "visitor stats", "analytics" | `skills/add-analytics.md` |
 | "update the kit", "get the latest", "upgrade" | `skills/update-kit.md` |
 | "it's broken", "nothing works", "I get an error", "check my app" | `skills/doctor.md` |
+| "am I ready to ship", "did we cover security", "is my app safe" | `skills/check-safety.md` |
+| "tell me when things break", "error alerts", "know if my app crashes" | `skills/track-errors.md` |
 | "sign in with Google", "sign up with Google", "Continue with Google" | `skills/sign-in-with-google.md` |
+| "save my code", "back up my project", "put it on GitHub" | `skills/back-up-my-code.md` |
+| "make it Hebrew", "translate my app", "add Spanish", "speak my language" | `skills/add-language.md` |
 | "set it up", "finish setup", "wire it up", "make it work" | grep `TODO(vybekiit)`, then run each named skill — see `AGENTS.md` → *Wire-up markers* |
 
 Anything else (change the design, add a screen, tweak text, general coding) is **not** a skill — just

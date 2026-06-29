@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { type FetchLike, createCloudflareEmail } from '../src/providers/cloudflare';
+import { type FetchLike, createCloudflareEmail } from '../src/providers/cloudflare/index';
 
 const config = {
   CLOUDFLARE_ACCOUNT_ID: 'acct',

@@ -43,7 +43,7 @@ export async function readViolations(ctx: VerbContext): Promise<CwsViolation[]> 
 
     const groupId = await discoverDeveloperGroupId(session.page);
     await session.page.goto(statusUrl(groupId, ctx.extension.chromeWebStoreId));
-    await session.page.waitForTimeout(2_500);
+    await session.page.waitForTimeout(2500);
 
     const violations = (await session.page.evaluate(`(() => {
       const text = (el) => (el.innerText || el.textContent || '').trim().replace(/\\s+/g, ' ');

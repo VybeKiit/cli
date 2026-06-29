@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            playwright: 'true'
+          - os: macos-latest
+            playwright: 'false'
+          - os: windows-latest
+            playwright: 'false'
+    runs-on: ${{ matrix.os }}
+    env:
+      PLAYWRIGHT_ENABLED: ${{ matrix.playwright }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        if: matrix.playwright == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - run: pnpm quality
+
+      - name: UI walkthrough tests
+        if: matrix.playwright == 'true'
+        run: pnpm test:e2e

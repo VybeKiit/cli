@@ -1,64 +1,62 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FEATURES } from '@/data/marketing';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HOME_FEATURES } from '@/data/marketing';
+import { useTranslations } from '@/hooks/use-translations';
 import { useTheme } from '@/theme/use-theme';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/**
- * Home / marketing screen — the RN parallel of the web `page.tsx`. A starting point
- * the agent reshapes to the builder's idea: hero copy, a CTA to sign up / view
- * pricing, and the {@link FEATURES} highlights. Navigates with expo-router's
- * `router.push` (the native equivalent of web's `<Link>`).
- */
+/** Home / marketing screen — hero rhythm + feature cards mirroring the web landing page. */
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors, spacing, fontSizes, fontWeights } = useTheme();
+  const { t } = useTranslations();
+  const { colors, spacing, fontSizes, fontWeights, radius } = useTheme();
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={[styles.content, { padding: spacing.lg, gap: spacing.xl }]}
     >
-      <View style={{ gap: spacing.md }}>
-        <Text
-          style={{
-            color: colors.foreground,
-            fontSize: fontSizes.xxxl,
-            fontWeight: fontWeights.bold,
-          }}
-        >
-          Your app starts here.
-        </Text>
-        <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.lg }}>
-          Tell your AI agent what you want to build. It wires the payments, the database, and the
-          deploy — you just describe the idea.
-        </Text>
-        <View style={{ gap: spacing.sm }}>
-          <Button title="Get started" size="lg" onPress={() => router.push('/signup')} />
-          <Button
-            title="See pricing"
-            size="lg"
-            variant="outline"
-            onPress={() => router.push('/pricing')}
-          />
-        </View>
-      </View>
-
-      <View style={{ gap: spacing.lg }}>
-        {FEATURES.map((feature) => (
-          <View key={feature.title} style={{ gap: spacing.xs }}>
-            <Text
-              style={{
-                color: colors.foreground,
-                fontSize: fontSizes.base,
-                fontWeight: fontWeights.semibold,
-              }}
-            >
-              {feature.title}
-            </Text>
-            <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
-              {feature.body}
-            </Text>
+      <Card style={{ borderColor: colors.primary, overflow: 'hidden' }}>
+        <CardHeader style={{ gap: spacing.md }}>
+          <Badge variant="secondary">{t('home.hero.badge')}</Badge>
+          <Text
+            style={{
+              color: colors.foreground,
+              fontSize: fontSizes.xxxl,
+              fontWeight: fontWeights.bold,
+            }}
+          >
+            {t('home.hero.title')}
+          </Text>
+          <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.lg }}>
+            {t('home.hero.description')}
+          </Text>
+          <View style={{ gap: spacing.sm }}>
+            <Button
+              title={t('home.hero.cta.getStarted')}
+              size="lg"
+              onPress={() => router.push('/signup')}
+            />
+            <Button
+              title={t('home.hero.cta.seePricing')}
+              size="lg"
+              variant="outline"
+              onPress={() => router.push('/pricing')}
+            />
           </View>
+        </CardHeader>
+      </Card>
+
+      <View style={{ gap: spacing.md }}>
+        {HOME_FEATURES.map((feature) => (
+          <Card key={feature.titleKey} style={{ borderRadius: radius }}>
+            <CardHeader>
+              <CardTitle style={{ fontSize: fontSizes.base }}>{t(feature.titleKey)}</CardTitle>
+              <CardDescription>{t(feature.bodyKey)}</CardDescription>
+            </CardHeader>
+          </Card>
         ))}
       </View>
     </ScrollView>

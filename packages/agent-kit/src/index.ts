@@ -5,6 +5,11 @@ export {
   type ToolVocabularyEntry,
 } from './tool-vocabulary';
 export {
+  SDLC_VOCABULARY,
+  renderSdlcVocabularyTable,
+  type SdlcVocabularyEntry,
+} from './sdlc-vocabulary';
+export {
   planKitUpdate,
   type KitPackageUpdate,
   type UpdatePlan,
@@ -32,3 +37,10 @@ export {
   renderServiceNameBanList,
   type DomainVocabularyEntry,
 } from './domain-vocabulary';
+export {
+  FORBIDDEN_WEB_UI_LIBS,
+  WEB_UI_SOURCES,
+  renderForbiddenWebUiLibsList,
+  renderWebUiSourcesTable,
+  type UiSourceEntry,
+} from './ui-sources';

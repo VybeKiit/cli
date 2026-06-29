@@ -9,6 +9,7 @@ describe('AGENT_LAYER_PATHS', () => {
   it('includes core agent layer files', () => {
     expect(AGENT_LAYER_PATHS).toContain('.vybekiit');
     expect(AGENT_LAYER_PATHS).toContain('AGENTS.md');
+    expect(AGENT_LAYER_PATHS).toContain('.cursor/rules/patterns.mdc');
     expect(AGENT_LAYER_PATHS).not.toContain('src');
   });
 });

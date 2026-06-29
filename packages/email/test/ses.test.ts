@@ -1,21 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createSesEmail } from '../src/providers/ses';
+import { createSesEmail } from '../src/providers/ses/index';
 
 /**
  * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. The
  * fake SendEmailCommand captures `input`, letting a test assert the exact SES payload,
  * while `send` is stubbed per case.
  */
-const { send, command } = vi.hoisted(() => {
-  return {
-    send: vi.fn(),
-    command: {
-      SendEmailCommand: class {
-        constructor(public readonly input: Record<string, unknown>) {}
-      },
+const { send, command } = vi.hoisted(() => ({
+  send: vi.fn(),
+  command: {
+    SendEmailCommand: class {
+      constructor(public readonly input: Record<string, unknown>) {}
     },
-  };
-});
+  },
+}));
 
 vi.mock('@aws-sdk/client-sesv2', () => ({
   SESv2Client: class {

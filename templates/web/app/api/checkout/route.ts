@@ -1,17 +1,14 @@
+import { isPaymentsUnconfigured } from '@/lib/payments-practice';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { NextResponse } from 'next/server';
-
 /**
  * Start a purchase: create a checkout with the configured payment provider and
  * return the URL to send the buyer to. Provider-agnostic — switching
  * `PAYMENTS_PROVIDER` changes nothing here.
  *
- * Only `productId` (the provider's purchasable id — see `CheckoutParams`) is
- * required: a buyer's pricing page sells the buyer's own product. `githubUsername`
- * and `email` are optional metadata round-tripped to the webhook when present (the
- * kit's own store sets `githubUsername` to gate repo access; most buyer apps omit it).
- * Until the `setup-payments` skill sets the provider's keys, `resolvePaymentProvider`
- * fails loud here with a config error rather than a half-built checkout.
+ * When no provider keys are set, returns a practice checkout URL on this app so
+ * the pricing flow is end-to-end in session #1 (real hosted checkout waits on
+ * the `setup-payments` skill).
  *
  * POST body: `{ productId: string, githubUsername?: string, email?: string }`.
  */
@@ -19,6 +16,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { productId, githubUsername, email } = await request.json();
   if (!productId) {
     return NextResponse.json({ error: 'productId is required.' }, { status: 400 });
+  }
+
+  if (isPaymentsUnconfigured()) {
+    const base = process.env.APP_URL ?? request.headers.get('origin') ?? 'http://localhost:3000';
+    const url = `${base}/checkout/practice?productId=${encodeURIComponent(productId)}`;
+    return NextResponse.json({ url });
   }
 
   const result = await resolvePaymentProvider().createCheckout({

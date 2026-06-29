@@ -1,63 +1,116 @@
+import { Avatar } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DASHBOARD_STATS, GETTING_STARTED } from '@/data/dashboard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs } from '@/components/ui/tabs';
+import { DASHBOARD_STATS, GETTING_STARTED_STEP_KEYS } from '@/data/dashboard';
+import { useTranslations } from '@/hooks/use-translations';
+import { useUser } from '@/hooks/use-user';
 import { useTheme } from '@/theme/use-theme';
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/**
- * Minimal signed-in dashboard — the RN parallel of the web dashboard page. The
- * route guard and real data are marked stubs the agent wires next.
- *
- * TODO(vybekiit): protect this route — redirect to /login when there is no session — skill: connect-account
- * TODO(vybekiit): replace the placeholder stats with the builder's real data — skill: save-data
- */
+/** Signed-in dashboard — stats, tabs, and getting-started list. */
 export default function DashboardScreen() {
   const { colors, spacing, fontSizes, fontWeights } = useTheme();
+  const { t } = useTranslations();
+  const { user, loading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!(loading || user)) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <ScrollView
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={[styles.content, { padding: spacing.lg, gap: spacing.md }]}
+      >
+        <Skeleton height={32} width="60%" />
+        <Skeleton height={20} width="80%" />
+        <Skeleton height={120} />
+        <Skeleton height={120} />
+      </ScrollView>
+    );
+  }
+
+  if (!user) return null;
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={[styles.content, { padding: spacing.lg, gap: spacing.xl }]}
     >
-      <View style={{ gap: spacing.xs }}>
-        <Text
-          style={{
-            color: colors.foreground,
-            fontSize: fontSizes.xxl,
-            fontWeight: fontWeights.bold,
-          }}
-        >
-          Dashboard
-        </Text>
-        <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.base }}>
-          Welcome back.
-        </Text>
-      </View>
-
-      <View style={{ gap: spacing.md }}>
-        {DASHBOARD_STATS.map((stat) => (
-          <Card key={stat.label}>
-            <CardHeader>
-              <CardDescription>{stat.label}</CardDescription>
-              <CardTitle style={{ fontSize: fontSizes.xxxl }}>{stat.value}</CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
-      </View>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Getting started</CardTitle>
-          <CardDescription>A few things you can ask your AI agent to do next.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <View style={{ gap: spacing.sm }}>
-            {GETTING_STARTED.map((step) => (
-              <Text key={step} style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
-                {step}
-              </Text>
-            ))}
+      <View style={{ gap: spacing.sm }}>
+        <Badge variant="secondary">{t('dashboard.badge')}</Badge>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <Avatar label={user.email ?? t('common.fallback.user')} />
+          <View style={{ flex: 1, gap: spacing.xs }}>
+            <Text
+              style={{
+                color: colors.foreground,
+                fontSize: fontSizes.xxl,
+                fontWeight: fontWeights.bold,
+              }}
+            >
+              {t('dashboard.title')}
+            </Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
+              {user.email}
+            </Text>
           </View>
-        </CardContent>
-      </Card>
+        </View>
+      </View>
+
+      <Tabs
+        defaultValue="overview"
+        items={[
+          {
+            value: 'overview',
+            label: t('dashboard.tabs.overview'),
+            content: (
+              <View style={{ gap: spacing.md }}>
+                {DASHBOARD_STATS.map((stat) => (
+                  <Card key={stat.labelKey}>
+                    <CardHeader>
+                      <CardDescription>{t(stat.labelKey)}</CardDescription>
+                      <CardTitle style={{ fontSize: fontSizes.xxxl }}>{t(stat.valueKey)}</CardTitle>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </View>
+            ),
+          },
+          {
+            value: 'next',
+            label: t('dashboard.tabs.nextSteps'),
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('dashboard.gettingStarted.title')}</CardTitle>
+                  <CardDescription>{t('dashboard.gettingStarted.description')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <View style={{ gap: spacing.sm }}>
+                    {GETTING_STARTED_STEP_KEYS.map((stepKey) => (
+                      <Text
+                        key={stepKey}
+                        style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}
+                      >
+                        {t(stepKey)}
+                      </Text>
+                    ))}
+                  </View>
+                </CardContent>
+              </Card>
+            ),
+          },
+        ]}
+      />
     </ScrollView>
   );
 }

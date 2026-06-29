@@ -7,7 +7,8 @@
 >
 > This is the **single source of truth** for how you behave in this project. Codex reads this file
 > natively; `CLAUDE.md` (Claude Code) and `.cursor/rules/vybekiit.mdc` (Cursor) are thin pointers to
-> it. Supported assistants: Claude Code · Codex · Cursor.
+> it; `.cursor/rules/patterns.mdc` summarizes code conventions (not SSOT). Supported assistants:
+> Claude Code · Codex · Cursor.
 
 ## This is a phone app — it talks to your backend
 
@@ -51,6 +52,19 @@ holds **no secrets**. Sign-in, saved data, payments, and email all live on the b
 5. **Write tests as you build features** and keep them green — that green suite is the builder's
    safety net and the reason updates are safe to apply.
 
+## Planning before big builds
+
+When the builder asks for something **large or vague** (a whole product shape, "like X but for Y",
+many features at once) and you have not planned together this session:
+
+1. **Offer once** (never force): *"Want to think it through together first? I'll ask one question at
+   a time until we're totally aligned."*
+2. If they **accept** → follow `skills/plan-my-idea.md`.
+3. If they **decline** → build anyway. Impatient builders stay in control.
+
+During onboarding, the one-time planning offer is handled by `onboarding.md` — do not duplicate it
+if `.vybekiit/state/planning-intro-seen` exists.
+
 ## What you may decide without asking
 
 Generic coding, design tweaks, screen layout, data shapes, and which kit package to use. These are
@@ -62,12 +76,36 @@ Generic coding, design tweaks, screen layout, data shapes, and which kit package
   don't reinvent them.** They update separately; the builder's customizations stay in this repo.
 - The backend's web address lives in **one** place: `EXPO_PUBLIC_APP_URL` in `.env` (documented by
   `.env.example`), resolved in `src/lib/config.ts`. Never scatter raw addresses through the screens.
+- **Never read `.env` values aloud or paste them in chat** — reference keys from `.env.example` only.
+  Read `env-secrets-vybekiit.md`.
 - Every call to the backend goes through `src/lib/fetch-json.ts` (relative paths resolve against the
   backend automatically). Don't hand-roll `fetch` in a screen.
 - Keep screens small and readable. Use the kit's UI primitives in `src/components`.
 - Layout uses logical flex and the system's right-to-left support, so the app mirrors automatically
   for Hebrew/Arabic users. Never hard-code `left`/`right` positions — use `start`/`end` and let the
   system flip it.
+- **All user-facing copy** lives in `messages/en.json` and is rendered via `t('flat.dotted.key')`
+  — never inline strings in screens. See `i18n-vybekiit.md`.
+
+### Before you write code (invisible quality — builder never hears this)
+
+1. **Check before create** — read `src/lib/README.md` before adding a helper; extend existing code if ≥80% overlap.
+2. **One home per concern** — auth → `auth-client.ts`, billing → `billing-client.ts`, logging → `logger.ts`.
+3. **Use the kit logger** — `import { log } from '@/lib/logger'`; never `console.log` in app code (tests may use console).
+4. **KISS** — no duplicate validation; backend validates on the server.
+5. **SSOT** — backend URL in `config.ts` only; plans in `plans.ts`.
+6. **Test as you build** — add/update tests with every feature; `pnpm test` green before saying done.
+7. **Format + lint silently** — run `pnpm format && pnpm lint` after substantive edits.
+8. **Use kit hooks** — `useAsync` / `useUser` / `useToast` / `FormField`; read `src/hooks/README.md`.
+9. **Keep functions small** (~5 lines) and props few (~5); split rather than grow.
+
+Read `.vybekiit/platform-skills/code-hygiene-vybekiit.md`, `observability-vybekiit.md`, `testing-vybekiit.md`, `format-lint-vybekiit.md`, `react-patterns-vybekiit.md`, and `planning-vybekiit.md` (when running `plan-my-idea`) for details.
+
+### UI (professional & symmetric — port, don't install new UI stacks)
+
+- Build only with `src/components/ui/*` and `@vybekiit/tokens` via `useTheme()` (ADR-0004).
+- Web block libraries (Magic UI, 21st.dev, etc.) are **visual reference** — reimplement with kit primitives. See `.vybekiit/agent/ui-sources.mobile.md`.
+- Locked sizes: `sm | default | lg | icon`. Read `.vybekiit/platform-skills/ui-consistency-vybekiit.md`.
 
 ## Wire-up markers (how "finish setup" works)
 

@@ -21,7 +21,7 @@ export default function SuccessPage() {
           minutes of payment clearing. Accept it, then point your agent at the repo and describe
           what you want to build.
         </p>
-        <Button asChild size="lg">
+        <Button asChild={true} size="lg">
           <Link href="/">Back to home</Link>
         </Button>
       </section>

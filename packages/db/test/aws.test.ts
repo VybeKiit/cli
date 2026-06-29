@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createAwsDataProvider } from '../src/providers/aws';
+import { createAwsDataProvider } from '../src/providers/aws/index';
 
 /**
  * `vi.mock` is hoisted above imports, so anything its factory references must be

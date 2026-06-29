@@ -1,4 +1,5 @@
 import { DEFAULT_APP_URL } from '@vybekiit/core';
+import process from 'node:process';
 
 /**
  * Mobile app runtime config — the one place the base API URL is resolved.

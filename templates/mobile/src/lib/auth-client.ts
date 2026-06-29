@@ -27,7 +27,7 @@ export async function signInWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
-  if (!email || !password) return fail('invalid_input', 'Enter your email and password.');
+  if (!(email && password)) return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
   return NOT_WIRED;
 }
 
@@ -39,7 +39,7 @@ export async function signUpWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
-  if (!email || !password) return fail('invalid_input', 'Enter your email and password.');
+  if (!(email && password)) return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
   return NOT_WIRED;
 }
 
@@ -48,7 +48,7 @@ export async function signUpWithPassword(
  * TODO(vybekiit): wire to `sendEmailCode` on resolveAuthProvider() from `@vybekiit/auth` — skill: connect-account
  */
 export async function sendEmailCode(email: string): Promise<Result<true>> {
-  if (!email) return fail('invalid_input', 'Enter your email.');
+  if (!email) return fail('invalid_input', 'auth.errors.enterEmail');
   return fail(
     'not_configured',
     'Email codes are not connected yet. Ask your AI agent to "add sign-in".',
@@ -60,6 +60,6 @@ export async function sendEmailCode(email: string): Promise<Result<true>> {
  * TODO(vybekiit): wire to `verifyEmailCode` on resolveAuthProvider() from `@vybekiit/auth` — skill: connect-account
  */
 export async function verifyEmailCode(email: string, code: string): Promise<Result<AuthUser>> {
-  if (!email || !code) return fail('invalid_input', 'Enter the code we sent you.');
+  if (!(email && code)) return fail('invalid_input', 'auth.errors.enterCode');
   return NOT_WIRED;
 }
