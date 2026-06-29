@@ -96,11 +96,9 @@ export function planDataModel(
   if (provider === 'supabase' || provider === 'neon') {
     const sqlParts = collections.map(emitSqlTable);
     for (const rel of relations) {
-      if (rel.type === 'many') {
-        sqlParts.push(
-          `alter table ${rel.from} add column if not exists ${rel.foreignKey} uuid references ${rel.to}(id);`,
-        );
-      }
+      sqlParts.push(
+        `alter table ${rel.from} add column if not exists ${rel.foreignKey} uuid references ${rel.to}(id);`,
+      );
     }
     migrations.push({ provider, sql: sqlParts.join('\n\n') });
   } else if (provider === 'firebase') {
