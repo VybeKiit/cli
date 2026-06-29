@@ -35,9 +35,11 @@ function page(pathname: string, candidates: DomCandidate[], hrefs: string[] = []
 
 describe('candidateToEntry', () => {
   it('prefers role+name for buttons', () => {
-    expect(
-      candidateToEntry(candidate({ tag: 'button', textContent: 'New product' })),
-    ).toEqual({ kind: 'role', role: 'button', name: 'New product' });
+    expect(candidateToEntry(candidate({ tag: 'button', textContent: 'New product' }))).toEqual({
+      kind: 'role',
+      role: 'button',
+      name: 'New product',
+    });
   });
 
   it('uses associated label for textboxes without id', () => {
@@ -49,7 +51,9 @@ describe('candidateToEntry', () => {
   });
 
   it('prefers css id for inputs with id attribute', () => {
-    expect(candidateToEntry(candidate({ tag: 'input', id: 'url', associatedLabel: 'Callback URL' }))).toEqual({
+    expect(
+      candidateToEntry(candidate({ tag: 'input', id: 'url', associatedLabel: 'Callback URL' })),
+    ).toEqual({
       kind: 'css',
       selector: 'input#url',
     });
@@ -98,7 +102,13 @@ describe('classifyCrawlPages', () => {
 
   it('matches product create button on products path', () => {
     const matched = classifyCrawlPages([
-      page('/products', [candidate({ tag: 'a', textContent: 'New product', href: 'https://app.lemonsqueezy.com/products/new' })]),
+      page('/products', [
+        candidate({
+          tag: 'a',
+          textContent: 'New product',
+          href: 'https://app.lemonsqueezy.com/products/new',
+        }),
+      ]),
     ]);
     expect(matched['product.createButton']?.entry).toEqual({
       kind: 'role',
@@ -110,7 +120,12 @@ describe('classifyCrawlPages', () => {
   it('matches webhook url input on webhook settings path', () => {
     const matched = classifyCrawlPages([
       page('/settings/webhooks', [
-        candidate({ tag: 'input', id: 'url', associatedLabel: 'Callback URL', placeholder: 'example.com/webhook' }),
+        candidate({
+          tag: 'input',
+          id: 'url',
+          associatedLabel: 'Callback URL',
+          placeholder: 'example.com/webhook',
+        }),
       ]),
     ]);
     expect(matched['webhook.urlInput']?.entry).toEqual({ kind: 'css', selector: 'input#url' });
@@ -129,7 +144,13 @@ describe('classifyCrawlPages', () => {
 
   it('scrapes variant id from variant hrefs', () => {
     const idMatches = scrapeIdMatches([
-      page('/products/1', [candidate({ tag: 'a', textContent: 'Default', href: 'https://app.lemonsqueezy.com/variants/999' })]),
+      page('/products/1', [
+        candidate({
+          tag: 'a',
+          textContent: 'Default',
+          href: 'https://app.lemonsqueezy.com/variants/999',
+        }),
+      ]),
     ]);
     const merged = mergeClassifiedMatches(idMatches);
     expect(merged['dashboard.variantId']).toBeDefined();
@@ -137,7 +158,9 @@ describe('classifyCrawlPages', () => {
 
   it('scrapes embedded store_id from page html', () => {
     const html = '<script>{"store_id":4242,"variant_id":7777}</script>';
-    const merged = mergeClassifiedMatches(scrapeIdsFromHtml(html, 'https://app.lemonsqueezy.com/dashboard'));
+    const merged = mergeClassifiedMatches(
+      scrapeIdsFromHtml(html, 'https://app.lemonsqueezy.com/dashboard'),
+    );
     expect(merged['dashboard.storeId']?.entry).toEqual({
       kind: 'css',
       selector: '[src*="/stores/4242/"]',
@@ -146,7 +169,9 @@ describe('classifyCrawlPages', () => {
 
   it('scrapes html-entity encoded store_id', () => {
     const html = '&quot;store_id&quot;:270009,&quot;order_id&quot;:1';
-    const merged = mergeClassifiedMatches(scrapeIdsFromHtml(html, 'https://app.lemonsqueezy.com/settings/stores'));
+    const merged = mergeClassifiedMatches(
+      scrapeIdsFromHtml(html, 'https://app.lemonsqueezy.com/settings/stores'),
+    );
     const entry = merged['dashboard.storeId']?.entry;
     expect(entry?.kind).toBe('css');
     if (entry?.kind === 'css') expect(entry.selector).toBe('[src*="/stores/270009/"]');

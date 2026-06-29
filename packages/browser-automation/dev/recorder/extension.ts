@@ -3,12 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { PROFILE_PATHS } from '../../src/core/types';
 import { ensureChromeWithCdp, profileDirFor } from './shared/chrome';
-import {
-  applyDraft,
-  ensureDraftTemplate,
-  renderGenerated,
-  type ParsedEntry,
-} from './shared/draft';
+import { applyDraft, ensureDraftTemplate, renderGenerated, type ParsedEntry } from './shared/draft';
 import { CWS_DRAFT_FIELDS } from './shared/fields';
 import { appendRecorderLog } from './shared/log';
 import { attachRecorderSession, printInspectorInstructions } from './shared/session';

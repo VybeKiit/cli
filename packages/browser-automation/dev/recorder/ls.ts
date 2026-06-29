@@ -4,12 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { PROFILE_PATHS } from '../../src/core/types';
 import { LS_DASHBOARD_URL } from '../../src/domains/payments/ls/types';
 import { ensureChromeWithCdp, profileDirFor } from './shared/chrome';
-import {
-  applyDraft,
-  ensureDraftTemplate,
-  renderGenerated,
-  type ParsedEntry,
-} from './shared/draft';
+import { applyDraft, ensureDraftTemplate, renderGenerated, type ParsedEntry } from './shared/draft';
 import { LS_DRAFT_FIELDS } from './shared/fields';
 import { appendRecorderLog } from './shared/log';
 import { runLsProbe } from './shared/probe/run';
@@ -89,9 +84,7 @@ async function probeSelectors(): Promise<void> {
   try {
     await session.page.waitForURL(/lemonsqueezy\.com/, { timeout: 15_000 }).catch(() => undefined);
     const report = await runLsProbe(session.page, {
-      startUrl: session.page.url().includes('/dashboard')
-        ? session.page.url()
-        : LS_DASHBOARD_URL,
+      startUrl: session.page.url().includes('/dashboard') ? session.page.url() : LS_DASHBOARD_URL,
       generatedPath: GENERATED_PATH,
       logDir: LOG_DIR,
     });
@@ -108,7 +101,9 @@ async function probeSelectors(): Promise<void> {
 async function probeE2e(): Promise<void> {
   if (process.env.PROBE_E2E_ALLOW !== '1') {
     console.log('[ls-probe-e2e] paused — creates four LS products (maintainer-only).');
-    console.log('  Set PROBE_E2E_ALLOW=1 to run, or use: recorder:ls probe-e2e cleanup (delete-only).');
+    console.log(
+      '  Set PROBE_E2E_ALLOW=1 to run, or use: recorder:ls probe-e2e cleanup (delete-only).',
+    );
     console.log('  Production ls setup uses frozen registry + fallbacks; probe is not required.');
     process.exitCode = 1;
     return;
@@ -129,9 +124,7 @@ async function probeE2e(): Promise<void> {
   try {
     await session.page.waitForURL(/lemonsqueezy\.com/, { timeout: 15_000 }).catch(() => undefined);
     const report = await runLsProbeE2e(session.page, {
-      startUrl: session.page.url().includes('/dashboard')
-        ? session.page.url()
-        : LS_DASHBOARD_URL,
+      startUrl: session.page.url().includes('/dashboard') ? session.page.url() : LS_DASHBOARD_URL,
       generatedPath: GENERATED_PATH,
       logDir: LOG_DIR,
       cleanupAfter,
@@ -194,6 +187,8 @@ if (command === 'open') {
     });
   }
 } else {
-  console.log('Usage: recorder:ls open | apply | probe | probe-e2e [--cleanup] | probe-e2e cleanup');
+  console.log(
+    'Usage: recorder:ls open | apply | probe | probe-e2e [--cleanup] | probe-e2e cleanup',
+  );
   process.exitCode = 1;
 }

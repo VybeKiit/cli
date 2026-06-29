@@ -4,11 +4,7 @@ import { SelectorMissingError } from '../../../../core/errors';
 import type { SelectorEntry } from '../../../extension/selectors';
 import { resolveLsSelectorEntry } from '../selectors/registry';
 import type { LsDraftFieldKey } from '../selectors/fields';
-import {
-  LS_FIELD_FALLBACKS,
-  locatorFromFallback,
-  type LsFieldFallback,
-} from './fieldFallbacks';
+import { LS_FIELD_FALLBACKS, locatorFromFallback, type LsFieldFallback } from './fieldFallbacks';
 
 function locatorFromEntry(page: Page, entry: SelectorEntry): Locator {
   switch (entry.kind) {
@@ -34,7 +30,10 @@ async function isUsable(locator: Locator, entry?: SelectorEntry): Promise<boolea
 
   if (entry?.kind === 'role' && entry.role === 'checkbox') {
     return first
-      .evaluate((el) => el.getAttribute('role') === 'checkbox' || (el as { type?: string }).type === 'checkbox')
+      .evaluate(
+        (el) =>
+          el.getAttribute('role') === 'checkbox' || (el as { type?: string }).type === 'checkbox',
+      )
       .catch(() => false);
   }
 
@@ -70,7 +69,13 @@ async function fallbackLocator(page: Page, fieldKey: LsDraftFieldKey): Promise<L
     return ok ? locator : null;
   }
 
-  if (await locator.first().isVisible().catch(() => false)) return locator;
+  if (
+    await locator
+      .first()
+      .isVisible()
+      .catch(() => false)
+  )
+    return locator;
   return null;
 }
 

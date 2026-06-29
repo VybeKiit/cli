@@ -48,7 +48,10 @@ export function extractPageSnapshot() {
     const rect = el.getBoundingClientRect();
     const visible =
       el.getAttribute('type') === 'file' ||
-      (style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0);
+      (style.visibility !== 'hidden' &&
+        style.display !== 'none' &&
+        rect.width > 0 &&
+        rect.height > 0);
     const tag = el.tagName.toLowerCase();
 
     out.push({

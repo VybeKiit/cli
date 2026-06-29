@@ -39,7 +39,8 @@ export function parseSetupArgs(rest: string[]): Partial<LsSetupCliArgs> {
   const out: Partial<LsSetupCliArgs> = {};
   for (const arg of rest) {
     if (arg.startsWith('--name=')) out.name = arg.slice('--name='.length);
-    else if (arg.startsWith('--price-cents=')) out.priceCents = Number(arg.slice('--price-cents='.length));
+    else if (arg.startsWith('--price-cents='))
+      out.priceCents = Number(arg.slice('--price-cents='.length));
     else if (arg.startsWith('--mode=')) out.mode = arg.slice('--mode='.length) as 'test' | 'live';
     else if (arg.startsWith('--webhook-url=')) out.webhookUrl = arg.slice('--webhook-url='.length);
     else if (arg.startsWith('--image-path=')) out.imagePath = arg.slice('--image-path='.length);

@@ -18,7 +18,10 @@ export type RunLsProbeE2eOptions = {
 };
 
 /** E2E probe: four pricing-type products + full editor on single-payment product. */
-export async function runLsProbeE2e(page: Page, options: RunLsProbeE2eOptions): Promise<ProbeReport> {
+export async function runLsProbeE2e(
+  page: Page,
+  options: RunLsProbeE2eOptions,
+): Promise<ProbeReport> {
   console.log('[ls-probe-e2e] creating four probe products and capturing selectors…');
 
   const matched: ProbeReport['matched'] = {};
@@ -52,7 +55,9 @@ export async function runLsProbeE2e(page: Page, options: RunLsProbeE2eOptions): 
   }
 
   const missing = missingFieldKeys(matched);
-  console.log(`[ls-probe-e2e] classified ${Object.keys(matched).length}/${LS_DRAFT_FIELDS.length} field keys`);
+  console.log(
+    `[ls-probe-e2e] classified ${Object.keys(matched).length}/${LS_DRAFT_FIELDS.length} field keys`,
+  );
 
   const { verified: verifiedRest, verifyFailed } = await verifyMatches(page, matched);
   const verified = [...new Set([...verifiedInline, ...verifiedRest])];

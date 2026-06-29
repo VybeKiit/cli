@@ -27,7 +27,10 @@ export function parseExpression(expression: string, lineNumber: number): ParsedE
   );
 }
 
-export function parseDraft(raw: string, knownFields: readonly string[]): Record<string, ParsedEntry> {
+export function parseDraft(
+  raw: string,
+  knownFields: readonly string[],
+): Record<string, ParsedEntry> {
   const out: Record<string, ParsedEntry> = {};
   const knownKeys = new Set<string>(knownFields);
   for (const [lineNumber, rawLine] of raw.split('\n').entries()) {

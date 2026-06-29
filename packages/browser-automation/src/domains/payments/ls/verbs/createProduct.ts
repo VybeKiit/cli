@@ -22,7 +22,10 @@ const DEFAULT_DESCRIPTION =
   'Digital product provisioned by VybeKiit. Update this description in your Lemon Squeezy dashboard.';
 
 /** Create a single-payment product with name, description, and price via the dashboard. */
-export async function createProduct(page: Page, params: LsSetupParams): Promise<CreateProductResult> {
+export async function createProduct(
+  page: Page,
+  params: LsSetupParams,
+): Promise<CreateProductResult> {
   await page.goto(`${ORIGIN}/products`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await (await lsField(page, 'product.createButton')).click({ timeout: 10_000 });
   await page.waitForURL(/\/products\/\d+/, { timeout: 20_000 });
@@ -34,7 +37,9 @@ export async function createProduct(page: Page, params: LsSetupParams): Promise<
   await (await lsField(page, 'product.nameInput')).fill(params.name);
   await (await lsField(page, 'product.descriptionInput')).first().fill(DEFAULT_DESCRIPTION);
   await (await lsField(page, 'product.pricing.single.option')).click({ timeout: 8_000 });
-  await (await lsField(page, 'product.pricing.priceInput')).fill(formatPriceFromCents(params.priceCents));
+  await (await lsField(page, 'product.pricing.priceInput')).fill(
+    formatPriceFromCents(params.priceCents),
+  );
 
   let html = await page.content();
   let storeId = scrapeStoreIdFromHtml(html);

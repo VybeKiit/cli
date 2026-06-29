@@ -27,7 +27,10 @@ export { clickSectionCreate as clickSectionCreateButton, waitForDialogInputs };
 /**
  * Open LS create dialogs to expose form fields — opens triggers only, never Save/Create submit.
  */
-export async function expandModals(page: Page, hooks: ModalExpandHooks = {}): Promise<ModalExpandResult> {
+export async function expandModals(
+  page: Page,
+  hooks: ModalExpandHooks = {},
+): Promise<ModalExpandResult> {
   const modalPages: PageSnapshot[] = [];
   const steps: ModalExpandResult['steps'] = [];
 
@@ -48,7 +51,9 @@ export async function expandModals(page: Page, hooks: ModalExpandHooks = {}): Pr
   await runStep('product-create-modal', async () => {
     await page.goto(`${ORIGIN}/products`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await page.getByRole('button', { name: /new product/i }).click({ timeout: 10_000 });
-    await page.waitForURL(/\/products\//, { timeout: 15_000 }).catch(() => waitForDialogInputs(page));
+    await page
+      .waitForURL(/\/products\//, { timeout: 15_000 })
+      .catch(() => waitForDialogInputs(page));
     await page.waitForTimeout(400);
   });
 
@@ -68,7 +73,10 @@ export async function expandModals(page: Page, hooks: ModalExpandHooks = {}): Pr
   });
 
   await runStep('webhook-create-modal', async () => {
-    await page.goto(`${ORIGIN}/settings/webhooks`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    await page.goto(`${ORIGIN}/settings/webhooks`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30_000,
+    });
     const clicked =
       (await clickSectionCreate(page, 'Webhooks')) ||
       (await page
@@ -83,7 +91,10 @@ export async function expandModals(page: Page, hooks: ModalExpandHooks = {}): Pr
   });
 
   await runStep('stores-settings-scrape', async () => {
-    await page.goto(`${ORIGIN}/settings/stores`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    await page.goto(`${ORIGIN}/settings/stores`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30_000,
+    });
     await page.waitForTimeout(500);
   });
 

@@ -26,7 +26,8 @@ export async function isCdpReachable(port: number): Promise<boolean> {
 async function waitForCdp(port: number, maxMs: number): Promise<void> {
   const start = Date.now();
   while (!(await isCdpReachable(port))) {
-    if (Date.now() - start > maxMs) throw new Error(`CDP did not come up on :${port} within ${maxMs}ms.`);
+    if (Date.now() - start > maxMs)
+      throw new Error(`CDP did not come up on :${port} within ${maxMs}ms.`);
     await delay(500);
   }
 }
@@ -79,11 +80,15 @@ export async function ensureChromeWithCdp(port: number, profileDir: string): Pro
   console.log(`Launching dedicated Chrome (profile: ${profileDir}) on :${port}…`);
   spawnChromeDetachedMac(port, profileDir);
   await waitForCdp(port, 30_000);
-  console.log(`Chrome is ready on http://localhost:${port}. Sign in once if this is a fresh profile.`);
+  console.log(
+    `Chrome is ready on http://localhost:${port}. Sign in once if this is a fresh profile.`,
+  );
 }
 
 export function profileDirFor(domain: 'extension' | 'ls'): string {
-  return domain === 'extension' ? `${homedir()}/.cws-chrome-profile` : `${homedir()}/.ls-chrome-profile`;
+  return domain === 'extension'
+    ? `${homedir()}/.cws-chrome-profile`
+    : `${homedir()}/.ls-chrome-profile`;
 }
 
 export { stopChromeDetachedMac };

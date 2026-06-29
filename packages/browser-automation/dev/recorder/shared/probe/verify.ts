@@ -26,12 +26,19 @@ export async function verifyEntryOnPage(page: Page, entry: ParsedEntry): Promise
     return first.evaluate((el) => (el as { type?: string }).type === 'file');
   }
   if (entry.kind === 'role' && entry.role === 'checkbox') {
-    return first.evaluate((el) => (el as { type?: string }).type === 'checkbox' || el.getAttribute('role') === 'checkbox');
+    return first.evaluate(
+      (el) =>
+        (el as { type?: string }).type === 'checkbox' || el.getAttribute('role') === 'checkbox',
+    );
   }
   if (entry.kind === 'role' && entry.role === 'switch') {
     return first.evaluate((el) => el.getAttribute('role') === 'switch');
   }
-  if (entry.kind === 'css' && /^#/.test(entry.selector) && !/\[type=["']file["']\]/.test(entry.selector)) {
+  if (
+    entry.kind === 'css' &&
+    /^#/.test(entry.selector) &&
+    !/\[type=["']file["']\]/.test(entry.selector)
+  ) {
     return first.evaluate((el) => el.isConnected);
   }
   return first.isVisible();

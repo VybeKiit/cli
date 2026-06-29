@@ -49,7 +49,10 @@ export function parseCwsStoreConfig(parsed: unknown): CwsStoreConfig {
 }
 
 /** Build verb context for buyer repos (WXT workspace at repo root). */
-export function buildVerbContext(discovered: DiscoverResult, log?: VerbContext['log']): VerbContext {
+export function buildVerbContext(
+  discovered: DiscoverResult,
+  log?: VerbContext['log'],
+): VerbContext {
   const extension: ExtensionConfig = {
     chromeWebStoreId: discovered.store.chromeWebStoreId,
     dir: '.',

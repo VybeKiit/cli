@@ -4,11 +4,7 @@ type JsonApiResource<T extends string, A> = {
   data: { type: T; id?: string; attributes: A; relationships?: Record<string, unknown> };
 };
 
-async function lsApiFetch<T>(
-  apiKey: string,
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
+async function lsApiFetch<T>(apiKey: string, path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${LS_API_BASE}${path}`, {
     ...init,
     headers: {
@@ -40,7 +36,10 @@ export async function createWebhookViaApi(
   events: string[] = ['order_created'],
   testMode = true,
 ): Promise<LsApiWebhookResult> {
-  const payload: JsonApiResource<'webhooks', { url: string; events: string[]; test_mode: boolean }> = {
+  const payload: JsonApiResource<
+    'webhooks',
+    { url: string; events: string[]; test_mode: boolean }
+  > = {
     data: {
       type: 'webhooks',
       attributes: { url, events, test_mode: testMode },

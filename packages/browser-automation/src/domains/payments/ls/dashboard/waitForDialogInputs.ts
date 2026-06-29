@@ -6,6 +6,9 @@ export async function waitForDialogInputs(page: Page): Promise<void> {
     .first()
     .waitFor({ state: 'visible', timeout: 8_000 })
     .catch(async () => {
-      await page.locator('input:visible, textarea:visible').first().waitFor({ state: 'visible', timeout: 5_000 });
+      await page
+        .locator('input:visible, textarea:visible')
+        .first()
+        .waitFor({ state: 'visible', timeout: 5_000 });
     });
 }

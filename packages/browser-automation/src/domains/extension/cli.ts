@@ -48,7 +48,9 @@ export function registerExtensionDomain(registry: CommandRegistry): void {
           withContext(flags, async (ctx) => {
             const { applied } = await updateListing(ctx);
             if (!flags.json) {
-              console.log(applied.length === 0 ? 'OK: no changes' : `OK: pushed ${applied.length} field(s)`);
+              console.log(
+                applied.length === 0 ? 'OK: no changes' : `OK: pushed ${applied.length} field(s)`,
+              );
             }
             return { applied };
           }),

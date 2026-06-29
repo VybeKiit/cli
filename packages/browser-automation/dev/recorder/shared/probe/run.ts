@@ -18,12 +18,16 @@ export async function runLsProbe(page: Page, options: RunLsProbeOptions): Promis
   console.log(`[ls-probe] crawling from ${options.startUrl} (href navigation only, no clicks)…`);
 
   const crawl = await crawlHrefPages(page, options.startUrl);
-  console.log(`[ls-probe] crawled ${crawl.visitedCount} page(s)${crawl.truncated ? ' (cap reached)' : ''}`);
+  console.log(
+    `[ls-probe] crawled ${crawl.visitedCount} page(s)${crawl.truncated ? ' (cap reached)' : ''}`,
+  );
 
   const htmlByUrl: Record<string, string> = {};
   for (const snap of crawl.pages) {
     if (LS_PRIORITY_PATH_RE.test(snap.url)) {
-      await page.goto(snap.url, { waitUntil: 'domcontentloaded', timeout: 30_000 }).catch(() => undefined);
+      await page
+        .goto(snap.url, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+        .catch(() => undefined);
       htmlByUrl[snap.url] = await page.content();
     }
   }

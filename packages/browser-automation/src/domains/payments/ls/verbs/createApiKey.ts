@@ -38,7 +38,9 @@ export async function createApiKeyInDashboard(page: Page, name: string): Promise
   const html = await page.content();
   const scraped = scrapeApiKeyFromHtml(html);
   if (!scraped) {
-    throw new Error('API key was created but could not be read from the dashboard (copy it manually).');
+    throw new Error(
+      'API key was created but could not be read from the dashboard (copy it manually).',
+    );
   }
   return scraped;
 }

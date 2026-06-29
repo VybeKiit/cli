@@ -4,7 +4,9 @@ export class CdpUnreachableError extends Error {
     public profileHint: string,
     cause?: unknown,
   ) {
-    super(`Could not connect to Chrome at ${endpoint}. Start Chrome with profile (${profileHint}) first.`);
+    super(
+      `Could not connect to Chrome at ${endpoint}. Start Chrome with profile (${profileHint}) first.`,
+    );
     this.name = 'CdpUnreachableError';
     if (cause) this.cause = cause;
   }
@@ -25,7 +27,9 @@ export class SelectorMissingError extends Error {
     public fieldKey: string,
     public reason: 'missing' | 'stale',
   ) {
-    super(`Selector for "${fieldKey}" is ${reason}. Run the maintainer recorder to update selectors.`);
+    super(
+      `Selector for "${fieldKey}" is ${reason}. Run the maintainer recorder to update selectors.`,
+    );
     this.name = 'SelectorMissingError';
   }
 }

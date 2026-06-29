@@ -30,7 +30,10 @@ async function probePage(page: import('playwright').Page): Promise<Candidate[]> 
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       const visible =
-        style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0;
+        style.visibility !== 'hidden' &&
+        style.display !== 'none' &&
+        rect.width > 0 &&
+        rect.height > 0;
       const tag = el.tagName.toLowerCase();
       out.push({
         tag,
@@ -60,7 +63,12 @@ async function main(): Promise<void> {
   const tabs = [];
   for (const page of lsPages) {
     const candidates = await probePage(page);
-    tabs.push({ url: page.url(), title: await page.title(), candidateCount: candidates.length, candidates });
+    tabs.push({
+      url: page.url(),
+      title: await page.title(),
+      candidateCount: candidates.length,
+      candidates,
+    });
   }
 
   const payload = { capturedAt: new Date().toISOString(), tabCount: tabs.length, tabs };

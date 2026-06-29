@@ -7,7 +7,10 @@ import { uploadProductFiles } from './uploadProductFiles';
 import { uploadProductImage } from './uploadProductImage';
 
 /** Provision LS store: browser product + image/files, dashboard API key, API webhook. */
-export async function runLsSetup(ctx: LsVerbContext, params: LsSetupParams): Promise<LsSetupResult> {
+export async function runLsSetup(
+  ctx: LsVerbContext,
+  params: LsSetupParams,
+): Promise<LsSetupResult> {
   const log = ctx.log ?? console;
   const session = await connectToLsChrome(ctx);
 

@@ -18,9 +18,18 @@ export const LS_FIELD_FALLBACKS: Partial<Record<LsDraftFieldKey, LsFieldFallback
   'product.createButton': { role: { role: 'button', name: /new product/i } },
   'product.nameInput': { css: '#input_name' },
   'product.descriptionInput': { css: '[contenteditable="true"]' },
-  'product.pricing.single.option': { sectionHeading: 'Pricing', text: { text: 'Single payment', exact: true } },
-  'product.pricing.subscription.option': { sectionHeading: 'Pricing', text: { text: 'Subscription', exact: true } },
-  'product.pricing.leadMagnet.option': { sectionHeading: 'Pricing', text: { text: 'Lead magnet', exact: true } },
+  'product.pricing.single.option': {
+    sectionHeading: 'Pricing',
+    text: { text: 'Single payment', exact: true },
+  },
+  'product.pricing.subscription.option': {
+    sectionHeading: 'Pricing',
+    text: { text: 'Subscription', exact: true },
+  },
+  'product.pricing.leadMagnet.option': {
+    sectionHeading: 'Pricing',
+    text: { text: 'Lead magnet', exact: true },
+  },
   'product.pricing.payWhatYouWant.option': {
     sectionHeading: 'Pricing',
     text: { text: 'Pay what you want', exact: true },
@@ -45,7 +54,9 @@ export const LS_FIELD_FALLBACKS: Partial<Record<LsDraftFieldKey, LsFieldFallback
   'product.actions.copyToTestModeMenuItem': { css: '[dusk="action-copy"]' },
   'product.actions.copyIdMenuItem': { css: '[dusk="action-copyId"]' },
   'product.actions.deleteMenuItem': { css: '[dusk="action-delete"]' },
-  'product.settings.licenseKeysToggle': { role: { role: 'checkbox', name: /generate license keys/i } },
+  'product.settings.licenseKeysToggle': {
+    role: { role: 'checkbox', name: /generate license keys/i },
+  },
   'product.settings.storefrontDisplayToggle': {
     role: { role: 'checkbox', name: /display product on storefront/i },
   },
@@ -62,7 +73,9 @@ export const LS_FIELD_FALLBACKS: Partial<Record<LsDraftFieldKey, LsFieldFallback
 
 export function scopeForFallback(page: Page, fallback: LsFieldFallback) {
   if (!fallback.sectionHeading) return page;
-  const heading = page.getByRole('heading', { name: new RegExp(fallback.sectionHeading, 'i') }).first();
+  const heading = page
+    .getByRole('heading', { name: new RegExp(fallback.sectionHeading, 'i') })
+    .first();
   return heading.locator('xpath=ancestor::*[self::section or self::div][1]').first();
 }
 

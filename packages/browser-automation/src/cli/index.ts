@@ -35,7 +35,10 @@ async function main(argv: string[]): Promise<number> {
       const subArgs = commandArgs.slice(1);
       const def = payDomain.commands[subCommand];
       if (!def) {
-        printError(`Unknown command "${subCommand}" for domain payments/${commandName}`, flags.json);
+        printError(
+          `Unknown command "${subCommand}" for domain payments/${commandName}`,
+          flags.json,
+        );
         return 1;
       }
       try {

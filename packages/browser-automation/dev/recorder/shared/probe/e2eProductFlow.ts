@@ -79,7 +79,12 @@ async function expandSettingsSections(
   for (const section of ['Settings', 'Confirmation modal', 'Email receipt'] as const) {
     await clickProductSection(page, section);
     await page.waitForTimeout(section === 'Settings' ? 1_200 : 700);
-    await pushSnapshot(page, pages, hooks, `expanded-${section.toLowerCase().replace(/\s+/g, '-')}`);
+    await pushSnapshot(
+      page,
+      pages,
+      hooks,
+      `expanded-${section.toLowerCase().replace(/\s+/g, '-')}`,
+    );
   }
 }
 
@@ -109,7 +114,11 @@ async function scrollAllSections(
   await dismissProductEditorPanels(page);
 }
 
-function manualMatch(fieldKey: LsDraftFieldKey, entry: ParsedEntry, pageUrl: string): ClassifiedMatch {
+function manualMatch(
+  fieldKey: LsDraftFieldKey,
+  entry: ParsedEntry,
+  pageUrl: string,
+): ClassifiedMatch {
   return {
     fieldKey,
     entry,
@@ -130,7 +139,10 @@ function manualMatch(fieldKey: LsDraftFieldKey, entry: ParsedEntry, pageUrl: str
 }
 
 function regexToLabelHint(pattern: RegExp): string {
-  return pattern.source.replace(/\\b|\\i|\\s/g, ' ').replace(/\^|\$/g, '').trim();
+  return pattern.source
+    .replace(/\\b|\\i|\\s/g, ' ')
+    .replace(/\^|\$/g, '')
+    .trim();
 }
 
 function parsedEntryFromFallback(fb: LsFieldFallback): ParsedEntry | null {
@@ -145,7 +157,8 @@ function parsedEntryFromFallback(fb: LsFieldFallback): ParsedEntry | null {
     return { kind: 'label', text };
   }
   if (fb.placeholder) {
-    const text = typeof fb.placeholder === 'string' ? fb.placeholder : regexToLabelHint(fb.placeholder);
+    const text =
+      typeof fb.placeholder === 'string' ? fb.placeholder : regexToLabelHint(fb.placeholder);
     return { kind: 'placeholder', text };
   }
   if (fb.text) {
@@ -168,7 +181,10 @@ async function captureFallbackMatches(
     if (!entry) continue;
     const locator = locatorFromFallback(page, fb);
     if ((await locator.count()) === 0) continue;
-    await locator.first().scrollIntoViewIfNeeded().catch(() => undefined);
+    await locator
+      .first()
+      .scrollIntoViewIfNeeded()
+      .catch(() => undefined);
     const ok = await verifyEntryOnPage(page, entry).catch(() => false);
     if (ok) out.push(manualMatch(fieldKey, entry, pageUrl));
   }
@@ -194,7 +210,10 @@ async function appendStableEditorMatches(
       'product.confirmation.messageInput',
       { kind: 'css', selector: '#confirmation_title ~ [contenteditable="true"]' },
     ],
-    ['product.confirmation.buttonTextInput', { kind: 'css', selector: '#confirmation_button_text' }],
+    [
+      'product.confirmation.buttonTextInput',
+      { kind: 'css', selector: '#confirmation_button_text' },
+    ],
     ['product.confirmation.buttonLinkInput', { kind: 'css', selector: '#redirect_url' }],
     ['product.emailReceipt.thankYouNoteInput', { kind: 'css', selector: '#thank_you_note' }],
     ['product.emailReceipt.buttonTextInput', { kind: 'css', selector: '#button_text' }],
@@ -284,7 +303,11 @@ async function createProbeProduct(
   await page.locator('#input_name').fill(productName);
   await page.locator('[contenteditable=true]').first().fill(PROBE_DESCRIPTION);
   manualMatches.push(
-    manualMatch('product.descriptionInput', { kind: 'css', selector: '[contenteditable="true"]' }, productUrl),
+    manualMatch(
+      'product.descriptionInput',
+      { kind: 'css', selector: '[contenteditable="true"]' },
+      productUrl,
+    ),
   );
   await pushSnapshot(page, pages, hooks, `${type}-core-fields`);
 
@@ -295,12 +318,17 @@ async function createProbeProduct(
   await pushSnapshot(page, pages, hooks, `${type}-pricing-panel`);
 
   manualMatches.push(
-    ...(await captureFallbackMatches(page, productUrl, [PRICING_OPTION_KEY[type], 'product.pricing.priceInput'])),
+    ...(await captureFallbackMatches(page, productUrl, [
+      PRICING_OPTION_KEY[type],
+      'product.pricing.priceInput',
+    ])),
   );
 
   if (type === 'subscription') {
     manualMatches.push(
-      ...(await captureFallbackMatches(page, productUrl, ['product.pricing.subscription.intervalSelect'])),
+      ...(await captureFallbackMatches(page, productUrl, [
+        'product.pricing.subscription.intervalSelect',
+      ])),
     );
   }
   if (type === 'payWhatYouWant') {
@@ -313,7 +341,10 @@ async function createProbeProduct(
   }
 
   if (type !== 'leadMagnet') {
-    await page.locator('#input_price').fill('9.99').catch(() => undefined);
+    await page
+      .locator('#input_price')
+      .fill('9.99')
+      .catch(() => undefined);
   }
 
   if (options.fullEditor) {
@@ -321,7 +352,13 @@ async function createProbeProduct(
     await page.locator('input[type="file"]').first().setInputFiles(PROBE_MEDIA_PATH);
     await page.waitForTimeout(1_000);
     await pushSnapshot(page, pages, hooks, 'single-media-uploaded');
-    manualMatches.push(manualMatch('product.media.uploadInput', { kind: 'css', selector: 'input[type="file"]' }, productUrl));
+    manualMatches.push(
+      manualMatch(
+        'product.media.uploadInput',
+        { kind: 'css', selector: 'input[type="file"]' },
+        productUrl,
+      ),
+    );
 
     await page.locator('input[type="file"]').nth(1).setInputFiles(PROBE_FILE_PATH);
     await page.waitForTimeout(1_000);

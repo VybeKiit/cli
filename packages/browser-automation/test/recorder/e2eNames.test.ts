@@ -12,9 +12,13 @@ describe('e2eNames', () => {
     const a = createE2eArtifacts();
     expect(a.runId).toBeTruthy();
     expect(probeProductName('single', a.runId)).toMatch(new RegExp(`^${LS_E2E_PREFIX}-single-`));
-    expect(probeProductName('subscription', a.runId)).toMatch(new RegExp(`^${LS_E2E_PREFIX}-subscription-`));
+    expect(probeProductName('subscription', a.runId)).toMatch(
+      new RegExp(`^${LS_E2E_PREFIX}-subscription-`),
+    );
     expect(probeProductName('leadMagnet', a.runId)).toMatch(new RegExp(`^${LS_E2E_PREFIX}-lead-`));
-    expect(probeProductName('payWhatYouWant', a.runId)).toMatch(new RegExp(`^${LS_E2E_PREFIX}-pwyw-`));
+    expect(probeProductName('payWhatYouWant', a.runId)).toMatch(
+      new RegExp(`^${LS_E2E_PREFIX}-pwyw-`),
+    );
   });
 
   it('matchesE2ePrefix detects probe artifacts', () => {

@@ -39,7 +39,11 @@ async function main(): Promise<void> {
     for (const el of document.querySelectorAll(sel)) {
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      const visible = style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0;
+      const visible =
+        style.visibility !== 'hidden' &&
+        style.display !== 'none' &&
+        rect.width > 0 &&
+        rect.height > 0;
       const tag = el.tagName.toLowerCase();
       out.push({
         tag,

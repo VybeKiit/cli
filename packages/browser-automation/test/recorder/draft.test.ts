@@ -34,7 +34,9 @@ listing.supportUrl =
   });
 
   it('rejects unknown keys', () => {
-    expect(() => parseDraft('unknown.field = locator("x")', CWS_DRAFT_FIELDS)).toThrow(/unknown field key/);
+    expect(() => parseDraft('unknown.field = locator("x")', CWS_DRAFT_FIELDS)).toThrow(
+      /unknown field key/,
+    );
   });
 
   it('accepts ls draft fields', () => {

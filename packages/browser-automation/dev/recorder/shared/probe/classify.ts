@@ -1,6 +1,9 @@
 import type { ParsedEntry } from '../draft';
 import { LS_DRAFT_FIELDS } from '../../../../src/domains/payments/ls/selectors/fields';
-import { LS_FIELD_HINTS, type LsFieldHint } from '../../../../src/domains/payments/ls/selectors/hints';
+import {
+  LS_FIELD_HINTS,
+  type LsFieldHint,
+} from '../../../../src/domains/payments/ls/selectors/hints';
 import type { ClassifiedMatch, DomCandidate, PageSnapshot } from './types';
 
 function matchesPattern(value: string | null | undefined, pattern: RegExp | undefined): boolean {
@@ -8,7 +11,12 @@ function matchesPattern(value: string | null | undefined, pattern: RegExp | unde
   return pattern.test(value);
 }
 
-function hintMatchesCandidate(hint: LsFieldHint, pathname: string, candidate: DomCandidate, fileInputIndex?: number): boolean {
+function hintMatchesCandidate(
+  hint: LsFieldHint,
+  pathname: string,
+  candidate: DomCandidate,
+  fileInputIndex?: number,
+): boolean {
   if (hint.pathPattern && !hint.pathPattern.test(pathname)) return false;
   if (hint.tags && !hint.tags.includes(candidate.tag)) return false;
   if (hint.inputType && candidate.type !== hint.inputType) return false;
@@ -16,7 +24,10 @@ function hintMatchesCandidate(hint: LsFieldHint, pathname: string, candidate: Do
     if (candidate.type !== 'file' || fileInputIndex !== hint.fileInputIndex) return false;
   }
 
-  if (hint.nearestHeadingPattern && !matchesPattern(candidate.nearestHeading, hint.nearestHeadingPattern)) {
+  if (
+    hint.nearestHeadingPattern &&
+    !matchesPattern(candidate.nearestHeading, hint.nearestHeadingPattern)
+  ) {
     return false;
   }
 
@@ -154,8 +165,7 @@ export function scrapeIdMatches(pages: PageSnapshot[]): ClassifiedMatch[] {
     }
 
     const storeMatch =
-      parsed.pathname.match(/\/stores\/(\d+)/) ??
-      parsed.pathname.match(/\/store\/(\d+)/);
+      parsed.pathname.match(/\/stores\/(\d+)/) ?? parsed.pathname.match(/\/store\/(\d+)/);
     if (storeMatch && !out.some((m) => m.fieldKey === 'dashboard.storeId')) {
       const storeId = storeMatch[1]!;
       out.push({
@@ -190,7 +200,10 @@ export function scrapeIdMatches(pages: PageSnapshot[]): ClassifiedMatch[] {
 
   for (const page of pages) {
     for (const c of page.candidates) {
-      if (c.href?.includes('/variants/') && !out.some((m) => m.fieldKey === 'dashboard.variantId')) {
+      if (
+        c.href?.includes('/variants/') &&
+        !out.some((m) => m.fieldKey === 'dashboard.variantId')
+      ) {
         const m = c.href.match(/\/variants\/(\d+)/);
         if (m) {
           out.push({
@@ -260,7 +273,9 @@ export function scrapeIdsFromHtml(html: string, pageUrl: string): ClassifiedMatc
 }
 
 /** Merge matches across pages — first win per field key. */
-export function mergeClassifiedMatches(matches: ClassifiedMatch[]): Record<string, ClassifiedMatch> {
+export function mergeClassifiedMatches(
+  matches: ClassifiedMatch[],
+): Record<string, ClassifiedMatch> {
   const out: Record<string, ClassifiedMatch> = {};
   for (const match of matches) {
     if (!out[match.fieldKey]) out[match.fieldKey] = match;

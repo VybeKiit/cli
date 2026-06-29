@@ -12,14 +12,19 @@ export async function clickSectionCreate(page: Page, headingText: string): Promi
       return true;
     }
     const row = heading.locator('xpath=ancestor::*[self::div or self::section][1]');
-    const rowButton = row.getByRole('button').filter({ hasNotText: /resend|jts/i }).last();
+    const rowButton = row
+      .getByRole('button')
+      .filter({ hasNotText: /resend|jts/i })
+      .last();
     if ((await rowButton.count()) > 0) {
       await rowButton.click({ timeout: 8_000 });
       return true;
     }
   }
 
-  const panel = page.locator(`h1:has-text("${headingText}"), h2:has-text("${headingText}")`).first();
+  const panel = page
+    .locator(`h1:has-text("${headingText}"), h2:has-text("${headingText}")`)
+    .first();
   if ((await panel.count()) > 0) {
     const btn = panel.locator('xpath=following::button[1]');
     if ((await btn.count()) > 0) {

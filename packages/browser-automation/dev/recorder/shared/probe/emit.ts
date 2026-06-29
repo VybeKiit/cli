@@ -20,7 +20,9 @@ function selectorEntryToParsed(entry: SelectorEntry): ParsedEntry {
   }
 }
 
-async function loadExistingRegistryEntries(generatedPath: string): Promise<Record<string, ParsedEntry>> {
+async function loadExistingRegistryEntries(
+  generatedPath: string,
+): Promise<Record<string, ParsedEntry>> {
   try {
     const mod = await import(pathToFileURL(generatedPath).href);
     const recorded = mod.LS_RECORDED_SELECTORS as Record<string, SelectorEntry[]> | undefined;
@@ -75,16 +77,23 @@ export async function emitProbeResults(options: {
   await mkdir(dirname(options.generatedPath), { recursive: true });
   await writeFile(options.generatedPath, body, 'utf8');
 
-  return { generatedPath: options.generatedPath, logPath, writtenCount: Object.keys(merged).length };
+  return {
+    generatedPath: options.generatedPath,
+    logPath,
+    writtenCount: Object.keys(merged).length,
+  };
 }
 
 export function printProbeSummary(report: ProbeReport, writtenCount: number): void {
   const total = LS_DRAFT_FIELDS.length;
   console.log('');
   console.log(`LS probe complete: ${writtenCount}/${total} verified selectors written.`);
-  console.log(`  Pages crawled: ${report.crawl.visitedCount}${report.crawl.truncated ? ' (truncated)' : ''}`);
+  console.log(
+    `  Pages crawled: ${report.crawl.visitedCount}${report.crawl.truncated ? ' (truncated)' : ''}`,
+  );
   if (report.verified.length > 0) console.log(`  Verified: ${report.verified.join(', ')}`);
-  if (report.verifyFailed.length > 0) console.log(`  Verify failed: ${report.verifyFailed.join(', ')}`);
+  if (report.verifyFailed.length > 0)
+    console.log(`  Verify failed: ${report.verifyFailed.join(', ')}`);
   if (report.missing.length > 0) console.log(`  Missing: ${report.missing.join(', ')}`);
   console.log('');
 }

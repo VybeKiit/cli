@@ -43,18 +43,18 @@ describe('recordChromeWebStoreId', () => {
       name: 'Extension',
     });
 
-    await expect(
-      recordChromeWebStoreId(repoRoot, 'extension', NEW_EXTENSION_ID),
-    ).rejects.toThrow(/already has chromeWebStoreId/);
+    await expect(recordChromeWebStoreId(repoRoot, 'extension', NEW_EXTENSION_ID)).rejects.toThrow(
+      /already has chromeWebStoreId/,
+    );
   });
 
   it('refuses malformed registry JSON', async () => {
     await mkdir(dirname(cwsJsonPath()), { recursive: true });
     await writeFile(cwsJsonPath(), '{ invalid', 'utf8');
 
-    await expect(
-      recordChromeWebStoreId(repoRoot, 'extension', NEW_EXTENSION_ID),
-    ).rejects.toThrow(/Could not parse/);
+    await expect(recordChromeWebStoreId(repoRoot, 'extension', NEW_EXTENSION_ID)).rejects.toThrow(
+      /Could not parse/,
+    );
   });
 });
 

@@ -22,7 +22,11 @@ export type E2eTouchResult = {
   steps: { id: string; ok: boolean; error?: string }[];
 };
 
-async function scrapeStoresPage(page: Page, hooks: E2eTouchHooks, pages: PageSnapshot[]): Promise<void> {
+async function scrapeStoresPage(
+  page: Page,
+  hooks: E2eTouchHooks,
+  pages: PageSnapshot[],
+): Promise<void> {
   await page.goto(`${ORIGIN}/settings/stores`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForTimeout(500);
   const snap = await snapshotPage(page);

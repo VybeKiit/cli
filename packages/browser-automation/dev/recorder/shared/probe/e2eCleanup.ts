@@ -19,7 +19,10 @@ export async function dismissProductEditorPanels(page: Page): Promise<void> {
   }
   const general = page.locator('a[href*="#"]').filter({ hasText: /^General$/i });
   if ((await general.count()) > 0) {
-    await general.first().click({ timeout: 8_000 }).catch(() => undefined);
+    await general
+      .first()
+      .click({ timeout: 8_000 })
+      .catch(() => undefined);
     await page.waitForTimeout(500);
   }
   await page.mouse.click(24, 320).catch(() => undefined);
@@ -44,7 +47,12 @@ async function clickDeleteMenuItem(page: Page): Promise<void> {
   const menuitem = page.getByRole('menuitem', { name: /delete product|delete/i });
   const button = page.getByRole('button', { name: /delete product/i });
 
-  await dusk.or(menuitem).or(button).first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => undefined);
+  await dusk
+    .or(menuitem)
+    .or(button)
+    .first()
+    .waitFor({ state: 'visible', timeout: 10_000 })
+    .catch(() => undefined);
 
   if ((await dusk.count()) > 0) {
     await dusk.click({ timeout: 8_000 });
@@ -74,7 +82,9 @@ export async function deleteProductOnCurrentPage(page: Page): Promise<void> {
 
 async function deleteProbeProduct(page: Page, name: string): Promise<void> {
   await page.goto(`${ORIGIN}/products`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-  const link = page.getByRole('link', { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) });
+  const link = page.getByRole('link', {
+    name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+  });
   if ((await link.count()) === 0) return;
 
   await link.first().click({ timeout: 8_000 });
@@ -107,7 +117,9 @@ export async function cleanupAllE2eByPrefix(page: Page): Promise<void> {
 }
 
 export async function loadLatestE2eArtifacts(logDir: string): Promise<LsE2eArtifacts | null> {
-  const files = (await readdir(logDir).catch(() => [])).filter((f) => f.startsWith('ls-e2e-artifacts-'));
+  const files = (await readdir(logDir).catch(() => [])).filter((f) =>
+    f.startsWith('ls-e2e-artifacts-'),
+  );
   if (files.length === 0) return null;
   files.sort();
   const raw = await readFile(resolve(logDir, files.at(-1)!), 'utf8');

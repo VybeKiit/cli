@@ -6,7 +6,10 @@ const SELECTOR_STALENESS_DAYS = 90;
 
 const DEFAULT_SELECTORS: Record<string, SelectorEntry[]> = {};
 
-const SELECTORS: Record<string, SelectorEntry[]> = { ...DEFAULT_SELECTORS, ...LS_RECORDED_SELECTORS };
+const SELECTORS: Record<string, SelectorEntry[]> = {
+  ...DEFAULT_SELECTORS,
+  ...LS_RECORDED_SELECTORS,
+};
 
 export function resolveLsSelector(fieldKey: string): SelectorEntry[] {
   const entries = SELECTORS[fieldKey];

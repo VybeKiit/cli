@@ -1,10 +1,6 @@
 import type { CommandRegistry } from '../../../cli/registry';
 import { printJson } from '../../../cli/output';
-import {
-  parseSetupArgs,
-  requireNonInteractive,
-  type LsSetupCliArgs,
-} from '../../../cli/flags';
+import { parseSetupArgs, requireNonInteractive, type LsSetupCliArgs } from '../../../cli/flags';
 import { promptLsSetup } from '../../../cli/wizard';
 import { runLsSetup, standbyLogin } from './index';
 
