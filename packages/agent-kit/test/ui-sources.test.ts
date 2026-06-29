@@ -10,9 +10,12 @@ describe('ui-sources', () => {
   it('includes core shadcn ecosystem sources', () => {
     const names = WEB_UI_SOURCES.map((s) => s.name);
     expect(names).toContain('shadcn/ui');
+    expect(names).toContain('BundUI / Shadcn UI Kit');
     expect(names).toContain('Magic UI');
     expect(names).toContain('Kokonut UI');
     expect(names).toContain('21st.dev');
+    expect(names).toContain('Untitled UI React');
+    expect(names).toContain('Gluestack UI');
   });
 
   it('renders a markdown table', () => {

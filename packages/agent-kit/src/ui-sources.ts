@@ -9,7 +9,25 @@ export interface UiSourceEntry {
   readonly bestFor: string;
   readonly install: string;
   readonly notes: string;
+  /** Local mirror namespace under src/components/ (web template). */
+  readonly namespace?: string;
+  /** Upstream GitHub source when available. */
+  readonly github?: string;
+  /** shadcn registry prefix, hosted URL template, or CLI id. */
+  readonly registry?: string;
 }
+
+/** Namespaced UI mirror targets in templates/web/src/components/. */
+export const UI_MIRROR_NAMESPACES = {
+  kit: 'ui',
+  bundui: 'bundui',
+  magicui: 'magicui',
+  kokonutui: 'kokonutui',
+  aceternity: 'aceternity',
+  untitled: 'untitled',
+  gluestack: 'gluestack',
+  blocks21st: 'blocks/21st',
+} as const;
 
 /** shadcn-compatible registries the web/extension agent may choose from. */
 export const WEB_UI_SOURCES: readonly UiSourceEntry[] = [
@@ -19,27 +37,49 @@ export const WEB_UI_SOURCES: readonly UiSourceEntry[] = [
     bestFor: 'Core primitives, forms, dialogs',
     install: 'npx shadcn@latest add <component>',
     notes: 'Default foundation — always prefer over duplicates',
+    namespace: UI_MIRROR_NAMESPACES.kit,
+    github: 'https://github.com/shadcn-ui/ui',
+    registry: 'shadcn',
+  },
+  {
+    name: 'BundUI / Shadcn UI Kit',
+    url: 'https://shadcnuikit.com/components',
+    bestFor: '503+ free shadcn variants, blocks, admin patterns',
+    install: 'npx shadcn@latest add @bundui/<name>',
+    notes: 'Mirror in components/bundui/; normalize controls to kit primitives',
+    namespace: UI_MIRROR_NAMESPACES.bundui,
+    github: 'https://github.com/bundui/components',
+    registry: '@bundui',
   },
   {
     name: 'Magic UI',
     url: 'https://magicui.design',
     bestFor: 'Animated marketing, marquees, beams, bento',
     install: 'npx shadcn@latest add @magicui/<name>',
-    notes: 'Normalize buttons/inputs to kit primitives',
+    notes: 'Mirror in components/magicui/; normalize buttons/inputs to kit primitives',
+    namespace: UI_MIRROR_NAMESPACES.magicui,
+    github: 'https://github.com/magicuidesign/magicui',
+    registry: '@magicui',
   },
   {
     name: 'Kokonut UI',
     url: 'https://kokonutui.com',
     bestFor: 'Interactive marketing, modern layouts',
     install: 'npx shadcn@latest add @kokonutui/<name>',
-    notes: 'shadcn + Motion; strip custom button sizes',
+    notes: 'Mirror in components/kokonutui/; shadcn + Motion; strip custom button sizes',
+    namespace: UI_MIRROR_NAMESPACES.kokonutui,
+    github: 'https://github.com/kokonut-labs/kokonutui',
+    registry: '@kokonutui',
   },
   {
     name: '21st.dev',
     url: 'https://21st.dev',
     bestFor: 'Community blocks, agent templates',
     install: 'npx shadcn add <registry-url>',
-    notes: 'Curate quality; reject blocks that bypass primitives',
+    notes: 'Mirror curated blocks in components/blocks/21st/; reject blocks that bypass primitives',
+    namespace: UI_MIRROR_NAMESPACES.blocks21st,
+    github: 'https://github.com/serafimcloud/21st',
+    registry: 'https://21st.dev/r/{user}/{slug}',
   },
   {
     name: 'Origin UI',
@@ -52,8 +92,30 @@ export const WEB_UI_SOURCES: readonly UiSourceEntry[] = [
     name: 'Aceternity UI',
     url: 'https://ui.aceternity.com',
     bestFor: 'High-motion landing sections',
-    install: 'Copy-paste',
-    notes: 'Marketing only; normalize spacing',
+    install: 'npx shadcn@latest add https://ui.aceternity.com/registry/<name>.json',
+    notes: 'Mirror in components/aceternity/; free tier only; no OSS GitHub',
+    namespace: UI_MIRROR_NAMESPACES.aceternity,
+    registry: 'https://ui.aceternity.com/registry/{name}.json',
+  },
+  {
+    name: 'Untitled UI React',
+    url: 'https://www.untitledui.com/react',
+    bestFor: 'Enterprise admin, dense application UI',
+    install: 'npx untitledui@latest add <name>',
+    notes: 'Mirror in components/untitled/; React Aria — never merge into ui/',
+    namespace: UI_MIRROR_NAMESPACES.untitled,
+    github: 'https://github.com/untitleduico/react',
+    registry: 'untitledui',
+  },
+  {
+    name: 'Gluestack UI',
+    url: 'https://gluestack.io/ui',
+    bestFor: 'Cross-platform patterns (web mirror only in VybeKiit)',
+    install: 'npx gluestack-ui@latest add <name>',
+    notes: 'Mirror web subset in components/gluestack/; mobile ports via kit StyleSheet only',
+    namespace: UI_MIRROR_NAMESPACES.gluestack,
+    github: 'https://github.com/gluestack/gluestack-ui',
+    registry: 'gluestack-ui',
   },
   {
     name: 'Cult UI',

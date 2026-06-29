@@ -1,3 +1,22 @@
 {
-  "files": {}
+  "files": {
+    "hero.webp": {
+      "source": "vybekiit-logo.png",
+      "width": 1000,
+      "height": 1000,
+      "bytes": 12564
+    },
+    "hero.png": {
+      "source": "vybekiit-logo.png",
+      "width": 1000,
+      "height": 1000,
+      "bytes": 162079
+    },
+    "profile.png": {
+      "source": "vybekiit-logo.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 54736
+    }
+  }
 }

@@ -1,0 +1,8103 @@
+{
+  "version": 1,
+  "generatedAt": "2026-06-29T20:44:10.776Z",
+  "componentCount": 474,
+  "sources": {
+    "magicui": 76,
+    "kokonutui": 40,
+    "aceternity": 109,
+    "untitled": 101,
+    "gluestack": 18,
+    "bundui": 130
+  },
+  "components": [
+    {
+      "source": "magicui",
+      "name": "magic-card",
+      "paths": [
+        "src/components/magicui/magic-card.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "next-themes"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "android",
+      "paths": [
+        "src/components/magicui/android.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "warp-background",
+      "paths": [
+        "src/components/magicui/warp-background.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "card",
+        "background"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "magicui",
+      "name": "line-shadow-text",
+      "paths": [
+        "src/components/magicui/line-shadow-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "aurora-text",
+      "paths": [
+        "src/components/magicui/aurora-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "morphing-text",
+      "paths": [
+        "src/components/magicui/morphing-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "scroll-progress",
+      "paths": [
+        "src/components/magicui/scroll-progress.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "lens",
+      "paths": [
+        "src/components/magicui/lens.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "pointer",
+      "paths": [
+        "src/components/magicui/pointer.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "smooth-cursor",
+      "paths": [
+        "src/components/magicui/smooth-cursor.tsx"
+      ],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "progressive-blur",
+      "paths": [
+        "src/components/magicui/progressive-blur.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "neon-gradient-card",
+      "paths": [
+        "src/components/magicui/neon-gradient-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "noise-texture",
+      "paths": [
+        "src/components/magicui/noise-texture.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "meteors",
+      "paths": [
+        "src/components/magicui/meteors.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "grid-pattern",
+      "paths": [
+        "src/components/magicui/grid-pattern.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "hexagon-pattern",
+      "paths": [
+        "src/components/magicui/hexagon-pattern.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "striped-pattern",
+      "paths": [
+        "src/components/magicui/striped-pattern.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "interactive-grid-pattern",
+      "paths": [
+        "src/components/magicui/interactive-grid-pattern.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "dot-pattern",
+      "paths": [
+        "src/components/magicui/dot-pattern.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "flickering-grid",
+      "paths": [
+        "src/components/magicui/flickering-grid.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "hero-video-dialog",
+      "paths": [
+        "src/components/magicui/hero-video-dialog.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "hero"
+    },
+    {
+      "source": "magicui",
+      "name": "code-comparison",
+      "paths": [
+        "src/components/magicui/code-comparison.tsx"
+      ],
+      "dependencies": [
+        "shiki",
+        "next-themes"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "marquee",
+      "paths": [
+        "src/components/magicui/marquee.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "globe",
+      "paths": [
+        "src/components/magicui/globe.tsx"
+      ],
+      "dependencies": [
+        "cobe@^0.6.4",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "form"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "glare-hover",
+      "paths": [
+        "src/components/magicui/glare-hover.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "shimmer-button",
+      "paths": [
+        "src/components/magicui/shimmer-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "tweet-card",
+      "paths": [
+        "src/components/magicui/tweet-card.tsx"
+      ],
+      "dependencies": [
+        "react-tweet"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "client-tweet-card",
+      "paths": [
+        "src/components/magicui/client-tweet-card.tsx"
+      ],
+      "dependencies": [
+        "react-tweet"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "bento-grid",
+      "paths": [
+        "src/components/magicui/bento-grid.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-icons"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "particles",
+      "paths": [
+        "src/components/magicui/particles.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "number-ticker",
+      "paths": [
+        "src/components/magicui/number-ticker.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "ripple",
+      "paths": [
+        "src/components/magicui/ripple.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "retro-grid",
+      "paths": [
+        "src/components/magicui/retro-grid.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-list",
+      "paths": [
+        "src/components/magicui/animated-list.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-shiny-text",
+      "paths": [
+        "src/components/magicui/animated-shiny-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-grid-pattern",
+      "paths": [
+        "src/components/magicui/animated-grid-pattern.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "border-beam",
+      "paths": [
+        "src/components/magicui/border-beam.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-beam",
+      "paths": [
+        "src/components/magicui/animated-beam.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "magicui",
+      "name": "text-reveal",
+      "paths": [
+        "src/components/magicui/text-reveal.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "dia-text-reveal",
+      "paths": [
+        "src/components/magicui/dia-text-reveal.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "hyper-text",
+      "paths": [
+        "src/components/magicui/hyper-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-gradient-text",
+      "paths": [
+        "src/components/magicui/animated-gradient-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "orbiting-circles",
+      "paths": [
+        "src/components/magicui/orbiting-circles.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "dock",
+      "paths": [
+        "src/components/magicui/dock.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "word-rotate",
+      "paths": [
+        "src/components/magicui/word-rotate.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "avatar-circles",
+      "paths": [
+        "src/components/magicui/avatar-circles.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "typing-animation",
+      "paths": [
+        "src/components/magicui/typing-animation.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "sparkles-text",
+      "paths": [
+        "src/components/magicui/sparkles-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "spinning-text",
+      "paths": [
+        "src/components/magicui/spinning-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "comic-text",
+      "paths": [
+        "src/components/magicui/comic-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "icon-cloud",
+      "paths": [
+        "src/components/magicui/icon-cloud.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "text-animate",
+      "paths": [
+        "src/components/magicui/text-animate.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "scroll-based-velocity",
+      "paths": [
+        "src/components/magicui/scroll-based-velocity.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "shiny-button",
+      "paths": [
+        "src/components/magicui/shiny-button.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "shine-border",
+      "paths": [
+        "src/components/magicui/shine-border.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-circular-progress-bar",
+      "paths": [
+        "src/components/magicui/animated-circular-progress-bar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "confetti",
+      "paths": [
+        "src/components/magicui/confetti.tsx"
+      ],
+      "dependencies": [
+        "canvas-confetti",
+        "@types/canvas-confetti"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "cool-mode",
+      "paths": [
+        "src/components/magicui/cool-mode.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "pulsating-button",
+      "paths": [
+        "src/components/magicui/pulsating-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "ripple-button",
+      "paths": [
+        "src/components/magicui/ripple-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "file-tree",
+      "paths": [
+        "src/components/magicui/file-tree.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "blur-fade",
+      "paths": [
+        "src/components/magicui/blur-fade.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "safari",
+      "paths": [
+        "src/components/magicui/safari.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "iphone",
+      "paths": [
+        "src/components/magicui/iphone.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "rainbow-button",
+      "paths": [
+        "src/components/magicui/rainbow-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "interactive-hover-button",
+      "paths": [
+        "src/components/magicui/interactive-hover-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "terminal",
+      "paths": [
+        "src/components/magicui/terminal.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "video-text",
+      "paths": [
+        "src/components/magicui/video-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "pixel-image",
+      "paths": [
+        "src/components/magicui/pixel-image.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "highlighter",
+      "paths": [
+        "src/components/magicui/highlighter.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "rough-notation"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "animated-theme-toggler",
+      "paths": [
+        "src/components/magicui/animated-theme-toggler.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "light-rays",
+      "paths": [
+        "src/components/magicui/light-rays.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "dotted-map",
+      "paths": [
+        "src/components/magicui/dotted-map.tsx"
+      ],
+      "dependencies": [
+        "svg-dotted-map"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "backlight",
+      "paths": [
+        "src/components/magicui/backlight.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "kinetic-text",
+      "paths": [
+        "src/components/magicui/kinetic-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "magicui",
+      "name": "text-3d-flip",
+      "paths": [
+        "src/components/magicui/text-3d-flip.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "marketing",
+        "hero",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "ai-prompt",
+      "paths": [
+        "src/components/kokonutui/ai-prompt.tsx",
+        "src/components/kokonutui/use-auto-resize-textarea.ts",
+        "src/components/kokonutui/anthropic.tsx",
+        "src/components/kokonutui/anthropic-dark.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "command-button",
+      "paths": [
+        "src/components/kokonutui/command-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "card-flip",
+      "paths": [
+        "src/components/kokonutui/card-flip.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "smooth-drawer",
+      "paths": [
+        "src/components/kokonutui/smooth-drawer.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "shape-hero",
+      "paths": [
+        "src/components/kokonutui/shape-hero.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "hero"
+      ],
+      "portable": false,
+      "category": "hero"
+    },
+    {
+      "source": "kokonutui",
+      "name": "ai-text-loading",
+      "paths": [
+        "src/components/kokonutui/ai-text-loading.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "shimmer-text",
+      "paths": [
+        "src/components/kokonutui/shimmer-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "carousel-cards",
+      "paths": [
+        "src/components/kokonutui/carousel-cards.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "file-upload",
+      "paths": [
+        "src/components/kokonutui/file-upload.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "action-search-bar",
+      "paths": [
+        "src/components/kokonutui/action-search-bar.tsx",
+        "src/components/kokonutui/use-debounce.ts"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "ai-input-search",
+      "paths": [
+        "src/components/kokonutui/ai-input-search.tsx",
+        "src/components/kokonutui/use-auto-resize-textarea.ts"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "form"
+    },
+    {
+      "source": "kokonutui",
+      "name": "currency-transfer",
+      "paths": [
+        "src/components/kokonutui/currency-transfer.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "background-paths",
+      "paths": [
+        "src/components/kokonutui/background-paths.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "background"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "kokonutui",
+      "name": "beams-background",
+      "paths": [
+        "src/components/kokonutui/beams-background.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "background"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "kokonutui",
+      "name": "apple-activity-card",
+      "paths": [
+        "src/components/kokonutui/apple-activity-card.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "ai-voice",
+      "paths": [
+        "src/components/kokonutui/ai-voice.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "smooth-tab",
+      "paths": [
+        "src/components/kokonutui/smooth-tab.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "team-selector",
+      "paths": [
+        "src/components/kokonutui/team-selector.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "switch-button",
+      "paths": [
+        "src/components/kokonutui/switch-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "bento-grid",
+      "paths": [
+        "src/components/kokonutui/bento-grid.tsx",
+        "src/components/kokonutui/anthropic.tsx",
+        "src/components/kokonutui/anthropic-dark.tsx",
+        "src/components/kokonutui/gemini.tsx",
+        "src/components/kokonutui/open-ai.tsx",
+        "src/components/kokonutui/open-ai-dark.tsx",
+        "src/components/kokonutui/mistral.tsx",
+        "src/components/kokonutui/deepseek.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "bento"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "social-button",
+      "paths": [
+        "src/components/kokonutui/social-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "hold-button",
+      "paths": [
+        "src/components/kokonutui/hold-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "attract-button",
+      "paths": [
+        "src/components/kokonutui/attract-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "gradient-button",
+      "paths": [
+        "src/components/kokonutui/gradient-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "v0-button",
+      "paths": [
+        "src/components/kokonutui/v0-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "toolbar",
+      "paths": [
+        "src/components/kokonutui/toolbar.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "ai-loading",
+      "paths": [
+        "src/components/kokonutui/ai-loading.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "card-stack",
+      "paths": [
+        "src/components/kokonutui/card-stack.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "avatar-picker",
+      "paths": [
+        "src/components/kokonutui/avatar-picker.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "type-writer",
+      "paths": [
+        "src/components/kokonutui/type-writer.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "swoosh-text",
+      "paths": [
+        "src/components/kokonutui/swoosh-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "sliced-text",
+      "paths": [
+        "src/components/kokonutui/sliced-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "glitch-text",
+      "paths": [
+        "src/components/kokonutui/glitch-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "matrix-text",
+      "paths": [
+        "src/components/kokonutui/matrix-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "dynamic-text",
+      "paths": [
+        "src/components/kokonutui/dynamic-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "particle-button",
+      "paths": [
+        "src/components/kokonutui/particle-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "tweet-card",
+      "paths": [
+        "src/components/kokonutui/tweet-card.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "scroll-text",
+      "paths": [
+        "src/components/kokonutui/scroll-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "liquid-glass-card",
+      "paths": [
+        "src/components/kokonutui/liquid-glass-card.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "kokonutui",
+      "name": "profile-dropdown",
+      "paths": [
+        "src/components/kokonutui/profile-dropdown.tsx",
+        "src/components/kokonutui/gemini.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "interactive",
+        "marketing",
+        "ai"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "grid",
+      "paths": [
+        "src/components/aceternity/grid.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "moving-line",
+      "paths": [
+        "src/components/aceternity/moving-line.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "sparkles",
+      "paths": [
+        "src/components/aceternity/sparkles.tsx"
+      ],
+      "dependencies": [
+        "@tsparticles/react",
+        "@tsparticles/engine",
+        "@tsparticles/slim",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "spotlight",
+      "paths": [
+        "src/components/aceternity/spotlight.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "glowing-stars",
+      "paths": [
+        "src/components/aceternity/glowing-stars.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "text-reveal-card",
+      "paths": [
+        "src/components/aceternity/text-reveal-card.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "animated-tooltip",
+      "paths": [
+        "src/components/aceternity/animated-tooltip.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "following-pointer",
+      "paths": [
+        "src/components/aceternity/following-pointer.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-beams",
+      "paths": [
+        "src/components/aceternity/background-beams.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "svg-mask-effect",
+      "paths": [
+        "src/components/aceternity/svg-mask-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "infinite-moving-cards",
+      "paths": [
+        "src/components/aceternity/infinite-moving-cards.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "3d-pin",
+      "paths": [
+        "src/components/aceternity/3d-pin.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "evervault-card",
+      "paths": [
+        "src/components/aceternity/evervault-card.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "parallax-scroll",
+      "paths": [
+        "src/components/aceternity/parallax-scroll.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "parallax-scroll-2",
+      "paths": [
+        "src/components/aceternity/parallax-scroll-2.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "parallax-hero-images",
+      "paths": [
+        "src/components/aceternity/parallax-hero-images.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "hero"
+    },
+    {
+      "source": "aceternity",
+      "name": "tracing-beam",
+      "paths": [
+        "src/components/aceternity/tracing-beam.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "container-scroll-animation",
+      "paths": [
+        "src/components/aceternity/container-scroll-animation.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "text-generate-effect",
+      "paths": [
+        "src/components/aceternity/text-generate-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "meteors",
+      "paths": [
+        "src/components/aceternity/meteors.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "card-stack",
+      "paths": [
+        "src/components/aceternity/card-stack.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "moving-border",
+      "paths": [
+        "src/components/aceternity/moving-border.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "lamp",
+      "paths": [
+        "src/components/aceternity/lamp.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "sticky-scroll-reveal",
+      "paths": [
+        "src/components/aceternity/sticky-scroll-reveal.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "floating-navbar",
+      "paths": [
+        "src/components/aceternity/floating-navbar.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "navbar"
+      ],
+      "portable": false,
+      "category": "navigation"
+    },
+    {
+      "source": "aceternity",
+      "name": "navbar-menu",
+      "paths": [
+        "src/components/aceternity/navbar-menu.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "navbar"
+      ],
+      "portable": false,
+      "category": "navigation"
+    },
+    {
+      "source": "aceternity",
+      "name": "tailwindcss-buttons",
+      "paths": [
+        "src/components/aceternity/tailwindcss-buttons.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "bento-grid",
+      "paths": [
+        "src/components/aceternity/bento-grid.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "bento"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "card-hover-effect",
+      "paths": [
+        "src/components/aceternity/card-hover-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "google-gemini-effect",
+      "paths": [
+        "src/components/aceternity/google-gemini-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "gooey-input",
+      "paths": [
+        "src/components/aceternity/gooey-input.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "form"
+    },
+    {
+      "source": "aceternity",
+      "name": "typewriter-effect",
+      "paths": [
+        "src/components/aceternity/typewriter-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-boxes",
+      "paths": [
+        "src/components/aceternity/background-boxes.tsx"
+      ],
+      "dependencies": [
+        "mini-svg-data-uri",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "3d-card",
+      "paths": [
+        "src/components/aceternity/3d-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "images-slider",
+      "paths": [
+        "src/components/aceternity/images-slider.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "direction-aware-hover",
+      "paths": [
+        "src/components/aceternity/direction-aware-hover.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "tabs",
+      "paths": [
+        "src/components/aceternity/tabs.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-tabs"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "hero-parallax",
+      "paths": [
+        "src/components/aceternity/hero-parallax.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "hero"
+    },
+    {
+      "source": "aceternity",
+      "name": "wavy-background",
+      "paths": [
+        "src/components/aceternity/wavy-background.tsx"
+      ],
+      "dependencies": [
+        "simplex-noise"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-gradient",
+      "paths": [
+        "src/components/aceternity/background-gradient.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "layout-grid",
+      "paths": [
+        "src/components/aceternity/layout-grid.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-gradient-animation",
+      "paths": [
+        "src/components/aceternity/background-gradient-animation.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "macbook-scroll",
+      "paths": [
+        "src/components/aceternity/macbook-scroll.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "input",
+      "paths": [
+        "src/components/aceternity/input.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "form"
+    },
+    {
+      "source": "aceternity",
+      "name": "label",
+      "paths": [
+        "src/components/aceternity/label.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-label"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "multi-step-loader",
+      "paths": [
+        "src/components/aceternity/multi-step-loader.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "globe",
+      "paths": [
+        "src/components/aceternity/globe.tsx"
+      ],
+      "dependencies": [
+        "three",
+        "three-globe",
+        "@react-three/fiber@alpha",
+        "@react-three/drei"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "aurora-background",
+      "paths": [
+        "src/components/aceternity/aurora-background.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "canvas-reveal-effect",
+      "paths": [
+        "src/components/aceternity/canvas-reveal-effect.tsx"
+      ],
+      "dependencies": [
+        "three",
+        "@react-three/fiber"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "hover-border-gradient",
+      "paths": [
+        "src/components/aceternity/hover-border-gradient.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "hero-highlight",
+      "paths": [
+        "src/components/aceternity/hero-highlight.tsx"
+      ],
+      "dependencies": [
+        "mini-svg-data-uri",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "hero"
+    },
+    {
+      "source": "aceternity",
+      "name": "vortex",
+      "paths": [
+        "src/components/aceternity/vortex.tsx"
+      ],
+      "dependencies": [
+        "simplex-noise",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "wobble-card",
+      "paths": [
+        "src/components/aceternity/wobble-card.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "placeholders-and-vanish-input",
+      "paths": [
+        "src/components/aceternity/placeholders-and-vanish-input.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "form"
+    },
+    {
+      "source": "aceternity",
+      "name": "flip-words",
+      "paths": [
+        "src/components/aceternity/flip-words.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "link-preview",
+      "paths": [
+        "src/components/aceternity/link-preview.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-hover-card",
+        "qss",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "glare-card",
+      "paths": [
+        "src/components/aceternity/glare-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "animated-modal",
+      "paths": [
+        "src/components/aceternity/animated-modal.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "sidebar",
+      "paths": [
+        "src/components/aceternity/sidebar.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "navigation"
+    },
+    {
+      "source": "aceternity",
+      "name": "apple-cards-carousel",
+      "paths": [
+        "src/components/aceternity/apple-cards-carousel.tsx",
+        "src/components/aceternity/use-outside-click.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "shooting-stars",
+      "paths": [
+        "src/components/aceternity/shooting-stars.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "stars-background",
+      "paths": [
+        "src/components/aceternity/stars-background.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "compare",
+      "paths": [
+        "src/components/aceternity/compare.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "card-spotlight",
+      "paths": [
+        "src/components/aceternity/card-spotlight.tsx",
+        "src/components/aceternity/canvas-reveal-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "cover",
+      "paths": [
+        "src/components/aceternity/cover.tsx",
+        "src/components/aceternity/sparkles.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "file-upload",
+      "paths": [
+        "src/components/aceternity/file-upload.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "react-dropzone",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "floating-dock",
+      "paths": [
+        "src/components/aceternity/floating-dock.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "focus-cards",
+      "paths": [
+        "src/components/aceternity/focus-cards.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-beams-with-collision",
+      "paths": [
+        "src/components/aceternity/background-beams-with-collision.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "timeline",
+      "paths": [
+        "src/components/aceternity/timeline.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "text-hover-effect",
+      "paths": [
+        "src/components/aceternity/text-hover-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "lens",
+      "paths": [
+        "src/components/aceternity/lens.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-lines",
+      "paths": [
+        "src/components/aceternity/background-lines.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "animated-testimonials",
+      "paths": [
+        "src/components/aceternity/animated-testimonials.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "testimonial"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "world-map",
+      "paths": [
+        "src/components/aceternity/world-map.tsx"
+      ],
+      "dependencies": [
+        "dotted-map",
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "code-block",
+      "paths": [
+        "src/components/aceternity/code-block.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "react-syntax-highlighter"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "carousel",
+      "paths": [
+        "src/components/aceternity/carousel.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "colourful-text",
+      "paths": [
+        "src/components/aceternity/colourful-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "squiggly-text",
+      "paths": [
+        "src/components/aceternity/squiggly-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "magnetic-button",
+      "paths": [
+        "src/components/aceternity/magnetic-button.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "notch",
+      "paths": [
+        "src/components/aceternity/notch.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "spotlight-new",
+      "paths": [
+        "src/components/aceternity/spotlight-new.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "glowing-effect",
+      "paths": [
+        "src/components/aceternity/glowing-effect.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "3d-marquee",
+      "paths": [
+        "src/components/aceternity/3d-marquee.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "container-text-flip",
+      "paths": [
+        "src/components/aceternity/container-text-flip.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "resizable-navbar",
+      "paths": [
+        "src/components/aceternity/resizable-navbar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "navbar"
+      ],
+      "portable": true,
+      "category": "navigation"
+    },
+    {
+      "source": "aceternity",
+      "name": "draggable-card",
+      "paths": [
+        "src/components/aceternity/draggable-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "sticky-banner",
+      "paths": [
+        "src/components/aceternity/sticky-banner.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "pointer-highlight",
+      "paths": [
+        "src/components/aceternity/pointer-highlight.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "stateful-button",
+      "paths": [
+        "src/components/aceternity/stateful-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "loader",
+      "paths": [
+        "src/components/aceternity/loader.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "comet-card",
+      "paths": [
+        "src/components/aceternity/comet-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "background-ripple-effect",
+      "paths": [
+        "src/components/aceternity/background-ripple-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "pixelated-canvas",
+      "paths": [
+        "src/components/aceternity/pixelated-canvas.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "canvas-text",
+      "paths": [
+        "src/components/aceternity/canvas-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "layout-text-flip",
+      "paths": [
+        "src/components/aceternity/layout-text-flip.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "dotted-glow-background",
+      "paths": [
+        "src/components/aceternity/dotted-glow-background.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "tooltip-card",
+      "paths": [
+        "src/components/aceternity/tooltip-card.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "encrypted-text",
+      "paths": [
+        "src/components/aceternity/encrypted-text.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "noise-background",
+      "paths": [
+        "src/components/aceternity/noise-background.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "background"
+    },
+    {
+      "source": "aceternity",
+      "name": "dither-shader",
+      "paths": [
+        "src/components/aceternity/dither-shader.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "webcam-pixel-grid",
+      "paths": [
+        "src/components/aceternity/webcam-pixel-grid.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "images-badge",
+      "paths": [
+        "src/components/aceternity/images-badge.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "keyboard",
+      "paths": [
+        "src/components/aceternity/keyboard.tsx"
+      ],
+      "dependencies": [
+        "@tabler/icons-react",
+        "motion/react"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "terminal",
+      "paths": [
+        "src/components/aceternity/terminal.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "3d-globe",
+      "paths": [
+        "src/components/aceternity/3d-globe.tsx"
+      ],
+      "dependencies": [
+        "three",
+        "@react-three/fiber",
+        "@react-three/drei"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "ascii-art",
+      "paths": [
+        "src/components/aceternity/ascii-art.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "scales",
+      "paths": [
+        "src/components/aceternity/scales.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "aceternity",
+      "name": "text-flipping-board",
+      "paths": [
+        "src/components/aceternity/text-flipping-board.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "animated",
+        "background",
+        "hero",
+        "motion"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "untitled",
+      "name": "app-store-buttons-outline",
+      "paths": [
+        "src/components/untitled/buttons/app-store-buttons-outline.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "app-store-buttons.demo",
+      "paths": [
+        "src/components/untitled/buttons/app-store-buttons.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "app-store-buttons.story",
+      "paths": [
+        "src/components/untitled/buttons/app-store-buttons.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "app-store-buttons",
+      "paths": [
+        "src/components/untitled/buttons/app-store-buttons.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "button-utility",
+      "paths": [
+        "src/components/untitled/buttons/button-utility.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "button",
+      "paths": [
+        "src/components/untitled/buttons/button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "buttons.demo",
+      "paths": [
+        "src/components/untitled/buttons/buttons.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "buttons.story",
+      "paths": [
+        "src/components/untitled/buttons/buttons.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "close-button",
+      "paths": [
+        "src/components/untitled/buttons/close-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "social-button",
+      "paths": [
+        "src/components/untitled/buttons/social-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "social-buttons.demo",
+      "paths": [
+        "src/components/untitled/buttons/social-buttons.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "social-buttons.story",
+      "paths": [
+        "src/components/untitled/buttons/social-buttons.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "social-logos",
+      "paths": [
+        "src/components/untitled/buttons/social-logos.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "hint-text",
+      "paths": [
+        "src/components/untitled/input/hint-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-date",
+      "paths": [
+        "src/components/untitled/input/input-date.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-file",
+      "paths": [
+        "src/components/untitled/input/input-file.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-group",
+      "paths": [
+        "src/components/untitled/input/input-group.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-number",
+      "paths": [
+        "src/components/untitled/input/input-number.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-payment",
+      "paths": [
+        "src/components/untitled/input/input-payment.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-tags-outer",
+      "paths": [
+        "src/components/untitled/input/input-tags-outer.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input-tags",
+      "paths": [
+        "src/components/untitled/input/input-tags.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "input",
+      "paths": [
+        "src/components/untitled/input/input.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "inputs.demo",
+      "paths": [
+        "src/components/untitled/input/inputs.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "inputs.story",
+      "paths": [
+        "src/components/untitled/input/inputs.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "label",
+      "paths": [
+        "src/components/untitled/input/label.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "pin-input.demo",
+      "paths": [
+        "src/components/untitled/input/pin-input.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "pin-input.story",
+      "paths": [
+        "src/components/untitled/input/pin-input.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "pin-input",
+      "paths": [
+        "src/components/untitled/input/pin-input.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "checkbox.demo",
+      "paths": [
+        "src/components/untitled/checkbox/checkbox.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "checkbox.story",
+      "paths": [
+        "src/components/untitled/checkbox/checkbox.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "checkbox",
+      "paths": [
+        "src/components/untitled/checkbox/checkbox.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "combobox",
+      "paths": [
+        "src/components/untitled/select/combobox.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "multi-select",
+      "paths": [
+        "src/components/untitled/select/multi-select.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "popover",
+      "paths": [
+        "src/components/untitled/select/popover.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select-item",
+      "paths": [
+        "src/components/untitled/select/select-item.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select-native",
+      "paths": [
+        "src/components/untitled/select/select-native.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select-shared",
+      "paths": [
+        "src/components/untitled/select/select-shared.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select.demo",
+      "paths": [
+        "src/components/untitled/select/select.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select.story",
+      "paths": [
+        "src/components/untitled/select/select.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "select",
+      "paths": [
+        "src/components/untitled/select/select.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "tag-select",
+      "paths": [
+        "src/components/untitled/select/tag-select.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "textarea.demo",
+      "paths": [
+        "src/components/untitled/textarea/textarea.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "textarea.story",
+      "paths": [
+        "src/components/untitled/textarea/textarea.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "textarea",
+      "paths": [
+        "src/components/untitled/textarea/textarea.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "avatar-label-group",
+      "paths": [
+        "src/components/untitled/avatar/avatar-label-group.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "avatar-profile-photo",
+      "paths": [
+        "src/components/untitled/avatar/avatar-profile-photo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "avatar.demo",
+      "paths": [
+        "src/components/untitled/avatar/avatar.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "avatar.story",
+      "paths": [
+        "src/components/untitled/avatar/avatar.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "avatar",
+      "paths": [
+        "src/components/untitled/avatar/avatar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badge-groups.demo",
+      "paths": [
+        "src/components/untitled/badges/badge-groups.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badge-groups.story",
+      "paths": [
+        "src/components/untitled/badges/badge-groups.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badge-groups",
+      "paths": [
+        "src/components/untitled/badges/badge-groups.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badges.demo",
+      "paths": [
+        "src/components/untitled/badges/badges.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badges.story",
+      "paths": [
+        "src/components/untitled/badges/badges.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "badges",
+      "paths": [
+        "src/components/untitled/badges/badges.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "form",
+      "paths": [
+        "src/components/untitled/form/form.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "hook-form",
+      "paths": [
+        "src/components/untitled/form/hook-form.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-account-breadcrumb",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-account-breadcrumb.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-account-button",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-account-button.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-account-card-md",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-account-card-md.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-account-card-sm",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-account-card-sm.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-account-card-xs",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-account-card-xs.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-avatar",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-avatar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-button-advanced",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-button-advanced.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-button-link",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-button-link.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-button-simple",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-button-simple.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-icon-advanced",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-icon-advanced.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-icon-simple",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-icon-simple.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-integration",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-integration.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-search-advanced",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-search-advanced.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown-search-simple",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown-search-simple.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown.story",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "dropdown",
+      "paths": [
+        "src/components/untitled/dropdown/dropdown.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "radio-buttons.demo",
+      "paths": [
+        "src/components/untitled/radio-buttons/radio-buttons.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "radio-buttons.story",
+      "paths": [
+        "src/components/untitled/radio-buttons/radio-buttons.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "radio-buttons",
+      "paths": [
+        "src/components/untitled/radio-buttons/radio-buttons.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "progress-circles",
+      "paths": [
+        "src/components/untitled/progress-indicators/progress-circles.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "progress-indicators.demo",
+      "paths": [
+        "src/components/untitled/progress-indicators/progress-indicators.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "progress-indicators.story",
+      "paths": [
+        "src/components/untitled/progress-indicators/progress-indicators.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "progress-indicators",
+      "paths": [
+        "src/components/untitled/progress-indicators/progress-indicators.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "simple-circle",
+      "paths": [
+        "src/components/untitled/progress-indicators/simple-circle.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "slider.demo",
+      "paths": [
+        "src/components/untitled/slider/slider.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "slider.story",
+      "paths": [
+        "src/components/untitled/slider/slider.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "slider",
+      "paths": [
+        "src/components/untitled/slider/slider.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "tags.demo",
+      "paths": [
+        "src/components/untitled/tags/tags.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "tags.story",
+      "paths": [
+        "src/components/untitled/tags/tags.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "tags",
+      "paths": [
+        "src/components/untitled/tags/tags.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "base"
+    },
+    {
+      "source": "untitled",
+      "name": "modal",
+      "paths": [
+        "src/components/untitled/modals/modal.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "table.demo",
+      "paths": [
+        "src/components/untitled/table/table.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "table.story",
+      "paths": [
+        "src/components/untitled/table/table.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "table",
+      "paths": [
+        "src/components/untitled/table/table.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination-base",
+      "paths": [
+        "src/components/untitled/pagination/pagination-base.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination-dot",
+      "paths": [
+        "src/components/untitled/pagination/pagination-dot.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination-line",
+      "paths": [
+        "src/components/untitled/pagination/pagination-line.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination.demo",
+      "paths": [
+        "src/components/untitled/pagination/pagination.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination.story",
+      "paths": [
+        "src/components/untitled/pagination/pagination.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "pagination",
+      "paths": [
+        "src/components/untitled/pagination/pagination.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "tabs.demo",
+      "paths": [
+        "src/components/untitled/tabs/tabs.demo.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "tabs.story",
+      "paths": [
+        "src/components/untitled/tabs/tabs.story.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "tabs",
+      "paths": [
+        "src/components/untitled/tabs/tabs.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "untitled",
+      "name": "empty-state",
+      "paths": [
+        "src/components/untitled/empty-state/empty-state.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "enterprise",
+        "admin",
+        "application"
+      ],
+      "portable": false,
+      "category": "application"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/button/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/input/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/card/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index.web",
+      "paths": [
+        "src/components/gluestack/card/index.web.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "styles",
+      "paths": [
+        "src/components/gluestack/card/styles.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/avatar/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/badge/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/checkbox/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/select/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "select-actionsheet",
+      "paths": [
+        "src/components/gluestack/select/select-actionsheet.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/textarea/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/modal/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/alert/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/spinner/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/switch/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "TabsAnimatedIndicator",
+      "paths": [
+        "src/components/gluestack/tabs/TabsAnimatedIndicator.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/tabs/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "gluestack",
+      "name": "index",
+      "paths": [
+        "src/components/gluestack/tooltip/index.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "cross-platform",
+        "patterns"
+      ],
+      "portable": false,
+      "category": "starter-kit-next"
+    },
+    {
+      "source": "bundui",
+      "name": "accordion-default",
+      "paths": [
+        "src/components/bundui/accordion-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "accordion-collapsible",
+      "paths": [
+        "src/components/bundui/accordion/components/abc.tsx",
+        "src/components/bundui/accordion/accordion.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "accordion-with-plus-icon",
+      "paths": [
+        "src/components/bundui/accordion-with-plus-icon.tsx"
+      ],
+      "dependencies": [
+        "@radix-ui/react-accordion",
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-default",
+      "paths": [
+        "src/components/bundui/alert-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-with-icon",
+      "paths": [
+        "src/components/bundui/alert-with-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-with-title",
+      "paths": [
+        "src/components/bundui/alert-with-title.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-with-action-button",
+      "paths": [
+        "src/components/bundui/alert-with-action-button.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-with-dismiss",
+      "paths": [
+        "src/components/bundui/alert-with-dismiss.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-success",
+      "paths": [
+        "src/components/bundui/alert-success.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-warning",
+      "paths": [
+        "src/components/bundui/alert-warning.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-danger",
+      "paths": [
+        "src/components/bundui/alert-danger.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "alert-dialog",
+      "paths": [
+        "src/components/bundui/alert-dialog.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "avatar-default",
+      "paths": [
+        "src/components/bundui/avatar-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "avatar-fallback-only",
+      "paths": [
+        "src/components/bundui/avatar-fallback-only.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "avatar-with-status-indicator",
+      "paths": [
+        "src/components/bundui/avatar-with-status-indicator.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "avatar-avatar-group",
+      "paths": [
+        "src/components/bundui/avatar-avatar-group.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "avatar-sizes",
+      "paths": [
+        "src/components/bundui/avatar-sizes.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-default",
+      "paths": [
+        "src/components/bundui/badge-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-secondary",
+      "paths": [
+        "src/components/bundui/badge-secondary.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-destructive",
+      "paths": [
+        "src/components/bundui/badge-destructive.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-outline",
+      "paths": [
+        "src/components/bundui/badge-outline.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-indicator",
+      "paths": [
+        "src/components/bundui/badge-indicator.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-with-icon",
+      "paths": [
+        "src/components/bundui/badge-with-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "badge-with-dismiss",
+      "paths": [
+        "src/components/bundui/badge-with-dismiss.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "breadcrumb-default",
+      "paths": [
+        "src/components/bundui/breadcrumb-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "breadcrumb-with-icon",
+      "paths": [
+        "src/components/bundui/breadcrumb-with-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "breadcrumb-with-dropdown",
+      "paths": [
+        "src/components/bundui/breadcrumb-with-dropdown.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-default",
+      "paths": [
+        "src/components/bundui/button-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-secondary",
+      "paths": [
+        "src/components/bundui/button-secondary.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-destructive",
+      "paths": [
+        "src/components/bundui/button-destructive.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-outline",
+      "paths": [
+        "src/components/bundui/button-outline.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-ghost",
+      "paths": [
+        "src/components/bundui/button-ghost.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-link",
+      "paths": [
+        "src/components/bundui/button-link.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-with-icon",
+      "paths": [
+        "src/components/bundui/button-with-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-only-icon",
+      "paths": [
+        "src/components/bundui/button-only-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-icon-sizes",
+      "paths": [
+        "src/components/bundui/button-icon-sizes.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-sizes",
+      "paths": [
+        "src/components/bundui/button-sizes.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-disabled",
+      "paths": [
+        "src/components/bundui/button-disabled.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-loading",
+      "paths": [
+        "src/components/bundui/button-loading.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "button-loading-with-icon",
+      "paths": [
+        "src/components/bundui/button-loading-with-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "calendar",
+      "paths": [
+        "src/components/bundui/calendar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-default",
+      "paths": [
+        "src/components/bundui/card-default.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-with-header",
+      "paths": [
+        "src/components/bundui/card-with-header.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-with-header-description",
+      "paths": [
+        "src/components/bundui/card-with-header-description.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-with-header-icon",
+      "paths": [
+        "src/components/bundui/card-with-header-icon.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-with-action",
+      "paths": [
+        "src/components/bundui/card-with-action.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-with-footer",
+      "paths": [
+        "src/components/bundui/card-with-footer.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "card-colored",
+      "paths": [
+        "src/components/bundui/card-colored.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "footer"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "carousel-01",
+      "paths": [
+        "src/components/bundui/carousel-01.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "carousel-02",
+      "paths": [
+        "src/components/bundui/carousel-02.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "carousel-03",
+      "paths": [
+        "src/components/bundui/carousel-03.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "chart",
+      "paths": [
+        "src/components/bundui/chart.tsx"
+      ],
+      "dependencies": [
+        "recharts"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "chart"
+      ],
+      "portable": true,
+      "category": "data-display"
+    },
+    {
+      "source": "bundui",
+      "name": "checkbox",
+      "paths": [
+        "src/components/bundui/checkbox.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "collapsible",
+      "paths": [
+        "src/components/bundui/collapsible.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "combobox",
+      "paths": [
+        "src/components/bundui/combobox.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "command",
+      "paths": [
+        "src/components/bundui/command.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "context-menu",
+      "paths": [
+        "src/components/bundui/context-menu.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "data-table-01",
+      "paths": [
+        "src/components/bundui/data-table-01.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "data-display"
+    },
+    {
+      "source": "bundui",
+      "name": "data-table-02",
+      "paths": [
+        "src/components/bundui/data-table-02.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "data-display"
+    },
+    {
+      "source": "bundui",
+      "name": "data-table-03",
+      "paths": [
+        "src/components/bundui/data-table-03.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "data-display"
+    },
+    {
+      "source": "bundui",
+      "name": "date-picker",
+      "paths": [
+        "src/components/bundui/date-picker.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "dialog",
+      "paths": [
+        "src/components/bundui/dialog.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "divider-01",
+      "paths": [
+        "src/components/bundui/divider-01.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "divider-02",
+      "paths": [
+        "src/components/bundui/divider-02.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "divider-03",
+      "paths": [
+        "src/components/bundui/divider-03.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "drawer",
+      "paths": [
+        "src/components/bundui/drawer.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "recharts"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "dropdown-menu",
+      "paths": [
+        "src/components/bundui/dropdown-menu.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "hover-card",
+      "paths": [
+        "src/components/bundui/hover-card.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "input",
+      "paths": [
+        "src/components/bundui/input.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "form"
+    },
+    {
+      "source": "bundui",
+      "name": "input-otp",
+      "paths": [
+        "src/components/bundui/input-otp.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "form"
+    },
+    {
+      "source": "bundui",
+      "name": "menubar",
+      "paths": [
+        "src/components/bundui/menubar.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "navigation-menu",
+      "paths": [
+        "src/components/bundui/navigation-menu.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "navigation"
+    },
+    {
+      "source": "bundui",
+      "name": "pagination",
+      "paths": [
+        "src/components/bundui/pagination.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "popover",
+      "paths": [
+        "src/components/bundui/popover.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "progress",
+      "paths": [
+        "src/components/bundui/progress.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "radio-group",
+      "paths": [
+        "src/components/bundui/radio-group.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "select-01",
+      "paths": [
+        "src/components/bundui/select-01.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "select-02",
+      "paths": [
+        "src/components/bundui/select-02.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "select-03",
+      "paths": [
+        "src/components/bundui/select-03.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "select-04",
+      "paths": [
+        "src/components/bundui/select-04.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "select-05",
+      "paths": [
+        "src/components/bundui/select-05.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "sheet",
+      "paths": [
+        "src/components/bundui/sheet.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "sidebar",
+      "paths": [
+        "src/components/bundui/sidebar.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "navigation"
+    },
+    {
+      "source": "bundui",
+      "name": "skeleton",
+      "paths": [
+        "src/components/bundui/skeleton.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "slider",
+      "paths": [
+        "src/components/bundui/slider.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "switch",
+      "paths": [
+        "src/components/bundui/switch.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "tabs",
+      "paths": [
+        "src/components/bundui/tabs.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "toggle-group",
+      "paths": [
+        "src/components/bundui/toggle-group.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "tooltip",
+      "paths": [
+        "src/components/bundui/tooltip.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "hero-sections-01",
+      "paths": [
+        "src/components/bundui/hero-sections-01.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "hero",
+        "form"
+      ],
+      "portable": true,
+      "category": "hero"
+    },
+    {
+      "source": "bundui",
+      "name": "cta-sections-01",
+      "paths": [
+        "src/components/bundui/cta-sections-01.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "pricing-sections-01",
+      "paths": [
+        "src/components/bundui/pricing-sections-01.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "pricing",
+        "form"
+      ],
+      "portable": true,
+      "category": "pricing"
+    },
+    {
+      "source": "bundui",
+      "name": "newsletter-sections",
+      "paths": [
+        "src/components/bundui/newsletter-sections.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "blog-sections-01",
+      "paths": [
+        "src/components/bundui/blog-sections-01.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "page-layouts-01",
+      "paths": [
+        "src/components/bundui/page-layouts/components/app-header.tsx",
+        "src/components/bundui/page-layouts/components/app-sidebar.tsx",
+        "src/components/bundui/page-layouts/components/nav-main.tsx",
+        "src/components/bundui/page-layouts/components/nav-projects.tsx",
+        "src/components/bundui/page-layouts/page-layouts.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "sign-in-forms-01",
+      "paths": [
+        "src/components/bundui/sign-in-forms-01.tsx"
+      ],
+      "dependencies": [
+        "react-hook-form",
+        "@hookform/resolvers",
+        "zod"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button",
+        "form"
+      ],
+      "portable": true,
+      "category": "form"
+    },
+    {
+      "source": "bundui",
+      "name": "modal-dialogs-01",
+      "paths": [
+        "src/components/bundui/modal-dialogs-01.tsx"
+      ],
+      "dependencies": [
+        "react-hook-form",
+        "@hookform/resolvers",
+        "zod"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "animated-text",
+      "paths": [
+        "src/components/bundui/animated-text/animated-text.tsx",
+        "src/components/bundui/animated-text/animated-text-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "animated-gradient-text",
+      "paths": [
+        "src/components/bundui/animated-gradient-text.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "text-morph-animation",
+      "paths": [
+        "src/components/bundui/text-morph-animation/text-morph-animation-example.tsx",
+        "src/components/bundui/text-morph-animation/text-morph.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "text-gradient-scroll",
+      "paths": [
+        "src/components/bundui/text-gradient-scroll/text-gradient-scroll-example.tsx",
+        "src/components/bundui/text-gradient-scroll/text-gradient-scroll.tsx"
+      ],
+      "dependencies": [
+        "lenis",
+        "motion",
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "circle-path",
+      "paths": [
+        "src/components/bundui/circle-path.tsx"
+      ],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "bento",
+        "animated"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "flip-card",
+      "paths": [
+        "src/components/bundui/flip-card/flip-card.tsx",
+        "src/components/bundui/flip-card/flip-card-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "magnetic-hover-effect-01",
+      "paths": [
+        "src/components/bundui/magnetic-hover-effect/magnetic-effect.tsx",
+        "src/components/bundui/magnetic-hover-effect/magnetic-hover-effect-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "magnetic-hover-effect-02",
+      "paths": [
+        "src/components/bundui/magnetic-hover-effect/magnetic-effect.tsx",
+        "src/components/bundui/magnetic-hover-effect/magnetic-hover-effect-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "tilt-effect",
+      "paths": [
+        "src/components/bundui/tilt-effect/tilt-effect-example.tsx",
+        "src/components/bundui/tilt-effect/tilt-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "ripple-effect-01",
+      "paths": [
+        "src/components/bundui/ripple-effect/ripple-effect-example.tsx",
+        "src/components/bundui/ripple-effect/ripple-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "ripple-effect-02",
+      "paths": [
+        "src/components/bundui/ripple-effect/ripple-effect-example.tsx",
+        "src/components/bundui/ripple-effect/ripple-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "ripple-effect-03",
+      "paths": [
+        "src/components/bundui/ripple-effect/ripple-effect-example.tsx",
+        "src/components/bundui/ripple-effect/ripple-effect.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "mouse-trail",
+      "paths": [
+        "src/components/bundui/mouse-trail/mouse-trail.tsx",
+        "src/components/bundui/mouse-trail/mouse-trail-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "animated-beam",
+      "paths": [
+        "src/components/bundui/animated-beam/animated-beam.tsx",
+        "src/components/bundui/animated-beam/animated-beam-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": false,
+      "category": "background"
+    },
+    {
+      "source": "bundui",
+      "name": "animated-tab",
+      "paths": [
+        "src/components/bundui/animated-tab/animated-tab.tsx",
+        "src/components/bundui/animated-tab/animated-tab-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "animated-gradient-border",
+      "paths": [
+        "src/components/bundui/animated-gradient-border/gradient-border.tsx",
+        "src/components/bundui/animated-gradient-border/animated-gradient-border-example.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "animated"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "counter-animation",
+      "paths": [
+        "src/components/bundui/counter-animation/counter-animation.tsx",
+        "src/components/bundui/counter-animation/counter-animation-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "floating-button",
+      "paths": [
+        "src/components/bundui/floating-button/floating-button.tsx",
+        "src/components/bundui/floating-button/floating-button-example.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "usehooks-ts",
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "hero",
+        "button"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "image-comparison",
+      "paths": [
+        "src/components/bundui/image-comparison/image-comparison.tsx",
+        "src/components/bundui/image-comparison/image-comparison-example.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "interactive-image-slider",
+      "paths": [
+        "src/components/bundui/interactive-image-slider/interactive-image-slider.tsx",
+        "src/components/bundui/interactive-image-slider/interactive-image-slider-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "hero"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "image-reveal",
+      "paths": [
+        "src/components/bundui/image-reveal/image-reveal.tsx",
+        "src/components/bundui/image-reveal/image-reveal-example.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "marquee-effect",
+      "paths": [
+        "src/components/bundui/marquee-effect/marquee-effect.tsx",
+        "src/components/bundui/marquee-effect/marquee-effect-example.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "react-use-measure"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "parallax-cards",
+      "paths": [
+        "src/components/bundui/parallax-cards/parallax-cards-example.tsx",
+        "src/components/bundui/parallax-cards/parallax-card-effect.tsx"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "motion",
+        "lenis"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "card"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "scroll-progress-bar-01",
+      "paths": [
+        "src/components/bundui/scroll-progress-bar-01.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "scroll-progress-bar-02",
+      "paths": [
+        "src/components/bundui/scroll-progress-bar-02.tsx"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "sliding-number",
+      "paths": [
+        "src/components/bundui/sliding-number/sliding-number-example.tsx",
+        "src/components/bundui/sliding-number/sliding-number.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "react-use-measure"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "countdown",
+      "paths": [
+        "src/components/bundui/countdown/countdown.tsx",
+        "src/components/bundui/countdown/countdown-example.tsx"
+      ],
+      "dependencies": [
+        "motion",
+        "react-use-measure"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "meteor-shower-animation",
+      "paths": [
+        "src/components/bundui/meteor-shower-animation/meteor-shower.tsx",
+        "src/components/bundui/meteor-shower-animation/meteor-shower-animation-example.tsx"
+      ],
+      "dependencies": [
+        "next-themes"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "form",
+        "background"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "snowfall-animation",
+      "paths": [
+        "src/components/bundui/snowfall-animation/snowfall-animation-example.tsx",
+        "src/components/bundui/snowfall-animation/snowfall.tsx"
+      ],
+      "dependencies": [
+        "next-themes"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "background"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "fireworks",
+      "paths": [
+        "src/components/bundui/fireworks/fireworks.tsx",
+        "src/components/bundui/fireworks/fireworks-example.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "background",
+        "animated"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "floating-paths",
+      "paths": [
+        "src/components/bundui/floating-paths/floating-paths.tsx",
+        "src/components/bundui/floating-paths/floating-paths-example.tsx"
+      ],
+      "dependencies": [
+        "motion"
+      ],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "background"
+      ],
+      "portable": false,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "fluid-particles",
+      "paths": [
+        "src/components/bundui/fluid-particles/fluid-particles.tsx",
+        "src/components/bundui/fluid-particles/fluid-particles-example.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "background"
+      ],
+      "portable": true,
+      "category": "component"
+    },
+    {
+      "source": "bundui",
+      "name": "stars",
+      "paths": [
+        "src/components/bundui/stars/stars-example.tsx",
+        "src/components/bundui/stars/stars.tsx"
+      ],
+      "dependencies": [],
+      "tags": [
+        "shadcn",
+        "variants",
+        "forms",
+        "admin",
+        "background",
+        "animated"
+      ],
+      "portable": true,
+      "category": "component"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "$schema": "./ui-registry-manifest.schema.json",
+  "version": 1,
+  "templateRoot": "templates/web",
+  "sources": {
+    "bundui": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://bundui.io/r/registry.json",
+      "itemUrlTemplate": "https://bundui.io/r/{name}.json",
+      "namespace": "bundui",
+      "discover": true,
+      "filter": "free",
+      "tags": ["shadcn", "variants", "forms", "admin"]
+    },
+    "magicui": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://magicui.design/r/registry.json",
+      "itemUrlTemplate": "https://magicui.design/r/{name}.json",
+      "namespace": "magicui",
+      "discover": true,
+      "filter": "ui-only",
+      "tags": ["animated", "marketing", "hero", "bento"]
+    },
+    "kokonutui": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://kokonutui.com/r/registry.json",
+      "itemUrlTemplate": "https://kokonutui.com/r/{name}.json",
+      "namespace": "kokonutui",
+      "discover": true,
+      "filter": "all",
+      "tags": ["interactive", "marketing", "ai"]
+    },
+    "aceternity": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://ui.aceternity.com/registry/registry.json",
+      "itemUrlTemplate": "https://ui.aceternity.com/registry/{name}.json",
+      "namespace": "aceternity",
+      "discover": true,
+      "filter": "ui-only",
+      "tags": ["animated", "background", "hero", "motion"]
+    },
+    "21st": {
+      "type": "21st-registry",
+      "namespace": "blocks/21st",
+      "authEnv": "API_KEY_21ST",
+      "installPath": "src/components/blocks/21st",
+      "searchQueries": ["hero", "pricing", "dashboard", "auth", "settings", "saas landing"],
+      "tags": ["blocks", "community"],
+      "urls": []
+    },
+    "untitled": {
+      "type": "github-tree",
+      "repo": "untitleduico/react",
+      "branch": "main",
+      "paths": [
+        "components/base/buttons",
+        "components/base/input",
+        "components/base/checkbox",
+        "components/base/select",
+        "components/base/textarea",
+        "components/base/avatar",
+        "components/base/badges",
+        "components/base/form",
+        "components/base/dropdown",
+        "components/base/radio-buttons",
+        "components/base/progress-indicators",
+        "components/base/slider",
+        "components/base/tags",
+        "components/application/modals",
+        "components/application/table",
+        "components/application/pagination",
+        "components/application/tabs",
+        "components/application/empty-state"
+      ],
+      "namespace": "untitled",
+      "tags": ["enterprise", "admin", "application"]
+    },
+    "gluestack": {
+      "type": "github-tree",
+      "repo": "gluestack/gluestack-ui",
+      "branch": "main",
+      "paths": [
+        "apps/starter-kit-next/components/ui/button",
+        "apps/starter-kit-next/components/ui/input",
+        "apps/starter-kit-next/components/ui/card",
+        "apps/starter-kit-next/components/ui/avatar",
+        "apps/starter-kit-next/components/ui/badge",
+        "apps/starter-kit-next/components/ui/checkbox",
+        "apps/starter-kit-next/components/ui/select",
+        "apps/starter-kit-next/components/ui/textarea",
+        "apps/starter-kit-next/components/ui/modal",
+        "apps/starter-kit-next/components/ui/alert",
+        "apps/starter-kit-next/components/ui/spinner",
+        "apps/starter-kit-next/components/ui/switch",
+        "apps/starter-kit-next/components/ui/tabs",
+        "apps/starter-kit-next/components/ui/tooltip"
+      ],
+      "namespace": "gluestack",
+      "tags": ["cross-platform", "patterns"]
+    }
+  }
+}
