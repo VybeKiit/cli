@@ -1,3 +1,4 @@
+import { ClientStateProvider } from '@/lib/client-state';
 import { Toaster } from '@/components/toaster';
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import { initI18n, t } from '@/lib/i18n';
@@ -32,23 +33,25 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.foreground,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: t(SCREEN_TITLES.index) }} />
-        <Stack.Screen name="login" options={{ title: t(SCREEN_TITLES.login) }} />
-        <Stack.Screen name="signup" options={{ title: t(SCREEN_TITLES.signup) }} />
-        <Stack.Screen name="verify" options={{ title: t(SCREEN_TITLES.verify) }} />
-        <Stack.Screen name="pricing" options={{ title: t(SCREEN_TITLES.pricing) }} />
-        <Stack.Screen name="dashboard" options={{ title: t(SCREEN_TITLES.dashboard) }} />
-      </Stack>
-      <Toaster />
-      <ReportModeDev />
+      <ClientStateProvider>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.foreground,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="index" options={{ title: t(SCREEN_TITLES.index) }} />
+          <Stack.Screen name="login" options={{ title: t(SCREEN_TITLES.login) }} />
+          <Stack.Screen name="signup" options={{ title: t(SCREEN_TITLES.signup) }} />
+          <Stack.Screen name="verify" options={{ title: t(SCREEN_TITLES.verify) }} />
+          <Stack.Screen name="pricing" options={{ title: t(SCREEN_TITLES.pricing) }} />
+          <Stack.Screen name="dashboard" options={{ title: t(SCREEN_TITLES.dashboard) }} />
+        </Stack>
+        <Toaster />
+        <ReportModeDev />
+      </ClientStateProvider>
     </SafeAreaProvider>
   );
 }
