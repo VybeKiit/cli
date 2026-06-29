@@ -17,17 +17,7 @@ function TechLogoItem({
         className="tech-logo inline-flex items-center gap-3"
         style={{ ['--brand-color' as string]: hoverColor }}
       >
-        <span className="relative inline-flex h-[22px] w-[22px] shrink-0">
-          <LogoMarkIcon
-            className="tech-logo-icon absolute inset-0 h-[22px] w-[22px] opacity-100 transition-opacity group-hover:opacity-0"
-            slug={slug}
-          />
-          <LogoMarkIcon
-            className="tech-logo-icon absolute inset-0 h-[22px] w-[22px] opacity-0 transition-opacity group-hover:opacity-100"
-            slug={slug}
-            variant="3d"
-          />
-        </span>
+        <LogoMarkIcon className="tech-logo-icon h-[22px] w-[22px] shrink-0" slug={slug} />
         <span className="tech-logo-label">{label}</span>
       </span>
     </li>

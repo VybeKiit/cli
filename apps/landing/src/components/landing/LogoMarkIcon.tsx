@@ -42,9 +42,25 @@ export const LOGO_MARK_RASTERS: Record<string, string> = {
   betterauth: '/brand-marks/betterauth.webp',
   wxt: '/brand-marks/wxt.webp',
   sonner: '/brand-marks/sonner.webp',
+  google: '/brand-marks/google.webp',
   googleplay: '/brand-marks/googleplay.webp',
   googlechrome: '/brand-marks/googlechrome.webp',
   appstore: '/brand-marks/appstore.webp',
+  cloudflare: '/brand-marks/cloudflare.webp',
+  expo: '/brand-marks/expo.webp',
+  github: '/brand-marks/github.webp',
+  mongodb: '/brand-marks/mongodb.webp',
+  nextdotjs: '/brand-marks/nextdotjs.webp',
+  nodedotjs: '/brand-marks/nodedotjs.webp',
+  plausible: '/brand-marks/plausible.webp',
+  react: '/brand-marks/react.webp',
+  resend: '/brand-marks/resend.webp',
+  sentry: '/brand-marks/sentry.webp',
+  stripe: '/brand-marks/stripe.webp',
+  supabase: '/brand-marks/supabase.webp',
+  tailwindcss: '/brand-marks/tailwindcss.webp',
+  typescript: '/brand-marks/typescript.webp',
+  vercel: '/brand-marks/vercel.webp',
 };
 
 const customSvgMarks: Record<string, LogoMarkIconData> = {
@@ -94,19 +110,11 @@ export const LOGO_MARK_ICONS: Record<string, LogoMarkIconData> = {
 interface LogoMarkIconProps {
   readonly slug: string;
   readonly className?: string;
-  readonly variant?: 'flat' | '3d';
-}
-
-function markSrc(slug: string, variant: 'flat' | '3d'): string | undefined {
-  if (variant === '3d') {
-    return `/brand-marks-3d/${slug}.webp`;
-  }
-  return LOGO_MARK_RASTERS[slug];
 }
 
 /** Official brand mark — raster WebP when available, otherwise mono SVG path. */
-export function LogoMarkIcon({ slug, className, variant = 'flat' }: LogoMarkIconProps) {
-  const rasterSrc = markSrc(slug, variant) ?? LOGO_MARK_RASTERS[slug];
+export function LogoMarkIcon({ slug, className }: LogoMarkIconProps) {
+  const rasterSrc = LOGO_MARK_RASTERS[slug];
   if (rasterSrc) {
     return (
       <img
@@ -117,14 +125,6 @@ export function LogoMarkIcon({ slug, className, variant = 'flat' }: LogoMarkIcon
         decoding="async"
         draggable={false}
         height={22}
-        onError={(event) => {
-          if (variant === '3d') {
-            const flat = LOGO_MARK_RASTERS[slug];
-            if (flat) {
-              event.currentTarget.src = flat;
-            }
-          }
-        }}
         src={rasterSrc}
         width={22}
       />

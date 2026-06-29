@@ -36,17 +36,7 @@ export function HeroBuilderToolOrbit({ className }: { readonly className?: strin
               animationDelay: position.delay,
             }}
           >
-            <span className="relative inline-flex h-8 w-8">
-              <LogoMarkIcon
-                className="hero-builder-orbit-icon absolute inset-0 opacity-100 transition-opacity group-hover:opacity-0"
-                slug={mark.slug}
-              />
-              <LogoMarkIcon
-                className="hero-builder-orbit-icon absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
-                slug={mark.slug}
-                variant="3d"
-              />
-            </span>
+            <LogoMarkIcon className="hero-builder-orbit-icon h-8 w-8" slug={mark.slug} />
             <span className="hero-builder-orbit-label">{mark.label}</span>
           </div>
         );
