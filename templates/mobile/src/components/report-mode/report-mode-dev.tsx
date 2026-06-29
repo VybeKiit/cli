@@ -1,0 +1,268 @@
+import { submitMobileReport } from '@/lib/report-mode/submit-report';
+import { useReportDockMobile } from '@/components/report-mode/use-report-dock-mobile';
+import { DOCK_CORNER_LABELS, DOCK_CORNER_PRESETS, getDockInsetStyle } from '@vybekiit/report-mode';
+import { usePathname } from 'expo-router';
+import { useState } from 'react';
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type GestureResponderEvent,
+} from 'react-native';
+import { useTheme } from '@/theme/use-theme';
+
+/** Dev-only Report Mode — R FAB with Pin corners (no drag); tap-to-report. */
+export function ReportModeDev() {
+  const pathname = usePathname();
+  const { colors } = useTheme();
+  const { corner, setCorner } = useReportDockMobile();
+  const [active, setActive] = useState(false);
+  const [showPin, setShowPin] = useState(false);
+  const [tapPoint, setTapPoint] = useState<{ x: number; y: number } | null>(null);
+  const [note, setNote] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  if (!__DEV__) {
+    return null;
+  }
+
+  const fabInset = getDockInsetStyle(corner, 24);
+
+  function handleScreenTap(event: GestureResponderEvent) {
+    if (!active || tapPoint) {
+      return;
+    }
+    const { locationX, locationY } = event.nativeEvent;
+    setTapPoint({ x: Math.round(locationX), y: Math.round(locationY) });
+  }
+
+  async function handleSubmit() {
+    if (!(tapPoint && note.trim())) {
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await submitMobileReport({
+        route: pathname,
+        selector: `tap@${tapPoint.x},${tapPoint.y}`,
+        builderNote: note.trim(),
+        consoleErrors: [],
+      });
+      setTapPoint(null);
+      setNote('');
+      setActive(false);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <>
+      {active ? null : (
+        <View style={[styles.fabCluster, fabInset]} pointerEvents="box-none">
+          {showPin ? (
+            <View
+              style={[
+                styles.pinRow,
+                { backgroundColor: colors.background, borderColor: colors.border },
+              ]}
+            >
+              {DOCK_CORNER_PRESETS.map((preset) => (
+                <Pressable
+                  key={preset}
+                  onPress={() => {
+                    setCorner(preset);
+                    setShowPin(false);
+                  }}
+                  style={[
+                    styles.pinChip,
+                    {
+                      backgroundColor: corner === preset ? colors.primary : colors.muted,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={{
+                      color: corner === preset ? colors.primaryForeground : colors.foreground,
+                      fontSize: 11,
+                    }}
+                  >
+                    {DOCK_CORNER_LABELS[preset]}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+          <View style={styles.fabRow}>
+            <Pressable
+              accessibilityLabel="Pin report button position"
+              onPress={() => setShowPin((value) => !value)}
+              style={[
+                styles.pinButton,
+                { borderColor: colors.border, backgroundColor: colors.background },
+              ]}
+            >
+              <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>Pin</Text>
+            </Pressable>
+            <Pressable
+              accessibilityLabel="Toggle report mode"
+              onPress={() => setActive(true)}
+              style={[styles.fab, { backgroundColor: colors.primary }]}
+            >
+              <Text style={[styles.fabText, { color: colors.primaryForeground }]}>R</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+
+      {active && !tapPoint ? (
+        <Pressable style={styles.overlay} onPress={handleScreenTap}>
+          <View style={styles.banner}>
+            <Text style={styles.bannerText}>Tap what looks wrong</Text>
+            <Pressable onPress={() => setActive(false)} hitSlop={8}>
+              <Text style={styles.bannerAction}>Cancel</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      ) : null}
+
+      <Modal visible={Boolean(tapPoint)} transparent={true} animationType="fade">
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalCard, { backgroundColor: colors.background }]}>
+            <Text style={[styles.modalTitle, { color: colors.foreground }]}>
+              What looks wrong here?
+            </Text>
+            <TextInput
+              autoFocus={true}
+              value={note}
+              onChangeText={setNote}
+              placeholder="e.g. button does nothing"
+              placeholderTextColor={colors.mutedForeground}
+              style={[styles.input, { color: colors.foreground, borderColor: colors.border }]}
+            />
+            <View style={styles.modalActions}>
+              <Pressable
+                disabled={submitting || !note.trim()}
+                onPress={() => void handleSubmit()}
+                style={[styles.sendButton, { backgroundColor: colors.primary }]}
+              >
+                <Text style={{ color: colors.primaryForeground }}>Send</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setTapPoint(null);
+                  setNote('');
+                }}
+              >
+                <Text style={{ color: colors.mutedForeground }}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  fabCluster: {
+    position: 'absolute',
+    zIndex: 9999,
+    elevation: 4,
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  fabRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pinButton: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  pinRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    maxWidth: 220,
+  },
+  pinChip: {
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  fab: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fabText: {
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 9998,
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+  banner: {
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bannerText: {
+    color: '#451a03',
+    fontSize: 13,
+    flex: 1,
+  },
+  bannerAction: {
+    color: '#451a03',
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+    padding: 16,
+  },
+  modalCard: {
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  sendButton: {
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+});

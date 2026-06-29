@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/toaster';
+import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import { initI18n, t } from '@/lib/i18n';
 import { useTheme } from '@/theme/use-theme';
 import { Stack } from 'expo-router';
@@ -47,6 +48,7 @@ export default function RootLayout() {
         <Stack.Screen name="dashboard" options={{ title: t(SCREEN_TITLES.dashboard) }} />
       </Stack>
       <Toaster />
+      <ReportModeDev />
     </SafeAreaProvider>
   );
 }
