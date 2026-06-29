@@ -48,6 +48,11 @@ describe('selectToolchain', () => {
     expect(names).toEqual(['gh', 'wrangler', 'atlas']);
   });
 
+  it('omits Supabase CLI for neon (MCP-first data provider)', () => {
+    const names = selectToolchain({ DATA_PROVIDER: 'neon' }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'wrangler']);
+  });
+
   it('includes the AWS CLI (once) when any single AWS adapter is set', () => {
     expect(selectToolchain({ STORAGE_PROVIDER: 's3' }).map((tool) => tool.name)).toEqual([
       'gh',

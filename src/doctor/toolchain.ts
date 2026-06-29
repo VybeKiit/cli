@@ -327,6 +327,11 @@ export function selectToolchain(
     case 'aws':
       add(AWS);
       break;
+    case 'neon':
+    case 'firebase':
+    case 'local':
+      // MCP-first or zero-config — no Supabase CLI
+      break;
     default:
       add(SUPABASE);
   }
