@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/kv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fast key-value storage adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",

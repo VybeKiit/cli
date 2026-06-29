@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/tenancy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Team workspace primitives for VybeKiit.",
   "license": "MIT",
   "type": "module",

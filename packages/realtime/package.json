@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/realtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Live update channels for VybeKiit.",
   "license": "MIT",
   "type": "module",

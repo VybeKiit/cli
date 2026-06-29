@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/security",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless app-layer security for VybeKiit — per-IP rate limiting + same-origin lock, secure by default, toggled from the core env SSOT. No framework, no UI.",
   "license": "MIT",
   "type": "module",

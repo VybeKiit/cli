@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/email",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless, provider-agnostic transactional email for VybeKiit — one EmailProvider interface with a Cloudflare adapter (send). No UI.",
   "license": "MIT",
   "type": "module",

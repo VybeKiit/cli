@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/observability",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless observability for VybeKiit — one ObservabilityProvider interface with a Sentry adapter and a local no-op default. No UI.",
   "license": "MIT",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "VybeKiit core — env + Zod-validated config (the single source of truth), a Result type, and shared constants.",
   "license": "MIT",
   "type": "module",

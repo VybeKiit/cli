@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/agent-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared agent-layer source of truth for VybeKiit — the buyer-skill contract, the tool-jargon → plain-language vocabulary, and the kit-update planner. Template-specific skills stay embedded in each template.",
   "license": "MIT",
   "type": "module",

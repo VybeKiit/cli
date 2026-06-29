@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/report-mode",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Dev-only Report Mode — structured vibe-coder reports and native assistant deeplink handoff.",
   "license": "MIT",
   "type": "module",

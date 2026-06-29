@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/ai",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Runtime LLM adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",

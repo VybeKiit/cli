@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/deploy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless, provider-agnostic hosting for VybeKiit — one Hosting interface with a Cloudflare adapter (deploy + status). No UI.",
   "license": "MIT",
   "type": "module",

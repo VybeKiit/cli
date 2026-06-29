@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/assets",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless asset optimization and CDN delivery for VybeKiit — build-time compression plus provider-native transform URLs.",
   "license": "MIT",
   "type": "module",
