@@ -63,21 +63,21 @@ function parsePosition(raw: string | null): ReportDockPosition {
   }
 }
 
-export function loadDockPosition(storage: DockPositionStorage | null): ReportDockPosition {
-  if (!storage) {
+export function loadDockPosition(store: DockPositionStorage | null): ReportDockPosition {
+  if (!store) {
     return DEFAULT_DOCK_POSITION;
   }
-  return parsePosition(storage.getItem(REPORT_DOCK_STORAGE_KEY));
+  return parsePosition(store.getItem(REPORT_DOCK_STORAGE_KEY));
 }
 
 export function saveDockPosition(
-  storage: DockPositionStorage | null,
+  store: DockPositionStorage | null,
   position: ReportDockPosition,
 ): void {
-  if (!storage) {
+  if (!store) {
     return;
   }
-  storage.setItem(REPORT_DOCK_STORAGE_KEY, JSON.stringify(position));
+  store.setItem(REPORT_DOCK_STORAGE_KEY, JSON.stringify(position));
 }
 
 /** Convert a dock position to fixed CSS coordinates. */
@@ -148,9 +148,9 @@ export function getDockInsetStyle(
 
 /** Load saved dock position but only return a corner anchor (mobile — no custom drag). */
 export function loadDockCornerOnly(
-  storage: DockPositionStorage | null,
+  store: DockPositionStorage | null,
 ): Exclude<ReportDockAnchor, 'custom'> {
-  const position = loadDockPosition(storage);
+  const position = loadDockPosition(store);
   if (position.anchor === 'custom') {
     return 'bottom-right';
   }
