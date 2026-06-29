@@ -4,30 +4,31 @@
 
 ## Catalog
 
-Web/extension: `.vybekiit/agent/ui-sources.md`  
-Mobile: `.vybekiit/agent/ui-sources.mobile.md`
+Web/extension: `.vybekiit/agent/ui-sources.md` · routing: `ui-routing-vybekiit.md`  
+Mobile: `.vybekiit/agent/ui-sources.mobile.md` · porting: `ui-port-from-web-vybekiit.md`
 
 ## Non-negotiable contract
 
-1. **Primitive-first** — `Button`, `Input`, `Card`, `Label`, `Alert`, `Badge`, `Separator`, `Skeleton`, `Avatar`, `Tabs`, `Dialog`, `Sheet`, `Select`, `DropdownMenu`, `Sonner` from `src/components/ui/`; no raw `<button>` / `<input>` for standard controls
-2. **Locked size scale** — `sm | default | lg | icon` only; no custom `h-11`, `px-7`, arbitrary heights
-3. **Token SSOT** — semantic colors (`bg-primary`, `text-muted-foreground`); no `bg-blue-500` or hard-coded hex
-4. **Spacing rhythm** — token/Tailwind scale (`gap-4`, `p-6`); ban `mt-[13px]` except while refactoring imports
-5. **Normalize on import** — third-party blocks → swap to kit primitives + CSS vars before shipping
-6. **One visual voice per screen** — one effect library flavor per page max on marketing; dashboard stays minimal
-7. **Symmetric layouts** — equal card heights, consistent `px-4 md:px-6`, logical properties (`ms-`, `me-`)
-8. **No second design system** — Tremor/charts-only exception for dashboards
+1. **Primitive-first** — `Button`, `Input`, `Card`, … from `src/components/ui/` for standard controls in buyer screens
+2. **Namespace mirrors** — upstream copies live in `bundui/`, `magicui/`, `kokonutui/`, `aceternity/`, `untitled/`, `gluestack/`, `blocks/21st/` — never merge into `ui/` wholesale
+3. **Locked size scale** — `sm | default | lg | icon` only in buyer-facing screens
+4. **Token SSOT** — semantic colors from `@vybekiit/tokens` CSS vars
+5. **Normalize on import** — when composing screens from mirrored blocks, swap controls to kit primitives + token colors
+6. **One visual voice per screen** — one effect-library flavor per marketing page
+7. **No second design system** — HeroUI, MUI, Chakra forbidden; Untitled/Gluestack isolated in their namespaces
 
 ## Normalize-on-import workflow
 
-1. Copy block from approved source (see catalog)
-2. `rg '<button|<input' <file>` — replace with kit components
-3. Map colors to CSS variables / theme tokens
-4. Strip conflicting Tailwind size classes
-5. Preview in dev — confirm buttons match existing screens
-6. Run UI checks from `check-safety` step 7
+1. Pick block via MCP `suggest_ui_blend` or search local mirror
+2. Copy/adapt into `app/` or `src/components/<feature>/`
+3. `rg '<button|<input' <file>` — replace with kit components
+4. Map colors to CSS variables / theme tokens
+5. Strip conflicting Tailwind size classes
+6. Preview in dev — confirm buttons match existing screens
+7. Run UI checks from `check-safety` step 7
 
 ## Cross-refs
 
 - `shadcn-vybekiit.md` — kit component conventions
+- `ui-routing-vybekiit.md` — intent → source mapping
 - `code-hygiene-vybekiit.md` — no duplicate helpers in UI code

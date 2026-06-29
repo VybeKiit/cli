@@ -45,6 +45,7 @@ when the buyer selects Cloudflare hosting (default).
 | `observability-vybekiit.md` | generic coding + `track-errors` | `@vybekiit/core` logger + `@vybekiit/observability` |
 | `sentry-vybekiit.md` | `track-errors` | docs.sentry.io + `@vybekiit/observability` |
 | `ui-consistency-vybekiit.md` | generic UI work | `.vybekiit/agent/ui-sources.md` + kit primitives |
+| `ui-routing-vybekiit.md` | generic UI work | VybeKiit UI catalog MCP + intent → source map |
 | `testing-vybekiit.md` | generic coding (invisible) | vitest + Testing Library patterns in `src/**/__tests__/` |
 | `format-lint-vybekiit.md` | generic coding (invisible) | Biome in template — `pnpm format` / `pnpm lint` |
 | `react-patterns-vybekiit.md` | generic coding (invisible) | kit hooks, FormField, folder map, soft size limits |

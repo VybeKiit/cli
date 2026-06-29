@@ -48,8 +48,10 @@ export {
 } from './domain-vocabulary';
 export {
   FORBIDDEN_WEB_UI_LIBS,
+  UI_MIRROR_NAMESPACES,
   WEB_UI_SOURCES,
   renderForbiddenWebUiLibsList,
   renderWebUiSourcesTable,
   type UiSourceEntry,
 } from './ui-sources';
+export { TONE_RULES, renderToneSection, type ToneRule } from './tone-rules';

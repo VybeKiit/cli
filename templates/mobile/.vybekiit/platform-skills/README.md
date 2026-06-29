@@ -22,6 +22,7 @@ Expo docs remain source of truth: https://docs.expo.dev/skills/
 | `observability-vybekiit.md` | generic coding + `track-errors` | `@vybekiit/core` logger + `@vybekiit/observability` |
 | `sentry-vybekiit.md` | `track-errors` | docs.sentry.io + `@vybekiit/observability` |
 | `ui-consistency-vybekiit.md` | generic UI work | `.vybekiit/agent/ui-sources.mobile.md` + kit primitives |
+| `ui-port-from-web-vybekiit.md` | generic UI work | web mirror catalog + StyleSheet port rules |
 | `testing-vybekiit.md` | generic coding (invisible) | vitest patterns in `src/**/__tests__/` |
 | `format-lint-vybekiit.md` | generic coding (invisible) | Biome — `pnpm format` / `pnpm lint` |
 | `react-patterns-vybekiit.md` | generic coding (invisible) | kit hooks, FormField, folder map |

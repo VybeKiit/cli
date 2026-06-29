@@ -3,6 +3,10 @@
     {
       "repo": "expo/skills",
       "skills": ["*"]
+    },
+    {
+      "repo": "firebase/agent-skills",
+      "skills": ["*"]
     }
   ]
 }

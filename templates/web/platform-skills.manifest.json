@@ -3,6 +3,22 @@
     {
       "repo": "vercel-labs/agent-skills",
       "skills": ["vercel-react-best-practices", "vercel-composition-patterns"]
+    },
+    {
+      "repo": "neondatabase/agent-skills",
+      "skills": ["*"]
+    },
+    {
+      "repo": "firebase/agent-skills",
+      "skills": ["*"]
+    },
+    {
+      "repo": "aws/agent-toolkit-for-aws/skills",
+      "skills": [
+        "aws-cli",
+        "deploy-serverless-application",
+        "troubleshoot-cloudformation-deployments"
+      ]
     }
   ],
   "_notes": {
