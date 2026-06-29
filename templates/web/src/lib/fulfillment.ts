@@ -26,7 +26,9 @@ export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
     const existing = await db.query<OrderRecord>('orders', { order_id: event.orderId });
     if (existing.ok && existing.value.length > 0) {
       const row = existing.value[0];
-      if (!row) return fail('fulfillment_failed', 'Order row missing.');
+      if (!row) {
+        return fail('fulfillment_failed', 'Order row missing.');
+      }
       const updated = await db.update<OrderRecord>('orders', row.id, {
         email: event.customerEmail ?? '',
         refunded: event.isRefund,
@@ -51,6 +53,8 @@ export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
       { onConflict: 'order_id' },
     );
 
-  if (error) return fail('fulfillment_failed', error.message);
+  if (error) {
+    return fail('fulfillment_failed', error.message);
+  }
   return ok(true);
 }

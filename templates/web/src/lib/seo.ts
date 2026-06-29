@@ -1,4 +1,4 @@
-import type { JsonLdBlock, MetadataInput, NextMetadataOutput, PageType } from '@vybekiit/seo';
+import type { MetadataInput, NextMetadataOutput, PageType } from '@vybekiit/seo';
 import { resolveSeoProvider } from '@vybekiit/seo';
 import type { Metadata } from 'next';
 import { getCms } from './cms-client';
@@ -32,7 +32,9 @@ export function buildPageMetadata(input: {
 export async function buildBlogGeo(slug: string) {
   const cms = getCms();
   const page = await cms.getPage(slug);
-  if (!page) return null;
+  if (!page) {
+    return null;
+  }
 
   const seo = getSeo();
   const input: MetadataInput = {

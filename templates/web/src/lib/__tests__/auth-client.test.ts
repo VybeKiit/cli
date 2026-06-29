@@ -67,7 +67,9 @@ describe('auth-client over the server routes', () => {
   it('validates input before hitting the network', async () => {
     const result = await signInWithPassword('', '');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('invalid_input');
+    if (!result.ok) {
+      expect(result.error.code).toBe('invalid_input');
+    }
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -75,7 +77,9 @@ describe('auth-client over the server routes', () => {
     vi.mocked(global.fetch).mockResolvedValue(fetchResponse(401, { error: 'Wrong password.' }));
     const result = await signInWithPassword('you@local.dev', 'nope');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.message).toBe('Wrong password.');
+    if (!result.ok) {
+      expect(result.error.message).toBe('Wrong password.');
+    }
   });
 });
 
@@ -103,7 +107,9 @@ describe('billing-client over the checkout route', () => {
   it('requires a plan id before hitting the network', async () => {
     const result = await startCheckout('');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('invalid_input');
+    if (!result.ok) {
+      expect(result.error.code).toBe('invalid_input');
+    }
     expect(global.fetch).not.toHaveBeenCalled();
   });
 });

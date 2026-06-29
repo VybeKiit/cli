@@ -1,4 +1,5 @@
 import { appConfigSchema, createLogger, parseEnv, resolveDefaultLogLevel } from '@vybekiit/core';
+import process from 'node:process';
 
 const app = parseEnv(appConfigSchema, process.env);
 const level = resolveDefaultLogLevel(app.NODE_ENV, app.LOG_LEVEL);

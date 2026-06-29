@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import process from 'node:process';
 
 /**
  * Server-only session-cookie helpers shared by the `/api/auth/*` routes.

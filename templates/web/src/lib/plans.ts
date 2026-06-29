@@ -17,7 +17,7 @@ export interface Plan {
 }
 
 /** Slug derived from plan id — e.g. plan_pro → pro. */
-function planSlug(id: string): string {
+function _planSlug(id: string): string {
   return id.replace(/^plan_/, '');
 }
 

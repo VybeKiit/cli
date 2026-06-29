@@ -30,7 +30,9 @@ export async function signInWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
-  if (!(email && password)) return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
+  if (!(email && password)) {
+    return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
+  }
   return postJson<AuthUser>(ROUTES.signIn, { email, password });
 }
 
@@ -39,20 +41,26 @@ export async function signUpWithPassword(
   email: string,
   password: string,
 ): Promise<Result<AuthUser>> {
-  if (!(email && password)) return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
+  if (!(email && password)) {
+    return fail('invalid_input', 'auth.errors.enterEmailAndPassword');
+  }
   return postJson<AuthUser>(ROUTES.signUp, { email, password });
 }
 
 /** Send a one-time sign-in code to an email address. */
 export async function sendEmailCode(email: string): Promise<Result<true>> {
-  if (!email) return fail('invalid_input', 'auth.errors.enterEmail');
+  if (!email) {
+    return fail('invalid_input', 'auth.errors.enterEmail');
+  }
   const result = await postJson<{ ok: true }>(ROUTES.sendCode, { email });
   return result.ok ? ok(true) : result;
 }
 
 /** Verify a one-time code and sign the builder in. */
 export async function verifyEmailCode(email: string, code: string): Promise<Result<AuthUser>> {
-  if (!(email && code)) return fail('invalid_input', 'auth.errors.enterCode');
+  if (!(email && code)) {
+    return fail('invalid_input', 'auth.errors.enterCode');
+  }
   return postJson<AuthUser>(ROUTES.verify, { email, code });
 }
 

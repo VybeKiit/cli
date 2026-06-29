@@ -15,7 +15,9 @@ describe('startCheckout', () => {
   it('returns invalid_input when plan id is empty', async () => {
     const result = await startCheckout('');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('invalid_input');
+    if (!result.ok) {
+      expect(result.error.code).toBe('invalid_input');
+    }
   });
 
   it('posts the plan id to /api/checkout and returns the checkout url', async () => {
@@ -27,6 +29,8 @@ describe('startCheckout', () => {
 
     const result = await startCheckout('plan_pro');
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.value.url).toContain('checkout/practice');
+    if (result.ok) {
+      expect(result.value.url).toContain('checkout/practice');
+    }
   });
 });

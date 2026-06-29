@@ -15,6 +15,8 @@ import { type Result, fail } from '@vybekiit/core';
  * renders and the rest of the app runs — only the buy action waits on real keys.
  */
 export async function startCheckout(planId: string): Promise<Result<{ url: string }>> {
-  if (!planId) return fail('invalid_input', 'pricing.errors.pickPlanFirst');
+  if (!planId) {
+    return fail('invalid_input', 'pricing.errors.pickPlanFirst');
+  }
   return postJson<{ url: string }>('/api/checkout', { productId: planId });
 }
