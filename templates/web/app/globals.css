@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /*
- * shadcn/ui design tokens (neutral base, HSL channels). The Tailwind theme maps
- * semantic color names to these vars, so components style with `bg-primary` etc.
+ * shadcn/ui design tokens (neutral base, HSL channels). Runtime theme overrides
+ * may apply via useTheme() reading @vybekiit/tokens cssVariables().
  * Dark mode follows the visitor's OS preference — no theme toggle to wire.
  */
 @layer base {
