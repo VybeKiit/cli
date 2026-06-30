@@ -1,4 +1,4 @@
-import { getCms } from '@/lib/cms-client';
+import { getCms } from '@/lib/providers';
 import { getSeo } from '@/lib/seo';
 
 /** llms.txt for AI crawlers and answer engines — skill: add-blog, go-live */

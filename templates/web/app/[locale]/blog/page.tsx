@@ -1,6 +1,6 @@
 import { MarketingShell } from '@/components/marketing-shell';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCms } from '@/lib/cms-client';
+import { getCms } from '@/lib/providers';
 import { buildPageMetadata } from '@/lib/seo';
 import { Link } from '@/i18n/navigation';
 import { setRequestLocale } from 'next-intl/server';

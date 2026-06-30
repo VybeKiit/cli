@@ -1,4 +1,4 @@
-import { getJobs } from '@/lib/jobs-client';
+import { getJobs } from '@/lib/providers';
 import { NextResponse } from 'next/server';
 
 /** Cloudflare Cron entry — skill: go-live wires CF cron to this route */

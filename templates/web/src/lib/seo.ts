@@ -1,7 +1,7 @@
 import type { MetadataInput, NextMetadataOutput, PageType } from '@vybekiit/seo';
 import { createSeoFromEnv } from '@vybekiit/seo';
 import type { Metadata } from 'next';
-import { getCms } from './cms-client';
+import { getCms } from './providers';
 
 /** SEO + GEO wire point — skills: add-blog, go-live */
 export function getSeo() {

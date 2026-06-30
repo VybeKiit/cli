@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { getAnalytics } from '@/lib/analytics-client';
+import { getAnalytics } from '@/lib/providers';
 
 /** Injects visitor-stats script when configured — skill: add-analytics */
 export function VybeAnalytics() {

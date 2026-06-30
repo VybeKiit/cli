@@ -11,6 +11,8 @@ Read this **before** adding a helper. Extend an existing file when it already co
 | `fulfillment.ts` | Post-purchase fulfillment hooks |
 | `logger.ts` | All app/API logging (`log.debug`, `log.info`, …) |
 | `plans.ts` | Plan/pricing constants |
+| `providers.ts` | Server provider resolution (`getAnalytics`, `getCms`, …) |
+| `api-security.ts` | `@vybekiit/security` adapter for Next middleware |
 | `utils.ts` | UI helpers only (`cn`) — not business logic |
 | `direction.ts` | RTL / locale direction helpers |
 

@@ -1,4 +1,4 @@
-import { getCms } from '@/lib/cms-client';
+import { getCms } from '@/lib/providers';
 import { getSeo } from '@/lib/seo';
 
 const STATIC_PATHS = ['/', '/pricing', '/checkout', '/blog'];
