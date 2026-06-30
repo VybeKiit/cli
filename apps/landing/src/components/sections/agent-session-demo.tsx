@@ -41,14 +41,13 @@ export function AgentSessionDemo() {
     if (!animate) {
       return;
     }
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (typedChars < USER_PROMPT.length) {
-      const t = setTimeout(() => setTypedChars((n) => n + 1), 45);
-      return () => clearTimeout(t);
+      timer = setTimeout(() => setTypedChars((n) => n + 1), 45);
+    } else if (railIndex === 0) {
+      timer = setTimeout(() => setRailIndex(1), 400);
     }
-    if (railIndex === 0) {
-      const t = setTimeout(() => setRailIndex(1), 400);
-      return () => clearTimeout(t);
-    }
+    return timer ? () => clearTimeout(timer) : undefined;
   }, [typedChars, railIndex, animate]);
 
   useEffect(() => {
