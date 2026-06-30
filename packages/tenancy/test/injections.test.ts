@@ -18,7 +18,10 @@ describe('resolveTenancyProvider injections', () => {
       name: 'local',
     } as DataProvider;
 
-    const tenancy = resolveTenancyProvider({ TENANCY_PROVIDER: 'better-auth' }, { dataProvider: data });
+    const tenancy = resolveTenancyProvider(
+      { TENANCY_PROVIDER: 'better-auth' },
+      { dataProvider: data },
+    );
     const result = await tenancy.createOrg('Team', 'owner-1');
     expect(result.ok).toBe(true);
     expect(inserts.length).toBe(1);
