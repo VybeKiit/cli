@@ -295,6 +295,16 @@ export interface ToolchainOptions {
 }
 
 /**
+ * Extra context {@link selectToolchain} can't read from the `*_PROVIDER` env keys.
+ *
+ * @property mobile - true for an Expo project; appends the build/publish tools
+ *   (`eas` + `launch`) on top of the env-selected web tools. `run.ts` detects this.
+ */
+export interface ToolchainOptions {
+  readonly mobile?: boolean;
+}
+
+/**
  * Pick the CLIs the buyer's *active* providers need, read from the `*_PROVIDER` env
  * keys (defaults preserved). `gh` always leads — it's the base tool that downloads the
  * template files and signs the buyer in to GitHub (ADR-0005), needed for every template.
@@ -357,6 +367,11 @@ export function selectToolchain(
   // the same signal so callers can pass either (e.g. run.ts has only the env at hand).
   if (options.wantsGoogleAuth || env.GOOGLE_OAUTH_CLIENT_ID) {
     add(GCLOUD);
+  }
+
+  if (options.mobile) {
+    add(EAS);
+    add(LAUNCH);
   }
 
   if (options.mobile) {

@@ -289,6 +289,40 @@ describe('selectToolchain', () => {
     );
     expect(names).toEqual(['aws', 'atlas']);
   });
+
+  it('appends the mobile tools (eas, launch) on top of the env tools when mobile', () => {
+    const names = selectToolchain({}, { mobile: true }).map((tool) => tool.name);
+    expect(names).toEqual(['wrangler', 'supabase', 'eas', 'launch']);
+  });
+
+  it('appends the mobile tools after AWS adapters, deduped once each', () => {
+    const names = selectToolchain(
+      { HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' },
+      { mobile: true },
+    ).map((tool) => tool.name);
+    expect(names).toEqual(['aws', 'eas', 'launch']);
+    expect(names.filter((name) => name === 'eas')).toHaveLength(1);
+    expect(names.filter((name) => name === 'launch')).toHaveLength(1);
+  });
+
+  it('leaves the web default identical when mobile is false or omitted', () => {
+    expect(selectToolchain({}, { mobile: false }).map((tool) => tool.name)).toEqual([
+      'wrangler',
+      'supabase',
+    ]);
+    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['wrangler', 'supabase']);
+  });
+
+  it('the launch tool needs no sign-in probe (no auth)', () => {
+    const launch = selectToolchain({}, { mobile: true }).find((tool) => tool.name === 'launch');
+    expect(launch?.auth).toBeUndefined();
+  });
+
+  it('the eas tool probes sign-in with `eas whoami` / `eas login`', () => {
+    const eas = selectToolchain({}, { mobile: true }).find((tool) => tool.name === 'eas');
+    expect(eas?.auth?.command).toBe('eas');
+    expect(eas?.auth?.loginHint).toBe('eas login');
+  });
 });
 
 describe('planInstall', () => {
