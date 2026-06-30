@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CI gate: check-goals + check-agent-layer for all four buyer templates.
+ * CI gate: check-goals + check-agent-layer for all buyer templates.
  */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
