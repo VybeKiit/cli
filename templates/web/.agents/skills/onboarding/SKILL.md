@@ -30,9 +30,8 @@ translate every error · celebrate. Decide all technical choices yourself.
    Create `.vybekiit/state/planning-intro-seen` (any content) so this offer never repeats.
 
 2. **Set up the tools, then get the preview running.**
-   First run **`vybekiit setup`** — it welcomes you and installs the tools your app will need (for the
-   database and for putting the app online) so the builder never configures anything (`vybekiit doctor`
-   still works to re-check tools anytime). It may say a tool "isn't signed
+   First run `vybekiit doctor` — it installs the tools the app will need (for the database and for
+   putting the app online) so the builder never configures anything. It may say a tool "isn't signed
    in yet" — that's fine for now; sign-in happens later, only when a step needs it (one browser click
    each). Then install the project's building blocks and start the app yourself, in plain words.
    After dependencies install, run **quality smoke** yourself: `pnpm quality` (format, lint, typecheck,

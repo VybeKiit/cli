@@ -29,8 +29,7 @@ translate every error · celebrate.
    - **No** → continue to step 2.
    Create `.vybekiit/state/planning-intro-seen` (any content) so this offer never repeats.
 
-2. **Set up tools and load a preview.** Run **`vybekiit setup`** (`vybekiit doctor` still works to
-   re-check tools anytime), install deps, build/load unpacked in
+2. **Set up tools and load a preview.** Run `vybekiit doctor`, install deps, build/load unpacked in
    Chrome (Extensions → Developer mode → Load unpacked). Explain in plain words.
    **Verify:** popup or side panel opens without errors.
 
