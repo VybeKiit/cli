@@ -111,51 +111,6 @@ const VERCEL: Tool = {
 };
 
 /**
- * GitHub CLI — the always-present base tool. It downloads the buyer's starter files
- * (clones the private template mirror — ADR-0005) and signs them in to GitHub, so it's
- * required for every template no matter the provider. Installs via Homebrew (macOS /
- * Linux) or Scoop (Windows), mirroring the Supabase/Atlas channels; sign-in lives in
- * `gh`'s own store and is probed with `gh auth status`.
- */
-const GH: Tool = {
-  name: 'gh',
-  purpose: "download your app's starter files and sign you in to GitHub",
-  versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'gh'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
-  },
-  auth: { command: 'gh', args: ['auth', 'status'], loginHint: 'gh auth login --web' },
-};
-
-/** Default hosting CLI — Cloudflare. Installs the same way everywhere (npm). */
-const WRANGLER: Tool = {
-  name: 'wrangler',
-  purpose: 'put your app online',
-  versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-    win32: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-    linux: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-  },
-  auth: { command: 'wrangler', args: ['whoami'], loginHint: 'wrangler login' },
-};
-
-/** Opt-in hosting CLI — Vercel (ADR-0006). Installs via npm global on every OS. */
-const VERCEL: Tool = {
-  name: 'vercel',
-  purpose: 'put your app online',
-  versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'vercel'] },
-    win32: { command: 'npm', args: ['install', '-g', 'vercel'] },
-    linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
-  },
-  auth: { command: 'vercel', args: ['whoami'], loginHint: 'vercel login' },
-};
-
-/**
  * Default data CLI — Supabase. Follows Supabase's own guidance (native package
  * managers, not the discouraged npm global), so each OS gets the right channel.
  */
@@ -327,16 +282,6 @@ export interface ToolchainOptions {
 }
 
 /**
- * Extra context {@link selectToolchain} can't read from the `*_PROVIDER` env keys.
- *
- * @property mobile - true for an Expo project; appends the build/publish tools
- *   (`eas` + `launch`) on top of the env-selected web tools. `run.ts` detects this.
- */
-export interface ToolchainOptions {
-  readonly mobile?: boolean;
-}
-
-/**
  * Pick the CLIs the buyer's *active* providers need, read from the `*_PROVIDER` env
  * keys (defaults preserved). `gh` always leads — it's the base tool that downloads the
  * template files and signs the buyer in to GitHub (ADR-0005), needed for every template.
@@ -399,11 +344,6 @@ export function selectToolchain(
   // the same signal so callers can pass either (e.g. run.ts has only the env at hand).
   if (options.wantsGoogleAuth || env.GOOGLE_OAUTH_CLIENT_ID) {
     add(GCLOUD);
-  }
-
-  if (options.mobile) {
-    add(EAS);
-    add(LAUNCH);
   }
 
   if (options.mobile) {
