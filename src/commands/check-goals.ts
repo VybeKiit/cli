@@ -1,41 +1,18 @@
-import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
 import process from 'node:process';
-import { checkGoalDrift, type TemplateId } from '@vybekiit/agent-kit';
-import { detectTemplateName } from '../lib/detect-template';
-import { isTemplateName } from '../lib/scaffold';
-
-async function listSkillPaths(cwd: string): Promise<string[]> {
-  const skillsDir = join(cwd, '.vybekiit/skills');
-  try {
-    const files = await readdir(skillsDir);
-    return files.filter((f) => f.endsWith('.md')).map((f) => `.vybekiit/skills/${f}`);
-  } catch {
-    return [];
-  }
-}
+import { checkGoalDrift } from '@vybekiit/agent-kit';
+import { listSkillPaths, resolveTemplateArg } from '../lib/agent-layer-io';
 
 export async function runCheckGoals(
   args: string[],
   cwd: string = process.cwd(),
 ): Promise<{ readonly json: string; readonly exitCode: number }> {
-  const explicit = args[0];
-  let template: TemplateId | null = null;
-
-  if (explicit === 'backend') {
-    template = 'backend';
-  } else if (explicit && isTemplateName(explicit)) {
-    template = explicit;
-  } else {
-    const detected = await detectTemplateName(cwd);
-    template = detected;
-  }
+  const template = await resolveTemplateArg(args[0], cwd);
 
   if (!template) {
     return {
       json: JSON.stringify({
         ok: false,
-        error: 'Could not detect template. Pass web, mobile, extension, or backend.',
+        error: 'Could not detect template. Pass web, mobile, extension, spa, or backend.',
       }),
       exitCode: 1,
     };
