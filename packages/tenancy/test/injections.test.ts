@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ok } from '@vybekiit/core';
+import { ok, type Result } from '@vybekiit/core';
+import type { DataProvider } from '@vybekiit/db';
 import { resolveTenancyProvider } from '../src/resolve';
 
 describe('resolveTenancyProvider injections', () => {
@@ -10,16 +11,14 @@ describe('resolveTenancyProvider injections', () => {
         inserts.push(row);
         return ok(row);
       },
+      get: async () => ok(null),
       query: async () => ok([]),
       remove: async () => ok(true),
-      update: async () => ok(undefined),
-      name: 'local' as const,
-    };
+      update: async () => ok({ id: 'x' }),
+      name: 'local',
+    } as DataProvider;
 
-    const tenancy = resolveTenancyProvider(
-      { TENANCY_PROVIDER: 'better-auth' },
-      { dataProvider: data },
-    );
+    const tenancy = resolveTenancyProvider({ TENANCY_PROVIDER: 'better-auth' }, { dataProvider: data });
     const result = await tenancy.createOrg('Team', 'owner-1');
     expect(result.ok).toBe(true);
     expect(inserts.length).toBe(1);
