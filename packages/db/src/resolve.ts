@@ -5,15 +5,19 @@ import {
   mongoConfigSchema,
   neonConfigSchema,
   parseEnv,
+  railwayConfigSchema,
   r2ConfigSchema,
+  resolveEnvProvider,
   storageConfigSchema,
   supabaseConfigSchema,
+  type EnvSource,
 } from '@vybekiit/core';
 import { createAwsDataProvider } from './providers/aws/index';
 import { createFirebaseDataProvider } from './providers/firebase/index';
 import { createLocalDataProvider } from './providers/local/index';
 import { createMongoDataProvider } from './providers/mongodb/index';
 import { createNeonDataProvider } from './providers/neon/index';
+import { createRailwayDataProvider } from './providers/railway/index';
 import { createR2StorageProvider } from './providers/r2/index';
 import { createS3StorageProvider } from './providers/s3/index';
 import {
@@ -21,9 +25,6 @@ import {
   createSupabaseStorageProvider,
 } from './providers/supabase/index';
 import type { DataProvider, StorageProvider } from './types';
-
-/** A readable view of `process.env` that doesn't require `@types/node` here. */
-type EnvSource = Record<string, string | undefined>;
 
 /**
  * The one required key that signals each real data backend is being configured —
@@ -70,20 +71,20 @@ export function resolveDataProvider(env: EnvSource = process.env): DataProvider 
   if (isDataUnconfigured(env)) return createLocalDataProvider();
 
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
-  switch (DATA_PROVIDER) {
-    case 'local':
-      return createLocalDataProvider();
-    case 'mongodb':
-      return createMongoDataProvider(parseEnv(mongoConfigSchema, env));
-    case 'aws':
-      return createAwsDataProvider(parseEnv(awsConfigSchema, env));
-    case 'neon':
-      return createNeonDataProvider(parseEnv(neonConfigSchema, env));
-    case 'firebase':
-      return createFirebaseDataProvider(parseEnv(firebaseConfigSchema, env));
-    default:
-      return createSupabaseDataProvider(parseEnv(supabaseConfigSchema, env));
-  }
+  return resolveEnvProvider(
+    DATA_PROVIDER,
+    {
+      local: () => createLocalDataProvider(),
+      mongodb: (source) => createMongoDataProvider(parseEnv(mongoConfigSchema, source)),
+      aws: (source) => createAwsDataProvider(parseEnv(awsConfigSchema, source)),
+      neon: (source) => createNeonDataProvider(parseEnv(neonConfigSchema, source)),
+      railway: (source) => createRailwayDataProvider(parseEnv(railwayConfigSchema, source)),
+      firebase: (source) => createFirebaseDataProvider(parseEnv(firebaseConfigSchema, source)),
+      supabase: (source) => createSupabaseDataProvider(parseEnv(supabaseConfigSchema, source)),
+    },
+    env,
+    'supabase',
+  );
 }
 
 /**
@@ -95,12 +96,14 @@ export function resolveDataProvider(env: EnvSource = process.env): DataProvider 
  */
 export function resolveStorageProvider(env: EnvSource = process.env): StorageProvider {
   const { STORAGE_PROVIDER } = parseEnv(storageConfigSchema, env);
-  switch (STORAGE_PROVIDER) {
-    case 's3':
-      return createS3StorageProvider(parseEnv(awsConfigSchema, env));
-    case 'r2':
-      return createR2StorageProvider(parseEnv(r2ConfigSchema, env));
-    default:
-      return createSupabaseStorageProvider(parseEnv(supabaseConfigSchema, env));
-  }
+  return resolveEnvProvider(
+    STORAGE_PROVIDER,
+    {
+      s3: (source) => createS3StorageProvider(parseEnv(awsConfigSchema, source)),
+      r2: (source) => createR2StorageProvider(parseEnv(r2ConfigSchema, source)),
+      supabase: (source) => createSupabaseStorageProvider(parseEnv(supabaseConfigSchema, source)),
+    },
+    env,
+    'supabase',
+  );
 }

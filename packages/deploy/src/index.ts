@@ -18,4 +18,10 @@ export {
   type VercelRunResult,
   type VercelRunner,
 } from './providers/vercel/index';
+export {
+  createRailwayHosting,
+  type RailwayDeployAction,
+  type RailwayRunResult,
+  type RailwayRunner,
+} from './providers/railway/index';
 export { createAwsHosting, type AmplifyRunner } from './providers/aws/index';

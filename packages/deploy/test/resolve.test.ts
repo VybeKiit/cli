@@ -23,6 +23,11 @@ describe('resolveHosting', () => {
     expect(provider.name).toBe('vercel');
   });
 
+  it('constructs the railway adapter without required token keys', () => {
+    const provider = resolveHosting({ HOSTING_PROVIDER: 'railway' });
+    expect(provider.name).toBe('railway');
+  });
+
   it('fails loud when the vercel adapter is selected without its token', () => {
     expect(() => resolveHosting({ HOSTING_PROVIDER: 'vercel' })).toThrow(/VERCEL_TOKEN/);
   });

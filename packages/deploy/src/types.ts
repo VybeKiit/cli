@@ -6,7 +6,7 @@ import type { Result } from '@vybekiit/core';
  * the go-live skill talks to the {@link Hosting} interface rather than a specific
  * vendor. Cloudflare is the v1 default; `vercel` and `aws` (Amplify/SST) are opt-in (ADR-0002/0006).
  */
-export type HostingProviderName = 'cloudflare' | 'vercel' | 'aws';
+export type HostingProviderName = 'cloudflare' | 'vercel' | 'aws' | 'railway';
 
 /**
  * Inputs for a deploy, normalized across hosts. Kept minimal: the go-live skill

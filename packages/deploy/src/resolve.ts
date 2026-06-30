@@ -4,15 +4,16 @@ import {
   cloudflareConfigSchema,
   hostingConfigSchema,
   parseEnv,
+  railwayHostingConfigSchema,
+  resolveEnvProvider,
+  type EnvSource,
   vercelConfigSchema,
 } from '@vybekiit/core';
 import { type AmplifyRunner, createAwsHosting } from './providers/aws/index';
 import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare/index';
+import { type RailwayRunner, createRailwayHosting } from './providers/railway/index';
 import { type VercelRunner, createVercelHosting } from './providers/vercel/index';
 import type { Hosting } from './types';
-
-/** A readable view of `process.env` that doesn't require `@types/node` here. */
-type EnvSource = Record<string, string | undefined>;
 
 /**
  * Injectable deploy executors, one per host, threaded through {@link resolveHosting} so
@@ -25,6 +26,8 @@ export interface HostingRunners {
   readonly cloudflare?: CloudflareRunner;
   /** Vercel deploy executor (`vercel` action runner). */
   readonly vercel?: VercelRunner;
+  /** Railway deploy executor (`railway` action runner). */
+  readonly railway?: RailwayRunner;
   /** AWS Amplify client used to start/inspect deploy jobs. */
   readonly aws?: AmplifyRunner;
 }
@@ -45,16 +48,22 @@ export function resolveHosting(
   runners: HostingRunners = {},
 ): Hosting {
   const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, env);
-  switch (HOSTING_PROVIDER) {
-    case 'aws':
-      return createAwsHosting(
-        parseEnv(awsConfigSchema, env),
-        parseEnv(awsHostingConfigSchema, env),
-        runners.aws,
-      );
-    case 'vercel':
-      return createVercelHosting(parseEnv(vercelConfigSchema, env), runners.vercel);
-    default:
-      return createCloudflareHosting(parseEnv(cloudflareConfigSchema, env), runners.cloudflare);
-  }
+  return resolveEnvProvider(
+    HOSTING_PROVIDER,
+    {
+      aws: (source) =>
+        createAwsHosting(
+          parseEnv(awsConfigSchema, source),
+          parseEnv(awsHostingConfigSchema, source),
+          runners.aws,
+        ),
+      vercel: (source) => createVercelHosting(parseEnv(vercelConfigSchema, source), runners.vercel),
+      railway: (source) =>
+        createRailwayHosting(parseEnv(railwayHostingConfigSchema, source), runners.railway),
+      cloudflare: (source) =>
+        createCloudflareHosting(parseEnv(cloudflareConfigSchema, source), runners.cloudflare),
+    },
+    env,
+    'cloudflare',
+  );
 }

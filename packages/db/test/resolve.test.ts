@@ -77,6 +77,18 @@ describe('resolveDataProvider', () => {
     expect(provider.name).toBe('neon');
   });
 
+  it('constructs the railway adapter from DATABASE_URL', () => {
+    const provider = resolveDataProvider({
+      DATA_PROVIDER: 'railway',
+      DATABASE_URL: 'postgresql://user:pass@host/railway',
+    });
+    expect(provider.name).toBe('railway');
+  });
+
+  it('fails loud when the railway adapter is selected without DATABASE_URL', () => {
+    expect(() => resolveDataProvider({ DATA_PROVIDER: 'railway' })).toThrow(/DATABASE_URL/);
+  });
+
   it('constructs the firebase adapter from project id', () => {
     const provider = resolveDataProvider({
       DATA_PROVIDER: 'firebase',
