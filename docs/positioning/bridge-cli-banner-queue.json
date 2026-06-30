@@ -1,0 +1,18 @@
+{
+  "description": "Batch queue for ChatGPT CLI welcome-banner concept images via ai-browser-bridge. Full prompts live in scripts/run-bridge-cli-banner-queue.mjs.",
+  "run": "node scripts/run-bridge-cli-banner-queue.mjs",
+  "outputDir": "out/cli-banner-inspirations",
+  "context": "docs/positioning/cli-banner-direction.md",
+  "items": [
+    { "id": "01-chevron-shimmer", "slug": "chevron-shimmer", "label": "Direction 1 — Chevron Shimmer" },
+    { "id": "02-ship-launch", "slug": "ship-launch", "label": "Direction 2 — Ship Launch" },
+    { "id": "03-pixel-kit", "slug": "pixel-kit", "label": "Direction 3 — Pixel Kit" },
+    { "id": "04-crt-phosphor", "slug": "crt-phosphor", "label": "Direction 4 — CRT Phosphor" },
+    { "id": "05-block-wordmark", "slug": "block-wordmark", "label": "Direction 5 — Block Wordmark" },
+    { "id": "06-minimal-oneline", "slug": "minimal-oneline", "label": "Direction 6 — Minimal One-Line" },
+    { "id": "07-toolkit-stack", "slug": "toolkit-stack", "label": "Direction 7 — Toolkit Stack" },
+    { "id": "08-wave-gradient", "slug": "wave-gradient", "label": "Direction 8 — Wave Gradient" },
+    { "id": "09-director-terminal", "slug": "director-terminal", "label": "Direction 9 — Director Terminal" },
+    { "id": "10-bold-poster", "slug": "bold-poster", "label": "Direction 10 — Bold Poster" }
+  ]
+}
