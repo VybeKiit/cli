@@ -65,6 +65,19 @@ export interface Tool {
   readonly auth?: AuthProbe;
 }
 
+/** Default hosting CLI — Cloudflare. Installs the same way everywhere (npm). */
+const WRANGLER: Tool = {
+  name: 'wrangler',
+  purpose: 'put your app online',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'wrangler'] },
+    win32: { command: 'npm', args: ['install', '-g', 'wrangler'] },
+    linux: { command: 'npm', args: ['install', '-g', 'wrangler'] },
+  },
+  auth: { command: 'wrangler', args: ['whoami'], loginHint: 'wrangler login' },
+};
+
 /**
  * GitHub CLI — the always-present base tool. It downloads the buyer's starter files
  * (clones the private template mirror — ADR-0005) and signs them in to GitHub, so it's

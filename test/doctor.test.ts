@@ -240,6 +240,57 @@ describe('verifyPlatformSkills', () => {
   });
 });
 
+describe('selectToolchain', () => {
+  it('returns [wrangler, supabase] for the defaults (empty env)', () => {
+    expect(selectToolchain({}).map((tool) => tool.name)).toEqual(['wrangler', 'supabase']);
+  });
+
+  it('matches the exported default TOOLCHAIN for explicit defaults', () => {
+    const names = selectToolchain({
+      HOSTING_PROVIDER: 'cloudflare',
+      DATA_PROVIDER: 'supabase',
+    }).map((tool) => tool.name);
+    expect(names).toEqual(['wrangler', 'supabase']);
+  });
+
+  it('includes the Atlas CLI when the Mongo data adapter is active', () => {
+    const names = selectToolchain({ DATA_PROVIDER: 'mongodb' }).map((tool) => tool.name);
+    expect(names).toEqual(['wrangler', 'atlas']);
+  });
+
+  it('includes the AWS CLI (once) when any single AWS adapter is set', () => {
+    expect(selectToolchain({ STORAGE_PROVIDER: 's3' }).map((tool) => tool.name)).toEqual([
+      'wrangler',
+      'supabase',
+      'aws',
+    ]);
+    expect(selectToolchain({ EMAIL_PROVIDER: 'ses' }).map((tool) => tool.name)).toEqual([
+      'wrangler',
+      'supabase',
+      'aws',
+    ]);
+    expect(selectToolchain({ AUTH_PROVIDER: 'cognito' }).map((tool) => tool.name)).toEqual([
+      'wrangler',
+      'supabase',
+      'aws',
+    ]);
+  });
+
+  it('uses the AWS CLI for hosting and dedupes when data is also AWS', () => {
+    const allAws = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' }).map(
+      (tool) => tool.name,
+    );
+    expect(allAws).toEqual(['aws']);
+  });
+
+  it('handles a mixed combo: AWS hosting + Mongo data', () => {
+    const names = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'mongodb' }).map(
+      (tool) => tool.name,
+    );
+    expect(names).toEqual(['aws', 'atlas']);
+  });
+});
+
 describe('planInstall', () => {
   it('returns install actions only for missing tools, in toolchain order', () => {
     const actions = planInstall('darwin', [
