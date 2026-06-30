@@ -16,6 +16,7 @@ const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 /** The mirrors whose source prefix must exist today. */
 const PRESENT_MIRRORS = [
   { repo: 'web', path: 'templates/web' },
+  { repo: 'spa', path: 'templates/spa' },
   { repo: 'mobile', path: 'templates/mobile' },
   { repo: 'extension', path: 'templates/extension' },
   { repo: 'cli', path: 'cli' },
@@ -25,7 +26,7 @@ const PRESENT_MIRRORS = [
 describe('parseArgs', () => {
   it('defaults to all five mirrors when no names are given', () => {
     const { names, dryRun } = parseArgs([]);
-    expect(names).toEqual(['web', 'mobile', 'extension', 'cli', 'infra']);
+    expect(names).toEqual(['web', 'spa', 'mobile', 'extension', 'cli', 'infra']);
     expect(dryRun).toBe(false);
   });
 
