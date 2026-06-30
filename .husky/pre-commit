@@ -1,2 +1,4 @@
 # Format + lint-fix on commit. Tests run in pre-push/CI only (AGENTS.md).
 pnpm biome check --write --no-errors-on-unmatched .
+# Biome injects `node:process` into instrumentation.ts; that breaks Next client bundles.
+git checkout -- templates/web/instrumentation.ts 2>/dev/null || true

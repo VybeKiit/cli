@@ -139,6 +139,12 @@
       }
     },
     {
+      "includes": ["**/templates/web/instrumentation.ts"],
+      "assist": { "enabled": false },
+      "formatter": { "enabled": false },
+      "linter": { "enabled": false }
+    },
+    {
       "includes": ["templates/web/src/components/**"],
       "linter": {
         "enabled": false
