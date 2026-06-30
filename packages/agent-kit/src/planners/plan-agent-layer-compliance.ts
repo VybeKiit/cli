@@ -1,4 +1,10 @@
 import type { TemplateId } from '../catalogs/goal-catalog';
+import {
+  checkBaseManifestParity,
+  mergePlatformSkillsManifests,
+  type PlatformSkillsTemplateManifest,
+} from '../catalogs/platform-skills-merge';
+import { checkAgentSkillSymlinks, checkBuyerSkillStubDrift } from '../render/buyer-skill-stubs';
 import { checkGoalDrift } from './plan-goal-routing';
 import {
   planAgentRuntimeCompliance,
@@ -13,6 +19,9 @@ export type AgentLayerComplianceCheckId =
   | 'goal-drift'
   | 'goal-index-drift'
   | 'session-bootstrap'
+  | 'buyer-skill-stub-drift'
+  | 'agent-skill-symlinks'
+  | 'platform-skills-manifest-parity'
   | import('./plan-agent-runtime-compliance').AgentRuntimeComplianceCheckId;
 
 export interface AgentLayerComplianceIssue {
@@ -26,7 +35,12 @@ export interface AgentLayerComplianceInput {
   readonly files: Readonly<Record<string, string>>;
   readonly skillPaths: readonly string[];
   readonly skillContents?: Readonly<Record<string, string>>;
+  readonly buyerSkillStubContents?: Readonly<Record<string, string>>;
+  readonly agentSkillSymlinkStates?: Readonly<
+    Record<string, { readonly isSymlink: boolean; readonly target: string | null }>
+  >;
   readonly platformSkillContents?: Readonly<Record<string, string>>;
+  readonly platformSkillsManifest?: PlatformSkillsTemplateManifest;
   readonly liveDocs?: Readonly<Record<string, string>>;
 }
 
@@ -155,18 +169,59 @@ export function planAgentLayerCompliance(
     }
   }
 
+  const skillContents = input.skillContents ?? {};
+  if (Object.keys(skillContents).length > 0) {
+    const stubDrift = checkBuyerSkillStubDrift(
+      template,
+      skillContents,
+      input.buyerSkillStubContents ?? {},
+    );
+    for (const issue of stubDrift.issues) {
+      issues.push({
+        check: 'buyer-skill-stub-drift',
+        message: `${issue.issue}: ${issue.stubPath} (from ${issue.buyerPath}) — run render-agent-layer`,
+        file: issue.stubPath,
+      });
+    }
+  }
+
+  if (input.agentSkillSymlinkStates) {
+    const symlinkReport = checkAgentSkillSymlinks(input.agentSkillSymlinkStates);
+    for (const issue of symlinkReport.issues) {
+      issues.push({
+        check: 'agent-skill-symlinks',
+        message: `${issue.issue}: ${issue.link} → expected ${issue.expectedTarget}${
+          issue.actualTarget ? `, got ${issue.actualTarget}` : ''
+        } — run render-agent-layer`,
+        file: issue.link,
+      });
+    }
+  }
+
+  if (input.platformSkillsManifest) {
+    const merged = mergePlatformSkillsManifests(input.platformSkillsManifest);
+    const missingBase = checkBaseManifestParity(merged);
+    for (const repo of missingBase) {
+      issues.push({
+        check: 'platform-skills-manifest-parity',
+        message: `Merged platform-skills manifest missing base repo: ${repo}`,
+        file: 'platform-skills.manifest.json',
+      });
+    }
+  }
+
   const runtimeInput: AgentRuntimeComplianceInput = {
     files,
-    skillContents: input.skillContents ?? {},
+    skillContents,
     platformSkillContents: input.platformSkillContents ?? {},
-    ...(input.liveDocs !== undefined ? { liveDocs: input.liveDocs } : {}),
+    ...(input.liveDocs === undefined ? {} : { liveDocs: input.liveDocs }),
   };
   const runtime = planAgentRuntimeCompliance(runtimeInput);
   for (const issue of runtime.issues) {
     issues.push({
       check: issue.check,
       message: issue.message,
-      ...(issue.file !== undefined ? { file: issue.file } : {}),
+      ...(issue.file === undefined ? {} : { file: issue.file }),
     });
   }
 

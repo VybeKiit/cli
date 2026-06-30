@@ -6,7 +6,6 @@ export const AGENT_LAYER_PATHS: readonly string[] = [
   '.vybekiit',
   'AGENTS.md',
   'CLAUDE.md',
-  'BUILDER-VOICE.md',
   'language.md',
   'checklist.md',
   '.cursor/rules/vybekiit.mdc',
@@ -15,6 +14,17 @@ export const AGENT_LAYER_PATHS: readonly string[] = [
   'skills-lock.json',
   '.agents/skills',
 ];
+
+/** Buyer-owned extension skills — never overwritten by sync-agent-layer. */
+export const AGENT_LAYER_EXTENSION_PREFIX = '.vybekiit/extensions/';
+
+/** True when a path under the project root is buyer-owned extension content. */
+export function isAgentLayerExtensionPath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, '/');
+  return (
+    normalized === '.vybekiit/extensions' || normalized.startsWith(AGENT_LAYER_EXTENSION_PREFIX)
+  );
+}
 
 /** Result of planning an agent-layer sync from mirror → buyer project. */
 export interface AgentLayerSyncPlan {

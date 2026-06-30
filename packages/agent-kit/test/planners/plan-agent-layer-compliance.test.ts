@@ -46,4 +46,14 @@ describe('planAgentLayerCompliance', () => {
     expect(report.ok).toBe(false);
     expect(report.issues.some((i) => i.check === 'checklist-structure')).toBe(true);
   });
+
+  it('passes platform-skills manifest parity when template extends base', () => {
+    const report = planAgentLayerCompliance({
+      template: 'web',
+      files: minimalWebFiles,
+      skillPaths: [],
+      platformSkillsManifest: { sources: [] },
+    });
+    expect(report.issues.some((i) => i.check === 'platform-skills-manifest-parity')).toBe(false);
+  });
 });

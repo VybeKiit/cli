@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { planFeatureReadiness } from '../../src/planners/plan-feature-readiness';
+import {
+  planFeatureReadiness,
+  resolveTemplateTopology,
+} from '../../src/planners/plan-feature-readiness';
 
 describe('planFeatureReadiness', () => {
   it('web is always ready', () => {
@@ -34,5 +37,17 @@ describe('planFeatureReadiness', () => {
     expect(plan.ready).toBe(false);
     expect(plan.orchestrate?.[0]?.action).toBe('set-env');
     expect(plan.orchestrate?.[0]?.envKey).toBe('EXPO_PUBLIC_APP_URL');
+  });
+});
+
+describe('resolveTemplateTopology', () => {
+  it('resolves spa topology for client-only', () => {
+    expect(
+      resolveTemplateTopology({
+        template: 'spa',
+        hasBackend: false,
+        hasWeb: false,
+      }),
+    ).toBe('client-only');
   });
 });

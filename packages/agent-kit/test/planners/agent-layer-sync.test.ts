@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   AGENT_LAYER_PATHS,
   formatAgentLayerSyncSummary,
+  isAgentLayerExtensionPath,
   planAgentLayerSync,
 } from '../../src/planners/agent-layer-sync';
 
@@ -9,10 +10,18 @@ describe('AGENT_LAYER_PATHS', () => {
   it('includes core agent layer files', () => {
     expect(AGENT_LAYER_PATHS).toContain('.vybekiit');
     expect(AGENT_LAYER_PATHS).toContain('AGENTS.md');
-    expect(AGENT_LAYER_PATHS).toContain('BUILDER-VOICE.md');
+    expect(AGENT_LAYER_PATHS).toContain('language.md');
+    expect(AGENT_LAYER_PATHS).not.toContain('BUILDER-VOICE.md');
     expect(AGENT_LAYER_PATHS).toContain('checklist.md');
     expect(AGENT_LAYER_PATHS).toContain('.cursor/rules/patterns.mdc');
     expect(AGENT_LAYER_PATHS).not.toContain('src');
+  });
+});
+
+describe('isAgentLayerExtensionPath', () => {
+  it('matches buyer-owned extension paths', () => {
+    expect(isAgentLayerExtensionPath('.vybekiit/extensions/skills/foo.md')).toBe(true);
+    expect(isAgentLayerExtensionPath('.vybekiit/skills/onboarding.md')).toBe(false);
   });
 });
 

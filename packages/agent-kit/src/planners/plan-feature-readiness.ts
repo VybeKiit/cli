@@ -25,6 +25,29 @@ export interface FeatureReadinessPlan {
   readonly orchestrate?: readonly OrchestrationStep[];
 }
 
+export type TemplateTopologyCombo =
+  | 'full-stack-web'
+  | 'standalone-backend'
+  | 'client-with-backend'
+  | 'client-with-web'
+  | 'client-only';
+
+export interface TemplateTopologyContext {
+  readonly template: TemplateId;
+  readonly hasBackend: boolean;
+  readonly hasWeb: boolean;
+}
+
+/** Explicit server topology for buyer projects — guides feature readiness orchestration. */
+export function resolveTemplateTopology(ctx: TemplateTopologyContext): TemplateTopologyCombo {
+  const { template, hasBackend, hasWeb } = ctx;
+  if (template === 'web') return 'full-stack-web';
+  if (template === 'backend') return 'standalone-backend';
+  if (hasBackend) return 'client-with-backend';
+  if (hasWeb) return 'client-with-web';
+  return 'client-only';
+}
+
 export interface FeatureReadinessContext {
   readonly template: TemplateId;
   readonly feature: FeatureName;
@@ -105,16 +128,13 @@ function backendOrchestration(
  */
 export function planFeatureReadiness(ctx: FeatureReadinessContext): FeatureReadinessPlan {
   const { template, feature, hasBackend, hasWeb } = ctx;
+  const topology = resolveTemplateTopology(ctx);
 
-  if (template === 'web') {
+  if (topology === 'full-stack-web' || topology === 'standalone-backend') {
     return { template, feature, ready: true };
   }
 
-  if (template === 'backend') {
-    return { template, feature, ready: true };
-  }
-
-  if (needsBackend(template, feature) && !hasBackend && !hasWeb) {
+  if (needsBackend(template, feature) && topology === 'client-only') {
     return {
       template,
       feature,
@@ -123,7 +143,7 @@ export function planFeatureReadiness(ctx: FeatureReadinessContext): FeatureReadi
     };
   }
 
-  if (needsBackend(template, feature) && !hasBackend && hasWeb) {
+  if (needsBackend(template, feature) && topology === 'client-with-web') {
     const envKey = MOBILE_EXT_ENV_KEYS[template];
     return {
       template,

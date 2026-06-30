@@ -10,8 +10,16 @@ import { renderProductionGates, renderChecklistSeed } from '../catalogs/producti
 import type { TemplateId } from '../catalogs/goal-catalog';
 import { renderSdlcVocabularyTable } from '../vocabulary/sdlc-vocabulary';
 import { renderToolVocabularyTable } from '../vocabulary/tool-vocabulary';
-import { renderFailureVocabularyTable, renderUiVocabularyTable } from '../vocabulary/ui-vocabulary';
+import {
+  renderAgentInternalVocabularyTable,
+  renderFailureVocabularyTable,
+  renderUiVocabularyTable,
+} from '../vocabulary/ui-vocabulary';
 import { renderPaymentsVocabularyTable } from '../vocabulary/domain-vocabulary';
+import { renderPeopleVocabularyTable } from '../vocabulary/people-vocabulary';
+import { renderAgentRuntimeVocabularyTable } from '../vocabulary/agent-runtime-vocabulary';
+import { renderCodeEditVocabularyTable } from '../vocabulary/code-edit-vocabulary';
+import { renderVybekiitLayerVocabularyTable } from '../vocabulary/vybekiit-layer-vocabulary';
 import { replaceGeneratedSection, wrapGeneratedSection, type GeneratedSectionId } from './markdown';
 
 export interface AgentLayerRenderTarget {
@@ -23,16 +31,28 @@ export interface AgentLayerRenderTarget {
 export const AGENT_LAYER_RENDER_TARGETS: readonly AgentLayerRenderTarget[] = [
   { file: 'AGENTS.md', sectionId: 'contract' },
   { file: 'language.md', sectionId: 'tone' },
+  { file: 'language.md', sectionId: 'people-vocabulary' },
   { file: 'language.md', sectionId: 'sdlc-vocabulary' },
   { file: 'language.md', sectionId: 'ui-vocabulary' },
   { file: 'language.md', sectionId: 'tool-vocabulary' },
+  { file: 'language.md', sectionId: 'agent-runtime-vocabulary' },
+  { file: 'language.md', sectionId: 'code-edit-vocabulary' },
+  { file: 'language.md', sectionId: 'vybekiit-layer-vocabulary' },
   { file: 'language.md', sectionId: 'failure-vocabulary' },
   { file: 'language.md', sectionId: 'payments-vocabulary' },
-  { file: 'BUILDER-VOICE.md', sectionId: 'tone' },
+  { file: 'language.md', sectionId: 'agent-internal-vocabulary' },
   { file: '.vybekiit/agent/ui-sources.md', sectionId: 'web-ui-sources' },
   { file: '.vybekiit/agent/tech-references.md', sectionId: 'tech-references' },
   { file: 'checklist.md', sectionId: 'production-gates' },
   { file: '.vybekiit/agent/session-bootstrap.md', sectionId: 'session-bootstrap' },
+];
+
+/** Unique markdown paths render/sync commands read before applying sections. */
+export const AGENT_LAYER_RENDER_FILES: readonly string[] = [
+  ...new Set([
+    ...AGENT_LAYER_RENDER_TARGETS.map((target) => target.file),
+    '.vybekiit/agent/goal-index.md',
+  ]),
 ];
 
 export interface ApplyAgentLayerOptions {
@@ -45,6 +65,8 @@ function renderSectionContent(sectionId: GeneratedSectionId, template: TemplateI
       return renderContract();
     case 'tone':
       return renderToneSection();
+    case 'people-vocabulary':
+      return ['## Who you are talking to', '', renderPeopleVocabularyTable()].join('\n');
     case 'sdlc-vocabulary':
       return ['## Quality and saving your work', '', renderSdlcVocabularyTable()].join('\n');
     case 'ui-vocabulary':
@@ -53,10 +75,28 @@ function renderSectionContent(sectionId: GeneratedSectionId, template: TemplateI
       return ['## Your assistant (never name the tool)', '', renderToolVocabularyTable()].join(
         '\n',
       );
+    case 'agent-runtime-vocabulary':
+      return ['## Your assistant at work (runtime)', '', renderAgentRuntimeVocabularyTable()].join(
+        '\n',
+      );
+    case 'code-edit-vocabulary':
+      return [
+        '## When you change their app (outcome-only)',
+        '',
+        renderCodeEditVocabularyTable(),
+      ].join('\n');
+    case 'vybekiit-layer-vocabulary':
+      return [
+        '## How the kit works (invisible to them)',
+        '',
+        renderVybekiitLayerVocabularyTable(),
+      ].join('\n');
     case 'failure-vocabulary':
       return ['## When something goes wrong', '', renderFailureVocabularyTable()].join('\n');
     case 'payments-vocabulary':
       return ['## Payments & tax', '', renderPaymentsVocabularyTable()].join('\n');
+    case 'agent-internal-vocabulary':
+      return ['## Agent-internal — never say', '', renderAgentInternalVocabularyTable()].join('\n');
     case 'web-ui-sources':
       return ['# Approved UI block sources', '', renderWebUiSourcesTable()].join('\n');
     case 'tech-references':
@@ -79,11 +119,16 @@ export function renderAgentLayerSections(
   const ids: GeneratedSectionId[] = [
     'contract',
     'tone',
+    'people-vocabulary',
     'sdlc-vocabulary',
     'ui-vocabulary',
     'tool-vocabulary',
+    'agent-runtime-vocabulary',
+    'code-edit-vocabulary',
+    'vybekiit-layer-vocabulary',
     'failure-vocabulary',
     'payments-vocabulary',
+    'agent-internal-vocabulary',
     'web-ui-sources',
     'tech-references',
     'production-gates',
