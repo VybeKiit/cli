@@ -18,10 +18,7 @@ describe('createSocketIoRealtime', () => {
         handlers.delete(event);
       },
     };
-    const rt = createSocketIoRealtime(
-      { url: 'http://localhost:4000' },
-      () => mockSocket as never,
-    );
+    const rt = createSocketIoRealtime({ url: 'http://localhost:4000' }, () => mockSocket as never);
     const ch = rt.channel('notifications');
     ch.subscribe(() => {});
     expect(emitted).toContainEqual({ event: 'join', data: 'notifications' });
