@@ -15,7 +15,7 @@ metadata:
 
 ## Steps
 
-1. Run **`vybekiit setup`** (`vybekiit doctor` still works to re-check tools anytime), then `./install.sh`, then `pnpm dev`.
+1. Run `vybekiit doctor`, then `./install.sh`, then `pnpm dev`.
 2. Open `http://localhost:4000/health` — **Verify:** `{ "ok": true }`.
 3. Celebrate — the server is ready for their app to connect.
 
