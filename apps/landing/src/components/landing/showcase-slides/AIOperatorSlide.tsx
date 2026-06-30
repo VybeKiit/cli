@@ -22,6 +22,12 @@ const LOG_LINES = [
   '> Running health check...',
 ] as const;
 
+function taskStatusDotClass(status: (typeof TASKS)[number]['status']): string {
+  if (status === 'done') return 'bg-[var(--green)]';
+  if (status === 'active') return 'animate-pulse bg-[var(--blue)]';
+  return 'bg-[var(--text-faint)]';
+}
+
 /** AI Operator carousel slide — dark task list with sidebar and log panel. */
 export function AIOperatorSlide() {
   return (
@@ -76,13 +82,7 @@ export function AIOperatorSlide() {
                 <CardContent className="flex items-center justify-between p-2">
                   <div className="flex min-w-0 items-center gap-2">
                     <span
-                      className={`h-2 w-2 shrink-0 rounded-full ${
-                        task.status === 'done'
-                          ? 'bg-[var(--green)]'
-                          : task.status === 'active'
-                            ? 'animate-pulse bg-[var(--blue)]'
-                            : 'bg-[var(--text-faint)]'
-                      }`}
+                      className={`h-2 w-2 shrink-0 rounded-full ${taskStatusDotClass(task.status)}`}
                     />
                     <span className="truncate text-white text-xs">{task.label}</span>
                   </div>

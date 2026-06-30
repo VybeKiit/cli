@@ -3,6 +3,18 @@
 import { ConsoleErrorBuffer } from '@vybekiit/report-mode';
 import { useEffect, useRef } from 'react';
 
+function formatConsoleErrorMessage(message: unknown, error: unknown): string {
+  if (error instanceof Error) return `${error.name}: ${error.message}`;
+  if (typeof message === 'string') return message;
+  return 'Unknown error';
+}
+
+function formatRejectionMessage(reason: unknown): string {
+  if (reason instanceof Error) return `${reason.name}: ${reason.message}`;
+  if (typeof reason === 'string') return reason;
+  return 'Unhandled promise rejection';
+}
+
 /** Capture recent console errors while Report Mode is mounted (dev only). */
 export function useConsoleErrorBuffer(): ConsoleErrorBuffer {
   const bufferRef = useRef<ConsoleErrorBuffer | null>(null);
@@ -16,12 +28,7 @@ export function useConsoleErrorBuffer(): ConsoleErrorBuffer {
     const previousOnUnhandled = window.onunhandledrejection;
 
     window.onerror = (message, _source, _line, _col, error) => {
-      const text =
-        error instanceof Error
-          ? `${error.name}: ${error.message}`
-          : typeof message === 'string'
-            ? message
-            : 'Unknown error';
+      const text = formatConsoleErrorMessage(message, error);
       buffer.push(text);
       if (typeof previousOnError === 'function') {
         return previousOnError(message, _source, _line, _col, error);
@@ -31,12 +38,7 @@ export function useConsoleErrorBuffer(): ConsoleErrorBuffer {
 
     window.onunhandledrejection = (event) => {
       const reason = event.reason;
-      const text =
-        reason instanceof Error
-          ? `${reason.name}: ${reason.message}`
-          : typeof reason === 'string'
-            ? reason
-            : 'Unhandled promise rejection';
+      const text = formatRejectionMessage(reason);
       buffer.push(text);
       if (typeof previousOnUnhandled === 'function') {
         return previousOnUnhandled.call(window, event);
