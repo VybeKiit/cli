@@ -377,10 +377,10 @@ export async function readListingComboboxes(page: Page): Promise<{
  * Reads optional text into the schema shape expected by the Chrome Web Store automation pipeline.
  */
 export async function readOptionalText(page: Page, fieldKey: string): Promise<string | undefined> {
-  try {
-    const value = await fieldLocator(page, fieldKey).inputValue();
-    return value.length > 0 ? value : undefined;
-  } catch {}
+  const value = await fieldLocator(page, fieldKey)
+    .inputValue()
+    .catch(() => undefined);
+  return value && value.length > 0 ? value : undefined;
 }
 
 /**
