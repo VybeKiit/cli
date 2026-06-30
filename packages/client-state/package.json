@@ -17,6 +17,11 @@
       "types": "./dist/mobile/index.d.ts",
       "import": "./dist/mobile/index.js",
       "require": "./dist/mobile/index.cjs"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "import": "./dist/web/index.js",
+      "require": "./dist/web/index.cjs"
     }
   },
   "files": [

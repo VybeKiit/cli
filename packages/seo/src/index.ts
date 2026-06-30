@@ -14,5 +14,5 @@ export type {
   NextMetadataOutput,
   SitemapEntry,
 } from './types';
-export { resolveSeoProvider } from './resolve';
+export { createSeoFromEnv, resolveSeoProvider } from './resolve';
 export { createLocalSeo } from './providers/local';

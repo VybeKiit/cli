@@ -4,14 +4,8 @@ import {
   createBetterAuthProvider,
 } from '../src/providers/better-auth/index';
 
-/** The fixed set of `api` methods the adapter calls, each a `vi.fn` we drive per case. */
 type FakeApi = Record<keyof BetterAuthInstance['api'], ReturnType<typeof vi.fn>>;
 
-/**
- * A fake better-auth instance: every `api` method is a `vi.fn`, so the adapter is
- * exercised with NO `pg`/Mongo connection. `createBetterAuthProvider` accepts this
- * via its `instance` test seam.
- */
 function fakeInstance(): { instance: BetterAuthInstance; api: FakeApi } {
   const api: FakeApi = {
     signUpEmail: vi.fn(),
@@ -37,25 +31,29 @@ function provider() {
 }
 
 describe('createBetterAuthProvider', () => {
-  it('reports its provider name', () => {
-    expect(provider().name).toBe('better-auth');
+  it('reports its provider name and capabilities', () => {
+    const p = provider();
+    expect(p.name).toBe('better-auth');
+    expect(p.capabilities.emailCode).toBe(true);
+    expect(p.capabilities.magicLink).toBe(false);
   });
 
-  it('signUpWithPassword calls signUpEmail and maps the user', async () => {
+  it('signUpWithPassword returns user + bearer token', async () => {
     fake.api.signUpEmail.mockResolvedValue({ token: 't', user });
     const result = await provider().signUpWithPassword('a@b.com', 'pw');
 
-    expect(result.ok && result.value).toEqual({ id: 'u1', email: 'a@b.com' });
+    expect(result.ok && result.value.user).toEqual({ id: 'u1', email: 'a@b.com' });
+    expect(result.ok && result.value.sessionToken).toBe('t');
     expect(fake.api.signUpEmail).toHaveBeenCalledWith({
       body: { email: 'a@b.com', password: 'pw', name: 'a' },
     });
   });
 
-  it('signInWithPassword calls signInEmail and maps the user', async () => {
+  it('signInWithPassword returns user + bearer token', async () => {
     fake.api.signInEmail.mockResolvedValue({ token: 't', user });
     const result = await provider().signInWithPassword('a@b.com', 'pw');
 
-    expect(result.ok && result.value).toEqual({ id: 'u1', email: 'a@b.com' });
+    expect(result.ok && result.value.sessionToken).toBe('t');
     expect(fake.api.signInEmail).toHaveBeenCalledWith({
       body: { email: 'a@b.com', password: 'pw' },
     });
@@ -71,11 +69,11 @@ describe('createBetterAuthProvider', () => {
     });
   });
 
-  it('verifyEmailCode calls signInEmailOTP and maps the user', async () => {
+  it('verifyEmailCode returns session with token', async () => {
     fake.api.signInEmailOTP.mockResolvedValue({ token: 't', user });
     const result = await provider().verifyEmailCode('a@b.com', '123456');
 
-    expect(result.ok && result.value).toEqual({ id: 'u1', email: 'a@b.com' });
+    expect(result.ok && result.value.sessionToken).toBe('t');
     expect(fake.api.signInEmailOTP).toHaveBeenCalledWith({
       body: { email: 'a@b.com', otp: '123456' },
     });
@@ -111,8 +109,8 @@ describe('createBetterAuthProvider', () => {
     expect(!get.ok && get.error.code).toBe('get_user_failed');
   });
 
-  it('returns no_user when a call succeeds without a user', async () => {
-    fake.api.signInEmail.mockResolvedValue({ token: 't', user: undefined });
+  it('returns no_user when sign-in succeeds without user or token', async () => {
+    fake.api.signInEmail.mockResolvedValue({ token: undefined, user: undefined });
     const result = await provider().signInWithPassword('a@b.com', 'pw');
     expect(!result.ok && result.error.code).toBe('no_user');
   });

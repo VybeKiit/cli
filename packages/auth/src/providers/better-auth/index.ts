@@ -19,6 +19,8 @@ import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { bearer, emailOTP } from 'better-auth/plugins';
 import { type Db, MongoClient } from 'mongodb';
 import { Pool } from 'pg';
+import type { SmsGateway } from '../../gateways';
+import { toSessionResult } from '../../session';
 import type { AuthProvider } from '../../types';
 import { type AuthUser, normalizeAuthUser } from '../../user';
 
@@ -67,54 +69,46 @@ export interface BetterAuthProviderOptions {
    * (and `build`) never open a database connection. Production callers omit it.
    */
   readonly instance?: BetterAuthInstance;
+  /** Injectable SMS seam — defaults to Twilio via env when omitted. */
+  readonly smsGateway?: SmsGateway;
 }
 
-/**
- * Build the DB-bound better-auth {@link AuthProvider} — VybeKiit's default auth
- * backend (ADR-0003).
- *
- * Construction is **lazy**: the real {@link BetterAuthInstance} (and the underlying
- * `pg` Pool / `MongoClient`) is created only on first method call, and only when no
- * `instance` was injected. This keeps the factory synchronous, lets tests inject a
- * fake with no live DB, and means a misconfigured `DATABASE_URL` surfaces at first
- * use rather than at import time.
- *
- * Database binding: `options.mongo` selects the `mongodbAdapter`; otherwise the
- * Postgres connection string in `config.DATABASE_URL` is opened via a `pg` Pool
- * (better-auth wraps it in its Kysely Postgres dialect). The `emailOTP` plugin backs
- * `sendEmailCode`/`verifyEmailCode`; the `bearer` plugin lets `getUser` resolve a
- * session from an `Authorization: Bearer <token>` header server-side.
- *
- * Every method maps better-auth's `{ user, token }` success payload through
- * {@link normalizeAuthUser} into a {@link Result}, and converts a thrown `APIError`
- * (or any error) into a `fail(...)` with the interface's stable codes — no exception
- * crosses the boundary.
- */
+const BETTER_AUTH_CAPABILITIES = {
+  emailCode: true,
+  passwordReset: false,
+  magicLink: false,
+  sms: true,
+} as const;
+
 /** In-memory reset/magic tokens until email delivery is wired by add-signin skill. */
 const resetTokens = new Map<string, string>();
 const magicTokens = new Map<string, string>();
 
-async function sendSmsWithEnv(phone: string): Promise<Result<true>> {
-  try {
-    const config = parseEnv(twilioConfigSchema, process.env);
-    return sendTwilioSmsOtp(phone, config);
-  } catch {
-    return ok(true);
-  }
-}
-
-async function verifySmsWithEnv(phone: string, code: string): Promise<Result<true>> {
-  try {
-    const config = parseEnv(twilioConfigSchema, process.env);
-    return verifyTwilioSmsOtp(phone, code, config);
-  } catch {
-    if (code === '000000') return ok(true);
-    return fail('sms_verify_failed', 'SMS is not configured.');
-  }
+function createDefaultSmsGateway(): SmsGateway {
+  return {
+    async sendOtp(phone: string): Promise<Result<true>> {
+      try {
+        const config = parseEnv(twilioConfigSchema, process.env);
+        return sendTwilioSmsOtp(phone, config);
+      } catch {
+        return ok(true);
+      }
+    },
+    async verifyOtp(phone: string, code: string): Promise<Result<true>> {
+      try {
+        const config = parseEnv(twilioConfigSchema, process.env);
+        return verifyTwilioSmsOtp(phone, code, config);
+      } catch {
+        if (code === '000000') return ok(true);
+        return fail('sms_verify_failed', 'SMS is not configured.');
+      }
+    },
+  };
 }
 
 export function createBetterAuthProvider(options: BetterAuthProviderOptions): AuthProvider {
   let instance: BetterAuthInstance | undefined = options.instance;
+  const sms = options.smsGateway ?? createDefaultSmsGateway();
 
   /** Construct (once) the real better-auth instance bound to the chosen database. */
   const auth = (): BetterAuthInstance => {
@@ -125,24 +119,23 @@ export function createBetterAuthProvider(options: BetterAuthProviderOptions): Au
 
   return {
     name: 'better-auth',
+    capabilities: BETTER_AUTH_CAPABILITIES,
 
-    async signUpWithPassword(email: string, password: string): Promise<Result<AuthUser>> {
+    async signUpWithPassword(email: string, password: string) {
       try {
-        // better-auth requires a `name`; we have none at sign-up, so default to the
-        // email's local part — a sensible display name the builder can edit later.
-        const { user } = await auth().api.signUpEmail({
+        const { user, token } = await auth().api.signUpEmail({
           body: { email, password, name: email.split('@')[0] ?? email },
         });
-        return toUserResult(user, 'Sign up succeeded but returned no user.');
+        return toSessionResult(user, token, 'Sign up succeeded but returned no session.');
       } catch (error) {
         return fail('signup_failed', errorMessage(error));
       }
     },
 
-    async signInWithPassword(email: string, password: string): Promise<Result<AuthUser>> {
+    async signInWithPassword(email: string, password: string) {
       try {
-        const { user } = await auth().api.signInEmail({ body: { email, password } });
-        return toUserResult(user, 'Sign in returned no user.');
+        const { user, token } = await auth().api.signInEmail({ body: { email, password } });
+        return toSessionResult(user, token, 'Sign in returned no session.');
       } catch (error) {
         return fail('signin_failed', errorMessage(error));
       }
@@ -157,10 +150,10 @@ export function createBetterAuthProvider(options: BetterAuthProviderOptions): Au
       }
     },
 
-    async verifyEmailCode(email: string, code: string): Promise<Result<AuthUser>> {
+    async verifyEmailCode(email: string, code: string) {
       try {
-        const { user } = await auth().api.signInEmailOTP({ body: { email, otp: code } });
-        return toUserResult(user, 'Code verified but returned no user.');
+        const { user, token } = await auth().api.signInEmailOTP({ body: { email, otp: code } });
+        return toSessionResult(user, token, 'Code verified but returned no session.');
       } catch (error) {
         return fail('otp_verify_failed', errorMessage(error));
       }
@@ -171,17 +164,21 @@ export function createBetterAuthProvider(options: BetterAuthProviderOptions): Au
       return ok(true);
     },
 
-    async resetPassword(token: string, newPassword: string): Promise<Result<AuthUser>> {
+    async resetPassword(token: string, newPassword: string) {
       const email = resetTokens.get(token) ?? resetTokens.get(`reset:${token}`);
       if (!email) {
         return fail('reset_failed', 'That reset link is not valid or has expired.');
       }
       resetTokens.delete(token);
       try {
-        const { user } = await auth().api.signUpEmail({
+        const { user, token: sessionToken } = await auth().api.signUpEmail({
           body: { email, password: newPassword, name: email.split('@')[0] ?? email },
         });
-        return toUserResult(user, 'Password reset succeeded but returned no user.');
+        return toSessionResult(
+          user,
+          sessionToken,
+          'Password reset succeeded but returned no session.',
+        );
       } catch (error) {
         return fail('reset_failed', errorMessage(error));
       }
@@ -192,32 +189,35 @@ export function createBetterAuthProvider(options: BetterAuthProviderOptions): Au
       return ok(true);
     },
 
-    async verifyMagicLink(token: string): Promise<Result<AuthUser>> {
+    async verifyMagicLink(token: string) {
       const email = magicTokens.get(token);
       if (!email) {
         return fail('magic_link_failed', 'That sign-in link is not valid or has expired.');
       }
       magicTokens.delete(token);
-      return toUserResult({ id: email, email }, 'Magic link verified but returned no user.');
+      return toSessionResult(
+        { id: email, email },
+        `magic:${token}`,
+        'Magic link verified but returned no session.',
+      );
     },
 
     async sendSmsCode(phone: string): Promise<Result<true>> {
-      return sendSmsWithEnv(phone);
+      return sms.sendOtp(phone);
     },
 
-    async verifySmsCode(phone: string, code: string): Promise<Result<AuthUser>> {
-      const verified = await verifySmsWithEnv(phone, code);
+    async verifySmsCode(phone: string, code: string) {
+      const verified = await sms.verifyOtp(phone, code);
       if (!verified.ok) return fail(verified.error.code, verified.error.message);
-      return toUserResult(
+      return toSessionResult(
         { id: `sms-${phone}`, email: `${phone.replace(/\D/g, '')}@sms.local` },
-        'SMS verified but returned no user.',
+        `sms:${phone}:${code}`,
+        'SMS verified but returned no session.',
       );
     },
 
     async getUser(sessionToken: string): Promise<Result<AuthUser>> {
       try {
-        // The `bearer` plugin resolves the session from this header server-side; the
-        // token is the one returned by sign-in/sign-up above.
         const session = await auth().api.getSession({
           headers: new Headers({ authorization: `Bearer ${sessionToken}` }),
         });
@@ -259,15 +259,8 @@ function buildBetterAuth(options: BetterAuthProviderOptions): BetterAuthInstance
   });
 }
 
-/**
- * emailOTP's required delivery callback. Actually mailing the code is the
- * `add-signin` skill's job (it wires `@vybekiit/email` here when the builder asks),
- * so the default is a no-op rather than a hard dependency on a mail provider at
- * construction time — keeping this package free of an email-provider coupling.
- */
 async function sendVerificationOTP(): Promise<void> {}
 
-/** Map a provider user (possibly absent) to a {@link Result}, failing as `no_user`. */
 function toUserResult(
   raw: { id: string; email: string } | null | undefined,
   noUserMessage: string,
@@ -276,7 +269,6 @@ function toUserResult(
   return user ? ok(user) : fail('no_user', noUserMessage);
 }
 
-/** Narrow an unknown caught value to a developer-facing message string. */
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'unknown better-auth error';
 }

@@ -129,6 +129,8 @@ export {
 export { ok, err, fail, type Result, type VybeKiitError } from './result';
 export { type EnvSource, resolveEnvProvider, resolveOptionalEnvProvider } from './env-source';
 export {
+  BACKEND_ANCHOR_KEYS,
+  isBackendUnconfigured,
   isCloudflareUnconfigured,
   isRailwayStackActive,
   isSupabaseUnconfigured,

@@ -12,6 +12,21 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./http": {
+      "types": "./dist/http/index.d.ts",
+      "import": "./dist/http/index.js",
+      "require": "./dist/http/index.cjs"
+    },
+    "./http/next": {
+      "types": "./dist/http/next.d.ts",
+      "import": "./dist/http/next.js",
+      "require": "./dist/http/next.cjs"
+    },
+    "./http/express": {
+      "types": "./dist/http/express.d.ts",
+      "import": "./dist/http/express.js",
+      "require": "./dist/http/express.cjs"
     }
   },
   "files": [
@@ -31,8 +46,18 @@
     "mongodb": "^7.4.0",
     "pg": "^8.13.1"
   },
+  "peerDependencies": {
+    "express": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/pg": "^8.11.10",
+    "express": "^4.21.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

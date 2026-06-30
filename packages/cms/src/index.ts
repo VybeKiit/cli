@@ -1,2 +1,3 @@
 export type { CmsProvider, CmsProviderName, CmsPage } from './types';
-export { resolveCmsProvider } from './resolve';
+export { createCmsFromEnv, resolveCmsProvider } from './resolve';
+export { createMdxCms, clearMdxCmsCache } from './providers/mdx';

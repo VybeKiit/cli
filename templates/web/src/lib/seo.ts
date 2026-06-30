@@ -1,11 +1,11 @@
 import type { MetadataInput, NextMetadataOutput, PageType } from '@vybekiit/seo';
-import { resolveSeoProvider } from '@vybekiit/seo';
+import { createSeoFromEnv } from '@vybekiit/seo';
 import type { Metadata } from 'next';
 import { getCms } from './cms-client';
 
 /** SEO + GEO wire point — skills: add-blog, go-live */
 export function getSeo() {
-  return resolveSeoProvider();
+  return createSeoFromEnv();
 }
 
 export function toNextMetadata(output: NextMetadataOutput): Metadata {

@@ -8,6 +8,30 @@ import {
 } from './config';
 import type { EnvSource } from './env-source';
 
+/**
+ * Canonical backend anchor keys — any one signals the builder wired a real backend.
+ * Shared by auth and data resolvers for ADR-0008 local dev adapter fallback (ADR-0018).
+ */
+export const BACKEND_ANCHOR_KEYS = [
+  'BETTER_AUTH_SECRET',
+  'DATABASE_URL',
+  'COGNITO_USER_POOL_ID',
+  'SUPABASE_URL',
+  'FIREBASE_PROJECT_ID',
+  'MONGODB_URI',
+  'AWS_REGION',
+] as const;
+
+/**
+ * True when neither an explicit provider nor any backend anchor key is set — the
+ * local dev adapter case (ADR-0008). Checked against raw env before {@link parseEnv}
+ * defaults mask the empty case.
+ */
+export function isBackendUnconfigured(env: EnvSource): boolean {
+  if (env.AUTH_PROVIDER || env.DATA_PROVIDER) return false;
+  return BACKEND_ANCHOR_KEYS.every((key) => !env[key]);
+}
+
 /** True when Cloudflare account credentials are absent — local/zero-config fallbacks apply. */
 export function isCloudflareUnconfigured(env: EnvSource): boolean {
   return !(env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_API_TOKEN);

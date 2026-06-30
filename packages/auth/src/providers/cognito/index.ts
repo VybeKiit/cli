@@ -14,6 +14,7 @@ import {
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { type CognitoConfig, type Result, fail, ok } from '@vybekiit/core';
+import { toSessionResult } from '../../session';
 import type { AuthProvider } from '../../types';
 import { type AuthUser, normalizeAuthUser } from '../../user';
 
@@ -62,6 +63,13 @@ export interface CognitoProviderOptions {
  * `verifyEmailCode` keys the confirmed {@link AuthUser} by the email it confirmed —
  * exact id/session behavior on a real pool is deferred to live-secret verification.
  */
+const COGNITO_CAPABILITIES = {
+  emailCode: true,
+  passwordReset: true,
+  magicLink: false,
+  sms: false,
+} as const;
+
 export function createCognitoAuthProvider(options: CognitoProviderOptions): AuthProvider {
   const { config } = options;
   const client = options.client ?? buildCognitoClient(config);
@@ -69,8 +77,9 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
 
   return {
     name: 'cognito',
+    capabilities: COGNITO_CAPABILITIES,
 
-    async signUpWithPassword(email: string, password: string): Promise<Result<AuthUser>> {
+    async signUpWithPassword(email: string, password: string) {
       try {
         const { UserSub } = (await client.send(
           new SignUpCommand({
@@ -80,13 +89,17 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
             UserAttributes: [{ Name: 'email', Value: email }],
           }),
         )) as { UserSub?: string };
-        return toUserResult({ id: UserSub, email }, 'Sign up returned no user id.');
+        return toSessionResult(
+          { id: UserSub ?? email, email },
+          UserSub ?? email,
+          'Sign up returned no session.',
+        );
       } catch (error) {
         return fail('signup_failed', errorMessage(error));
       }
     },
 
-    async signInWithPassword(email: string, password: string): Promise<Result<AuthUser>> {
+    async signInWithPassword(email: string, password: string) {
       try {
         const auth = (await client.send(
           new InitiateAuthCommand({
@@ -98,7 +111,13 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
 
         const accessToken = auth.AuthenticationResult?.AccessToken;
         if (!accessToken) return fail('signin_failed', 'Cognito returned no access token.');
-        return resolveUserFromAccessToken(client, accessToken, 'signin_failed');
+        const userResult = await resolveUserFromAccessToken(client, accessToken, 'signin_failed');
+        if (!userResult.ok) return userResult;
+        return toSessionResult(
+          { id: userResult.value.id, email: userResult.value.email ?? email },
+          accessToken,
+          'Sign in returned no session.',
+        );
       } catch (error) {
         return fail('signin_failed', errorMessage(error));
       }
@@ -115,7 +134,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
       }
     },
 
-    async verifyEmailCode(email: string, code: string): Promise<Result<AuthUser>> {
+    async verifyEmailCode(email: string, code: string) {
       try {
         await client.send(
           new ConfirmSignUpCommand({
@@ -124,7 +143,11 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
             ConfirmationCode: code,
           }),
         );
-        return toUserResult({ id: email, email }, 'Code verified but returned no user.');
+        return toSessionResult(
+          { id: email, email },
+          `cognito-confirmed:${email}`,
+          'Code verified but returned no session.',
+        );
       } catch (error) {
         return fail('otp_verify_failed', errorMessage(error));
       }
@@ -139,7 +162,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
       }
     },
 
-    async resetPassword(token: string, newPassword: string): Promise<Result<AuthUser>> {
+    async resetPassword(token: string, newPassword: string) {
       try {
         const [username, code] = token.includes(':') ? token.split(':', 2) : ['', token];
         if (!username) {
@@ -153,7 +176,11 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
             Password: newPassword,
           }),
         );
-        return toUserResult({ id: username, email: username }, 'Password reset succeeded.');
+        return toSessionResult(
+          { id: username, email: username },
+          `cognito-reset:${username}`,
+          'Password reset succeeded but returned no session.',
+        );
       } catch (error) {
         return fail('reset_failed', errorMessage(error));
       }
@@ -166,7 +193,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
       );
     },
 
-    async verifyMagicLink(_token: string): Promise<Result<AuthUser>> {
+    async verifyMagicLink(_token: string) {
       return fail('magic_link_failed', 'Magic link sign-in is not available on this auth backend.');
     },
 
@@ -177,7 +204,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
       );
     },
 
-    async verifySmsCode(_phone: string, _code: string): Promise<Result<AuthUser>> {
+    async verifySmsCode(_phone: string, _code: string) {
       return fail('sms_verify_failed', 'SMS sign-in is not configured.');
     },
 

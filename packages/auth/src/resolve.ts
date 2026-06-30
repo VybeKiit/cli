@@ -3,6 +3,7 @@ import {
   betterAuthConfigSchema,
   cognitoConfigSchema,
   dataConfigSchema,
+  isBackendUnconfigured,
   mongoConfigSchema,
   parseEnv,
   resolveEnvProvider,
@@ -13,41 +14,6 @@ import { type CognitoClientLike, createCognitoAuthProvider } from './providers/c
 import { createLocalAuthProvider } from './providers/local/index';
 import type { AuthProvider } from './types';
 
-/**
- * The keys whose presence means a real auth or data backend is being configured —
- * any one of them means the builder intends a real backend, so the local fallback
- * stands down. `BETTER_AUTH_SECRET`/`DATABASE_URL` anchor better-auth, `COGNITO_*`
- * anchors Cognito, and the data anchors mirror `@vybekiit/db`'s resolver so auth
- * follows data: a configured database implies real auth, not the dev identity.
- */
-const CONFIGURED_KEYS = [
-  'BETTER_AUTH_SECRET',
-  'DATABASE_URL',
-  'COGNITO_USER_POOL_ID',
-  'SUPABASE_URL',
-  'MONGODB_URI',
-  'AWS_REGION',
-] as const;
-
-/**
- * True when nothing selects or configures an auth/data backend — no `AUTH_PROVIDER`,
- * no `DATA_PROVIDER`, and none of the {@link CONFIGURED_KEYS}. Only this empty case
- * is filled by the local dev identity (ADR-0008); any explicit provider or backend
- * key resolves normally and fails loud on its own missing keys. Checked against raw
- * env *before* {@link parseEnv}, whose `.default(...)`s would otherwise mask it.
- */
-function isAuthUnconfigured(env: EnvSource): boolean {
-  if (env.AUTH_PROVIDER || env.DATA_PROVIDER) return false;
-  return CONFIGURED_KEYS.every((key) => !env[key]);
-}
-
-/**
- * Test seams passed straight through to the adapters so resolving never opens a real
- * connection. `betterAuthInstance` injects a fake better-auth instance (no `pg`/Mongo
- * dial); `cognitoClient` injects a fake Cognito client (no network). Production
- * callers omit both — consistent with how the deploy/email resolvers accept injected
- * runners/fetch.
- */
 export interface ResolveAuthInjections {
   readonly betterAuthInstance?: BetterAuthInstance;
   readonly cognitoClient?: CognitoClientLike;
@@ -77,7 +43,7 @@ export function resolveAuthProvider(
   env: EnvSource = process.env,
   injections: ResolveAuthInjections = {},
 ): AuthProvider {
-  if (isAuthUnconfigured(env)) return createLocalAuthProvider();
+  if (isBackendUnconfigured(env)) return createLocalAuthProvider();
 
   const cognito = (): AuthProvider =>
     createCognitoAuthProvider({

@@ -2,8 +2,11 @@ import { cmsConfigSchema, mdxCmsConfigSchema, parseEnv, type EnvSource } from '@
 import { createMdxCms } from './providers/mdx';
 import type { CmsProvider } from './types';
 
-/** CMS resolves to MDX local provider — CMS_PROVIDER validated but only one adapter ships. */
-export function resolveCmsProvider(env: EnvSource = process.env): CmsProvider {
+/** Build the MDX blog-page module from env — single adapter until #2 ships. */
+export function createCmsFromEnv(env: EnvSource = process.env): CmsProvider {
   parseEnv(cmsConfigSchema, env);
   return createMdxCms(parseEnv(mdxCmsConfigSchema, env));
 }
+
+/** @deprecated Use {@link createCmsFromEnv} — kept for existing template imports. */
+export const resolveCmsProvider = createCmsFromEnv;

@@ -2,6 +2,7 @@ import {
   awsConfigSchema,
   dataConfigSchema,
   firebaseConfigSchema,
+  isBackendUnconfigured,
   mongoConfigSchema,
   neonConfigSchema,
   parseEnv,
@@ -27,34 +28,6 @@ import {
 import type { DataProvider, StorageProvider } from './types';
 
 /**
- * The one required key that signals each real data backend is being configured —
- * its presence is how we distinguish "the builder wired a backend" from "fresh
- * scaffold, nothing set." Each is the non-optional anchor of its adapter's schema:
- * Supabase's project URL, Mongo's connection string, AWS's region.
- */
-const BACKEND_ANCHOR_KEYS = [
-  'SUPABASE_URL',
-  'DATABASE_URL',
-  'FIREBASE_PROJECT_ID',
-  'MONGODB_URI',
-  'AWS_REGION',
-] as const;
-
-/**
- * True when the environment carries no data configuration at all — neither an
- * explicit `DATA_PROVIDER` nor any real backend's anchor key. This is the only case
- * the local fallback fills; a single anchor key (or an explicit provider) means the
- * builder intends a real backend, so we resolve it normally and let it fail loud if
- * its other keys are missing. Checked against raw env *before* {@link parseEnv},
- * because the schema defaults `DATA_PROVIDER` to `supabase` (which would otherwise
- * mask the empty case and demand Supabase keys).
- */
-function isDataUnconfigured(env: EnvSource): boolean {
-  if (env.DATA_PROVIDER) return false;
-  return BACKEND_ANCHOR_KEYS.every((key) => !env[key]);
-}
-
-/**
  * Construct the configured data provider from the environment — the single call
  * site features use, so they never name a backend. The agent swaps backends by
  * changing one env value.
@@ -68,7 +41,7 @@ function isDataUnconfigured(env: EnvSource): boolean {
  * @throws if a configured adapter's required keys are missing (via {@link parseEnv}).
  */
 export function resolveDataProvider(env: EnvSource = process.env): DataProvider {
-  if (isDataUnconfigured(env)) return createLocalDataProvider();
+  if (isBackendUnconfigured(env)) return createLocalDataProvider();
 
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
   return resolveEnvProvider(

@@ -1,10 +1,29 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BACKEND_ANCHOR_KEYS,
+  isBackendUnconfigured,
   isCloudflareUnconfigured,
   isRailwayStackActive,
   isSupabaseUnconfigured,
   needsAwsCliFromAuxiliaryProviders,
 } from '../src/provider-dispatch';
+
+describe('isBackendUnconfigured', () => {
+  it('is true when no provider or anchor keys are set', () => {
+    expect(isBackendUnconfigured({})).toBe(true);
+  });
+
+  it('is false when any anchor key is present', () => {
+    for (const key of BACKEND_ANCHOR_KEYS) {
+      expect(isBackendUnconfigured({ [key]: 'x' })).toBe(false);
+    }
+  });
+
+  it('is false when AUTH_PROVIDER or DATA_PROVIDER is set', () => {
+    expect(isBackendUnconfigured({ AUTH_PROVIDER: 'local' })).toBe(false);
+    expect(isBackendUnconfigured({ DATA_PROVIDER: 'supabase' })).toBe(false);
+  });
+});
 
 describe('isCloudflareUnconfigured', () => {
   it('is true when account id or token is missing', () => {

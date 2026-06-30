@@ -1,5 +1,6 @@
 import { getJson } from '@/lib/fetch-json';
 import type { AuthUser } from '@vybekiit/auth';
+import { queryKeys } from '@vybekiit/client-state';
 import { useQuery } from '@tanstack/react-query';
 
 /** Where the current-user lookup is served from once sign-in is wired. */
@@ -18,7 +19,7 @@ async function fetchCurrentUser(): Promise<AuthUser | null> {
  */
 export function useUser(): { user: AuthUser | null; loading: boolean } {
   const { data, isLoading } = useQuery({
-    queryKey: ['auth', 'me'],
+    queryKey: queryKeys.auth.me,
     queryFn: fetchCurrentUser,
   });
   return { user: data ?? null, loading: isLoading };

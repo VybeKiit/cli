@@ -58,7 +58,8 @@ describe('createCognitoAuthProvider', () => {
     send.mockResolvedValue({ UserSub: 'sub-1' });
     const result = await provider().signUpWithPassword('a@b.com', 'pw');
 
-    expect(result.ok && result.value).toEqual({ id: 'sub-1', email: 'a@b.com' });
+    expect(result.ok && result.value.user).toEqual({ id: 'sub-1', email: 'a@b.com' });
+    expect(result.ok && result.value.sessionToken).toBe('sub-1');
     expect(issued(0).type).toBe('SignUp');
     expect(issued(0).input).toMatchObject({
       ClientId: 'client',
@@ -80,7 +81,8 @@ describe('createCognitoAuthProvider', () => {
 
     const result = await provider().signInWithPassword('a@b.com', 'pw');
 
-    expect(result.ok && result.value).toEqual({ id: 'sub-9', email: 'a@b.com' });
+    expect(result.ok && result.value.user).toEqual({ id: 'sub-9', email: 'a@b.com' });
+    expect(result.ok && result.value.sessionToken).toBe('acc');
     expect(issued(0).type).toBe('InitiateAuth');
     expect(issued(0).input).toMatchObject({ AuthFlow: 'USER_PASSWORD_AUTH' });
     expect(issued(1).type).toBe('GetUser');
@@ -106,7 +108,7 @@ describe('createCognitoAuthProvider', () => {
     send.mockResolvedValue({});
     const result = await provider().verifyEmailCode('a@b.com', '123456');
 
-    expect(result.ok && result.value).toEqual({ id: 'a@b.com', email: 'a@b.com' });
+    expect(result.ok && result.value.user).toEqual({ id: 'a@b.com', email: 'a@b.com' });
     expect(issued(0).type).toBe('ConfirmSignUp');
     expect(issued(0).input).toMatchObject({ Username: 'a@b.com', ConfirmationCode: '123456' });
   });

@@ -1,8 +1,6 @@
 import { SelectorMissingError } from '../../../../core/errors';
-import type { SelectorEntry } from '../../../extension/selectors';
+import { type SelectorEntry, resolveFreshSelectorEntry } from '../../../../core/selectors';
 import { LS_RECORDED_SELECTORS } from './registry.generated';
-
-const SELECTOR_STALENESS_DAYS = 90;
 
 const DEFAULT_SELECTORS: Record<string, SelectorEntry[]> = {};
 
@@ -20,18 +18,9 @@ export function resolveLsSelector(fieldKey: string): SelectorEntry[] {
 }
 
 export function resolveLsSelectorEntry(fieldKey: string, today: Date = new Date()): SelectorEntry {
-  const entries = resolveLsSelector(fieldKey);
-  const fresh = entries.find((entry) => isFresh(entry, today));
-  if (!fresh) throw new SelectorMissingError(fieldKey, 'stale');
-  return fresh;
-}
-
-function isFresh(entry: SelectorEntry, today: Date): boolean {
-  if (!entry.verifiedAt) return false;
-  const verified = new Date(entry.verifiedAt);
-  if (Number.isNaN(verified.getTime())) return false;
-  const ageDays = (today.getTime() - verified.getTime()) / (1000 * 60 * 60 * 24);
-  return ageDays <= SELECTOR_STALENESS_DAYS;
+  return resolveFreshSelectorEntry(SELECTORS[fieldKey], fieldKey, today, (key, reason) => {
+    throw new SelectorMissingError(key, reason);
+  });
 }
 
 export type { SelectorEntry };
