@@ -158,6 +158,18 @@ export const authConfigSchema = z.object({
 });
 
 /**
+ * Which auth adapter `@vybekiit/auth` constructs. `better-auth` (DB-bound) is the
+ * default; `cognito` is the AWS path (ADR-0003). When `better-auth` is selected,
+ * the adapter follows `DATA_PROVIDER` ({@link dataConfigSchema}) to pick its
+ * database binding — and AWS-data apps auto-route to Cognito, since DynamoDB has no
+ * better-auth adapter. The agent's add-signin skill drives this; the builder never
+ * picks a name.
+ */
+export const authConfigSchema = z.object({
+  AUTH_PROVIDER: z.enum(['better-auth', 'cognito']).default('better-auth'),
+});
+
+/**
  * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
  * Storage is the default; `r2` is the Cloudflare stack default once doctor provisions
  * it; `s3` is an opt-in AWS adapter (ADR-0002).
