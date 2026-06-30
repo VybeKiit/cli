@@ -12,7 +12,7 @@ vi.mock('@vybekiit/core', async (importOriginal) => {
     parseEnv: vi.fn(() => ({
       GITHUB_GATE_TOKEN: 'tok',
       GITHUB_GATE_ORG: 'VybeKiit',
-      GITHUB_GATE_REPOS: ['web', 'mobile', 'extension'],
+      GITHUB_GATE_REPOS: ['web', 'spa', 'mobile', 'extension'],
     })),
   };
 });
@@ -48,6 +48,6 @@ describe('POST /api/webhook', () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(200);
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetch).toHaveBeenCalledTimes(4);
   });
 });

@@ -351,7 +351,7 @@ export const githubGateConfigSchema = z.object({
   /** CSV of mirror repo names under {@link GITHUB_GATE_ORG} — ADR-0005 bundle invite. */
   GITHUB_GATE_REPOS: z
     .string()
-    .default('web,mobile,extension')
+    .default('web,spa,mobile,extension')
     .transform((raw) =>
       raw
         .split(',')
