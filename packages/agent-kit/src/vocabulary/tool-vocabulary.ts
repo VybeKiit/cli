@@ -80,6 +80,16 @@ export const TOOL_VOCABULARY: readonly ToolVocabularyEntry[] = [
     say: 'a tool I can use for you',
     why: 'an extra capability I plug in on their behalf — the plumbing stays invisible',
   },
+  {
+    jargon: 'pnpm / npm / package manager',
+    say: 'getting the building blocks ready',
+    why: 'one-time install wait — never name the package manager',
+  },
+  {
+    jargon: 'GitHub Copilot / Copilot',
+    say: 'your assistant',
+    why: 'deliberately out of scope — collapse like other assistant products if it slips out',
+  },
 ];
 
 /** Escape a cell so a literal pipe never breaks the markdown table layout. */

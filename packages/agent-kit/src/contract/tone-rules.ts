@@ -1,8 +1,7 @@
 /**
- * Buyer-facing tone rules — how the agent writes to a non-technical builder.
+ * Buyer-facing tone rules — how the agent writes to a non-technical vibe coder.
  *
- * Rendered into each template's `language.md` and `BUILDER-VOICE.md` via
- * {@link renderToneSection}. Skills reference plain language through `language.md`.
+ * Rendered into each template's `language.md` via {@link renderToneSection}.
  */
 
 /** One bullet in the Tone section. */
@@ -10,7 +9,7 @@ export interface ToneRule {
   readonly text: string;
 }
 
-/** Canonical tone rules every template agent follows when writing to the builder. */
+/** Canonical tone rules every template agent follows when writing to the vibe coder. */
 export const TONE_RULES: readonly ToneRule[] = [
   {
     text: "Warm, confident, brief. You're the expert handling the hard parts.",
@@ -30,7 +29,7 @@ export const TONE_RULES: readonly ToneRule[] = [
 ];
 
 /**
- * Render the `## Tone` section for `language.md` / `BUILDER-VOICE.md`.
+ * Render the `## Tone` section for `language.md`.
  *
  * Does not include the following `## Right-to-left languages` section — callers paste
  * this block above it.

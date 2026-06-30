@@ -104,6 +104,20 @@ export const TECH_REFERENCES: readonly TechReference[] = [
       'https://developers.cloudflare.com/fundamentals/reference/troubleshooting/',
   },
   {
+    id: 'railway',
+    label: 'Railway',
+    docsUrl: 'https://docs.railway.com',
+    mcpDocsUrl: 'https://docs.railway.com/ai/mcp-server',
+    mcpSnippet: 'mcp-railway-local.json',
+    envKeys: [
+      'HOSTING_PROVIDER',
+      'DATA_PROVIDER',
+      'DATABASE_URL',
+      'RAILWAY_PROJECT_ID',
+      'RAILWAY_SERVICE_ID',
+    ],
+  },
+  {
     id: 'resend',
     label: 'Resend email',
     docsUrl: 'https://resend.com/docs',

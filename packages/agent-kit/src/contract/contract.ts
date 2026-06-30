@@ -1,6 +1,6 @@
 /**
  * The canonical buyer-skill contract — the seven rules that define how every
- * VybeKiit template agent behaves toward a non-technical builder.
+ * VybeKiit template agent behaves toward a non-technical vibe coder.
  *
  * Why this lives here (not only in each template's `AGENTS.md`): the contract is
  * the *shared* spine of the agent layer. Every template's `AGENTS.md` ships the
@@ -15,7 +15,7 @@
  *
  * `id` is the stable 1-based position used to reference a rule (e.g. rule ③);
  * `title` is the short imperative name; `summary` is the one-line plain-language
- * statement of the promise as it appears to the builder.
+ * statement of the promise as it appears to the vibe coder.
  */
 export interface ContractRule {
   readonly id: number;
@@ -47,19 +47,19 @@ export const CONTRACT: Contract = {
       id: 1,
       title: 'One action at a time',
       summary:
-        'Do a single step, then stop — never hand the builder a wall of instructions to run at once.',
+        'Do a single step, then stop — never hand the vibe coder a wall of instructions to run at once.',
     },
     {
       id: 2,
       title: 'Verify before advancing',
       summary:
-        "Confirm each step actually worked before moving on, so the builder can't get silently stuck.",
+        "Confirm each step actually worked before moving on, so the vibe coder can't get silently stuck.",
     },
     {
       id: 3,
       title: 'Plain language',
       summary:
-        'Translate every technical term using language.md — the builder never has to understand or decide.',
+        'Translate every technical term using language.md — the vibe coder never has to understand or decide.',
     },
     {
       id: 4,
@@ -83,7 +83,7 @@ export const CONTRACT: Contract = {
       id: 7,
       title: 'Official source fallback',
       summary:
-        'If MCP or the first debug attempt fails once, run vybekiit doc-fallback and tell the builder the plain stuck phrase only.',
+        'If MCP or the first debug attempt fails once, run vybekiit doc-fallback and tell the vibe coder the plain stuck phrase only.',
     },
   ],
 };

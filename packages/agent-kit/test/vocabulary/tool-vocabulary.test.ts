@@ -20,6 +20,11 @@ describe('renderToolVocabularyTable', () => {
     expect(table).toContain('| MCP / MCP server | a tool I can use for you |');
   });
 
+  it('translates package manager without naming pnpm', () => {
+    const table = renderToolVocabularyTable();
+    expect(table).toContain('| pnpm / npm / package manager | getting the building blocks ready |');
+  });
+
   it('never escapes-away an embedded pipe (cells stay valid)', () => {
     for (const row of lines.slice(2)) {
       expect(row.startsWith('| ')).toBe(true);

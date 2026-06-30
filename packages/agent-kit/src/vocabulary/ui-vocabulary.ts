@@ -121,6 +121,31 @@ export const AGENT_INTERNAL_VOCABULARY: readonly UiVocabularyEntry[] = [
     say: '',
     why: 'agent-internal — say "what you clicked" or "location in code" in the handoff only',
   },
+  {
+    jargon: 'sandbox',
+    say: '',
+    why: 'agent-internal — never say',
+  },
+  {
+    jargon: 'ask mode / agent mode',
+    say: '',
+    why: 'agent-internal — never say',
+  },
+  {
+    jargon: 'skills CLI / skills.sh',
+    say: '',
+    why: 'agent-internal — never say',
+  },
+  {
+    jargon: '*-vybekiit.md (Layer B wrapper paths)',
+    say: '',
+    why: 'agent-internal file paths — never spoken aloud',
+  },
+  {
+    jargon: 'JWT / JWKS',
+    say: '',
+    why: 'agent-internal — never say',
+  },
 ];
 
 function escapeCell(text: string): string {
