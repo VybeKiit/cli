@@ -1,0 +1,93 @@
+{
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!!**/.agents/skills", "!!**/.vybekiit", "!!**/.wxt", "!!**/.output"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    },
+    "globals": ["chrome"]
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "useSortedKeys": "off",
+        "useSortedPackageJson": "off",
+        "useSortedAttributes": "off",
+        "organizeImports": "off"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "all",
+      "style": {
+        "noDefaultExport": "off",
+        "noJsxLiterals": "off",
+        "useComponentExportOnlyModules": "off",
+        "noTernary": "off",
+        "useNamingConvention": "off",
+        "noMagicNumbers": "off",
+        "noCommonJs": "off",
+        "useExportsLast": "warn",
+        "noIncrementDecrement": "off",
+        "noProcessEnv": "off",
+        "noExcessiveLinesPerFile": "warn"
+      },
+      "correctness": {
+        "noNodejsModules": "off",
+        "noUndeclaredDependencies": "warn",
+        "noUndeclaredVariables": "warn",
+        "noUnresolvedImports": "off",
+        "useImportExtensions": "off",
+        "useHookAtTopLevel": "off"
+      },
+      "performance": {
+        "noAwaitInLoops": "warn"
+      },
+      "suspicious": {
+        "noUnnecessaryConditions": "warn",
+        "noControlCharactersInRegex": "off",
+        "noAssignInExpressions": "off",
+        "noReturnAssign": "off",
+        "noConsole": "off",
+        "noUnknownAttribute": "off",
+        "noReactForwardRef": "off",
+        "noUnknownAtRules": "off",
+        "noReactSpecificProps": "off"
+      },
+      "security": {
+        "noSecrets": "warn"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn",
+        "noExcessiveLinesPerFunction": "warn",
+        "noVoid": "off"
+      }
+    },
+    "domains": {
+      "react": "all",
+      "test": "all",
+      "project": "all"
+    }
+  }
+}

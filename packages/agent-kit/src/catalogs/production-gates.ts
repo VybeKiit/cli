@@ -30,6 +30,12 @@ const TEMPLATE_GATES: Readonly<Record<TemplateId, readonly ProductionGate[]>> = 
     { id: 'backend', label: 'Extension talks to live backend URL' },
     { id: 'publish', label: 'Extension loads in Chrome Developer Mode' },
   ],
+  spa: [
+    ...COMMON_GATES,
+    { id: 'payments', label: 'Payments tested (practice then live)' },
+    { id: 'deploy', label: 'App is live at a public URL' },
+    { id: 'security', label: 'Safety check skill completed' },
+  ],
   backend: [
     ...COMMON_GATES,
     { id: 'health', label: '/health responds on deployed URL' },

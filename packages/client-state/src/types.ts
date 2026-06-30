@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import type { StoreApi, UseBoundStore } from 'zustand';
 
-export type ClientStateSurface = 'web' | 'mobile' | 'extension';
+export type ClientStateSurface = 'web' | 'mobile' | 'extension' | 'spa';
 
 export type UiStoreState = {
   /** Example UI-only slice — templates extend via createUiStore options. */

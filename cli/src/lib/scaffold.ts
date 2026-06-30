@@ -3,7 +3,7 @@ import { basename, join } from 'node:path';
 import { type DependencyMap, rewriteWorkspaceDeps } from './rewrite-deps';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
-export const TEMPLATES = ['web', 'mobile', 'extension', 'backend'] as const;
+export const TEMPLATES = ['web', 'spa', 'mobile', 'extension', 'backend'] as const;
 export type TemplateName = (typeof TEMPLATES)[number];
 
 /** Thrown for expected, user-facing failures so the entrypoint can print one clean line. */

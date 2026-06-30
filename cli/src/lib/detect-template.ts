@@ -18,6 +18,9 @@ export async function detectTemplateName(cwd: string): Promise<TemplateName | nu
     if (pkg.dependencies?.next) {
       return 'web';
     }
+    if (pkg.dependencies?.vite && pkg.dependencies?.['@tanstack/react-router']) {
+      return 'spa';
+    }
   } catch {
     // no package.json — fall through
   }

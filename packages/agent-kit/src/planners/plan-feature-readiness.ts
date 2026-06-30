@@ -38,6 +38,7 @@ const MOBILE_EXT_ENV_KEYS: Readonly<Record<TemplateId, string>> = {
   web: 'APP_URL',
   mobile: 'EXPO_PUBLIC_APP_URL',
   extension: 'WXT_PUBLIC_APP_URL',
+  spa: 'VITE_PUBLIC_APP_URL',
   backend: 'APP_URL',
 };
 
