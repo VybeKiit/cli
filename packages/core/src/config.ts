@@ -158,18 +158,6 @@ export const authConfigSchema = z.object({
 });
 
 /**
- * Which auth adapter `@vybekiit/auth` constructs. `better-auth` (DB-bound) is the
- * default; `cognito` is the AWS path (ADR-0003). When `better-auth` is selected,
- * the adapter follows `DATA_PROVIDER` ({@link dataConfigSchema}) to pick its
- * database binding — and AWS-data apps auto-route to Cognito, since DynamoDB has no
- * better-auth adapter. The agent's add-signin skill drives this; the builder never
- * picks a name.
- */
-export const authConfigSchema = z.object({
-  AUTH_PROVIDER: z.enum(['better-auth', 'cognito']).default('better-auth'),
-});
-
-/**
  * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
  * Storage is the default; `r2` is the Cloudflare stack default once doctor provisions
  * it; `s3` is an opt-in AWS adapter (ADR-0002).
@@ -539,19 +527,6 @@ export const i18nConfigSchema = z.object({
 /** Resend transactional email — `@vybekiit/email` (resend adapter). */
 export const resendConfigSchema = z.object({
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
-});
-
-/**
- * The VybeKiit store's own checkout target — used by `apps/landing`'s checkout route
- * to tell the payment provider *what* is being sold. `STORE_PRODUCT_ID` is the
- * provider's purchasable id (a Lemon Squeezy *variant* id by default), passed
- * straight to {@link CheckoutParams.productId}. This is store infrastructure (the
- * id of the kit we sell), not part of a buyer's scaffolded app — a buyer's app
- * carries its own product ids instead. Required, so a misconfigured store fails
- * loud at checkout rather than creating an empty cart.
- */
-export const storeConfigSchema = z.object({
-  STORE_PRODUCT_ID: z.string().min(1, 'STORE_PRODUCT_ID is required'),
 });
 
 export type AppConfig = z.infer<typeof appConfigSchema>;

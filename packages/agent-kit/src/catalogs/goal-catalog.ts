@@ -3,17 +3,14 @@
  * Source of truth for {@link planGoalRouting} and {@link checkGoalDrift}.
  */
 
-export type TemplateId = 'web' | 'mobile' | 'extension' | 'backend';
+export type TemplateId = 'web' | 'mobile' | 'extension' | 'backend' | 'spa';
 
 export interface GoalCatalogEntry {
   readonly id: string;
-  /** Substrings matched case-insensitively against the builder's phrase. */
   readonly phrases: readonly string[];
-  /** Skill file stem (without .md) per template; `null` = not available on that template. */
   readonly skills: Readonly<Record<TemplateId, string | null>>;
 }
 
-/** Ordered goal entries — first match wins when routing a phrase. */
 export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
   {
     id: 'onboarding',
@@ -22,6 +19,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'onboarding',
       mobile: 'onboarding',
       extension: 'onboarding',
+      spa: 'onboarding',
       backend: 'onboarding',
     },
   },
@@ -38,6 +36,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'plan-my-idea',
       mobile: 'plan-my-idea',
       extension: 'plan-my-idea',
+      spa: 'plan-my-idea',
       backend: 'plan-my-idea',
     },
   },
@@ -48,6 +47,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'setup-payments',
       mobile: 'setup-payments',
       extension: 'setup-payments',
+      spa: 'setup-payments',
       backend: 'wire-payments',
     },
   },
@@ -58,6 +58,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'go-live',
       mobile: 'publish-app',
       extension: 'publish-extension',
+      spa: 'go-live',
       backend: 'go-live',
     },
   },
@@ -68,6 +69,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-signin',
       mobile: 'connect-account',
       extension: 'connect-account',
+      spa: 'connect-account',
       backend: 'wire-auth',
     },
   },
@@ -78,6 +80,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'reset-password',
       mobile: 'connect-account',
       extension: 'connect-account',
+      spa: 'connect-account',
       backend: 'reset-password',
     },
   },
@@ -88,6 +91,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'sign-in-with-email-link',
       mobile: 'connect-account',
       extension: 'connect-account',
+      spa: 'connect-account',
       backend: 'sign-in-with-email-link',
     },
   },
@@ -98,6 +102,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'sign-in-with-phone',
       mobile: 'connect-account',
       extension: 'connect-account',
+      spa: 'connect-account',
       backend: 'sign-in-with-phone',
     },
   },
@@ -108,6 +113,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'setup-sms',
       mobile: 'connect-account',
       extension: 'connect-account',
+      spa: 'connect-account',
       backend: 'setup-sms',
     },
   },
@@ -118,6 +124,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'save-data',
       mobile: 'save-data',
       extension: 'save-data',
+      spa: 'save-data',
       backend: 'wire-database',
     },
   },
@@ -128,6 +135,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'design-my-data',
       mobile: 'design-my-data',
       extension: 'design-my-data',
+      spa: 'design-my-data',
       backend: 'design-my-data',
     },
   },
@@ -138,18 +146,14 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-files',
       mobile: 'add-files',
       extension: null,
+      spa: 'add-files',
       backend: 'add-upload',
     },
   },
   {
     id: 'setup-email',
     phrases: ['send emails', 'email my users', 'set up email'],
-    skills: {
-      web: 'setup-email',
-      mobile: null,
-      extension: null,
-      backend: 'wire-email',
-    },
+    skills: { web: 'setup-email', mobile: null, extension: null, spa: null, backend: 'wire-email' },
   },
   {
     id: 'doctor',
@@ -158,6 +162,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'doctor',
       mobile: 'doctor',
       extension: 'doctor',
+      spa: 'doctor',
       backend: 'doctor',
     },
   },
@@ -168,6 +173,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'update-kit',
       mobile: 'update-kit',
       extension: 'update-kit',
+      spa: 'update-kit',
       backend: 'update-kit',
     },
   },
@@ -178,28 +184,19 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'harden',
       mobile: 'check-safety',
       extension: 'check-safety',
+      spa: 'check-safety',
       backend: 'harden',
     },
   },
   {
     id: 'add-route',
     phrases: ['add an endpoint', 'add api', 'new route'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'add-route',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'add-route' },
   },
   {
     id: 'add-crud',
     phrases: ['crud', 'create read update delete'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'add-crud',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'add-crud' },
   },
   {
     id: 'add-images',
@@ -208,6 +205,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-images',
       mobile: 'add-images',
       extension: 'add-images',
+      spa: 'add-images',
       backend: null,
     },
   },
@@ -218,6 +216,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-teams',
       mobile: 'add-teams',
       extension: 'add-teams',
+      spa: 'add-teams',
       backend: null,
     },
   },
@@ -228,6 +227,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-notifications',
       mobile: 'add-notifications',
       extension: 'add-notifications',
+      spa: 'add-notifications',
       backend: null,
     },
   },
@@ -238,48 +238,29 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-analytics',
       mobile: 'add-analytics',
       extension: 'add-analytics',
+      spa: 'add-analytics',
       backend: null,
     },
   },
   {
     id: 'add-ai',
     phrases: ['add ai', 'chatbot', 'smart replies'],
-    skills: {
-      web: 'add-ai',
-      mobile: null,
-      extension: null,
-      backend: null,
-    },
+    skills: { web: 'add-ai', mobile: null, extension: null, spa: null, backend: null },
   },
   {
     id: 'add-search',
     phrases: ['let users search', 'find things', 'search my data'],
-    skills: {
-      web: 'add-search',
-      mobile: null,
-      extension: null,
-      backend: null,
-    },
+    skills: { web: 'add-search', mobile: null, extension: null, spa: null, backend: null },
   },
   {
     id: 'add-blog',
     phrases: ['add a blog', 'write articles', 'changelog'],
-    skills: {
-      web: 'add-blog',
-      mobile: null,
-      extension: null,
-      backend: null,
-    },
+    skills: { web: 'add-blog', mobile: null, extension: null, spa: null, backend: null },
   },
   {
     id: 'buy-domain',
     phrases: ['get a domain', 'buy a web address', 'my own url'],
-    skills: {
-      web: 'buy-domain',
-      mobile: null,
-      extension: null,
-      backend: null,
-    },
+    skills: { web: 'buy-domain', mobile: null, extension: null, spa: null, backend: null },
   },
   {
     id: 'sign-in-with-google',
@@ -288,6 +269,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'sign-in-with-google',
       mobile: 'sign-in-with-google',
       extension: 'sign-in-with-google',
+      spa: 'sign-in-with-google',
       backend: null,
     },
   },
@@ -298,6 +280,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'check-safety',
       mobile: 'check-safety',
       extension: 'check-safety',
+      spa: 'check-safety',
       backend: null,
     },
   },
@@ -308,6 +291,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'track-errors',
       mobile: 'track-errors',
       extension: null,
+      spa: 'track-errors',
       backend: null,
     },
   },
@@ -318,6 +302,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'back-up-my-code',
       mobile: 'back-up-my-code',
       extension: null,
+      spa: 'back-up-my-code',
       backend: null,
     },
   },
@@ -328,6 +313,7 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: 'add-language',
       mobile: 'add-language',
       extension: 'add-language',
+      spa: 'add-language',
       backend: null,
     },
   },
@@ -338,78 +324,44 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: null,
       mobile: 'configure-capabilities',
       extension: 'configure-capabilities',
+      spa: null,
       backend: null,
     },
   },
   {
     id: 'publish-app',
     phrases: ['publish app', 'app store'],
-    skills: {
-      web: null,
-      mobile: 'publish-app',
-      extension: null,
-      backend: null,
-    },
+    skills: { web: null, mobile: 'publish-app', extension: null, spa: null, backend: null },
   },
   {
     id: 'publish-extension',
     phrases: ['chrome store', 'publish extension'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: 'publish-extension',
-      backend: null,
-    },
+    skills: { web: null, mobile: null, extension: 'publish-extension', spa: null, backend: null },
   },
   {
     id: 'add-upload',
     phrases: ['file upload endpoint'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'add-upload',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'add-upload' },
   },
   {
     id: 'wire-auth',
     phrases: ['wire auth'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'wire-auth',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'wire-auth' },
   },
   {
     id: 'wire-database',
     phrases: ['wire database'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'wire-database',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'wire-database' },
   },
   {
     id: 'wire-payments',
     phrases: ['wire payments'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'wire-payments',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'wire-payments' },
   },
   {
     id: 'wire-email',
     phrases: ['wire email'],
-    skills: {
-      web: null,
-      mobile: null,
-      extension: null,
-      backend: 'wire-email',
-    },
+    skills: { web: null, mobile: null, extension: null, spa: null, backend: 'wire-email' },
   },
   {
     id: 'connect-account-backend',
@@ -418,12 +370,12 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
       web: null,
       mobile: 'connect-account-backend',
       extension: 'connect-account-backend',
+      spa: 'connect-account-backend',
       backend: null,
     },
   },
 ];
 
-/** Lookup map by goal id. */
 export const GOAL_CATALOG: Readonly<Record<string, GoalCatalogEntry>> = Object.fromEntries(
   GOAL_ENTRIES.map((entry) => [entry.id, entry]),
 );
