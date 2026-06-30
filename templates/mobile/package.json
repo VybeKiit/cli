@@ -25,6 +25,7 @@
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/http-client": "workspace:*",
     "@vybekiit/observability": "workspace:*",
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/tokens": "workspace:*",

@@ -42,6 +42,7 @@
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/http-client": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
     "@vybekiit/observability": "workspace:*",
     "@vybekiit/realtime": "workspace:*",

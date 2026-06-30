@@ -1,11 +1,11 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
+import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/infer-project-surface';
 import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-skills';
-import { formatProjectHealthReport, verifyProjectHealth } from './project-health';
+import { computeDoctorExitCode, reportFor } from './plan-doctor-run';
+import { verifyProjectHealth } from './project-health';
 import { provisionR2Storage } from './storage-r2';
 import { formatProductSurfaceHints } from './product-surface';
 import { ensureCodexSkillsEnabled } from './codex-config';
@@ -31,84 +31,31 @@ import {
 /**
  * `vybekiit doctor` — provision + verify the agentic toolchain (ADR-0001).
  *
- * The agent runs this on the buyer's machine so the CLIs it needs are installed
- * globally and signed in, without the buyer configuring anything. It is
- * provider-aware: {@link selectToolchain} reads the `*_PROVIDER` env keys so only the
- * CLIs the buyer's active adapters use get installed (defaults → `supabase` +
- * `wrangler`), plus the mobile build/publish tools (`eas` + `launch`) when the cwd is
- * an Expo project. This file is the side-effecting half: it detects what's present,
- * installs what's missing the OS-correct way, probes sign-in, and prints
- * buyer-readable lines. All decision logic lives in the pure `toolchain.ts` so it
- * stays testable.
+ * Pure planning lives in `toolchain.ts` and `plan-doctor-run.ts`; this file is the
+ * side-effecting executor (install, probe, env writes).
  */
 
-/** Map node's `process.platform` onto a supported {@link Platform}, or null if we can't install there. */
 function toPlatform(platform: NodeJS.Platform): Platform | null {
   return platform === 'darwin' || platform === 'win32' || platform === 'linux' ? platform : null;
 }
 
-/**
- * True when `dir` is an Expo project — the signal that the mobile build/publish tools
- * (`eas` + `launch`) belong in the toolchain. We treat an `app.json` (or
- * `app.config.json`) carrying an `expo` key as the marker; a parse failure or a plain
- * config without that key reads as "not mobile", keeping the web default untouched.
- */
-function isMobileProject(dir: string): boolean {
-  for (const file of ['app.json', 'app.config.json']) {
-    const path = join(dir, file);
-    if (!existsSync(path)) {
-      continue;
-    }
-    try {
-      const config: unknown = JSON.parse(readFileSync(path, 'utf8'));
-      if (typeof config === 'object' && config !== null && 'expo' in config) {
-        return true;
-      }
-    } catch {
-      // Unreadable/invalid config → not a recognized mobile project.
-    }
-  }
-  return false;
-}
-
-/** True when `dir` is a WXT browser-extension project. */
-function isExtensionProject(dir: string): boolean {
-  return existsSync(join(dir, 'wxt.config.ts'));
-}
-
-/** Env keys Report Mode reads per template surface. */
-function reportModeEnvKeys(cwd: string, assistant: string): Record<string, string> {
-  if (isMobileProject(cwd)) {
-    return { EXPO_PUBLIC_VYBE_ASSISTANT: assistant };
-  }
-  if (isExtensionProject(cwd)) {
-    return { WXT_PUBLIC_VYBE_ASSISTANT: assistant };
-  }
-  return { VYBE_ASSISTANT: assistant };
-}
-
-/** True when running inside Cursor (IDE — no separate CLI install needed). */
 function isCursorSession(): boolean {
   return Boolean(process.env.CURSOR_TRACE_ID || process.env.CURSOR_SESSION_ID);
 }
 
-/** Run a command silently and report whether it exited cleanly — the basis of every probe. */
 function succeeds(command: string, args: readonly string[]): boolean {
   return spawnSync(command, [...args], { stdio: 'ignore' }).status === 0;
 }
 
-/** Outcome of one install attempt; a missing prerequisite is distinguished from a failed run. */
 interface InstallOutcome {
   readonly ok: boolean;
   readonly missingRequirement?: string;
 }
 
-/** Read a spawn error's `code` (e.g. `ENOENT`) without asserting the Node error subtype. */
 function errorCode(error: Error | undefined): string | undefined {
   return error && 'code' in error && typeof error.code === 'string' ? error.code : undefined;
 }
 
-/** Run one install action, surfacing an absent package manager (ENOENT) as a translatable hint. */
 function runInstall(action: InstallAction, log: Console): InstallOutcome {
   log.log(`[doctor] setting up ${action.tool}: ${action.command} ${action.args.join(' ')}`);
   const result = spawnSync(action.command, [...action.args], { stdio: 'inherit' });
@@ -118,7 +65,6 @@ function runInstall(action: InstallAction, log: Console): InstallOutcome {
   return { ok: result.status === 0 };
 }
 
-/** Resolve one tool's final state: installed? (already there or just installed) and signed in? */
 function buildReport(
   tool: Tool,
   presence: readonly ToolPresence[],
@@ -151,15 +97,6 @@ function buildReport(
   };
 }
 
-function reportFor(reports: readonly ToolReport[], name: string): ToolReport | undefined {
-  return reports.find((r) => r.tool === name);
-}
-
-/**
- * Orchestrate a full doctor run. Returns a process exit code: 0 when every tool is
- * installed (sign-in still pending is fine — that's a guided next step the agent
- * handles), 1 when a tool couldn't be installed or the OS is unsupported.
- */
 export async function runDoctor(log: Console = console): Promise<number> {
   const platform = toPlatform(process.platform);
   if (!platform) {
@@ -168,9 +105,10 @@ export async function runDoctor(log: Console = console): Promise<number> {
   }
 
   const cwd = process.cwd();
+  const surface = inferProjectSurfaceSync(cwd);
   const env = mergeEnv(process.env, loadEnvFile(cwd));
   const providerTools = selectToolchain(env, {
-    mobile: isMobileProject(cwd),
+    mobile: surface.mobile,
     wantsGoogleAuth: Boolean(env.GOOGLE_OAUTH_CLIENT_ID),
   });
   const toolchain = mergeAgentAndProviderTools(providerTools);
@@ -208,7 +146,7 @@ export async function runDoctor(log: Console = console): Promise<number> {
   }
 
   const projectHealth = verifyProjectHealth(cwd);
-  for (const line of formatProjectHealthReport(projectHealth)) {
+  for (const line of projectHealth.lines) {
     log.log(line);
   }
 
@@ -243,10 +181,15 @@ export async function runDoctor(log: Console = console): Promise<number> {
     codexInstalled: codex?.installed === true,
   });
   if (assistant) {
-    writeEnvKeys(cwd, reportModeEnvKeys(cwd, assistant));
+    writeEnvKeys(cwd, reportModeEnvKeysForSurface(surface, assistant));
     log.log(`✓ Report Mode — your assistant is set to ${assistant}.`);
   }
 
-  const ready = cloudReady && r2Result.ok && agentReady && skillsReady && projectHealth.ok;
-  return ready ? 0 : 1;
+  return computeDoctorExitCode({
+    cloudReady,
+    r2Ok: r2Result.ok,
+    agentReady,
+    skillsReady,
+    projectHealthOk: projectHealth.ok,
+  });
 }

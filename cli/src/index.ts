@@ -12,7 +12,7 @@ import { runCheckGoals } from './commands/check-goals';
 import { runCheckAgentLayer } from './commands/check-agent-layer';
 import { runLintExtensionSkill } from './commands/lint-extension-skill';
 import { runDocFallback } from './commands/doc-fallback';
-import { runDoctor } from './commands/doctor';
+import { runDoctor } from './doctor/run';
 import { runNew } from './commands/new';
 import { runSetup } from './commands/setup';
 import { runPlanDataModel } from './commands/plan-data-model-cmd';
@@ -123,7 +123,8 @@ async function main(argv: string[]): Promise<number> {
   }
   if (command === 'sync-agent-layer') {
     const result = await runSyncAgentLayer(rest);
-    for (const _line of result.lines) {
+    for (const line of result.lines) {
+      console.log(line);
     }
     return result.exitCode;
   }

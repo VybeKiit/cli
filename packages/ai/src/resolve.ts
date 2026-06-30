@@ -15,6 +15,7 @@ function isOpenAiUnconfigured(env: EnvSource): boolean {
   return !env.OPENAI_API_KEY;
 }
 
+/** Registry entries for anthropic/openrouter throw until those adapters ship (ADR-0012). */
 export function resolveAiProvider(env: EnvSource = process.env): AiProvider {
   const { AI_PROVIDER } = parseEnv(aiConfigSchema, env);
   return resolveEnvProvider(

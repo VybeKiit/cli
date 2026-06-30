@@ -51,7 +51,8 @@ const QUEUE = [
     id: '01-chevron-shimmer',
     slug: 'chevron-shimmer',
     label: 'Direction 1 — Chevron Shimmer',
-    artDirection: `Refined triple-chevron logo centered, each chevron built from / \\ and underscores. VybeKiit wordmark directly below with letter spacing. Strong cyan→violet horizontal gradient sweep frozen mid-animation across chevrons + wordmark. Clean, premium — like Linear CLI meets Stripe. This is the polished evolution of a basic chevron ASCII.`,
+    artDirection:
+      'Refined triple-chevron logo centered, each chevron built from / \\ and underscores. VybeKiit wordmark directly below with letter spacing. Strong cyan→violet horizontal gradient sweep frozen mid-animation across chevrons + wordmark. Clean, premium — like Linear CLI meets Stripe. This is the polished evolution of a basic chevron ASCII.',
   },
   {
     id: '02-ship-launch',
@@ -63,13 +64,15 @@ const QUEUE = [
     id: '03-pixel-kit',
     slug: 'pixel-kit',
     label: 'Direction 3 — Pixel Kit',
-    artDirection: `8-bit pixel-art style VybeKiit logo using block chars (█ ▓ ░) — retro game boot screen. Three chevrons as pixel layers. Shimmer shown as alternating bright/dim pixel columns. Nostalgic vibe coder aesthetic, still fits dark terminal.`,
+    artDirection:
+      '8-bit pixel-art style VybeKiit logo using block chars (█ ▓ ░) — retro game boot screen. Three chevrons as pixel layers. Shimmer shown as alternating bright/dim pixel columns. Nostalgic vibe coder aesthetic, still fits dark terminal.',
   },
   {
     id: '04-crt-phosphor',
     slug: 'crt-phosphor',
     label: 'Direction 4 — CRT Phosphor',
-    artDirection: `Classic green phosphor (#39FF14) on near-black with subtle scanlines and soft bloom. Chevrons + VybeKiit in CRT ASCII. Shimmer = phosphor intensity variation. Slight curved screen vignette. Feels like 1980s mainframe welcome but modern copy.`,
+    artDirection:
+      'Classic green phosphor (#39FF14) on near-black with subtle scanlines and soft bloom. Chevrons + VybeKiit in CRT ASCII. Shimmer = phosphor intensity variation. Slight curved screen vignette. Feels like 1980s mainframe welcome but modern copy.',
   },
   {
     id: '05-block-wordmark',

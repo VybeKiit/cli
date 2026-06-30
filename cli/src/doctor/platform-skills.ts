@@ -7,6 +7,7 @@ import {
   type PlatformSkillsManifest,
   type SkillsLockFile,
 } from '@vybekiit/agent-kit';
+import { inferProjectSurfaceSync } from '../lib/infer-project-surface';
 
 export interface PlatformSkillsReport {
   readonly ok: boolean;
@@ -64,34 +65,17 @@ export function verifyPlatformSkills(cwd: string): PlatformSkillsReport {
   return {
     ok: missing.length === 0,
     missing,
-    template: detectTemplateNameSync(cwd),
+    template: templateLabelForPlatformSkills(cwd),
     lockCount: lockNames.length,
   };
 }
 
-/** Sync template detection for doctor — uses package.json when manifest exists. */
-function detectTemplateNameSync(cwd: string): string | null {
+/** Template label for platform-skills report — only when manifest exists. */
+function templateLabelForPlatformSkills(cwd: string): string | null {
   if (!existsSync(join(cwd, 'platform-skills.manifest.json'))) {
     return null;
   }
-  try {
-    const raw = readFileSync(join(cwd, 'package.json'), 'utf8');
-    const pkg = JSON.parse(raw) as { dependencies?: Record<string, string>; main?: string };
-    if (pkg.dependencies?.express) return 'backend';
-    if (pkg.dependencies?.expo || pkg.main?.includes('expo-router')) return 'mobile';
-    if (pkg.dependencies?.vite && pkg.dependencies?.['@tanstack/react-router']) return 'spa';
-    if (pkg.dependencies?.next) return 'web';
-  } catch {
-    // fall through to layout heuristics
-  }
-  if (existsSync(join(cwd, 'app.json'))) return 'mobile';
-  if (existsSync(join(cwd, 'wxt.config.ts')) || existsSync(join(cwd, 'extension.config.ts'))) {
-    return 'extension';
-  }
-  if (existsSync(join(cwd, 'src', 'index.ts')) && existsSync(join(cwd, 'src', 'app.ts'))) {
-    return 'backend';
-  }
-  return 'web';
+  return inferProjectSurfaceSync(cwd).template;
 }
 
 /** Plain-language lines for the doctor report. */

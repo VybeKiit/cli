@@ -825,7 +825,18 @@ Provider JSON under buyer `.vybekiit/agent/mcp-*.json` merged into Cursor, Claud
 Supabase, Neon, Firebase — login-once agent tooling for database onboarding.
 
 **Message catalog loader**:
-Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs.
+Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs. SPA and mobile templates call
+`resolveI18nProvider()` for locale and direction; UI providers stay owned, catalog rules stay maintained.
+
+**Project surface inference**:
+Single CLI rule set that answers "which template is this cwd?" (web, mobile, extension, spa, backend)
+and whether mobile/extension toolchain flags apply. Used by doctor, platform-skills, and agent-layer
+commands — one module, not parallel heuristics.
+_Avoid_: duplicating `isMobileProject` / `detectTemplateName` logic in new call sites.
+
+**JSON client**:
+Maintained `@vybekiit/http-client` — Result-typed fetch helpers. Templates keep a thin origin seam
+(same-origin web vs absolute URL on mobile/spa).
 
 **Agentic toolchain**:
 The CLIs the agent must have to act (supabase, wrangler, Expo/EAS, etc.), provisioned globally by

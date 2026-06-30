@@ -1,2 +1,2 @@
 export type { TenancyProvider, TenancyProviderName, OrgMember } from './types';
-export { resolveTenancyProvider } from './resolve';
+export { resolveTenancyProvider, type ResolveTenancyInjections } from './resolve';

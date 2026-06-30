@@ -43,6 +43,7 @@
     "@vybekiit/compliance": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
+    "@vybekiit/http-client": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
     "@vybekiit/jobs": "workspace:*",
     "@vybekiit/kv": "workspace:*",

@@ -11,6 +11,7 @@ import { createLocalSearch } from './providers/local';
 import { createSupabaseSearch } from './providers/supabase';
 import type { SearchProvider } from './types';
 
+/** typesense/algolia registry entries throw until those adapters ship (ADR-0012). */
 export function resolveSearchProvider(env: EnvSource = process.env): SearchProvider {
   const { SEARCH_PROVIDER } = parseEnv(searchConfigSchema, env);
   return resolveEnvProvider(

@@ -21,6 +21,7 @@ const PACKAGES = [
   'assets',
   'agent-kit',
   'client-state',
+  'http-client',
   'browser-automation',
   'report-mode',
   'i18n',

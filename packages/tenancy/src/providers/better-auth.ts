@@ -1,6 +1,10 @@
-import { resolveDataProvider } from '@vybekiit/db';
+import { resolveDataProvider, type DataProvider } from '@vybekiit/db';
 import { fail, ok, type Result } from '@vybekiit/core';
 import type { OrgMember, TenancyProvider } from '../types';
+
+export interface ResolveTenancyInjections {
+  readonly dataProvider?: DataProvider;
+}
 
 interface OrgRow {
   readonly id: string;
@@ -16,8 +20,10 @@ interface MemberRow {
   readonly role: string;
 }
 
-export function createBetterAuthTenancy(): TenancyProvider {
-  const data = resolveDataProvider();
+export function createBetterAuthTenancy(
+  injections: ResolveTenancyInjections = {},
+): TenancyProvider {
+  const data = injections.dataProvider ?? resolveDataProvider();
   return {
     name: 'better-auth',
     async createOrg(name: string, ownerUserId: string): Promise<Result<{ orgId: string }>> {

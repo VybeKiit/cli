@@ -1,8 +1,9 @@
-import { access, readFile } from 'node:fs/promises';
+import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
 import { planFeatureReadiness, type FeatureName, type TemplateId } from '@vybekiit/agent-kit';
 import { detectTemplateName } from '../lib/detect-template';
+import { inferProjectSurfaceSync } from '../lib/infer-project-surface';
 import { isTemplateName } from '../lib/scaffold';
 
 const FEATURES: readonly FeatureName[] = [
@@ -22,16 +23,6 @@ async function pathExists(path: string): Promise<boolean> {
   try {
     await access(path);
     return true;
-  } catch {
-    return false;
-  }
-}
-
-async function detectHasWeb(cwd: string): Promise<boolean> {
-  try {
-    const raw = await readFile(join(cwd, 'package.json'), 'utf8');
-    const pkg = JSON.parse(raw) as { dependencies?: Record<string, string> };
-    return Boolean(pkg.dependencies?.next);
   } catch {
     return false;
   }
@@ -70,7 +61,7 @@ export async function runPlanReadiness(
   }
 
   const hasBackend = await pathExists(join(cwd, 'backend', 'package.json'));
-  const hasWeb = await detectHasWeb(cwd);
+  const hasWeb = inferProjectSurfaceSync(cwd).template === 'web';
 
   const plan = planFeatureReadiness({
     template,
