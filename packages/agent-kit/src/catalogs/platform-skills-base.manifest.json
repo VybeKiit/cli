@@ -1,0 +1,68 @@
+{
+  "sources": [
+    {
+      "repo": "vercel-labs/agent-skills",
+      "skills": ["vercel-react-best-practices", "vercel-composition-patterns"]
+    },
+    {
+      "repo": "supabase/agent-skills",
+      "skills": ["supabase", "supabase-postgres-best-practices"]
+    },
+    {
+      "repo": "cloudflare/skills",
+      "skills": ["wrangler", "workers-best-practices"]
+    },
+    {
+      "repo": "better-auth/skills",
+      "skills": [
+        "better-auth-best-practices",
+        "create-auth-skill",
+        "better-auth-security-best-practices"
+      ]
+    },
+    {
+      "repo": "https://docs.stripe.com",
+      "skills": ["stripe-best-practices"]
+    },
+    {
+      "repo": "resend/resend-skills",
+      "skills": ["resend"]
+    },
+    {
+      "repo": "resend/email-best-practices",
+      "skills": ["email-best-practices"]
+    },
+    {
+      "repo": "getsentry/sentry-for-ai",
+      "skills": ["sentry-sdk-setup", "sentry-workflow"]
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "skills": ["instrument-product-analytics", "instrument-feature-flags"]
+    },
+    {
+      "repo": "neondatabase/agent-skills",
+      "skills": ["*"]
+    },
+    {
+      "repo": "firebase/agent-skills",
+      "skills": ["*"]
+    },
+    {
+      "repo": "aws/agent-toolkit-for-aws/skills",
+      "skills": ["aws-serverless", "aws-cdk", "aws-cloudformation"]
+    },
+    {
+      "repo": "mongodb/agent-skills",
+      "skills": ["*"]
+    },
+    {
+      "repo": "railwayapp/railway-skills",
+      "skills": ["use-railway"]
+    }
+  ],
+  "_notes": {
+    "manifest-model": "Shared base — templates merge overrides via mergePlatformSkillsManifests()",
+    "docs-only": "lemon-squeezy, paypal, plausible, wxt — blocked by audit-platform-skills strict CI"
+  }
+}

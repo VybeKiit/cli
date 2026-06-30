@@ -85,6 +85,14 @@ export function planPlatformSkillsUpdate(
   });
 }
 
+/** Skill names pinned in skills-lock.json — source of truth for installed skills. */
+export function expectedSkillNamesFromLock(lock: SkillsLockFile | null): string[] {
+  if (!lock?.skills) {
+    return [];
+  }
+  return Object.keys(lock.skills);
+}
+
 /**
  * Returns true when the agent should run `npx skills update -y` during update-kit.
  * Wildcard manifests always suggest update when a lock exists; explicit manifests
