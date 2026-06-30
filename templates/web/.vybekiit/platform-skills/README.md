@@ -32,9 +32,11 @@ when the buyer selects Cloudflare hosting (default).
 | `shadcn-vybekiit.md` | generic UI work | ui.shadcn.com + kit `src/components` |
 | `deploy-cloudflare-vybekiit.md` | `go-live` (default) | developers.cloudflare.com + wrangler |
 | `deploy-vercel-vybekiit.md` | `go-live` when `HOSTING_PROVIDER=vercel` | vercel.com/docs + vercel CLI |
+| `deploy-railway-vybekiit.md` | `go-live` when `HOSTING_PROVIDER=railway` | docs.railway.com + railway CLI + MCP |
 | `assets-vybekiit.md` | `add-images`, `add-files`, `go-live` | R2 + CF Image Resizing + `@vybekiit/assets` |
 | `supabase-vybekiit.md` | `save-data`, `doctor` | supabase.com/docs + supabase CLI + MCP |
 | `neon-vybekiit.md` | `save-data` when `DATA_PROVIDER=neon` | neon.tech + Neon MCP |
+| `railway-postgres-vybekiit.md` | `save-data` when `DATA_PROVIDER=railway` | docs.railway.com + Railway MCP |
 | `firebase-vybekiit.md` | `save-data` when `DATA_PROVIDER=firebase` | firebase.google.com + Firebase MCP |
 | `data-model-vybekiit.md` | `design-my-data`, `save-data` | `planDataModel()` + MCP tier |
 | `client-state-vybekiit.md` | generic coding (invisible) | `@vybekiit/client-state` + TanStack Query |

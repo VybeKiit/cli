@@ -1,28 +1,6 @@
 {
-  "sources": [
-    {
-      "repo": "vercel-labs/agent-skills",
-      "skills": ["vercel-react-best-practices", "vercel-composition-patterns"]
-    },
-    {
-      "repo": "neondatabase/agent-skills",
-      "skills": ["*"]
-    },
-    {
-      "repo": "firebase/agent-skills",
-      "skills": ["*"]
-    },
-    {
-      "repo": "aws/agent-toolkit-for-aws/skills",
-      "skills": ["aws-serverless", "aws-cdk", "aws-cloudformation"]
-    },
-    {
-      "repo": "mongodb/agent-skills",
-      "skills": ["*"]
-    }
-  ],
+  "sources": [],
   "_notes": {
-    "cloudflare": "No official skills.sh repo yet — use deploy-cloudflare-vybekiit.md + developers.cloudflare.com",
-    "web-perf": "Optional global skill — reference from doctor.md when Chrome DevTools MCP is available"
+    "extends": "packages/agent-kit/src/catalogs/platform-skills-base.manifest.json"
   }
 }

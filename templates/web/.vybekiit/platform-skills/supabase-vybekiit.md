@@ -7,6 +7,7 @@
 - Docs: https://supabase.com/docs
 - Supabase MCP: https://supabase.com/docs/guides/ai-tools/mcp
 - CLI: `supabase` (installed by `vybekiit doctor`)
+- Pinned skills: `.agents/skills/supabase/SKILL.md`, `.agents/skills/supabase-postgres-best-practices/SKILL.md`
 
 ## Kit wiring
 

@@ -9,7 +9,7 @@
 
 1. Run `vybekiit plan-setup` is not needed — run three channels:
    - `npm update @vybekiit/*` (or `planKitUpdate` via package.json compare)
-   - `vybekiit sync-agent-layer backend`
+   - `vybekiit sync-agent-layer backend` (preserves `.vybekiit/extensions/**` and extension goal-index rows)
    - `npx skills update -y` when `skills-lock.json` exists
 2. **Verify:** `pnpm quality` passes.
 

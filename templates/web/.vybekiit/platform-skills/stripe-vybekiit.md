@@ -7,6 +7,7 @@
 - Docs: https://docs.stripe.com
 - API reference: https://docs.stripe.com/api
 - Stripe MCP: https://docs.stripe.com/mcp
+- Pinned skill: `.agents/skills/stripe-best-practices/SKILL.md`
 
 ## Kit wiring
 

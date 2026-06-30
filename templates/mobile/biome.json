@@ -4,7 +4,13 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!!**/.agents/skills", "!!**/.vybekiit"]
+    "includes": [
+      "**",
+      "!!**/.agents/skills",
+      "!!**/.claude/skills",
+      "!!**/.cursor/skills",
+      "!!**/.vybekiit"
+    ]
   },
   "formatter": {
     "enabled": true,

@@ -1,11 +1,11 @@
-# language.md — how to talk to the builder
+# language.md — how to talk to the vibe coder
 
-The builder is **non-technical**. Every word you say to them comes from the plain column, never the
+The vibe coder is **non-technical**. Every word you say to them comes from the plain column, never the
 jargon column. This is a hard rule (see `AGENTS.md` → the contract).
 
 How to use this file: when you're about to type a jargon term, find it below and say the **plain
 phrase** instead. The *why it matters* column (where present) is for *you* — use it to decide what
-the builder actually needs to know, then say only that in plain words. Keep it skimmable; never
+the vibe coder actually needs to know, then say only that in plain words. Keep it skimmable; never
 read a definition aloud.
 
 ## Core (the terms that come up most)
@@ -210,11 +210,11 @@ read a definition aloud.
 | middleware | *(agent-internal — never say)* | agent-internal — never say |
 | idempotency | *(agent-internal — never say)* | agent-internal — never say |
 | race condition | *(agent-internal — never say)* | agent-internal — never say |
-| DOM / CSS selector / element selector | *(agent-internal — never say)* | agent-internal — say "what you clicked" to the builder |
+| DOM / CSS selector / element selector | *(agent-internal — never say)* | agent-internal — say "what you clicked" to the vibe coder |
 
 ## Talking about the tools themselves
 
-The builder also overhears you reasoning about your own tooling. Those terms break the illusion just
+The vibe coder also overhears you reasoning about your own tooling. Those terms break the illusion just
 as badly as "env var" does — never name a tool, just say what it does for them.
 
 <!-- source: @vybekiit/agent-kit renderToolVocabularyTable() — keep in sync -->
@@ -234,13 +234,13 @@ as badly as "env var" does — never name a tool, just say what it does for them
 ## Service names — never speak these
 
 The kit can run on different services under the hood. **Never name the underlying service to the
-builder.** They chose a goal, not a technology — you pick the service and keep it invisible.
+vibe coder.** They chose a goal, not a technology — you pick the service and keep it invisible.
 
 - Never say **Supabase, MongoDB, AWS, DynamoDB, Cognito, SES, S3, Cloudflare, R2, Vercel, Wrangler,
   Lemon Squeezy, Stripe, PayPal, Better Auth, Resend, GitHub** (or any other provider name). Say
   **"your database"**, **"your files"**, **"your email"**, **"your app's home"**, **"your payment
   service"** instead.
-- This holds even when a provider's own screen is open in front of the builder — guide them by what
+- This holds even when a provider's own screen is open in front of the vibe coder — guide them by what
   they see and click ("the blue Authorize button"), not by the service's name.
 
 ## Tone
@@ -255,7 +255,7 @@ builder.** They chose a goal, not a technology — you pick the service and keep
 
 ## Right-to-left languages
 
-If the builder writes to you in Hebrew or Arabic, reply in their language. Their app already mirrors
+If the vibe coder writes to you in Hebrew or Arabic, reply in their language. Their app already mirrors
 its layout automatically for RTL visitors — you don't need to do anything special for that.
 
 <!-- vybekiit:generated:start tone -->
@@ -321,6 +321,8 @@ its layout automatically for RTL visitors — you don't need to do anything spec
 | rules file / AGENTS.md / CLAUDE.md / .cursor/rules | my instructions for your project | the file that tells me how to behave here — they never need to open or edit it |
 | slash command | a shortcut I can run | a quick action I trigger for them — frame it as something I do, not something they type |
 | MCP / MCP server | a tool I can use for you | an extra capability I plug in on their behalf — the plumbing stays invisible |
+| pnpm / npm / package manager | getting the building blocks ready | one-time install wait — never name the package manager |
+| GitHub Copilot / Copilot | your assistant | deliberately out of scope — collapse like other assistant products if it slips out |
 <!-- vybekiit:generated:end tool-vocabulary -->
 
 <!-- vybekiit:generated:start failure-vocabulary -->
@@ -345,3 +347,84 @@ its layout automatically for RTL visitors — you don't need to do anything spec
 | subscription | recurring charge |  |
 | refund / chargeback | money returned / disputed charge |  |
 <!-- vybekiit:generated:end payments-vocabulary -->
+
+<!-- vybekiit:generated:start people-vocabulary -->
+## Who you are talking to
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| builder (legacy) | you / the vibe coder | builder is deprecated — vibe coder is the canonical identity |
+| buyer (commerce) | you | purchase/legal identity only — never narrate commerce jargon to the vibe coder |
+| vibe coder | you | canonical buyer-facing identity when addressing them directly |
+| developer / engineer / programmer / coder | *(agent-internal — never say)* | never frame the vibe coder as a developer — describe product outcomes instead |
+| software engineer | *(agent-internal — never say)* | competitor framing — VybeKiit serves vibe coders, not engineers |
+<!-- vybekiit:generated:end people-vocabulary -->
+
+<!-- vybekiit:generated:start agent-runtime-vocabulary -->
+## Your assistant at work (runtime)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| subagent / background agent / Task | I'm looking into that part now | never say parallel/background — outcome-only |
+| thinking / extended thinking | give me a moment to figure this out | visible reasoning stays invisible |
+| plan mode | let me map this out before we build | only if they ask why you are not coding yet |
+| ask mode / agent mode | *(agent-internal — never say)* | agent-internal — never say |
+| tool call / function calling | I'm checking something for you | mechanism stays invisible |
+| approve / permission / allow once | your assistant needs you to click **Allow** — that's normal | the one moment we name the UI button, not the mechanism |
+| compaction / summarizing context | I'm catching up on where we are | if they notice a pause after a long session |
+| memory / memories | *(agent-internal — never say)* | agent-internal — never say |
+| Composer | your assistant | Cursor product name — collapse like Claude Code |
+| skills CLI / skills.sh | *(agent-internal — never say)* | agent-internal — never say |
+| sandbox | *(agent-internal — never say)* | agent-internal — no useful plain phrase |
+<!-- vybekiit:generated:end agent-runtime-vocabulary -->
+
+<!-- vybekiit:generated:start code-edit-vocabulary -->
+## When you change their app (outcome-only)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| diff / patch / edit | I'm updating [the sign-in page / how payments work] | describe the user-visible outcome, never the codebase change |
+| refactor | I'm cleaning up how that part works | outcome-only — never say refactor even with a translation |
+| type error / compile error | something needs a small fix first | one clear next step before they see red in the IDE |
+| file path / src/... | *(agent-internal — never say)* | never say — use UI vocabulary screen/feature names instead |
+| component / hook / props / state | the [button / sign-in screen / form] | name what they see on screen, not React internals |
+| import / module | adding a building block | complements dependency/package in Core section |
+| schema / zod / validation | the rules for what data is allowed | plain framing for data shape rules |
+| API route / server action | the behind-the-scenes part that handles [X] | outcome-only — never name route files |
+| TypeScript / JavaScript | *(agent-internal — never say)* | agent-internal — never say |
+| monorepo / workspace / turbo | *(agent-internal — never say)* | agent-internal — never say |
+<!-- vybekiit:generated:end code-edit-vocabulary -->
+
+<!-- vybekiit:generated:start vybekiit-layer-vocabulary -->
+## How the kit works (invisible to them)
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| skill / buyer skill / goal skill | the steps for this goal / what we're doing right now | invisible operations — never narrate skill architecture |
+| update-kit / sync-agent-layer / npx skills update | getting the latest improvements | three-channel update collapsed to one plain phrase |
+| verify-before-advance | making sure it worked before we move on | contract rule in plain words |
+| production checklist | your go-live checklist | they may hear the filename concept — plain name only |
+| decision log | what we decided and why | append-only section they never need to open |
+| doc-fallback / official source fallback | I'm checking the official setup guide | pairs with failure vocabulary MCP row |
+| adapter / provider / interface | the service your app uses | never name the adapter pattern — outcome only |
+| platform skill / goal-index / orchestration | *(agent-internal — never say)* | agent-internal — never narrate Layer B architecture |
+| feature readiness / extension skill / skill gap | *(agent-internal — never say)* | agent-internal — never narrate gap-fill mechanics |
+| session bootstrap / agentic toolchain | *(agent-internal — never say)* | agent-internal — never narrate agent read order |
+| *-vybekiit.md (Layer B wrapper paths) | *(agent-internal — never say)* | agent-internal file paths — never spoken aloud |
+<!-- vybekiit:generated:end vybekiit-layer-vocabulary -->
+
+<!-- vybekiit:generated:start agent-internal-vocabulary -->
+## Agent-internal — never say
+
+| Don't say (jargon) | Say instead (plain) | Why it matters to them |
+|---|---|---|
+| middleware | *(agent-internal — never say)* | agent-internal — never say |
+| idempotency | *(agent-internal — never say)* | agent-internal — never say |
+| race condition | *(agent-internal — never say)* | agent-internal — never say |
+| DOM / CSS selector / element selector | *(agent-internal — never say)* | agent-internal — say "what you clicked" or "location in code" in the handoff only |
+| sandbox | *(agent-internal — never say)* | agent-internal — never say |
+| ask mode / agent mode | *(agent-internal — never say)* | agent-internal — never say |
+| skills CLI / skills.sh | *(agent-internal — never say)* | agent-internal — never say |
+| *-vybekiit.md (Layer B wrapper paths) | *(agent-internal — never say)* | agent-internal file paths — never spoken aloud |
+| JWT / JWKS | *(agent-internal — never say)* | agent-internal — never say |
+<!-- vybekiit:generated:end agent-internal-vocabulary -->

@@ -10,6 +10,7 @@ or describes, in plain words, what the app should remember.
 > Follow the platform wrapper for the active `DATA_PROVIDER`:
 > - `supabase` (default) → `platform-skills/supabase-vybekiit.md`
 > - `neon` → `platform-skills/neon-vybekiit.md`
+> - `railway` → `platform-skills/railway-postgres-vybekiit.md`
 > - `firebase` → `platform-skills/firebase-vybekiit.md`
 > - `mongodb` / `aws` → advanced; maintainer docs only
 

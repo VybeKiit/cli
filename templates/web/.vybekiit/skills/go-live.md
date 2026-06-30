@@ -8,8 +8,8 @@ asked.
 
 > (Under the hood — agent-only) Put the app online via `@vybekiit/deploy`'s `resolveHosting()` —
 > Cloudflare by default, Vercel or AWS (Amplify) when the builder's setup uses them. Follow the
-> matching platform wrapper in `.vybekiit/platform-skills/` (`deploy-cloudflare-vybekiit.md` or
-> `deploy-vercel-vybekiit.md`). Pick the host from their settings; don't make the builder choose
+> matching platform wrapper in `.vybekiit/platform-skills/` (`deploy-cloudflare-vybekiit.md`,
+> `deploy-vercel-vybekiit.md`, or `deploy-railway-vybekiit.md`). Pick the host from their settings; don't make the builder choose
 > or hear the host's name (unless they ask).
 
 ## Steps

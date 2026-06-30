@@ -6,6 +6,7 @@
 
 - Docs: https://docs.sentry.io/platforms/javascript/guides/nextjs/
 - Package: `@vybekiit/observability` (Sentry adapter via `@sentry/core`)
+- Pinned skills: `.agents/skills/sentry-sdk-setup/SKILL.md`, `.agents/skills/sentry-workflow/SKILL.md`
 
 ## Kit wiring
 

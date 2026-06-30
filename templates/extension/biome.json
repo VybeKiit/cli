@@ -4,7 +4,15 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!!**/.agents/skills", "!!**/.vybekiit", "!!**/.wxt", "!!**/.output"]
+    "includes": [
+      "**",
+      "!!**/.agents/skills",
+      "!!**/.claude/skills",
+      "!!**/.cursor/skills",
+      "!!**/.vybekiit",
+      "!!**/.wxt",
+      "!!**/.output"
+    ]
   },
   "formatter": {
     "enabled": true,

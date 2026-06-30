@@ -6,7 +6,7 @@
 
 - Docs: https://developers.cloudflare.com
 - CLI: `wrangler` (installed + probed by `vybekiit doctor`)
-- Optional pinned skills: Cloudflare plugin / global `wrangler`, `workers-best-practices`
+- Pinned skills: `.agents/skills/wrangler/SKILL.md`, `.agents/skills/workers-best-practices/SKILL.md`
 
 ## Kit wiring
 

@@ -14,10 +14,12 @@ When MCP or first-pass debug fails, run `vybekiit doc-fallback <id>` and follow 
 | stripe | https://docs.stripe.com | — | STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET |
 | neon | https://neon.tech/docs | — | DATABASE_URL |
 | firebase | https://firebase.google.com/docs | — | — |
+| mongodb | https://www.mongodb.com/docs/ | https://www.mongodb.com/docs/mcp-server/overview/ | DATA_PROVIDER, MONGODB_URI, MONGODB_DB |
 | express | https://expressjs.com | — | — |
 | expo | https://docs.expo.dev | — | — |
 | nextjs | https://nextjs.org/docs | — | — |
 | cloudflare | https://developers.cloudflare.com | — | — |
+| railway | https://docs.railway.com | https://docs.railway.com/ai/mcp-server | HOSTING_PROVIDER, DATA_PROVIDER, DATABASE_URL, RAILWAY_PROJECT_ID, RAILWAY_SERVICE_ID |
 | resend | https://resend.com/docs | — | EMAIL_PROVIDER, RESEND_API_KEY |
 | lemon-squeezy | https://docs.lemonsqueezy.com | — | LEMONSQUEEZY_API_KEY, LEMONSQUEEZY_STORE_ID |
 | sentry | https://docs.sentry.io | https://mcp.sentry.dev/mcp | OBSERVABILITY_PROVIDER, SENTRY_DSN |

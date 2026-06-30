@@ -5,6 +5,7 @@
 ## Official upstream
 
 - Docs: https://docs.lemonsqueezy.com
+- **Freshness note:** `@lemonsqueezy/lemonsqueezy.js` npm publish is stale (Nov 2024) — no vendor skills.sh repo. Rely on `@vybekiit/payments` adapter + `browser-automation-vybekiit.md`; check https://docs.lemonsqueezy.com/help/changelog before API changes.
 
 ## Kit wiring
 

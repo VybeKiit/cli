@@ -5,6 +5,7 @@
 ## Official upstream
 
 - Docs: https://www.better-auth.com/docs
+- Pinned skills: `.agents/skills/better-auth-best-practices/SKILL.md`, `.agents/skills/create-auth-skill/SKILL.md`, `.agents/skills/better-auth-security-best-practices/SKILL.md`
 
 ## Kit wiring
 

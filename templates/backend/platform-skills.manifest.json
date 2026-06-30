@@ -1,8 +1,6 @@
 {
-  "sources": [
-    {
-      "repo": "mongodb/agent-skills",
-      "skills": ["*"]
-    }
-  ]
+  "sources": [],
+  "_notes": {
+    "extends": "packages/agent-kit/src/catalogs/platform-skills-base.manifest.json"
+  }
 }

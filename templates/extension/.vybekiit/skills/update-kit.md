@@ -28,7 +28,8 @@ translate every error · celebrate. You do the whole update; the builder just wa
 
    **3b — Agent instructions.** Run `vybekiit sync-agent-layer` (or pass `extension` if detection fails).
    Tell the builder: *"I'm refreshing my latest instructions for your project."*
-   **Verify:** command exits 0.
+   **Verify:** command exits 0. Buyer-owned `.vybekiit/extensions/**` and extension rows in
+   `goal-index.md` are never overwritten.
 
    **3c — Platform instructions.** If `skills-lock.json` exists, run `npx skills update -y`.
    Skip with no message if the lock file is absent (extension has no pinned platform skills yet).

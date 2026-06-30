@@ -1,6 +1,7 @@
 {
   "sources": [],
   "_notes": {
+    "extends": "packages/agent-kit/src/catalogs/platform-skills-base.manifest.json",
     "wxt": "Docs-only until WXT ships official skills — see chrome-extension-vybekiit.md"
   }
 }

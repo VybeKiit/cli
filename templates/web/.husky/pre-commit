@@ -1,0 +1,3 @@
+#!/bin/sh
+# Format + lint-fix on commit. Tests run in pre-push/CI only.
+pnpm biome check --write --no-errors-on-unmatched .

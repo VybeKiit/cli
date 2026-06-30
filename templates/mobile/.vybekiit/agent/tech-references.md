@@ -19,6 +19,7 @@ When MCP or first-pass debug fails, run `vybekiit doc-fallback <id>` and follow 
 | expo | https://docs.expo.dev | — | — |
 | nextjs | https://nextjs.org/docs | — | — |
 | cloudflare | https://developers.cloudflare.com | — | — |
+| railway | https://docs.railway.com | https://docs.railway.com/ai/mcp-server | HOSTING_PROVIDER, DATA_PROVIDER, DATABASE_URL, RAILWAY_PROJECT_ID, RAILWAY_SERVICE_ID |
 | resend | https://resend.com/docs | — | EMAIL_PROVIDER, RESEND_API_KEY |
 | lemon-squeezy | https://docs.lemonsqueezy.com | — | LEMONSQUEEZY_API_KEY, LEMONSQUEEZY_STORE_ID |
 | sentry | https://docs.sentry.io | https://mcp.sentry.dev/mcp | OBSERVABILITY_PROVIDER, SENTRY_DSN |

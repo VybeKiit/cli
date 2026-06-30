@@ -80,6 +80,13 @@ Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 | Sentry error alerts | `mcp-sentry.json` | https://mcp.sentry.dev/mcp |
 | PostHog analytics / flags | `mcp-posthog.json` | https://mcp.posthog.com/mcp |
 | Advanced data (`DATA_PROVIDER=mongodb`, **agent/maintainer only**) | `mcp-mongodb.json` | https://www.mongodb.com/docs/mcp-server/get-started/ |
+| Railway stack (`HOSTING_PROVIDER=railway` and/or `DATA_PROVIDER=railway`) | `mcp-railway-local.json` | https://docs.railway.com/ai/mcp-server |
+| Railway remote MCP (OAuth, no local CLI state) | `mcp-railway-remote.json` | https://docs.railway.com/ai/mcp-server |
+
+**Railway MCP — when to use which**
+
+- **Local** (`mcp-railway-local.json`): repo-linked deploys, `railway up`, variables, logs — shares CLI login. Preferred when `railway` is installed and authed (doctor runs `railway setup agent -y`).
+- **Remote** (`mcp-railway-remote.json`): OAuth at `mcp.railway.com` — project/service discovery, redeploys, `railway-agent` for multi-step ops. Use when local CLI context is unavailable.
 
 ### MCP failure → official docs
 

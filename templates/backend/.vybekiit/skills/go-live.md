@@ -8,7 +8,7 @@
 ## Steps
 
 1. Run `vybekiit plan-setup deploy`.
-2. Deploy to the builder's hosting provider (Cloudflare, Railway, etc.).
+2. Deploy via `@vybekiit/deploy`'s `resolveHosting()` — follow `.vybekiit/platform-skills/deploy-railway-vybekiit.md` when `HOSTING_PROVIDER=railway`, or the matching wrapper for other hosts.
 3. **Verify:** public `/health` responds.
 
 ## After completing this skill

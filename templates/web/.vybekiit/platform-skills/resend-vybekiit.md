@@ -5,6 +5,7 @@
 ## Official upstream
 
 - Docs: https://resend.com/docs
+- Pinned skills: `.agents/skills/resend/SKILL.md`, `.agents/skills/email-best-practices/SKILL.md`
 
 ## Kit wiring
 
