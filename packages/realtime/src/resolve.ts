@@ -1,8 +1,6 @@
-import { parseEnv, realtimeConfigSchema } from '@vybekiit/core';
+import { parseEnv, realtimeConfigSchema, type EnvSource } from '@vybekiit/core';
 import { createLocalRealtime } from './providers/local';
 import type { RealtimeProvider } from './types';
-
-type EnvSource = Record<string, string | undefined>;
 
 function isSupabaseUnconfigured(env: EnvSource): boolean {
   return !(env.SUPABASE_URL && env.SUPABASE_ANON_KEY);

@@ -1,17 +1,16 @@
 import {
   awsConfigSchema,
-  cloudflareConfigSchema,
   emailConfigSchema,
   parseEnv,
   resendConfigSchema,
+  resolveEnvProvider,
+  cloudflareConfigSchema,
+  type EnvSource,
 } from '@vybekiit/core';
 import { type FetchLike, createCloudflareEmail } from './providers/cloudflare/index';
 import { createSesEmail } from './providers/ses/index';
 import { createResendEmail } from './providers/resend/index';
 import type { EmailProvider } from './types';
-
-/** A readable view of `process.env` that doesn't require `@types/node` here. */
-type EnvSource = Record<string, string | undefined>;
 
 /**
  * Construct the configured email provider from the environment — the single call
@@ -30,12 +29,15 @@ export function resolveEmailProvider(
   fetchImpl?: FetchLike,
 ): EmailProvider {
   const { EMAIL_PROVIDER } = parseEnv(emailConfigSchema, env);
-  switch (EMAIL_PROVIDER) {
-    case 'ses':
-      return createSesEmail(parseEnv(awsConfigSchema, env));
-    case 'resend':
-      return createResendEmail(parseEnv(resendConfigSchema, env));
-    default:
-      return createCloudflareEmail(parseEnv(cloudflareConfigSchema, env), fetchImpl);
-  }
+  return resolveEnvProvider(
+    EMAIL_PROVIDER,
+    {
+      ses: (source) => createSesEmail(parseEnv(awsConfigSchema, source)),
+      resend: (source) => createResendEmail(parseEnv(resendConfigSchema, source)),
+      cloudflare: (source) =>
+        createCloudflareEmail(parseEnv(cloudflareConfigSchema, source), fetchImpl),
+    },
+    env,
+    'cloudflare',
+  );
 }

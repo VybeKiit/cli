@@ -1,22 +1,33 @@
-import { cloudflareJobsConfigSchema, jobsConfigSchema, parseEnv } from '@vybekiit/core';
+import {
+  cloudflareJobsConfigSchema,
+  jobsConfigSchema,
+  parseEnv,
+  resolveEnvProvider,
+  type EnvSource,
+} from '@vybekiit/core';
 import { createCloudflareJobs } from './providers/cloudflare';
 import { createLocalJobs } from './providers/local';
 import type { JobsProvider } from './types';
 
-type EnvSource = Record<string, string | undefined>;
-
 export function resolveJobsProvider(env: EnvSource = process.env): JobsProvider {
   const { JOBS_PROVIDER } = parseEnv(jobsConfigSchema, env);
-  switch (JOBS_PROVIDER) {
-    case 'trigger':
-    case 'qstash':
-      throw new Error(`${JOBS_PROVIDER} jobs adapter ships in a later step`);
-    case 'local':
-      return createLocalJobs();
-    default: {
-      const cfJobs = parseEnv(cloudflareJobsConfigSchema, env);
-      if (!cfJobs.CLOUDFLARE_QUEUE_NAME) return createLocalJobs();
-      return createCloudflareJobs(cfJobs);
-    }
-  }
+  return resolveEnvProvider(
+    JOBS_PROVIDER,
+    {
+      trigger: () => {
+        throw new Error('trigger jobs adapter ships in a later step');
+      },
+      qstash: () => {
+        throw new Error('qstash jobs adapter ships in a later step');
+      },
+      local: () => createLocalJobs(),
+      cloudflare: (source) => {
+        const cfJobs = parseEnv(cloudflareJobsConfigSchema, source);
+        if (!cfJobs.CLOUDFLARE_QUEUE_NAME) return createLocalJobs();
+        return createCloudflareJobs(cfJobs);
+      },
+    },
+    env,
+    'cloudflare',
+  );
 }

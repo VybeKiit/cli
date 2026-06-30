@@ -24,7 +24,9 @@ export function createE2eArtifacts(): LsE2eArtifacts {
 }
 
 export function probeProductName(type: LsPricingProbeType, runId: string): string {
-  const slug = type === 'payWhatYouWant' ? 'pwyw' : type === 'leadMagnet' ? 'lead' : type;
+  let slug: string = type;
+  if (type === 'payWhatYouWant') slug = 'pwyw';
+  else if (type === 'leadMagnet') slug = 'lead';
   return `${LS_E2E_PREFIX}-${slug}-${runId}`;
 }
 

@@ -3,13 +3,13 @@ import {
   parseEnv,
   plausibleConfigSchema,
   posthogConfigSchema,
+  resolveEnvProvider,
+  type EnvSource,
 } from '@vybekiit/core';
 import { createLocalAnalytics } from './providers/local';
 import { createPlausibleAnalytics } from './providers/plausible';
 import { createPosthogAnalytics } from './providers/posthog';
 import type { AnalyticsProvider } from './types';
-
-type EnvSource = Record<string, string | undefined>;
 
 function isPlausibleUnconfigured(env: EnvSource): boolean {
   return !env.PLAUSIBLE_DOMAIN;
@@ -17,13 +17,17 @@ function isPlausibleUnconfigured(env: EnvSource): boolean {
 
 export function resolveAnalyticsProvider(env: EnvSource = process.env): AnalyticsProvider {
   const { ANALYTICS_PROVIDER } = parseEnv(analyticsConfigSchema, env);
-  switch (ANALYTICS_PROVIDER) {
-    case 'posthog':
-      return createPosthogAnalytics(parseEnv(posthogConfigSchema, env));
-    case 'local':
-      return createLocalAnalytics();
-    default:
-      if (isPlausibleUnconfigured(env)) return createLocalAnalytics();
-      return createPlausibleAnalytics(parseEnv(plausibleConfigSchema, env));
-  }
+  return resolveEnvProvider(
+    ANALYTICS_PROVIDER,
+    {
+      posthog: (source) => createPosthogAnalytics(parseEnv(posthogConfigSchema, source)),
+      local: () => createLocalAnalytics(),
+      plausible: (source) =>
+        isPlausibleUnconfigured(source)
+          ? createLocalAnalytics()
+          : createPlausibleAnalytics(parseEnv(plausibleConfigSchema, source)),
+    },
+    env,
+    'plausible',
+  );
 }

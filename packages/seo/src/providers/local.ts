@@ -127,9 +127,11 @@ export function createLocalSeo(app: AppConfig, _config: SeoConfig): SeoProvider 
     },
 
     sitemapEntries(paths: readonly string[]): SitemapEntry[] {
-      return paths.map((path) => ({
-        url: path.startsWith('http') ? path : `${base}${path.startsWith('/') ? path : `/${path}`}`,
-      }));
+      return paths.map((path) => {
+        if (path.startsWith('http')) return { url: path };
+        const normalized = path.startsWith('/') ? path : `/${path}`;
+        return { url: `${base}${normalized}` };
+      });
     },
 
     robotsTxt(): string {

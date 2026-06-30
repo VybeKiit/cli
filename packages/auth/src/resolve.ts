@@ -5,14 +5,13 @@ import {
   dataConfigSchema,
   mongoConfigSchema,
   parseEnv,
+  resolveEnvProvider,
+  type EnvSource,
 } from '@vybekiit/core';
 import { type BetterAuthInstance, createBetterAuthProvider } from './providers/better-auth/index';
 import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito/index';
 import { createLocalAuthProvider } from './providers/local/index';
 import type { AuthProvider } from './types';
-
-/** A readable view of `process.env` that doesn't require `@types/node` here. */
-type EnvSource = Record<string, string | undefined>;
 
 /**
  * The keys whose presence means a real auth or data backend is being configured —
@@ -80,8 +79,6 @@ export function resolveAuthProvider(
 ): AuthProvider {
   if (isAuthUnconfigured(env)) return createLocalAuthProvider();
 
-  // The optional test seams are spread conditionally so an omitted injection stays
-  // *absent* rather than an explicit `undefined` (the repo runs exactOptionalPropertyTypes).
   const cognito = (): AuthProvider =>
     createCognitoAuthProvider({
       config: parseEnv(cognitoConfigSchema, env),
@@ -96,25 +93,39 @@ export function resolveAuthProvider(
   if (AUTH_PROVIDER === 'cognito') return cognito();
 
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
-  switch (DATA_PROVIDER) {
-    // Auth follows data: explicit local data pairs with the local dev identity, so
-    // forcing `DATA_PROVIDER=local` doesn't then demand a real auth secret (ADR-0008).
-    case 'local':
-      return createLocalAuthProvider();
-    // DynamoDB has no better-auth adapter, so AWS-data apps use Cognito behind the
-    // same interface; the builder never hears the name (ADR-0003).
-    case 'aws':
-      return cognito();
-    case 'mongodb':
-      return createBetterAuthProvider({
-        config: parseEnv(betterAuthConfigSchema, env),
-        mongo: parseEnv(mongoConfigSchema, env),
-        ...injectedInstance,
-      });
-    default:
-      return createBetterAuthProvider({
-        config: parseEnv(betterAuthConfigSchema, env),
-        ...injectedInstance,
-      });
-  }
+  return resolveEnvProvider(
+    DATA_PROVIDER,
+    {
+      local: () => createLocalAuthProvider(),
+      aws: () => cognito(),
+      mongodb: (source) =>
+        createBetterAuthProvider({
+          config: parseEnv(betterAuthConfigSchema, source),
+          mongo: parseEnv(mongoConfigSchema, source),
+          ...injectedInstance,
+        }),
+      supabase: (source) =>
+        createBetterAuthProvider({
+          config: parseEnv(betterAuthConfigSchema, source),
+          ...injectedInstance,
+        }),
+      neon: (source) =>
+        createBetterAuthProvider({
+          config: parseEnv(betterAuthConfigSchema, source),
+          ...injectedInstance,
+        }),
+      firebase: (source) =>
+        createBetterAuthProvider({
+          config: parseEnv(betterAuthConfigSchema, source),
+          ...injectedInstance,
+        }),
+      railway: (source) =>
+        createBetterAuthProvider({
+          config: parseEnv(betterAuthConfigSchema, source),
+          ...injectedInstance,
+        }),
+    },
+    env,
+    'supabase',
+  );
 }

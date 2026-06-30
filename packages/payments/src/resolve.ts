@@ -3,15 +3,14 @@ import {
   parseEnv,
   paymentsConfigSchema,
   paypalConfigSchema,
+  resolveEnvProvider,
   stripeConfigSchema,
+  type EnvSource,
 } from '@vybekiit/core';
 import { createLemonSqueezyProvider } from './providers/lemon-squeezy/index';
 import { createPayPalProvider } from './providers/paypal/index';
 import { createStripeProvider } from './providers/stripe/index';
 import type { PaymentProvider } from './types';
-
-/** A readable view of `process.env` that doesn't require `@types/node` here. */
-type EnvSource = Record<string, string | undefined>;
 
 /**
  * Construct the configured payment provider from the environment — the single call
@@ -24,12 +23,15 @@ type EnvSource = Record<string, string | undefined>;
  */
 export function resolvePaymentProvider(env: EnvSource = process.env): PaymentProvider {
   const { PAYMENTS_PROVIDER } = parseEnv(paymentsConfigSchema, env);
-  switch (PAYMENTS_PROVIDER) {
-    case 'stripe':
-      return createStripeProvider(parseEnv(stripeConfigSchema, env));
-    case 'paypal':
-      return createPayPalProvider(parseEnv(paypalConfigSchema, env));
-    default:
-      return createLemonSqueezyProvider(parseEnv(lemonSqueezyConfigSchema, env));
-  }
+  return resolveEnvProvider(
+    PAYMENTS_PROVIDER,
+    {
+      stripe: (source) => createStripeProvider(parseEnv(stripeConfigSchema, source)),
+      paypal: (source) => createPayPalProvider(parseEnv(paypalConfigSchema, source)),
+      'lemon-squeezy': (source) =>
+        createLemonSqueezyProvider(parseEnv(lemonSqueezyConfigSchema, source)),
+    },
+    env,
+    'lemon-squeezy',
+  );
 }
