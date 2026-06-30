@@ -2,37 +2,38 @@ import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '@/lib/
 import { resolveAnalyticsProvider } from '@vybekiit/analytics';
 import { observability } from '@/lib/observability';
 
+const mocks = vi.hoisted(() => ({
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
+  track: vi.fn(),
+}));
+
 vi.mock('@vybekiit/analytics', () => ({
-  resolveAnalyticsProvider: vi.fn(),
+  resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
 }));
 
 vi.mock('@/lib/observability', () => ({
   observability: {
-    captureException: vi.fn(),
-    captureMessage: vi.fn(),
+    captureException: mocks.captureException,
+    captureMessage: mocks.captureMessage,
   },
 }));
 
 describe('auth-telemetry', () => {
   beforeEach(() => {
-    vi.mocked(resolveAnalyticsProvider).mockReturnValue({
-      track: vi.fn(),
-    } as ReturnType<typeof resolveAnalyticsProvider>);
+    mocks.captureException.mockClear();
+    mocks.captureMessage.mockClear();
+    mocks.track.mockClear();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('tracks signup success via analytics provider', () => {
-    const track = vi.fn();
-    vi.mocked(resolveAnalyticsProvider).mockReturnValue({ track } as ReturnType<
-      typeof resolveAnalyticsProvider
-    >);
-
     trackAuthEvent('signup_completed', { method: 'password' });
 
-    expect(track).toHaveBeenCalledWith({
+    expect(mocks.track).toHaveBeenCalledWith({
       name: 'signup_completed',
       properties: { method: 'password' },
     });
@@ -42,7 +43,7 @@ describe('auth-telemetry', () => {
     const error = new Error('boom');
     captureAuthFailure(error, { route: 'signup' });
 
-    expect(observability.captureException).toHaveBeenCalledWith(error, {
+    expect(mocks.captureException).toHaveBeenCalledWith(error, {
       domain: 'auth',
       route: 'signup',
     });
@@ -51,7 +52,7 @@ describe('auth-telemetry', () => {
   it('captures expected rejections as warnings', () => {
     captureAuthRejection('Invalid password', { route: 'signin', code: 'invalid_credentials' });
 
-    expect(observability.captureMessage).toHaveBeenCalledWith('Invalid password', 'warning', {
+    expect(mocks.captureMessage).toHaveBeenCalledWith('Invalid password', 'warning', {
       domain: 'auth',
       route: 'signin',
       code: 'invalid_credentials',

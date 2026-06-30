@@ -9,7 +9,7 @@ export interface HomeFeature {
   readonly techLabelKey?: string;
   readonly icon: HomeFeatureIcon;
   /** Stagger intro tooltips so they do not stack on mount. */
-  readonly mountHintDelayMs?: number;
+  readonly mountHintDelayMs: number;
 }
 
 /** Marketing feature cards shown below the hero on the home page. */
