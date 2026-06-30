@@ -97,6 +97,19 @@ const WRANGLER: Tool = {
   auth: { command: 'wrangler', args: ['whoami'], loginHint: 'wrangler login' },
 };
 
+/** Opt-in hosting CLI — Vercel (ADR-0006). Installs via npm global on every OS. */
+const VERCEL: Tool = {
+  name: 'vercel',
+  purpose: 'put your app online',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'vercel'] },
+    win32: { command: 'npm', args: ['install', '-g', 'vercel'] },
+    linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
+  },
+  auth: { command: 'vercel', args: ['whoami'], loginHint: 'vercel login' },
+};
+
 /**
  * GitHub CLI — the always-present base tool. It downloads the buyer's starter files
  * (clones the private template mirror — ADR-0005) and signs them in to GitHub, so it's
