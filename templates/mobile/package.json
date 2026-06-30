@@ -60,6 +60,7 @@
     "launch-store": "^0.29.1",
     "sharp": "^0.34.5",
     "typescript": "^5.7.2",
+    "msw": "^2.7.0",
     "vitest": "^2.1.8"
   }
 }
