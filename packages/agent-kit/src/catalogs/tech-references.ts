@@ -72,6 +72,16 @@ export const TECH_REFERENCES: readonly TechReference[] = [
     mcpSnippet: 'mcp-firebase.json',
   },
   {
+    id: 'mongodb',
+    label: 'MongoDB Atlas',
+    docsUrl: 'https://www.mongodb.com/docs/',
+    apiRefUrl: 'https://www.mongodb.com/docs/drivers/node/current/',
+    mcpDocsUrl: 'https://www.mongodb.com/docs/mcp-server/overview/',
+    mcpSnippet: 'mcp-mongodb.json',
+    envKeys: ['DATA_PROVIDER', 'MONGODB_URI', 'MONGODB_DB'],
+    troubleshootingPath: 'https://www.mongodb.com/docs/mcp-server/configuration/troubleshoot/',
+  },
+  {
     id: 'express',
     label: 'Express',
     docsUrl: 'https://expressjs.com',

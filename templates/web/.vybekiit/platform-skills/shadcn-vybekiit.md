@@ -12,7 +12,9 @@
 
 ## Kit conventions
 
-- Use existing primitives in `src/components/ui/` and shared shells — do not add a second design system
+- Full shadcn base primitive set is pre-installed in `src/components/ui/` (including sidebar, table, form, etc.)
+- Signed-in dashboard chrome uses shadcn `Sidebar` via `src/components/app-sidebar.tsx` and `dashboard-shell.tsx`
+- Use existing primitives and shared shells — do not add a second design system
 - Read colors/spacing from CSS variables backed by `@vybekiit/tokens`
 - Forms: reuse `FormField` and shared error patterns from the template
 - Third-party blocks: **normalize on import** — see `ui-consistency-vybekiit.md`

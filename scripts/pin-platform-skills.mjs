@@ -11,7 +11,7 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 
 const REPO_ROOT = new URL('..', import.meta.url).pathname;
-const TEMPLATES = ['web', 'mobile', 'extension'];
+const TEMPLATES = ['web', 'mobile', 'extension', 'backend'];
 
 /**
  * @typedef {{ repo: string, skills: string[] }} ManifestSource

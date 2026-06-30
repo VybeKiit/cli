@@ -47,6 +47,22 @@ args = ["-y", "mcp-remote", "https://mcp.sandbox.paypal.com/http"]
 
 Production PayPal: replace sandbox URL with `https://mcp.paypal.com/http`.
 
+### Stdio (Firebase, MongoDB)
+
+```toml
+[mcp_servers.firebase]
+command = "npx"
+args = ["-y", "firebase-tools@latest", "mcp"]
+
+[mcp_servers.mongodb]
+command = "npx"
+args = ["-y", "mongodb-mcp-server@latest"]
+
+[mcp_servers.mongodb.env]
+MDB_MCP_CONNECTION_STRING = "<copy from MONGODB_URI in .env>"
+MDB_MCP_READ_ONLY = "true"
+```
+
 Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 
 ## Provider snippets (merge one or more)
@@ -63,6 +79,7 @@ Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 | Twilio API (optional alpha) | `mcp-twilio-alpha.json` | `@twilio-alpha/mcp` stdio bridge |
 | Sentry error alerts | `mcp-sentry.json` | https://mcp.sentry.dev/mcp |
 | PostHog analytics / flags | `mcp-posthog.json` | https://mcp.posthog.com/mcp |
+| Advanced data (`DATA_PROVIDER=mongodb`, **agent/maintainer only**) | `mcp-mongodb.json` | https://www.mongodb.com/docs/mcp-server/get-started/ |
 
 ### MCP failure → official docs
 
@@ -94,3 +111,7 @@ First tool call opens PayPal login in the browser. Use sandbox endpoint until ch
 - **Supabase CI:** PAT in `Authorization` header — see Supabase MCP security docs
 
 Never connect MCP to production buyer data without `read_only=true` or a dev branch.
+
+### MongoDB (agent/maintainer only)
+
+When `.env` has `DATA_PROVIDER=mongodb`, merge `mcp-mongodb.json` and copy `MONGODB_URI` into `MDB_MCP_CONNECTION_STRING`. Keep `MDB_MCP_READ_ONLY=true` unless a maintainer explicitly needs write tools. Buyers never see provider names — see `BUILDER-VOICE.md`.

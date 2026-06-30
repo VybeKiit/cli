@@ -15,6 +15,10 @@
     {
       "repo": "aws/agent-toolkit-for-aws/skills",
       "skills": ["aws-serverless", "aws-cdk", "aws-cloudformation"]
+    },
+    {
+      "repo": "mongodb/agent-skills",
+      "skills": ["*"]
     }
   ],
   "_notes": {

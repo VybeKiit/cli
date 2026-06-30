@@ -26,4 +26,4 @@ primary key, foreign key, migration, schema, normalization, SQL, NoSQL
 
 ## MCP tier
 
-Document login-once paths in `onboarding.md`. MongoDB and AWS are advanced (maintainer docs only).
+Document login-once paths in `onboarding.md`. Supabase, Neon, and Firebase are buyer-facing MCP tiers. MongoDB: agent-only via `mongodb-vybekiit.md` when `DATA_PROVIDER=mongodb` (not buyer-facing). AWS remains advanced (maintainer docs only).
