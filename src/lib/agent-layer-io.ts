@@ -20,11 +20,17 @@ export const COMPLIANCE_FILES = [
 export { AGENT_LAYER_RENDER_FILES };
 
 export async function readOptionalFile(cwd: string, file: string): Promise<string | undefined> {
-  try {
-    return await readFile(join(cwd, file), 'utf8');
-  } catch {
-    return undefined;
+  const path = join(cwd, file);
+  if (!(await pathExists(path))) {
+    return;
   }
+  let content: string | undefined;
+  try {
+    content = await readFile(path, 'utf8');
+  } catch {
+    content = undefined;
+  }
+  return content;
 }
 
 export async function pathExists(path: string): Promise<boolean> {

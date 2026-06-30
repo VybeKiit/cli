@@ -8,11 +8,15 @@ function parseLiveDocsEnv(): Record<string, string> | undefined {
   if (!raw?.trim()) {
     return;
   }
+  let parsed: unknown;
   try {
-    return JSON.parse(raw) as Record<string, string>;
+    parsed = JSON.parse(raw);
   } catch {
-    return undefined;
+    parsed = undefined;
   }
+  return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+    ? (parsed as Record<string, string>)
+    : undefined;
 }
 
 export async function runCheckAgentLayer(
