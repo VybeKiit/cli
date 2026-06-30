@@ -14,6 +14,7 @@ When MCP or first-pass debug fails, run `vybekiit doc-fallback <id>` and follow 
 | stripe | https://docs.stripe.com | — | STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET |
 | neon | https://neon.tech/docs | — | DATABASE_URL |
 | firebase | https://firebase.google.com/docs | — | — |
+| mongodb | https://www.mongodb.com/docs/ | https://www.mongodb.com/docs/mcp-server/overview/ | DATA_PROVIDER, MONGODB_URI, MONGODB_DB |
 | express | https://expressjs.com | — | — |
 | expo | https://docs.expo.dev | — | — |
 | nextjs | https://nextjs.org/docs | — | — |
