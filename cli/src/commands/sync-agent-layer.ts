@@ -7,8 +7,11 @@ import {
   AGENT_LAYER_PATHS,
   applyAgentLayerSections,
   formatAgentLayerSyncSummary,
+  isAgentLayerExtensionPath,
+  mergeGoalIndexOnSync,
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
+import { loadExistingAgentLayerRenderInputs } from '../lib/agent-layer-io';
 import { detectTemplateName } from '../lib/detect-template';
 import { cloneMirror, resolveTemplatesSource } from '../lib/resolve-templates';
 import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
@@ -54,6 +57,50 @@ async function listMirrorAgentPaths(
   return found;
 }
 
+/** Copy allowlisted path from mirror → buyer, skipping buyer-owned extension subtrees. */
+async function copyAgentLayerPath(
+  mirrorRoot: string,
+  cwd: string,
+  path: string,
+  copy: SyncAgentLayerDeps['copy'],
+  pathExists: SyncAgentLayerDeps['pathExists'],
+): Promise<void> {
+  const src = join(mirrorRoot, path);
+  const dest = join(cwd, path);
+
+  if (path !== '.vybekiit') {
+    await copy(src, dest, { recursive: true, force: true });
+    return;
+  }
+
+  // Selective .vybekiit sync — never overwrite `.vybekiit/extensions/**`
+  const { readdir, stat, mkdir } = await import('node:fs/promises');
+
+  async function walk(rel: string): Promise<void> {
+    const relNorm = rel.replace(/\\/g, '/');
+    if (isAgentLayerExtensionPath(relNorm)) {
+      return;
+    }
+    const srcPath = join(mirrorRoot, relNorm);
+    const destPath = join(cwd, relNorm);
+    if (!(await pathExists(srcPath))) {
+      return;
+    }
+    const info = await stat(srcPath);
+    if (info.isDirectory()) {
+      await mkdir(destPath, { recursive: true });
+      const entries = await readdir(srcPath);
+      for (const entry of entries) {
+        await walk(join(relNorm, entry));
+      }
+      return;
+    }
+    await copy(srcPath, destPath, { force: true });
+  }
+
+  await walk('.vybekiit');
+}
+
 export interface SyncAgentLayerResult {
   readonly lines: readonly string[];
   readonly exitCode: number;
@@ -69,12 +116,13 @@ export async function runSyncAgentLayer(
   deps: SyncAgentLayerDeps = defaultDeps,
 ): Promise<SyncAgentLayerResult> {
   const explicit = args[0];
-  const template = explicit && isTemplateName(explicit) ? explicit : await detectTemplateName(cwd);
+  const template: TemplateName | null =
+    explicit && isTemplateName(explicit) ? explicit : await detectTemplateName(cwd);
 
   if (!template) {
     return {
       lines: [
-        'Could not tell which template this project uses. Pass: web, mobile, extension, or backend.',
+        'Could not tell which template this project uses. Pass: web, mobile, extension, backend, or spa.',
       ],
       exitCode: 1,
     };
@@ -93,33 +141,26 @@ export async function runSyncAgentLayer(
 
     const lines: string[] = [formatAgentLayerSyncSummary(plan)];
 
+    const goalIndexBefore =
+      plan.pathsToSync.includes('.vybekiit') &&
+      (await deps.pathExists(join(cwd, '.vybekiit/agent/goal-index.md')))
+        ? await readFile(join(cwd, '.vybekiit/agent/goal-index.md'), 'utf8')
+        : undefined;
+
     for (const path of plan.pathsToSync) {
-      const src = join(mirrorRoot, path);
-      const dest = join(cwd, path);
-      await deps.copy(src, dest, { recursive: true, force: true });
+      await copyAgentLayerPath(mirrorRoot, cwd, path, deps.copy, deps.pathExists);
     }
 
-    const renderTargets = [
-      'AGENTS.md',
-      'language.md',
-      'BUILDER-VOICE.md',
-      '.vybekiit/agent/ui-sources.md',
-      '.vybekiit/agent/tech-references.md',
-      '.vybekiit/agent/session-bootstrap.md',
-      '.vybekiit/agent/goal-index.md',
-      'checklist.md',
-    ];
-    const fileContents: Record<string, string> = {};
-    for (const file of renderTargets) {
-      const dest = join(cwd, file);
-      if (await deps.pathExists(dest)) {
-        try {
-          fileContents[file] = await readFile(dest, 'utf8');
-        } catch {
-          // pathExists can be true before copy completes in tests — skip unreadable files
-        }
+    if (goalIndexBefore !== undefined) {
+      const goalIndexPath = join(cwd, '.vybekiit/agent/goal-index.md');
+      const synced = await readFile(goalIndexPath, 'utf8');
+      const merged = mergeGoalIndexOnSync(synced, goalIndexBefore);
+      if (merged !== synced) {
+        await writeFile(goalIndexPath, merged, 'utf8');
       }
     }
+
+    const fileContents = await loadExistingAgentLayerRenderInputs(cwd, deps.pathExists);
     if (Object.keys(fileContents).length > 0) {
       const rendered = applyAgentLayerSections(fileContents, { template });
       for (const [file, content] of Object.entries(rendered)) {

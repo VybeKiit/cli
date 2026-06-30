@@ -10,9 +10,11 @@ import {
 } from './commands/backend-cli';
 import { runCheckGoals } from './commands/check-goals';
 import { runCheckAgentLayer } from './commands/check-agent-layer';
+import { runLintExtensionSkill } from './commands/lint-extension-skill';
 import { runDocFallback } from './commands/doc-fallback';
 import { runDoctor } from './commands/doctor';
 import { runNew } from './commands/new';
+import { runSetup } from './commands/setup';
 import { runPlanDataModel } from './commands/plan-data-model-cmd';
 import { runPlanReadiness } from './commands/plan-readiness';
 import { runPlanSetup } from './commands/plan-setup-cmd';
@@ -27,6 +29,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const _HELP = `vybekiit — scaffold a VybeKiit template into your own repo
 
 Usage:
+  vybekiit setup
   vybekiit new [template] [directory]
   vybekiit scaffold backend [directory]
   vybekiit doctor
@@ -37,6 +40,7 @@ Usage:
   vybekiit plan-setup <domain>
   vybekiit plan-data-model <entities.json> [provider]
   vybekiit check-agent-layer [template]
+  vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
   vybekiit env wizard
   vybekiit backend add-route <name>
@@ -50,6 +54,7 @@ Templates:
   backend     Express MVC API for mobile/extension clients   [available]
 
 Commands:
+  setup               Welcome banner + set up the tools your app needs
   new                 Scaffold a template (interactive menu when TTY)
   scaffold backend    Add Express API server to an existing project
   doctor              Set up + check the tools your app needs
@@ -60,6 +65,7 @@ Commands:
   plan-readiness      Feature readiness + orchestration steps (JSON)
   plan-setup          Plain-language setup checklist for a domain
   plan-data-model     Data model plan from entities JSON file
+  lint-extension-skill Lint an extension skill draft before saving (JSON)
   doc-fallback        Official docs URLs when MCP or debug fails once (JSON)
   env wizard          Interactive .env setup (TTY only)
   backend add-route   Append a route + controller to backend/
@@ -67,6 +73,7 @@ Commands:
   backend add-upload  Add multer upload route
 
 Examples:
+  vybekiit setup
   vybekiit new
   vybekiit new web my-app
   vybekiit doc-fallback twilio
@@ -98,10 +105,15 @@ async function main(argv: string[]): Promise<number> {
   const [command, subcommand, ...rest] = argv;
 
   if (!command || command === 'help' || command === '--help' || command === '-h') {
+    console.log(_HELP);
     return 0;
   }
   if (command === '--version' || command === '-v') {
+    console.log(await readVersion());
     return 0;
+  }
+  if (command === 'setup') {
+    return await runSetup();
   }
   if (command === 'new') {
     return runNew(rest);
@@ -141,6 +153,11 @@ async function main(argv: string[]): Promise<number> {
   }
   if (command === 'plan-data-model') {
     const result = await runPlanDataModel(rest);
+    console.log(result.json);
+    return result.exitCode;
+  }
+  if (command === 'lint-extension-skill') {
+    const result = await runLintExtensionSkill(rest);
     console.log(result.json);
     return result.exitCode;
   }
