@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   AGENT_TOOLS,
@@ -10,7 +13,8 @@ import {
   selectToolchain,
   type ToolReport,
 } from '../src/doctor/toolchain';
-import { expectedSkillNames, verifyPlatformSkills } from '../src/doctor/platform-skills';
+import { expectedSkillNamesFromManifest } from '@vybekiit/agent-kit';
+import { verifyPlatformSkills } from '../src/doctor/platform-skills';
 import { verifyProjectHealth } from '../src/doctor/project-health';
 
 describe('selectToolchain', () => {
@@ -77,6 +81,20 @@ describe('selectToolchain', () => {
   it('uses the Vercel CLI when the vercel hosting adapter is active', () => {
     const names = selectToolchain({ HOSTING_PROVIDER: 'vercel' }).map((tool) => tool.name);
     expect(names).toEqual(['gh', 'vercel', 'supabase']);
+  });
+
+  it('uses the Railway CLI when the railway hosting adapter is active', () => {
+    const names = selectToolchain({
+      HOSTING_PROVIDER: 'railway',
+      DATA_PROVIDER: 'railway',
+    }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'railway']);
+  });
+
+  it('omits Supabase CLI for coupled Railway stack', () => {
+    const names = selectToolchain({ DATA_PROVIDER: 'railway' }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'wrangler', 'railway']);
+    expect(names).not.toContain('supabase');
   });
 
   it('uses the AWS CLI for hosting and dedupes when data is also AWS', () => {
@@ -228,15 +246,39 @@ describe('verifyPlatformSkills', () => {
       ok: true,
       missing: [],
       template: null,
+      lockCount: 0,
     });
   });
 
-  it('expectedSkillNames flattens manifest sources', () => {
+  it('expectedSkillNamesFromManifest flattens manifest sources', () => {
     expect(
-      expectedSkillNames({
+      expectedSkillNamesFromManifest({
         sources: [{ repo: 'vercel-labs/agent-skills', skills: ['a', 'b'] }],
       }),
     ).toEqual(['a', 'b']);
+  });
+
+  it('verifies all skills-lock.json entries when lock exists', () => {
+    const tmp = mkdtempSync(join(tmpdir(), 'vyb-skills-'));
+    try {
+      writeFileSync(
+        join(tmp, 'platform-skills.manifest.json'),
+        JSON.stringify({ sources: [{ repo: 'x/y', skills: ['explicit-only'] }] }),
+      );
+      writeFileSync(
+        join(tmp, 'skills-lock.json'),
+        JSON.stringify({ version: 1, skills: { 'locked-skill': {}, 'missing-skill': {} } }),
+      );
+      mkdirSync(join(tmp, '.agents', 'skills', 'locked-skill'), { recursive: true });
+      writeFileSync(join(tmp, '.agents', 'skills', 'locked-skill', 'SKILL.md'), '# locked\n');
+
+      const report = verifyPlatformSkills(tmp);
+      expect(report.ok).toBe(false);
+      expect(report.missing).toEqual(['missing-skill']);
+      expect(report.lockCount).toBe(2);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
   });
 });
 
@@ -299,6 +341,20 @@ describe('selectToolchain', () => {
   it('uses the Vercel CLI when the vercel hosting adapter is active', () => {
     const names = selectToolchain({ HOSTING_PROVIDER: 'vercel' }).map((tool) => tool.name);
     expect(names).toEqual(['gh', 'vercel', 'supabase']);
+  });
+
+  it('uses the Railway CLI when the railway hosting adapter is active', () => {
+    const names = selectToolchain({
+      HOSTING_PROVIDER: 'railway',
+      DATA_PROVIDER: 'railway',
+    }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'railway']);
+  });
+
+  it('omits Supabase CLI for coupled Railway stack', () => {
+    const names = selectToolchain({ DATA_PROVIDER: 'railway' }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'wrangler', 'railway']);
+    expect(names).not.toContain('supabase');
   });
 
   it('uses the AWS CLI for hosting and dedupes when data is also AWS', () => {

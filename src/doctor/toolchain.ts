@@ -26,6 +26,17 @@
  * extension template in v3 — no tool ships before the template/adapter that uses it.
  */
 
+import {
+  dataConfigSchema,
+  hostingConfigSchema,
+  isRailwayStackActive,
+  needsAwsCliFromAuxiliaryProviders,
+  parseEnv,
+  resolveEnvProvider,
+  resolveOptionalEnvProvider,
+  type EnvSource,
+} from '@vybekiit/core';
+
 /** OS families we know how to install on. `process.platform` maps onto this. */
 export type Platform = 'darwin' | 'win32' | 'linux';
 
@@ -108,6 +119,19 @@ const VERCEL: Tool = {
     linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
   },
   auth: { command: 'vercel', args: ['whoami'], loginHint: 'vercel login' },
+};
+
+/** Opt-in hosting CLI — Railway (ADR-0017). Installs via npm global on every OS. */
+const RAILWAY: Tool = {
+  name: 'railway',
+  purpose: 'put your app online and manage your database host',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
+    win32: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
+    linux: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
+  },
+  auth: { command: 'railway', args: ['whoami'], loginHint: 'railway login' },
 };
 
 /**
@@ -303,12 +327,8 @@ export function selectToolchain(
   env: Record<string, string | undefined>,
   options: ToolchainOptions = {},
 ): Tool[] {
-  const usesAws =
-    env.DATA_PROVIDER === 'aws' ||
-    env.STORAGE_PROVIDER === 's3' ||
-    env.EMAIL_PROVIDER === 'ses' ||
-    env.AUTH_PROVIDER === 'cognito' ||
-    env.HOSTING_PROVIDER === 'aws';
+  const envSource: EnvSource = env;
+  const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, envSource);
 
   const tools: Tool[] = [];
   const add = (tool: Tool): void => {
@@ -318,25 +338,44 @@ export function selectToolchain(
   };
 
   add(GH);
-  add(env.HOSTING_PROVIDER === 'aws' ? AWS : env.HOSTING_PROVIDER === 'vercel' ? VERCEL : WRANGLER);
 
-  switch (env.DATA_PROVIDER) {
-    case 'mongodb':
-      add(ATLAS);
-      break;
-    case 'aws':
-      add(AWS);
-      break;
-    case 'neon':
-    case 'firebase':
-    case 'local':
-      // MCP-first or zero-config — no Supabase CLI
-      break;
-    default:
-      add(SUPABASE);
+  add(
+    resolveEnvProvider(
+      HOSTING_PROVIDER,
+      {
+        aws: () => AWS,
+        vercel: () => VERCEL,
+        railway: () => RAILWAY,
+        cloudflare: () => WRANGLER,
+      },
+      envSource,
+      'cloudflare',
+    ),
+  );
+
+  if (isRailwayStackActive(envSource) && HOSTING_PROVIDER !== 'railway') {
+    add(RAILWAY);
   }
 
-  if (usesAws) {
+  const dataTool = resolveOptionalEnvProvider(
+    parseEnv(dataConfigSchema, envSource).DATA_PROVIDER,
+    {
+      mongodb: () => ATLAS,
+      aws: () => AWS,
+      neon: () => undefined,
+      firebase: () => undefined,
+      local: () => undefined,
+      railway: () => undefined,
+      supabase: () => SUPABASE,
+    },
+    envSource,
+    'supabase',
+  );
+  if (dataTool) {
+    add(dataTool);
+  }
+
+  if (needsAwsCliFromAuxiliaryProviders(envSource)) {
     add(AWS);
   }
 
