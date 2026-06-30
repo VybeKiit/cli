@@ -512,6 +512,20 @@ The small official logo beside a builder-tool or product-stack name on the landi
 at rest on the dark row, not a hand-drawn stand-in.
 _Avoid_: placeholder icons, monochrome fake paths, or calling Codex a different mark than OpenAI.
 
+**Vibe hint**:
+Plain-English, cheeky explanation on a landing-page brand mark — what the tool/service is plus
+reassurance the vibe coder never touches it. Desktop: hover tooltip on the whole mark. Mobile
+(product-stack row only): always-visible subtitle under the technical label. Hero orbit hints are
+desktop-only.
+_Avoid_: control hint (Report Mode dock only), jargon definitions, or duplicating the technical label.
+
+**Domino cascade**:
+One-time on-mount intro on the hero builder-tool orbit (desktop only): each vibe hint tooltip
+auto-opens in sequence (~1.2s apart, domino-style), then closes; hover works anytime after to
+re-read. Product-stack row does not cascade.
+_Avoid_: calling it a tutorial or onboarding; it is ambient store-page personality, not buyer-layer
+guidance.
+
 **Proceed animation**:
 When the builder clicks Get VybeKiit, a cart icon flies toward the checkout direction as visual
 feedback before navigation — RTL-aware on the landing page.

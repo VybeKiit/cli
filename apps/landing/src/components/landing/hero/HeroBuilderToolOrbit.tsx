@@ -1,6 +1,8 @@
 'use client';
 
+import { BrandMarkVibeHint } from '@/components/landing/BrandMarkVibeHint';
 import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
+import { useVibeHintCascade } from '@/components/landing/useVibeHintCascade';
 import { BUILDER_TOOL_MARKS } from '@/data/landing';
 import { cn } from '@/lib/utils';
 
@@ -17,28 +19,47 @@ const ORBIT_POSITIONS = [
 
 /** Floating builder-tool marks behind the hero headline. */
 export function HeroBuilderToolOrbit({ className }: { readonly className?: string }) {
+  const { activeIndex, cancelCascade } = useVibeHintCascade(BUILDER_TOOL_MARKS.length);
+
   return (
     <div
-      aria-hidden="true"
-      className={cn('hero-builder-orbit pointer-events-none absolute inset-0 -z-0', className)}
+      className={cn(
+        'hero-builder-orbit max-md:pointer-events-none absolute inset-0 -z-0',
+        className,
+      )}
     >
       {BUILDER_TOOL_MARKS.map((mark, index) => {
         const position = ORBIT_POSITIONS[index % ORBIT_POSITIONS.length] ?? ORBIT_POSITIONS[0];
+        const isCascadeActive = activeIndex === index;
+
         return (
-          <div
-            className="hero-builder-orbit-item group"
+          <BrandMarkVibeHint
+            forceOpen={isCascadeActive}
             key={mark.slug}
-            style={{
-              top: position.top,
-              left: 'left' in position ? position.left : undefined,
-              right: 'right' in position ? position.right : undefined,
-              ['--brand-color' as string]: mark.hoverColor,
-              animationDelay: position.delay,
-            }}
+            mode="tooltip-only"
+            onCascadeInterrupt={cancelCascade}
+            side={index % 2 === 0 ? 'top' : 'bottom'}
+            slug={mark.slug}
           >
-            <LogoMarkIcon className="hero-builder-orbit-icon h-8 w-8" slug={mark.slug} />
-            <span className="hero-builder-orbit-label">{mark.label}</span>
-          </div>
+            <div
+              aria-label={mark.label}
+              className={cn(
+                'hero-builder-orbit-item group md:pointer-events-auto md:cursor-default',
+                isCascadeActive && 'hero-builder-orbit-item--cascade-active',
+              )}
+              role="img"
+              style={{
+                top: position.top,
+                left: 'left' in position ? position.left : undefined,
+                right: 'right' in position ? position.right : undefined,
+                ['--brand-color' as string]: mark.hoverColor,
+                animationDelay: position.delay,
+              }}
+            >
+              <LogoMarkIcon className="hero-builder-orbit-icon h-8 w-8" slug={mark.slug} />
+              <span className="hero-builder-orbit-label">{mark.label}</span>
+            </div>
+          </BrandMarkVibeHint>
         );
       })}
     </div>

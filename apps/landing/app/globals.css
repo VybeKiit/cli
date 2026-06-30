@@ -427,6 +427,15 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   font-size: 11px;
   backdrop-filter: blur(8px);
   animation: hero-orbit-float 8s ease-in-out infinite;
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.landing-page .hero-builder-orbit-item--cascade-active {
+  border-color: color-mix(in srgb, var(--brand-color) 55%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--brand-color) 45%, transparent);
 }
 
 .landing-page .hero-builder-orbit-icon {
@@ -885,6 +894,14 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   font-weight: 500;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+.landing-page .brand-mark-vibe-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 12rem;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 @keyframes auto-scroll-row {

@@ -1,6 +1,9 @@
-import { PRODUCT_STACK_MARKS } from '@/data/landing';
-import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
+'use client';
+
+import { BrandMarkVibeHint, BrandMarkVibeHintMobile } from '@/components/landing/BrandMarkVibeHint';
 import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
+import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
+import { PRODUCT_STACK_MARKS } from '@/data/landing';
 
 function TechLogoItem({
   label,
@@ -13,13 +16,18 @@ function TechLogoItem({
 }) {
   return (
     <li className="tech-logo-item group shrink-0">
-      <span
-        className="tech-logo inline-flex items-center gap-3"
-        style={{ ['--brand-color' as string]: hoverColor }}
-      >
-        <LogoMarkIcon className="tech-logo-icon h-[22px] w-[22px] shrink-0" slug={slug} />
-        <span className="tech-logo-label">{label}</span>
-      </span>
+      <BrandMarkVibeHint mode="tooltip-and-mobile-subtitle" slug={slug}>
+        <span
+          className="tech-logo inline-flex items-center gap-3"
+          style={{ ['--brand-color' as string]: hoverColor }}
+        >
+          <LogoMarkIcon className="tech-logo-icon h-[22px] w-[22px] shrink-0" slug={slug} />
+          <span className="flex flex-col gap-0.5">
+            <span className="tech-logo-label">{label}</span>
+            <BrandMarkVibeHintMobile slug={slug} />
+          </span>
+        </span>
+      </BrandMarkVibeHint>
     </li>
   );
 }

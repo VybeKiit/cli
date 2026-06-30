@@ -208,6 +208,8 @@ export const PRODUCT_STACK_MARKS: readonly ProductStackMark[] = [
 /** @deprecated Use PRODUCT_STACK_MARKS */
 export const TECH_STACK_MARKS = PRODUCT_STACK_MARKS;
 
+export { VIBE_HINTS } from './vibe-hints';
+
 /** FAQ entry ids to show on the landing page (from faq.ts). */
 export const LANDING_FAQ_IDS = [
   'non-technical',
