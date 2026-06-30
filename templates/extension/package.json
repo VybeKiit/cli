@@ -31,6 +31,8 @@
     "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/seo": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-query-persist-client": "^5.101.1",
+    "@vybekiit/http-client": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "react": "^19.0.0",
