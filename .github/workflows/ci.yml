@@ -1,6 +1,5 @@
 # CI is the HEAVY gate (full tests + typecheck + lint + build).
-# Pre-commit stays lenient (format/lint-fix only) so it can be inherited by buyer repos
-# without trapping a non-coder behind red — see AGENTS.md → "TDD & quality gate".
+# Pre-commit runs biome check (format + lint-fix) on maintainer and buyer templates.
 name: ci
 
 on:

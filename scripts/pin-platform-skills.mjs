@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Pin official upstream platform skills into each template (ADR-0007).
-// Reads templates/<name>/platform-skills.manifest.json and runs the skills CLI.
+// Merges platform-skills-base.manifest.json with per-template overrides, then runs skills CLI.
 
 import { execFile } from 'node:child_process';
 import { access, readFile } from 'node:fs/promises';
@@ -12,10 +12,14 @@ const execFileAsync = promisify(execFile);
 
 const REPO_ROOT = new URL('..', import.meta.url).pathname;
 const TEMPLATES = ['web', 'mobile', 'extension', 'backend'];
+const BASE_MANIFEST_PATH = join(
+  REPO_ROOT,
+  'packages/agent-kit/src/catalogs/platform-skills-base.manifest.json',
+);
 
 /**
  * @typedef {{ repo: string, skills: string[] }} ManifestSource
- * @typedef {{ sources: ManifestSource[] }} PlatformSkillsManifest
+ * @typedef {{ sources: ManifestSource[], _notes?: Record<string, string> }} PlatformSkillsManifest
  */
 
 /**
@@ -33,13 +37,48 @@ function parseArgs(argv) {
 }
 
 /**
- * @param {string} templateDir
+ * @param {string} path
  * @returns {Promise<PlatformSkillsManifest>}
  */
-async function readManifest(templateDir) {
-  const path = join(templateDir, 'platform-skills.manifest.json');
+async function readManifest(path) {
   const raw = await readFile(path, 'utf8');
   return JSON.parse(raw);
+}
+
+/**
+ * @param {ManifestSource[]} a
+ * @param {ManifestSource[]} b
+ * @returns {ManifestSource[]}
+ */
+function mergeSkillLists(a, b) {
+  const merged = new Set([...a, ...b]);
+  if (merged.has('*')) return ['*'];
+  return [...merged];
+}
+
+/**
+ * @param {PlatformSkillsManifest} base
+ * @param {PlatformSkillsManifest} template
+ * @returns {PlatformSkillsManifest}
+ */
+function mergeManifests(base, template) {
+  /** @type {Map<string, ManifestSource>} */
+  const byRepo = new Map();
+  for (const source of base.sources ?? []) {
+    byRepo.set(source.repo, { repo: source.repo, skills: [...source.skills] });
+  }
+  for (const source of template.sources ?? []) {
+    const existing = byRepo.get(source.repo);
+    if (existing) {
+      byRepo.set(source.repo, {
+        repo: source.repo,
+        skills: mergeSkillLists(existing.skills, source.skills),
+      });
+    } else {
+      byRepo.set(source.repo, { repo: source.repo, skills: [...source.skills] });
+    }
+  }
+  return { sources: [...byRepo.values()] };
 }
 
 /**
@@ -54,6 +93,7 @@ async function pinSource(templateDir, source, dryRun) {
   const skillArgs = source.skills.flatMap((skill) => ['--skill', skill]);
   const cmd = ['skills', 'add', source.repo, ...skillArgs, '-y'];
   if (dryRun) {
+    console.log(`[dry-run] ${templateDir}: npx ${cmd.join(' ')}`);
     return;
   }
   await execFileAsync('npx', cmd, { cwd: templateDir, env: process.env });
@@ -66,11 +106,11 @@ async function pinSource(templateDir, source, dryRun) {
 async function pinTemplate(template, dryRun) {
   const templateDir = join(REPO_ROOT, 'templates', template);
   await access(templateDir);
-  const manifest = await readManifest(templateDir);
-  if (manifest.sources?.length === 0) {
-    return;
-  }
-  for (const source of manifest.sources) {
+  const base = await readManifest(BASE_MANIFEST_PATH);
+  const templatePath = join(templateDir, 'platform-skills.manifest.json');
+  const local = await readManifest(templatePath);
+  const merged = mergeManifests(base, local);
+  for (const source of merged.sources) {
     await pinSource(templateDir, source, dryRun);
   }
 }
@@ -83,6 +123,7 @@ async function main() {
       await pinTemplate(template, dryRun);
     } catch (error) {
       const _message = error instanceof Error ? error.message : String(error);
+      console.error(`pin-platform-skills: ${template} failed — ${_message}`);
       failed.push(template);
     }
   }

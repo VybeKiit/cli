@@ -24,6 +24,17 @@ const liveDocs = fetchDocs.stdout.trim();
 const templates = ['web', 'mobile', 'extension', 'backend'];
 let failed = false;
 
+const discoveryScript = join(repoRoot, 'scripts/validate-agent-skill-discovery.mjs');
+const discovery = spawnSync('node', [discoveryScript], { encoding: 'utf8' });
+if (discovery.status === 0) {
+  console.log(discovery.stdout.trim());
+} else {
+  failed = true;
+  console.error('agent-skill discovery smoke test failed');
+  console.error(discovery.stdout);
+  console.error(discovery.stderr);
+}
+
 for (const template of templates) {
   const cwd = join(repoRoot, 'templates', template);
   for (const cmd of ['check-goals', 'check-agent-layer']) {
@@ -35,11 +46,11 @@ for (const template of templates) {
         VYBEKIIT_AGENT_RUNTIME_DOCS: liveDocs,
       },
     });
-    if (result.status !== 0) {
+    if (result.status === 0) {
+      console.log(`${template}: ${cmd} ok`);
+    } else {
       failed = true;
       console.error(`\n${template}: vybekiit ${cmd} failed\n${result.stdout}\n${result.stderr}`);
-    } else {
-      console.log(`${template}: ${cmd} ok`);
     }
   }
 }

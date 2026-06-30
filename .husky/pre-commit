@@ -1,4 +1,2 @@
-# Lenient on purpose: format + safe lint fixes only — never blocks on a failing test.
-# The real gate (tests + typecheck + build) lives in CI. This must stay friendly enough
-# to be inherited by a non-coder's scaffolded repo. See AGENTS.md.
-pnpm biome format --write --no-errors-on-unmatched .
+# Format + lint-fix on commit. Tests run in pre-push/CI only (AGENTS.md).
+pnpm biome check --write --no-errors-on-unmatched .
