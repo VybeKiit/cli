@@ -46,13 +46,17 @@ traceable code). Specifically:
 - **No scattered URLs/secrets.** Centralize endpoints in `core`. Never commit secrets.
 - Keep files readable (~200–400 lines); split when a file does multiple jobs.
 - Match the nearest sibling file's style; reuse existing helpers before writing new ones.
+- **Provider dispatch (ADR-0018):** before changing any `*_PROVIDER` adapter or `resolve.ts`, read
+  `.agents/skills/extend-provider-dispatch/SKILL.md`. Use `parseEnv` + `resolveEnvProvider` from
+  `@vybekiit/core`; never hand-roll `switch` on provider keys or raw `env.*_PROVIDER` compares.
+  Reference: `packages/payments/src/resolve.ts`.
 
 ## TDD & quality gate (this is load-bearing — it's also the product promise)
 
 - **Write tests first.** Red → green → refactor. The agent's green loop is the real "no bugs"
   gate and is what makes the buyer's `update-kit` safe (green suite = safe to bump).
-- **Pre-commit is lenient** (format + lint-fix only) — it must never block on a failing test, so
-  it can be inherited by buyer repos without trapping a non-coder.
+- **Pre-commit runs Biome check** (format + lint-fix) on maintainer and buyer templates — it must
+  never block on a failing test, so it can be inherited without trapping a non-coder.
 - **Pre-push + CI are the heavy gate** — both run `pnpm quality` (lint, typecheck, test,
   script tests, build). A red gate is a check *the agent* fixes before push/merge.
 - Run `pnpm quality` after substantial changes (pre-push runs the same commands automatically).
@@ -64,8 +68,8 @@ traceable code). Specifically:
 
 Anything that ships to buyers obeys the **Decide + Guide** contract and the strict skill template
 (see `CONTEXT.md` → agent layer): one action at a time · **verify-before-advance** · plain
-language (per `templates/*/BUILDER-VOICE.md`) · errors translated · celebrate · **no em dashes
-(`—`)** in buyer-facing prose (UI titles stay unpunctuated; see Tone in `BUILDER-VOICE.md`). If you
+language (per `templates/*/language.md`) · errors translated · celebrate · **no em dashes
+(`—`)** in buyer-facing prose (UI titles stay unpunctuated; see Tone in `language.md`). If you
 catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate it.
 
 ## Releasing packages

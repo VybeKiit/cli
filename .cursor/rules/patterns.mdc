@@ -35,12 +35,14 @@ Before adding code: logic the buyer shouldn't touch → `packages/`. UI, screens
 - Zod at public boundaries. No scattered URLs or secrets.
 - Files ~200–400 lines; split when a file does multiple jobs.
 - Match nearest sibling style; reuse helpers before writing new ones.
+- **Provider dispatch:** read `.agents/skills/extend-provider-dispatch/SKILL.md` before any
+  `resolve.ts` or `selectToolchain` change. `parseEnv` + `resolveEnvProvider` only (ADR-0018).
 
 ## TDD & quality gate
 
 - **Tests first:** red → green → refactor. Green suite = safe `update-kit` for buyers.
-- **Pre-commit:** lenient (format + lint-fix only) — must not block on failing tests.
-- **CI / pre-push:** heavy gate (lint → typecheck → test → build).
+- **Pre-commit:** Biome check (format + lint-fix) — maintainer monorepo and buyer templates; does not run tests.
+- **CI / pre-push:** heavy gate (lint → typecheck → test → build → `check-provider-dispatch`).
 - Run typecheck/test/lint after substantial changes.
 
 ## Editing buyer-facing content (`templates/*`)

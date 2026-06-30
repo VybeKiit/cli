@@ -24,4 +24,6 @@ exclude = [
   "packages/**",
   "infra/**",
   "cli/**",
+  "templates/**/.claude/skills/**",
+  "templates/**/.cursor/skills/**",
 ]

@@ -1,4 +1,4 @@
-# ADR-0010 — Structured i18n as default template scaffold
+# ADR-0019 — Structured i18n as default template scaffold
 
 - **Status:** Accepted
 - **Date:** 2026-06-29

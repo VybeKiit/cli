@@ -27,9 +27,11 @@ packages/   MAINTAINED · published to npm as @vybekiit/* · headless logic (no 
   db/               typed Supabase data client
   browser-automation/  Unified dashboard Playwright CLI (CWS + Lemon Squeezy)
 templates/  OWNED · NOT published · copied into a buyer's repo by the CLI
-  web/              Next.js + shadcn (RTL-ready) + the buyer-facing agent layer   ← v1.0
-  mobile/           Expo                                                          ← v2
-  extension/        WXT                                                           ← v3
+  web/              Next.js + shadcn (RTL-ready) + the buyer-facing agent layer
+  spa/              Vite admin SPA + agent layer
+  mobile/           Expo + shared tokens — full web parity
+  extension/        WXT browser extension scaffold + agent layer
+  backend/          Express MVC API for mobile/extension/spa clients
 apps/landing/       marketing site — dogfoods templates/web · Cloudflare Pages
 cli/                `npx vybekiit` — scaffolds a template into the buyer's own repo
 ```
