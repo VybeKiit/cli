@@ -7,6 +7,7 @@ export type {
   WebhookHeaders,
 } from './types';
 export { resolvePaymentProvider } from './resolve';
+export { isPaymentsUnconfigured } from './practice';
 export { createLemonSqueezyProvider } from './providers/lemon-squeezy/index';
 export { createStripeProvider } from './providers/stripe/index';
 export { createPayPalProvider } from './providers/paypal/index';

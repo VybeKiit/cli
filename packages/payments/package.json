@@ -12,6 +12,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./http": {
+      "types": "./dist/http/index.d.ts",
+      "import": "./dist/http/index.js",
+      "require": "./dist/http/index.cjs"
+    },
+    "./http/express": {
+      "types": "./dist/http/express.d.ts",
+      "import": "./dist/http/express.js",
+      "require": "./dist/http/express.cjs"
     }
   },
   "files": [
@@ -30,8 +40,18 @@
     "stripe": "^22.3.0",
     "zod": "^3.24.1"
   },
+  "peerDependencies": {
+    "express": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "express": "^4.21.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
