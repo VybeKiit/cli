@@ -114,6 +114,29 @@ centralized so a skill edits **one** file, not every screen: sign-in lives in
 `src/lib/auth-client.ts`, checkout in `src/lib/billing-client.ts`. Never show the builder a marker or
 the word "stub" — just do the work and tell them what now works.
 
+## Wire-up markers (how "finish setup" works)
+
+Some files ship as **ready layouts with the logic stubbed**, so the app builds and looks finished
+before any keys exist (the sign-in, sign-up, verify, pricing, and dashboard screens are like this).
+Every unfinished point carries one greppable marker:
+
+```
+TODO(vybekiit): <what to do> — skill: <skill-name>
+```
+
+When the builder says "set it up", "finish setup", "wire it up", or "make it work", list every
+marker and resolve them one at a time:
+
+```
+grep -rn "TODO(vybekiit)" .
+```
+
+Each marker names the skill that completes it (e.g. `add-signin`, `setup-payments`). Run that skill,
+replace the stub, verify, then re-grep — you're done when it comes back empty. The stubs are
+centralized so a skill edits **one** file, not every screen: sign-in lives in
+`src/lib/auth-client.ts`, checkout in `src/lib/billing-client.ts`. Never show the builder a marker or
+the word "stub" — just do the work and tell them what now works.
+
 ## Boundaries
 
 - You fix and extend **this app**. You don't promise things the kit doesn't do.
