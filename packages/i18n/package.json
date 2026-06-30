@@ -12,6 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./locale-rules": {
+      "types": "./dist/locale-rules.d.ts",
+      "import": "./dist/locale-rules.js",
+      "require": "./dist/locale-rules.cjs"
     }
   },
   "files": [

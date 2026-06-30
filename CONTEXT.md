@@ -825,8 +825,8 @@ Provider JSON under buyer `.vybekiit/agent/mcp-*.json` merged into Cursor, Claud
 Supabase, Neon, Firebase — login-once agent tooling for database onboarding.
 
 **Message catalog loader**:
-Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs. SPA and mobile templates call
-`resolveI18nProvider()` for locale and direction; UI providers stay owned, catalog rules stay maintained.
+Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs. Browser templates import
+`@vybekiit/i18n/locale-rules` for RTL + default locale; Node servers use `resolveI18nProvider()`.
 
 **Project surface inference**:
 Single CLI rule set that answers "which template is this cwd?" (web, mobile, extension, spa, backend)

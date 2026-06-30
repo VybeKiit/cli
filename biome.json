@@ -145,6 +145,20 @@
       "formatter": {
         "enabled": false
       }
+    },
+    {
+      "includes": [
+        "templates/web/instrumentation.ts",
+        "templates/web/app/api/checkout/route.ts",
+        "templates/web/src/components/vybe-image.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "off"
+          }
+        }
+      }
     }
   ]
 }

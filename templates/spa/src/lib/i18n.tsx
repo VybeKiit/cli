@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { resolveI18nProvider } from '@vybekiit/i18n';
+import { isRtlLocale, resolveLocaleOrDefault } from '@vybekiit/i18n/locale-rules';
 import en from '../../messages/en.json';
 
 type Messages = typeof en;
@@ -12,14 +12,14 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-const i18nProvider = resolveI18nProvider();
+const DEFAULT_LOCALE = 'en';
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const value = useMemo<I18nContextValue>(() => {
-    const locale = i18nProvider.resolveLocale();
+    const locale = resolveLocaleOrDefault(undefined, DEFAULT_LOCALE);
     return {
       locale,
-      dir: i18nProvider.isRtl(locale) ? 'rtl' : 'ltr',
+      dir: isRtlLocale(locale) ? 'rtl' : 'ltr',
       t: (key) => {
         const k = key as keyof Messages;
         return en[k] ?? String(key);

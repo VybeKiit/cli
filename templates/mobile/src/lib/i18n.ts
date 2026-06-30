@@ -1,6 +1,6 @@
 import { getLocales } from 'expo-localization';
 import { I18n } from 'i18n-js';
-import { resolveI18nProvider } from '@vybekiit/i18n';
+import { resolveLocaleOrDefault } from '@vybekiit/i18n/locale-rules';
 import en from '../../messages/en.json' with { type: 'json' };
 import { applyRtlForLocale } from './direction';
 
@@ -35,12 +35,10 @@ i18n.defaultLocale = 'en';
 i18n.enableFallback = true;
 i18n.locale = 'en';
 
-const kitI18n = resolveI18nProvider();
-
 /** Pick the best device locale that has a catalog, falling back to `en`. */
 export function resolveDeviceLocale(): string {
   const device = getLocales()[0]?.languageCode ?? 'en';
-  const resolved = kitI18n.resolveLocale(device);
+  const resolved = resolveLocaleOrDefault(device, 'en');
   return resolved in flatCatalogs ? resolved : 'en';
 }
 
