@@ -1,15 +1,19 @@
 import { execFile } from 'node:child_process';
-import { access, cp, readFile } from 'node:fs/promises';
+import { access, cp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
 import { promisify } from 'node:util';
 import {
   AGENT_LAYER_PATHS,
+  applyAgentLayerSections,
   formatAgentLayerSyncSummary,
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
-import { cloneMirror, resolveTemplatesSource } from './resolve-templates';
-import { isTemplateName, ScaffoldError, type TemplateName } from './scaffold';
+import { detectTemplateName } from '../lib/detect-template';
+import { cloneMirror, resolveTemplatesSource } from '../lib/resolve-templates';
+import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
+
+export { detectTemplateName } from '../lib/detect-template';
 
 const execFileAsync = promisify(execFile);
 
@@ -36,30 +40,6 @@ const defaultDeps: SyncAgentLayerDeps = {
     }
   },
 };
-
-/**
- * Infer template from the buyer project layout when no explicit name is passed.
- */
-export async function detectTemplateName(cwd: string): Promise<TemplateName | null> {
-  try {
-    const raw = await readFile(join(cwd, 'package.json'), 'utf8');
-    const pkg = JSON.parse(raw) as { dependencies?: Record<string, string>; main?: string };
-    if (pkg.dependencies?.expo || pkg.main?.includes('expo-router')) {
-      return 'mobile';
-    }
-    if (pkg.dependencies?.next) {
-      return 'web';
-    }
-  } catch {
-    // no package.json — fall through
-  }
-  try {
-    await access(join(cwd, '.vybekiit/skills/publish-extension.md'));
-    return 'extension';
-  } catch {
-    return 'web';
-  }
-}
 
 async function listMirrorAgentPaths(
   mirrorRoot: string,
@@ -93,7 +73,9 @@ export async function runSyncAgentLayer(
 
   if (!template) {
     return {
-      lines: ['Could not tell which template this project uses. Pass: web, mobile, or extension.'],
+      lines: [
+        'Could not tell which template this project uses. Pass: web, mobile, extension, or backend.',
+      ],
       exitCode: 1,
     };
   }
@@ -115,6 +97,37 @@ export async function runSyncAgentLayer(
       const src = join(mirrorRoot, path);
       const dest = join(cwd, path);
       await deps.copy(src, dest, { recursive: true, force: true });
+    }
+
+    const renderTargets = [
+      'AGENTS.md',
+      'language.md',
+      'BUILDER-VOICE.md',
+      '.vybekiit/agent/ui-sources.md',
+      '.vybekiit/agent/tech-references.md',
+      '.vybekiit/agent/session-bootstrap.md',
+      '.vybekiit/agent/goal-index.md',
+      'checklist.md',
+    ];
+    const fileContents: Record<string, string> = {};
+    for (const file of renderTargets) {
+      const dest = join(cwd, file);
+      if (await deps.pathExists(dest)) {
+        try {
+          fileContents[file] = await readFile(dest, 'utf8');
+        } catch {
+          // pathExists can be true before copy completes in tests — skip unreadable files
+        }
+      }
+    }
+    if (Object.keys(fileContents).length > 0) {
+      const rendered = applyAgentLayerSections(fileContents, { template });
+      for (const [file, content] of Object.entries(rendered)) {
+        if (fileContents[file] !== undefined && content !== fileContents[file]) {
+          await writeFile(join(cwd, file), content, 'utf8');
+        }
+      }
+      lines.push('Refreshed generated instruction sections.');
     }
 
     if (await deps.pathExists(join(cwd, 'skills-lock.json'))) {
