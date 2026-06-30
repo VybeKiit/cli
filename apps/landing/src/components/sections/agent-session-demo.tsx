@@ -39,7 +39,7 @@ export function AgentSessionDemo() {
 
   useEffect(() => {
     if (!animate) {
-      return undefined;
+      return;
     }
     if (typedChars < USER_PROMPT.length) {
       const t = setTimeout(() => setTypedChars((n) => n + 1), 45);
@@ -49,7 +49,6 @@ export function AgentSessionDemo() {
       const t = setTimeout(() => setRailIndex(1), 400);
       return () => clearTimeout(t);
     }
-    return undefined;
   }, [typedChars, railIndex, animate]);
 
   useEffect(() => {

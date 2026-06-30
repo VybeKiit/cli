@@ -33,7 +33,7 @@ export function Pricing() {
               <ul className="mt-3 flex flex-col gap-2 text-sm">
                 {INCLUDED.map((point) => (
                   <li key={point.id} className="flex items-start gap-2">
-                    <span aria-hidden className="mt-0.5 text-foreground">
+                    <span aria-hidden={true} className="mt-0.5 text-foreground">
                       ✓
                     </span>
                     <span>{point.text}</span>
@@ -46,7 +46,7 @@ export function Pricing() {
               <ul className="mt-3 flex flex-col gap-2 text-muted-foreground text-sm">
                 {NOT_INCLUDED_YET.map((point) => (
                   <li key={point.id} className="flex items-start gap-2">
-                    <span aria-hidden className="mt-0.5">
+                    <span aria-hidden={true} className="mt-0.5">
                       –
                     </span>
                     <span>{point.text}</span>
@@ -57,7 +57,7 @@ export function Pricing() {
                 {NOT_INCLUDED_NOTE}
               </p>
             </div>
-            <Button asChild size="lg" className="w-full">
+            <Button asChild={true} size="lg" className="w-full">
               <Link href="/checkout">Get VybeKiit — {PRICE.display}</Link>
             </Button>
           </CardContent>

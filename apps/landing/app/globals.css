@@ -414,6 +414,33 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   overflow: hidden;
 }
 
+.landing-page .hero-product-stack-orbit {
+  overflow: hidden;
+}
+
+.landing-page .hero-product-stack-item {
+  position: absolute;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  opacity: 0.55;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+.landing-page .hero-product-stack-item--3d {
+  opacity: 0.58;
+}
+
+.landing-page .hero-product-stack-item--2d {
+  opacity: 0.42;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+}
+
+.landing-page .hero-product-stack-item--float {
+  animation: hero-orbit-float 8s ease-in-out infinite;
+}
+
 .landing-page .hero-builder-orbit-item {
   position: absolute;
   display: inline-flex;
@@ -788,6 +815,10 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   }
 
   .landing-page .hero-builder-orbit-item {
+    animation: none;
+  }
+
+  .landing-page .hero-product-stack-item--float {
     animation: none;
   }
 

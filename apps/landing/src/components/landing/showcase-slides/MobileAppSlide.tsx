@@ -119,7 +119,7 @@ export function MobileAppSlide() {
             <div className="flex items-center gap-2">
               <img
                 alt=""
-                aria-hidden
+                aria-hidden={true}
                 className="h-5 w-auto opacity-90"
                 height={20}
                 src="/brand-marks/appstore.webp"
@@ -127,7 +127,7 @@ export function MobileAppSlide() {
               />
               <img
                 alt=""
-                aria-hidden
+                aria-hidden={true}
                 className="h-5 w-auto opacity-90"
                 height={20}
                 src="/brand-marks/googleplay.webp"

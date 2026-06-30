@@ -22,7 +22,13 @@ export function ExtensionSlide() {
     <div className="flex h-full flex-col rounded-xl border border-white/15 bg-[#0d1117] p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img alt="" aria-hidden height={16} src="/brand-marks/googlechrome.webp" width={16} />
+          <img
+            alt=""
+            aria-hidden={true}
+            height={16}
+            src="/brand-marks/googlechrome.webp"
+            width={16}
+          />
           <p className="font-semibold text-sm text-white">VybeKiit Assistant</p>
         </div>
         <Badge

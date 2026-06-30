@@ -101,7 +101,7 @@ export function ReportHighlightColorMenu({
           />
         </label>
 
-        {color !== DEFAULT_INSPECT_HIGHLIGHT_COLOR ? (
+        {color === DEFAULT_INSPECT_HIGHLIGHT_COLOR ? null : (
           <button
             className="report-mode-highlight-reset"
             data-testid="report-mode-highlight-reset"
@@ -113,7 +113,7 @@ export function ReportHighlightColorMenu({
           >
             Reset
           </button>
-        ) : null}
+        )}
       </ReportFlyoutPortal>
     </div>
   );

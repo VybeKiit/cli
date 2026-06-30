@@ -2,6 +2,7 @@
 
 import { AnimatedUnderlineText } from '@/components/landing/hero/AnimatedUnderlineText';
 import { HeroBuilderToolOrbit } from '@/components/landing/hero/HeroBuilderToolOrbit';
+import { HeroProductStackOrbit } from '@/components/landing/hero/HeroProductStackOrbit';
 import { ComponentShowcaseCarousel } from '@/components/landing/ComponentShowcaseCarousel';
 import { HeroComponentCountBadge } from '@/components/landing/HeroComponentCountBadge';
 import { CheckoutCTA } from '@/components/ui/CheckoutCTA';
@@ -10,10 +11,11 @@ import { SectionShell } from '@/components/ui/SectionShell';
 import { LANDING_HERO } from '@/data/landing';
 import { motion } from 'framer-motion';
 
-/** Center-aligned hero with builder-tool orbit, typewriter copy, and animated underline. */
+/** Center-aligned hero with static product-stack orbit, builder-tool pills, typewriter copy. */
 export function Hero() {
   return (
     <SectionShell className="hero-section relative text-center">
+      <HeroProductStackOrbit />
       <HeroBuilderToolOrbit />
 
       <TypewriterSequence
