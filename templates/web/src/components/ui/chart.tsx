@@ -169,7 +169,7 @@ const ChartTooltipContent = React.forwardRef<
       return <div className={cn('font-medium', labelClassName)}>{value}</div>;
     }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
-    if (!active || !payload?.length) {
+    if (!(active && payload?.length)) {
       return null;
     }
 
@@ -181,7 +181,7 @@ const ChartTooltipContent = React.forwardRef<
         )}
         ref={ref}
       >
-        {!hideLabel ? tooltipLabel : null}
+        {hideLabel ? null : tooltipLabel}
         <div className="grid gap-1.5">
           {payload.map((item, index) => {
             const key = `${nameKey ?? item.name ?? item.dataKey ?? 'value'}`;
@@ -197,7 +197,7 @@ const ChartTooltipContent = React.forwardRef<
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
-                    {!hideIndicator ? (
+                    {hideIndicator ? null : (
                       <div
                         className={cn(
                           'shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]',
@@ -215,7 +215,7 @@ const ChartTooltipContent = React.forwardRef<
                           } as React.CSSProperties
                         }
                       />
-                    ) : null}
+                    )}
                     <div className="flex flex-1 justify-between leading-none">
                       <span className="text-muted-foreground">
                         {itemConfig?.label ?? item.name}

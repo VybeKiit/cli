@@ -187,7 +187,7 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
       <div
         className={cn(
           'report-mode-dock-root fixed z-[9999] flex flex-col gap-2',
-          !collapse.pinnedExpanded && !collapse.dockHovered && 'report-mode-dock-root--collapsed',
+          !(collapse.pinnedExpanded || collapse.dockHovered) && 'report-mode-dock-root--collapsed',
           collapse.pinnedExpanded && 'report-mode-dock-root--pinned',
         )}
         data-corner={position.anchor}

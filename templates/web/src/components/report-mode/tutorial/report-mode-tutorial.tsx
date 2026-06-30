@@ -111,7 +111,7 @@ export function ReportModeTutorial({
   const [spotlight, setSpotlight] = useState<DOMRect | null>(null);
 
   const measure = useCallback(() => {
-    if (!active || !step) {
+    if (!(active && step)) {
       setSpotlight(null);
       return;
     }
@@ -120,7 +120,7 @@ export function ReportModeTutorial({
   }, [active, step]);
 
   useEffect(() => {
-    if (!active || !step) {
+    if (!(active && step)) {
       return;
     }
 
@@ -152,7 +152,7 @@ export function ReportModeTutorial({
     };
   }, [active, measure, step]);
 
-  if (!active || !step) {
+  if (!(active && step)) {
     return null;
   }
 

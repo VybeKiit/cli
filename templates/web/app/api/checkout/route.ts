@@ -1,6 +1,7 @@
 import { isPaymentsUnconfigured } from '@/lib/payments-practice';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { NextResponse } from 'next/server';
+import process from 'node:process';
 /**
  * Start a purchase: create a checkout with the configured payment provider and
  * return the URL to send the buyer to. Provider-agnostic — switching

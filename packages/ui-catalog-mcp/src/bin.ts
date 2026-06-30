@@ -39,9 +39,9 @@ async function main() {
     },
     async ({ query, source, category, limit }) => {
       const results = searchComponents(catalog, query, {
-        ...(source !== undefined ? { source } : {}),
-        ...(category !== undefined ? { category } : {}),
-        ...(limit !== undefined ? { limit } : {}),
+        ...(source === undefined ? {} : { source }),
+        ...(category === undefined ? {} : { category }),
+        ...(limit === undefined ? {} : { limit }),
       });
       return {
         content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],

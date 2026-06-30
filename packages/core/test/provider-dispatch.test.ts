@@ -42,9 +42,9 @@ describe('isRailwayStackActive', () => {
   it('is true for railway hosting or data', () => {
     expect(isRailwayStackActive({ HOSTING_PROVIDER: 'railway' })).toBe(true);
     expect(isRailwayStackActive({ DATA_PROVIDER: 'railway' })).toBe(true);
-    expect(
-      isRailwayStackActive({ HOSTING_PROVIDER: 'railway', DATA_PROVIDER: 'railway' }),
-    ).toBe(true);
+    expect(isRailwayStackActive({ HOSTING_PROVIDER: 'railway', DATA_PROVIDER: 'railway' })).toBe(
+      true,
+    );
   });
 
   it('is false for default cloudflare + supabase', () => {

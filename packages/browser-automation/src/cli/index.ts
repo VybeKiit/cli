@@ -23,7 +23,7 @@ async function main(argv: string[]): Promise<number> {
   }
 
   const [domainName, commandName, ...commandArgs] = rest;
-  if (!domainName || !commandName) {
+  if (!(domainName && commandName)) {
     printError('Usage: vybekiit-automate <domain> <command> [args]', flags.json);
     return 1;
   }

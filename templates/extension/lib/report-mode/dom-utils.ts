@@ -69,7 +69,7 @@ function isReportModeUi(element: Element): boolean {
 function clipLabel(text: string): string | undefined {
   const normalized = normalizeLabelText(text);
   if (normalized.length < MIN_LABEL_LENGTH) {
-    return undefined;
+    return;
   }
   return normalized.length <= MAX_LABEL_LENGTH ? normalized : normalized.slice(0, MAX_LABEL_LENGTH);
 }

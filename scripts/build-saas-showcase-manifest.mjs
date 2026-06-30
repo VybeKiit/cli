@@ -44,7 +44,7 @@ async function main() {
         }
       }
     }
-    const missing = validated[surface].filter((e) => !e.exists && !e.optional);
+    const missing = validated[surface].filter((e) => !(e.exists || e.optional));
     if (missing.length > 0) {
       console.error(`Showcase validation failed for ${surface}: ${missing.length} missing paths`);
       process.exit(1);

@@ -154,7 +154,7 @@ function validateAgentsSsot(content: string | undefined): AgentRuntimeCompliance
     return [{ check: 'agents-ssot', message: 'Missing AGENTS.md', file: 'AGENTS.md' }];
   }
   const issues: AgentRuntimeComplianceIssue[] = [];
-  if (!/single source of truth/i.test(content) && !/SSOT/i.test(content)) {
+  if (!(/single source of truth/i.test(content) || /SSOT/i.test(content))) {
     issues.push({
       check: 'agents-ssot',
       message:

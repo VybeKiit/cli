@@ -350,7 +350,7 @@ export function ReportModeDev() {
                 value={highlightColor}
               />
             </label>
-            {highlightColor !== DEFAULT_INSPECT_HIGHLIGHT_COLOR ? (
+            {highlightColor === DEFAULT_INSPECT_HIGHLIGHT_COLOR ? null : (
               <Button
                 data-testid="report-mode-highlight-reset"
                 onClick={resetHighlightColor}
@@ -360,7 +360,7 @@ export function ReportModeDev() {
               >
                 Reset
               </Button>
-            ) : null}
+            )}
           </div>
         ) : null}
 

@@ -106,7 +106,7 @@ export function checkGoalDrift(
     GOAL_ENTRIES.map((e) => e.skills[template]).filter((s): s is string => s !== null),
   );
   for (const path of existing) {
-    if (!path.startsWith('.vybekiit/skills/') || !path.endsWith('.md')) continue;
+    if (!(path.startsWith('.vybekiit/skills/') && path.endsWith('.md'))) continue;
     const stem = path.slice('.vybekiit/skills/'.length, -'.md'.length);
     if (!catalogSkills.has(stem)) {
       issues.push({

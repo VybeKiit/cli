@@ -27,7 +27,7 @@ export function BuilderFeatureHint({
 
   useEffect(() => {
     const showTimer = window.setTimeout(() => {
-      if (!hoveringRef.current && !mountIntroDoneRef.current) {
+      if (!(hoveringRef.current || mountIntroDoneRef.current)) {
         setOpen(true);
       }
     }, mountDelayMs);

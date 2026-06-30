@@ -84,17 +84,17 @@ async function main() {
     try {
       const { stdout } = await exec('npm', ['view', dep, 'version'], { timeout: 30_000 });
       const latest = stdout.trim();
-      if (!deps[dep]) {
-        deps[dep] = `^${latest}`;
-        changes.push({ name: dep, action: 'added', version: deps[dep] });
-      } else {
+      if (deps[dep]) {
         const next = bumpWithinSemver(deps[dep], latest);
-        if (next !== deps[dep]) {
+        if (next === deps[dep]) {
+          changes.push({ name: dep, action: 'skipped', version: deps[dep] });
+        } else {
           changes.push({ name: dep, action: 'updated', version: next });
           deps[dep] = next;
-        } else {
-          changes.push({ name: dep, action: 'skipped', version: deps[dep] });
         }
+      } else {
+        deps[dep] = `^${latest}`;
+        changes.push({ name: dep, action: 'added', version: deps[dep] });
       }
     } catch {
       changes.push({ name: dep, action: 'skipped', version: deps[dep] });

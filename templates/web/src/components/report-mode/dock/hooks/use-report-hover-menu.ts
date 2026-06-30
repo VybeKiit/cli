@@ -26,9 +26,7 @@ export function useReportHoverMenu() {
     closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
   }, [clearCloseTimer]);
 
-  useEffect(() => {
-    return () => clearCloseTimer();
-  }, [clearCloseTimer]);
+  useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
 
   return { open, openMenu, scheduleClose, closeMenu: () => setOpen(false) };
 }

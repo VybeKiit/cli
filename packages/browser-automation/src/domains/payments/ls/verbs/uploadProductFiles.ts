@@ -10,11 +10,11 @@ export async function uploadProductFiles(
 ): Promise<void> {
   await page.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await (await lsField(page, 'product.files.uploadInput')).setInputFiles(filesPath);
-  await page.waitForTimeout(2_000);
+  await page.waitForTimeout(2000);
 
   const saveDraft = await lsField(page, 'product.actions.saveDraftButton');
   if (await saveDraft.isEnabled()) {
-    await saveDraft.click({ timeout: 8_000 }).catch(() => undefined);
+    await saveDraft.click({ timeout: 8000 }).catch(() => undefined);
     await page.waitForTimeout(800);
   }
 }

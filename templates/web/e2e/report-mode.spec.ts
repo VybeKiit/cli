@@ -82,9 +82,9 @@ test.describe('Report Mode (dev)', () => {
     await page.getByTestId('report-mode-highlight-color').hover();
     await page.getByTestId('report-mode-highlight-preset-3b82f6').click();
 
-    const borderColor = await page.getByTestId('report-mode-highlight').evaluate((element) => {
-      return getComputedStyle(element).borderColor;
-    });
+    const borderColor = await page
+      .getByTestId('report-mode-highlight')
+      .evaluate((element) => getComputedStyle(element).borderColor);
     expect(borderColor).toBe('rgb(59, 130, 246)');
   });
 

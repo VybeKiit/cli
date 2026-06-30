@@ -133,7 +133,7 @@ describe('classifyCrawlPages', () => {
 
   it('scrapes store id from crawled urls', () => {
     const idMatches = scrapeIdMatches([
-      page('/dashboard', [], [`https://app.lemonsqueezy.com/stores/12345/products`]),
+      page('/dashboard', [], ['https://app.lemonsqueezy.com/stores/12345/products']),
     ]);
     const merged = mergeClassifiedMatches(idMatches);
     expect(merged['dashboard.storeId']?.entry).toEqual({

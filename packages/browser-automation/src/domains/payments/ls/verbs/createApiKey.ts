@@ -14,15 +14,15 @@ export async function createApiKeyInDashboard(page: Page, name: string): Promise
     (await clickSectionCreate(page, 'API keys')) ||
     (await page
       .getByRole('button', { name: /create api key/i })
-      .click({ timeout: 3_000 })
+      .click({ timeout: 3000 })
       .then(() => true)
       .catch(() => false));
   if (!clicked) throw new Error('Could not open API key create dialog');
 
   await waitForDialogInputs(page);
   await page.getByPlaceholder(/api key name/i).fill(name);
-  await page.getByRole('button', { name: /create api key/i }).click({ timeout: 8_000 });
-  await page.waitForTimeout(1_500);
+  await page.getByRole('button', { name: /create api key/i }).click({ timeout: 8000 });
+  await page.waitForTimeout(1500);
 
   const fromInput = await page
     .locator('input[readonly], input[type="text"]')

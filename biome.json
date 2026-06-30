@@ -11,7 +11,7 @@
       "!!.vybekiit/changelog.json",
       "!!.bridge",
       "!!downloads",
-      "!!templates/spa/**"
+      "!!templates/spa"
     ]
   },
   "formatter": {

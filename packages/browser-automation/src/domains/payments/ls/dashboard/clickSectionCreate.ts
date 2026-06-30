@@ -8,7 +8,7 @@ export async function clickSectionCreate(page: Page, headingText: string): Promi
       'xpath=following::button[not(contains(@id,"menu-button-1"))][1]',
     );
     if ((await following.count()) > 0) {
-      await following.click({ timeout: 8_000 });
+      await following.click({ timeout: 8000 });
       return true;
     }
     const row = heading.locator('xpath=ancestor::*[self::div or self::section][1]');
@@ -17,7 +17,7 @@ export async function clickSectionCreate(page: Page, headingText: string): Promi
       .filter({ hasNotText: /resend|jts/i })
       .last();
     if ((await rowButton.count()) > 0) {
-      await rowButton.click({ timeout: 8_000 });
+      await rowButton.click({ timeout: 8000 });
       return true;
     }
   }
@@ -28,7 +28,7 @@ export async function clickSectionCreate(page: Page, headingText: string): Promi
   if ((await panel.count()) > 0) {
     const btn = panel.locator('xpath=following::button[1]');
     if ((await btn.count()) > 0) {
-      await btn.click({ timeout: 8_000 });
+      await btn.click({ timeout: 8000 });
       return true;
     }
   }

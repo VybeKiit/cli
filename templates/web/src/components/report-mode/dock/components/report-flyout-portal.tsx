@@ -32,7 +32,7 @@ export function ReportFlyoutPortal({
     setMounted(true);
   }, []);
 
-  if (!open || !mounted) {
+  if (!(open && mounted)) {
     return null;
   }
 

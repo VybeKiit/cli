@@ -36,7 +36,5 @@ export function needsAwsCliFromAuxiliaryProviders(env: EnvSource): boolean {
   const { STORAGE_PROVIDER } = parseEnv(storageConfigSchema, env);
   const { EMAIL_PROVIDER } = parseEnv(emailConfigSchema, env);
   const { AUTH_PROVIDER } = parseEnv(authConfigSchema, env);
-  return (
-    STORAGE_PROVIDER === 's3' || EMAIL_PROVIDER === 'ses' || AUTH_PROVIDER === 'cognito'
-  );
+  return STORAGE_PROVIDER === 's3' || EMAIL_PROVIDER === 'ses' || AUTH_PROVIDER === 'cognito';
 }

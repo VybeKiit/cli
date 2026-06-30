@@ -47,14 +47,14 @@ async function clickPricingType(page: Page, type: LsPricingProbeType): Promise<v
   const key = PRICING_OPTION_KEY[type];
   const fallback = LS_FIELD_FALLBACKS[key];
   if (!fallback) throw new Error(`No fallback for ${key}`);
-  await locatorFromFallback(page, fallback).first().click({ timeout: 8_000 });
+  await locatorFromFallback(page, fallback).first().click({ timeout: 8000 });
 }
 
 async function clickProductSection(page: Page, name: string): Promise<void> {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const link = page.locator('a[href*="#"]').filter({ hasText: new RegExp(`^${escaped}$`, 'i') });
   if ((await link.count()) > 0) {
-    await link.first().click({ timeout: 8_000 });
+    await link.first().click({ timeout: 8000 });
     await page.waitForTimeout(700);
   }
 }
@@ -64,10 +64,10 @@ async function clickActionsMenuTrigger(page: Page): Promise<void> {
   const menu = locatorFromFallback(page, LS_FIELD_FALLBACKS['product.actions.menuTrigger']!);
   if ((await menu.count()) === 0) throw new Error('Actions menu trigger not found');
   try {
-    await menu.click({ timeout: 8_000 });
+    await menu.click({ timeout: 8000 });
   } catch {
     await dismissProductEditorPanels(page);
-    await menu.click({ timeout: 8_000, force: true });
+    await menu.click({ timeout: 8000, force: true });
   }
 }
 
@@ -78,7 +78,7 @@ async function expandSettingsSections(
 ): Promise<void> {
   for (const section of ['Settings', 'Confirmation modal', 'Email receipt'] as const) {
     await clickProductSection(page, section);
-    await page.waitForTimeout(section === 'Settings' ? 1_200 : 700);
+    await page.waitForTimeout(section === 'Settings' ? 1200 : 700);
     await pushSnapshot(
       page,
       pages,
@@ -106,7 +106,7 @@ async function scrollAllSections(
 
   const addVariant = page.getByRole('button', { name: /add variant/i });
   if ((await addVariant.count()) > 0) {
-    await addVariant.click({ timeout: 5_000 }).catch(() => undefined);
+    await addVariant.click({ timeout: 5000 }).catch(() => undefined);
     await page.waitForTimeout(800);
     await pushSnapshot(page, pages, hooks, 'variants-add-clicked');
   }
@@ -350,7 +350,7 @@ async function createProbeProduct(
   if (options.fullEditor) {
     console.log(`  [crud:${type}] update full editor (media, files, settings, confirmation)`);
     await page.locator('input[type="file"]').first().setInputFiles(PROBE_MEDIA_PATH);
-    await page.waitForTimeout(1_000);
+    await page.waitForTimeout(1000);
     await pushSnapshot(page, pages, hooks, 'single-media-uploaded');
     manualMatches.push(
       manualMatch(
@@ -361,7 +361,7 @@ async function createProbeProduct(
     );
 
     await page.locator('input[type="file"]').nth(1).setInputFiles(PROBE_FILE_PATH);
-    await page.waitForTimeout(1_000);
+    await page.waitForTimeout(1000);
     await pushSnapshot(page, pages, hooks, 'single-files-uploaded');
 
     await scrollAllSections(page, pages, hooks);
@@ -403,7 +403,7 @@ async function createProbeProduct(
 
   const saveDraft = page.getByRole('button', { name: /save as draft/i });
   if ((await saveDraft.count()) > 0 && (await saveDraft.isEnabled())) {
-    await saveDraft.click({ timeout: 8_000 }).catch(() => undefined);
+    await saveDraft.click({ timeout: 8000 }).catch(() => undefined);
     await page.waitForTimeout(800);
     await pushSnapshot(page, pages, hooks, `${type}-saved-draft`);
   }

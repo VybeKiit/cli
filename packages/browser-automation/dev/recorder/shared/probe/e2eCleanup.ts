@@ -21,7 +21,7 @@ export async function dismissProductEditorPanels(page: Page): Promise<void> {
   if ((await general.count()) > 0) {
     await general
       .first()
-      .click({ timeout: 8_000 })
+      .click({ timeout: 8000 })
       .catch(() => undefined);
     await page.waitForTimeout(500);
   }
@@ -34,10 +34,10 @@ async function openActionsMenu(page: Page): Promise<void> {
   const menu = locatorFromFallback(page, LS_FIELD_FALLBACKS['product.actions.menuTrigger']!);
   if ((await menu.count()) === 0) throw new Error('Actions menu trigger not found');
   try {
-    await menu.click({ timeout: 8_000 });
+    await menu.click({ timeout: 8000 });
   } catch {
     await dismissProductEditorPanels(page);
-    await menu.click({ timeout: 8_000, force: true });
+    await menu.click({ timeout: 8000, force: true });
   }
   await page.waitForTimeout(700);
 }
@@ -55,15 +55,15 @@ async function clickDeleteMenuItem(page: Page): Promise<void> {
     .catch(() => undefined);
 
   if ((await dusk.count()) > 0) {
-    await dusk.click({ timeout: 8_000 });
+    await dusk.click({ timeout: 8000 });
     return;
   }
   if ((await menuitem.count()) > 0) {
-    await menuitem.first().click({ timeout: 8_000 });
+    await menuitem.first().click({ timeout: 8000 });
     return;
   }
   if ((await button.count()) > 0) {
-    await button.first().click({ timeout: 8_000 });
+    await button.first().click({ timeout: 8000 });
     return;
   }
   throw new Error('Delete menu item not found');
@@ -75,8 +75,8 @@ export async function deleteProductOnCurrentPage(page: Page): Promise<void> {
   await clickDeleteMenuItem(page);
 
   const confirm = page.getByRole('button', { name: /delete|confirm|yes/i });
-  if ((await confirm.count()) > 0) await confirm.first().click({ timeout: 8_000 });
-  await page.waitForTimeout(1_000);
+  if ((await confirm.count()) > 0) await confirm.first().click({ timeout: 8000 });
+  await page.waitForTimeout(1000);
   await page.waitForURL(/\/products/, { timeout: 20_000 }).catch(() => undefined);
 }
 
@@ -87,7 +87,7 @@ async function deleteProbeProduct(page: Page, name: string): Promise<void> {
   });
   if ((await link.count()) === 0) return;
 
-  await link.first().click({ timeout: 8_000 });
+  await link.first().click({ timeout: 8000 });
   await page.waitForURL(/\/products\/\d+/, { timeout: 15_000 });
   await deleteProductOnCurrentPage(page);
 }

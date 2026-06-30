@@ -13,7 +13,7 @@ import process from 'node:process';
 const REPO_ROOT = new URL('..', import.meta.url).pathname;
 const BUMP = process.argv[2];
 
-if (!BUMP || !['patch', 'minor', 'major'].includes(BUMP)) {
+if (!(BUMP && ['patch', 'minor', 'major'].includes(BUMP))) {
   console.error('Usage: node scripts/bump-kit-version.mjs <patch|minor|major>');
   process.exit(1);
 }

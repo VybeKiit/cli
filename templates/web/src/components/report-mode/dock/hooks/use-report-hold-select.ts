@@ -62,13 +62,14 @@ export function useReportHoldSelect<T>(onSelect: (value: T) => void) {
     [cancelHold],
   );
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
-    };
-  }, []);
+    },
+    [],
+  );
 
   return { pending, progress, startHold, cancelHold };
 }

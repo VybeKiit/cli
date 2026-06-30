@@ -14,7 +14,7 @@ export function useReportFlyoutPosition(
 
   const measure = useCallback(() => {
     const trigger = triggerRef.current;
-    if (!open || !trigger) {
+    if (!(open && trigger)) {
       setStyle({});
       return;
     }
@@ -28,7 +28,7 @@ export function useReportFlyoutPosition(
         left: rect.right,
         top: rect.top - gap,
         transform: 'translate(-100%, -100%)',
-        zIndex: 10001,
+        zIndex: 10_001,
       });
       return;
     }
@@ -38,7 +38,7 @@ export function useReportFlyoutPosition(
       left: rect.left + rect.width / 2,
       top: rect.top - gap,
       transform: 'translate(-50%, -100%)',
-      zIndex: 10001,
+      zIndex: 10_001,
     });
   }, [align, open, triggerRef]);
 

@@ -19,7 +19,7 @@ const MIRRORS = [
 const tag = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
 
-if (!tag || !/^v\d+\.\d+\.\d+$/.test(tag)) {
+if (!(tag && /^v\d+\.\d+\.\d+$/.test(tag))) {
   console.error('Usage: node scripts/tag-mirror-repos.mjs vX.Y.Z [--dry-run]');
   process.exit(1);
 }
@@ -96,7 +96,7 @@ async function tagMirror(repo, token) {
 
 async function main() {
   const token = process.env.GH_MIRROR_TOKEN ?? process.env.GITHUB_TOKEN;
-  if (!token && !dryRun) {
+  if (!(token || dryRun)) {
     console.error('Set GH_MIRROR_TOKEN or GITHUB_TOKEN to tag mirror repos.');
     process.exit(1);
   }

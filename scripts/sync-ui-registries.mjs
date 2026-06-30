@@ -145,7 +145,7 @@ async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
   const itemName = String(item.name ?? 'component');
   const written = [];
   for (const file of files) {
-    if (!file.content || !file.path) {
+    if (!(file.content && file.path)) {
       continue;
     }
     if (shouldSkipMirrorFile(file.path, itemName)) {

@@ -64,7 +64,7 @@ export async function expandModals(
       (await page
         .getByRole('button', { name: /create api|new api|add api/i })
         .first()
-        .click({ timeout: 3_000 })
+        .click({ timeout: 3000 })
         .then(() => true)
         .catch(() => false));
     if (!clicked) throw new Error('Could not find API key create trigger');
@@ -82,7 +82,7 @@ export async function expandModals(
       (await page
         .getByRole('button', { name: /add webhook|new webhook|create webhook/i })
         .first()
-        .click({ timeout: 3_000 })
+        .click({ timeout: 3000 })
         .then(() => true)
         .catch(() => false));
     if (!clicked) throw new Error('Could not find webhook create trigger');

@@ -11,8 +11,7 @@
  * Output goes to stdout. Redirect or capture it to inject into an agent prompt.
  */
 
-'use strict';
-
+import process from 'node:process';
 const fs = require('fs');
 const path = require('path');
 
@@ -136,7 +135,7 @@ function extractModifiers(modifiersFile) {
           if (kl === '*/' || kl === '/**' || kl === '*') continue;
           if (kl.startsWith('* ')) {
             const text = kl.slice(2).trim();
-            if (!text.startsWith('-') && !text.startsWith('<')) {
+            if (!(text.startsWith('-') || text.startsWith('<'))) {
               summary = text.replace(/\.$/, '');
             }
           }
@@ -192,10 +191,10 @@ const docsNote = withDocs
   : ' (names only — run with --docs for descriptions)';
 console.log(`@expo/ui ${version}${docsNote}\n`);
 
-console.log(`@expo/ui — universal (iOS + Android + web)`);
+console.log('@expo/ui — universal (iOS + Android + web)');
 console.log(`  Components: ${formatNames(universalComponents)}\n`);
 
-console.log(`@expo/ui/swift-ui — iOS ONLY (crashes on Android)`);
+console.log('@expo/ui/swift-ui — iOS ONLY (crashes on Android)');
 console.log(`  Components: ${formatNames(swiftuiComponents)}`);
 if (withDocs) {
   console.log(`  Modifiers:\n${formatModifiers(swiftuiModifiers)}`);
@@ -204,7 +203,7 @@ if (withDocs) {
 }
 console.log();
 
-console.log(`@expo/ui/jetpack-compose — Android ONLY (crashes on iOS)`);
+console.log('@expo/ui/jetpack-compose — Android ONLY (crashes on iOS)');
 console.log(`  Components: ${formatNames(composeComponents)}`);
 if (withDocs) {
   console.log(`  Modifiers:\n${formatModifiers(composeModifiers)}`);

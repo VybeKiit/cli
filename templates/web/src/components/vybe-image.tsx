@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from 'next/image';
 import { join } from 'node:path';
 import { resolveAssetDelivery, resolveLocalAssetSrc } from '@vybekiit/assets';
+import process from 'node:process';
 
 type VybeImageProps = Omit<ImageProps, 'src'> & {
   src: string;

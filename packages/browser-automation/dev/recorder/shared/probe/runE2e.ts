@@ -86,7 +86,7 @@ export async function runLsProbeE2e(
   printProbeSummary(report, writtenCount);
   console.log(`Probe log: ${logPath}`);
   console.log(`E2E artifacts: ${e2e.artifactsPath}`);
-  console.log(`Cleanup: pnpm --filter @vybekiit/browser-automation recorder:ls probe-e2e cleanup`);
+  console.log('Cleanup: pnpm --filter @vybekiit/browser-automation recorder:ls probe-e2e cleanup');
 
   if (options.cleanupAfter) {
     const remaining = e2e.artifacts.productNames.filter(

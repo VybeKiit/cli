@@ -36,7 +36,7 @@ export async function createProduct(
 
   await (await lsField(page, 'product.nameInput')).fill(params.name);
   await (await lsField(page, 'product.descriptionInput')).first().fill(DEFAULT_DESCRIPTION);
-  await (await lsField(page, 'product.pricing.single.option')).click({ timeout: 8_000 });
+  await (await lsField(page, 'product.pricing.single.option')).click({ timeout: 8000 });
   await (await lsField(page, 'product.pricing.priceInput')).fill(
     formatPriceFromCents(params.priceCents),
   );
@@ -49,11 +49,11 @@ export async function createProduct(
   const saveDraft = await lsField(page, 'product.actions.saveDraftButton');
 
   if (params.mode === 'live' && (await publish.isEnabled())) {
-    await publish.click({ timeout: 8_000 });
+    await publish.click({ timeout: 8000 });
   } else if (await saveDraft.isEnabled()) {
-    await saveDraft.click({ timeout: 8_000 });
+    await saveDraft.click({ timeout: 8000 });
   }
-  await page.waitForTimeout(1_500);
+  await page.waitForTimeout(1500);
 
   html = await page.content();
   storeId = storeId ?? scrapeStoreIdFromHtml(html);

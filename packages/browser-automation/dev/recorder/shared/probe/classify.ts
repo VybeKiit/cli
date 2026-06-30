@@ -7,7 +7,7 @@ import {
 import type { ClassifiedMatch, DomCandidate, PageSnapshot } from './types';
 
 function matchesPattern(value: string | null | undefined, pattern: RegExp | undefined): boolean {
-  if (!pattern || !value) return false;
+  if (!(pattern && value)) return false;
   return pattern.test(value);
 }
 
@@ -20,9 +20,11 @@ function hintMatchesCandidate(
   if (hint.pathPattern && !hint.pathPattern.test(pathname)) return false;
   if (hint.tags && !hint.tags.includes(candidate.tag)) return false;
   if (hint.inputType && candidate.type !== hint.inputType) return false;
-  if (hint.fileInputIndex !== undefined) {
-    if (candidate.type !== 'file' || fileInputIndex !== hint.fileInputIndex) return false;
-  }
+  if (
+    hint.fileInputIndex !== undefined &&
+    (candidate.type !== 'file' || fileInputIndex !== hint.fileInputIndex)
+  )
+    return false;
 
   if (
     hint.nearestHeadingPattern &&
@@ -35,7 +37,7 @@ function hintMatchesCandidate(
     const inferred = inferRole(candidate);
     const textboxOk =
       (candidate.tag === 'input' || candidate.tag === 'textarea') && hint.roles.includes('textbox');
-    if (!hint.roles.includes(inferred) && !textboxOk) return false;
+    if (!(hint.roles.includes(inferred) || textboxOk)) return false;
   }
 
   const labelText = candidate.associatedLabel ?? candidate.ariaLabel;
@@ -45,7 +47,7 @@ function hintMatchesCandidate(
       matchesPattern(labelText, hint.labelPattern) ||
       matchesPattern(candidate.placeholder, hint.placeholderPattern) ||
       matchesPattern(candidate.textContent, hint.textPattern);
-    if (!textOk && !(hint.allowEmptyText && !candidate.textContent?.trim())) return false;
+    if (!(textOk || (hint.allowEmptyText && !candidate.textContent?.trim()))) return false;
     if (!textOk && hint.allowEmptyText) return true;
     return textOk;
   }

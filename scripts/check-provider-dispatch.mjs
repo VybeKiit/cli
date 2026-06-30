@@ -9,10 +9,7 @@ import process from 'node:process';
 
 const repoRoot = join(import.meta.dirname, '..');
 
-const SCAN_ROOTS = [
-  join(repoRoot, 'packages'),
-  join(repoRoot, 'cli', 'src', 'doctor'),
-];
+const SCAN_ROOTS = [join(repoRoot, 'packages'), join(repoRoot, 'cli', 'src', 'doctor')];
 
 const ALLOWLIST = new Set([
   // provider-dispatch.ts may compare parsed provider keys for stack helpers
