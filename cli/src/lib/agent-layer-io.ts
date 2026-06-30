@@ -22,7 +22,9 @@ export { AGENT_LAYER_RENDER_FILES };
 export async function readOptionalFile(cwd: string, file: string): Promise<string | undefined> {
   try {
     return await readFile(join(cwd, file), 'utf8');
-  } catch {}
+  } catch {
+    return undefined;
+  }
 }
 
 export async function pathExists(path: string): Promise<boolean> {

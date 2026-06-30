@@ -18,7 +18,9 @@ function parseLiveDocsEnv(): Record<string, string> | undefined {
   }
   try {
     return JSON.parse(raw) as Record<string, string>;
-  } catch {}
+  } catch {
+    return undefined;
+  }
 }
 
 export async function runCheckAgentLayer(
