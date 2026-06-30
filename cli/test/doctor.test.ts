@@ -296,6 +296,11 @@ describe('selectToolchain', () => {
     ]);
   });
 
+  it('uses the Vercel CLI when the vercel hosting adapter is active', () => {
+    const names = selectToolchain({ HOSTING_PROVIDER: 'vercel' }).map((tool) => tool.name);
+    expect(names).toEqual(['gh', 'vercel', 'supabase']);
+  });
+
   it('uses the AWS CLI for hosting and dedupes when data is also AWS', () => {
     const allAws = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' }).map(
       (tool) => tool.name,

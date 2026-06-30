@@ -529,6 +529,19 @@ export const resendConfigSchema = z.object({
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
 });
 
+/**
+ * The VybeKiit store's own checkout target — used by `apps/landing`'s checkout route
+ * to tell the payment provider *what* is being sold. `STORE_PRODUCT_ID` is the
+ * provider's purchasable id (a Lemon Squeezy *variant* id by default), passed
+ * straight to {@link CheckoutParams.productId}. This is store infrastructure (the
+ * id of the kit we sell), not part of a buyer's scaffolded app — a buyer's app
+ * carries its own product ids instead. Required, so a misconfigured store fails
+ * loud at checkout rather than creating an empty cart.
+ */
+export const storeConfigSchema = z.object({
+  STORE_PRODUCT_ID: z.string().min(1, 'STORE_PRODUCT_ID is required'),
+});
+
 export type AppConfig = z.infer<typeof appConfigSchema>;
 export type SecurityConfig = z.infer<typeof securityConfigSchema>;
 export type GoogleOAuthConfig = z.infer<typeof googleOAuthConfigSchema>;
