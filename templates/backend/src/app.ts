@@ -1,14 +1,16 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
-import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import { createExpressSecurityMiddleware } from '@vybekiit/security/express';
 import { errorHandler } from './middleware/error-handler.js';
 import { authRouter } from './routes/auth.routes.js';
 import { healthRouter } from './routes/health.routes.js';
+import { handlePaymentsWebhook, paymentsRouter } from './routes/payments.routes.js';
 
 export function createApp(): Express {
   const app = express();
+  const apiSecurity = createExpressSecurityMiddleware();
 
   app.use(helmet());
   app.use(
@@ -17,14 +19,10 @@ export function createApp(): Express {
       credentials: true,
     }),
   );
-  app.use(
-    rateLimit({
-      windowMs: 15 * 60 * 1000,
-      max: 300,
-      standardHeaders: true,
-      legacyHeaders: false,
-    }),
-  );
+
+  app.post('/api/webhook', apiSecurity, express.raw({ type: '*/*' }), handlePaymentsWebhook);
+
+  app.use('/api', apiSecurity);
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser(process.env.SESSION_SECRET));
 
@@ -38,6 +36,7 @@ export function createApp(): Express {
 
   app.use('/health', healthRouter);
   app.use('/api/auth', authRouter);
+  app.use('/api', paymentsRouter);
 
   // vybekiit:routes-import
   // vybekiit:routes-mount
