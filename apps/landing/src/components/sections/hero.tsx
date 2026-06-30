@@ -1,7 +1,7 @@
 import { AgentSessionDemo } from '@/components/sections/agent-session-demo';
 import { Button } from '@/components/ui/button';
 import { HERO } from '@/data/pillars';
-import { PRICE, TRUST_BADGES } from '@/data/site';
+import { DEMO_VIDEO_EMBED_URL, PRICE, TRUST_BADGES } from '@/data/site';
 import Link from 'next/link';
 
 /**
@@ -38,14 +38,20 @@ export function Hero() {
             </li>
           ))}
         </ul>
-        <Link
-          href="/inspirations"
-          className="text-muted-foreground text-xs underline-offset-4 hover:underline"
-        >
-          Browse 10 layout inspirations →
-        </Link>
       </div>
-      <AgentSessionDemo />
+      {DEMO_VIDEO_EMBED_URL ? (
+        <div className="aspect-video w-full overflow-hidden rounded-xl border shadow-sm">
+          <iframe
+            title="VybeKiit demo — pay to live in one session"
+            src={DEMO_VIDEO_EMBED_URL}
+            className="h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen={true}
+          />
+        </div>
+      ) : (
+        <AgentSessionDemo />
+      )}
     </section>
   );
 }
