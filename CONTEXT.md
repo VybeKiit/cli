@@ -472,6 +472,12 @@ An agent-kit catalog entry mapping a provider (Twilio, Supabase, better-auth, et
 docs URL, optional MCP endpoint, and related secret-setting keys. Rendered into
 `.vybekiit/agent/tech-references.md` for agents only.
 
+**MongoDB (agent path)**:
+Opt-in data store when `DATA_PROVIDER=mongodb`. Official MCP and pinned agent-skills support
+maintainers and agents only — not a buyer-facing data tier. Buyers still use plain-language skills;
+agents follow `mongodb-vybekiit.md` when the env is already set.
+_Avoid_: offering Mongo as a default or buyer-facing choice alongside Supabase, Neon, or Firebase.
+
 **Production checklist**:
 An owned `checklist.md` per template tracking go-live gates (generated block) plus an append-only
 decision log the agent updates after each completing skill.
