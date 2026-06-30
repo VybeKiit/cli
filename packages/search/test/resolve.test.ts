@@ -7,6 +7,16 @@ describe('resolveSearchProvider', () => {
     expect(search.name).toBe('local');
   });
 
+  it('falls back to local for unshipped typesense provider', () => {
+    const search = resolveSearchProvider({ SEARCH_PROVIDER: 'typesense' });
+    expect(search.name).toBe('local');
+  });
+
+  it('falls back to local for unshipped algolia provider', () => {
+    const search = resolveSearchProvider({ SEARCH_PROVIDER: 'algolia' });
+    expect(search.name).toBe('local');
+  });
+
   it('indexes and searches locally', async () => {
     const search = resolveSearchProvider({ SEARCH_PROVIDER: 'local' });
     await search.index({ id: '1', content: 'hello world' });

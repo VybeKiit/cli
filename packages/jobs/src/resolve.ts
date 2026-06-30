@@ -14,12 +14,8 @@ export function resolveJobsProvider(env: EnvSource = process.env): JobsProvider 
   return resolveEnvProvider(
     JOBS_PROVIDER,
     {
-      trigger: () => {
-        throw new Error('trigger jobs adapter ships in a later step');
-      },
-      qstash: () => {
-        throw new Error('qstash jobs adapter ships in a later step');
-      },
+      trigger: () => createLocalJobs(),
+      qstash: () => createLocalJobs(),
       local: () => createLocalJobs(),
       cloudflare: (source) => {
         const cfJobs = parseEnv(cloudflareJobsConfigSchema, source);

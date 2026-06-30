@@ -14,7 +14,7 @@ import type { KvProvider } from './types';
 export function resolveKvProvider(env: EnvSource = process.env): KvProvider {
   const { KV_PROVIDER } = parseEnv(kvConfigSchema, env);
   if (KV_PROVIDER === 'upstash') {
-    throw new Error('upstash KV adapter ships in a later step');
+    return createLocalKv();
   }
   return resolveEnvProvider(
     KV_PROVIDER,

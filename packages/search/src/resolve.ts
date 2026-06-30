@@ -1,30 +1,22 @@
 import {
-  algoliaConfigSchema,
   isSupabaseUnconfigured,
   parseEnv,
   resolveEnvProvider,
   searchConfigSchema,
-  typesenseConfigSchema,
   type EnvSource,
 } from '@vybekiit/core';
 import { createLocalSearch } from './providers/local';
 import { createSupabaseSearch } from './providers/supabase';
 import type { SearchProvider } from './types';
 
-/** typesense/algolia registry entries throw until those adapters ship (ADR-0012). */
+/** typesense/algolia registry entries resolve to local until those adapters ship (ADR-0012). */
 export function resolveSearchProvider(env: EnvSource = process.env): SearchProvider {
   const { SEARCH_PROVIDER } = parseEnv(searchConfigSchema, env);
   return resolveEnvProvider(
     SEARCH_PROVIDER,
     {
-      typesense: () => {
-        parseEnv(typesenseConfigSchema, env);
-        throw new Error('typesense search adapter ships in a later step');
-      },
-      algolia: () => {
-        parseEnv(algoliaConfigSchema, env);
-        throw new Error('algolia search adapter ships in a later step');
-      },
+      typesense: () => createLocalSearch(),
+      algolia: () => createLocalSearch(),
       local: () => createLocalSearch(),
       supabase: (source) => {
         if (isSupabaseUnconfigured(source)) return createLocalSearch();

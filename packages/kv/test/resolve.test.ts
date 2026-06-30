@@ -7,6 +7,11 @@ describe('resolveKvProvider', () => {
     expect(kv.name).toBe('local');
   });
 
+  it('falls back to local for unshipped upstash provider', () => {
+    const kv = resolveKvProvider({ KV_PROVIDER: 'upstash' });
+    expect(kv.name).toBe('local');
+  });
+
   it('stores and reads local values', async () => {
     const kv = resolveKvProvider({ KV_PROVIDER: 'local' });
     await kv.set('key', 'value');
