@@ -21,7 +21,10 @@ node scripts/run-bridge-cli-banner-queue.mjs --only ship-launch
 **Prerequisites:**
 
 ```bash
-node ../ai-browser-bridge/dist/bridge.js login --provider chatgpt
+# Quit your regular Chrome first — bridge uses an isolated profile on port 9222
+# and will not open a second window while daily Chrome is running.
+
+node ../ai-browser-bridge/dist/bridge.js login --provider chatgpt --repo .
 # Sign in in the isolated Chrome window; pick an image-capable model in ChatGPT.
 ```
 
