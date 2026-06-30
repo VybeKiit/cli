@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from 'next/image';
 import { join } from 'node:path';
 import { resolveAssetDelivery, resolveLocalAssetSrc } from '@vybekiit/assets';
+import { readNodeCwd } from '@/lib/node-env';
 
 type VybeImageProps = Omit<ImageProps, 'src'> & {
   src: string;
@@ -12,7 +13,7 @@ type VybeImageProps = Omit<ImageProps, 'src'> & {
  */
 export function VybeImage({ src, alt, ...props }: VybeImageProps) {
   const delivery = resolveAssetDelivery();
-  const publicDir = join(process.cwd(), 'public');
+  const publicDir = join(readNodeCwd(), 'public');
 
   let resolved = src;
   if (src.startsWith('http://') || src.startsWith('https://')) {

@@ -1,4 +1,5 @@
 import { isPaymentsUnconfigured } from '@/lib/payments-practice';
+import { readNodeEnv } from '@/lib/node-env';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { NextResponse } from 'next/server';
 /**
@@ -13,13 +14,14 @@ import { NextResponse } from 'next/server';
  * POST body: `{ productId: string, githubUsername?: string, email?: string }`.
  */
 export async function POST(request: Request): Promise<NextResponse> {
+  const env = readNodeEnv();
   const { productId, githubUsername, email } = await request.json();
   if (!productId) {
     return NextResponse.json({ error: 'productId is required.' }, { status: 400 });
   }
 
   if (isPaymentsUnconfigured()) {
-    const base = process.env.APP_URL ?? request.headers.get('origin') ?? 'http://localhost:3000';
+    const base = env.APP_URL ?? request.headers.get('origin') ?? 'http://localhost:3000';
     const url = `${base}/checkout/practice?productId=${encodeURIComponent(productId)}`;
     return NextResponse.json({ url });
   }
@@ -28,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     productId,
     ...(githubUsername ? { githubUsername } : {}),
     ...(email ? { email } : {}),
-    ...(process.env.APP_URL ? { successUrl: process.env.APP_URL } : {}),
+    ...(env.APP_URL ? { successUrl: env.APP_URL } : {}),
   });
 
   if (!result.ok) {
