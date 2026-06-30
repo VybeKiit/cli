@@ -380,7 +380,9 @@ export async function readOptionalText(page: Page, fieldKey: string): Promise<st
   try {
     const value = await fieldLocator(page, fieldKey).inputValue();
     return value.length > 0 ? value : undefined;
-  } catch {}
+  } catch {
+    return undefined;
+  }
 }
 
 /**
