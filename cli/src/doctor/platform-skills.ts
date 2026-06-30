@@ -1,33 +1,18 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-interface ManifestSource {
-  readonly repo: string;
-  readonly skills: string[];
-}
-
-interface PlatformSkillsManifest {
-  readonly sources: ManifestSource[];
-}
+import process from 'node:process';
+import {
+  expectedSkillNamesFromLock,
+  expectedSkillNamesFromManifest,
+  type PlatformSkillsManifest,
+  type SkillsLockFile,
+} from '@vybekiit/agent-kit';
 
 export interface PlatformSkillsReport {
   readonly ok: boolean;
   readonly missing: readonly string[];
   readonly template: string | null;
-}
-
-/** Detect which VybeKiit template cwd is (web / mobile / extension). */
-export function detectTemplate(cwd: string): string | null {
-  if (existsSync(join(cwd, 'platform-skills.manifest.json'))) {
-    if (existsSync(join(cwd, 'app.json'))) {
-      return 'mobile';
-    }
-    if (existsSync(join(cwd, 'wxt.config.ts')) || existsSync(join(cwd, 'extension.config.ts'))) {
-      return 'extension';
-    }
-    return 'web';
-  }
-  return null;
+  readonly lockCount: number;
 }
 
 function readManifest(cwd: string): PlatformSkillsManifest | null {
@@ -38,34 +23,40 @@ function readManifest(cwd: string): PlatformSkillsManifest | null {
   return JSON.parse(readFileSync(path, 'utf8')) as PlatformSkillsManifest;
 }
 
-/** List skill folder names expected from the manifest. */
-export function expectedSkillNames(manifest: PlatformSkillsManifest): string[] {
-  const names = new Set<string>();
-  for (const source of manifest.sources) {
-    for (const skill of source.skills) {
-      if (skill === '*') {
-        continue;
-      }
-      names.add(skill);
-    }
+function readSkillsLock(cwd: string): SkillsLockFile | null {
+  const path = join(cwd, 'skills-lock.json');
+  if (!existsSync(path)) {
+    return null;
   }
-  return [...names];
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) as SkillsLockFile;
+  } catch {
+    return null;
+  }
+}
+
+function skillFileExists(cwd: string, name: string): boolean {
+  return existsSync(join(cwd, '.agents', 'skills', name, 'SKILL.md'));
 }
 
 /**
  * Verify pinned platform skills exist under `.agents/skills/<name>/SKILL.md`.
- * Pure — no network, no install (the agent runs `npx skills add` when missing).
+ * When skills-lock.json exists, every locked skill is verified (not just manifest explicit names).
  */
 export function verifyPlatformSkills(cwd: string): PlatformSkillsReport {
   const manifest = readManifest(cwd);
   if (!manifest) {
-    return { ok: true, missing: [], template: null };
+    return { ok: true, missing: [], template: null, lockCount: 0 };
   }
 
+  const lock = readSkillsLock(cwd);
+  const lockNames = expectedSkillNamesFromLock(lock);
+  const manifestNames = expectedSkillNamesFromManifest(manifest);
+  const namesToVerify = lockNames.length > 0 ? lockNames : manifestNames;
+
   const missing: string[] = [];
-  for (const name of expectedSkillNames(manifest)) {
-    const skillPath = join(cwd, '.agents', 'skills', name, 'SKILL.md');
-    if (!existsSync(skillPath)) {
+  for (const name of namesToVerify) {
+    if (!skillFileExists(cwd, name)) {
       missing.push(name);
     }
   }
@@ -73,8 +64,34 @@ export function verifyPlatformSkills(cwd: string): PlatformSkillsReport {
   return {
     ok: missing.length === 0,
     missing,
-    template: detectTemplate(cwd),
+    template: detectTemplateNameSync(cwd),
+    lockCount: lockNames.length,
   };
+}
+
+/** Sync template detection for doctor — uses package.json when manifest exists. */
+function detectTemplateNameSync(cwd: string): string | null {
+  if (!existsSync(join(cwd, 'platform-skills.manifest.json'))) {
+    return null;
+  }
+  try {
+    const raw = readFileSync(join(cwd, 'package.json'), 'utf8');
+    const pkg = JSON.parse(raw) as { dependencies?: Record<string, string>; main?: string };
+    if (pkg.dependencies?.express) return 'backend';
+    if (pkg.dependencies?.expo || pkg.main?.includes('expo-router')) return 'mobile';
+    if (pkg.dependencies?.vite && pkg.dependencies?.['@tanstack/react-router']) return 'spa';
+    if (pkg.dependencies?.next) return 'web';
+  } catch {
+    // fall through to layout heuristics
+  }
+  if (existsSync(join(cwd, 'app.json'))) return 'mobile';
+  if (existsSync(join(cwd, 'wxt.config.ts')) || existsSync(join(cwd, 'extension.config.ts'))) {
+    return 'extension';
+  }
+  if (existsSync(join(cwd, 'src', 'index.ts')) && existsSync(join(cwd, 'src', 'app.ts'))) {
+    return 'backend';
+  }
+  return 'web';
 }
 
 /** Plain-language lines for the doctor report. */
@@ -86,9 +103,7 @@ export function formatPlatformSkillsReport(report: PlatformSkillsReport): string
   const lockPath = join(process.cwd(), 'skills-lock.json');
   if (existsSync(lockPath)) {
     try {
-      const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as {
-        skills?: Record<string, unknown>;
-      };
+      const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as SkillsLockFile;
       const count = Object.keys(lock.skills ?? {}).length;
       lines.push(`✓ platform skills lock — ${count} pinned skill(s) in skills-lock.json.`);
     } catch {
@@ -98,7 +113,11 @@ export function formatPlatformSkillsReport(report: PlatformSkillsReport): string
     lines.push('→ platform skills lock — skills-lock.json missing (run pin-platform-skills).');
   }
   if (report.ok) {
-    lines.push('✓ platform skills — all explicit manifest skills are present.');
+    const scope =
+      report.lockCount > 0
+        ? `all ${report.lockCount} locked skill(s)`
+        : 'all explicit manifest skills';
+    lines.push(`✓ platform skills — ${scope} are present.`);
     return lines;
   }
   lines.push(

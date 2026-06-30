@@ -8,6 +8,12 @@ import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-ski
 import { formatProjectHealthReport, verifyProjectHealth } from './project-health';
 import { provisionR2Storage } from './storage-r2';
 import { formatProductSurfaceHints } from './product-surface';
+import { ensureCodexSkillsEnabled } from './codex-config';
+import {
+  formatRailwayStackReport,
+  isRailwayStackActive,
+  runRailwayAgentSetup,
+} from './railway-agent-setup';
 import {
   formatReport,
   type InstallAction,
@@ -145,6 +151,10 @@ function buildReport(
   };
 }
 
+function reportFor(reports: readonly ToolReport[], name: string): ToolReport | undefined {
+  return reports.find((r) => r.tool === name);
+}
+
 /**
  * Orchestrate a full doctor run. Returns a process exit code: 0 when every tool is
  * installed (sign-in still pending is fine — that's a guided next step the agent
@@ -184,6 +194,14 @@ export async function runDoctor(log: Console = console): Promise<number> {
     log.log(line);
   }
 
+  if (isRailwayStackActive(env)) {
+    const railway = reportFor(reports, 'railway');
+    const agentSetup = runRailwayAgentSetup(railway?.installed === true, railway?.authed ?? null);
+    for (const line of formatRailwayStackReport(env, agentSetup)) {
+      log.log(line);
+    }
+  }
+
   const skillsReport = verifyPlatformSkills(cwd);
   for (const line of formatPlatformSkillsReport(skillsReport)) {
     log.log(line);
@@ -202,22 +220,33 @@ export async function runDoctor(log: Console = console): Promise<number> {
   }
 
   const cloudReady = providerTools.every((tool) => {
-    const report = reports.find((r) => r.tool === tool.name);
+    const report = reportFor(reports, tool.name);
     return report?.installed === true;
   });
   const cursorSession = isCursorSession();
   const agentReady = isAgentRuntimeReady(reports) || cursorSession;
   const skillsReady = isSkillsCliReady(reports);
 
+  const codex = reportFor(reports, 'codex');
+  if (codex?.installed) {
+    const codexSkills = await ensureCodexSkillsEnabled();
+    if (codexSkills.updated) {
+      log.log('✓ Codex — enabled Agent Skills discovery in ~/.codex/config.toml.');
+    } else {
+      log.log('✓ Codex — Agent Skills discovery already enabled.');
+    }
+  }
+
   const assistant = inferVybeAssistant({
     cursorSession,
-    claudeInstalled: reports.find((r) => r.tool === 'claude')?.installed === true,
-    codexInstalled: reports.find((r) => r.tool === 'codex')?.installed === true,
+    claudeInstalled: reportFor(reports, 'claude')?.installed === true,
+    codexInstalled: codex?.installed === true,
   });
   if (assistant) {
     writeEnvKeys(cwd, reportModeEnvKeys(cwd, assistant));
     log.log(`✓ Report Mode — your assistant is set to ${assistant}.`);
   }
 
-  return cloudReady && r2Result.ok && agentReady && skillsReady && projectHealth.ok ? 0 : 1;
+  const ready = cloudReady && r2Result.ok && agentReady && skillsReady && projectHealth.ok;
+  return ready ? 0 : 1;
 }
