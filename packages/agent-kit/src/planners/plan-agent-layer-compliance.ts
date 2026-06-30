@@ -1,5 +1,9 @@
 import type { TemplateId } from '../catalogs/goal-catalog';
 import { checkGoalDrift } from './plan-goal-routing';
+import {
+  planAgentRuntimeCompliance,
+  type AgentRuntimeComplianceInput,
+} from './plan-agent-runtime-compliance';
 import { GENERATED_SECTION_MARKERS, type GeneratedSectionId } from '../render/markdown';
 
 export type AgentLayerComplianceCheckId =
@@ -8,7 +12,8 @@ export type AgentLayerComplianceCheckId =
   | 'buyer-context'
   | 'goal-drift'
   | 'goal-index-drift'
-  | 'session-bootstrap';
+  | 'session-bootstrap'
+  | import('./plan-agent-runtime-compliance').AgentRuntimeComplianceCheckId;
 
 export interface AgentLayerComplianceIssue {
   readonly check: AgentLayerComplianceCheckId;
@@ -20,6 +25,9 @@ export interface AgentLayerComplianceInput {
   readonly template: TemplateId;
   readonly files: Readonly<Record<string, string>>;
   readonly skillPaths: readonly string[];
+  readonly skillContents?: Readonly<Record<string, string>>;
+  readonly platformSkillContents?: Readonly<Record<string, string>>;
+  readonly liveDocs?: Readonly<Record<string, string>>;
 }
 
 export interface AgentLayerComplianceReport {
@@ -145,6 +153,21 @@ export function planAgentLayerCompliance(
         }
       }
     }
+  }
+
+  const runtimeInput: AgentRuntimeComplianceInput = {
+    files,
+    skillContents: input.skillContents ?? {},
+    platformSkillContents: input.platformSkillContents ?? {},
+    ...(input.liveDocs !== undefined ? { liveDocs: input.liveDocs } : {}),
+  };
+  const runtime = planAgentRuntimeCompliance(runtimeInput);
+  for (const issue of runtime.issues) {
+    issues.push({
+      check: issue.check,
+      message: issue.message,
+      ...(issue.file !== undefined ? { file: issue.file } : {}),
+    });
   }
 
   return { template, issues, ok: issues.length === 0 };

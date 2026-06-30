@@ -2,6 +2,9 @@
 
 **Goal:** users can search the builder's data in plain language.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 > (Under the hood — agent-only) `@vybekiit/search` → `resolveSearchProvider()` via `src/lib/search-client.ts`.
 
 ## Steps

@@ -18,8 +18,8 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
    - **Secret settings:** are the required values in `.env` present and non-empty? (Use
      `.env.example` as the checklist.) Missing/blank is the #1 cause. Never read `.env` values aloud —
      follow `env-secrets-vybekiit.md`. Doctor verifies `.cursorignore` lists `.env`.
-   - **Tools installed + signed in:** run `vybekiit doctor` — it installs your AI assistant (Claude Code
-     or Codex), the skills installer, and whichever cloud tools your settings use (database, hosting,
+   - **Tools installed + signed in:** run `vybekiit doctor` — it installs your AI assistant (Claude Code,
+     Codex, or Cursor), the skills installer, and whichever cloud tools your settings use (database, hosting,
      Google sign-in). It also checks official platform skills are present. If it reports "not signed
      in yet," walk the builder through the one sign-in command it prints (a browser window opens;
      they click approve). Then make sure the project's dependencies are installed.

@@ -2,6 +2,9 @@
 
 **Goal:** plan what the server should remember.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Ask the builder what to remember in plain words.

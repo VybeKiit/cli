@@ -1,0 +1,27 @@
+# VybeKiit maintainer monorepo — validate VybeKiit-owned agent wiring only.
+# Pinned upstream skills (.agents/skills) are re-pinned via pin-platform-skills, not linted here.
+
+tools = ["claude-code", "cursor", "codex"]
+
+[rules]
+# Buyer .vybekiit/skills/*.md use a custom contract (check-agent-layer), not Agent Skills SKILL.md.
+skills = false
+mcp = false
+agents = false
+
+[files]
+exclude = [
+  "node_modules/**",
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/.next/**",
+  "**/.turbo/**",
+  "**/.agents/skills/**",
+  "**/agent/skills/**",
+  "**/.vybekiit/agent/mcp-*.json",
+  "**/.vybekiit/agent/ui-sources.md",
+  "apps/**",
+  "packages/**",
+  "infra/**",
+  "cli/**",
+]

@@ -1,6 +1,5 @@
 ---
 description: VybeKiit maintainer code patterns — details in AGENTS.md and CONTEXT.md
-globs: **/*
 alwaysApply: true
 ---
 

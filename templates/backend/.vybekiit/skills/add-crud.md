@@ -2,6 +2,9 @@
 
 **Goal:** scaffold create/read/update/delete routes for a resource.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Agree on the resource name in plain words (e.g. "posts", "orders").

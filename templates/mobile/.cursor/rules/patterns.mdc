@@ -1,6 +1,5 @@
 ---
 description: VybeKiit code patterns summary — details in AGENTS.md and platform-skills
-globs: **/*
 alwaysApply: true
 ---
 

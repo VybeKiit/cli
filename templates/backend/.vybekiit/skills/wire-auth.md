@@ -2,6 +2,9 @@
 
 **Goal:** people can sign in through this API (mobile/extension clients call these routes).
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Run `vybekiit plan-readiness sign-in backend` and follow any orchestration steps.

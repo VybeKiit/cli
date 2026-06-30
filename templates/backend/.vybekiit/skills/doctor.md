@@ -2,6 +2,9 @@
 
 **Goal:** find and fix what's wrong with the server.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Run `pnpm quality`.

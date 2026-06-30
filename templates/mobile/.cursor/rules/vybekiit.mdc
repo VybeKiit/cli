@@ -1,6 +1,5 @@
 ---
 description: VybeKiit agent layer — read AGENTS.md
-globs: **/*
 alwaysApply: true
 ---
 

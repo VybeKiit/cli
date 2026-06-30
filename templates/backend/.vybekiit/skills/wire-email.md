@@ -2,6 +2,9 @@
 
 **Goal:** send emails from the API.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Run `vybekiit plan-setup email`.

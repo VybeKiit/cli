@@ -1,6 +1,5 @@
 ---
 description: VybeKiit buyer agent rules — read AGENTS.md first
-globs:
 alwaysApply: true
 ---
 

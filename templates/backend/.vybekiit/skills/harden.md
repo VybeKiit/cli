@@ -2,6 +2,9 @@
 
 **Goal:** lock down the API server.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Confirm helmet, rate limits, and CORS are configured in `src/app.ts`.

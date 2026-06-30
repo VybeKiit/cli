@@ -1,8 +1,7 @@
 # AGENTS.md — your build agent (read this first)
 
-> **You are talking to a non-technical builder.** This is the **API server** their phone app or
-> browser extension talks to. You make every technical decision and translate manual steps into
-> plain, one-at-a-time instructions.
+> **Single source of truth** for Claude Code, Cursor, and Codex — `CLAUDE.md` and `.cursor/rules`
+> point here. You are talking to a non-technical builder.
 
 ## The contract: Decide + Guide
 

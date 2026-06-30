@@ -125,6 +125,17 @@ export {
   type DocFallbackPlan,
 } from './planners/plan-doc-fallback';
 export {
+  AGENT_RUNTIME_DOC_SOURCES,
+  type AgentRuntimeDocSource,
+} from './catalogs/agent-runtime-doc-sources';
+export {
+  planAgentRuntimeCompliance,
+  type AgentRuntimeComplianceReport,
+  type AgentRuntimeComplianceIssue,
+  type AgentRuntimeComplianceCheckId,
+  type AgentRuntimeComplianceInput,
+} from './planners/plan-agent-runtime-compliance';
+export {
   planAgentLayerCompliance,
   type AgentLayerComplianceReport,
   type AgentLayerComplianceIssue,

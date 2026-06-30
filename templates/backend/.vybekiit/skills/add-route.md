@@ -2,6 +2,9 @@
 
 **Goal:** add a new API endpoint without hand-writing boilerplate.
 
+
+**Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
+
 ## Steps
 
 1. Ask the builder what the endpoint should do (plain words).

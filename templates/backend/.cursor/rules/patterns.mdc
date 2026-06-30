@@ -1,10 +1,9 @@
 ---
 description: Code hygiene checklist (not SSOT)
-globs:
 alwaysApply: true
 ---
 
 - Use `@vybekiit/*` packages from `src/services/`.
-- Read `.vybekiit/agent/session-bootstrap.md` at the start of every task.
+- Read `AGENTS.md` and `.vybekiit/agent/session-bootstrap.md` at the start of every task.
 - MVC: routes → controllers → services.
 - Validate request bodies with zod at route boundary.
