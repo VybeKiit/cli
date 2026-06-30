@@ -65,6 +65,25 @@ export interface Tool {
   readonly auth?: AuthProbe;
 }
 
+/**
+ * GitHub CLI — the always-present base tool. It downloads the buyer's starter files
+ * (clones the private template mirror — ADR-0005) and signs them in to GitHub, so it's
+ * required for every template no matter the provider. Installs via Homebrew (macOS /
+ * Linux) or Scoop (Windows), mirroring the Supabase/Atlas channels; sign-in lives in
+ * `gh`'s own store and is probed with `gh auth status`.
+ */
+const GH: Tool = {
+  name: 'gh',
+  purpose: "download your app's starter files and sign you in to GitHub",
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
+    win32: { command: 'scoop', args: ['install', 'gh'], requires: 'Scoop' },
+    linux: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
+  },
+  auth: { command: 'gh', args: ['auth', 'status'], loginHint: 'gh auth login --web' },
+};
+
 /** Default hosting CLI — Cloudflare. Installs the same way everywhere (npm). */
 const WRANGLER: Tool = {
   name: 'wrangler',
