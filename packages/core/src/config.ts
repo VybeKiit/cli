@@ -139,7 +139,7 @@ export const paypalConfigSchema = z.object({
  */
 export const dataConfigSchema = z.object({
   DATA_PROVIDER: z
-    .enum(['supabase', 'neon', 'firebase', 'mongodb', 'aws', 'local'])
+    .enum(['supabase', 'neon', 'firebase', 'mongodb', 'aws', 'local', 'railway'])
     .default('supabase'),
 });
 
@@ -172,7 +172,7 @@ export const storageConfigSchema = z.object({
  * agent's go-live skill drives the chosen adapter — the builder never picks.
  */
 export const hostingConfigSchema = z.object({
-  HOSTING_PROVIDER: z.enum(['cloudflare', 'vercel', 'aws']).default('cloudflare'),
+  HOSTING_PROVIDER: z.enum(['cloudflare', 'vercel', 'aws', 'railway']).default('cloudflare'),
 });
 
 /**
@@ -255,6 +255,23 @@ export const supabaseConfigSchema = z.object({
  */
 export const neonConfigSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required for Neon'),
+});
+
+/**
+ * Railway Postgres — used by `@vybekiit/db` (railway adapter, ADR-0017).
+ * `DATABASE_URL` is the Postgres connection string from Railway service variables.
+ */
+export const railwayConfigSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required for Railway Postgres'),
+});
+
+/**
+ * Railway hosting — used by `@vybekiit/deploy` (railway adapter, ADR-0017).
+ * Auth is CLI-native (`railway login`); project/service ids are optional until link.
+ */
+export const railwayHostingConfigSchema = z.object({
+  RAILWAY_PROJECT_ID: z.string().min(1).optional(),
+  RAILWAY_SERVICE_ID: z.string().min(1).optional(),
 });
 
 /**
@@ -547,6 +564,8 @@ export type AwsConfig = z.infer<typeof awsConfigSchema>;
 export type AwsHostingConfig = z.infer<typeof awsHostingConfigSchema>;
 export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
 export type NeonConfig = z.infer<typeof neonConfigSchema>;
+export type RailwayConfig = z.infer<typeof railwayConfigSchema>;
+export type RailwayHostingConfig = z.infer<typeof railwayHostingConfigSchema>;
 export type FirebaseConfig = z.infer<typeof firebaseConfigSchema>;
 export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
 export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;

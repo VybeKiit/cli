@@ -17,6 +17,8 @@ export {
   awsHostingConfigSchema,
   supabaseConfigSchema,
   neonConfigSchema,
+  railwayConfigSchema,
+  railwayHostingConfigSchema,
   firebaseConfigSchema,
   betterAuthConfigSchema,
   cognitoConfigSchema,
@@ -72,6 +74,8 @@ export {
   type AwsHostingConfig,
   type SupabaseConfig,
   type NeonConfig,
+  type RailwayConfig,
+  type RailwayHostingConfig,
   type FirebaseConfig,
   type BetterAuthConfig,
   type CognitoConfig,
@@ -123,3 +127,10 @@ export {
   DEFAULT_APP_URL,
 } from './constants';
 export { ok, err, fail, type Result, type VybeKiitError } from './result';
+export { type EnvSource, resolveEnvProvider, resolveOptionalEnvProvider } from './env-source';
+export {
+  isCloudflareUnconfigured,
+  isRailwayStackActive,
+  isSupabaseUnconfigured,
+  needsAwsCliFromAuxiliaryProviders,
+} from './provider-dispatch';

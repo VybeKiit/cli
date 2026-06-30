@@ -60,3 +60,4 @@ ends in a refund.
 
 Doctor also verifies `platform-skills.manifest.json` skills exist under `.agents/skills/`.
 See ADR-0009 for security env toggles doctor-adjacent skills reference.
+Provider→tool dispatch in `toolchain.ts` follows ADR-0018 (`parseEnv` + `resolveEnvProvider`).

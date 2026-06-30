@@ -6,6 +6,8 @@
     "includes": [
       "**",
       "!!**/.agents/skills",
+      "!!**/.claude/skills",
+      "!!**/.cursor/skills",
       "!!.vybekiit/changelog.json",
       "!!.bridge",
       "!!downloads",
@@ -53,6 +55,7 @@
         "noJsxLiterals": "off",
         "useComponentExportOnlyModules": "off",
         "noTernary": "off",
+        "noNestedTernary": "warn",
         "useNamingConvention": "off",
         "noMagicNumbers": "off",
         "noCommonJs": "off",
@@ -113,6 +116,16 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["packages/**", "cli/**", "apps/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNestedTernary": "error"
+          }
+        }
+      }
+    },
     {
       "includes": ["apps/landing/**"],
       "linter": {

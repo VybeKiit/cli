@@ -33,6 +33,9 @@ pattern to every infrastructure concern, without changing the defaults the rest 
 6. **Skills are written once, against the interface.** Adding a provider adds an adapter, never a
    skill.
 
+7. **Dispatch shape is SSOT in `@vybekiit/core`** — see ADR-0018. All `resolve.ts` files and
+   doctor planners use `parseEnv` + `resolveEnvProvider`; no hand-rolled `switch` on `*_PROVIDER`.
+
 ## Consequences
 
 - **Defaults are unchanged.** Supabase + Cloudflare still ship as the out-of-the-box stack, so
