@@ -38,4 +38,30 @@ describe('createLocalAuthProvider', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe('no_user');
   });
+
+  it('requestPasswordReset succeeds in practice mode', async () => {
+    const result = await createLocalAuthProvider().requestPasswordReset('anyone@x.com');
+    expect(result.ok && result.value).toBe(true);
+  });
+
+  it('resetPassword accepts local-reset-token', async () => {
+    const provider = createLocalAuthProvider();
+    await provider.requestPasswordReset('anyone@x.com');
+    const result = await provider.resetPassword('local-reset-token', 'newpass');
+    expect(result.ok && result.value).toEqual(DEV_USER);
+  });
+
+  it('sendMagicLink and verifyMagicLink work in practice mode', async () => {
+    const provider = createLocalAuthProvider();
+    await provider.sendMagicLink('anyone@x.com');
+    const result = await provider.verifyMagicLink('local-magic-token');
+    expect(result.ok && result.value).toEqual(DEV_USER);
+  });
+
+  it('sendSmsCode and verifySmsCode work in practice mode', async () => {
+    const provider = createLocalAuthProvider();
+    await provider.sendSmsCode('+15551234567');
+    const result = await provider.verifySmsCode('+15551234567', '000000');
+    expect(result.ok && result.value).toEqual(DEV_USER);
+  });
 });

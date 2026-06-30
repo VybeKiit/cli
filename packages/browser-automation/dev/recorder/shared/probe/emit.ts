@@ -7,16 +7,20 @@ import { renderGenerated, type ParsedEntry } from '../draft';
 import { LS_DRAFT_FIELDS } from '../../../../src/domains/payments/ls/selectors/fields';
 import type { ClassifiedMatch, ProbeReport } from './types';
 
+function patternText(value: RegExp | string): string {
+  return typeof value === 'string' ? value : value.source;
+}
+
 function selectorEntryToParsed(entry: SelectorEntry): ParsedEntry {
   switch (entry.kind) {
     case 'css':
       return { kind: 'css', selector: entry.selector };
     case 'label':
-      return { kind: 'label', text: entry.text };
+      return { kind: 'label', text: patternText(entry.text) };
     case 'placeholder':
-      return { kind: 'placeholder', text: entry.text };
+      return { kind: 'placeholder', text: patternText(entry.text) };
     case 'role':
-      return { kind: 'role', role: entry.role, name: entry.name };
+      return { kind: 'role', role: entry.role, name: patternText(entry.name) };
   }
 }
 

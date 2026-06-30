@@ -14,7 +14,7 @@
     "test": "vitest run",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test",
+    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/check-agent-patterns.mjs",
     "test:e2e": "node scripts/run-e2e.mjs",
     "check:quality": "node scripts/check-quality.mjs",
     "prepare": "husky"

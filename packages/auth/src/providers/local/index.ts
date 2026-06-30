@@ -2,36 +2,24 @@ import { type Result, fail, ok } from '@vybekiit/core';
 import type { AuthProvider } from '../../types';
 import type { AuthUser } from '../../user';
 
-/**
- * The single fixed identity the local adapter signs everyone in as. The email and
- * id are intentionally obvious dev placeholders so a builder (and our screens) can
- * tell at a glance this is practice mode, not a real account (ADR-0008).
- */
 const DEV_USER: AuthUser = { id: 'local-dev-user', email: 'you@local.dev' };
+const resetTokens = new Map<string, string>();
+const magicTokens = new Map<string, string>();
 
-/**
- * Build the zero-config local {@link AuthProvider} — VybeKiit's no-secrets dev
- * fallback (ADR-0008). It takes no config and reaches no network: a freshly
- * scaffolded app with no auth backend resolves to this so the very first `pnpm dev`
- * can sign in and render the dashboard, and it doubles as the network-free
- * contract-conformance fixture for the {@link AuthProvider} interface.
- *
- * It is **intentionally permissive** — every sign-in/sign-up/OTP path succeeds and
- * returns the same {@link DEV_USER}, because this is local practice mode, not a
- * security boundary. `getUser` treats any non-empty session token as that dev user
- * and only an empty token as `no_user`. Real identity arrives the moment the
- * `add-signin` skill wires a real backend (the screens then "remember you for real").
- */
+function okUser(): Promise<Result<AuthUser>> {
+  return Promise.resolve(ok(DEV_USER));
+}
+
 export function createLocalAuthProvider(): AuthProvider {
   return {
     name: 'local',
 
     signUpWithPassword(): Promise<Result<AuthUser>> {
-      return Promise.resolve(ok(DEV_USER));
+      return okUser();
     },
 
     signInWithPassword(): Promise<Result<AuthUser>> {
-      return Promise.resolve(ok(DEV_USER));
+      return okUser();
     },
 
     sendEmailCode(): Promise<Result<true>> {
@@ -39,12 +27,44 @@ export function createLocalAuthProvider(): AuthProvider {
     },
 
     verifyEmailCode(): Promise<Result<AuthUser>> {
-      return Promise.resolve(ok(DEV_USER));
+      return okUser();
+    },
+
+    requestPasswordReset(email: string): Promise<Result<true>> {
+      resetTokens.set('local-reset-token', email);
+      return Promise.resolve(ok(true));
+    },
+
+    resetPassword(token: string, _newPassword: string): Promise<Result<AuthUser>> {
+      if (token !== 'local-reset-token' && !resetTokens.has(token)) {
+        return Promise.resolve(fail('reset_failed', 'That reset link is not valid.'));
+      }
+      return okUser();
+    },
+
+    sendMagicLink(email: string): Promise<Result<true>> {
+      magicTokens.set('local-magic-token', email);
+      return Promise.resolve(ok(true));
+    },
+
+    verifyMagicLink(token: string): Promise<Result<AuthUser>> {
+      if (token !== 'local-magic-token' && !magicTokens.has(token)) {
+        return Promise.resolve(fail('magic_link_failed', 'That sign-in link is not valid.'));
+      }
+      return okUser();
+    },
+
+    sendSmsCode(_phone: string): Promise<Result<true>> {
+      return Promise.resolve(ok(true));
+    },
+
+    verifySmsCode(_phone: string, _code: string): Promise<Result<AuthUser>> {
+      return okUser();
     },
 
     getUser(sessionToken: string): Promise<Result<AuthUser>> {
       if (!sessionToken) return Promise.resolve(fail('no_user', 'No session token provided.'));
-      return Promise.resolve(ok(DEV_USER));
+      return okUser();
     },
   };
 }

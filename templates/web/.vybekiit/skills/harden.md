@@ -74,3 +74,10 @@ Run `doctor`. If real visitors hit "too many requests", the limit is too low —
 
 `SECURITY_RATE_LIMIT` and `SECURITY_ORIGIN_LOCK` are on, tuned to the app, abuse is blocked in a quick
 test, normal use works, and the builder knows (in plain words) their app is protected.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

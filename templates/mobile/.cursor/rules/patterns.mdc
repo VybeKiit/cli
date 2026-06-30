@@ -12,6 +12,7 @@ Actionable checklist for coding in this template. **SSOT:** `AGENTS.md`. Deep de
 ## Contract (every task)
 
 - **Decide + Guide** — you choose all tech; builder gets plain one-step instructions only.
+- Read `.vybekiit/agent/session-bootstrap.md` at the start of every task.
 - Pick skills via `.vybekiit/agent/goal-index.md` → `.vybekiit/skills/`.
 - **Verify-before-advance** after every step. Translate errors; never paste build logs at builder.
 - **No em dashes (`—`)** in buyer-facing copy. UI titles: no em dash, no trailing period or comma. See `language.md` → Tone.

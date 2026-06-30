@@ -4,13 +4,13 @@
 
 **Contract:** one action at a time · verify-before-advance · plain language · celebrate.
 
-> (Agent-only) Auth runs on the **backend web app**; extension calls it via `auth-client.ts`.
-> Ensure web `add-signin` is done first.
+> (Agent-only) Prefer `connect-account-backend.md` for orchestration. Run
+> `vybekiit plan-readiness sign-in extension` — scaffold backend automatically if needed.
 
 ## Steps
 
-1. **Backend sign-in ready.** Web app must accept accounts. If not, set up web sign-in first.
-   **Verify:** web sign-in works at the deployed URL.
+1. **Readiness.** Run `vybekiit plan-readiness sign-in extension` and follow orchestration steps.
+   **Verify:** backend or web sign-in works.
 
 2. **Wire extension client.** Replace `TODO(vybekiit): … — skill: connect-account` in auth client.
    **Verify:** sign-in flow works from the extension UI.
@@ -21,3 +21,15 @@
 ## Definition of done
 
 Real account sign-in works from the extension against the live backend.
+
+## If anything breaks
+
+Run `doctor`. If backend auth or MCP fails once, run `vybekiit doc-fallback better-auth` and use the
+plain stuck phrase — never say MCP to the builder.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

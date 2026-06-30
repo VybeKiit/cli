@@ -36,8 +36,15 @@ translate every error · celebrate. You set up alerts; the builder only pastes o
 ## If anything breaks
 
 Run `doctor`. Most failures are a missing or wrong DSN — re-copy from the dashboard into `.env` only
-(never chat). Translate errors; never paste stack traces at the builder.
+(never chat). If MCP fails once, run `vybekiit doc-fallback sentry`.
 
 ## Definition of done
 
 `OBSERVABILITY_PROVIDER=sentry`, DSN set, test alert received, and the builder knows they'll be notified when things break.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

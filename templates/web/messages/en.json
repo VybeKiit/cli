@@ -27,16 +27,36 @@
 
   "home.hero.badge": "Built with VybeKiit",
   "home.hero.title": "Your app starts here.",
-  "home.hero.description": "Tell your AI agent what you want to build. It wires the payments, the database, and the deploy — you just describe the idea.",
+  "home.hero.description": "Tell your AI agent what you want to build. It wires the payments, the database, and the deploy. You just describe the idea.",
   "home.hero.cta.getStarted": "Get started",
   "home.hero.cta.seePricing": "See pricing",
 
   "home.features.payments.title": "Payments built in",
-  "home.features.payments.body": "Take money on day one — Lemon Squeezy, Stripe, or PayPal.",
+  "home.features.payments.body": "Take money on day one with checkout wired in.",
+  "home.features.payments.tooltip": "Your agent picks the checkout setup for you. You describe what you sell; they wire the buy button and test a practice purchase.",
+  "home.features.payments.hintLabel": "How payments work here",
+
   "home.features.data.title": "Your data, ready",
   "home.features.data.body": "A database and sign-in wired up without the setup headache.",
+  "home.features.data.tooltip": "Accounts and saved info live in a database your agent manages. You never pick tables or run migrations yourself.",
+  "home.features.data.hintLabel": "How your data works here",
+
   "home.features.deploy.title": "Live in minutes",
   "home.features.deploy.body": "Deploy to the web with a custom domain when you are ready.",
+  "home.features.deploy.tooltip": "When you say go live, your agent ships the app and hooks up your domain. You stay in plain language the whole time.",
+  "home.features.deploy.hintLabel": "How going live works here",
+
+  "home.features.stats.title": "Visitor stats",
+  "home.features.stats.body": "See who shows up and what they click. Ask your agent to turn on visitor stats.",
+  "home.features.stats.tooltip": "PostHog is the visitor-stats layer behind this app. Ask your agent to see who uses my app and they turn it on, send a test visit, and explain the numbers in plain words.",
+  "home.features.stats.hintLabel": "What visitor stats do",
+  "home.features.stats.techLabel": "PostHog",
+
+  "home.features.alerts.title": "Error alerts",
+  "home.features.alerts.body": "Get a heads-up when something breaks. Ask your agent to wire error alerts.",
+  "home.features.alerts.tooltip": "Sentry is the error-alert layer behind this app. Say tell me when things break and your agent connects it, sends a test alert, and pings you when real visitors hit a problem.",
+  "home.features.alerts.hintLabel": "What error alerts do",
+  "home.features.alerts.techLabel": "Sentry",
 
   "auth.shell.brandLink": "My App",
 
@@ -64,7 +84,7 @@
   "auth.verify.codeLabel": "Code",
   "auth.verify.submit": "Verify",
   "auth.verify.submitting": "Checking...",
-  "auth.verify.resend": "Resend code",
+  "auth.verify.resend": "Send code again",
   "auth.verify.codeSent": "We sent you a new code.",
 
   "auth.dashboard.signOut": "Sign out",
@@ -108,25 +128,25 @@
 
   "pricing.checkout.badge": "Practice checkout",
   "pricing.checkout.title": "Confirm your plan",
-  "pricing.checkout.description": "No payment keys yet — this simulates a successful purchase locally. Ask your agent to \"add payments\" for real checkout.",
+  "pricing.checkout.description": "No payment keys yet: this simulates a successful purchase locally. Ask your agent to \"add payments\" for real checkout.",
   "pricing.checkout.fallbackPlanName": "Selected plan",
   "pricing.checkout.complete": "Complete practice purchase",
   "pricing.checkout.completing": "Completing...",
-  "pricing.checkout.successToast": "Purchase complete — practice mode.",
+  "pricing.checkout.successToast": "Purchase complete (practice mode).",
 
   "dashboard.badge": "Signed in",
   "dashboard.title": "Dashboard",
-  "dashboard.subtitle": "Welcome back — here is a snapshot of your app.",
+  "dashboard.subtitle": "Welcome back. Here is a snapshot of your app.",
 
   "dashboard.tabs.overview": "Overview",
   "dashboard.tabs.nextSteps": "Next steps",
 
   "dashboard.stats.users.label": "Users",
-  "dashboard.stats.users.value": "—",
+  "dashboard.stats.users.value": "-",
   "dashboard.stats.revenue.label": "Revenue",
-  "dashboard.stats.revenue.value": "—",
+  "dashboard.stats.revenue.value": "-",
   "dashboard.stats.activeToday.label": "Active today",
-  "dashboard.stats.activeToday.value": "—",
+  "dashboard.stats.activeToday.value": "-",
 
   "dashboard.gettingStarted.title": "Getting started",
   "dashboard.gettingStarted.description": "A few things you can ask your AI agent to do next.",

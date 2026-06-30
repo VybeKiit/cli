@@ -34,7 +34,15 @@ unless you screen-share a summary.
 ## If anything breaks
 
 Run `doctor`. Common cause: wrong site id or ad blockers in dev — test in a normal browser window.
+If MCP fails once, run `vybekiit doc-fallback posthog` or `vybekiit doc-fallback plausible`.
 
 ## Definition of done
 
 Visitor stats record at least one page view, and the builder knows where to check numbers in plain words.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

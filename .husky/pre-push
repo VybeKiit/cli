@@ -1,5 +1,5 @@
 # Maintainer-only guard. We have no branch protection (GitHub Pro/Team-gated on private repos),
-# so this hook is the stand-in: it mirrors CI exactly (lint → typecheck → test → build), syncs all
+# so this hook is the stand-in: it runs `pnpm quality` (same as CI), syncs all
 # delivery mirrors (pin-platform-skills → pnpm mirror), and blocks the push if any step fails.
 # Turbo caches typecheck/test/build, so unchanged packages are near-instant.
 # Never shipped to a buyer's scaffolded repo — a blocking pre-push would trap a non-coder behind red.
@@ -17,7 +17,7 @@ case "$remote_url" in
     ;;
 esac
 
-pnpm lint && pnpm typecheck && pnpm test && pnpm test:scripts && pnpm build
+pnpm quality
 
 node scripts/pin-platform-skills.mjs
 # subtree split publishes committed history only — abort if pin left uncommitted changes

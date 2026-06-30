@@ -28,6 +28,8 @@ translate every error · celebrate. You do the whole update; the builder just wa
    **Verify:** the install finishes cleanly.
 
    **3b — Agent instructions.** Run `vybekiit sync-agent-layer` (or pass `web` if detection fails).
+   Regenerates vocabulary/contract sections from agent-kit. Optionally run `vybekiit render-agent-layer`
+   after local edits to maintained renderers.
    Tell the builder: *"I'm refreshing my latest instructions for your project."*
    **Verify:** command exits 0; allowlisted paths copied (`.vybekiit/`, `AGENTS.md`, `language.md`,
    etc.).
@@ -55,3 +57,10 @@ the kit packages back to the last working versions — the app keeps working whi
 The kit packages are on their latest working versions, agent instructions are refreshed, platform
 skills are updated when pinned, the tests are green, the app still works, and none of the builder's
 own app files were changed.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

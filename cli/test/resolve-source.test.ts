@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type ResolveDeps, resolveTemplatesSource } from '../src/index';
-import { ScaffoldError } from '../src/scaffold';
+import { ScaffoldError } from '../src/lib/scaffold';
 
 /**
  * `resolveTemplatesSource` resolution-order tests. All three branches are exercised

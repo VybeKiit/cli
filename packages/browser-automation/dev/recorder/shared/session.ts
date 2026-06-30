@@ -17,7 +17,7 @@ export async function attachRecorderSession(options: {
 }): Promise<RecorderSession> {
   const { cdpEndpoint, profileHint, startUrl, tabUrlPattern } = options;
 
-  let browser;
+  let browser: Browser;
   try {
     browser = await chromium.connectOverCDP(cdpEndpoint, { timeout: 15_000 });
   } catch (err) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { rewriteWorkspaceDeps } from '../src/rewrite-deps';
-import { isTemplateName } from '../src/scaffold';
+import { rewriteWorkspaceDeps } from '../src/lib/rewrite-deps';
+import { isTemplateName } from '../src/lib/scaffold';
 
 describe('rewriteWorkspaceDeps', () => {
   it('pins @vybekiit workspace ranges to a caret npm version', () => {

@@ -62,3 +62,10 @@ If the prompt starts with `[VybeKiit Report]` (or the builder used Report mode o
 
 The thing that was broken now works, verified on the phone, and the builder knows (in plain words)
 it's handled.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

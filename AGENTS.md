@@ -53,8 +53,12 @@ traceable code). Specifically:
   gate and is what makes the buyer's `update-kit` safe (green suite = safe to bump).
 - **Pre-commit is lenient** (format + lint-fix only) — it must never block on a failing test, so
   it can be inherited by buyer repos without trapping a non-coder.
-- **CI is the heavy gate** (full tests + typecheck). A red CI is a check *the agent* fixes.
-- Run the project's typecheck/test/lint after substantial changes.
+- **Pre-push + CI are the heavy gate** — both run `pnpm quality` (lint, typecheck, test,
+  script tests, build). A red gate is a check *the agent* fixes before push/merge.
+- Run `pnpm quality` after substantial changes (pre-push runs the same commands automatically).
+- Never `git push --no-verify` to skip a red gate unless you are deliberately re-running mirror
+  sync only — then use the **mirror-repos** workflow or `pnpm mirror` manually.
+- Run `./scripts/setup-branch-protection.sh` once if GitHub Team/Pro is available on private repos.
 
 ## Authoring buyer-facing content (skills, templates, docs)
 
@@ -121,3 +125,15 @@ you can take $1 and auto-invite yourself, the business is real.
 - **$29 pricing** is flagged as underpriced (parked, not settled).
 - Brand `vybekiit` availability confirmed free on **npm** (`@vybekiit/*` + unscoped) and **GitHub org**
   as of the scaffold; the org still has to be **created in the browser** (no API for that).
+
+<!-- vybekiit:generated:start contract -->
+## The contract: Decide + Guide
+
+① **One action at a time** — Do a single step, then stop — never hand the builder a wall of instructions to run at once.
+② **Verify before advancing** — Confirm each step actually worked before moving on, so the builder can't get silently stuck.
+③ **Plain language** — Translate every technical term using language.md — the builder never has to understand or decide.
+④ **Translate errors** — Turn any failure into "what happened + the one thing to do about it" — never paste a raw stack trace.
+⑤ **Celebrate progress** — Call out small wins out loud ("Payments are working! 🎉") to keep a non-coder going.
+⑥ **Record decisions** — After every completing skill, append one entry to checklist.md Decision log via formatChecklistEntry().
+⑦ **Official source fallback** — If MCP or the first debug attempt fails once, run vybekiit doc-fallback and tell the builder the plain stuck phrase only.
+<!-- vybekiit:generated:end contract -->

@@ -29,6 +29,9 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
      instructions first"* in plain words, never name upstream tools.
    - **Services reachable:** if it's data-related, check the database is reachable
      (`@vybekiit/db`'s `pingDatabase`). If payments, re-check payment secret values.
+   - **MCP / integration stuck once?** Run `vybekiit doc-fallback <tech-id>` (see
+     `.vybekiit/agent/tech-references.md`). Tell the builder you're checking the official setup
+     guide — use the plain phrase from `formatBuilderStuckMessage()`, never say MCP.
 
 3. **Fix the one thing.** Make the smallest change that addresses the actual cause. If it's a value
    the builder must supply, ask for **just that one**, with exactly where to get it.
@@ -59,3 +62,10 @@ If the prompt starts with `[VybeKiit Report]` (or the builder used Report mode o
 ## Definition of done
 
 The thing that was broken now works, verified, and the builder knows (in plain words) it's handled.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

@@ -15,11 +15,10 @@ when a step truly needs it.
 
 ## Steps
 
-1. **Make sure the backend can sign people in first.** Sign-in happens on the builder's web app. If
-   the web side doesn't have sign-in set up yet, run the **web** add-signin skill (or `go-live`) over
-   there first, then come back — the phone app can only connect to a backend that already does it.
-   **Verify:** the backend's sign-in works (the web app accepts a real account), and `APP_URL` in
-   `.env` points at that deployed backend.
+1. **Make sure the backend can sign people in.** Run `vybekiit plan-readiness sign-in mobile` and
+   execute every orchestration step (scaffold `backend/` if needed, wire auth, set
+   `EXPO_PUBLIC_APP_URL`) without asking the builder to choose.
+   **Verify:** backend `/health` or web sign-in works and `EXPO_PUBLIC_APP_URL` points at it.
 
 2. **Connect the sign-in screens.** In `src/lib/auth-client.ts`, replace the stubbed
    `signInWithPassword` / `signUpWithPassword` / `sendEmailCode` / `verifyEmailCode` with real calls
@@ -40,11 +39,18 @@ when a step truly needs it.
 
 ## If anything breaks
 
-Run `doctor`. The usual causes are the backend address (`APP_URL`) not pointing at the deployed web
-app, or the backend not having sign-in set up yet — fix the one cause for them, don't explain the
-internals.
+Run `doctor`. If backend auth or MCP fails once, run `vybekiit doc-fallback better-auth` and use the
+plain stuck phrase — never say MCP to the builder. Usual causes are also the backend address
+(`APP_URL`) not pointing at the deployed web app, or sign-in not set up yet on the backend.
 
 ## Definition of done
 
 A real account can sign up, sign in, and reach the protected dashboard on the phone; a passing test
 covers it; no `connect-account` markers remain (re-grep `TODO(vybekiit)`).
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

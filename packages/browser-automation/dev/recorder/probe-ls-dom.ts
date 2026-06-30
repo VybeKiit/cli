@@ -36,7 +36,7 @@ async function main(): Promise<void> {
   const candidates = await page.evaluate((): Candidate[] => {
     const out: Candidate[] = [];
     const sel = 'input, textarea, select, button, a[href], [role="button"], [role="textbox"]';
-    for (const el of document.querySelectorAll(sel)) {
+    for (const el of Array.from(document.querySelectorAll(sel))) {
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       const visible =

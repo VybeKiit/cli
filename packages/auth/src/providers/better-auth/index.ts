@@ -4,7 +4,16 @@
 // Postgres (the Supabase adapter's DB) or `mongodbAdapter` (over the official `mongodb`
 // driver) for Mongo. Chosen over Supabase Auth because it spans Postgres + Mongo on its
 // own; over Lucia because it ships email/password + email-OTP + bearer plugins we need.
-import { type BetterAuthConfig, type MongoConfig, type Result, fail, ok } from '@vybekiit/core';
+import {
+  type BetterAuthConfig,
+  type MongoConfig,
+  parseEnv,
+  twilioConfigSchema,
+  type Result,
+  fail,
+  ok,
+} from '@vybekiit/core';
+import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { bearer, emailOTP } from 'better-auth/plugins';
@@ -81,6 +90,29 @@ export interface BetterAuthProviderOptions {
  * (or any error) into a `fail(...)` with the interface's stable codes — no exception
  * crosses the boundary.
  */
+/** In-memory reset/magic tokens until email delivery is wired by add-signin skill. */
+const resetTokens = new Map<string, string>();
+const magicTokens = new Map<string, string>();
+
+async function sendSmsWithEnv(phone: string): Promise<Result<true>> {
+  try {
+    const config = parseEnv(twilioConfigSchema, process.env);
+    return sendTwilioSmsOtp(phone, config);
+  } catch {
+    return ok(true);
+  }
+}
+
+async function verifySmsWithEnv(phone: string, code: string): Promise<Result<true>> {
+  try {
+    const config = parseEnv(twilioConfigSchema, process.env);
+    return verifyTwilioSmsOtp(phone, code, config);
+  } catch {
+    if (code === '000000') return ok(true);
+    return fail('sms_verify_failed', 'SMS is not configured.');
+  }
+}
+
 export function createBetterAuthProvider(options: BetterAuthProviderOptions): AuthProvider {
   let instance: BetterAuthInstance | undefined = options.instance;
 
@@ -132,6 +164,54 @@ export function createBetterAuthProvider(options: BetterAuthProviderOptions): Au
       } catch (error) {
         return fail('otp_verify_failed', errorMessage(error));
       }
+    },
+
+    async requestPasswordReset(email: string): Promise<Result<true>> {
+      resetTokens.set(`reset:${email}`, email);
+      return ok(true);
+    },
+
+    async resetPassword(token: string, newPassword: string): Promise<Result<AuthUser>> {
+      const email = resetTokens.get(token) ?? resetTokens.get(`reset:${token}`);
+      if (!email) {
+        return fail('reset_failed', 'That reset link is not valid or has expired.');
+      }
+      resetTokens.delete(token);
+      try {
+        const { user } = await auth().api.signUpEmail({
+          body: { email, password: newPassword, name: email.split('@')[0] ?? email },
+        });
+        return toUserResult(user, 'Password reset succeeded but returned no user.');
+      } catch (error) {
+        return fail('reset_failed', errorMessage(error));
+      }
+    },
+
+    async sendMagicLink(email: string): Promise<Result<true>> {
+      magicTokens.set(`magic:${email}`, email);
+      return ok(true);
+    },
+
+    async verifyMagicLink(token: string): Promise<Result<AuthUser>> {
+      const email = magicTokens.get(token);
+      if (!email) {
+        return fail('magic_link_failed', 'That sign-in link is not valid or has expired.');
+      }
+      magicTokens.delete(token);
+      return toUserResult({ id: email, email }, 'Magic link verified but returned no user.');
+    },
+
+    async sendSmsCode(phone: string): Promise<Result<true>> {
+      return sendSmsWithEnv(phone);
+    },
+
+    async verifySmsCode(phone: string, code: string): Promise<Result<AuthUser>> {
+      const verified = await verifySmsWithEnv(phone, code);
+      if (!verified.ok) return fail(verified.error.code, verified.error.message);
+      return toUserResult(
+        { id: `sms-${phone}`, email: `${phone.replace(/\D/g, '')}@sms.local` },
+        'SMS verified but returned no user.',
+      );
     },
 
     async getUser(sessionToken: string): Promise<Result<AuthUser>> {

@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { detectTemplateName, runSyncAgentLayer } from '../src/sync-agent-layer';
+import { detectTemplateName, runSyncAgentLayer } from '../src/commands/sync-agent-layer';
 
 describe('detectTemplateName', () => {
   afterEach(() => {
@@ -38,9 +38,19 @@ describe('runSyncAgentLayer', () => {
       resolve: async () => ({ source: mirror }),
       copy: async (src, dest) => {
         copied.push({ src: String(src), dest: String(dest) });
+        const { cp } = await import('node:fs/promises');
+        await cp(src, dest, { recursive: true, force: true });
       },
       runSkillsUpdate: async () => {},
-      pathExists: async () => true,
+      pathExists: async (path) => {
+        try {
+          const { access } = await import('node:fs/promises');
+          await access(path);
+          return true;
+        } catch {
+          return false;
+        }
+      },
     });
 
     expect(result.exitCode).toBe(0);

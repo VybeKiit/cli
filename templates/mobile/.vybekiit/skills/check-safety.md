@@ -33,3 +33,10 @@ backend, clean code on the phone, consistent UI. Plain pass/fail summary for the
 ## Definition of done
 
 Backend protected, no secrets on phone, code clean, UI consistent, quality smoke green, doctor green. 🎉
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

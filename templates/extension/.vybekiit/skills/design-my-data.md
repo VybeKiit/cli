@@ -5,7 +5,7 @@
 **Contract:** one action at a time · verify-before-advance · plain language (`language.md`) ·
 translate every error · celebrate. You do all the planning; the builder describes features in plain words.
 
-> (Agent-only) Call `planDataModel()` from `@vybekiit/agent-kit` with entities inferred from the
+> (Agent-only) Run `vybekiit plan-data-model entities.json [provider]` — do not eval TypeScript from node_modules. Entities inferred from the
 > conversation. Never say primary key, foreign key, migration, schema, or normalization to the builder.
 > Follow `platform-skills/data-model-vybekiit.md`.
 
@@ -14,7 +14,7 @@ translate every error · celebrate. You do all the planning; the builder describ
 1. **Learn what users do.** From the product description, ask what must be saved (not a schema interview).
    **Verify:** you can list 1–3 things the app remembers.
 
-2. **Plan the shape (agent-only).** Run `planDataModel()` with entities and fields inferred from step 1.
+2. **Plan the shape (agent-only).** Run `vybekiit plan-data-model entities.json` with entities from step 1.
    **Verify:** plan has collections and a `buyerSummary` sentence.
 
 3. **Read back in one sentence.** Use `renderDataModelSummary(plan)` — plain words only.
@@ -25,9 +25,16 @@ translate every error · celebrate. You do all the planning; the builder describ
 
 ## When to skip
 
-Single trivial entity (e.g. one list of notes) — you may inline `planDataModel()` inside `save-data` step 2
+Single trivial entity (e.g. one list of notes) — you may run `vybekiit plan-data-model` inside `save-data` step 2
 instead of running this skill separately.
 
 ## Definition of done
 
 Builder agreed on what the app remembers and `save-data` is running with a clear target shape.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

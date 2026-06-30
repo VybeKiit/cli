@@ -36,3 +36,10 @@ still points at the old address — fix it for them, don't explain the internals
 
 The app loads at the builder's own web address with the padlock showing, and its address settings
 match.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

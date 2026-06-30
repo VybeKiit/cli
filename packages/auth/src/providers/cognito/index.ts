@@ -5,7 +5,9 @@
 import {
   type AttributeType,
   CognitoIdentityProviderClient,
+  ConfirmForgotPasswordCommand,
   ConfirmSignUpCommand,
+  ForgotPasswordCommand,
   GetUserCommand,
   InitiateAuthCommand,
   ResendConfirmationCodeCommand,
@@ -122,11 +124,61 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
             ConfirmationCode: code,
           }),
         );
-        // ConfirmSignUp returns no `sub`; key the confirmed user by its email.
         return toUserResult({ id: email, email }, 'Code verified but returned no user.');
       } catch (error) {
         return fail('otp_verify_failed', errorMessage(error));
       }
+    },
+
+    async requestPasswordReset(email: string): Promise<Result<true>> {
+      try {
+        await client.send(new ForgotPasswordCommand({ ClientId: clientId, Username: email }));
+        return ok(true);
+      } catch (error) {
+        return fail('reset_request_failed', errorMessage(error));
+      }
+    },
+
+    async resetPassword(token: string, newPassword: string): Promise<Result<AuthUser>> {
+      try {
+        const [username, code] = token.includes(':') ? token.split(':', 2) : ['', token];
+        if (!username) {
+          return fail('reset_failed', 'Reset token must be username:code from Cognito flow.');
+        }
+        await client.send(
+          new ConfirmForgotPasswordCommand({
+            ClientId: clientId,
+            Username: username,
+            ConfirmationCode: code,
+            Password: newPassword,
+          }),
+        );
+        return toUserResult({ id: username, email: username }, 'Password reset succeeded.');
+      } catch (error) {
+        return fail('reset_failed', errorMessage(error));
+      }
+    },
+
+    async sendMagicLink(_email: string): Promise<Result<true>> {
+      return fail(
+        'magic_link_failed',
+        'Magic link sign-in is not available on this auth backend — use email code or password.',
+      );
+    },
+
+    async verifyMagicLink(_token: string): Promise<Result<AuthUser>> {
+      return fail('magic_link_failed', 'Magic link sign-in is not available on this auth backend.');
+    },
+
+    async sendSmsCode(_phone: string): Promise<Result<true>> {
+      return fail(
+        'sms_send_failed',
+        'SMS sign-in is not configured — set NOTIFICATIONS_PROVIDER=twilio and Twilio secret settings.',
+      );
+    },
+
+    async verifySmsCode(_phone: string, _code: string): Promise<Result<AuthUser>> {
+      return fail('sms_verify_failed', 'SMS sign-in is not configured.');
     },
 
     async getUser(sessionToken: string): Promise<Result<AuthUser>> {

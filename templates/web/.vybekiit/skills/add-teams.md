@@ -38,3 +38,10 @@ Run `doctor`. Common cause: sign-in not wired, or migration not applied.
 ## Definition of done
 
 Owner can invite a teammate by email, the invite is stored, and a passing test covers org membership.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

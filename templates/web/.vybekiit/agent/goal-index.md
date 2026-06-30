@@ -13,6 +13,10 @@ translate errors · celebrate.
 | "add payments", "let me take money", "sell something", "charge people" | `skills/setup-payments.md` |
 | "put it online", "publish", "make it live", "ship it", "deploy" | `skills/go-live.md` |
 | "let people sign in / log in / create accounts / add users" | `skills/add-signin.md` |
+| "I forgot my password", "reset my password" | `skills/reset-password.md` |
+| "email me a link", "sign in without a password" | `skills/sign-in-with-email-link.md` |
+| "sign in with my phone", "text me a code" | `skills/sign-in-with-phone.md` |
+| "set up text messages", "Twilio", "WhatsApp" | `skills/setup-sms.md` |
 | "save my data", "remember this", "store info", "add a database" | `skills/save-data.md` |
 | "what should my app remember", "design my database", "what data do I need", "map my features to data" | `skills/design-my-data.md` |
 | "let users upload", "store files / images / attachments" | `skills/add-files.md` |
@@ -42,3 +46,7 @@ do it well per `AGENTS.md`, then offer the next relevant goal above.
 > The sign-in, save-data, file-upload, email, domain, and update-the-kit goals are now shipping (no
 > longer "coming soon") — each routes to its skill above. Each one routes to the right service under
 > the hood; never name the service to the builder (see `language.md`).
+
+<!-- vybekiit:generated:start goal-index-validation -->
+<!-- Goal drift: run `vybekiit check-goals` — non-zero exit means fix goal-index or add skills -->
+<!-- vybekiit:generated:end goal-index-validation -->

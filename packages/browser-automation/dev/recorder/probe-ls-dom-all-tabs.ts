@@ -26,7 +26,7 @@ async function probePage(page: import('playwright').Page): Promise<Candidate[]> 
     const out: Candidate[] = [];
     const sel =
       'input, textarea, select, button, a[href], [role="button"], [role="textbox"], [role="link"], [role="combobox"]';
-    for (const el of document.querySelectorAll(sel)) {
+    for (const el of Array.from(document.querySelectorAll(sel))) {
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       const visible =

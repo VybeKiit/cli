@@ -49,3 +49,10 @@ Run `doctor`. Roll kit packages back to the last working versions if you can't f
 
 Kit packages updated, agent instructions refreshed, platform skills updated when pinned, tests
 green, extension preview works, and none of the builder's own extension files were changed.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

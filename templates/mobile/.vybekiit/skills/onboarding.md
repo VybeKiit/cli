@@ -61,3 +61,10 @@ that won't scan is usually the phone and computer not on the same Wi-Fi — fix 
 
 The builder has seen their own app running on their phone and personalized, and knows the next thing
 they can ask for. Save progress for them (don't make them think about it).
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

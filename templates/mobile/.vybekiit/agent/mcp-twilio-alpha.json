@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "twilio-alpha": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@twilio-alpha/mcp",
+        "--services",
+        "api_v2010,messaging_v1,verify_v2"
+      ]
+    }
+  }
+}

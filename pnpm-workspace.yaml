@@ -21,4 +21,5 @@ packages:
   - "templates/web"
   - "templates/mobile"
   - "templates/extension"
+  - "templates/backend"
   - "apps/landing"

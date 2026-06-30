@@ -6,6 +6,7 @@ alwaysApply: true
 
 # VybeKiit agent layer
 
-Read and follow `./AGENTS.md` as the single source of truth for this project.
+Read and follow `./AGENTS.md` as the single source of truth for this project. At task start,
+read `.vybekiit/agent/session-bootstrap.md` for the read order.
 
 Treat `.env` as redacted — never reproduce secret values from it in chat or commits.

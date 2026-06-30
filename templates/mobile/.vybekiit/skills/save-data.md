@@ -22,7 +22,7 @@ or describes, in plain words, what the app should remember.
    **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).
 
 2. **Agree on what to remember, in plain words.** If no prior `design-my-data` session, run that skill first
-   (or inline `planDataModel()` from `@vybekiit/agent-kit` for a single simple entity). Ask what the app
+   (or run `vybekiit plan-data-model` from `@vybekiit/agent-kit` for a single simple entity). Ask what the app
    should save; turn their answer into a simple data shape yourself.
    **Verify:** read the shape back in one sentence and get a yes.
 
@@ -46,3 +46,10 @@ them, don't explain the internals.
 
 The app saves and reads back real data, a passing test covers it, and no save-data markers remain
 (re-grep `TODO(vybekiit)`).
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+

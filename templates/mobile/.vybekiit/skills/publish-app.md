@@ -55,3 +55,10 @@ or a missing review detail — fix the one cause for them, don't explain the int
 
 The app is submitted (and, once approved, live) on both stores, its identity markers are resolved,
 and the builder has the store links.
+
+## After completing this skill
+
+Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
+
+If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*
+
