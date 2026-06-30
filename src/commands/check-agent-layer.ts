@@ -1,15 +1,7 @@
 import process from 'node:process';
-import { planAgentLayerCompliance, type PlatformSkillsTemplateManifest } from '@vybekiit/agent-kit';
-import { readAgentSkillSymlinkStates } from '../lib/agent-skill-symlinks';
-import {
-  COMPLIANCE_FILES,
-  listPlatformSkillWrappers,
-  listSkillPaths,
-  readBuyerSkillStubContents,
-  readFilesByPath,
-  readOptionalFile,
-  resolveTemplateArg,
-} from '../lib/agent-layer-io';
+import { planAgentLayerCompliance } from '@vybekiit/agent-kit';
+import { loadAgentLayerSnapshot } from '../lib/agent-layer-snapshot';
+import { resolveTemplateArg } from '../lib/agent-layer-io';
 
 function parseLiveDocsEnv(): Record<string, string> | undefined {
   const raw = process.env.VYBEKIIT_AGENT_RUNTIME_DOCS;
@@ -18,9 +10,7 @@ function parseLiveDocsEnv(): Record<string, string> | undefined {
   }
   try {
     return JSON.parse(raw) as Record<string, string>;
-  } catch {
-    return undefined;
-  }
+  } catch {}
 }
 
 export async function runCheckAgentLayer(
@@ -39,26 +29,19 @@ export async function runCheckAgentLayer(
     };
   }
 
-  const files = await readFilesByPath(cwd, COMPLIANCE_FILES);
-  const skillPaths = await listSkillPaths(cwd);
-  const skillContents = await readFilesByPath(cwd, skillPaths);
-  const buyerSkillStubContents = await readBuyerSkillStubContents(cwd, skillPaths);
-  const agentSkillSymlinkStates = await readAgentSkillSymlinkStates(cwd);
-  const platformSkillContents = await listPlatformSkillWrappers(cwd);
+  const snapshot = await loadAgentLayerSnapshot(cwd);
   const liveDocs = parseLiveDocsEnv();
-  const manifestRaw = await readOptionalFile(cwd, 'platform-skills.manifest.json');
-  const platformSkillsManifest = manifestRaw
-    ? (JSON.parse(manifestRaw) as PlatformSkillsTemplateManifest)
-    : undefined;
   const report = planAgentLayerCompliance({
     template,
-    files,
-    skillPaths,
-    skillContents,
-    buyerSkillStubContents,
-    agentSkillSymlinkStates,
-    platformSkillContents,
-    ...(platformSkillsManifest === undefined ? {} : { platformSkillsManifest }),
+    files: snapshot.files,
+    skillPaths: snapshot.skillPaths,
+    skillContents: snapshot.skillContents,
+    buyerSkillStubContents: snapshot.buyerSkillStubContents,
+    agentSkillSymlinkStates: snapshot.agentSkillSymlinkStates,
+    platformSkillContents: snapshot.platformSkillContents,
+    ...(snapshot.platformSkillsManifest === undefined
+      ? {}
+      : { platformSkillsManifest: snapshot.platformSkillsManifest }),
     ...(liveDocs === undefined ? {} : { liveDocs }),
   });
 
@@ -68,7 +51,7 @@ export async function runCheckAgentLayer(
         template: report.template,
         ok: report.ok,
         issues: report.issues,
-        skillCount: skillPaths.length,
+        skillCount: snapshot.skillPaths.length,
       },
       null,
       2,

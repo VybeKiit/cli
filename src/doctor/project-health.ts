@@ -49,7 +49,3 @@ export function verifyProjectHealth(cwd: string): ProjectHealthReport {
 
   return { ok, lines };
 }
-
-export function formatProjectHealthReport(report: ProjectHealthReport): readonly string[] {
-  return report.lines;
-}

@@ -1,4 +1,4 @@
-import { runDoctor } from './doctor';
+import { runDoctor } from '../doctor/run';
 import { playWelcomeBanner } from '../ui/welcome-banner';
 
 /** Post-purchase welcome: brand banner → toolchain doctor → scaffold CTA. */
