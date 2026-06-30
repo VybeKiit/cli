@@ -27,6 +27,11 @@
       "types": "./dist/http/express.d.ts",
       "import": "./dist/http/express.js",
       "require": "./dist/http/express.cjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
     }
   },
   "files": [
