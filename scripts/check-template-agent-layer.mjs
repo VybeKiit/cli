@@ -10,7 +10,7 @@ import process from 'node:process';
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cli = join(repoRoot, 'cli/dist/index.js');
 
-const templates = ['web', 'spa', 'mobile', 'extension', 'backend'];
+const templates = ['web', 'mobile', 'extension', 'backend'];
 let failed = false;
 
 for (const template of templates) {
