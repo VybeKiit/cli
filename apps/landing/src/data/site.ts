@@ -44,6 +44,7 @@ export interface NavLink {
 
 /** Primary in-page nav links shown in the header (anchors to the home sections). */
 export const HEADER_LINKS: readonly NavLink[] = [
+  { href: 'https://ui.vybekiit.com', label: 'UI Library' },
   { href: '#pillars', label: 'How it works' },
   { href: '#compare', label: 'Compare' },
   { href: '#pricing', label: 'Pricing' },
@@ -78,6 +79,6 @@ export const SUPPORT: {
 } = {
   /** Discord invite URL — set before launch. */
   discordUrl: '',
-  /** Kit bug email — set before launch. */
-  kitEmail: 'support@vybekiit.com',
+  /** Kit bug email — from root EMAIL_FROM when set. */
+  kitEmail: process.env.EMAIL_FROM ?? 'support@vybekiit.com',
 };

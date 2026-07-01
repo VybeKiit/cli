@@ -21,6 +21,7 @@
     "@radix-ui/react-tabs": "^1.1.15",
     "@radix-ui/react-tooltip": "^1.2.10",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/email": "workspace:*",
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/tokens": "workspace:*",

@@ -1,0 +1,56 @@
+name: Deploy UI library
+
+# Deploy apps/component-library to Cloudflare Pages at ui.vybekiit.com.
+# Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CF_UI_PAGES_PROJECT
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/component-library/**'
+      - 'templates/web/src/components/**'
+      - 'templates/web/.vybekiit/agent/ui-catalog-index.json'
+      - 'scripts/build-component-library-index.mjs'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: deploy-ui-library
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ vars.CF_UI_PAGES_PROJECT != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: node scripts/build-component-library-index.mjs
+
+      - run: pnpm --filter vybekiit-component-library build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/component-library/.next --project-name=${{ vars.CF_UI_PAGES_PROJECT }}

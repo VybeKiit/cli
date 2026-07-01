@@ -1,0 +1,5 @@
+@import "../../../templates/web/app/globals.css";
+
+.ui-library-page {
+  min-height: 100vh;
+}
