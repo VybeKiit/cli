@@ -18,6 +18,7 @@ import { runSetup } from './commands/setup';
 import { runPlanDataModel } from './commands/plan-data-model-cmd';
 import { runPlanReadiness } from './commands/plan-readiness';
 import { runPlanSetup } from './commands/plan-setup-cmd';
+import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/presets-cmd';
 import { runRenderAgentLayer } from './commands/render-agent-layer';
 import { runSyncAgentLayer } from './commands/sync-agent-layer';
 import { cloneMirror, resolveTemplatesSource } from './lib/resolve-templates';
@@ -39,6 +40,9 @@ Usage:
   vybekiit plan-readiness <feature> [template]
   vybekiit plan-setup <domain>
   vybekiit plan-data-model <entities.json> [provider]
+  vybekiit apply-preset <feature> [--provider=supabase|neon|railway] [--dry-run]
+  vybekiit list-presets
+  vybekiit verify-presets [--fix] [preset...]
   vybekiit check-agent-layer [template]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
@@ -49,9 +53,10 @@ Usage:
 
 Templates:
   web         Next.js + shadcn (RTL-ready) + the agent layer   [available]
+  spa         Vite admin SPA + Express backend stack           [available]
   mobile      Expo                                             [available]
   extension   WXT                                              [available]
-  backend     Express MVC API for mobile/extension clients   [available]
+  backend     Express MVC API (pairs with spa)                   [available]
 
 Commands:
   setup               Welcome banner + set up the tools your app needs
@@ -65,6 +70,9 @@ Commands:
   plan-readiness      Feature readiness + orchestration steps (JSON)
   plan-setup          Plain-language setup checklist for a domain
   plan-data-model     Data model plan from entities JSON file
+  apply-preset        Apply a DB feature preset migration
+  list-presets        List available DB feature presets (JSON)
+  verify-presets      Verify preset tables exist; --fix applies missing
   lint-extension-skill Lint an extension skill draft before saving (JSON)
   doc-fallback        Official docs URLs when MCP or debug fails once (JSON)
   env wizard          Interactive .env setup (TTY only)
@@ -154,6 +162,21 @@ async function main(argv: string[]): Promise<number> {
   }
   if (command === 'plan-data-model') {
     const result = await runPlanDataModel(rest);
+    console.log(result.json);
+    return result.exitCode;
+  }
+  if (command === 'apply-preset') {
+    const result = await runApplyPreset(rest);
+    console.log(result.json);
+    return result.exitCode;
+  }
+  if (command === 'list-presets') {
+    const result = runListPresets();
+    console.log(result.json);
+    return result.exitCode;
+  }
+  if (command === 'verify-presets') {
+    const result = await runVerifyPresets(rest);
     console.log(result.json);
     return result.exitCode;
   }
