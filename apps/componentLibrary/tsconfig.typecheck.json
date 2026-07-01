@@ -8,8 +8,8 @@
     "src/components/**/*.ts",
     "src/components/**/*.tsx",
     "src/data/**/*.ts",
-    "src/lib/resolve-preview-export.ts",
+    "src/lib/resolvePreviewExport.ts",
     "next-env.d.ts"
   ],
-  "exclude": ["node_modules", "app/embed/**", "src/lib/load-preview.client.ts", "src/demos/**"]
+  "exclude": ["node_modules", "app/embed/**", "src/lib/loadPreview.client.ts", "src/demos/**"]
 }

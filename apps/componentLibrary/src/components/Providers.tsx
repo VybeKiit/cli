@@ -1,5 +1,6 @@
 'use client';
 
+import { PreviewThemeProvider } from '@library/components/PreviewThemeProvider';
 import { ThemeProvider } from 'next-themes';
 import type { ReactNode } from 'react';
 
@@ -11,7 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
       enableSystem={true}
       disableTransitionOnChange={true}
     >
-      {children}
+      <PreviewThemeProvider>{children}</PreviewThemeProvider>
     </ThemeProvider>
   );
 }

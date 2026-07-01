@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate component library catalog + preview loaders for apps/component-library
+ * Generate component library catalog + preview loaders for apps/componentLibrary
  */
 
 import { access, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
@@ -9,11 +9,11 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const CATALOG_PATH = join(REPO_ROOT, 'templates/web/.vybekiit/agent/ui-catalog-index.json');
-const OUT_CATALOG = join(REPO_ROOT, 'apps/component-library/src/data/catalog.ts');
-const OUT_CLIENT_LOAD = join(REPO_ROOT, 'apps/component-library/src/lib/load-preview.client.ts');
+const OUT_CATALOG = join(REPO_ROOT, 'apps/componentLibrary/src/data/catalog.ts');
+const OUT_CLIENT_LOAD = join(REPO_ROOT, 'apps/componentLibrary/src/lib/loadPreview.client.ts');
 const WEB_ROOT = join(REPO_ROOT, 'templates/web');
-const DEMOS_ROOT = join(REPO_ROOT, 'apps/component-library/src/demos');
-const LIB_PKG_PATH = join(REPO_ROOT, 'apps/component-library/package.json');
+const DEMOS_ROOT = join(REPO_ROOT, 'apps/componentLibrary/src/demos');
+const LIB_PKG_PATH = join(REPO_ROOT, 'apps/componentLibrary/package.json');
 
 /** Hand-curated demos — never auto-deleted or overwritten. */
 const MANUAL_DEMOS = new Set(['aceternity/google-gemini-effect']);
@@ -60,7 +60,12 @@ const API_KEY_EXAMPLES = new Set([
 /** Namespaces excluded from auto demo generation (handled separately). */
 const AUTO_DEMO_SKIP_NAMESPACES = new Set([]);
 
-/** Import patterns that break isolated preview builds. */
+/**
+ * Import patterns that genuinely break an isolated preview build: native/WebGL
+ * runtimes and deps that aren't installed. A missing `@/components/ui/*` primitive
+ * is NOT listed here — it's caught for real by resolving the alias against the
+ * mirror (isBuildSafeShallow), so every primitive that actually exists is allowed.
+ */
 const BROKEN_IMPORT_PATTERNS = [
   /react-native/,
   /react-syntax-highlighter/,
@@ -69,7 +74,6 @@ const BROKEN_IMPORT_PATTERNS = [
   /from ['"]three['"]/,
   /three-globe/,
   /@react-three\//,
-  /@\/components\/ui\/(?!button|card|input|label|badge|avatar|dialog|select|tabs|tooltip|separator|sheet|skeleton|alert|dropdown-menu|chart|sonner|scroll-area|command|popover|collapsible|hover-card|carousel|progress|switch|accordion|input-group|button-group|spinner|checkbox|textarea)/,
 ];
 
 /**
@@ -166,13 +170,9 @@ async function isSimpleComponent(namespace, name) {
   if (BROKEN_IMPORT_PATTERNS.some((pattern) => pattern.test(content))) {
     return false;
   }
-  if (
-    /useScroll|useTransform|MotionValue|pathLengths|createContext|useRef\(null\)|3d|three|Three/.test(
-      content,
-    )
-  ) {
-    return false;
-  }
+  // Framer Motion (useScroll/useTransform/MotionValue), createContext, and refs all
+  // render fine in an isolated preview — the only real blockers are the native/WebGL
+  // imports above and unresolved deps, both covered by isBuildSafeShallow.
   return isBuildSafeShallow(mirrorFile);
 }
 
@@ -193,14 +193,37 @@ export { default } from '@/components/${namespace}/${upstreamExampleName}';
     await writeFile(path, content, 'utf8');
     return;
   }
-  const content = `'use client';
+  // Prefer a real default import when the mirror has one (clean, no webpack warning);
+  // otherwise scan named exports for the first component. Reading `Mirror.default` on a
+  // named-only module is what produced the "does not contain a default export" warnings.
+  const mirrorFile = `${importPathToFile(`@/components/${namespace}/${name}`)}.tsx`;
+  let mirrorContent = '';
+  try {
+    mirrorContent = await readFile(mirrorFile, 'utf8');
+  } catch {
+    // fall through to the named-export wrapper
+  }
+  const content = /export\s+default/.test(mirrorContent)
+    ? `'use client';
+
+import Component from '@/components/${namespace}/${name}';
+
+export default function ${toPascalCase(name)}Preview() {
+  return (
+    <div className="flex min-h-[200px] items-center justify-center p-6">
+      <Component />
+    </div>
+  );
+}
+`
+    : `'use client';
 
 import type { ComponentType } from 'react';
 import * as Mirror from '@/components/${namespace}/${name}';
 
-const Component =
-  (Mirror as { default?: ComponentType<object> }).default ??
-  (Object.values(Mirror).find((value) => typeof value === 'function') as ComponentType<object> | undefined);
+const Component = Object.values(Mirror).find(
+  (value): value is ComponentType<object> => typeof value === 'function',
+);
 
 export default function ${toPascalCase(name)}Preview() {
   if (!Component) {
@@ -634,6 +657,40 @@ async function isDemoBuildSafe(namespace, name, demoFile, demoSources) {
 }
 
 /**
+ * Why an entry can't render a live preview — drives honest gallery copy instead of a
+ * vague "no demo yet". Native/WebGL renders in an app but not the isolated gallery;
+ * `deps` needs packages the web template doesn't install; `env` needs API keys.
+ * @param {string} mirrorFile
+ * @param {boolean} requiresEnv
+ * @returns {Promise<'env' | 'native' | 'deps' | 'nodemo'>}
+ */
+async function classifyUnavailable(mirrorFile, requiresEnv) {
+  if (requiresEnv) {
+    return 'env';
+  }
+  let content;
+  try {
+    content = await readFile(mirrorFile, 'utf8');
+  } catch {
+    return 'nodemo';
+  }
+  // native/WebGL runtimes: match `react-native`, `from 'three'`, `@react-three/`
+  if (/react-native|from ['"]three['"]|@react-three\//.test(content)) {
+    return 'native';
+  }
+  const allowed = await getAllowedPackages();
+  const externals = [...content.matchAll(/from ['"]([^'"]+)['"]/g)]
+    .map((match) => match[1])
+    .filter((spec) => !(spec.startsWith('.') || spec.startsWith('@/')));
+  for (const spec of externals) {
+    if (spec.startsWith('@repo/') || !allowed.has(packageNameFromSpecifier(spec))) {
+      return 'deps';
+    }
+  }
+  return 'nodemo';
+}
+
+/**
  * @param {Record<string, unknown>} raw
  * @param {Map<string, 'manual' | 'upstream' | 'generated'>} demoSources
  */
@@ -646,6 +703,12 @@ async function toCatalogEntry(raw, demoSources) {
     ? `@/${primaryPath.replace(/^src\//, '').replace(/\.tsx$/, '')}`
     : `@/components/${namespace}/${name}`;
 
+  // Storybook artifacts (untitled ships *.demo.tsx / *.story.tsx) aren't catalog
+  // components — drop them. Examples use a `-demo` suffix, not a `.demo` extension.
+  if (/\.(story|demo)\.tsx$/.test(primaryPath)) {
+    return null;
+  }
+
   const kind =
     raw.kind === 'example' || name.startsWith('example-') || /-demo(-\d+)?$/.test(name)
       ? 'example'
@@ -653,6 +716,13 @@ async function toCatalogEntry(raw, demoSources) {
   const hasDemo = kind === 'component' ? await demoExists(namespace, name) : false;
   const renderMode = inferRenderMode({ name, kind }, hasDemo);
   const fileExists = await mirrorFileExists(importPath);
+  // Prune phantom entries: listed in the registry catalog index but never synced into
+  // the mirror (the untitled/kibo/gluestack dirs are empty). No source file = nothing
+  // a buyer could scaffold and nothing to preview, so drop it rather than ship a
+  // dead placeholder.
+  if (!fileExists) {
+    return null;
+  }
   const mirrorFile = `${importPathToFile(importPath)}.tsx`;
   const demoFile = demoPath(namespace, name);
   const demoBuildSafe = hasDemo
@@ -670,6 +740,9 @@ async function toCatalogEntry(raw, demoSources) {
   const previewable = kind === 'example' ? exampleBuildSafe : componentPreviewable;
   const buildSafe = previewable;
   const requiresEnv = API_KEY_EXAMPLES.has(name);
+  const unavailableReason = previewable
+    ? undefined
+    : await classifyUnavailable(mirrorFile, requiresEnv);
   const demoSource = demoSources.get(previewKey(namespace, name));
 
   return {
@@ -684,6 +757,7 @@ async function toCatalogEntry(raw, demoSources) {
     previewable,
     buildSafe,
     requiresEnv,
+    unavailableReason,
     demoSource: demoSource ?? undefined,
     relatedExamples: [],
     tags: raw.tags ?? [],
@@ -708,9 +782,10 @@ async function main() {
   const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
   const rawComponents = catalog.components ?? [];
   const demoSources = await ensureDemoWrappers(rawComponents);
-  const rawEntries = await Promise.all(
-    rawComponents.map((raw) => toCatalogEntry(raw, demoSources)),
-  );
+  const rawEntries = (
+    await Promise.all(rawComponents.map((raw) => toCatalogEntry(raw, demoSources)))
+  ).filter((entry) => entry !== null);
+  const prunedCount = rawComponents.length - rawEntries.length;
 
   /** @type {Map<string, typeof rawEntries[0]>} */
   const deduped = new Map();
@@ -721,12 +796,14 @@ async function main() {
   }
   const entries = [...deduped.values()];
 
-  const catalogTs = `/** Generated by scripts/build-component-library-index.mjs — do not edit. */
-export const COMPONENT_CATALOG_COUNT = ${catalog.componentCount ?? entries.length};
+  const catalogTs = `/** Generated by scripts/buildComponentLibraryIndex.mjs — do not edit. */
+export const COMPONENT_CATALOG_COUNT = ${entries.length};
 
 export type CatalogKind = 'component' | 'example';
 export type RenderMode = 'example' | 'demo' | 'auto';
 export type DemoSource = 'manual' | 'upstream' | 'generated';
+/** Why a non-previewable entry can't render live in the isolated gallery. */
+export type UnavailableReason = 'env' | 'native' | 'deps' | 'nodemo';
 
 export interface CatalogEntry {
   source: string;
@@ -740,6 +817,7 @@ export interface CatalogEntry {
   previewable: boolean;
   buildSafe: boolean;
   requiresEnv?: boolean;
+  unavailableReason?: UnavailableReason;
   demoSource?: DemoSource;
   relatedExamples: string[];
   tags: string[];
@@ -766,7 +844,7 @@ export const CATALOG_EXAMPLES = CATALOG_ENTRIES.filter((e) => e.kind === 'exampl
     default:
       throw new Error(\`No preview loader for \${entry.previewKey}\`);`;
 
-  const clientLoadTs = `/** Generated by scripts/build-component-library-index.mjs — do not edit. */
+  const clientLoadTs = `/** Generated by scripts/buildComponentLibraryIndex.mjs — do not edit. */
 'use client';
 // @ts-nocheck
 import type { CatalogEntry } from '@library/data/catalog';
@@ -782,7 +860,7 @@ ${loaderSwitchBody}
   await writeFile(OUT_CATALOG, catalogTs, 'utf8');
   await writeFile(OUT_CLIENT_LOAD, clientLoadTs, 'utf8');
   console.log(
-    `Wrote ${OUT_CATALOG} and ${OUT_CLIENT_LOAD} (${entries.length} entries, ${serverCases.length} preview loaders)`,
+    `Wrote ${OUT_CATALOG} and ${OUT_CLIENT_LOAD} (${entries.length} entries, ${serverCases.length} preview loaders, ${prunedCount} phantom entries pruned)`,
   );
 }
 

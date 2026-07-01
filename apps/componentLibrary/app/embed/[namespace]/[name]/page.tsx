@@ -1,13 +1,64 @@
 'use client';
 
-import { CATALOG_BY_KEY } from '@library/data/catalog';
-import { loadPreviewModule } from '@library/lib/load-preview.client';
-import { resolvePreviewExport } from '@library/lib/resolve-preview-export';
-import { useParams } from 'next/navigation';
-import { useEffect, useState, type ComponentType } from 'react';
+import { CATALOG_BY_KEY, type UnavailableReason } from '@library/data/catalog';
+import { loadPreviewModule } from '@library/lib/loadPreview.client';
+import { resolvePreviewExport } from '@library/lib/resolvePreviewExport';
+import { applyPrimaryVars, DEFAULT_PRIMARY } from '@library/lib/theme';
+import { useParams, useSearchParams } from 'next/navigation';
+import {
+  Component,
+  Suspense,
+  useEffect,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from 'react';
+
+/** Previews are third-party components — if one throws while rendering, fail soft. */
+class PreviewErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <div className="flex min-h-[320px] items-center justify-center p-6 text-destructive text-sm">
+          This component could not render in isolation.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+/** Short, honest fallback shown if the embed URL is opened for a non-previewable entry. */
+const EMBED_UNAVAILABLE: Record<UnavailableReason, string> = {
+  env: 'Needs API keys or a live backend — run it inside your app.',
+  deps: 'Needs extra packages the starter does not install by default.',
+  native: 'Native/WebGL component — renders in your app, not the gallery.',
+  nodemo: 'Live preview is coming soon.',
+};
 
 export default function EmbedPreviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[320px] items-center justify-center p-6 text-muted-foreground text-sm">
+          Loading preview…
+        </div>
+      }
+    >
+      <EmbedPreviewInner />
+    </Suspense>
+  );
+}
+
+function EmbedPreviewInner() {
   const params = useParams<{ namespace: string; name: string }>();
+  const searchParams = useSearchParams();
   const namespace = params.namespace;
   const name = decodeURIComponent(params.name);
   const key = `${namespace}/${name}`;
@@ -17,6 +68,18 @@ export default function EmbedPreviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // The parent toolbar passes the chosen theme + primary through the iframe URL; apply
+  // them to this document (its own browsing context) so the preview repaints to match.
+  const themeParam = searchParams.get('theme');
+  const primaryParam = searchParams.get('primary');
+  useEffect(() => {
+    const root = document.documentElement;
+    const isDark = themeParam === 'dark';
+    root.classList.toggle('dark', isDark);
+    root.classList.toggle('light', !isDark);
+    applyPrimaryVars(root, primaryParam ?? DEFAULT_PRIMARY);
+  }, [themeParam, primaryParam]);
+
   useEffect(() => {
     if (!entry) {
       setError('Component not found in catalog.');
@@ -25,10 +88,10 @@ export default function EmbedPreviewPage() {
     }
 
     if (!entry.buildSafe) {
+      // Reached only if someone opens the embed URL directly for a non-previewable
+      // entry (the catalog renders the reason inline instead of this iframe).
       setError(
-        entry.requiresEnv
-          ? 'This example needs API keys or a live backend.'
-          : 'Live preview is unavailable for this entry.',
+        EMBED_UNAVAILABLE[entry.unavailableReason ?? (entry.requiresEnv ? 'env' : 'nodemo')],
       );
       setLoading(false);
       return;
@@ -102,7 +165,9 @@ export default function EmbedPreviewPage() {
 
   return (
     <div className="min-h-[320px] bg-background p-4 text-foreground">
-      <Preview />
+      <PreviewErrorBoundary>
+        <Preview />
+      </PreviewErrorBoundary>
     </div>
   );
 }

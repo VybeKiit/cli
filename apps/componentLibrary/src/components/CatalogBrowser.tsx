@@ -1,6 +1,7 @@
 'use client';
 
 import { ComponentCard } from '@library/components/ComponentCard';
+import { GlobalThemeControls } from '@library/components/ThemeToolbar';
 import {
   CATALOG_COMPONENTS,
   CATALOG_ENTRIES,
@@ -66,13 +67,16 @@ export function CatalogBrowser() {
       </aside>
 
       <main className="flex-1 p-6 md:p-8">
-        <header className="mb-8">
-          <p className="font-medium text-muted-foreground text-sm">VybeKiit · ui.vybekiit.com</p>
-          <h1 className="mt-1 font-bold text-3xl tracking-tight">Component Library</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            {COMPONENT_CATALOG_COUNT} mirrored blocks from AI Elements, Kibo UI, Magic UI, BundUI,
-            Kokonut, Aceternity, Untitled, and Gluestack — synced into every VybeKiit web scaffold.
-          </p>
+        <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-medium text-muted-foreground text-sm">VybeKiit · ui.vybekiit.com</p>
+            <h1 className="mt-1 font-bold text-3xl tracking-tight">Component Library</h1>
+            <p className="mt-2 max-w-2xl text-muted-foreground">
+              {COMPONENT_CATALOG_COUNT} mirrored blocks from AI Elements, Kibo UI, Magic UI, BundUI,
+              Kokonut, Aceternity, Untitled, and Gluestack, synced into every VybeKiit web scaffold.
+            </p>
+          </div>
+          <GlobalThemeControls />
         </header>
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">

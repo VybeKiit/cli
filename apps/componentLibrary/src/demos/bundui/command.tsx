@@ -1,18 +1,8 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/bundui/command';
-
-const Component =
-  (Mirror as { default?: ComponentType<object> }).default ??
-  (Object.values(Mirror).find((value) => typeof value === 'function') as
-    | ComponentType<object>
-    | undefined);
+import Component from '@/components/bundui/command';
 
 export default function CommandPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
     <div className="flex min-h-[200px] items-center justify-center p-6">
       <Component />

@@ -1,4 +1,4 @@
-# apps/component-library — VybeKiit UI browser
+# apps/componentLibrary — VybeKiit UI browser
 
 Public component gallery at [ui.vybekiit.com](https://ui.vybekiit.com). Imports mirrored blocks from `templates/web/src/components/` via webpack alias — single SSOT, no duplicate copies.
 
@@ -13,7 +13,7 @@ pnpm --filter vybekiit-component-library dev
 Regenerate catalog after `pnpm sync:ui`:
 
 ```bash
-node scripts/build-component-library-index.mjs
+node scripts/buildComponentLibraryIndex.mjs
 ```
 
 ## Deploy

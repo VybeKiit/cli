@@ -3,11 +3,9 @@
 import type { ComponentType } from 'react';
 import * as Mirror from '@/components/ai-elements/edge';
 
-const Component =
-  (Mirror as { default?: ComponentType<object> }).default ??
-  (Object.values(Mirror).find((value) => typeof value === 'function') as
-    | ComponentType<object>
-    | undefined);
+const Component = Object.values(Mirror).find(
+  (value): value is ComponentType<object> => typeof value === 'function',
+);
 
 export default function EdgePreview() {
   if (!Component) {
