@@ -1,7 +1,9 @@
 import type { CommandRegistry } from '../../../cli/registry';
+import { baseVerbContext } from '../../../cli/verbContext';
 import { printJson } from '../../../cli/output';
 import { parseSetupArgs, requireNonInteractive, type LsSetupCliArgs } from '../../../cli/flags';
 import { promptLsSetup } from '../../../cli/wizard';
+import { lsSetupEnvBlock, verifyVariantViaApi } from './api/verifyVariant';
 import { runLsSetup, standbyLogin } from './index';
 
 export function registerLsDomain(registry: CommandRegistry): void {
@@ -12,7 +14,7 @@ export function registerLsDomain(registry: CommandRegistry): void {
       standby: {
         description: 'Wait for Lemon Squeezy dashboard after builder sign-in',
         run: async ({ flags }) => {
-          const result = await standbyLogin({});
+          const result = await standbyLogin(baseVerbContext(flags));
           if (flags.json) printJson({ ok: result.ready, ...result });
           else if (result.ready) console.log(`OK: dashboard ready at ${result.url}`);
           else console.log('Timed out waiting for Lemon Squeezy dashboard sign-in.');
@@ -34,9 +36,30 @@ export function registerLsDomain(registry: CommandRegistry): void {
           if (missing.length > 0) params = await promptLsSetup(partial);
           else params = partial as LsSetupCliArgs;
 
-          const result = await runLsSetup({}, params);
-          if (flags.json) printJson({ ok: true, ...result });
-          else console.log('OK: Lemon Squeezy setup complete.');
+          const result = await runLsSetup(baseVerbContext(flags), params);
+
+          await verifyVariantViaApi(result.apiKey, result.variantId, {
+            name: params.name,
+            priceCents: params.priceCents,
+            mode: params.mode,
+          });
+
+          const env = lsSetupEnvBlock(result, params.mode);
+          if (flags.json) {
+            printJson({
+              ok: true,
+              env,
+              productId: result.productId,
+              variantId: result.variantId,
+              storeId: result.storeId,
+            });
+          } else {
+            console.log('OK: Lemon Squeezy setup complete.');
+            console.log('Write these to .env:');
+            for (const [key, value] of Object.entries(env)) {
+              console.log(`${key}=${value}`);
+            }
+          }
           return 0;
         },
       },

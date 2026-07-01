@@ -12,9 +12,13 @@ export async function uploadProductFiles(
   await (await lsField(page, 'product.files.uploadInput')).setInputFiles(filesPath);
   await page.waitForTimeout(2000);
 
-  const saveDraft = await lsField(page, 'product.actions.saveDraftButton');
-  if (await saveDraft.isEnabled()) {
-    await saveDraft.click({ timeout: 8000 }).catch(() => undefined);
-    await page.waitForTimeout(800);
+  try {
+    const saveDraft = await lsField(page, 'product.actions.saveDraftButton');
+    if (await saveDraft.isEnabled()) {
+      await saveDraft.click({ timeout: 8000 }).catch(() => undefined);
+      await page.waitForTimeout(800);
+    }
+  } catch {
+    // File upload may auto-save; missing save button is not fatal.
   }
 }

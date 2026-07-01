@@ -1,22 +1,22 @@
 import { connectToLsChrome } from '../connect';
-import { LS_DASHBOARD_URL, type LsVerbContext } from '../types';
-
-const AUTH_TIMEOUT_MS = 120_000;
+import { waitForLsAuthenticated } from '../dashboard/waitForAuthenticated';
+import type { LsVerbContext } from '../types';
 
 /** Wait until builder reaches the LS dashboard after manual sign-in. */
 export async function standbyLogin(ctx: LsVerbContext): Promise<{ ready: boolean; url?: string }> {
-  const log = ctx.log ?? console;
-  const session = await connectToLsChrome(ctx);
+  const session = await connectToLsChrome(ctx, { waitForAuth: false });
 
   try {
-    log.log(`[ls] waiting for dashboard at ${LS_DASHBOARD_URL}`);
-    await session.page.waitForURL(/lemonsqueezy\.com\/dashboard/, {
-      timeout: AUTH_TIMEOUT_MS,
-    });
-    const url = session.page.url();
-    return { ready: url.includes('/dashboard'), url };
-  } catch {
-    return { ready: false };
+    try {
+      session.page = await waitForLsAuthenticated(
+        session.page,
+        ctx.log ?? console,
+        session.context,
+      );
+      return { ready: session.page.url().includes('/dashboard'), url: session.page.url() };
+    } catch {
+      return { ready: false };
+    }
   } finally {
     await session.dispose();
   }

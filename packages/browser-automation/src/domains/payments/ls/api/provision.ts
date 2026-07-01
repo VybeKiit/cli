@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 const LS_API_BASE = 'https://api.lemonsqueezy.com/v1';
 
 type JsonApiResource<T extends string, A> = {
@@ -28,6 +30,11 @@ export type LsApiWebhookResult = {
   url: string;
 };
 
+/** LS requires the caller to supply a signing secret (6–40 chars); it is not returned by the API. */
+function generateWebhookSecret(): string {
+  return randomBytes(16).toString('hex');
+}
+
 /** Create a webhook via LS REST API (requires an existing API key). */
 export async function createWebhookViaApi(
   apiKey: string,
@@ -36,13 +43,14 @@ export async function createWebhookViaApi(
   events: string[] = ['order_created'],
   testMode = true,
 ): Promise<LsApiWebhookResult> {
+  const secret = generateWebhookSecret();
   const payload: JsonApiResource<
     'webhooks',
-    { url: string; events: string[]; test_mode: boolean }
+    { url: string; events: string[]; test_mode: boolean; secret: string }
   > = {
     data: {
       type: 'webhooks',
-      attributes: { url, events, test_mode: testMode },
+      attributes: { url, events, test_mode: testMode, secret },
       relationships: {
         store: { data: { type: 'stores', id: storeId } },
       },
@@ -55,7 +63,7 @@ export async function createWebhookViaApi(
 
   return {
     id: res.data.id,
-    secret: res.data.attributes.secret,
+    secret,
     url: res.data.attributes.url,
   };
 }

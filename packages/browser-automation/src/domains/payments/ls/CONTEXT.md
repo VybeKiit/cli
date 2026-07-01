@@ -16,6 +16,11 @@ Browser automation for Lemon Squeezy onboarding and product editor flows.
 | **Tax category** | Fixed dropdown option set for product tax classification; options live in `selectors/taxCategories.ts`. |
 | **Product actions menu** | Three-dot product menu (edit, share, delete, …) opened from the product editor header. |
 | **Text hint fallback** | Runtime hint in `dashboard/fieldFallbacks.ts` when registry entry is missing or not visible. |
+| **Test catalog** | LS sidebar Test mode ON — products published here are purchasable with test checkouts only. |
+| **Live catalog** | Test mode OFF — real charges; used for production launch. |
+| **Draft** | Unpublished product editor state — checkout cannot sell draft variants. |
+| **Published** | Product saved and visible in the active catalog (test or live); required before checkout works. |
+| **Variant id** | LS variant numeric id — this is what `STORE_PRODUCT_ID` must hold (not product id). |
 
 ## Layout
 

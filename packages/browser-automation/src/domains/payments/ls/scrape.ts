@@ -7,7 +7,18 @@ export function scrapeStoreIdFromHtml(html: string): string | null {
   return match?.[1] ?? null;
 }
 
-export function scrapeVariantIdFromHtml(html: string): string | null {
+export function scrapeVariantIdFromHtml(html: string, productId?: string): string | null {
+  if (productId) {
+    const scoped =
+      html.match(
+        new RegExp(`"id"\\s*:\\s*"${productId}"[\\s\\S]{0,4000}?"variant_id"\\s*:\\s*"?([0-9]+)"?`),
+      ) ??
+      html.match(
+        new RegExp(`"product_id"\\s*:\\s*"?${productId}"?[\\s\\S]{0,2000}?"id"\\s*:\\s*"([0-9]+)"`),
+      );
+    if (scoped?.[1]) return scoped[1];
+  }
+
   const match =
     html.match(/"variant_id"\s*:\s*"?(\d+)"?/) ??
     html.match(/variant_id(?:&quot;|")\s*:\s*(\d+)/) ??
