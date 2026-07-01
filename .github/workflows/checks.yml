@@ -31,6 +31,13 @@ jobs:
 
       - run: pnpm check:agent-configs
 
-      - run: pnpm check:templates
-
       - run: pnpm check:provider-dispatch
+
+      # check:templates is intentionally NOT run in CI. It validates each
+      # template's *pinned* platform skills (templates/*/.claude/skills — a
+      # gitignored release artifact) through the built vybekiit CLI and a live
+      # docs fetch, and pinning does an external `skills add` network fetch. A
+      # cold checkout has neither the pinned skills nor the built CLI, so it can
+      # only pass after a full build + external skill fetch on every run. It
+      # stays in the local `pnpm quality` / pre-push gate, where the environment
+      # is already pinned. See docs/agents for the pinning workflow.
