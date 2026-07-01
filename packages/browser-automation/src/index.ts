@@ -3,6 +3,11 @@
  */
 
 export { connectToChrome } from './core/connect';
+export {
+  ensureChromeWithCdp,
+  getChromeUserDataDirForPort,
+  isCdpReachable,
+} from './core/launchChrome';
 export { DEFAULT_CDP_ENDPOINT, PROFILE_PATHS, type BaseVerbContext } from './core/types';
 export * from './domains/extension/index';
 export * from './domains/payments/index';

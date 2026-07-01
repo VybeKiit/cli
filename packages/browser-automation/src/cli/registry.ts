@@ -47,7 +47,10 @@ export class CommandRegistry {
         lines.push(`    ${cmd.padEnd(22)} ${def.description}`);
       }
     }
-    lines.push('\nGlobal flags: --json, --yes, --profile=<path>');
+    lines.push('\nGlobal flags: --json, --yes, --cdp=<url>, --profile=<path|last>');
+    lines.push(
+      '  Profile: defaults per domain (~/.nc-chrome-profile, etc.). --profile=last reuses last path from ~/.vybekiit/automate-profiles.json',
+    );
     return lines.join('\n');
   }
 }

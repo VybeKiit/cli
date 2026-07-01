@@ -8,11 +8,20 @@ import { parseGlobalFlags } from './flags';
 import { printError } from './output';
 import { registerExtensionDomain } from '../domains/extension/cli';
 import { registerLsDomain, registerLsTopLevelAlias } from '../domains/payments/ls/cli';
+import {
+  registerNamecheapDomain,
+  registerNcTopLevelAlias,
+} from '../domains/registrars/namecheap/cli';
+import { registerGodaddyDomain, registerGdTopLevelAlias } from '../domains/registrars/godaddy/cli';
 
 const registry = createRegistry();
 registerExtensionDomain(registry);
 registerLsDomain(registry);
 registerLsTopLevelAlias(registry);
+registerNamecheapDomain(registry);
+registerNcTopLevelAlias(registry);
+registerGodaddyDomain(registry);
+registerGdTopLevelAlias(registry);
 
 async function main(argv: string[]): Promise<number> {
   const { flags, rest } = parseGlobalFlags(argv);

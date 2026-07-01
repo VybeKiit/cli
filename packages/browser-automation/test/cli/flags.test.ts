@@ -39,12 +39,20 @@ describe('parseSetupArgs', () => {
         '--price-cents=2900',
         '--mode=test',
         '--webhook-url=https://example.com/hook',
+        '--description=Hello',
+        '--reuse-product-id=123',
+        '--hide-from-storefront',
+        '--license-keys',
       ]),
     ).toEqual({
       name: 'Pro',
       priceCents: 2900,
       mode: 'test',
       webhookUrl: 'https://example.com/hook',
+      description: 'Hello',
+      reuseProductId: '123',
+      hideFromStorefront: true,
+      licenseKeys: true,
     });
   });
 });
