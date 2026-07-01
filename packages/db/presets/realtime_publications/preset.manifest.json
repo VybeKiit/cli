@@ -1,0 +1,20 @@
+{
+  "id": "realtime_publications",
+  "version": 1,
+  "description": "Supabase Realtime publication helpers for live table updates.",
+  "entities": [],
+  "indexes": [],
+  "helpers": ["realtime_publication"],
+  "rls": "none",
+  "capabilities": [],
+  "skills": ["add-realtime"],
+  "packages": ["@vybekiit/realtime"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "planned",
+    "railway": "planned",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}

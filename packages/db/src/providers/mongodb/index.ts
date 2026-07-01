@@ -5,6 +5,7 @@ import { type MongoConfig, type Result, fail, ok } from '@vybekiit/core';
 // driver pools connections internally and is the canonical, well-supported client.
 import { type Collection, type Filter, MongoClient } from 'mongodb';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
+import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
 /**
  * Build the MongoDB (Atlas) {@link DataProvider} — the opt-in document backend a
@@ -41,6 +42,7 @@ export function createMongoDataProvider(config: MongoConfig): DataProvider {
 
   return {
     name: 'mongodb',
+    capabilities: MINIMAL_CAPABILITIES,
 
     async insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>> {
       try {

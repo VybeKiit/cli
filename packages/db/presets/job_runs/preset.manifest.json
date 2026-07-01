@@ -1,0 +1,43 @@
+{
+  "id": "job_runs",
+  "version": 1,
+  "description": "Background job execution history for cron and queue workers.",
+  "entities": [
+    {
+      "name": "job_runs",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "job_name", "type": "text", "required": true },
+        { "name": "status", "type": "text", "required": true },
+        { "name": "started_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "finished_at", "type": "timestamptz" },
+        { "name": "error", "type": "text" },
+        { "name": "metadata", "type": "jsonb", "required": true, "default": "'{}'::jsonb" }
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "table": "job_runs",
+      "columns": ["job_name", "started_at"],
+      "reason": "job run history timeline"
+    },
+    {
+      "table": "job_runs",
+      "columns": ["status"],
+      "reason": "find failed or running jobs"
+    }
+  ],
+  "rls": "service-role-only",
+  "capabilities": ["bulkInsert"],
+  "skills": ["go-live"],
+  "packages": ["@vybekiit/jobs"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}

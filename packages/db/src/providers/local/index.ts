@@ -1,5 +1,6 @@
 import { type Result, fail, ok } from '@vybekiit/core';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
+import { LOCAL_CAPABILITIES } from '../postgres/shared';
 
 /**
  * A stored row: a {@link DbRecord} widened with a string index signature. Each
@@ -60,6 +61,7 @@ export function createLocalDataProvider(): DataProvider {
 
   return {
     name: 'local',
+    capabilities: LOCAL_CAPABILITIES,
 
     insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>> {
       // Mirror a real backend assigning a primary key when the caller omits one.
@@ -102,6 +104,67 @@ export function createLocalDataProvider(): DataProvider {
       const removed = collectionOf(collection).delete(id);
       if (!removed) return Promise.resolve(fail('not_found', `No record ${id} in ${collection}.`));
       return Promise.resolve(ok(true));
+    },
+
+    async upsert<T extends DbRecord>(
+      collection: string,
+      record: T,
+      conflictKey: keyof T & string,
+    ): Promise<Result<T>> {
+      const rows = [...collectionOf(collection).values()];
+      const existing = rows.find((row) => row[conflictKey] === record[conflictKey]);
+      if (existing) {
+        const updated = { ...existing, ...record, id: existing.id } as StoredRecord;
+        collectionOf(collection).set(existing.id, updated);
+        return ok(asRecord<T>(updated));
+      }
+      const id = record.id || crypto.randomUUID();
+      const stored = { ...record, id } as StoredRecord;
+      collectionOf(collection).set(id, stored);
+      return ok(asRecord<T>(stored));
+    },
+
+    async idempotentInsert<T extends DbRecord>(
+      collection: string,
+      record: T,
+      dedupeKey: keyof T & string,
+    ): Promise<Result<T>> {
+      const rows = [...collectionOf(collection).values()];
+      const existing = rows.find((row) => row[dedupeKey] === record[dedupeKey]);
+      if (existing) return ok(asRecord<T>(existing));
+      const id = record.id || crypto.randomUUID();
+      const stored = { ...record, id } as StoredRecord;
+      collectionOf(collection).set(id, stored);
+      return ok(asRecord<T>(stored));
+    },
+
+    async fullTextSearch<T extends DbRecord>(
+      collection: string,
+      query: string,
+      _limit: number,
+    ): Promise<Result<T[]>> {
+      const needle = query.toLowerCase();
+      const matches = [...collectionOf(collection).values()]
+        .filter((row) => {
+          const content = row.content;
+          return typeof content === 'string' && content.toLowerCase().includes(needle);
+        })
+        .map((row) => asRecord<T>(row));
+      return Promise.resolve(ok(matches));
+    },
+
+    async bulkInsert<T extends DbRecord>(
+      collection: string,
+      records: readonly T[],
+    ): Promise<Result<T[]>> {
+      const inserted: T[] = [];
+      for (const record of records) {
+        const id = record.id || crypto.randomUUID();
+        const stored = { ...record, id } as StoredRecord;
+        collectionOf(collection).set(id, stored);
+        inserted.push(asRecord<T>(stored));
+      }
+      return ok(inserted);
     },
   };
 }

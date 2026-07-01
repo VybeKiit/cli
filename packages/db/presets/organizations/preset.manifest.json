@@ -1,0 +1,71 @@
+{
+  "id": "organizations",
+  "version": 1,
+  "description": "Team workspaces with org membership.",
+  "entities": [
+    {
+      "name": "organizations",
+      "columns": [
+        { "name": "id", "type": "text", "required": true },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "owner_user_id", "type": "text", "required": true },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "organization_members",
+      "columns": [
+        { "name": "id", "type": "text", "required": true },
+        {
+          "name": "org_id",
+          "type": "text",
+          "required": true,
+          "references": { "table": "organizations", "column": "id" }
+        },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "email", "type": "text", "required": true },
+        { "name": "role", "type": "text", "required": true, "default": "'member'" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "organization_members",
+      "to": "organizations",
+      "foreignKey": "org_id",
+      "type": "many"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "organization_members",
+      "columns": ["org_id", "user_id"],
+      "unique": true,
+      "reason": "one membership row per user per org"
+    },
+    {
+      "table": "organization_members",
+      "columns": ["org_id"],
+      "reason": "list members for an org"
+    },
+    {
+      "table": "organizations",
+      "columns": ["owner_user_id"],
+      "reason": "list orgs owned by a user"
+    }
+  ],
+  "rls": "org-owned",
+  "orgColumn": "org_id",
+  "capabilities": [],
+  "skills": ["add-teams"],
+  "packages": ["@vybekiit/tenancy"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}

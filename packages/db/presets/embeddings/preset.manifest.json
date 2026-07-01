@@ -1,0 +1,45 @@
+{
+  "id": "embeddings",
+  "version": 1,
+  "description": "Vector embeddings for semantic search and RAG.",
+  "entities": [
+    {
+      "name": "embeddings",
+      "columns": [
+        { "name": "id", "type": "text", "required": true },
+        { "name": "user_id", "type": "text" },
+        { "name": "content", "type": "text" },
+        { "name": "embedding", "type": "vector", "required": true },
+        { "name": "metadata", "type": "jsonb", "required": true, "default": "'{}'::jsonb" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "extensions": ["vector"],
+  "indexes": [
+    {
+      "table": "embeddings",
+      "columns": ["embedding"],
+      "method": "hnsw",
+      "reason": "approximate nearest-neighbor vector search"
+    },
+    {
+      "table": "embeddings",
+      "columns": ["user_id"],
+      "reason": "scoped vector search per user"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["vectorSearch", "bulkInsert"],
+  "skills": ["add-ai"],
+  "packages": ["@vybekiit/search", "@vybekiit/ai"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}

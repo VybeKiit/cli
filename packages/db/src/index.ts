@@ -1,12 +1,34 @@
 export type {
   DataProvider,
+  DataProviderCapabilities,
   DataProviderName,
   DbRecord,
   QueryFilter,
   StorageProvider,
   StorageProviderName,
 } from './types';
+export type {
+  PresetManifest,
+  PresetVerificationResult,
+  ApplyPresetResult,
+} from './presets/index';
 export { resolveDataProvider, resolveStorageProvider } from './resolve';
+export {
+  ALL_PRESETS,
+  PRESET_CATALOG,
+  PRESET_TABLE_NAMES,
+  applyPreset,
+  applyPresets,
+  expectedPresetsFromEnv,
+  getPreset,
+  listPresetsForSkill,
+  postgresProviderFromEnv,
+  presetsForSkill,
+  renderPostgresPreset,
+  renderPreset,
+  verifyAllPresets,
+  verifyPresets,
+} from './presets/index';
 export {
   createSupabaseDataProvider,
   createSupabaseStorageProvider,

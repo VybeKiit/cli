@@ -3,6 +3,7 @@ import { type FirebaseConfig, type Result, fail, ok } from '@vybekiit/core';
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, type Firestore, type Query } from 'firebase-admin/firestore';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
+import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -37,6 +38,7 @@ export function createFirebaseDataProvider(config: FirebaseConfig): DataProvider
 
   return {
     name: 'firebase',
+    capabilities: MINIMAL_CAPABILITIES,
 
     async insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>> {
       try {

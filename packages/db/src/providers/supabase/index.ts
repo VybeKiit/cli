@@ -1,6 +1,13 @@
 import { type Result, type SupabaseConfig, fail, ok } from '@vybekiit/core';
 import { createDbClient } from '../../client';
 import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '../../types';
+import { POSTGRES_CAPABILITIES } from '../postgres/shared';
+import {
+  supabaseBulkInsert,
+  supabaseFullTextSearch,
+  supabaseIdempotentInsert,
+  supabaseUpsert,
+} from '../postgres/supabase-capabilities';
 
 /**
  * The slice of the Supabase query builder this adapter uses, typed for *dynamic*
@@ -14,8 +21,24 @@ import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '../..
  * bodies stay typed against `DbRecord` instead of leaking `any`.
  */
 interface DynamicTable {
-  insert(record: DbRecord): {
-    select(): { single(): Promise<{ data: DbRecord | null; error: { message: string } | null }> };
+  insert(record: DbRecord | DbRecord[]): {
+    select(): {
+      single(): Promise<{
+        data: DbRecord | null;
+        error: { message: string; code?: string } | null;
+      }>;
+    };
+  };
+  upsert(
+    record: DbRecord,
+    options: { onConflict: string },
+  ): {
+    select(): {
+      single(): Promise<{
+        data: DbRecord | null;
+        error: { message: string; code?: string } | null;
+      }>;
+    };
   };
   select(columns: string): {
     eq(
@@ -26,6 +49,13 @@ interface DynamicTable {
       data: DbRecord[] | null;
       error: { message: string } | null;
     }>;
+    textSearch(
+      column: string,
+      query: string,
+      options?: { config?: string; type?: string },
+    ): {
+      limit(n: number): Promise<{ data: DbRecord[] | null; error: { message: string } | null }>;
+    };
   };
   update(patch: Record<string, unknown>): {
     eq(
@@ -59,6 +89,7 @@ export function createSupabaseDataProvider(config: SupabaseConfig): DataProvider
 
   return {
     name: 'supabase',
+    capabilities: POSTGRES_CAPABILITIES,
 
     async insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>> {
       const { data, error } = await table(collection).insert(record).select().single();
@@ -95,6 +126,76 @@ export function createSupabaseDataProvider(config: SupabaseConfig): DataProvider
       const { error } = await table(collection).delete().eq('id', id);
       if (error) return fail('db_remove_failed', error.message);
       return ok(true);
+    },
+
+    upsert<T extends DbRecord>(
+      collection: string,
+      record: T,
+      conflictKey: keyof T & string,
+    ): Promise<Result<T>> {
+      return supabaseUpsert(
+        (name) =>
+          table(name) as unknown as Parameters<typeof supabaseUpsert>[0] extends (
+            n: string,
+          ) => infer U
+            ? U
+            : never,
+        collection,
+        record,
+        conflictKey,
+      );
+    },
+
+    idempotentInsert<T extends DbRecord>(
+      collection: string,
+      record: T,
+      dedupeKey: keyof T & string,
+    ): Promise<Result<T>> {
+      return supabaseIdempotentInsert(
+        (name) =>
+          table(name) as unknown as Parameters<typeof supabaseIdempotentInsert>[0] extends (
+            n: string,
+          ) => infer U
+            ? U
+            : never,
+        collection,
+        record,
+        dedupeKey,
+      );
+    },
+
+    fullTextSearch<T extends DbRecord>(
+      collection: string,
+      query: string,
+      limit: number,
+    ): Promise<Result<T[]>> {
+      return supabaseFullTextSearch(
+        (name) =>
+          table(name) as unknown as Parameters<typeof supabaseFullTextSearch>[0] extends (
+            n: string,
+          ) => infer U
+            ? U
+            : never,
+        collection,
+        query,
+        limit,
+      );
+    },
+
+    bulkInsert<T extends DbRecord>(
+      collection: string,
+      records: readonly T[],
+    ): Promise<Result<T[]>> {
+      return supabaseBulkInsert(
+        (name) =>
+          table(name) as unknown as Parameters<typeof supabaseBulkInsert>[0] extends (
+            n: string,
+          ) => infer U
+            ? U
+            : never,
+        collection,
+        records,
+      );
     },
   };
 }

@@ -1,0 +1,43 @@
+{
+  "id": "notifications_log",
+  "version": 1,
+  "description": "Delivery log for push, SMS, and email notifications.",
+  "entities": [
+    {
+      "name": "notifications_log",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "channel", "type": "text", "required": true },
+        { "name": "status", "type": "text", "required": true },
+        { "name": "payload", "type": "jsonb", "required": true, "default": "'{}'::jsonb" },
+        { "name": "sent_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "table": "notifications_log",
+      "columns": ["user_id", "sent_at"],
+      "reason": "notification history per user"
+    },
+    {
+      "table": "notifications_log",
+      "columns": ["status"],
+      "reason": "retry failed deliveries"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["bulkInsert"],
+  "skills": ["add-notifications"],
+  "packages": ["@vybekiit/notifications"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}

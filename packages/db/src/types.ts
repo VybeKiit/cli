@@ -43,6 +43,16 @@ export interface DbRecord {
  */
 export type QueryFilter<T extends DbRecord> = Partial<Omit<T, 'id'>>;
 
+/** Optional advanced operations a {@link DataProvider} adapter may support. */
+export type DataProviderCapabilities = {
+  readonly upsert?: boolean;
+  readonly idempotentInsert?: boolean;
+  readonly vectorSearch?: boolean;
+  readonly fullTextSearch?: boolean;
+  readonly bulkInsert?: boolean;
+  readonly transaction?: boolean;
+};
+
 /**
  * The swappable data seam — a small, vendor-neutral CRUD contract that Postgres,
  * MongoDB, and DynamoDB can all satisfy. Each adapter is constructed from its own
@@ -58,6 +68,8 @@ export type QueryFilter<T extends DbRecord> = Partial<Omit<T, 'id'>>;
 export interface DataProvider {
   /** Which backend this instance talks to. */
   readonly name: DataProviderName;
+  /** Which optional operations this adapter implements. */
+  readonly capabilities: DataProviderCapabilities;
   /** Insert a record and return it as stored (with its final `id`). */
   insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>>;
   /** Fetch one record by id; resolves `null` value when no row matches. */
@@ -72,6 +84,34 @@ export interface DataProvider {
   ): Promise<Result<T>>;
   /** Delete one record by id. */
   remove(collection: string, id: string): Promise<Result<true>>;
+  /** Insert or update on a non-id conflict key (when {@link DataProviderCapabilities.upsert}). */
+  upsert?<T extends DbRecord>(
+    collection: string,
+    record: T,
+    conflictKey: keyof T & string,
+  ): Promise<Result<T>>;
+  /** Insert once; return existing row when dedupe key collides. */
+  idempotentInsert?<T extends DbRecord>(
+    collection: string,
+    record: T,
+    dedupeKey: keyof T & string,
+  ): Promise<Result<T>>;
+  /** Approximate nearest-neighbor search on vector-enabled preset tables. */
+  vectorSearch?<T extends DbRecord>(
+    collection: string,
+    embedding: readonly number[],
+    limit: number,
+  ): Promise<Result<T[]>>;
+  /** Full-text search on preset tables with tsvector columns. */
+  fullTextSearch?<T extends DbRecord>(
+    collection: string,
+    query: string,
+    limit: number,
+  ): Promise<Result<T[]>>;
+  /** Insert many rows in one round trip. */
+  bulkInsert?<T extends DbRecord>(collection: string, records: readonly T[]): Promise<Result<T[]>>;
+  /** Run fn in a transaction when the adapter supports it. */
+  withTransaction?<R>(fn: (tx: DataProvider) => Promise<Result<R>>): Promise<Result<R>>;
 }
 
 /**

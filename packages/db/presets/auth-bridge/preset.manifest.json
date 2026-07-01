@@ -1,0 +1,34 @@
+{
+  "id": "auth-bridge",
+  "version": 1,
+  "description": "App user profiles linked to better-auth users with app-level admin role.",
+  "entities": [
+    {
+      "name": "user_profiles",
+      "primaryKey": "user_id",
+      "columns": [
+        { "name": "user_id", "type": "uuid", "required": true },
+        { "name": "email", "type": "text" },
+        { "name": "display_name", "type": "text" },
+        { "name": "role", "type": "text", "required": true, "default": "'user'" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "indexes": [],
+  "helpers": ["is_admin"],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": [],
+  "skills": ["add-signin"],
+  "packages": ["@vybekiit/auth"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "planned",
+    "firebase": "planned",
+    "aws": "planned"
+  }
+}
