@@ -31,6 +31,8 @@
     "src/components/aceternity",
     "src/components/untitled",
     "src/components/gluestack",
-    "src/components/blocks"
+    "src/components/blocks",
+    "src/components/ai-elements",
+    "src/components/kibo"
   ]
 }
