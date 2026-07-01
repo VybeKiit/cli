@@ -6,6 +6,11 @@ const extensionRoot = pathResolve(fileURLToPath(new URL('.', import.meta.url)));
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
+  dev: {
+    server: {
+      port: 3002,
+    },
+  },
   vite: () => ({
     resolve: {
       // WXT may rewrite storage helpers in workspace packages; resolve subpath from here.
@@ -16,14 +21,22 @@ export default defineConfig({
   }),
   manifest: {
     default_locale: 'en',
-    name: '__MSG_ext.name__',
-    description: '__MSG_ext.description__',
-    permissions: ['storage'],
-    host_permissions: ['http://localhost:3000/*', 'https://*/*'],
+    name: '__MSG_ext_name__',
+    description: '__MSG_ext_description__',
+    permissions: ['storage', 'sidePanel'],
+    host_permissions: [
+      'http://localhost:3000/*',
+      'http://localhost:3001/*',
+      'http://localhost:3002/*',
+      'https://*/*',
+    ],
     icons: {
       16: 'icon/16.png',
       48: 'icon/48.png',
       128: 'icon/128.png',
+    },
+    side_panel: {
+      default_path: 'sidepanel.html',
     },
     background: {
       service_worker: 'background.js',

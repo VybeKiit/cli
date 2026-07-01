@@ -1,19 +1,31 @@
 {
-  "ext.name": {
+  "ext_name": {
     "message": "My VybeKiit Extension",
     "description": "Extension name shown in browser toolbar and store listing."
   },
-  "ext.description": {
+  "ext_description": {
     "message": "Built with VybeKiit — calls your web app backend.",
     "description": "Extension description for browser store listing."
   },
-  "popup.title": {
+  "nav_label": {
+    "message": "Main navigation"
+  },
+  "nav_home": {
+    "message": "Home"
+  },
+  "nav_login": {
+    "message": "Sign in"
+  },
+  "nav_pricing": {
+    "message": "Pricing"
+  },
+  "popup_title": {
     "message": "My VybeKiit Extension"
   },
-  "popup.description": {
+  "popup_description": {
     "message": "Sign-in, data, and payments run on your web app — this popup stays secret-free."
   },
-  "popup.backend": {
+  "popup_backend": {
     "message": "Backend: $URL$",
     "placeholders": {
       "url": {
@@ -22,7 +34,154 @@
       }
     }
   },
-  "popup.openWebApp": {
+  "popup_openWebApp": {
     "message": "Open web app"
+  },
+  "popup_loading": {
+    "message": "Checking sign-in…"
+  },
+  "popup_signIn": {
+    "message": "Sign in (practice)"
+  },
+  "popup_signingIn": {
+    "message": "Signing in…"
+  },
+  "popup_signedInAs": {
+    "message": "Signed in as $EMAIL$",
+    "placeholders": {
+      "email": {
+        "content": "$1",
+        "example": "you@local.dev"
+      }
+    }
+  },
+  "popup_tryCheckout": {
+    "message": "Try practice checkout"
+  },
+  "popup_startingCheckout": {
+    "message": "Starting checkout…"
+  },
+  "home_title": {
+    "message": "Welcome"
+  },
+  "home_description": {
+    "message": "Your extension talks to the web backend — no secrets stored here."
+  },
+  "home_goToLogin": {
+    "message": "Go to sign in"
+  },
+  "home_openSidebar": {
+    "message": "Open side panel"
+  },
+  "home_openingSidebar": {
+    "message": "Opening…"
+  },
+  "home_sidebarError": {
+    "message": "Could not open the side panel. Try the toolbar menu."
+  },
+  "home_viewPricing": {
+    "message": "View pricing plans"
+  },
+  "home_signOut": {
+    "message": "Sign out"
+  },
+  "auth_shell_brand": {
+    "message": "My App"
+  },
+  "auth_login_title": {
+    "message": "Sign in"
+  },
+  "auth_login_description": {
+    "message": "Use the same account as your web app."
+  },
+  "auth_login_emailLabel": {
+    "message": "Email"
+  },
+  "auth_login_passwordLabel": {
+    "message": "Password"
+  },
+  "auth_login_submit": {
+    "message": "Sign in"
+  },
+  "auth_login_submitting": {
+    "message": "Signing in…"
+  },
+  "pricing_badge": {
+    "message": "Plans"
+  },
+  "pricing_title": {
+    "message": "Simple pricing"
+  },
+  "pricing_subtitle": {
+    "message": "Pick a plan — practice checkout works with no payment keys."
+  },
+  "pricing_popularBadge": {
+    "message": "Popular"
+  },
+  "pricing_choosePlan": {
+    "message": "Choose plan"
+  },
+  "pricing_starting": {
+    "message": "Starting…"
+  },
+  "pricing_plan_free_name": {
+    "message": "Free"
+  },
+  "pricing_plan_free_price": {
+    "message": "$0"
+  },
+  "pricing_plan_free_period": {
+    "message": "/mo"
+  },
+  "pricing_plan_free_description": {
+    "message": "Try the basics"
+  },
+  "pricing_plan_free_feature_0": {
+    "message": "Core features"
+  },
+  "pricing_plan_free_feature_1": {
+    "message": "Community support"
+  },
+  "pricing_plan_pro_name": {
+    "message": "Pro"
+  },
+  "pricing_plan_pro_price": {
+    "message": "$19"
+  },
+  "pricing_plan_pro_period": {
+    "message": "/mo"
+  },
+  "pricing_plan_pro_description": {
+    "message": "For growing products"
+  },
+  "pricing_plan_pro_feature_0": {
+    "message": "Everything in Free"
+  },
+  "pricing_plan_pro_feature_1": {
+    "message": "Priority support"
+  },
+  "pricing_plan_pro_feature_2": {
+    "message": "Advanced analytics"
+  },
+  "pricing_plan_team_name": {
+    "message": "Team"
+  },
+  "pricing_plan_team_price": {
+    "message": "$49"
+  },
+  "pricing_plan_team_period": {
+    "message": "/mo"
+  },
+  "pricing_plan_team_description": {
+    "message": "For teams and orgs"
+  },
+  "pricing_plan_team_feature_0": {
+    "message": "Everything in Pro"
+  },
+  "pricing_plan_team_feature_1": {
+    "message": "Shared workspace"
+  },
+  "pricing_plan_team_feature_2": {
+    "message": "Admin controls"
   }
 }

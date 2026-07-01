@@ -9,7 +9,7 @@ if (root) {
   createRoot(root).render(
     <StrictMode>
       <ClientStateProvider>
-        <AppRoot surface="popup" />
+        <AppRoot surface="sidepanel" />
       </ClientStateProvider>
     </StrictMode>,
   );
