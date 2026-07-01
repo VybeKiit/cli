@@ -1,7 +1,7 @@
 {
   "name": "@vybekiit/auth",
   "version": "0.3.0",
-  "description": "Headless auth for VybeKiit — one AuthProvider interface with a DB-bound better-auth default and a Cognito (AWS) adapter, normalized to a Result. No UI.",
+  "description": "Headless auth for VybeKiit — one AuthProvider interface: Supabase Auth (default), better-auth (Postgres/Mongo), and Cognito (AWS), returned as an Effect. No UI.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.1075.0",
+    "@supabase/supabase-js": "^2.47.10",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/http": "workspace:*",
     "@vybekiit/notifications": "workspace:*",

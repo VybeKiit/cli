@@ -33,7 +33,7 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  apps/component-library:
+  apps/componentLibrary:
     dependencies:
       '@vybekiit/tokens':
         specifier: workspace:*
@@ -131,7 +131,7 @@ importers:
         version: link:../../packages/payments
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../../packages/report-mode
+        version: link:../../packages/reportMode
       '@vybekiit/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -240,7 +240,7 @@ importers:
         version: 7.10.1(@types/node@22.20.0)
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../packages/agent-kit
+        version: link:../packages/agentKit
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -252,7 +252,7 @@ importers:
         version: link:../packages/deploy
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../packages/report-mode
+        version: link:../packages/reportMode
     devDependencies:
       '@types/node':
         specifier: ^22.10.2
@@ -267,7 +267,7 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/agent-kit:
+  packages/agentKit:
     dependencies:
       '@vybekiit/core':
         specifier: workspace:*
@@ -275,13 +275,13 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.7.3)(yaml@2.9.0)
       typescript:
         specifier: ^5.7.2
-        version: 5.9.3
+        version: 5.7.3
       vitest:
         specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.7.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/ai:
     dependencies:
@@ -342,6 +342,9 @@ importers:
       '@aws-sdk/client-cognito-identity-provider':
         specifier: ^3.1075.0
         version: 3.1075.0
+      '@supabase/supabase-js':
+        specifier: ^2.47.10
+        version: 2.108.2
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../core
@@ -383,7 +386,7 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/browser-automation:
+  packages/browserAutomation:
     dependencies:
       '@clack/prompts':
         specifier: ^1.6.0
@@ -391,30 +394,30 @@ importers:
       '@vybekiit/deploy':
         specifier: workspace:*
         version: link:../deploy
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
       playwright:
         specifier: ^1.61.1
         version: 1.61.1
-      zod:
-        specifier: ^4.3.6
-        version: 4.4.3
     devDependencies:
       '@types/node':
         specifier: ^22.10.2
         version: 22.20.0
       tsup:
         specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.7.3)(yaml@2.9.0)
       tsx:
         specifier: ^4.19.2
         version: 4.22.4
       typescript:
         specifier: ^5.7.2
-        version: 5.9.3
+        version: 5.7.3
       vitest:
         specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.7.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/client-state:
+  packages/clientState:
     dependencies:
       '@tanstack/query-async-storage-persister':
         specifier: ^5.101.1
@@ -446,13 +449,13 @@ importers:
         version: 19.2.7
       tsup:
         specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.7.3)(yaml@2.9.0)
       typescript:
         specifier: ^5.7.2
-        version: 5.9.3
+        version: 5.7.3
       vitest:
         specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.7.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/cms:
     dependencies:
@@ -491,9 +494,6 @@ importers:
       effect:
         specifier: 3.21.4
         version: 3.21.4
-      zod:
-        specifier: ^3.24.1
-        version: 3.25.76
     devDependencies:
       '@effect/vitest':
         specifier: 0.29.0
@@ -528,6 +528,9 @@ importers:
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../core
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
       firebase-admin:
         specifier: ^13.0.2
         version: 13.10.0
@@ -714,9 +717,6 @@ importers:
       stripe:
         specifier: ^22.3.0
         version: 22.3.0(@types/node@22.20.0)
-      zod:
-        specifier: ^3.24.1
-        version: 3.25.76
     devDependencies:
       '@types/express':
         specifier: ^5.0.0
@@ -753,17 +753,17 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/report-mode:
+  packages/reportMode:
     devDependencies:
       tsup:
         specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.7.3)(yaml@2.9.0)
       typescript:
         specifier: ^5.7.2
-        version: 5.9.3
+        version: 5.7.3
       vitest:
         specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.7.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/search:
     dependencies:
@@ -773,6 +773,9 @@ importers:
       '@vybekiit/db':
         specifier: workspace:*
         version: link:../db
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
     devDependencies:
       tsup:
         specifier: ^8.3.5
@@ -833,6 +836,9 @@ importers:
       '@vybekiit/db':
         specifier: workspace:*
         version: link:../db
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
     devDependencies:
       tsup:
         specifier: ^8.3.5
@@ -856,7 +862,7 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/ui-catalog-mcp:
+  packages/uiCatalogMcp:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.1
@@ -867,19 +873,19 @@ importers:
     devDependencies:
       tsup:
         specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
+        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.7.3)(yaml@2.9.0)
       typescript:
         specifier: ^5.7.2
-        version: 5.9.3
+        version: 5.7.3
       vitest:
         specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.7.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   templates/backend:
     dependencies:
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../../packages/agent-kit
+        version: link:../../packages/agentKit
       '@vybekiit/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -907,6 +913,9 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.6
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
       express:
         specifier: ^4.21.2
         version: 4.22.2
@@ -916,9 +925,6 @@ importers:
       multer:
         specifier: ^1.4.5-lts.1
         version: 1.4.5-lts.2
-      zod:
-        specifier: ^3.24.1
-        version: 3.25.76
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.5.1
@@ -961,7 +967,7 @@ importers:
         version: 5.101.2(@tanstack/react-query@5.101.2(react@19.2.7))(react@19.2.7)
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../../packages/agent-kit
+        version: link:../../packages/agentKit
       '@vybekiit/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -973,7 +979,7 @@ importers:
         version: link:../../packages/auth
       '@vybekiit/client-state':
         specifier: workspace:*
-        version: link:../../packages/client-state
+        version: link:../../packages/clientState
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -988,7 +994,7 @@ importers:
         version: link:../../packages/payments
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../../packages/report-mode
+        version: link:../../packages/reportMode
       '@vybekiit/seo':
         specifier: workspace:*
         version: link:../../packages/seo
@@ -1022,7 +1028,7 @@ importers:
         version: 19.2.3(@types/react@19.2.17)
       '@vybekiit/browser-automation':
         specifier: workspace:*
-        version: link:../../packages/browser-automation
+        version: link:../../packages/browserAutomation
       '@wxt-dev/module-react':
         specifier: ^1.1.3
         version: 1.2.2(vite@8.1.0(@types/node@22.20.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(wxt@0.20.27(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(rolldown@1.1.3)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -1061,7 +1067,7 @@ importers:
         version: 5.101.2(@tanstack/react-query@5.101.2(react@19.2.7))(react@19.2.7)
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../../packages/agent-kit
+        version: link:../../packages/agentKit
       '@vybekiit/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -1073,7 +1079,7 @@ importers:
         version: link:../../packages/auth
       '@vybekiit/client-state':
         specifier: workspace:*
-        version: link:../../packages/client-state
+        version: link:../../packages/clientState
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -1097,7 +1103,7 @@ importers:
         version: link:../../packages/payments
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../../packages/report-mode
+        version: link:../../packages/reportMode
       '@vybekiit/security':
         specifier: workspace:*
         version: link:../../packages/security
@@ -1245,7 +1251,7 @@ importers:
         version: 2.27.2
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../../packages/agent-kit
+        version: link:../../packages/agentKit
       '@vybekiit/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
@@ -1254,7 +1260,7 @@ importers:
         version: link:../../packages/auth
       '@vybekiit/client-state':
         specifier: workspace:*
-        version: link:../../packages/client-state
+        version: link:../../packages/clientState
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -1275,7 +1281,7 @@ importers:
         version: link:../../packages/realtime
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../../packages/report-mode
+        version: link:../../packages/reportMode
       '@vybekiit/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -1534,7 +1540,7 @@ importers:
         version: 2.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@vybekiit/agent-kit':
         specifier: workspace:*
-        version: link:../../packages/agent-kit
+        version: link:../../packages/agentKit
       '@vybekiit/ai':
         specifier: workspace:*
         version: link:../../packages/ai
@@ -1549,7 +1555,7 @@ importers:
         version: link:../../packages/auth
       '@vybekiit/client-state':
         specifier: workspace:*
-        version: link:../../packages/client-state
+        version: link:../../packages/clientState
       '@vybekiit/cms':
         specifier: workspace:*
         version: link:../../packages/cms
@@ -1588,7 +1594,7 @@ importers:
         version: link:../../packages/realtime
       '@vybekiit/report-mode':
         specifier: workspace:*
-        version: link:../../packages/report-mode
+        version: link:../../packages/reportMode
       '@vybekiit/search':
         specifier: workspace:*
         version: link:../../packages/search
@@ -1637,6 +1643,9 @@ importers:
       dotted-map:
         specifier: ^3.1.0
         version: 3.1.0
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
       framer-motion:
         specifier: ^12.23.12
         version: 12.42.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -20331,7 +20340,7 @@ snapshots:
 
   compressible@2.0.18:
     dependencies:
-      mime-db: 1.52.0
+      mime-db: 1.54.0
 
   compression@1.8.1:
     dependencies:

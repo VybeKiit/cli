@@ -6,17 +6,17 @@
   "type": "module",
   "scripts": {
     "dev": "wxt",
-    "prebuild": "node scripts/optimize-assets.mjs",
+    "prebuild": "node scripts/optimizeAssets.mjs",
     "build": "wxt build",
     "postinstall": "wxt prepare",
     "lint": "biome check .",
     "format": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "pretypecheck": "node scripts/optimize-assets.mjs",
+    "pretypecheck": "node scripts/optimizeAssets.mjs",
     "test": "vitest run --passWithNoTests",
-    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build && node scripts/check-agent-patterns.mjs",
-    "test:e2e": "node scripts/run-e2e.mjs",
-    "check:quality": "node scripts/check-quality.mjs",
+    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build && node scripts/checkAgentPatterns.mjs",
+    "test:e2e": "node scripts/runE2e.mjs",
+    "check:quality": "node scripts/checkQuality.mjs",
     "prepare": "husky"
   },
   "dependencies": {

@@ -39,8 +39,7 @@
     "@vybekiit/core": "workspace:*",
     "@vybekiit/http": "workspace:*",
     "effect": "3.21.4",
-    "stripe": "^22.3.0",
-    "zod": "^3.24.1"
+    "stripe": "^22.3.0"
   },
   "peerDependencies": {
     "express": ">=4"

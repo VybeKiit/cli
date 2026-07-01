@@ -6,17 +6,17 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "prestart": "node scripts/optimize-assets.mjs",
+    "prestart": "node scripts/optimizeAssets.mjs",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit",
-    "pretypecheck": "node scripts/optimize-assets.mjs",
+    "pretypecheck": "node scripts/optimizeAssets.mjs",
     "test": "vitest run",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/check-agent-patterns.mjs",
-    "test:e2e": "node scripts/run-e2e.mjs",
-    "check:quality": "node scripts/check-quality.mjs",
+    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/checkAgentPatterns.mjs",
+    "test:e2e": "node scripts/runE2e.mjs",
+    "check:quality": "node scripts/checkQuality.mjs",
     "prepare": "husky"
   },
   "dependencies": {
