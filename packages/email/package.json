@@ -12,10 +12,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./worker": {
+      "types": "./dist/worker.d.ts",
+      "import": "./dist/worker.js",
+      "require": "./dist/worker.cjs"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "worker"
   ],
   "sideEffects": false,
   "scripts": {
@@ -28,6 +34,7 @@
     "@vybekiit/core": "workspace:*"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250523.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

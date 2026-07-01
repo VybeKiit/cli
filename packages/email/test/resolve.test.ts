@@ -6,8 +6,8 @@ import { resolveEmailProvider } from '../src/resolve';
 vi.mock('@aws-sdk/client-sesv2', () => ({ SESv2Client: class {} }));
 
 const cloudflareEnv = {
-  CLOUDFLARE_ACCOUNT_ID: 'acct',
-  CLOUDFLARE_API_TOKEN: 'token',
+  EMAIL_WORKER_SECRET: 'worker-secret',
+  CLOUDFLARE_EMAIL_ENDPOINT: 'https://app.example.com/send',
 };
 
 describe('resolveEmailProvider', () => {
@@ -15,9 +15,12 @@ describe('resolveEmailProvider', () => {
     expect(resolveEmailProvider(cloudflareEnv).name).toBe('cloudflare');
   });
 
+  it('fails loud when cloudflare email creds are missing', () => {
+    expect(() => resolveEmailProvider({})).toThrow(/EMAIL_WORKER_SECRET/);
+  });
+
   it('constructs the ses adapter from its AWS config', () => {
     const provider = resolveEmailProvider({
-      ...cloudflareEnv,
       EMAIL_PROVIDER: 'ses',
       AWS_REGION: 'us-east-1',
     });
@@ -25,9 +28,7 @@ describe('resolveEmailProvider', () => {
   });
 
   it('fails loud when the ses adapter is selected without its region', () => {
-    expect(() => resolveEmailProvider({ ...cloudflareEnv, EMAIL_PROVIDER: 'ses' })).toThrow(
-      /AWS_REGION/,
-    );
+    expect(() => resolveEmailProvider({ EMAIL_PROVIDER: 'ses' })).toThrow(/AWS_REGION/);
   });
 
   it('constructs the resend adapter from its API key', () => {

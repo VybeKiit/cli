@@ -1,10 +1,10 @@
 import {
   awsConfigSchema,
+  cloudflareEmailConfigSchema,
   emailConfigSchema,
   parseEnv,
   resendConfigSchema,
   resolveEnvProvider,
-  cloudflareConfigSchema,
   type EnvSource,
 } from '@vybekiit/core';
 import { type FetchLike, createCloudflareEmail } from './providers/cloudflare/index';
@@ -35,7 +35,7 @@ export function resolveEmailProvider(
       ses: (source) => createSesEmail(parseEnv(awsConfigSchema, source)),
       resend: (source) => createResendEmail(parseEnv(resendConfigSchema, source)),
       cloudflare: (source) =>
-        createCloudflareEmail(parseEnv(cloudflareConfigSchema, source), fetchImpl),
+        createCloudflareEmail(parseEnv(cloudflareEmailConfigSchema, source), fetchImpl),
     },
     env,
     'cloudflare',

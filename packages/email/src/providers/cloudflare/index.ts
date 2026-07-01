@@ -1,4 +1,5 @@
-import { type CloudflareConfig, type Result, fail, ok } from '@vybekiit/core';
+import { type CloudflareEmailConfig, type Result, fail, ok } from '@vybekiit/core';
+import { toWorkerSendBody } from '../../cloudflare/worker-contract';
 import type { EmailProvider, SendEmailParams } from '../../types';
 
 /**
@@ -26,15 +27,15 @@ function readMessageId(body: unknown): string | null {
  *
  * Constraint: Cloudflare has no general outbound email API. Transactional mail is
  * sent from the deployed Worker/Pages context, which exposes its own send route; this
- * adapter POSTs to that route (`CLOUDFLARE_EMAIL_ENDPOINT`) with the account API
- * token as a bearer credential. `fetch` is injectable so the boundary is unit
- * testable without a network or live Worker.
+ * adapter POSTs to that route (`CLOUDFLARE_EMAIL_ENDPOINT`) with
+ * {@link EMAIL_WORKER_SECRET} as a bearer credential. `fetch` is injectable so the
+ * boundary is unit testable without a network or live Worker.
  *
- * @param config - Cloudflare credentials; `CLOUDFLARE_EMAIL_ENDPOINT` must be set
+ * @param config - email worker credentials from {@link cloudflareEmailConfigSchema}
  * @param fetchImpl - transport; defaults to `globalThis.fetch`
  */
 export function createCloudflareEmail(
-  config: CloudflareConfig,
+  config: CloudflareEmailConfig,
   fetchImpl: FetchLike = globalThis.fetch,
 ): EmailProvider {
   return {
@@ -42,12 +43,6 @@ export function createCloudflareEmail(
 
     async send(params: SendEmailParams): Promise<Result<{ id: string }>> {
       const endpoint = config.CLOUDFLARE_EMAIL_ENDPOINT;
-      if (!endpoint) {
-        return fail(
-          'no_endpoint',
-          'Set CLOUDFLARE_EMAIL_ENDPOINT to the Worker/Pages route that sends mail.',
-        );
-      }
 
       let response: Awaited<ReturnType<FetchLike>>;
       try {
@@ -55,15 +50,9 @@ export function createCloudflareEmail(
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            authorization: `Bearer ${config.CLOUDFLARE_API_TOKEN}`,
+            authorization: `Bearer ${config.EMAIL_WORKER_SECRET}`,
           },
-          body: JSON.stringify({
-            to: params.to,
-            from: params.from,
-            subject: params.subject,
-            html: params.html,
-            ...(params.text ? { text: params.text } : {}),
-          }),
+          body: JSON.stringify(toWorkerSendBody(params)),
         });
       } catch (error) {
         const detail = error instanceof Error ? error.message : 'unknown network error';

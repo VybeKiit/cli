@@ -2,8 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { type FetchLike, createCloudflareEmail } from '../src/providers/cloudflare/index';
 
 const config = {
-  CLOUDFLARE_ACCOUNT_ID: 'acct',
-  CLOUDFLARE_API_TOKEN: 'token',
+  EMAIL_WORKER_SECRET: 'worker-secret',
   CLOUDFLARE_EMAIL_ENDPOINT: 'https://app.example.com/send',
 };
 
@@ -29,24 +28,13 @@ describe('createCloudflareEmail.send', () => {
     const [url, init] = fetchImpl.mock.calls[0] ?? [];
     expect(url).toBe('https://app.example.com/send');
     expect(init?.method).toBe('POST');
-    expect(init?.headers.authorization).toBe('Bearer token');
+    expect(init?.headers.authorization).toBe('Bearer worker-secret');
     expect(JSON.parse(init?.body ?? '{}')).toMatchObject({
       to: 'buyer@example.com',
+      from: 'hello@example.com',
       subject: 'Welcome',
       html: '<p>Hi</p>',
     });
-  });
-
-  it('fails when no send endpoint is configured', async () => {
-    const fetchImpl = vi.fn<FetchLike>();
-    const { CLOUDFLARE_EMAIL_ENDPOINT, ...withoutEndpoint } = config;
-    void CLOUDFLARE_EMAIL_ENDPOINT;
-
-    const result = await createCloudflareEmail(withoutEndpoint, fetchImpl).send(params);
-
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('no_endpoint');
-    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it('maps a non-ok response to an api_error result', async () => {
