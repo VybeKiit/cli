@@ -20,6 +20,8 @@
   "registries": {
     "@bundui": "https://bundui.io/r/{name}.json",
     "@magicui": "https://magicui.design/r/{name}.json",
-    "@kokonutui": "https://kokonutui.com/r/{name}.json"
+    "@kokonutui": "https://kokonutui.com/r/{name}.json",
+    "@aielements": "https://elements.ai-sdk.dev/api/registry/{name}.json",
+    "@kibo": "https://www.kibo-ui.com/r/{name}.json"
   }
 }

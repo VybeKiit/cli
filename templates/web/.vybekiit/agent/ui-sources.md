@@ -2,7 +2,7 @@
 
 The builder never picks a UI library. You choose from this catalog, then **normalize** every block to kit primitives and `@vybekiit/tokens`.
 
-**Local mirror:** `src/components/{bundui,magicui,kokonutui,aceternity,untitled,gluestack,blocks/21st}/` — synced via `pnpm sync:ui` from [`scripts/ui-registry-manifest.json`](../../../../scripts/ui-registry-manifest.json).
+**Local mirror:** `src/components/{bundui,magicui,kokonutui,aceternity,untitled,gluestack,ai-elements,kibo,blocks/21st}/` — synced via `pnpm sync:ui` from [`scripts/ui-registry-manifest.json`](../../../../scripts/ui-registry-manifest.json).
 
 **MCP:** Merge `.vybekiit/agent/mcp-ui-catalog.json`, `mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`, and (by provider) `mcp-stripe.json` or `mcp-paypal.json` into buyer MCP config — see `mcp-setup.md` for Cursor, Claude Desktop, and Codex paths. Use `suggest_ui_blend` for intent-based routing.
 
@@ -20,6 +20,8 @@ See also: `ui-routing-vybekiit.md` · `ui-consistency-vybekiit.md` · `shadcn-vy
 | [21st.dev](https://21st.dev) | Community blocks | `npx shadcn add https://21st.dev/r/...` (auth) | `src/components/blocks/21st/` | [serafimcloud/21st](https://github.com/serafimcloud/21st) |
 | [Untitled UI React](https://www.untitledui.com/react) | Enterprise admin, dense app UI | `npx untitledui@latest add <name>` | `src/components/untitled/` | [untitleduico/react](https://github.com/untitleduico/react) |
 | [Gluestack UI](https://gluestack.io/ui) | Cross-platform patterns (web mirror) | `npx gluestack-ui@latest add <name>` | `src/components/gluestack/` | [gluestack/gluestack-ui](https://github.com/gluestack/gluestack-ui) |
+| [AI Elements](https://elements.ai-sdk.dev) | AI chat, agents, streaming, tool UI | `npx shadcn@latest add @aielements/<name>` | `src/components/ai-elements/` | [vercel/ai-elements](https://github.com/vercel/ai-elements) |
+| [Kibo UI](https://www.kibo-ui.com) | Application UI: kanban, editor, gantt, data viz | `npx shadcn@latest add @kibo/<name>` | `src/components/kibo/` | [shadcnblocks/kibo](https://github.com/shadcnblocks/kibo) |
 | [Origin UI](https://originui.com) | Extra shadcn-style primitives | Registry CLI | merge into `ui/` once | — |
 | [Cult UI](https://cult-ui.com) | AI chat / agent UI patterns | Copy-paste / registry | normalize to kit forms | — |
 | [Tailark](https://tailark.com) | Marketing blocks, conversion layouts | Copy-paste / registry | keep token colors | — |
@@ -36,7 +38,9 @@ See also: `ui-routing-vybekiit.md` · `ui-consistency-vybekiit.md` · `shadcn-vy
   "registries": {
     "@bundui": "https://bundui.io/r/{name}.json",
     "@magicui": "https://magicui.design/r/{name}.json",
-    "@kokonutui": "https://kokonutui.com/r/{name}.json"
+    "@kokonutui": "https://kokonutui.com/r/{name}.json",
+    "@aielements": "https://elements.ai-sdk.dev/api/registry/{name}.json",
+    "@kibo": "https://www.kibo-ui.com/r/{name}.json"
   }
 }
 ```
@@ -60,7 +64,7 @@ rg "@mui/|@chakra-ui/|antd|nativewind|@heroui/" app/ src/components/auth-shell.t
 - Marketing flair → Aceternity / Magic UI / Kokonut (**one** effect library per page)
 - Variants / admin density → BundUI or Untitled namespace
 - Dashboard metrics → Tremor or shadcn Charts inside kit `Card`
-- AI chat UI → Cult UI or Kokonut patterns, normalized to kit forms
+- AI chat UI → AI Elements (`ai-elements/`) or Kokonut patterns; normalize to kit forms
 - Refresh mirrors → maintainer runs `pnpm sync:ui`
 
 <!-- vybekiit:generated:start web-ui-sources -->
