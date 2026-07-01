@@ -5,9 +5,9 @@
  * Reads only the monorepo root `.env`.
  *
  * Usage:
- *   DOMAIN=vybekiit.com node infra/scripts/provision-domain.mjs
- *   DOMAIN=vybekiit.com node infra/scripts/provision-domain.mjs --skip-namecheap
- *   DOMAIN=vybekiit.com node infra/scripts/provision-domain.mjs --skip-email
+ *   DOMAIN=vybekiit.com node infra/scripts/provisionDomain.mjs
+ *   DOMAIN=vybekiit.com node infra/scripts/provisionDomain.mjs --skip-namecheap
+ *   DOMAIN=vybekiit.com node infra/scripts/provisionDomain.mjs --skip-email
  */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

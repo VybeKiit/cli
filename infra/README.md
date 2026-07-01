@@ -38,7 +38,7 @@ Transactional email worker: **`packages/email/worker/`** (see that README).
 All secrets live in the **monorepo root `.env`** (copy from `.env.example`).
 
 ```bash
-DOMAIN=yourdomain.com node infra/scripts/provision-domain.mjs
+DOMAIN=yourdomain.com node infra/scripts/provisionDomain.mjs
 cd packages/email/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET && npm run deploy
 pnpm email:test-send you@example.com
 ```
@@ -92,5 +92,5 @@ non-secret policy toggles only.
 ## Status
 
 - **Shipping now:** the security edge config — `security-worker.ts` + `wrangler.toml`.
-- **Shipping now:** email worker at `packages/email/worker/` + `scripts/provision-domain.mjs`.
+- **Shipping now:** email worker at `packages/email/worker/` + `scripts/provisionDomain.mjs`.
 - **Lands with issue #7:** Supabase SQL migrations and full deploy helper automation.

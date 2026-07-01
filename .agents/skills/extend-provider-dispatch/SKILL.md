@@ -72,7 +72,7 @@ Must read as a linear pipeline (~5 seconds):
 pnpm --filter @vybekiit/core build && pnpm --filter @vybekiit/core test
 cd packages/<pkg> && pnpm test
 cd cli && pnpm test -- doctor.test.ts
-node scripts/check-provider-dispatch.mjs
+node scripts/checkProviderDispatch.mjs
 ```
 
 ## Docs

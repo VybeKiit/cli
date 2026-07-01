@@ -338,9 +338,9 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 **Hybrid distribution:** pin official upstream skills (Expo, Vercel-labs, Supabase, Cloudflare, …) via the
 [skills CLI](https://skills.sh) into `.agents/skills/`, plus thin VybeKiit wrappers that wire
 `resolve*Provider()`, `TODO(vybekiit)` markers, and verify-before-advance. Shared base manifest at
-`packages/agent-kit/src/catalogs/platform-skills-base.manifest.json`; each template's
+`packages/agentKit/src/catalogs/platform-skills-base.manifest.json`; each template's
 `platform-skills.manifest.json` extends it (mobile adds `expo/skills`). Maintainer CI re-pins via
-`scripts/pin-platform-skills.mjs` after `scripts/audit-platform-skills.mjs` (strict 90d repo / 180d npm gate).
+`scripts/pinPlatformSkills.mjs` after `scripts/auditPlatformSkills.mjs` (strict 90d repo / 180d npm gate).
 
 ### Three-channel update (buyer `update-kit`)
 
@@ -708,10 +708,10 @@ Mirrored Vercel AI Elements blocks under `src/components/ai-elements/` — chat,
 Mirrored Kibo UI blocks under `src/components/kibo/` — application-grade components (kanban, editor, gantt, etc.) from the shadcnblocks registry.
 
 **Component library app**:
-Public browsable gallery at `ui.vybekiit.com` (`apps/component-library`) — catalog of mirrored blocks with Primary Previews (demo wrappers) and a separate Examples tab for upstream demos; maintainer monorepo app, not shipped to buyers.
+Public browsable gallery at `ui.vybekiit.com` (`apps/componentLibrary`) — catalog of mirrored blocks with Primary Previews (demo wrappers) and a separate Examples tab for upstream demos; maintainer monorepo app, not shipped to buyers.
 
 **Primary preview**:
-Live render on a component detail page via a demo wrapper (`apps/component-library/src/demos/{namespace}/{name}.tsx`) — required for component entries to show a live preview.
+Live render on a component detail page via a demo wrapper (`apps/componentLibrary/src/demos/{namespace}/{name}.tsx`) — required for component entries to show a live preview.
 
 **Example entry**:
 Upstream demo synced as its own catalog item (`kind: example`, e.g. Magic UI `magic-card-demo`, AI Elements `example-message`) — browsable on the global Examples tab, separate from the component's Primary Preview.

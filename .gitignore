@@ -33,6 +33,6 @@ apps/landing/downloads/
 .claude/
 
 # browser-automation maintainer recorder drafts (local only)
-packages/browser-automation/.cws-selectors.draft.txt
-packages/browser-automation/.ls-selectors.draft.txt
-packages/browser-automation/dev/recorder/logs/
+packages/browserAutomation/.cws-selectors.draft.txt
+packages/browserAutomation/.ls-selectors.draft.txt
+packages/browserAutomation/dev/recorder/logs/
