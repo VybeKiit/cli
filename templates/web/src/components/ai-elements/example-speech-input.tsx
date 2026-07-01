@@ -2,7 +2,6 @@
 
 import { SpeechInput } from '@/components/ai-elements/speech-input';
 import { useCallback, useState } from 'react';
-import process from 'node:process';
 
 /**
  * Fallback handler for browsers that don't support Web Speech API (Firefox, Safari).

@@ -1,6 +1,6 @@
 import type { AuthHttpDeps } from '@vybekiit/auth/http';
-import { clearSessionCookie, readSessionCookie, setSessionCookie } from '@/lib/auth-session';
-import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from '@/lib/auth-telemetry';
+import { clearSessionCookie, readSessionCookie, setSessionCookie } from '@/lib/authSession';
+import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from '@/lib/authTelemetry';
 
 /** Shared deps for {@link createNextAuthRoutes} — wires Next session cookies + telemetry. */
 export const webAuthHttpDeps: AuthHttpDeps = {

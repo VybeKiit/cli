@@ -30,7 +30,7 @@
    NAMECHEAP_CLIENT_IP=
    ```
 
-5. Domain provisioning: `DOMAIN=yourdomain.com node infra/scripts/provision-domain.mjs`
+5. Domain provisioning: `DOMAIN=yourdomain.com node infra/scripts/provisionDomain.mjs`
 6. Enable sending: `npx wrangler email sending enable yourdomain.com`
 7. Test: `pnpm email:test-send you@example.com`
 

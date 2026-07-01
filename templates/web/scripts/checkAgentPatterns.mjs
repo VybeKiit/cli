@@ -6,7 +6,7 @@ import process from 'node:process';
 
 const templateRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = join(templateRoot, '../..');
-const script = join(repoRoot, 'scripts/check-agent-patterns.mjs');
+const script = join(repoRoot, 'scripts/checkAgentPatterns.mjs');
 
 const result = spawnSync('node', [script, '--root', templateRoot], {
   stdio: 'inherit',

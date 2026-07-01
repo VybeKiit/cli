@@ -1,5 +1,5 @@
 import { DashboardGuard } from '@/components/dashboard-guard';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/useUser';
 import { render, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 
@@ -7,7 +7,7 @@ vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
 }));
 
-vi.mock('@/hooks/use-user', () => ({
+vi.mock('@/hooks/useUser', () => ({
   useUser: vi.fn(),
 }));
 

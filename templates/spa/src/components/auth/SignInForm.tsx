@@ -6,8 +6,8 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../tailadmin-ui/button/Button";
-import { useAsync } from "../../hooks/use-async";
-import { signInWithPassword } from "../../lib/auth-client";
+import { useAsync } from "../../hooks/useAsync";
+import { signInWithPassword } from "../../lib/authClient";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");

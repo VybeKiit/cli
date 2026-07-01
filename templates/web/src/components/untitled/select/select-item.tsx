@@ -7,7 +7,7 @@ import { ListBoxItem as AriaListBoxItem, Text as AriaText } from "react-aria-com
 import { Avatar } from "@/components/base/avatar/avatar";
 import { CheckboxBase } from "@/components/base/checkbox/checkbox";
 import { cx } from "@/utils/cx";
-import { isReactComponent } from "@/utils/is-react-component";
+import { isReactComponent } from "@/utils/isReactComponent";
 import type { SelectItemType } from "./select-shared";
 import { SelectContext } from "./select-shared";
 

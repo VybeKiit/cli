@@ -3,8 +3,8 @@ import {
   signInWithPassword,
   signUpWithPassword,
   verifyEmailCode,
-} from '@/lib/auth-client';
-import { startCheckout } from '@/lib/billing-client';
+} from '@/lib/authClient';
+import { startCheckout } from '@/lib/billingClient';
 import { DEV_USER, signInFailureHandler } from '@/test/msw/handlers';
 import { mswServer } from '@/test/msw/server';
 

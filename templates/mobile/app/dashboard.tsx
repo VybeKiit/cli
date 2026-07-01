@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs } from '@/components/ui/tabs';
 import { DASHBOARD_STATS, GETTING_STARTED_STEP_KEYS } from '@/data/dashboard';
-import { useTranslations } from '@/hooks/use-translations';
-import { useUser } from '@/hooks/use-user';
-import { useTheme } from '@/theme/use-theme';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useUser } from '@/hooks/useUser';
+import { useTheme } from '@/theme/useTheme';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';

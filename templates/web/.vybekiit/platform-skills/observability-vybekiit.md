@@ -29,7 +29,7 @@ Never use bare `console.log` in `app/` or `src/` (tests excluded).
 ## Pre-ship checks
 
 ```bash
-node scripts/check-no-console.mjs
+node scripts/checkNoConsole.mjs
 rg "from '@/lib/logger'" app/api/
 ```
 

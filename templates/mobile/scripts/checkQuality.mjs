@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Runs the full quality smoke — format, lint, typecheck, tests.
- * Usage: node scripts/check-quality.mjs (from template root or any cwd)
+ * Usage: node scripts/checkQuality.mjs (from template root or any cwd)
  */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

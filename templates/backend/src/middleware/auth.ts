@@ -1,5 +1,6 @@
-import type { NextFunction, Request, Response } from 'express';
 import { resolveAuthProvider } from '@vybekiit/auth';
+import { Effect, Exit } from 'effect';
+import type { NextFunction, Request, Response } from 'express';
 import { SESSION_COOKIE } from './session.js';
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -9,13 +10,13 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return;
   }
 
-  const result = await resolveAuthProvider().getUser(token);
-  if (!result.ok) {
+  const exit = await Effect.runPromiseExit(resolveAuthProvider().getUser(token));
+  if (Exit.isFailure(exit)) {
     res.status(401).json({ error: 'Sign in required.' });
     return;
   }
 
-  req.user = result.value;
+  req.user = exit.value;
   next();
 }
 

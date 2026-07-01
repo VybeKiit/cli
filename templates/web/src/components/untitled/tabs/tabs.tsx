@@ -6,7 +6,7 @@ import type { TabListProps as AriaTabListProps, TabProps as AriaTabProps, TabRen
 import { Tab as AriaTab, TabList as AriaTabList, TabPanel as AriaTabPanel, Tabs as AriaTabs, TabsContext, useSlottedContext } from "react-aria-components";
 import { Badge } from "@/components/base/badges/badges";
 import { cx } from "@/utils/cx";
-import { isReactComponent } from "@/utils/is-react-component";
+import { isReactComponent } from "@/utils/isReactComponent";
 
 type Orientation = "horizontal" | "vertical";
 

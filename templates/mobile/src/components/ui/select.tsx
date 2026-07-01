@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 /** Simple option picker — mirrors web Select for plan/account pickers. */

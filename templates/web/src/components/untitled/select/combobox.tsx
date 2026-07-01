@@ -11,7 +11,7 @@ import { Popover } from "@/components/base/select/popover";
 import { type CommonProps, SelectContext, type SelectItemType, sizes } from "@/components/base/select/select-shared";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
 import { cx } from "@/utils/cx";
-import { isReactComponent } from "@/utils/is-react-component";
+import { isReactComponent } from "@/utils/isReactComponent";
 
 interface ComboBoxProps extends Omit<AriaComboBoxProps<SelectItemType>, "children" | "items">, RefAttributes<HTMLDivElement>, CommonProps {
     shortcut?: boolean;

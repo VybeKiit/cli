@@ -1,6 +1,6 @@
 {
   "sources": [],
   "_notes": {
-    "extends": "packages/agent-kit/src/catalogs/platform-skills-base.manifest.json"
+    "extends": "packages/agentKit/src/catalogs/platform-skills-base.manifest.json"
   }
 }

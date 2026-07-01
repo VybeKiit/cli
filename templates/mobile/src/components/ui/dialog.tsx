@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { t } from '@/lib/i18n';
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 

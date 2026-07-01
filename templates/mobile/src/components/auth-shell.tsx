@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { t } from '@/lib/i18n';
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 

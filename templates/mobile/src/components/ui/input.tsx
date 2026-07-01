@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { useState } from 'react';
 import { StyleSheet, TextInput, type TextInputProps } from 'react-native';
 

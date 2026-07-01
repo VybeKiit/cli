@@ -4,9 +4,9 @@ import { AuthShell } from '@/components/auth-shell';
 import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useAsync } from '@/hooks/use-async';
+import { useAsync } from '@/hooks/useAsync';
 import { Link, useRouter } from '@/i18n/navigation';
-import { signInWithPassword } from '@/lib/auth-client';
+import { signInWithPassword } from '@/lib/authClient';
 import { useTranslations } from 'next-intl';
 import { type FormEvent, useState } from 'react';
 

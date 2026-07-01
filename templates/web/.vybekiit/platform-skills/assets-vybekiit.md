@@ -26,6 +26,6 @@
 
 ## Verify
 
-- `node scripts/optimize-assets.mjs` succeeds
+- `node scripts/optimizeAssets.mjs` succeeds
 - Upload test file → `url()` returns CDN transform URL
 - Images load fast in browser / on device

@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { type StyleProp, Text, type TextStyle } from 'react-native';
 
 /** Props for {@link Label}: the visible text plus optional style overrides. */

@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import process from 'node:process';
+import { readNodeEnv } from './nodeEnv';
 
 /**
  * Server-only session-cookie helpers shared by the `/api/auth/*` routes.
@@ -26,7 +26,7 @@ export async function setSessionCookie(token: string): Promise<void> {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    secure: process.env.NODE_ENV === 'production',
+    secure: readNodeEnv().NODE_ENV === 'production',
   });
 }
 

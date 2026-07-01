@@ -33,7 +33,7 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    **Verify:** dual-layer protection documented in go-live.
 
 6. **Code readiness (agent-only checks).** Run silently; summarize in plain English:
-   - `node scripts/check-no-console.mjs` — no debug `console.log` in `app/` or `src/`
+   - `node scripts/checkNoConsole.mjs` — no debug `console.log` in `app/` or `src/`
    - Scan `src/lib/` for duplicate exported function names; merge duplicates
    - Spot-check API routes use `@/lib/logger` instead of bare console
    - If going live with alerts: when `OBSERVABILITY_PROVIDER=sentry`, confirm `SENTRY_DSN` is set

@@ -2,7 +2,7 @@ import { ClientStateProvider } from '@/lib/client-state';
 import { Toaster } from '@/components/toaster';
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import { initI18n, t } from '@/lib/i18n';
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';

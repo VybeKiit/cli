@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 /** Compact action menu — mirrors web DropdownMenu for account actions. */

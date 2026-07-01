@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 /** Horizontal rule — mirrors web Separator. */

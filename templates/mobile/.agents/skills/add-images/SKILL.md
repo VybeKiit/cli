@@ -14,7 +14,7 @@ metadata:
 **Contract:** one action at a time · verify-before-advance · plain language (`language.md`) ·
 translate every error · celebrate.
 
-> (Under the hood — agent-only) Assets live in `assets/`. Run `node scripts/optimize-assets.mjs`
+> (Under the hood — agent-only) Assets live in `assets/`. Run `node scripts/optimizeAssets.mjs`
 > (hooked to `pnpm start`). `app.json` points `icon` and `splash` at generated PNGs. Use `VybeImage`
 > for remote images (CDN URLs via `resolveAssetDelivery()`).
 
@@ -23,7 +23,7 @@ translate every error · celebrate.
 1. **Add files to `assets/`.** Place `icon.svg` or PNGs; scaffold ships `assets/icon.svg`.
    **Verify:** files exist.
 
-2. **Optimize.** Run `node scripts/optimize-assets.mjs` — creates `icon.png` and `splash.png`.
+2. **Optimize.** Run `node scripts/optimizeAssets.mjs` — creates `icon.png` and `splash.png`.
    **Verify:** PNGs exist and `app.json` icon/splash paths resolve.
 
 3. **Wire `VybeImage`** for any remote images (e.g. from your web backend).

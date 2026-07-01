@@ -1,11 +1,11 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/useUser';
 import { t } from '@/lib/i18n';
-import { requestOpenSidePanel } from '@/lib/side-panel-api';
+import { requestOpenSidePanel } from '@/lib/sidePanelApi';
 import type { ExtensionView } from '@/lib/view';
-import { signOut } from '@/lib/auth-client';
+import { signOut } from '@/lib/authClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@vybekiit/client-state';
 import { useState } from 'react';

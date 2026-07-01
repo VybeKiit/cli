@@ -19,7 +19,7 @@ Or the full loop:
 pnpm quality   # format → lint → typecheck → test
 ```
 
-Optional agent wrapper: `node scripts/check-quality.mjs`
+Optional agent wrapper: `node scripts/checkQuality.mjs`
 
 ## Rules
 

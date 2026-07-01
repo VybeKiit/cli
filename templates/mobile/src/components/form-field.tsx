@@ -1,6 +1,6 @@
 import { Input, type InputProps } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { StyleSheet, Text, View } from 'react-native';
 
 /**

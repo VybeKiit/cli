@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Fails when debug console calls exist outside tests — used at go-live / check-safety.
- * Usage: node scripts/check-no-console.mjs (from template root)
+ * Usage: node scripts/checkNoConsole.mjs (from template root)
  */
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';

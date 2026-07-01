@@ -1,11 +1,13 @@
+import { Either, Schema } from 'effect';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
-const contactSchema = z.object({
-  name: z.string().min(1).max(200),
-  email: z.string().email(),
-  message: z.string().min(1).max(5000),
+const contactSchema = Schema.Struct({
+  name: Schema.String.pipe(Schema.minLength(1), Schema.maxLength(200)),
+  email: Schema.String.pipe(Schema.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
+  message: Schema.String.pipe(Schema.minLength(1), Schema.maxLength(5000)),
 });
+
+const decodeContact = Schema.decodeUnknownEither(contactSchema);
 
 /**
  * Public contact form — lenient rate-limit tier (`public-form`), not auth-strict.
@@ -19,8 +21,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const parsed = contactSchema.safeParse(body);
-  if (!parsed.success) {
+  const parsed = decodeContact(body);
+  if (Either.isLeft(parsed)) {
     return NextResponse.json(
       { error: 'Please fill in name, email, and message.' },
       { status: 400 },

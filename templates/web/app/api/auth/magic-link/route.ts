@@ -1,3 +1,3 @@
-import { authRoutes } from '@/lib/auth-http-next';
+import { authRoutes } from '@/lib/authHttpNext';
 
 export const POST = authRoutes.sendMagicLink;

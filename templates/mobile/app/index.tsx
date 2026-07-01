@@ -2,8 +2,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HOME_FEATURES } from '@/data/marketing';
-import { useTranslations } from '@/hooks/use-translations';
-import { useTheme } from '@/theme/use-theme';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useTheme } from '@/theme/useTheme';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 

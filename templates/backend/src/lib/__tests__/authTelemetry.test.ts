@@ -17,7 +17,7 @@ vi.mock('@vybekiit/observability', () => ({
   })),
 }));
 
-import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '../auth-telemetry.js';
+import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '../authTelemetry.js';
 
 describe('auth-telemetry', () => {
   beforeEach(() => {

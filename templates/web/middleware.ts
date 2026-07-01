@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { evaluateApiSecurity } from '@/lib/api-security';
+import { evaluateApiSecurity } from '@/lib/apiSecurity';
 
 /** Keep in sync with `src/i18n/routing.ts`. */
 const locales = ['en'] as const;

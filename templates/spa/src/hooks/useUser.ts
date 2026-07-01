@@ -1,4 +1,4 @@
-import { getJson } from '@/lib/api-client';
+import { getJson } from '@/lib/apiClient';
 import type { AuthUser } from '@vybekiit/auth';
 import { queryKeys } from '@vybekiit/client-state';
 import { useQuery } from '@tanstack/react-query';

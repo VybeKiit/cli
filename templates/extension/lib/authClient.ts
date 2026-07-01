@@ -1,5 +1,5 @@
 import { createAuthClient } from '@vybekiit/auth/client';
-import { postJson } from './fetch-json';
+import { postJson } from './fetchJson';
 
 /** Buyer-facing auth wire points — the ONE file the `connect-account` skill edits. */
 const client = createAuthClient(postJson);

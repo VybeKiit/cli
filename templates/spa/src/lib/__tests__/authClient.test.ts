@@ -4,8 +4,8 @@ import {
   signInWithPassword,
   signUpWithPassword,
   verifyEmailCode,
-} from '../auth-client';
-import { startCheckout } from '../billing-client';
+} from '../authClient';
+import { startCheckout } from '../billingClient';
 import { DEV_USER, signInFailureHandler } from '../../test/msw/handlers';
 import { mswServer } from '../../test/msw/server';
 

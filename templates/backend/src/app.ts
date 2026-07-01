@@ -3,7 +3,7 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import { createExpressSecurityMiddleware } from '@vybekiit/security/express';
-import { errorHandler } from './middleware/error-handler.js';
+import { errorHandler } from './middleware/errorHandler.js';
 import { authRouter } from './routes/auth.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 import { handlePaymentsWebhook, paymentsRouter } from './routes/payments.routes.js';

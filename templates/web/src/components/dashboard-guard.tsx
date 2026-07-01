@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/useUser';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect } from 'react';
 

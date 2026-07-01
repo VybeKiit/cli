@@ -1,5 +1,5 @@
 import { handleCheckout, handleWebhook } from '@vybekiit/payments/http';
-import { readNodeEnv } from '@/lib/node-env';
+import { readNodeEnv } from '@/lib/nodeEnv';
 import { fulfillOrder } from '@/lib/fulfillment';
 import { NextResponse } from 'next/server';
 

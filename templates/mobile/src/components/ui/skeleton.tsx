@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { type StyleProp, View, type ViewStyle } from 'react-native';
 
 /** Animated placeholder block for loading states — mirrors web Skeleton. */

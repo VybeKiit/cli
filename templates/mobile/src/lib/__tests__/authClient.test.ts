@@ -6,8 +6,8 @@ import {
   signInWithPassword,
   signUpWithPassword,
   verifyEmailCode,
-} from '../auth-client';
-import { startCheckout } from '../billing-client';
+} from '../authClient';
+import { startCheckout } from '../billingClient';
 
 describe('auth-client (MSW)', () => {
   it('signInWithPassword returns the user the route resolved', async () => {

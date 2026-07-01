@@ -1,5 +1,5 @@
 import { createAuthClient } from '@vybekiit/auth/client';
-import { postJson } from '@/lib/fetch-json';
+import { postJson } from '@/lib/fetchJson';
 
 /**
  * Buyer-facing auth wire points — the ONE file the `add-signin` skill touches.

@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import { Text, View, type ViewStyle } from 'react-native';
 
 /** Circular initials avatar — mirrors web Avatar + AvatarFallback. */

@@ -1,4 +1,4 @@
-import { submitMobileReport } from '@/lib/report-mode/submit-report';
+import { submitMobileReport } from '@/lib/report-mode/submitReport';
 import { useReportDockMobile } from '@/components/report-mode/use-report-dock-mobile';
 import { DOCK_CORNER_LABELS, DOCK_CORNER_PRESETS, getDockInsetStyle } from '@vybekiit/report-mode';
 import { usePathname } from 'expo-router';
@@ -12,7 +12,7 @@ import {
   View,
   type GestureResponderEvent,
 } from 'react-native';
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 
 /** Dev-only Report Mode — R FAB with Pin corners (no drag); tap-to-report. */
 export function ReportModeDev() {

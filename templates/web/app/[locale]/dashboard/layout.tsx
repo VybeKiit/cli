@@ -2,7 +2,7 @@
 
 import { DashboardGuard } from '@/components/dashboard-guard';
 import { DashboardShell } from '@/components/dashboard-shell';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/useUser';
 import type { ReactNode } from 'react';
 
 /** Protects dashboard routes and wraps them in signed-in chrome. */

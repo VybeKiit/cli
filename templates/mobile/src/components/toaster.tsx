@@ -1,5 +1,5 @@
-import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/theme/use-theme';
+import { useToast } from '@/hooks/useToast';
+import { useTheme } from '@/theme/useTheme';
 import { StyleSheet, Text, View } from 'react-native';
 
 /**

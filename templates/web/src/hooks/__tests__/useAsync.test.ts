@@ -1,4 +1,4 @@
-import { useAsync } from '@/hooks/use-async';
+import { useAsync } from '@/hooks/useAsync';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { type Result, fail, ok } from '@vybekiit/core';
 

@@ -1,6 +1,6 @@
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import type { SidePanelMessage } from '@/lib/side-panel-api';
+import type { SidePanelMessage } from '@/lib/sidePanelApi';
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {

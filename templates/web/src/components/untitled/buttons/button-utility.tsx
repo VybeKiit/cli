@@ -7,7 +7,7 @@ import type { ButtonProps as AriaButtonProps, LinkProps as AriaLinkProps } from 
 import { Button as AriaButton, Link as AriaLink } from "react-aria-components";
 import { Tooltip } from "@/components/base/tooltip/tooltip";
 import { cx } from "@/utils/cx";
-import { isReactComponent } from "@/utils/is-react-component";
+import { isReactComponent } from "@/utils/isReactComponent";
 
 export const styles = {
     secondary:

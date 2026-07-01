@@ -1,4 +1,4 @@
 import { createNextAuthRoutes } from '@vybekiit/auth/http/next';
-import { webAuthHttpDeps } from './auth-http-deps';
+import { webAuthHttpDeps } from './authHttpDeps';
 
 export const authRoutes = createNextAuthRoutes(webAuthHttpDeps);

@@ -35,4 +35,4 @@ Follow pinned `vercel-react-best-practices` for event-listener dedup, RSC prop d
 
 ## Verify
 
-After refactors: tests green · `node scripts/check-no-console.mjs` (web) · no duplicate function names in `src/lib/`.
+After refactors: tests green · `node scripts/checkNoConsole.mjs` (web) · no duplicate function names in `src/lib/`.

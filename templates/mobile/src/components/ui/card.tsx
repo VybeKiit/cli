@@ -1,4 +1,4 @@
-import { useTheme } from '@/theme/use-theme';
+import { useTheme } from '@/theme/useTheme';
 import type { ReactNode } from 'react';
 import {
   type StyleProp,

@@ -1,4 +1,4 @@
-import { postJson } from './api-client';
+import { postJson } from './apiClient';
 import { type Result, fail } from '@vybekiit/core';
 
 /**

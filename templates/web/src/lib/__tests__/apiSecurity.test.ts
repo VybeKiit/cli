@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 import { SecurityGuard } from '@vybekiit/security';
-import { evaluateApiSecurity } from '@/lib/api-security';
+import { evaluateApiSecurity } from '@/lib/apiSecurity';
 
 describe('evaluateApiSecurity', () => {
   it('allows same-origin state-changing API requests', () => {

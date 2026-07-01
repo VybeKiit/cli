@@ -4,6 +4,7 @@ const REPORT_MODE_UI_SELECTOR = '[data-report-mode-ui]';
 
 /** Collapse whitespace for label comparison. */
 export function normalizeLabelText(text: string): string {
+  // collapse any whitespace run to one space: "a   b" → "a b"
   return text.replace(/\s+/g, ' ').trim();
 }
 
@@ -55,6 +56,7 @@ export function getAccessibleName(element: Element): string | undefined {
 
 /** Visible inner text, trimmed and capped. */
 export function getVisibleText(element: Element): string | undefined {
+  // collapse any whitespace run to one space: "a   b" → "a b"
   const text = element.textContent?.replace(/\s+/g, ' ').trim();
   if (!text) {
     return;
@@ -112,6 +114,7 @@ function collectDirectCandidates(element: Element, candidates: Set<string>): voi
     addCandidate(candidates, element.alt);
   }
 
+  // heading element? matches tag "H1".."H6", not "DIV"
   if (/^H[1-6]$/i.test(element.tagName)) {
     addCandidate(candidates, element.textContent);
   }

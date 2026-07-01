@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Link, useRouter } from '@/i18n/navigation';
-import { signOut } from '@/lib/auth-client';
+import { signOut } from '@/lib/authClient';
 import type { AuthUser } from '@vybekiit/auth';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';

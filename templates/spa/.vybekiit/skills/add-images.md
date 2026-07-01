@@ -6,7 +6,7 @@
 translate every error · celebrate. You place and wire images; the kit compresses them automatically.
 
 > (Under the hood — agent-only) Project assets live in `public/` (web), `assets/` (mobile), or
-> `public/icon/` (extension). Run `node scripts/optimize-assets.mjs` (or `pnpm build` / `pnpm start`
+> `public/icon/` (extension). Run `node scripts/optimizeAssets.mjs` (or `pnpm build` / `pnpm start`
 > which run it automatically). Display with `VybeImage` from `@vybekiit/assets` — it picks optimized
 > formats and CDN URLs for remote images via `resolveAssetDelivery()`.
 
@@ -19,7 +19,7 @@ translate every error · celebrate. You place and wire images; the kit compresse
 2. **Add the image files.** Copy or generate the builder's logo/hero/icons into that folder.
    **Verify:** files are on disk with sensible names (`logo.svg`, `hero.jpg`, etc.).
 
-3. **Optimize.** Run `node scripts/optimize-assets.mjs` (or the project's build/start script).
+3. **Optimize.** Run `node scripts/optimizeAssets.mjs` (or the project's build/start script).
    **Verify:** optimized variants exist (WebP/AVIF for photos, compressed SVG) and
    `asset-manifest.json` is updated when applicable.
 

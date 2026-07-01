@@ -1,4 +1,4 @@
-import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '@/lib/auth-telemetry';
+import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '@/lib/authTelemetry';
 import { resolveAnalyticsProvider } from '@vybekiit/analytics';
 import { observability } from '@/lib/observability';
 

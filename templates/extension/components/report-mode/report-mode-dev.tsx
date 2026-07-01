@@ -10,8 +10,8 @@ import {
   getCssPath,
   getShortestUniqueLabel,
   getVisibleText,
-} from '@/lib/report-mode/dom-utils';
-import { submitExtensionReport } from '@/lib/report-mode/submit-report';
+} from '@/lib/report-mode/domUtils';
+import { submitExtensionReport } from '@/lib/report-mode/submitReport';
 import {
   DOCK_CORNER_LABELS,
   DOCK_CORNER_PRESETS,

@@ -1,4 +1,4 @@
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/useUser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { AuthUser } from '@vybekiit/auth';
