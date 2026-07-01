@@ -9,6 +9,7 @@ import { ScrollToTop } from './components/common/ScrollToTop';
 import AppLayout from './layout/AppLayout';
 import SignIn from './pages/AuthPages/SignIn';
 import SignUp from './pages/AuthPages/SignUp';
+import PracticeCheckout from './pages/Checkout/PracticeCheckout';
 import BarChart from './pages/Charts/BarChart';
 import LineChart from './pages/Charts/LineChart';
 import Calendar from './pages/Calendar';
@@ -155,6 +156,12 @@ const signUpRoute = createRoute({
   component: SignUp,
 });
 
+const practiceCheckoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout/practice',
+  component: PracticeCheckout,
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '$',
@@ -183,6 +190,7 @@ const routeTree = rootRoute.addChildren([
   signInRoute,
   resetPasswordRoute,
   signUpRoute,
+  practiceCheckoutRoute,
   notFoundRoute,
 ]);
 

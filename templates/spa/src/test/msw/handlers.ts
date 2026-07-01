@@ -19,6 +19,6 @@ export const wirePointHandlers = [
 
 export function signInFailureHandler(message = 'Wrong password.') {
   return http.post(`${base}/api/auth/signin`, async () =>
-    HttpResponse.json({ error: message }, { status: 401 }),
+    HttpResponse.json({ code: 'unauthorized', error: message }, { status: 401 }),
   );
 }

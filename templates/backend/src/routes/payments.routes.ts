@@ -7,11 +7,12 @@ function checkoutDeps(req: Request) {
   return {
     env: process.env,
     appUrl: process.env.APP_URL,
+    frontendUrl: process.env.FRONTEND_URL ?? process.env.APP_URL,
     requestOrigin: req.headers.origin ?? null,
   };
 }
 
-export const paymentsRouter = createExpressPaymentsRouter(checkoutDeps);
+export const paymentsRouter = createExpressPaymentsRouter(checkoutDeps, { fulfillOrder });
 
 export async function handlePaymentsWebhook(req: Request, res: Response): Promise<void> {
   const rawBody = readWebhookRawBody(req.body);
