@@ -1,0 +1,33 @@
+name: Test
+
+# Reusable leg (workflow_call): the package test suites (turbo run test) plus the
+# maintainer script suite (test:scripts). Kept together so one red test blocks the
+# CI Gate. Single-leg (ubuntu, node 22); engines require node >=20.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests + script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
+
+      - run: pnpm test:scripts

@@ -40,10 +40,10 @@ jobs:
 
       - name: Pin platform skills
         if: steps.guard.outputs.enabled == 'true'
-        run: node scripts/pin-platform-skills.mjs
+        run: node scripts/pinPlatformSkills.mjs
 
       - name: Mirror repos
         if: steps.guard.outputs.enabled == 'true'
         env:
           GH_MIRROR_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
-        run: node scripts/mirror-repos.mjs
+        run: node scripts/mirrorRepos.mjs

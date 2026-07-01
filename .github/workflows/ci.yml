@@ -1,26 +1,49 @@
-# CI is the HEAVY gate (full tests + typecheck + lint + build).
-# Pre-commit runs biome check (format + lint-fix) on maintainer and buyer templates.
 name: ci
+
+# CI gate — composes the single-purpose reusable legs (biome / typecheck / test /
+# build / checks) via local `./` refs; each is `on: workflow_call`. Together they
+# are the same set `pnpm quality` runs locally, split so a red leg is easy to spot.
+#
+# - `CI Gate` is the single aggregated status check: require it in branch
+#   protection so any red leg blocks the merge.
+# - `ci-failure-issue.yml` (separate, `workflow_run`-triggered) opens a deduped
+#   issue when this workflow fails on main — never for PRs.
 
 on:
   push:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  verify:
+  biome:
+    uses: ./.github/workflows/biome.yml
+
+  typecheck:
+    uses: ./.github/workflows/typecheck.yml
+
+  test:
+    uses: ./.github/workflows/test.yml
+
+  build:
+    uses: ./.github/workflows/build.yml
+
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  gate:
+    name: CI Gate
+    needs: [biome, typecheck, test, build, checks]
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.2
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm quality
+      - name: Require every leg to pass
+        run: |
+          echo "biome=${{ needs.biome.result }} typecheck=${{ needs.typecheck.result }} test=${{ needs.test.result }} build=${{ needs.build.result }} checks=${{ needs.checks.result }}"
+          test "${{ needs.biome.result }}" = "success" \
+            && test "${{ needs.typecheck.result }}" = "success" \
+            && test "${{ needs.test.result }}" = "success" \
+            && test "${{ needs.build.result }}" = "success" \
+            && test "${{ needs.checks.result }}" = "success"

@@ -1,0 +1,31 @@
+name: Typecheck
+
+# Reusable leg (workflow_call): turbo run typecheck (tsc --noEmit per package).
+# Type results are deterministic across OS/Node, so this runs single-leg
+# (ubuntu, node 22) — no matrix. turbo builds upstream deps first (^build).
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck

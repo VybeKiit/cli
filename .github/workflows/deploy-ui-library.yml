@@ -1,6 +1,6 @@
 name: Deploy UI library
 
-# Deploy apps/component-library to Cloudflare Pages at ui.vybekiit.com.
+# Deploy apps/componentLibrary to Cloudflare Pages at ui.vybekiit.com.
 # Requires: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CF_UI_PAGES_PROJECT
 
 on:
@@ -8,10 +8,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/component-library/**'
+      - 'apps/componentLibrary/**'
       - 'templates/web/src/components/**'
       - 'templates/web/.vybekiit/agent/ui-catalog-index.json'
-      - 'scripts/build-component-library-index.mjs'
+      - 'scripts/buildComponentLibraryIndex.mjs'
       - 'pnpm-lock.yaml'
 
 concurrency:
@@ -42,7 +42,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: node scripts/build-component-library-index.mjs
+      - run: node scripts/buildComponentLibraryIndex.mjs
 
       - run: pnpm --filter vybekiit-component-library build
         env:
@@ -53,4 +53,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/component-library/.next --project-name=${{ vars.CF_UI_PAGES_PROJECT }}
+          command: pages deploy apps/componentLibrary/.next --project-name=${{ vars.CF_UI_PAGES_PROJECT }}

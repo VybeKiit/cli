@@ -1,0 +1,6 @@
+# Local CI via `act` — run the same gate GitHub runs, before pushing.
+#   act -W .github/workflows/ci.yml -j biome      # one leg
+#   act pull_request                              # the whole ci.yml gate
+# Medium runner image (bootstraps most actions); amd64 so it works on Apple Silicon.
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+--container-architecture linux/amd64
