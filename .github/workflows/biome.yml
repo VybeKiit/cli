@@ -17,14 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.2
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+
+      # corepack activates the pinned pnpm from package.json#packageManager. It replaces
+      # pnpm/action-setup here because that action's PATH edits break `act` locally (node
+      # drops off PATH for the next step — nektos/act#107); corepack works in both.
+      - run: corepack enable
 
       - run: pnpm install --frozen-lockfile
 
