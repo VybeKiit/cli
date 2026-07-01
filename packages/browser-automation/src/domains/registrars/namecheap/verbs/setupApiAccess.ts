@@ -12,7 +12,10 @@ import { NC_API_ACCESS_URL, type NcSetupParams, type NcSetupResult } from '../ty
 function envCredentials(): { apiKey?: string; apiUser?: string } {
   const apiKey = process.env.NAMECHEAP_API_KEY?.trim();
   const apiUser = process.env.NAMECHEAP_API_USER?.trim().toLowerCase();
-  return { apiKey: apiKey || undefined, apiUser: apiUser || undefined };
+  return {
+    ...(apiKey ? { apiKey } : {}),
+    ...(apiUser ? { apiUser } : {}),
+  };
 }
 
 async function isApiAccessEnabled(page: Page): Promise<boolean> {

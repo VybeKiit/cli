@@ -22,7 +22,7 @@ const DRAFT_HEADER = [
 async function openRecorder(chromeWebStoreId: string): Promise<void> {
   await appendRecorderLog('extension-open', `starting open-recorder for ${chromeWebStoreId}`);
   const profile = profileDirFor('extension');
-  await ensureChromeWithCdp(DEFAULT_CDP_PORT, profile);
+  await ensureChromeWithCdp({ port: DEFAULT_CDP_PORT, profileDir: profile });
   await ensureDraftTemplate(DRAFT_PATH, CWS_DRAFT_FIELDS, DRAFT_HEADER);
 
   const listingHref = `https://chrome.google.com/webstore/devconsole/${chromeWebStoreId}/edit/listing?hl=en`;

@@ -54,7 +54,6 @@ describe('waitForRedirectAfterSignIn', () => {
       waitingPage as never,
       context as never,
       {
-        authenticatedPattern: /developer\.godaddy\.com/i,
         isAuthenticated: (url) => url.includes('developer.godaddy.com'),
         logPrefix: '[gd]',
         prompt: 'sign in',

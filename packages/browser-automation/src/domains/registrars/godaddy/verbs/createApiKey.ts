@@ -5,9 +5,11 @@ import { scrapeGodaddyKeyPair, scrapeGodaddyKeysFromList } from '../scrape';
 import { GD_KEYS_URL, type GdSetupParams, type GdSetupResult } from '../types';
 
 function envCredentials(): { apiKey?: string; apiSecret?: string } {
+  const apiKey = process.env.GODADDY_API_KEY?.trim();
+  const apiSecret = process.env.GODADDY_API_SECRET?.trim();
   return {
-    apiKey: process.env.GODADDY_API_KEY?.trim() || undefined,
-    apiSecret: process.env.GODADDY_API_SECRET?.trim() || undefined,
+    ...(apiKey ? { apiKey } : {}),
+    ...(apiSecret ? { apiSecret } : {}),
   };
 }
 

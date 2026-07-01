@@ -30,7 +30,7 @@ const DRAFT_HEADER = [
 async function openRecorder(): Promise<void> {
   await appendRecorderLog('ls-open', 'starting open-recorder');
   const profile = profileDirFor('ls');
-  await ensureChromeWithCdp(DEFAULT_CDP_PORT, profile);
+  await ensureChromeWithCdp({ port: DEFAULT_CDP_PORT, profileDir: profile });
   await ensureDraftTemplate(DRAFT_PATH, LS_DRAFT_FIELDS, DRAFT_HEADER);
 
   const session = await attachRecorderSession({
@@ -72,7 +72,7 @@ async function applyRecorded(): Promise<void> {
 async function probeSelectors(): Promise<void> {
   await appendRecorderLog('ls-probe', 'starting passive href probe');
   const profile = profileDirFor('ls');
-  await ensureChromeWithCdp(DEFAULT_CDP_PORT, profile);
+  await ensureChromeWithCdp({ port: DEFAULT_CDP_PORT, profileDir: profile });
 
   const session = await attachRecorderSession({
     cdpEndpoint: `http://localhost:${DEFAULT_CDP_PORT}`,
@@ -112,7 +112,7 @@ async function probeE2e(): Promise<void> {
   const cleanupAfter = process.argv.includes('--cleanup');
   await appendRecorderLog('ls-probe-e2e', cleanupAfter ? 'e2e with cleanup' : 'e2e create');
   const profile = profileDirFor('ls');
-  await ensureChromeWithCdp(DEFAULT_CDP_PORT, profile);
+  await ensureChromeWithCdp({ port: DEFAULT_CDP_PORT, profileDir: profile });
 
   const session = await attachRecorderSession({
     cdpEndpoint: `http://localhost:${DEFAULT_CDP_PORT}`,
@@ -142,7 +142,7 @@ async function probeE2e(): Promise<void> {
 async function probeE2eCleanup(): Promise<void> {
   await appendRecorderLog('ls-probe-e2e', 'cleanup by prefix');
   const profile = profileDirFor('ls');
-  await ensureChromeWithCdp(DEFAULT_CDP_PORT, profile);
+  await ensureChromeWithCdp({ port: DEFAULT_CDP_PORT, profileDir: profile });
 
   const session = await attachRecorderSession({
     cdpEndpoint: `http://localhost:${DEFAULT_CDP_PORT}`,
