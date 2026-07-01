@@ -1,4 +1,4 @@
-import { EditorContent, useEditor } from '@tiptap/react';
+import { EditorContent, useEditor, type Extensions } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +17,7 @@ export function RichTextEditor({
   placeholder = 'Start writing…',
 }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit] as Extensions,
     content: value,
     editorProps: {
       attributes: {
