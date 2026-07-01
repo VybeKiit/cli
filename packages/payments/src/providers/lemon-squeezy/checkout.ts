@@ -20,17 +20,24 @@ export async function createLemonSqueezyCheckout(
 ): Promise<Result<CheckoutResult>> {
   lemonSqueezySetup({ apiKey: config.LEMONSQUEEZY_API_KEY });
 
+  const variantId = Number(params.productId);
+  const testMode = config.LEMONSQUEEZY_TEST_MODE ?? false;
+
   let url: string | undefined;
   try {
     const response = await createLemonSqueezyHostedCheckout(
       config.LEMONSQUEEZY_STORE_ID,
       params.productId,
       {
+        testMode,
+        productOptions: {
+          enabledVariants: [variantId],
+          ...(params.successUrl ? { redirectUrl: params.successUrl } : {}),
+        },
         checkoutData: {
           ...(params.email ? { email: params.email } : {}),
           ...(params.githubUsername ? { custom: { github_username: params.githubUsername } } : {}),
         },
-        ...(params.successUrl ? { productOptions: { redirectUrl: params.successUrl } } : {}),
       },
     );
     if (response.error) {
