@@ -253,6 +253,8 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/pointer');
     case 'magicui/smooth-cursor':
       return import('@library/demos/magicui/smooth-cursor');
+    case 'magicui/progressive-blur':
+      return import('@library/demos/magicui/progressive-blur');
     case 'magicui/neon-gradient-card':
       return import('@library/demos/magicui/neon-gradient-card');
     case 'magicui/noise-texture':
@@ -397,6 +399,8 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/pointer-demo-1');
     case 'magicui/smooth-cursor-demo':
       return import('@/components/magicui/smooth-cursor-demo');
+    case 'magicui/progressive-blur-demo':
+      return import('@/components/magicui/progressive-blur-demo');
     case 'magicui/neon-gradient-card-demo':
       return import('@/components/magicui/neon-gradient-card-demo');
     case 'magicui/noise-texture-demo':
@@ -893,8 +897,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/ai-elements/snippet');
     case 'ai-elements/sources':
       return import('@library/demos/ai-elements/sources');
-    case 'ai-elements/speech-input':
-      return import('@library/demos/ai-elements/speech-input');
     case 'ai-elements/suggestion':
       return import('@library/demos/ai-elements/suggestion');
     case 'ai-elements/test-results':
@@ -1015,8 +1017,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/ai-elements/example-sources-custom');
     case 'ai-elements/example-sources':
       return import('@/components/ai-elements/example-sources');
-    case 'ai-elements/example-speech-input':
-      return import('@/components/ai-elements/example-speech-input');
     case 'ai-elements/example-suggestion-input':
       return import('@/components/ai-elements/example-suggestion-input');
     case 'ai-elements/example-suggestion':
