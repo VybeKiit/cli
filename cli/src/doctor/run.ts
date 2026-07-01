@@ -9,6 +9,10 @@ import { verifyProjectHealth } from './project-health';
 import { provisionR2Storage } from './storage-r2';
 import { formatProductSurfaceHints } from './product-surface';
 import { ensureCodexSkillsEnabled } from './codex-config';
+import { verifyPresetsDoctor } from './verify-presets';
+import { verifyNamecheapDoctor } from './verify-namecheap';
+import { verifyGodaddyDoctor } from './verify-godaddy';
+import { verifyEmailWorkerDoctor } from './verify-email-worker';
 import {
   formatRailwayStackReport,
   isRailwayStackActive,
@@ -129,6 +133,26 @@ export async function runDoctor(log: Console = console): Promise<number> {
 
   const reports = toolchain.map((tool) => buildReport(tool, presence, installs));
   for (const line of formatReport(reports)) {
+    log.log(line);
+  }
+
+  const presetReport = await verifyPresetsDoctor(env);
+  for (const line of presetReport.lines) {
+    log.log(line);
+  }
+
+  const namecheapReport = await verifyNamecheapDoctor(env);
+  for (const line of namecheapReport.lines) {
+    log.log(line);
+  }
+
+  const godaddyReport = await verifyGodaddyDoctor(env);
+  for (const line of godaddyReport.lines) {
+    log.log(line);
+  }
+
+  const emailWorkerReport = await verifyEmailWorkerDoctor(env);
+  for (const line of emailWorkerReport.lines) {
     log.log(line);
   }
 

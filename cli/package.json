@@ -24,6 +24,8 @@
     "@inquirer/prompts": "^7.5.0",
     "@vybekiit/agent-kit": "workspace:*",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/db": "workspace:*",
+    "@vybekiit/deploy": "workspace:*",
     "@vybekiit/report-mode": "workspace:*"
   },
   "devDependencies": {
