@@ -16,4 +16,4 @@ export {
   createLocalAssetDelivery,
   createVercelDelivery,
   createAwsS3Delivery,
-} from './providers/index';
+} from './providers';

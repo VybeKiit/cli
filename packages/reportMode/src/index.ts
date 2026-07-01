@@ -6,7 +6,7 @@ export {
   type ReportPlatform,
   type VybeAssistant,
 } from './types';
-export { formatReportPrompt } from './format-prompt';
+export { formatReportPrompt } from './formatPrompt';
 export {
   buildAssistantDeepLink,
   inferVybeAssistant,
@@ -19,7 +19,7 @@ export {
   REPORT_HANDOFF_TARGET_STORAGE_KEY,
   saveReportHandoffTarget,
   type ReportHandoffTarget,
-} from './handoff-target';
+} from './handoffTarget';
 export {
   DEFAULT_INSPECT_HIGHLIGHT_COLOR,
   hexToRgba,
@@ -29,7 +29,7 @@ export {
   normalizeInspectHighlightColor,
   REPORT_INSPECT_HIGHLIGHT_COLOR_STORAGE_KEY,
   saveInspectHighlightColor,
-} from './inspect-highlight-color';
+} from './inspectHighlightColor';
 export {
   DOCK_CORNER_LABELS,
   DOCK_CORNER_PRESETS,

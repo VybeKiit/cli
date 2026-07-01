@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   parseLemonSqueezyWebhook,
   verifyLemonSqueezySignature,
-} from '../src/providers/lemon-squeezy/webhook';
+} from '../src/providers/lemonSqueezy/webhook';
 
 const SECRET = 'test-secret';
 

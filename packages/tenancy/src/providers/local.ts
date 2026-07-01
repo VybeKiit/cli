@@ -1,4 +1,4 @@
-import { ok, type Result } from '@vybekiit/core';
+import { Effect } from 'effect';
 import type { OrgMember, TenancyProvider } from '../types';
 
 const orgs = new Map<string, { name: string; ownerUserId: string }>();
@@ -7,23 +7,23 @@ const members = new Map<string, OrgMember & { orgId: string }>();
 export function createLocalTenancy(): TenancyProvider {
   return {
     name: 'local',
-    async createOrg(name: string, ownerUserId: string): Promise<Result<{ orgId: string }>> {
+    createOrg(name: string, ownerUserId: string) {
       const orgId = `org_${Date.now()}`;
       orgs.set(orgId, { name, ownerUserId });
-      return ok({ orgId });
+      return Effect.succeed({ orgId });
     },
-    async inviteMember(orgId: string, email: string, role = 'member'): Promise<Result<true>> {
+    inviteMember(orgId: string, email: string, role = 'member') {
       const userId = `user_${email}`;
       members.set(`${orgId}:${userId}`, { orgId, userId, email, role });
-      return ok(true);
+      return Effect.succeed(true as const);
     },
-    async listMembers(orgId: string): Promise<Result<readonly OrgMember[]>> {
+    listMembers(orgId: string) {
       const list = [...members.values()].filter((m) => m.orgId === orgId);
-      return ok(list);
+      return Effect.succeed<readonly OrgMember[]>(list);
     },
-    async removeMember(orgId: string, userId: string): Promise<Result<true>> {
+    removeMember(orgId: string, userId: string) {
       members.delete(`${orgId}:${userId}`);
-      return ok(true);
+      return Effect.succeed(true as const);
     },
   };
 }

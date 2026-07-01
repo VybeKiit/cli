@@ -59,6 +59,8 @@ export {
   i18nConfigSchema,
   resendConfigSchema,
   parseEnv,
+  onOff,
+  positiveIntEnv,
   type AppConfig,
   type SecurityConfig,
   type GoogleOAuthConfig,
@@ -133,7 +135,8 @@ export {
   DEFAULT_APP_URL,
 } from './constants';
 export { ok, err, fail, type Result, type VybeKiitError } from './result';
-export { type EnvSource, resolveEnvProvider, resolveOptionalEnvProvider } from './env-source';
+export { fromResult, fromResultPromise, makeResultLifter } from './effectInterop';
+export { type EnvSource, resolveEnvProvider, resolveOptionalEnvProvider } from './envSource';
 export {
   BACKEND_ANCHOR_KEYS,
   isBackendUnconfigured,
@@ -141,4 +144,4 @@ export {
   isRailwayStackActive,
   isSupabaseUnconfigured,
   needsAwsCliFromAuxiliaryProviders,
-} from './provider-dispatch';
+} from './providerDispatch';

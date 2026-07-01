@@ -1,9 +1,9 @@
 // `better-auth` is a framework-agnostic, self-hosted auth library whose tables live
 // in the builder's OWN database (ADR-0003) — so auth and data share one DB with no
-// extra service or account. We bind it to the active data backend: a `pg` Pool for
-// Postgres (the Supabase adapter's DB) or `mongodbAdapter` (over the official `mongodb`
-// driver) for Mongo. Chosen over Supabase Auth because it spans Postgres + Mongo on its
-// own; over Lucia because it ships email/password + email-OTP + bearer plugins we need.
+// extra service or account. It backs the **non-Supabase** Postgres/Mongo stacks
+// (Supabase stacks use Supabase Auth, ADR-0024): a `pg` Pool for Neon/Railway Postgres
+// or `mongodbAdapter` (over the official `mongodb` driver) for Mongo. Chosen over Lucia
+// because it ships the email/password + email-OTP + bearer plugins we need.
 import { parseEnv, twilioConfigSchema, type Result, fail, ok } from '@vybekiit/core';
 import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications';
 import { betterAuth } from 'better-auth';
@@ -12,7 +12,7 @@ import { bearer, emailOTP } from 'better-auth/plugins';
 import { type Db, MongoClient } from 'mongodb';
 import { Pool } from 'pg';
 import type { BetterAuthConfig, MongoConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effect-bridge';
+import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
 import type { SmsGateway } from '../../gateways';
 import { toSessionResult } from '../../session';
 import type { AuthProvider } from '../../types';

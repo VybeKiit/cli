@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   planFeatureReadiness,
   resolveTemplateTopology,
-} from '../../src/planners/plan-feature-readiness';
+} from '../../src/planners/planFeatureReadiness';
 
 describe('planFeatureReadiness', () => {
   it('web is always ready', () => {

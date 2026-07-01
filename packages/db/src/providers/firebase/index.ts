@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { type FirebaseConfig, type Result, fail, ok } from '@vybekiit/core';
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, type Firestore, type Query } from 'firebase-admin/firestore';
+import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
@@ -36,7 +37,7 @@ function resolveFirestore(config: FirebaseConfig): Firestore {
 export function createFirebaseDataProvider(config: FirebaseConfig): DataProvider {
   const db = resolveFirestore(config);
 
-  return {
+  const impl: DataProviderResult = {
     name: 'firebase',
     capabilities: MINIMAL_CAPABILITIES,
 
@@ -110,6 +111,7 @@ export function createFirebaseDataProvider(config: FirebaseConfig): DataProvider
       }
     },
   };
+  return toEffectDataProvider(impl);
 }
 
 /** Firestore connectivity probe. */

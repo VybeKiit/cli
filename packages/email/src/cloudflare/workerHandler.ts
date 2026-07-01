@@ -1,10 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import {
-  type CloudflareWorkerSendBody,
-  parseWorkerSendBody,
-  senderDomain,
-} from './worker-contract';
+import { type CloudflareWorkerSendBody, parseWorkerSendBody, senderDomain } from './workerContract';
 
 export interface EmailWorkerEnv {
   EMAIL: SendEmail;

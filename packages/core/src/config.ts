@@ -1,5 +1,4 @@
 import { Schema } from 'effect';
-import { z } from 'zod';
 import { DEFAULT_APP_URL } from './constants';
 
 /**
@@ -11,58 +10,80 @@ import { DEFAULT_APP_URL } from './constants';
  * slice via {@link parseEnv}, so a feature never fails because an *unrelated*
  * group of keys is blank. This keeps the single `.env.example` as the one source
  * of truth while letting each consumer require only what it touches.
+ *
+ * Validation is Effect `Schema` end-to-end (ADR-0023). `core` keeps the shared
+ * primitives + the {@link parseEnv} engine; provider packages own their own slices.
  */
 
 /** A readable view of `process.env` that doesn't require `@types/node` here. */
 type EnvSource = Record<string, string | undefined>;
 
-/** Minimum log level — optional override; {@link resolveDefaultLogLevel} applies when absent. */
-const logLevel = z.enum(['debug', 'info', 'warn', 'error', 'silent']);
+/** A required, non-empty env string. */
+const NonEmpty = Schema.String.pipe(Schema.minLength(1));
 
-/** Core app settings — always available (both have safe defaults). */
-export const appConfigSchema = z.object({
-  APP_URL: z.string().url().default(DEFAULT_APP_URL),
-  NODE_ENV: z.enum(['development', 'production']).default('development'),
-  /** Agent-only advanced override — builder never sets this; defaults from `NODE_ENV`. */
-  LOG_LEVEL: logLevel.optional(),
-});
+/** A string that parses as a URL — the Schema equivalent of the old zod `.url()`. */
+const UrlString = Schema.String.pipe(
+  Schema.filter((value) => URL.canParse(value), { message: () => 'must be a valid URL' }),
+);
+
+/** A string shaped like an email address — the Schema equivalent of zod `.email()`. */
+const EmailString = Schema.String.pipe(
+  Schema.filter((value) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value), {
+    message: () => 'must be a valid email',
+  }),
+);
+
+/** Minimum log level — optional override; `resolveDefaultLogLevel` applies when absent. */
+const logLevel = Schema.Literal('debug', 'info', 'warn', 'error', 'silent');
 
 /** An `on`/`off` env switch — the plain-language toggle a non-coder edits in `.env`. */
-const onOff = z.enum(['on', 'off']);
+export const onOff = Schema.Literal('on', 'off');
 
 /**
  * Coerce an env string to a positive integer, treating blank/absent as the default.
  *
  * Env values are always strings; a key left empty in a copied `.env` would otherwise
- * coerce to `0` and trip the `positive()` guard. Pre-mapping `''`/`undefined` to
- * `undefined` lets the schema default apply, so a blank line means "use the safe
- * default" rather than "fail to boot" — important when the consumer is a non-coder.
+ * coerce to `0` and trip the `positive` guard. Mapping `''` to the default (and absent
+ * to the `optionalWith` default) means a blank line means "use the safe default"
+ * rather than "fail to boot" — important when the consumer is a non-coder.
  */
-const positiveIntEnv = (fallback: number) =>
-  z.preprocess(
-    (value) => (value === undefined || value === '' ? undefined : value),
-    z.coerce.number().int().positive().default(fallback),
+export const positiveIntEnv = (fallback: number) =>
+  Schema.optionalWith(
+    Schema.transform(Schema.String, Schema.Number, {
+      strict: true,
+      decode: (value) => (value === '' ? fallback : Number(value)),
+      encode: (value) => String(value),
+    }).pipe(Schema.int(), Schema.positive()),
+    { default: () => fallback },
   );
 
+/** An optional `0/1/true/false` env flag → boolean (absent → omitted). */
+const optionalBoolEnv = Schema.optional(
+  Schema.transform(Schema.Literal('0', '1', 'true', 'false', ''), Schema.Boolean, {
+    strict: true,
+    decode: (raw) => raw === '1' || raw === 'true',
+    encode: (value) => (value ? '1' : '0'),
+  }),
+);
+
+/** Core app settings — always available (both have safe defaults). */
+export const appConfigSchema = Schema.Struct({
+  APP_URL: Schema.optionalWith(UrlString, { default: () => DEFAULT_APP_URL }),
+  NODE_ENV: Schema.optionalWith(Schema.Literal('development', 'production'), {
+    default: () => 'development' as const,
+  }),
+  /** Agent-only advanced override — builder never sets this; defaults from `NODE_ENV`. */
+  LOG_LEVEL: Schema.optional(logLevel),
+});
+
 /**
- * App-layer security — the protection every SaaS needs but a non-coder never thinks
- * to ask for, so the kit ships it **on by default** and exposes plain toggles here.
- * Read by `@vybekiit/security` (the headless engine), the web `middleware.ts`, and
- * the Cloudflare edge config in `infra/` — one source of truth, three enforcement
- * points, so a rule can never mean different things on different layers.
- *
- * - `SECURITY_RATE_LIMIT` / `_MAX` / `_WINDOW_SECONDS`: cap requests per client (by
- *   IP) to blunt brute-force and abuse on the auth + checkout routes. Default: 60
- *   requests / 60s.
- * - `SECURITY_ORIGIN_LOCK`: reject cross-site POSTs whose `Origin` isn't the app
- *   itself (basic CSRF / API-scraping defense). Same-origin always passes; the
- *   browser sends no `Origin` on top-level navigations, so pages are unaffected.
- * - `SECURITY_ALLOWED_ORIGINS`: comma-separated extra origins allowed past the lock
- *   (e.g. a separate marketing site or a mobile web build). Blank = same-origin only,
- *   the safe default. `@vybekiit/security` splits the CSV; core keeps the raw string.
+ * Secure-by-default app-layer limits (rate limit, origin lock) — shipped on so a
+ * non-coder never has to ask for them. Read by `@vybekiit/security`, the web
+ * `middleware.ts`, and the Cloudflare edge config: one source, three enforcement
+ * points. Rationale + threat model: ADR-0009.
  */
-export const securityConfigSchema = z.object({
-  SECURITY_RATE_LIMIT: onOff.default('on'),
+export const securityConfigSchema = Schema.Struct({
+  SECURITY_RATE_LIMIT: Schema.optionalWith(onOff, { default: () => 'on' as const }),
   /** Default ceiling for routes that don't match a tier-specific override. */
   SECURITY_RATE_LIMIT_MAX: positiveIntEnv(60),
   SECURITY_RATE_LIMIT_WINDOW_SECONDS: positiveIntEnv(60),
@@ -70,27 +91,20 @@ export const securityConfigSchema = z.object({
   SECURITY_RATE_LIMIT_AUTH_MAX: positiveIntEnv(10),
   /** Lenient tier — human-paced public forms (contact, waitlist). Default 30/min. */
   SECURITY_RATE_LIMIT_PUBLIC_FORM_MAX: positiveIntEnv(30),
-  SECURITY_ORIGIN_LOCK: onOff.default('on'),
-  SECURITY_ALLOWED_ORIGINS: z.string().default(''),
+  SECURITY_ORIGIN_LOCK: Schema.optionalWith(onOff, { default: () => 'on' as const }),
+  SECURITY_ALLOWED_ORIGINS: Schema.optionalWith(Schema.String, { default: () => '' }),
 });
 
 /**
- * Google OAuth credentials — used by `@vybekiit/auth` (better-auth social provider)
- * to power "sign in with Google". All optional because the agent provisions them for
- * the builder: the `sign-in-with-google` skill runs `gcloud` (installed by
- * `vybekiit doctor`, ADR-0001) to create the OAuth client, then writes these keys.
- * The package imports + the `doctor` skill therefore run before the values exist;
- * the adapter fails loud at first sign-in attempt while they're still blank, rather
- * than half-enabling a broken login. `GOOGLE_OAUTH_REDIRECT_URI` defaults to the
- * app's callback path so local dev needs no value.
+ * Google OAuth credentials — used by `@vybekiit/auth` for "sign in with Google". All
+ * optional because the agent provisions them for the builder (the `sign-in-with-google`
+ * skill runs `gcloud`), so imports run before the values exist; the adapter fails loud
+ * at first sign-in while blank. Rationale: ADR-0001.
  */
-export const googleOAuthConfigSchema = z.object({
-  GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
-  GOOGLE_OAUTH_CLIENT_SECRET: z.string().min(1).optional(),
-  GOOGLE_OAUTH_REDIRECT_URI: z
-    .string()
-    .url('GOOGLE_OAUTH_REDIRECT_URI must be a valid URL')
-    .optional(),
+export const googleOAuthConfigSchema = Schema.Struct({
+  GOOGLE_OAUTH_CLIENT_ID: Schema.optional(NonEmpty),
+  GOOGLE_OAUTH_CLIENT_SECRET: Schema.optional(NonEmpty),
+  GOOGLE_OAUTH_REDIRECT_URI: Schema.optional(UrlString),
 });
 
 /**
@@ -98,619 +112,563 @@ export const googleOAuthConfigSchema = z.object({
  * at a time; the agent swaps by changing this single value. Lemon Squeezy is the
  * v1 default (Merchant of Record — it handles tax/VAT for the seller).
  */
-export const paymentsConfigSchema = z.object({
-  PAYMENTS_PROVIDER: z.enum(['lemon-squeezy', 'stripe', 'paypal']).default('lemon-squeezy'),
+export const paymentsConfigSchema = Schema.Struct({
+  PAYMENTS_PROVIDER: Schema.optionalWith(Schema.Literal('lemon-squeezy', 'stripe', 'paypal'), {
+    default: () => 'lemon-squeezy' as const,
+  }),
 });
 
 /** Lemon Squeezy credentials — used by `@vybekiit/payments` (lemon-squeezy adapter). */
-export const lemonSqueezyConfigSchema = z.object({
-  LEMONSQUEEZY_API_KEY: z.string().min(1, 'LEMONSQUEEZY_API_KEY is required'),
-  LEMONSQUEEZY_STORE_ID: z.string().min(1, 'LEMONSQUEEZY_STORE_ID is required'),
-  LEMONSQUEEZY_WEBHOOK_SECRET: z.string().min(1, 'LEMONSQUEEZY_WEBHOOK_SECRET is required'),
-  LEMONSQUEEZY_TEST_MODE: z
-    .enum(['true', 'false'])
-    .default('false')
-    .transform((v) => v === 'true'),
+export const lemonSqueezyConfigSchema = Schema.Struct({
+  LEMONSQUEEZY_API_KEY: NonEmpty,
+  LEMONSQUEEZY_STORE_ID: NonEmpty,
+  LEMONSQUEEZY_WEBHOOK_SECRET: NonEmpty,
+  LEMONSQUEEZY_TEST_MODE: Schema.optionalWith(
+    Schema.transform(Schema.Literal('true', 'false'), Schema.Boolean, {
+      strict: true,
+      decode: (value) => value === 'true',
+      encode: (value) => (value ? 'true' : 'false'),
+    }),
+    { default: () => false },
+  ),
 });
 
 /** Stripe credentials — used by `@vybekiit/payments` (stripe adapter). */
-export const stripeConfigSchema = z.object({
-  STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
+export const stripeConfigSchema = Schema.Struct({
+  STRIPE_SECRET_KEY: NonEmpty,
+  STRIPE_WEBHOOK_SECRET: NonEmpty,
 });
 
 /**
- * PayPal credentials — used by `@vybekiit/payments` (paypal adapter).
- *
- * `PAYPAL_WEBHOOK_ID` is required because PayPal verifies webhooks server-side: the
- * adapter posts the event back to PayPal keyed by this id rather than checking a
- * local HMAC. `PAYPAL_ENV` switches between the sandbox and live API hosts.
+ * PayPal credentials — used by `@vybekiit/payments` (paypal adapter). `PAYPAL_WEBHOOK_ID`
+ * is required because PayPal verifies webhooks server-side; `PAYPAL_ENV` switches between
+ * the sandbox and live API hosts.
  */
-export const paypalConfigSchema = z.object({
-  PAYPAL_CLIENT_ID: z.string().min(1, 'PAYPAL_CLIENT_ID is required'),
-  PAYPAL_CLIENT_SECRET: z.string().min(1, 'PAYPAL_CLIENT_SECRET is required'),
-  PAYPAL_WEBHOOK_ID: z.string().min(1, 'PAYPAL_WEBHOOK_ID is required'),
-  PAYPAL_ENV: z.enum(['sandbox', 'live']).default('sandbox'),
+export const paypalConfigSchema = Schema.Struct({
+  PAYPAL_CLIENT_ID: NonEmpty,
+  PAYPAL_CLIENT_SECRET: NonEmpty,
+  PAYPAL_WEBHOOK_ID: NonEmpty,
+  PAYPAL_ENV: Schema.optionalWith(Schema.Literal('sandbox', 'live'), {
+    default: () => 'sandbox' as const,
+  }),
 });
 
 /**
- * Which data adapter `@vybekiit/db` constructs. One backend runs at a time; the
- * agent swaps by changing this single value. Supabase (Postgres) is the default;
- * `mongodb` (Atlas) and `aws` (DynamoDB/DocumentDB) are opt-in escape hatches that
- * ship in a later step (ADR-0002). `local` is the zero-config, in-memory dev
- * fallback (ADR-0008) — never a name the builder picks: it exists in the enum so
- * an explicit `DATA_PROVIDER=local` is valid, but `resolveDataProvider` selects it
- * implicitly whenever nothing is configured, so a fresh scaffold runs with no `.env`.
+ * Which data adapter `@vybekiit/db` constructs. One backend runs at a time; the agent
+ * swaps by changing this value. Supabase (Postgres) is the default; `local` is the
+ * zero-config in-memory dev fallback selected implicitly when nothing is configured
+ * (ADR-0008). Rationale: ADR-0002.
  */
-export const dataConfigSchema = z.object({
-  DATA_PROVIDER: z
-    .enum(['supabase', 'neon', 'firebase', 'mongodb', 'aws', 'local', 'railway'])
-    .default('supabase'),
+export const dataConfigSchema = Schema.Struct({
+  DATA_PROVIDER: Schema.optionalWith(
+    Schema.Literal('supabase', 'neon', 'firebase', 'mongodb', 'aws', 'local', 'railway'),
+    { default: () => 'supabase' as const },
+  ),
 });
 
 /**
- * Which auth adapter `@vybekiit/auth` constructs. `better-auth` (DB-bound) is the
- * default; `cognito` is the AWS path (ADR-0003). When `better-auth` is selected,
- * the adapter follows `DATA_PROVIDER` ({@link dataConfigSchema}) to pick its
- * database binding — and AWS-data apps auto-route to Cognito, since DynamoDB has no
- * better-auth adapter. The agent's add-signin skill drives this; the builder never
- * picks a name. `local` is the zero-config dev fallback (ADR-0008): like the data
- * enum, it is selectable explicitly but is chosen implicitly by `resolveAuthProvider`
- * only when nothing is configured, so a fresh scaffold signs in as a fixed dev user.
+ * Which auth adapter `@vybekiit/auth` constructs. `supabase` (Supabase Auth) is the
+ * default for the default Supabase stack; `better-auth` binds to a non-Supabase
+ * Postgres/Mongo; `cognito` is the AWS path; `local` is the zero-config dev fallback
+ * (ADR-0008). When unset, auth follows `DATA_PROVIDER`. Rationale: ADR-0003.
  */
-export const authConfigSchema = z.object({
-  AUTH_PROVIDER: z.enum(['better-auth', 'cognito', 'local']).default('better-auth'),
+export const authConfigSchema = Schema.Struct({
+  AUTH_PROVIDER: Schema.optional(Schema.Literal('supabase', 'better-auth', 'cognito', 'local')),
 });
 
 /**
  * Which object-storage adapter `@vybekiit/db` constructs for file uploads. Supabase
- * Storage is the default; `r2` is the Cloudflare stack default once doctor provisions
- * it; `s3` is an opt-in AWS adapter (ADR-0002).
+ * Storage is the default; `r2` is the Cloudflare stack default; `s3` is opt-in AWS.
  */
-export const storageConfigSchema = z.object({
-  STORAGE_PROVIDER: z.enum(['supabase', 'r2', 's3']).default('supabase'),
+export const storageConfigSchema = Schema.Struct({
+  STORAGE_PROVIDER: Schema.optionalWith(Schema.Literal('supabase', 'r2', 's3'), {
+    default: () => 'supabase' as const,
+  }),
 });
 
 /**
  * Which hosting adapter `@vybekiit/deploy` constructs at go-live. Cloudflare is the
- * default; `vercel` and `aws` (Amplify/SST) are opt-in adapters (ADR-0002/0006). The
- * agent's go-live skill drives the chosen adapter — the builder never picks.
+ * default; `vercel` and `aws` are opt-in (ADR-0002/0006). The go-live skill drives it.
  */
-export const hostingConfigSchema = z.object({
-  HOSTING_PROVIDER: z.enum(['cloudflare', 'vercel', 'aws', 'railway']).default('cloudflare'),
+export const hostingConfigSchema = Schema.Struct({
+  HOSTING_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'vercel', 'aws', 'railway'), {
+    default: () => 'cloudflare' as const,
+  }),
 });
 
 /**
- * Which email adapter `@vybekiit/email` constructs. Cloudflare is the default
- * (reuses {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in
- * adapters shipping later (ADR-0002).
+ * Which email adapter `@vybekiit/email` constructs. Cloudflare is the default (reuses
+ * {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in (ADR-0002).
  */
-export const emailConfigSchema = z.object({
-  EMAIL_PROVIDER: z.enum(['cloudflare', 'ses', 'resend']).default('cloudflare'),
+export const emailConfigSchema = Schema.Struct({
+  EMAIL_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'ses', 'resend'), {
+    default: () => 'cloudflare' as const,
+  }),
 });
 
 /**
- * MongoDB Atlas credentials — used by `@vybekiit/db` (mongodb adapter).
- *
- * `MONGODB_URI` is the full SRV connection string Atlas hands out (it carries the
- * cluster host + user/password), so it is validated as a non-empty string rather
- * than a `url()` (Zod's url check rejects the `mongodb+srv://` scheme). `MONGODB_DB`
- * names the database the adapter opens collections against.
+ * MongoDB Atlas credentials — used by `@vybekiit/db` (mongodb adapter). `MONGODB_URI`
+ * is the full SRV connection string (validated as non-empty, since the `mongodb+srv://`
+ * scheme fails a strict URL check); `MONGODB_DB` names the database opened.
  */
-export const mongoConfigSchema = z.object({
-  MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
-  MONGODB_DB: z.string().min(1, 'MONGODB_DB is required'),
+export const mongoConfigSchema = Schema.Struct({
+  MONGODB_URI: NonEmpty,
+  MONGODB_DB: NonEmpty,
 });
 
 /**
- * AWS DynamoDB credentials — used by `@vybekiit/db` (aws adapter).
- *
- * `AWS_REGION` is required so the SDK knows which endpoint to hit. The access keys
- * are optional: when both are present the adapter passes explicit credentials,
- * otherwise it falls back to the SDK's default credential chain (instance role,
- * shared config, env vars), so a deploy on AWS infra needs no keys committed.
- * `AWS_DYNAMODB_TABLE_PREFIX` optionally namespaces table names (e.g. `prod_`).
+ * AWS DynamoDB credentials — used by `@vybekiit/db` (aws adapter). `AWS_REGION` is
+ * required; the access keys are optional (SDK default credential chain applies when
+ * absent). `AWS_DYNAMODB_TABLE_PREFIX` optionally namespaces table names.
  */
-export const awsConfigSchema = z.object({
-  AWS_REGION: z.string().min(1, 'AWS_REGION is required'),
-  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
-  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
-  AWS_DYNAMODB_TABLE_PREFIX: z.string().default(''),
+export const awsConfigSchema = Schema.Struct({
+  AWS_REGION: NonEmpty,
+  AWS_ACCESS_KEY_ID: Schema.optional(NonEmpty),
+  AWS_SECRET_ACCESS_KEY: Schema.optional(NonEmpty),
+  AWS_DYNAMODB_TABLE_PREFIX: Schema.optionalWith(Schema.String, { default: () => '' }),
 });
 
 /**
- * AWS Amplify Hosting target — used by `@vybekiit/deploy` (aws adapter) on top of
- * the region/credentials in {@link awsConfigSchema}.
- *
- * `AWS_AMPLIFY_APP_ID` names the Amplify app the go-live skill provisions; it is
- * optional here so the package imports + the `doctor` skill run before the app
- * exists, with the adapter failing loud at deploy time when it is still blank.
- * `AWS_AMPLIFY_BRANCH` is the Amplify branch to deploy (defaults to `main`).
+ * AWS Amplify Hosting target — used by `@vybekiit/deploy` (aws adapter) on top of the
+ * region/credentials in {@link awsConfigSchema}. `AWS_AMPLIFY_APP_ID` is optional until
+ * the go-live skill provisions it; `AWS_AMPLIFY_BRANCH` defaults to `main`.
  */
-export const awsHostingConfigSchema = z.object({
-  AWS_AMPLIFY_APP_ID: z.string().min(1).optional(),
-  AWS_AMPLIFY_BRANCH: z.string().min(1).default('main'),
+export const awsHostingConfigSchema = Schema.Struct({
+  AWS_AMPLIFY_APP_ID: Schema.optional(NonEmpty),
+  AWS_AMPLIFY_BRANCH: Schema.optionalWith(NonEmpty, { default: () => 'main' }),
 });
 
 /**
- * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and
- * `@vybekiit/assets` (CDN delivery). Provisioned by `vybekiit doctor` on the default
- * Cloudflare stack. `R2_PUBLIC_URL` is the public bucket origin (custom domain or
- * r2.dev URL) used for readable object URLs and image transforms.
+ * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and `@vybekiit/assets`
+ * (CDN delivery). `R2_PUBLIC_URL` is the public bucket origin for readable object URLs.
  */
-export const r2ConfigSchema = z.object({
-  R2_ACCOUNT_ID: z.string().min(1, 'R2_ACCOUNT_ID is required'),
-  R2_BUCKET: z.string().min(1, 'R2_BUCKET is required'),
-  R2_ACCESS_KEY_ID: z.string().min(1, 'R2_ACCESS_KEY_ID is required'),
-  R2_SECRET_ACCESS_KEY: z.string().min(1, 'R2_SECRET_ACCESS_KEY is required'),
-  R2_PUBLIC_URL: z.string().url('R2_PUBLIC_URL must be a valid URL'),
+export const r2ConfigSchema = Schema.Struct({
+  R2_ACCOUNT_ID: NonEmpty,
+  R2_BUCKET: NonEmpty,
+  R2_ACCESS_KEY_ID: NonEmpty,
+  R2_SECRET_ACCESS_KEY: NonEmpty,
+  R2_PUBLIC_URL: UrlString,
 });
 
-/** Supabase credentials — used by `@vybekiit/db` (supabase adapter). */
-export const supabaseConfigSchema = z.object({
-  SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
-  SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY is required'),
+/** Supabase credentials — used by `@vybekiit/db` (supabase adapter) and Supabase Auth. */
+export const supabaseConfigSchema = Schema.Struct({
+  SUPABASE_URL: UrlString,
+  SUPABASE_ANON_KEY: NonEmpty,
   // Server-only; the browser client never sets it.
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+  SUPABASE_SERVICE_ROLE_KEY: Schema.optional(NonEmpty),
 });
 
 /**
  * Neon serverless Postgres — used by `@vybekiit/db` (neon adapter).
  * Reuses `DATABASE_URL` (pooled connection string from Neon dashboard).
  */
-export const neonConfigSchema = z.object({
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required for Neon'),
+export const neonConfigSchema = Schema.Struct({
+  DATABASE_URL: NonEmpty,
 });
 
 /**
  * Railway Postgres — used by `@vybekiit/db` (railway adapter, ADR-0017).
  * `DATABASE_URL` is the Postgres connection string from Railway service variables.
  */
-export const railwayConfigSchema = z.object({
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required for Railway Postgres'),
+export const railwayConfigSchema = Schema.Struct({
+  DATABASE_URL: NonEmpty,
 });
 
 /**
  * Railway hosting — used by `@vybekiit/deploy` (railway adapter, ADR-0017).
  * Auth is CLI-native (`railway login`); project/service ids are optional until link.
  */
-export const railwayHostingConfigSchema = z.object({
-  RAILWAY_PROJECT_ID: z.string().min(1).optional(),
-  RAILWAY_SERVICE_ID: z.string().min(1).optional(),
+export const railwayHostingConfigSchema = Schema.Struct({
+  RAILWAY_PROJECT_ID: Schema.optional(NonEmpty),
+  RAILWAY_SERVICE_ID: Schema.optional(NonEmpty),
 });
 
 /**
  * Firebase Firestore — used by `@vybekiit/db` (firebase adapter).
- * Provide inline JSON or a credentials file path (server-only).
+ * Provide inline JSON or a credentials file path (server-only); one is required.
  */
-export const firebaseConfigSchema = z
-  .object({
-    FIREBASE_PROJECT_ID: z.string().min(1, 'FIREBASE_PROJECT_ID is required'),
-    GOOGLE_APPLICATION_CREDENTIALS: z.string().min(1).optional(),
-    FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(1).optional(),
-  })
-  .refine(
-    (value) =>
-      Boolean(value.FIREBASE_SERVICE_ACCOUNT_JSON) || Boolean(value.GOOGLE_APPLICATION_CREDENTIALS),
-    {
-      message:
-        'FIREBASE_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS is required for Firebase',
-    },
-  );
+export const firebaseConfigSchema = Schema.Struct({
+  FIREBASE_PROJECT_ID: NonEmpty,
+  GOOGLE_APPLICATION_CREDENTIALS: Schema.optional(NonEmpty),
+  FIREBASE_SERVICE_ACCOUNT_JSON: Schema.optional(NonEmpty),
+}).pipe(
+  Schema.filter((value) =>
+    value.FIREBASE_SERVICE_ACCOUNT_JSON || value.GOOGLE_APPLICATION_CREDENTIALS
+      ? true
+      : 'FIREBASE_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS is required for Firebase',
+  ),
+);
 
 /**
  * better-auth settings — used by `@vybekiit/auth` (better-auth adapter, ADR-0003).
- *
- * `BETTER_AUTH_SECRET` signs/encrypts sessions and is always required (a blank
- * secret would silently weaken every session). `BETTER_AUTH_URL` is the app's base
- * URL better-auth issues cookies/links against; it defaults to {@link DEFAULT_APP_URL}
- * so local dev needs no value. `DATABASE_URL` is the **Postgres** connection string
- * better-auth opens when `DATA_PROVIDER` is `supabase`/`postgres` — Supabase exposes
- * this in Project Settings → Database; it is optional so the package imports + the
- * `doctor` skill run before a project exists, with the adapter failing loud at first
- * use when it is still blank. The Mongo binding reads {@link mongoConfigSchema}
- * instead, so `DATABASE_URL` stays empty there.
+ * `BETTER_AUTH_SECRET` signs sessions (always required); `BETTER_AUTH_URL` defaults to
+ * {@link DEFAULT_APP_URL}; `DATABASE_URL` is the Postgres binding (optional so imports
+ * run before a project exists; the adapter fails loud at first use when blank).
  */
-export const betterAuthConfigSchema = z.object({
-  BETTER_AUTH_SECRET: z.string().min(1, 'BETTER_AUTH_SECRET is required'),
-  BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL must be a valid URL').default(DEFAULT_APP_URL),
-  DATABASE_URL: z.string().min(1).optional(),
+export const betterAuthConfigSchema = Schema.Struct({
+  BETTER_AUTH_SECRET: NonEmpty,
+  BETTER_AUTH_URL: Schema.optionalWith(UrlString, { default: () => DEFAULT_APP_URL }),
+  DATABASE_URL: Schema.optional(NonEmpty),
 });
 
 /**
  * AWS Cognito credentials — used by `@vybekiit/auth` (cognito adapter, ADR-0003).
- *
- * `COGNITO_USER_POOL_ID` + `COGNITO_CLIENT_ID` name the user pool and its app client
- * the adapter signs up / signs in against. `AWS_REGION` is required (Cognito is
- * region-scoped) and intentionally matches the key the AWS data/S3/SES adapters use,
- * so an AWS-only app sets one region for everything. The optional access keys mirror
- * {@link awsConfigSchema}: when both are present the adapter passes explicit
- * credentials, otherwise the SDK's default credential chain applies.
+ * `AWS_REGION` is required (Cognito is region-scoped) and matches the AWS data/S3/SES
+ * key. The optional access keys mirror {@link awsConfigSchema}.
  */
-export const cognitoConfigSchema = z.object({
-  COGNITO_USER_POOL_ID: z.string().min(1, 'COGNITO_USER_POOL_ID is required'),
-  COGNITO_CLIENT_ID: z.string().min(1, 'COGNITO_CLIENT_ID is required'),
-  AWS_REGION: z.string().min(1, 'AWS_REGION is required'),
-  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
-  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+export const cognitoConfigSchema = Schema.Struct({
+  COGNITO_USER_POOL_ID: NonEmpty,
+  COGNITO_CLIENT_ID: NonEmpty,
+  AWS_REGION: NonEmpty,
+  AWS_ACCESS_KEY_ID: Schema.optional(NonEmpty),
+  AWS_SECRET_ACCESS_KEY: Schema.optional(NonEmpty),
 });
 
 /**
  * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by
- * `@vybekiit/email`.
- *
- * `CLOUDFLARE_EMAIL_ENDPOINT` is optional because Cloudflare has no general outbound
- * email API: transactional sends run from the deployed Worker/Pages context, which
- * exposes its own send route. The email adapter POSTs there; without it, `send`
- * fails loud rather than silently dropping mail.
+ * `@vybekiit/email`. `CLOUDFLARE_EMAIL_ENDPOINT` is optional (transactional sends run
+ * from the deployed Worker/Pages context, which exposes its own send route).
  */
-export const cloudflareConfigSchema = z.object({
-  CLOUDFLARE_ACCOUNT_ID: z.string().min(1, 'CLOUDFLARE_ACCOUNT_ID is required'),
-  CLOUDFLARE_API_TOKEN: z.string().min(1, 'CLOUDFLARE_API_TOKEN is required'),
-  CLOUDFLARE_EMAIL_ENDPOINT: z
-    .string()
-    .url('CLOUDFLARE_EMAIL_ENDPOINT must be a valid URL')
-    .optional(),
+export const cloudflareConfigSchema = Schema.Struct({
+  CLOUDFLARE_ACCOUNT_ID: NonEmpty,
+  CLOUDFLARE_API_TOKEN: NonEmpty,
+  CLOUDFLARE_EMAIL_ENDPOINT: Schema.optional(UrlString),
 });
 
 /**
  * Cloudflare email worker credentials — used by `@vybekiit/email` (cloudflare adapter).
  * Separate from deploy creds so sending does not require a full CF API token at runtime.
  */
-export const cloudflareEmailConfigSchema = z.object({
-  EMAIL_WORKER_SECRET: z.string().min(1, 'EMAIL_WORKER_SECRET is required'),
-  CLOUDFLARE_EMAIL_ENDPOINT: z.string().url('CLOUDFLARE_EMAIL_ENDPOINT must be a valid URL'),
-  EMAIL_FROM: z.string().email().optional(),
-  EMAIL_FROM_NAME: z.string().min(1).optional(),
+export const cloudflareEmailConfigSchema = Schema.Struct({
+  EMAIL_WORKER_SECRET: NonEmpty,
+  CLOUDFLARE_EMAIL_ENDPOINT: UrlString,
+  EMAIL_FROM: Schema.optional(EmailString),
+  EMAIL_FROM_NAME: Schema.optional(NonEmpty),
 });
 
 /**
  * Namecheap registrar API — optional; used by `@vybekiit/deploy` and `vybekiit doctor`
- * to automate nameserver delegation when a domain is registered at Namecheap.
- * All three core keys must be set together when any is present.
+ * to automate nameserver delegation. All three core keys must be set together.
  */
-export const namecheapConfigSchema = z
-  .object({
-    NAMECHEAP_API_USER: z.string().min(1).optional(),
-    NAMECHEAP_API_KEY: z.string().min(1).optional(),
-    NAMECHEAP_CLIENT_IP: z.string().min(1).optional(),
-    NAMECHEAP_USERNAME: z.string().min(1).optional(),
-    NAMECHEAP_SANDBOX: z
-      .enum(['0', '1', 'true', 'false', ''])
-      .optional()
-      .transform((raw) => {
-        if (raw === undefined || raw === '') return;
-        return raw === '1' || raw === 'true';
-      }),
-  })
-  .superRefine((value, ctx) => {
-    const required = ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY', 'NAMECHEAP_CLIENT_IP'] as const;
-    const present = required.filter((key) => Boolean(value[key]));
-    if (present.length === 0 || present.length === required.length) {
-      return;
-    }
-    for (const key of required) {
-      if (!value[key]) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `${key} is required when any Namecheap env var is set`,
-          path: [key],
-        });
-      }
-    }
-  });
+export const namecheapConfigSchema = Schema.Struct({
+  NAMECHEAP_API_USER: Schema.optional(NonEmpty),
+  NAMECHEAP_API_KEY: Schema.optional(NonEmpty),
+  NAMECHEAP_CLIENT_IP: Schema.optional(NonEmpty),
+  NAMECHEAP_USERNAME: Schema.optional(NonEmpty),
+  NAMECHEAP_SANDBOX: optionalBoolEnv,
+}).pipe(
+  Schema.filter((value) =>
+    allOrNone(value, ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY', 'NAMECHEAP_CLIENT_IP']),
+  ),
+);
 
 /**
  * GoDaddy registrar API — optional; used by `@vybekiit/deploy` and `vybekiit doctor`
- * to automate nameserver delegation when a domain is registered at GoDaddy.
- * Both core keys must be set together when any is present.
+ * to automate nameserver delegation. Both core keys must be set together.
  */
-export const godaddyConfigSchema = z
-  .object({
-    GODADDY_API_KEY: z.string().min(1).optional(),
-    GODADDY_API_SECRET: z.string().min(1).optional(),
-    GODADDY_OTE: z
-      .enum(['0', '1', 'true', 'false', ''])
-      .optional()
-      .transform((raw) => {
-        if (raw === undefined || raw === '') return;
-        return raw === '1' || raw === 'true';
-      }),
-  })
-  .superRefine((value, ctx) => {
-    const required = ['GODADDY_API_KEY', 'GODADDY_API_SECRET'] as const;
-    const present = required.filter((key) => Boolean(value[key]));
-    if (present.length === 0 || present.length === required.length) {
-      return;
-    }
-    for (const key of required) {
-      if (!value[key]) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `${key} is required when any GoDaddy env var is set`,
-          path: [key],
-        });
-      }
-    }
-  });
+export const godaddyConfigSchema = Schema.Struct({
+  GODADDY_API_KEY: Schema.optional(NonEmpty),
+  GODADDY_API_SECRET: Schema.optional(NonEmpty),
+  GODADDY_OTE: optionalBoolEnv,
+}).pipe(Schema.filter((value) => allOrNone(value, ['GODADDY_API_KEY', 'GODADDY_API_SECRET'])));
+
+/**
+ * Enforce an all-or-none group of required keys: pass when none or all are present,
+ * else fail with the first missing key named (so the message is actionable + greppable).
+ */
+function allOrNone<K extends string>(
+  value: Partial<Record<K, unknown>>,
+  keys: readonly K[],
+): true | string {
+  const present = keys.filter((key) => Boolean(value[key]));
+  if (present.length === 0 || present.length === keys.length) return true;
+  const missing = keys.find((key) => !value[key]);
+  return `${missing} is required when any related registrar var is set`;
+}
 
 /**
  * Vercel credentials — used by `@vybekiit/deploy` (vercel adapter, ADR-0006).
- *
- * `VERCEL_TOKEN` is a personal/team token from the Vercel dashboard (Settings → Tokens).
- * `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are optional until the go-live skill links the
- * project; when set they pin deploy scope.
+ * `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID` are optional until the go-live skill links.
  */
-export const vercelConfigSchema = z.object({
-  VERCEL_TOKEN: z.string().min(1, 'VERCEL_TOKEN is required'),
-  VERCEL_ORG_ID: z.string().min(1).optional(),
-  VERCEL_PROJECT_ID: z.string().min(1).optional(),
+export const vercelConfigSchema = Schema.Struct({
+  VERCEL_TOKEN: NonEmpty,
+  VERCEL_ORG_ID: Schema.optional(NonEmpty),
+  VERCEL_PROJECT_ID: Schema.optional(NonEmpty),
 });
 
 /** GitHub access automation — "the gate" that grants/revokes paid repo access. */
-export const githubGateConfigSchema = z.object({
-  GITHUB_GATE_TOKEN: z.string().min(1, 'GITHUB_GATE_TOKEN is required'),
-  GITHUB_GATE_ORG: z.string().min(1).default('VybeKiit'),
-  /** CSV of mirror repo names under {@link GITHUB_GATE_ORG} — ADR-0005 bundle invite. */
-  GITHUB_GATE_REPOS: z
-    .string()
-    .default('web,mobile,extension')
-    .transform((raw) =>
-      raw
-        .split(',')
-        .map((name) => name.trim())
-        .filter((name) => name.length > 0),
-    ),
+export const githubGateConfigSchema = Schema.Struct({
+  GITHUB_GATE_TOKEN: NonEmpty,
+  GITHUB_GATE_ORG: Schema.optionalWith(NonEmpty, { default: () => 'VybeKiit' }),
+  /** CSV of mirror repo names under `GITHUB_GATE_ORG` — ADR-0005 bundle invite. */
+  GITHUB_GATE_REPOS: Schema.optionalWith(
+    Schema.transform(Schema.String, Schema.Array(Schema.String), {
+      strict: true,
+      decode: (raw) =>
+        raw
+          .split(',')
+          .map((name) => name.trim())
+          .filter((name) => name.length > 0),
+      encode: (repos) => repos.join(','),
+    }),
+    { default: () => ['web', 'mobile', 'extension'] as readonly string[] },
+  ),
 });
 
 /**
- * The VybeKiit store's own checkout target — used by `apps/landing`'s checkout route
- * to tell the payment provider *what* is being sold. `STORE_PRODUCT_ID` is the
- * provider's purchasable id (a Lemon Squeezy *variant* id by default), passed
- * straight to {@link CheckoutParams.productId}. This is store infrastructure (the
- * id of the kit we sell), not part of a buyer's scaffolded app — a buyer's app
- * carries its own product ids instead. Required, so a misconfigured store fails
- * loud at checkout rather than creating an empty cart.
+ * The VybeKiit store's own checkout target — used by `apps/landing`'s checkout route to
+ * tell the payment provider *what* is being sold. Required, so a misconfigured store
+ * fails loud at checkout rather than creating an empty cart.
  */
-export const storeConfigSchema = z.object({
-  STORE_PRODUCT_ID: z.string().min(1, 'STORE_PRODUCT_ID is required'),
+export const storeConfigSchema = Schema.Struct({
+  STORE_PRODUCT_ID: NonEmpty,
 });
 
 /**
  * Which observability adapter `@vybekiit/observability` constructs. `local` is the
- * no-op default (ADR-0008 pattern); `sentry` sends errors to Sentry when
- * `SENTRY_DSN` is set. The agent's track-errors skill drives this — the builder
- * never picks a name.
+ * no-op default; `sentry` sends errors when `SENTRY_DSN` is set (track-errors skill).
  */
-export const observabilityConfigSchema = z.object({
-  OBSERVABILITY_PROVIDER: z.enum(['sentry', 'local']).default('local'),
+export const observabilityConfigSchema = Schema.Struct({
+  OBSERVABILITY_PROVIDER: Schema.optionalWith(Schema.Literal('sentry', 'local'), {
+    default: () => 'local' as const,
+  }),
 });
 
 /** Sentry credentials — used by `@vybekiit/observability` (sentry adapter). */
-export const sentryConfigSchema = z.object({
-  SENTRY_DSN: z.string().min(1).optional(),
+export const sentryConfigSchema = Schema.Struct({
+  SENTRY_DSN: Schema.optional(NonEmpty),
 });
 
 /** Which background-jobs adapter `@vybekiit/jobs` constructs. */
-export const jobsConfigSchema = z.object({
-  JOBS_PROVIDER: z.enum(['cloudflare', 'trigger', 'qstash', 'local']).default('cloudflare'),
+export const jobsConfigSchema = Schema.Struct({
+  JOBS_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'trigger', 'qstash', 'local'), {
+    default: () => 'cloudflare' as const,
+  }),
 });
 
 /** Cloudflare queue/cron bindings for `@vybekiit/jobs`. */
-export const cloudflareJobsConfigSchema = z.object({
-  CLOUDFLARE_QUEUE_NAME: z.string().min(1).optional(),
-  CLOUDFLARE_CRON_SECRET: z.string().min(1).optional(),
+export const cloudflareJobsConfigSchema = Schema.Struct({
+  CLOUDFLARE_QUEUE_NAME: Schema.optional(NonEmpty),
+  CLOUDFLARE_CRON_SECRET: Schema.optional(NonEmpty),
 });
 
 /** Which visitor-stats adapter `@vybekiit/analytics` constructs. */
-export const analyticsConfigSchema = z.object({
-  ANALYTICS_PROVIDER: z.enum(['plausible', 'posthog', 'local']).default('plausible'),
+export const analyticsConfigSchema = Schema.Struct({
+  ANALYTICS_PROVIDER: Schema.optionalWith(Schema.Literal('plausible', 'posthog', 'local'), {
+    default: () => 'plausible' as const,
+  }),
 });
 
-export const plausibleConfigSchema = z.object({
-  PLAUSIBLE_DOMAIN: z.string().min(1, 'PLAUSIBLE_DOMAIN is required'),
-  PLAUSIBLE_API_HOST: z.string().url().optional(),
+export const plausibleConfigSchema = Schema.Struct({
+  PLAUSIBLE_DOMAIN: NonEmpty,
+  PLAUSIBLE_API_HOST: Schema.optional(UrlString),
 });
 
-export const posthogConfigSchema = z.object({
-  POSTHOG_API_KEY: z.string().min(1, 'POSTHOG_API_KEY is required'),
-  POSTHOG_HOST: z.string().url().optional(),
+export const posthogConfigSchema = Schema.Struct({
+  POSTHOG_API_KEY: NonEmpty,
+  POSTHOG_HOST: Schema.optional(UrlString),
 });
 
 /** Which notifications adapter `@vybekiit/notifications` constructs. */
-export const notificationsConfigSchema = z.object({
-  NOTIFICATIONS_PROVIDER: z.enum(['expo', 'twilio', 'email', 'local']).default('expo'),
+export const notificationsConfigSchema = Schema.Struct({
+  NOTIFICATIONS_PROVIDER: Schema.optionalWith(Schema.Literal('expo', 'twilio', 'email', 'local'), {
+    default: () => 'expo' as const,
+  }),
 });
 
-export const expoPushConfigSchema = z.object({
-  EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
+export const expoPushConfigSchema = Schema.Struct({
+  EXPO_ACCESS_TOKEN: Schema.optional(NonEmpty),
 });
 
-export const twilioConfigSchema = z.object({
-  TWILIO_ACCOUNT_SID: z.string().min(1, 'TWILIO_ACCOUNT_SID is required'),
-  TWILIO_AUTH_TOKEN: z.string().min(1, 'TWILIO_AUTH_TOKEN is required'),
-  TWILIO_FROM_NUMBER: z.string().min(1, 'TWILIO_FROM_NUMBER is required'),
-  TWILIO_WHATSAPP_FROM: z.string().min(1).optional(),
-  TWILIO_VERIFY_SERVICE_SID: z.string().min(1).optional(),
+export const twilioConfigSchema = Schema.Struct({
+  TWILIO_ACCOUNT_SID: NonEmpty,
+  TWILIO_AUTH_TOKEN: NonEmpty,
+  TWILIO_FROM_NUMBER: NonEmpty,
+  TWILIO_WHATSAPP_FROM: Schema.optional(NonEmpty),
+  TWILIO_VERIFY_SERVICE_SID: Schema.optional(NonEmpty),
 });
 
 /** Which AI runtime adapter `@vybekiit/ai` constructs. */
-export const aiConfigSchema = z.object({
-  AI_PROVIDER: z.enum(['openai', 'anthropic', 'openrouter', 'local']).default('openai'),
+export const aiConfigSchema = Schema.Struct({
+  AI_PROVIDER: Schema.optionalWith(Schema.Literal('openai', 'anthropic', 'openrouter', 'local'), {
+    default: () => 'openai' as const,
+  }),
 });
 
-export const openaiConfigSchema = z.object({
-  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
-  OPENAI_MODEL: z.string().min(1).default('gpt-4o-mini'),
+export const openaiConfigSchema = Schema.Struct({
+  OPENAI_API_KEY: NonEmpty,
+  OPENAI_MODEL: Schema.optionalWith(NonEmpty, { default: () => 'gpt-4o-mini' }),
 });
 
-export const anthropicConfigSchema = z.object({
-  ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
-  ANTHROPIC_MODEL: z.string().min(1).default('claude-3-5-haiku-latest'),
+export const anthropicConfigSchema = Schema.Struct({
+  ANTHROPIC_API_KEY: NonEmpty,
+  ANTHROPIC_MODEL: Schema.optionalWith(NonEmpty, { default: () => 'claude-3-5-haiku-latest' }),
 });
 
-export const openrouterConfigSchema = z.object({
-  OPENROUTER_API_KEY: z.string().min(1, 'OPENROUTER_API_KEY is required'),
-  OPENROUTER_MODEL: z.string().min(1).default('openai/gpt-4o-mini'),
+export const openrouterConfigSchema = Schema.Struct({
+  OPENROUTER_API_KEY: NonEmpty,
+  OPENROUTER_MODEL: Schema.optionalWith(NonEmpty, { default: () => 'openai/gpt-4o-mini' }),
 });
 
 /** Which search adapter `@vybekiit/search` constructs. */
-export const searchConfigSchema = z.object({
-  SEARCH_PROVIDER: z.enum(['supabase', 'typesense', 'algolia', 'local']).default('supabase'),
+export const searchConfigSchema = Schema.Struct({
+  SEARCH_PROVIDER: Schema.optionalWith(
+    Schema.Literal('supabase', 'typesense', 'algolia', 'local'),
+    { default: () => 'supabase' as const },
+  ),
 });
 
-export const typesenseConfigSchema = z.object({
-  TYPESENSE_HOST: z.string().min(1, 'TYPESENSE_HOST is required'),
-  TYPESENSE_API_KEY: z.string().min(1, 'TYPESENSE_API_KEY is required'),
+export const typesenseConfigSchema = Schema.Struct({
+  TYPESENSE_HOST: NonEmpty,
+  TYPESENSE_API_KEY: NonEmpty,
 });
 
-export const algoliaConfigSchema = z.object({
-  ALGOLIA_APP_ID: z.string().min(1, 'ALGOLIA_APP_ID is required'),
-  ALGOLIA_API_KEY: z.string().min(1, 'ALGOLIA_API_KEY is required'),
-  ALGOLIA_INDEX_NAME: z.string().min(1).default('default'),
+export const algoliaConfigSchema = Schema.Struct({
+  ALGOLIA_APP_ID: NonEmpty,
+  ALGOLIA_API_KEY: NonEmpty,
+  ALGOLIA_INDEX_NAME: Schema.optionalWith(NonEmpty, { default: () => 'default' }),
 });
 
 /** Which live-update adapter `@vybekiit/realtime` constructs. */
-export const realtimeConfigSchema = z.object({
-  REALTIME_PROVIDER: z.enum(['supabase', 'cloudflare-do', 'local']).default('supabase'),
+export const realtimeConfigSchema = Schema.Struct({
+  REALTIME_PROVIDER: Schema.optionalWith(Schema.Literal('supabase', 'cloudflare-do', 'local'), {
+    default: () => 'supabase' as const,
+  }),
 });
 
 /** Which content adapter `@vybekiit/cms` constructs. */
-export const cmsConfigSchema = z.object({
-  CMS_PROVIDER: z.enum(['mdx', 'local']).default('mdx'),
+export const cmsConfigSchema = Schema.Struct({
+  CMS_PROVIDER: Schema.optionalWith(Schema.Literal('mdx', 'local'), {
+    default: () => 'mdx' as const,
+  }),
 });
 
-export const mdxCmsConfigSchema = z.object({
-  CMS_CONTENT_DIR: z.string().min(1).default('content'),
+export const mdxCmsConfigSchema = Schema.Struct({
+  CMS_CONTENT_DIR: Schema.optionalWith(NonEmpty, { default: () => 'content' }),
 });
 
 /** Compliance / cookie consent — `@vybekiit/compliance`. */
-export const complianceConfigSchema = z.object({
-  COMPLIANCE_PROVIDER: z.enum(['local']).default('local'),
-  COOKIE_CONSENT_ENABLED: z.enum(['on', 'off']).default('on'),
+export const complianceConfigSchema = Schema.Struct({
+  COMPLIANCE_PROVIDER: Schema.optionalWith(Schema.Literal('local'), {
+    default: () => 'local' as const,
+  }),
+  COOKIE_CONSENT_ENABLED: Schema.optionalWith(onOff, { default: () => 'on' as const }),
 });
 
 /** SEO helpers — `@vybekiit/seo`. */
-export const seoConfigSchema = z.object({
-  SEO_PROVIDER: z.enum(['local']).default('local'),
+export const seoConfigSchema = Schema.Struct({
+  SEO_PROVIDER: Schema.optionalWith(Schema.Literal('local'), { default: () => 'local' as const }),
 });
 
 /** Team workspaces — `@vybekiit/tenancy`. */
-export const tenancyConfigSchema = z.object({
-  TENANCY_PROVIDER: z.enum(['better-auth', 'local']).default('better-auth'),
+export const tenancyConfigSchema = Schema.Struct({
+  TENANCY_PROVIDER: Schema.optionalWith(Schema.Literal('better-auth', 'local'), {
+    default: () => 'better-auth' as const,
+  }),
 });
 
 /** Fast storage — `@vybekiit/kv`. */
-export const kvConfigSchema = z.object({
-  KV_PROVIDER: z.enum(['cloudflare', 'upstash', 'local']).default('cloudflare'),
+export const kvConfigSchema = Schema.Struct({
+  KV_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'upstash', 'local'), {
+    default: () => 'cloudflare' as const,
+  }),
 });
 
 /** Client-side cache + UI prefs — `@vybekiit/client-state`. */
-export const clientStateConfigSchema = z.object({
-  CLIENT_STATE_PERSIST: onOff.default('on'),
+export const clientStateConfigSchema = Schema.Struct({
+  CLIENT_STATE_PERSIST: Schema.optionalWith(onOff, { default: () => 'on' as const }),
   CLIENT_STATE_QUERY_STALE_SECONDS: positiveIntEnv(60),
 });
 
-export const upstashKvConfigSchema = z.object({
-  UPSTASH_KV_REST_URL: z.string().url('UPSTASH_KV_REST_URL must be a valid URL'),
-  UPSTASH_KV_REST_TOKEN: z.string().min(1, 'UPSTASH_KV_REST_TOKEN is required'),
+export const upstashKvConfigSchema = Schema.Struct({
+  UPSTASH_KV_REST_URL: UrlString,
+  UPSTASH_KV_REST_TOKEN: NonEmpty,
 });
 
-export const cloudflareKvConfigSchema = z.object({
-  CLOUDFLARE_KV_NAMESPACE_ID: z.string().min(1).optional(),
+export const cloudflareKvConfigSchema = Schema.Struct({
+  CLOUDFLARE_KV_NAMESPACE_ID: Schema.optional(NonEmpty),
 });
 
 /** Message catalogs — `@vybekiit/i18n`. */
-export const i18nConfigSchema = z.object({
-  I18N_PROVIDER: z.enum(['local']).default('local'),
-  DEFAULT_LOCALE: z.string().min(1).default('en'),
-  MESSAGES_DIR: z.string().min(1).default('messages'),
+export const i18nConfigSchema = Schema.Struct({
+  I18N_PROVIDER: Schema.optionalWith(Schema.Literal('local'), { default: () => 'local' as const }),
+  DEFAULT_LOCALE: Schema.optionalWith(NonEmpty, { default: () => 'en' }),
+  MESSAGES_DIR: Schema.optionalWith(NonEmpty, { default: () => 'messages' }),
 });
 
 /** Resend transactional email — `@vybekiit/email` (resend adapter). */
-export const resendConfigSchema = z.object({
-  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
+export const resendConfigSchema = Schema.Struct({
+  RESEND_API_KEY: NonEmpty,
 });
 
-export type AppConfig = z.infer<typeof appConfigSchema>;
-export type SecurityConfig = z.infer<typeof securityConfigSchema>;
-export type GoogleOAuthConfig = z.infer<typeof googleOAuthConfigSchema>;
-export type PaymentsConfig = z.infer<typeof paymentsConfigSchema>;
-export type DataConfig = z.infer<typeof dataConfigSchema>;
-export type AuthConfig = z.infer<typeof authConfigSchema>;
-export type StorageConfig = z.infer<typeof storageConfigSchema>;
-export type R2Config = z.infer<typeof r2ConfigSchema>;
-export type HostingConfig = z.infer<typeof hostingConfigSchema>;
-export type EmailConfig = z.infer<typeof emailConfigSchema>;
-export type LemonSqueezyConfig = z.infer<typeof lemonSqueezyConfigSchema>;
-export type StripeConfig = z.infer<typeof stripeConfigSchema>;
-export type PaypalConfig = z.infer<typeof paypalConfigSchema>;
-export type MongoConfig = z.infer<typeof mongoConfigSchema>;
-export type AwsConfig = z.infer<typeof awsConfigSchema>;
-export type AwsHostingConfig = z.infer<typeof awsHostingConfigSchema>;
-export type SupabaseConfig = z.infer<typeof supabaseConfigSchema>;
-export type NeonConfig = z.infer<typeof neonConfigSchema>;
-export type RailwayConfig = z.infer<typeof railwayConfigSchema>;
-export type RailwayHostingConfig = z.infer<typeof railwayHostingConfigSchema>;
-export type FirebaseConfig = z.infer<typeof firebaseConfigSchema>;
-export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
-export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;
-export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
-export type CloudflareEmailConfig = z.infer<typeof cloudflareEmailConfigSchema>;
-export type NamecheapConfig = z.infer<typeof namecheapConfigSchema>;
-export type GodaddyConfig = z.infer<typeof godaddyConfigSchema>;
-export type VercelConfig = z.infer<typeof vercelConfigSchema>;
-export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
-export type StoreConfig = z.infer<typeof storeConfigSchema>;
-export type ObservabilityConfig = z.infer<typeof observabilityConfigSchema>;
-export type SentryConfig = z.infer<typeof sentryConfigSchema>;
-export type JobsConfig = z.infer<typeof jobsConfigSchema>;
-export type CloudflareJobsConfig = z.infer<typeof cloudflareJobsConfigSchema>;
-export type AnalyticsConfig = z.infer<typeof analyticsConfigSchema>;
-export type PlausibleConfig = z.infer<typeof plausibleConfigSchema>;
-export type PosthogConfig = z.infer<typeof posthogConfigSchema>;
-export type NotificationsConfig = z.infer<typeof notificationsConfigSchema>;
-export type ExpoPushConfig = z.infer<typeof expoPushConfigSchema>;
-export type TwilioConfig = z.infer<typeof twilioConfigSchema>;
-export type AiConfig = z.infer<typeof aiConfigSchema>;
-export type OpenaiConfig = z.infer<typeof openaiConfigSchema>;
-export type AnthropicConfig = z.infer<typeof anthropicConfigSchema>;
-export type OpenrouterConfig = z.infer<typeof openrouterConfigSchema>;
-export type SearchConfig = z.infer<typeof searchConfigSchema>;
-export type TypesenseConfig = z.infer<typeof typesenseConfigSchema>;
-export type AlgoliaConfig = z.infer<typeof algoliaConfigSchema>;
-export type RealtimeConfig = z.infer<typeof realtimeConfigSchema>;
-export type CmsConfig = z.infer<typeof cmsConfigSchema>;
-export type MdxCmsConfig = z.infer<typeof mdxCmsConfigSchema>;
-export type ComplianceConfig = z.infer<typeof complianceConfigSchema>;
-export type SeoConfig = z.infer<typeof seoConfigSchema>;
-export type TenancyConfig = z.infer<typeof tenancyConfigSchema>;
-export type KvConfig = z.infer<typeof kvConfigSchema>;
-export type ClientStateConfig = z.infer<typeof clientStateConfigSchema>;
-export type UpstashKvConfig = z.infer<typeof upstashKvConfigSchema>;
-export type CloudflareKvConfig = z.infer<typeof cloudflareKvConfigSchema>;
-export type I18nConfig = z.infer<typeof i18nConfigSchema>;
-export type ResendConfig = z.infer<typeof resendConfigSchema>;
+export type AppConfig = Schema.Schema.Type<typeof appConfigSchema>;
+export type SecurityConfig = Schema.Schema.Type<typeof securityConfigSchema>;
+export type GoogleOAuthConfig = Schema.Schema.Type<typeof googleOAuthConfigSchema>;
+export type PaymentsConfig = Schema.Schema.Type<typeof paymentsConfigSchema>;
+export type DataConfig = Schema.Schema.Type<typeof dataConfigSchema>;
+export type AuthConfig = Schema.Schema.Type<typeof authConfigSchema>;
+export type StorageConfig = Schema.Schema.Type<typeof storageConfigSchema>;
+export type R2Config = Schema.Schema.Type<typeof r2ConfigSchema>;
+export type HostingConfig = Schema.Schema.Type<typeof hostingConfigSchema>;
+export type EmailConfig = Schema.Schema.Type<typeof emailConfigSchema>;
+export type LemonSqueezyConfig = Schema.Schema.Type<typeof lemonSqueezyConfigSchema>;
+export type StripeConfig = Schema.Schema.Type<typeof stripeConfigSchema>;
+export type PaypalConfig = Schema.Schema.Type<typeof paypalConfigSchema>;
+export type MongoConfig = Schema.Schema.Type<typeof mongoConfigSchema>;
+export type AwsConfig = Schema.Schema.Type<typeof awsConfigSchema>;
+export type AwsHostingConfig = Schema.Schema.Type<typeof awsHostingConfigSchema>;
+export type SupabaseConfig = Schema.Schema.Type<typeof supabaseConfigSchema>;
+export type NeonConfig = Schema.Schema.Type<typeof neonConfigSchema>;
+export type RailwayConfig = Schema.Schema.Type<typeof railwayConfigSchema>;
+export type RailwayHostingConfig = Schema.Schema.Type<typeof railwayHostingConfigSchema>;
+export type FirebaseConfig = Schema.Schema.Type<typeof firebaseConfigSchema>;
+export type BetterAuthConfig = Schema.Schema.Type<typeof betterAuthConfigSchema>;
+export type CognitoConfig = Schema.Schema.Type<typeof cognitoConfigSchema>;
+export type CloudflareConfig = Schema.Schema.Type<typeof cloudflareConfigSchema>;
+export type CloudflareEmailConfig = Schema.Schema.Type<typeof cloudflareEmailConfigSchema>;
+export type NamecheapConfig = Schema.Schema.Type<typeof namecheapConfigSchema>;
+export type GodaddyConfig = Schema.Schema.Type<typeof godaddyConfigSchema>;
+export type VercelConfig = Schema.Schema.Type<typeof vercelConfigSchema>;
+export type GithubGateConfig = Schema.Schema.Type<typeof githubGateConfigSchema>;
+export type StoreConfig = Schema.Schema.Type<typeof storeConfigSchema>;
+export type ObservabilityConfig = Schema.Schema.Type<typeof observabilityConfigSchema>;
+export type SentryConfig = Schema.Schema.Type<typeof sentryConfigSchema>;
+export type JobsConfig = Schema.Schema.Type<typeof jobsConfigSchema>;
+export type CloudflareJobsConfig = Schema.Schema.Type<typeof cloudflareJobsConfigSchema>;
+export type AnalyticsConfig = Schema.Schema.Type<typeof analyticsConfigSchema>;
+export type PlausibleConfig = Schema.Schema.Type<typeof plausibleConfigSchema>;
+export type PosthogConfig = Schema.Schema.Type<typeof posthogConfigSchema>;
+export type NotificationsConfig = Schema.Schema.Type<typeof notificationsConfigSchema>;
+export type ExpoPushConfig = Schema.Schema.Type<typeof expoPushConfigSchema>;
+export type TwilioConfig = Schema.Schema.Type<typeof twilioConfigSchema>;
+export type AiConfig = Schema.Schema.Type<typeof aiConfigSchema>;
+export type OpenaiConfig = Schema.Schema.Type<typeof openaiConfigSchema>;
+export type AnthropicConfig = Schema.Schema.Type<typeof anthropicConfigSchema>;
+export type OpenrouterConfig = Schema.Schema.Type<typeof openrouterConfigSchema>;
+export type SearchConfig = Schema.Schema.Type<typeof searchConfigSchema>;
+export type TypesenseConfig = Schema.Schema.Type<typeof typesenseConfigSchema>;
+export type AlgoliaConfig = Schema.Schema.Type<typeof algoliaConfigSchema>;
+export type RealtimeConfig = Schema.Schema.Type<typeof realtimeConfigSchema>;
+export type CmsConfig = Schema.Schema.Type<typeof cmsConfigSchema>;
+export type MdxCmsConfig = Schema.Schema.Type<typeof mdxCmsConfigSchema>;
+export type ComplianceConfig = Schema.Schema.Type<typeof complianceConfigSchema>;
+export type SeoConfig = Schema.Schema.Type<typeof seoConfigSchema>;
+export type TenancyConfig = Schema.Schema.Type<typeof tenancyConfigSchema>;
+export type KvConfig = Schema.Schema.Type<typeof kvConfigSchema>;
+export type ClientStateConfig = Schema.Schema.Type<typeof clientStateConfigSchema>;
+export type UpstashKvConfig = Schema.Schema.Type<typeof upstashKvConfigSchema>;
+export type CloudflareKvConfig = Schema.Schema.Type<typeof cloudflareKvConfigSchema>;
+export type I18nConfig = Schema.Schema.Type<typeof i18nConfigSchema>;
+export type ResendConfig = Schema.Schema.Type<typeof resendConfigSchema>;
 
-/** Parse + validate one config slice from the environment, failing loud (ADR-0023 dual-mode: Effect `Schema` or zod). */
-export function parseEnv<A, I>(schema: Schema.Schema<A, I>, env?: EnvSource): A;
-export function parseEnv<S extends z.ZodTypeAny>(schema: S, env?: EnvSource): z.infer<S>;
-export function parseEnv(
-  schema: Schema.Schema<unknown, unknown> | z.ZodTypeAny,
-  env: EnvSource = process.env,
-): unknown {
-  // zod schemas expose `safeParse`; Effect Schemas don't — the strangler-fig discriminator.
-  // Both branches live until Slice 8 drops zod; every call-site keeps the same signature.
-  if ('safeParse' in schema && typeof schema.safeParse === 'function') {
-    const parsed = schema.safeParse(env);
-    if (parsed.success) return parsed.data;
-    const issues = parsed.error.issues
-      .map((issue) => `  - ${issue.path.join('.') || '(root)'}: ${issue.message}`)
-      .join('\n');
-    throw new Error(`Invalid VybeKiit configuration:\n${issues}`);
-  }
+/**
+ * Parse + validate one config slice from the environment, failing loud with a single
+ * actionable message (ADR-0023). `errors: 'all'` accumulates every missing/invalid key
+ * so a misconfigured deploy sees them together; excess env keys are ignored by default.
+ */
+export function parseEnv<A, I>(schema: Schema.Schema<A, I>, env: EnvSource = process.env): A {
   try {
-    return Schema.decodeUnknownSync(schema as Schema.Schema<unknown, unknown>)(env);
+    return Schema.decodeUnknownSync(schema, { errors: 'all' })(env);
   } catch (caught) {
     const detail = caught instanceof Error ? caught.message : String(caught);
     throw new Error(`Invalid VybeKiit configuration:\n${detail}`);

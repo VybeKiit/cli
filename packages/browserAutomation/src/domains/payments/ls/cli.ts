@@ -4,7 +4,7 @@ import { printJson } from '../../../cli/output';
 import { parseSetupArgs, requireNonInteractive, type LsSetupCliArgs } from '../../../cli/flags';
 import { promptLsSetup } from '../../../cli/wizard';
 import { lsSetupEnvBlock, verifyVariantViaApi } from './api/verifyVariant';
-import { runLsSetup, standbyLogin } from './index';
+import { runLsSetup, standbyLogin } from '.';
 
 export function registerLsDomain(registry: CommandRegistry): void {
   registry.register({

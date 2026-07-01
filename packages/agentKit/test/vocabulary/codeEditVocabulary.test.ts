@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CODE_EDIT_VOCABULARY,
   renderCodeEditVocabularyTable,
-} from '../../src/vocabulary/code-edit-vocabulary';
+} from '../../src/vocabulary/codeEditVocabulary';
 
 describe('renderCodeEditVocabularyTable', () => {
   const lines = renderCodeEditVocabularyTable().split('\n');

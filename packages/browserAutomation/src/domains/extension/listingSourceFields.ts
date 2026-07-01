@@ -278,7 +278,7 @@ export async function readCertifications(
     return out;
   })()`)) as Record<string, boolean>;
 
-  const result = {} as CwsListing['privacy']['certifications'];
+  const result = {} as Record<keyof CwsListing['privacy']['certifications'], boolean>;
   for (const [field, prefix] of Object.entries(CERTIFICATION_LABEL_PREFIXES) as [
     keyof typeof CERTIFICATION_LABEL_PREFIXES,
     string,
@@ -309,7 +309,7 @@ export async function readDataUseDisclosure(
   const allMissing = Object.values(DATA_USE_LABELS).every((label) => !(label in checkedByLabel));
   if (allMissing) return;
 
-  const result = {} as DataUseDisclosure;
+  const result = {} as Record<keyof DataUseDisclosure, boolean>;
   for (const [field, label] of Object.entries(DATA_USE_LABELS) as [
     keyof typeof DATA_USE_LABELS,
     string,

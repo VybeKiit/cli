@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PEOPLE_VOCABULARY,
   renderPeopleVocabularyTable,
-} from '../../src/vocabulary/people-vocabulary';
+} from '../../src/vocabulary/peopleVocabulary';
 
 describe('renderPeopleVocabularyTable', () => {
   const lines = renderPeopleVocabularyTable().split('\n');

@@ -1,4 +1,4 @@
-import { GOAL_ENTRIES, type TemplateId } from '../catalogs/goal-catalog';
+import { GOAL_ENTRIES, type TemplateId } from '../catalogs/goalCatalog';
 
 /** Marker in generated `.agents/skills/<goal>/SKILL.md` bodies — do not edit by hand. */
 export const BUYER_SKILL_STUB_MARKER = 'vybekiit:generated:buyer-skill-stub';

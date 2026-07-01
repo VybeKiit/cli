@@ -3,7 +3,7 @@ import {
   parseWorkerSendBody,
   senderDomain,
   toWorkerSendBody,
-} from '../src/cloudflare/worker-contract';
+} from '../src/cloudflare/workerContract';
 
 describe('worker-contract', () => {
   it('round-trips SendEmailParams through JSON', () => {

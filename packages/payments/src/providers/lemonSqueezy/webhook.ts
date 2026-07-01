@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { type Result, fail, ok } from '@vybekiit/core';
-import { z } from 'zod';
+import { Either, Schema } from 'effect';
 import type { OrderEvent } from '../../types';
 
 /**
@@ -8,23 +8,23 @@ import type { OrderEvent } from '../../types';
  *
  * `meta.custom_data` carries the checkout custom fields set at checkout time —
  * specifically the buyer's GitHub username, which the gate uses to send the repo
- * invite. `.passthrough()` keeps validation tolerant of LS adding fields.
+ * invite. `Schema.Struct` strips unknown keys on decode, so extra LS fields are tolerated.
  */
-const webhookSchema = z.object({
-  meta: z.object({
-    event_name: z.string().min(1),
-    custom_data: z.record(z.string()).optional(),
+const webhookSchema = Schema.Struct({
+  meta: Schema.Struct({
+    event_name: Schema.String.pipe(Schema.minLength(1)),
+    custom_data: Schema.optional(Schema.Record({ key: Schema.String, value: Schema.String })),
   }),
-  data: z.object({
-    id: z.string(),
-    attributes: z
-      .object({
-        user_email: z.string().email().optional(),
-        refunded: z.boolean().optional(),
-      })
-      .passthrough(),
+  data: Schema.Struct({
+    id: Schema.String,
+    attributes: Schema.Struct({
+      user_email: Schema.optional(Schema.String),
+      refunded: Schema.optional(Schema.Boolean),
+    }),
   }),
 });
+
+const decodeWebhook = Schema.decodeUnknownEither(webhookSchema);
 
 /**
  * Verify a Lemon Squeezy webhook signature (HMAC-SHA256 of the raw body).
@@ -70,12 +70,12 @@ export function parseLemonSqueezyWebhook(
     return fail('invalid_body', 'Webhook body was not valid JSON.');
   }
 
-  const parsed = webhookSchema.safeParse(json);
-  if (!parsed.success) {
+  const parsed = decodeWebhook(json);
+  if (Either.isLeft(parsed)) {
     return fail('invalid_shape', 'Webhook payload was missing expected fields.');
   }
 
-  const { meta, data } = parsed.data;
+  const { meta, data } = parsed.right;
   return ok({
     provider: 'lemon-squeezy',
     eventName: meta.event_name,

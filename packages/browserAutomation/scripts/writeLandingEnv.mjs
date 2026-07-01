@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Merge ls setup --json env block into apps/landing/.env.local
- * Usage: node dist/cli/index.cjs ls setup --json ... | node scripts/write-landing-env.mjs
+ * Usage: node dist/cli/index.cjs ls setup --json ... | node scripts/writeLandingEnv.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';

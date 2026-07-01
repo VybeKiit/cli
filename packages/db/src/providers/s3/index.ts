@@ -4,6 +4,7 @@
 // through `.send` — rather than the legacy v2 callback client.
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { type AwsConfig, type Result, fail, ok } from '@vybekiit/core';
+import { type StorageProviderResult, toEffectStorageProvider } from '../../effectBridge';
 import type { StorageProvider } from '../../types';
 
 /**
@@ -37,7 +38,7 @@ export function createS3StorageProvider(config: AwsConfig): StorageProvider {
       : {}),
   });
 
-  return {
+  const impl: StorageProviderResult = {
     name: 's3',
 
     async upload(
@@ -79,6 +80,7 @@ export function createS3StorageProvider(config: AwsConfig): StorageProvider {
       }
     },
   };
+  return toEffectStorageProvider(impl);
 }
 
 /** Narrow an unknown caught value to a developer-facing message string. */

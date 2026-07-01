@@ -1,9 +1,6 @@
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  type BetterAuthInstance,
-  createBetterAuthProvider,
-} from '../src/providers/better-auth/index';
+import { type BetterAuthInstance, createBetterAuthProvider } from '../src/providers/betterAuth';
 
 type FakeApi = Record<keyof BetterAuthInstance['api'], ReturnType<typeof vi.fn>>;
 

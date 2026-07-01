@@ -1,1 +1,1 @@
-export * from './ls/index';
+export * from './ls';

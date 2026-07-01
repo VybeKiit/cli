@@ -1,6 +1,7 @@
 import { type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
 import { PRESET_TABLE_NAMES } from '../../presets/catalog';
+import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { POSTGRES_CAPABILITIES } from './shared';
 
@@ -37,7 +38,7 @@ export function createHybridPostgresProvider(
   sql: SqlClient,
   name: 'neon' | 'railway',
 ): DataProvider {
-  return {
+  const impl: DataProviderResult = {
     name,
     capabilities: POSTGRES_CAPABILITIES,
 
@@ -291,4 +292,5 @@ export function createHybridPostgresProvider(
       return ok(inserted);
     },
   };
+  return toEffectDataProvider(impl);
 }

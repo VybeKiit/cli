@@ -6,9 +6,9 @@ import {
   PaypalConfigSchema,
   StripeConfigSchema,
 } from './config';
-import { createLemonSqueezyProvider } from './providers/lemon-squeezy/index';
-import { createPayPalProvider } from './providers/paypal/index';
-import { createStripeProvider } from './providers/stripe/index';
+import { createLemonSqueezyProvider } from './providers/lemonSqueezy';
+import { createPayPalProvider } from './providers/paypal';
+import { createStripeProvider } from './providers/stripe';
 import type { PaymentProvider } from './types';
 
 /**

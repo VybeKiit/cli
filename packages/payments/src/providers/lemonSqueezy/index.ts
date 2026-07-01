@@ -1,5 +1,5 @@
 import type { LemonSqueezyConfig } from '@vybekiit/core';
-import { fromResult, fromResultPromise } from '../../effect-bridge';
+import { fromResult, fromResultPromise } from '../../effectBridge';
 import type { PaymentProvider } from '../../types';
 import { createLemonSqueezyCheckout } from './checkout';
 import { parseLemonSqueezyWebhook } from './webhook';

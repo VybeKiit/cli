@@ -2,24 +2,24 @@ import { renderContract } from '../contract/contract';
 import {
   renderSessionBootstrapFile,
   renderAgentSessionBootstrap,
-} from '../contract/session-bootstrap';
-import { renderToneSection } from '../contract/tone-rules';
-import { renderWebUiSourcesTable } from '../catalogs/ui-sources';
-import { renderTechReferencesTable } from '../catalogs/tech-references';
-import { renderProductionGates, renderChecklistSeed } from '../catalogs/production-gates';
-import type { TemplateId } from '../catalogs/goal-catalog';
-import { renderSdlcVocabularyTable } from '../vocabulary/sdlc-vocabulary';
-import { renderToolVocabularyTable } from '../vocabulary/tool-vocabulary';
+} from '../contract/sessionBootstrap';
+import { renderToneSection } from '../contract/toneRules';
+import { renderWebUiSourcesTable } from '../catalogs/uiSources';
+import { renderTechReferencesTable } from '../catalogs/techReferences';
+import { renderProductionGates, renderChecklistSeed } from '../catalogs/productionGates';
+import type { TemplateId } from '../catalogs/goalCatalog';
+import { renderSdlcVocabularyTable } from '../vocabulary/sdlcVocabulary';
+import { renderToolVocabularyTable } from '../vocabulary/toolVocabulary';
 import {
   renderAgentInternalVocabularyTable,
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
-} from '../vocabulary/ui-vocabulary';
-import { renderPaymentsVocabularyTable } from '../vocabulary/domain-vocabulary';
-import { renderPeopleVocabularyTable } from '../vocabulary/people-vocabulary';
-import { renderAgentRuntimeVocabularyTable } from '../vocabulary/agent-runtime-vocabulary';
-import { renderCodeEditVocabularyTable } from '../vocabulary/code-edit-vocabulary';
-import { renderVybekiitLayerVocabularyTable } from '../vocabulary/vybekiit-layer-vocabulary';
+} from '../vocabulary/uiVocabulary';
+import { renderPaymentsVocabularyTable } from '../vocabulary/domainVocabulary';
+import { renderPeopleVocabularyTable } from '../vocabulary/peopleVocabulary';
+import { renderAgentRuntimeVocabularyTable } from '../vocabulary/agentRuntimeVocabulary';
+import { renderCodeEditVocabularyTable } from '../vocabulary/codeEditVocabulary';
+import { renderVybekiitLayerVocabularyTable } from '../vocabulary/vybekiitLayerVocabulary';
 import { replaceGeneratedSection, wrapGeneratedSection, type GeneratedSectionId } from './markdown';
 
 export interface AgentLayerRenderTarget {

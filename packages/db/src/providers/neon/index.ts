@@ -1,6 +1,6 @@
 import { type NeonConfig, type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
-import { createHybridPostgresProvider, type SqlClient } from '../postgres/hybrid-provider';
+import { createHybridPostgresProvider, type SqlClient } from '../postgres/hybridProvider';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);

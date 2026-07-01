@@ -1,5 +1,11 @@
 import { type Result, type SupabaseConfig, fail, ok } from '@vybekiit/core';
 import { createDbClient } from '../../client';
+import {
+  type DataProviderResult,
+  type StorageProviderResult,
+  toEffectDataProvider,
+  toEffectStorageProvider,
+} from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '../../types';
 import { POSTGRES_CAPABILITIES } from '../postgres/shared';
 import {
@@ -7,7 +13,7 @@ import {
   supabaseFullTextSearch,
   supabaseIdempotentInsert,
   supabaseUpsert,
-} from '../postgres/supabase-capabilities';
+} from '../postgres/supabaseCapabilities';
 
 /**
  * The slice of the Supabase query builder this adapter uses, typed for *dynamic*
@@ -87,7 +93,7 @@ export function createSupabaseDataProvider(config: SupabaseConfig): DataProvider
   const table = (collection: string): DynamicTable =>
     client.from(collection) as unknown as DynamicTable;
 
-  return {
+  const impl: DataProviderResult = {
     name: 'supabase',
     capabilities: POSTGRES_CAPABILITIES,
 
@@ -198,6 +204,7 @@ export function createSupabaseDataProvider(config: SupabaseConfig): DataProvider
       );
     },
   };
+  return toEffectDataProvider(impl);
 }
 
 /**
@@ -209,7 +216,7 @@ export function createSupabaseDataProvider(config: SupabaseConfig): DataProvider
 export function createSupabaseStorageProvider(config: SupabaseConfig): StorageProvider {
   const client = createDbClient(config);
 
-  return {
+  const impl: StorageProviderResult = {
     name: 'supabase',
 
     async upload(
@@ -237,4 +244,5 @@ export function createSupabaseStorageProvider(config: SupabaseConfig): StoragePr
       return ok(true);
     },
   };
+  return toEffectStorageProvider(impl);
 }

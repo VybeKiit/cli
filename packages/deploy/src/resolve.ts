@@ -9,10 +9,10 @@ import {
   type EnvSource,
   vercelConfigSchema,
 } from '@vybekiit/core';
-import { type AmplifyRunner, createAwsHosting } from './providers/aws/index';
-import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare/index';
-import { type RailwayRunner, createRailwayHosting } from './providers/railway/index';
-import { type VercelRunner, createVercelHosting } from './providers/vercel/index';
+import { type AmplifyRunner, createAwsHosting } from './providers/aws';
+import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare';
+import { type RailwayRunner, createRailwayHosting } from './providers/railway';
+import { type VercelRunner, createVercelHosting } from './providers/vercel';
 import type { Hosting } from './types';
 
 /**

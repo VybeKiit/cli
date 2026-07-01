@@ -14,6 +14,6 @@ vybekiit-automate gd setup --json [--production] [--name=vybekiit] [--cdp=http:/
 
 `setup` waits for sign-in and continues automatically on redirect (no re-run). Optional `standby` only checks readiness.
 
-Parallel verify: `bash packages/browser-automation/scripts/operator-registrar-verify.sh`
+Parallel verify: `bash packages/browserAutomation/scripts/operator-registrar-verify.sh`
 
 Nameserver delegation stays in `@vybekiit/deploy` REST clients — not browser automation.

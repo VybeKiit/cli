@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isRtlLocale, resolveLocaleOrDefault } from '../src/locale-rules';
+import { isRtlLocale, resolveLocaleOrDefault } from '../src/localeRules';
 
 describe('locale-rules', () => {
   it('resolves trimmed locale or default', () => {

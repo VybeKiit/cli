@@ -1,4 +1,4 @@
-import { GOAL_ENTRIES, type GoalCatalogEntry, type TemplateId } from '../catalogs/goal-catalog';
+import { GOAL_ENTRIES, type GoalCatalogEntry, type TemplateId } from '../catalogs/goalCatalog';
 
 export interface GoalRoutingPlan {
   readonly goalId: string;

@@ -15,7 +15,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { type Result, fail, ok } from '@vybekiit/core';
 import type { CognitoConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effect-bridge';
+import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
 import { toSessionResult } from '../../session';
 import type { AuthProvider } from '../../types';
 import { type AuthUser, normalizeAuthUser } from '../../user';

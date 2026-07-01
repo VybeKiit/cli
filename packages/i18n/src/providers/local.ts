@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { I18nConfig } from '@vybekiit/core';
-import { isRtlLocale, resolveLocaleOrDefault } from '../locale-rules';
+import { isRtlLocale, resolveLocaleOrDefault } from '../localeRules';
 import type { I18nProvider } from '../types';
 
 export function createLocalI18n(config: I18nConfig): I18nProvider {

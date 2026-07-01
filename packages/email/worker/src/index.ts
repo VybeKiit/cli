@@ -1,3 +1,3 @@
-import { createEmailWorkerHandler } from '../../src/cloudflare/worker-handler';
+import { createEmailWorkerHandler } from '../../src/cloudflare/workerHandler';
 
 export default createEmailWorkerHandler();

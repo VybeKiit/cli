@@ -16,11 +16,12 @@ const UrlString = Schema.String.pipe(
   Schema.filter((value) => URL.canParse(value), { message: () => 'must be a valid URL' }),
 );
 
-/** Which auth adapter `@vybekiit/auth` constructs (ADR-0003); `better-auth` is default. */
+/**
+ * Which auth adapter `@vybekiit/auth` constructs (ADR-0024). `supabase` (Supabase Auth)
+ * is the default for the Supabase stack; when unset, auth follows `DATA_PROVIDER`.
+ */
 export const AuthConfigSchema = Schema.Struct({
-  AUTH_PROVIDER: Schema.optionalWith(Schema.Literal('better-auth', 'cognito', 'local'), {
-    default: () => 'better-auth' as const,
-  }),
+  AUTH_PROVIDER: Schema.optional(Schema.Literal('supabase', 'better-auth', 'cognito', 'local')),
 });
 export type AuthConfig = Schema.Schema.Type<typeof AuthConfigSchema>;
 
@@ -57,3 +58,10 @@ export const CognitoConfigSchema = Schema.Struct({
   AWS_SECRET_ACCESS_KEY: Schema.optional(NonEmpty),
 });
 export type CognitoConfig = Schema.Schema.Type<typeof CognitoConfigSchema>;
+
+/** Supabase project URL + anon key — the Supabase Auth adapter (ADR-0024). */
+export const SupabaseAuthConfigSchema = Schema.Struct({
+  SUPABASE_URL: UrlString,
+  SUPABASE_ANON_KEY: NonEmpty,
+});
+export type SupabaseAuthConfig = Schema.Schema.Type<typeof SupabaseAuthConfigSchema>;

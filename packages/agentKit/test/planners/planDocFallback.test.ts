@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planDocFallback, formatBuilderStuckMessage } from '../../src/planners/plan-doc-fallback';
+import { planDocFallback, formatBuilderStuckMessage } from '../../src/planners/planDocFallback';
 
 describe('planDocFallback', () => {
   it('returns twilio docs and MCP url', () => {

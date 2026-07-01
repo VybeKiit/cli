@@ -1,5 +1,5 @@
 import type { PaypalConfig } from '@vybekiit/core';
-import { fromResultPromise } from '../../effect-bridge';
+import { fromResultPromise } from '../../effectBridge';
 import type { PaymentProvider } from '../../types';
 import { createPayPalCheckout } from './checkout';
 import { parsePayPalWebhook } from './webhook';

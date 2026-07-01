@@ -1,29 +1,33 @@
 import { PAYPAL_API_BASE, type PaypalConfig, type Result, fail, ok } from '@vybekiit/core';
-import { z } from 'zod';
+import { Either, Schema } from 'effect';
 import type { OrderEvent } from '../../types';
 
 /**
  * PayPal webhook envelope (only the fields VybeKiit reads). PayPal nests the
  * GitHub username (sent as `custom_id` at order creation) differently per event:
  * order events carry it on `resource.purchase_units[].custom_id`; capture events
- * carry it on `resource.custom_id`. `.passthrough()` tolerates PayPal's extra keys.
+ * carry it on `resource.custom_id`. `Schema.Struct` strips unknown keys on decode,
+ * tolerating PayPal's extra keys.
  */
-const eventSchema = z.object({
-  event_type: z.string().min(1),
-  resource: z
-    .object({
-      id: z.string().optional(),
-      custom_id: z.string().optional(),
-      payer: z.object({ email_address: z.string().optional() }).optional(),
-      purchase_units: z.array(z.object({ custom_id: z.string().optional() })).optional(),
-    })
-    .passthrough(),
+const eventSchema = Schema.Struct({
+  event_type: Schema.String.pipe(Schema.minLength(1)),
+  resource: Schema.Struct({
+    id: Schema.optional(Schema.String),
+    custom_id: Schema.optional(Schema.String),
+    payer: Schema.optional(Schema.Struct({ email_address: Schema.optional(Schema.String) })),
+    purchase_units: Schema.optional(
+      Schema.Array(Schema.Struct({ custom_id: Schema.optional(Schema.String) })),
+    ),
+  }),
 });
 
-type PayPalEvent = z.infer<typeof eventSchema>;
+type PayPalEvent = Schema.Schema.Type<typeof eventSchema>;
 
-const tokenSchema = z.object({ access_token: z.string() });
-const verifySchema = z.object({ verification_status: z.string() });
+const decodeEvent = Schema.decodeUnknownEither(eventSchema);
+const decodeToken = Schema.decodeUnknownEither(Schema.Struct({ access_token: Schema.String }));
+const decodeVerify = Schema.decodeUnknownEither(
+  Schema.Struct({ verification_status: Schema.String }),
+);
 
 /** Map a verified PayPal event to the normalized {@link OrderEvent} (pure — unit tested). */
 export function mapPayPalEvent(event: PayPalEvent): OrderEvent {
@@ -54,8 +58,8 @@ async function getAccessToken(config: PaypalConfig): Promise<string | null> {
   });
   if (!response.ok) return null;
 
-  const parsed = tokenSchema.safeParse(await response.json());
-  return parsed.success ? parsed.data.access_token : null;
+  const parsed = decodeToken(await response.json());
+  return Either.isRight(parsed) ? parsed.right.access_token : null;
 }
 
 /**
@@ -101,8 +105,8 @@ export async function parsePayPalWebhook(
         }),
       },
     );
-    const parsed = verifySchema.safeParse(await response.json());
-    if (!parsed.success || parsed.data.verification_status !== 'SUCCESS') {
+    const parsed = decodeVerify(await response.json());
+    if (Either.isLeft(parsed) || parsed.right.verification_status !== 'SUCCESS') {
       verification = fail('invalid_signature', 'PayPal webhook signature did not verify.');
     }
   } catch (error) {
@@ -111,9 +115,9 @@ export async function parsePayPalWebhook(
   }
   if (verification) return verification;
 
-  const parsed = eventSchema.safeParse(event);
-  if (!parsed.success) {
+  const parsed = decodeEvent(event);
+  if (Either.isLeft(parsed)) {
     return fail('invalid_shape', 'Webhook payload was missing expected fields.');
   }
-  return ok(mapPayPalEvent(parsed.data));
+  return ok(mapPayPalEvent(parsed.right));
 }

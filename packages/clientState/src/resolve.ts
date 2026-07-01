@@ -2,7 +2,7 @@ import { parseEnv, type EnvSource } from '@vybekiit/core';
 
 import { ClientStateConfigSchema } from './config';
 import { createQueryClient } from './query/client';
-import { createUiStore } from './ui-store/create-store';
+import { createUiStore } from './uiStore/createStore';
 import type { ClientStateSurface, ResolvedClientState } from './types';
 
 export function resolveClientState(

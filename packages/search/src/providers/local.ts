@@ -1,4 +1,4 @@
-import { type Result, ok } from '@vybekiit/core';
+import { Effect } from 'effect';
 import type { SearchDocument, SearchHit, SearchProvider } from '../types';
 
 const docs = new Map<string, SearchDocument>();
@@ -6,11 +6,11 @@ const docs = new Map<string, SearchDocument>();
 export function createLocalSearch(): SearchProvider {
   return {
     name: 'local',
-    async index(doc: SearchDocument): Promise<Result<true>> {
+    index(doc: SearchDocument) {
       docs.set(doc.id, doc);
-      return ok(true);
+      return Effect.succeed(true as const);
     },
-    async search(query: string, limit = 10): Promise<Result<readonly SearchHit[]>> {
+    search(query: string, limit = 10) {
       const hits: SearchHit[] = [];
       for (const doc of docs.values()) {
         if (doc.content.toLowerCase().includes(query.toLowerCase())) {
@@ -18,11 +18,11 @@ export function createLocalSearch(): SearchProvider {
         }
         if (hits.length >= limit) break;
       }
-      return ok(hits);
+      return Effect.succeed(hits as readonly SearchHit[]);
     },
-    async remove(id: string): Promise<Result<true>> {
+    remove(id: string) {
       docs.delete(id);
-      return ok(true);
+      return Effect.succeed(true as const);
     },
   };
 }

@@ -5,13 +5,13 @@ import {
   isPlatformSkillsAuditBlocking,
   normalizeSkillsRepoKey,
   PLATFORM_SKILLS_AUDIT_PROVIDERS,
-} from '../src/catalogs/platform-skills-audit';
+} from '../src/catalogs/platformSkillsAudit';
 import {
   checkBaseManifestParity,
   findDocsOnlyViolations,
   mergePlatformSkillsManifests,
   PLATFORM_SKILLS_BASE_MANIFEST,
-} from '../src/catalogs/platform-skills-merge';
+} from '../src/catalogs/platformSkillsMerge';
 
 describe('mergePlatformSkillsManifests', () => {
   it('returns base sources when template override is empty', () => {

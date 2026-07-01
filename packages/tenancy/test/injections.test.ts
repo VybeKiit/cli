@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { ok, type Result } from '@vybekiit/core';
 import type { DataProvider } from '@vybekiit/db';
+import { Effect } from 'effect';
+import { describe, expect, it } from 'vitest';
 import { resolveTenancyProvider } from '../src/resolve';
 
 describe('resolveTenancyProvider injections', () => {
@@ -8,23 +8,22 @@ describe('resolveTenancyProvider injections', () => {
     const inserts: unknown[] = [];
     const data = {
       capabilities: {},
-      insert: async (_table: string, row: unknown) => {
+      insert: (_table: string, row: unknown) => {
         inserts.push(row);
-        return ok(row);
+        return Effect.succeed(row);
       },
-      get: async () => ok(null),
-      query: async () => ok([]),
-      remove: async () => ok(true),
-      update: async () => ok({ id: 'x' }),
+      get: () => Effect.succeed(null),
+      query: () => Effect.succeed([]),
+      remove: () => Effect.succeed(true as const),
+      update: () => Effect.succeed({ id: 'x' }),
       name: 'local',
-    } as DataProvider;
+    } as unknown as DataProvider;
 
     const tenancy = resolveTenancyProvider(
       { TENANCY_PROVIDER: 'better-auth' },
       { dataProvider: data },
     );
-    const result = await tenancy.createOrg('Team', 'owner-1');
-    expect(result.ok).toBe(true);
+    await Effect.runPromise(tenancy.createOrg('Team', 'owner-1'));
     expect(inserts.length).toBe(1);
   });
 });

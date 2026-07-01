@@ -6,9 +6,9 @@ import {
   INSPECT_HIGHLIGHT_PRESETS,
   loadInspectHighlightColor,
   saveInspectHighlightColor,
-} from '../src/inspect-highlight-color';
-import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoff-target';
-import { formatReportPrompt } from '../src/format-prompt';
+} from '../src/inspectHighlightColor';
+import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoffTarget';
+import { formatReportPrompt } from '../src/formatPrompt';
 import { getDockInsetStyle, loadDockCornerOnly, snapDockToNearestCorner } from '../src/position';
 import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
 

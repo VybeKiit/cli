@@ -1,4 +1,4 @@
-import type { Result } from '@vybekiit/core';
+import { Data, type Effect } from 'effect';
 
 /**
  * The data backends VybeKiit ships an adapter for. One runs at a time (chosen via
@@ -54,6 +54,16 @@ export type DataProviderCapabilities = {
 };
 
 /**
+ * The tagged failure every data/storage method can produce (ADR-0023). Carries a
+ * stable `code` (skills branch on it to pick a plain-language message) and a
+ * developer-facing `message`. Replaces the old `Result`-carried `VybeKiitError`.
+ */
+export class DbError extends Data.TaggedError('DbError')<{
+  readonly code: string;
+  readonly message: string;
+}> {}
+
+/**
  * The swappable data seam — a small, vendor-neutral CRUD contract that Postgres,
  * MongoDB, and DynamoDB can all satisfy. Each adapter is constructed from its own
  * validated config (credentials live in the factory, not per call), so every method
@@ -61,9 +71,9 @@ export type DataProviderCapabilities = {
  * written once against this interface; adding a backend adds an adapter, not a skill.
  *
  * `collection` is the table/collection name (a Postgres table, a Mongo collection,
- * a Dynamo table). Every method returns a {@link Result} so expected boundary
- * failures (not found, constraint violation, network blip) are branched on by the
- * caller and translated to plain language, rather than thrown.
+ * a Dynamo table). Every method returns an {@link Effect.Effect} that fails with a
+ * tagged {@link DbError} for expected boundary failures (not found, constraint
+ * violation, network blip); composition roots run it at the edge.
  */
 export interface DataProvider {
   /** Which backend this instance talks to. */
@@ -71,47 +81,55 @@ export interface DataProvider {
   /** Which optional operations this adapter implements. */
   readonly capabilities: DataProviderCapabilities;
   /** Insert a record and return it as stored (with its final `id`). */
-  insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>>;
-  /** Fetch one record by id; resolves `null` value when no row matches. */
-  get<T extends DbRecord>(collection: string, id: string): Promise<Result<T | null>>;
+  insert<T extends DbRecord>(collection: string, record: T): Effect.Effect<T, DbError>;
+  /** Fetch one record by id; succeeds with `null` when no row matches. */
+  get<T extends DbRecord>(collection: string, id: string): Effect.Effect<T | null, DbError>;
   /** Fetch every record matching an equality {@link QueryFilter}. */
-  query<T extends DbRecord>(collection: string, filter: QueryFilter<T>): Promise<Result<T[]>>;
+  query<T extends DbRecord>(
+    collection: string,
+    filter: QueryFilter<T>,
+  ): Effect.Effect<T[], DbError>;
   /** Patch fields of one record by id and return the updated record. */
   update<T extends DbRecord>(
     collection: string,
     id: string,
     patch: Partial<Omit<T, 'id'>>,
-  ): Promise<Result<T>>;
+  ): Effect.Effect<T, DbError>;
   /** Delete one record by id. */
-  remove(collection: string, id: string): Promise<Result<true>>;
+  remove(collection: string, id: string): Effect.Effect<true, DbError>;
   /** Insert or update on a non-id conflict key (when {@link DataProviderCapabilities.upsert}). */
   upsert?<T extends DbRecord>(
     collection: string,
     record: T,
     conflictKey: keyof T & string,
-  ): Promise<Result<T>>;
+  ): Effect.Effect<T, DbError>;
   /** Insert once; return existing row when dedupe key collides. */
   idempotentInsert?<T extends DbRecord>(
     collection: string,
     record: T,
     dedupeKey: keyof T & string,
-  ): Promise<Result<T>>;
+  ): Effect.Effect<T, DbError>;
   /** Approximate nearest-neighbor search on vector-enabled preset tables. */
   vectorSearch?<T extends DbRecord>(
     collection: string,
     embedding: readonly number[],
     limit: number,
-  ): Promise<Result<T[]>>;
+  ): Effect.Effect<T[], DbError>;
   /** Full-text search on preset tables with tsvector columns. */
   fullTextSearch?<T extends DbRecord>(
     collection: string,
     query: string,
     limit: number,
-  ): Promise<Result<T[]>>;
+  ): Effect.Effect<T[], DbError>;
   /** Insert many rows in one round trip. */
-  bulkInsert?<T extends DbRecord>(collection: string, records: readonly T[]): Promise<Result<T[]>>;
+  bulkInsert?<T extends DbRecord>(
+    collection: string,
+    records: readonly T[],
+  ): Effect.Effect<T[], DbError>;
   /** Run fn in a transaction when the adapter supports it. */
-  withTransaction?<R>(fn: (tx: DataProvider) => Promise<Result<R>>): Promise<Result<R>>;
+  withTransaction?<R>(
+    fn: (tx: DataProvider) => Effect.Effect<R, DbError>,
+  ): Effect.Effect<R, DbError>;
 }
 
 /**
@@ -125,7 +143,8 @@ export type StorageProviderName = 'supabase' | 'r2' | 's3';
  * The swappable file-storage seam. `bucket` is the storage container (a Supabase
  * Storage bucket, an S3 bucket); `key` is the object path within it. Like
  * {@link DataProvider}, the adapter is built from validated config so call sites
- * stay credential-free, and every method returns a {@link Result}.
+ * stay credential-free, and every method returns an {@link Effect.Effect} failing
+ * with a tagged {@link DbError}.
  */
 export interface StorageProvider {
   /** Which storage backend this instance talks to. */
@@ -136,9 +155,9 @@ export interface StorageProvider {
     key: string,
     data: Uint8Array,
     contentType?: string,
-  ): Promise<Result<{ key: string }>>;
+  ): Effect.Effect<{ key: string }, DbError>;
   /** Resolve a readable URL for an existing object. */
-  getUrl(bucket: string, key: string): Promise<Result<{ url: string }>>;
+  getUrl(bucket: string, key: string): Effect.Effect<{ url: string }, DbError>;
   /** Delete an object at `bucket/key`. */
-  remove(bucket: string, key: string): Promise<Result<true>>;
+  remove(bucket: string, key: string): Effect.Effect<true, DbError>;
 }

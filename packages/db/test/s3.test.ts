@@ -1,5 +1,6 @@
+import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createS3StorageProvider } from '../src/providers/s3/index';
+import { createS3StorageProvider } from '../src/providers/s3';
 
 /**
  * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. Each
@@ -35,6 +36,7 @@ function sentCommand(): { name: string; input: Record<string, unknown> } {
 }
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
+const run = Effect.runPromise;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -49,11 +51,8 @@ describe('createS3StorageProvider', () => {
     send.mockResolvedValue({});
     const body = new Uint8Array([1, 2, 3]);
 
-    const result = await createS3StorageProvider(config).upload(
-      'assets',
-      'logo.png',
-      body,
-      'image/png',
+    const value = await run(
+      createS3StorageProvider(config).upload('assets', 'logo.png', body, 'image/png'),
     );
 
     expect(sentCommand().name).toBe('PutObject');
@@ -63,51 +62,47 @@ describe('createS3StorageProvider', () => {
       Body: body,
       ContentType: 'image/png',
     });
-    expect(result.ok && result.value).toEqual({ key: 'logo.png' });
+    expect(value).toEqual({ key: 'logo.png' });
   });
 
   it('upload omits ContentType when none is given', async () => {
     send.mockResolvedValue({});
-    await createS3StorageProvider(config).upload('assets', 'raw.bin', new Uint8Array([0]));
+    await run(createS3StorageProvider(config).upload('assets', 'raw.bin', new Uint8Array([0])));
     expect(sentCommand().input).not.toHaveProperty('ContentType');
   });
 
   it('upload maps an SDK error to fail("storage_upload_failed")', async () => {
     send.mockRejectedValue(new Error('access denied'));
-    const result = await createS3StorageProvider(config).upload(
-      'assets',
-      'logo.png',
-      new Uint8Array([1]),
+    const error = await run(
+      Effect.flip(
+        createS3StorageProvider(config).upload('assets', 'logo.png', new Uint8Array([1])),
+      ),
     );
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('storage_upload_failed');
-      expect(result.error.message).toBe('access denied');
-    }
+    expect(error.code).toBe('storage_upload_failed');
+    expect(error.message).toBe('access denied');
   });
 
   it('getUrl returns the virtual-hosted public URL without calling send', async () => {
-    const result = await createS3StorageProvider(config).getUrl('assets', 'logo.png');
-    expect(result.ok && result.value.url).toBe(
-      'https://assets.s3.us-east-1.amazonaws.com/logo.png',
-    );
+    const value = await run(createS3StorageProvider(config).getUrl('assets', 'logo.png'));
+    expect(value.url).toBe('https://assets.s3.us-east-1.amazonaws.com/logo.png');
     expect(send).not.toHaveBeenCalled();
   });
 
   it('remove issues a DeleteObjectCommand and returns true', async () => {
     send.mockResolvedValue({});
 
-    const result = await createS3StorageProvider(config).remove('assets', 'logo.png');
+    const value = await run(createS3StorageProvider(config).remove('assets', 'logo.png'));
 
     expect(sentCommand().name).toBe('DeleteObject');
     expect(sentCommand().input).toEqual({ Bucket: 'assets', Key: 'logo.png' });
-    expect(result.ok && result.value).toBe(true);
+    expect(value).toBe(true);
   });
 
   it('remove maps an SDK error to fail("storage_remove_failed")', async () => {
     send.mockRejectedValue(new Error('no such key'));
-    const result = await createS3StorageProvider(config).remove('assets', 'gone.png');
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('storage_remove_failed');
+    const error = await run(
+      Effect.flip(createS3StorageProvider(config).remove('assets', 'gone.png')),
+    );
+    expect(error.code).toBe('storage_remove_failed');
   });
 });

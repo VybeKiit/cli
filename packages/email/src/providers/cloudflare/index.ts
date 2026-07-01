@@ -1,5 +1,5 @@
 import { type CloudflareEmailConfig, type Result, fail, ok } from '@vybekiit/core';
-import { toWorkerSendBody } from '../../cloudflare/worker-contract';
+import { toWorkerSendBody } from '../../cloudflare/workerContract';
 import type { EmailProvider, SendEmailParams } from '../../types';
 
 /**

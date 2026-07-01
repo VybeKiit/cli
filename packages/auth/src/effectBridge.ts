@@ -1,5 +1,4 @@
-import type { Result } from '@vybekiit/core';
-import { Effect } from 'effect';
+import { type Result, makeResultLifter } from '@vybekiit/core';
 import type { AuthSession } from './session';
 import {
   AuthError,
@@ -31,19 +30,13 @@ export interface AuthProviderResult {
   getUser(sessionToken: string): Promise<Result<AuthUser>>;
 }
 
-/** Lift a `Result`-returning adapter body into the `Effect` the interface returns. */
-function fromResultPromise<T>(promise: Promise<Result<T>>): Effect.Effect<T, AuthError> {
-  return Effect.flatMap(
-    Effect.promise(() => promise),
-    (result) =>
-      result.ok ? Effect.succeed(result.value) : Effect.fail(new AuthError(result.error)),
-  );
-}
+/** Lift auth adapter bodies into `Effect`, binding the shared core lifter to {@link AuthError}. */
+const { fromResultPromise } = makeResultLifter((failure) => new AuthError(failure));
 
 /**
  * Wrap a {@link AuthProviderResult} as the public {@link AuthProvider} — every method
- * lifted through {@link fromResultPromise} once, so adapters keep returning `Result`
- * from their proven bodies while callers get an `Effect`.
+ * lifted through the shared core lifter once, so adapters keep returning `Result` from
+ * their proven bodies while callers get an `Effect`.
  */
 export function toEffectAuthProvider(impl: AuthProviderResult): AuthProvider {
   return {

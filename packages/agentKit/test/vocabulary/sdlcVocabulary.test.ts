@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SDLC_VOCABULARY, renderSdlcVocabularyTable } from '../../src/vocabulary/sdlc-vocabulary';
+import { SDLC_VOCABULARY, renderSdlcVocabularyTable } from '../../src/vocabulary/sdlcVocabulary';
 
 describe('renderSdlcVocabularyTable', () => {
   const lines = renderSdlcVocabularyTable().split('\n');

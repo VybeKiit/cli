@@ -3,7 +3,7 @@ import { Effect, Schema } from 'effect';
 import { describe, expect } from 'vitest';
 import { appConfigSchema, parseEnv } from './config';
 
-describe('parseEnv — dual-mode Effect Schema | zod (ADR-0023 strangler-fig)', () => {
+describe('parseEnv — Effect Schema slices (ADR-0023)', () => {
   const ExampleSchema = Schema.Struct({ APP_URL: Schema.String });
 
   it('decodes a valid Effect Schema slice, ignoring excess env keys', () => {
@@ -15,7 +15,7 @@ describe('parseEnv — dual-mode Effect Schema | zod (ADR-0023 strangler-fig)', 
     expect(() => parseEnv(ExampleSchema, {})).toThrow(/Invalid VybeKiit configuration/);
   });
 
-  it('still decodes a zod schema with defaults (zod path lives until Slice 8)', () => {
+  it('decodes a core config slice, applying its defaults', () => {
     const cfg = parseEnv(appConfigSchema, {});
     expect(cfg.NODE_ENV).toBe('development');
   });

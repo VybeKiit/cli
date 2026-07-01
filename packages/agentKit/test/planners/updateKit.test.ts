@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planKitUpdate } from '../../src/planners/update-kit';
+import { planKitUpdate } from '../../src/planners/updateKit';
 
 describe('planKitUpdate', () => {
   it('flags packages with a strictly newer published version', () => {

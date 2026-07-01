@@ -6,7 +6,7 @@ import {
   renderAgentInternalVocabularyTable,
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
-} from '../../src/vocabulary/ui-vocabulary';
+} from '../../src/vocabulary/uiVocabulary';
 
 describe('renderUiVocabularyTable', () => {
   const lines = renderUiVocabularyTable().split('\n');

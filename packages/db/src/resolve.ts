@@ -1,4 +1,5 @@
 import {
+  type EnvSource,
   awsConfigSchema,
   dataConfigSchema,
   firebaseConfigSchema,
@@ -6,25 +7,22 @@ import {
   mongoConfigSchema,
   neonConfigSchema,
   parseEnv,
-  railwayConfigSchema,
   r2ConfigSchema,
+  railwayConfigSchema,
   resolveEnvProvider,
   storageConfigSchema,
   supabaseConfigSchema,
-  type EnvSource,
 } from '@vybekiit/core';
-import { createAwsDataProvider } from './providers/aws/index';
-import { createFirebaseDataProvider } from './providers/firebase/index';
-import { createLocalDataProvider } from './providers/local/index';
-import { createMongoDataProvider } from './providers/mongodb/index';
-import { createNeonDataProvider } from './providers/neon/index';
-import { createRailwayDataProvider } from './providers/railway/index';
-import { createR2StorageProvider } from './providers/r2/index';
-import { createS3StorageProvider } from './providers/s3/index';
-import {
-  createSupabaseDataProvider,
-  createSupabaseStorageProvider,
-} from './providers/supabase/index';
+import { Context, Effect, Layer } from 'effect';
+import { createAwsDataProvider } from './providers/aws';
+import { createFirebaseDataProvider } from './providers/firebase';
+import { createLocalDataProvider } from './providers/local';
+import { createMongoDataProvider } from './providers/mongodb';
+import { createNeonDataProvider } from './providers/neon';
+import { createR2StorageProvider } from './providers/r2';
+import { createRailwayDataProvider } from './providers/railway';
+import { createS3StorageProvider } from './providers/s3';
+import { createSupabaseDataProvider, createSupabaseStorageProvider } from './providers/supabase';
 import type { DataProvider, StorageProvider } from './types';
 
 /**
@@ -78,5 +76,27 @@ export function resolveStorageProvider(env: EnvSource = process.env): StoragePro
     },
     env,
     'supabase',
+  );
+}
+
+/** The data provider as an injectable service — composition roots `Effect.provide` it (ADR-0023 DI). */
+export class Data extends Context.Tag('@vybekiit/db/Data')<Data, DataProvider>() {}
+
+/** `Live` layer building {@link Data} from the environment; config fails loud at the composition root. */
+export function makeDataLive(env: EnvSource = process.env): Layer.Layer<Data> {
+  return Layer.effect(
+    Data,
+    Effect.sync(() => resolveDataProvider(env)),
+  );
+}
+
+/** The storage provider as an injectable service (ADR-0023 DI). */
+export class Storage extends Context.Tag('@vybekiit/db/Storage')<Storage, StorageProvider>() {}
+
+/** `Live` layer building {@link Storage} from the environment; config fails loud at the composition root. */
+export function makeStorageLive(env: EnvSource = process.env): Layer.Layer<Storage> {
+  return Layer.effect(
+    Storage,
+    Effect.sync(() => resolveStorageProvider(env)),
   );
 }

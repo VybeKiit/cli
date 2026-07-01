@@ -4,7 +4,7 @@ import {
   renderForbiddenWebUiLibsList,
   renderWebUiSourcesTable,
   WEB_UI_SOURCES,
-} from '../../src/catalogs/ui-sources';
+} from '../../src/catalogs/uiSources';
 
 describe('ui-sources', () => {
   it('includes core shadcn ecosystem sources', () => {

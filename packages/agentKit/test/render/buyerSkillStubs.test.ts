@@ -12,7 +12,7 @@ import {
   planBuyerSkillStubOutputs,
   renderBuyerSkillDescription,
   renderBuyerSkillStub,
-} from '../../src/render/buyer-skill-stubs';
+} from '../../src/render/buyerSkillStubs';
 
 const REPO_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const GO_LIVE = readFileSync(join(REPO_ROOT, 'templates/web/.vybekiit/skills/go-live.md'), 'utf8');

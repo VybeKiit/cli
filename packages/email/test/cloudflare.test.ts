@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { type FetchLike, createCloudflareEmail } from '../src/providers/cloudflare/index';
+import { type FetchLike, createCloudflareEmail } from '../src/providers/cloudflare';
 
 const config = {
   EMAIL_WORKER_SECRET: 'worker-secret',

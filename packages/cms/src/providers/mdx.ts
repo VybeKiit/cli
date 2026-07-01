@@ -12,8 +12,10 @@ type ParsedMdx = {
 const pageCache = new Map<string, ParsedMdx | null>();
 
 function parseFrontmatter(raw: string): ParsedMdx {
+  // split a leading ---frontmatter--- from the body: "---\ntitle: X\n---\nBody" → ["title: X", "Body"]
   const frontmatterMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!frontmatterMatch) {
+    // first "# Heading" line anywhere in the doc: "# Hello" → "Hello"
     const titleMatch = raw.match(/^#\s+(.+)$/m);
     return { title: titleMatch?.[1]?.trim() ?? 'Untitled', body: raw };
   }
@@ -23,13 +25,16 @@ function parseFrontmatter(raw: string): ParsedMdx {
   const body = bodyBlock ?? '';
   const fields = new Map<string, string>();
   for (const line of frontmatter.split('\n')) {
+    // a "key: value" frontmatter line → ["key", "value"] (key is letters/digits/_/-)
     const match = line.match(/^([a-zA-Z0-9_-]+):\s*(.+)$/);
     if (match?.[1] && match[2]) {
+      // strip surrounding quotes from the value: '"Hi"' → 'Hi', "'Hi'" → 'Hi'
       fields.set(match[1], match[2].replace(/^["']|["']$/g, '').trim());
     }
   }
 
   const titleFromFm = fields.get('title');
+  // first "# Heading" line in the body: "# Hello" → "Hello"
   const titleFromHeading = body.match(/^#\s+(.+)$/m)?.[1]?.trim();
   const title = titleFromFm ?? titleFromHeading ?? 'Untitled';
   const description = fields.get('description');
@@ -74,6 +79,7 @@ export function createMdxCms(config: MdxCmsConfig): CmsProvider {
         const pages: CmsPage[] = [];
         for (const file of files) {
           if (!file.endsWith('.mdx')) continue;
+          // drop the trailing ".mdx" extension: "about.mdx" → "about"
           const slug = file.replace(/\.mdx$/, '');
           const page = await readMdxFile(dir, slug);
           if (page) pages.push(page);

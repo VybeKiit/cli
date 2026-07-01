@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   VYBEKIIT_LAYER_VOCABULARY,
   renderVybekiitLayerVocabularyTable,
-} from '../../src/vocabulary/vybekiit-layer-vocabulary';
+} from '../../src/vocabulary/vybekiitLayerVocabulary';
 
 describe('renderVybekiitLayerVocabularyTable', () => {
   const lines = renderVybekiitLayerVocabularyTable().split('\n');

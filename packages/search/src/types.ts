@@ -1,4 +1,4 @@
-import type { Result } from '@vybekiit/core';
+import { Data, type Effect } from 'effect';
 
 export type SearchProviderName = 'supabase' | 'typesense' | 'algolia' | 'local';
 
@@ -14,9 +14,18 @@ export interface SearchHit {
   readonly snippet: string;
 }
 
+/** The tagged failure a {@link SearchProvider} method can produce (ADR-0023). */
+export class SearchError extends Data.TaggedError('SearchError')<{
+  readonly code: string;
+  readonly message: string;
+}> {}
+
 export interface SearchProvider {
   readonly name: SearchProviderName;
-  index(doc: SearchDocument): Promise<Result<true>>;
-  search(query: string, limit?: number | undefined): Promise<Result<readonly SearchHit[]>>;
-  remove(id: string): Promise<Result<true>>;
+  index(doc: SearchDocument): Effect.Effect<true, SearchError>;
+  search(
+    query: string,
+    limit?: number | undefined,
+  ): Effect.Effect<readonly SearchHit[], SearchError>;
+  remove(id: string): Effect.Effect<true, SearchError>;
 }

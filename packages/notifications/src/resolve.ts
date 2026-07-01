@@ -9,13 +9,13 @@ import {
 import {
   createEmailBridgeNotifications,
   type ResolveNotificationsInjections,
-} from './providers/email-bridge';
+} from './providers/emailBridge';
 import { createExpoNotifications } from './providers/expo';
 import { createLocalNotifications } from './providers/local';
-import { createTwilioNotifications } from './providers/twilio-notifications';
+import { createTwilioNotifications } from './providers/twilioNotifications';
 import type { NotificationsProvider } from './types';
 
-export type { ResolveNotificationsInjections } from './providers/email-bridge';
+export type { ResolveNotificationsInjections } from './providers/emailBridge';
 
 export function resolveNotificationsProvider(
   env: EnvSource = process.env,

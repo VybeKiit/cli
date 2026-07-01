@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { GOAL_ENTRIES } from '../../src/catalogs/goal-catalog';
-import { planGoalRouting, checkGoalDrift } from '../../src/planners/plan-goal-routing';
+import { GOAL_ENTRIES } from '../../src/catalogs/goalCatalog';
+import { planGoalRouting, checkGoalDrift } from '../../src/planners/planGoalRouting';
 
 describe('planGoalRouting', () => {
   it('routes onboarding phrase on web', () => {

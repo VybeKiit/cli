@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planAgentLayerCompliance } from '../../src/planners/plan-agent-layer-compliance';
+import { planAgentLayerCompliance } from '../../src/planners/planAgentLayerCompliance';
 
 const minimalWebFiles = {
   'checklist.md': `# Production checklist

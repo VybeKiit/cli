@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import {
   AGENT_LAYER_EXTENSION_PREFIX,
   isAgentLayerExtensionPath,
-} from '../src/planners/agent-layer-sync';
-import { lintExtensionSkill } from '../src/lint/lint-extension-skill';
+} from '../src/planners/agentLayerSync';
+import { lintExtensionSkill } from '../src/lint/lintExtensionSkill';
 import {
   renderBuyerGoalExtensionSkill,
   renderPlatformWrapperExtensionSkill,
   renderGlobalAgentSkill,
-} from '../src/render/extension-skill-templates';
+} from '../src/render/extensionSkillTemplates';
 import {
   extractExtensionGoalIndexRows,
   formatExtensionGoalIndexRow,
   mergeGoalIndexOnSync,
-} from '../src/planners/merge-goal-index';
-import { detectAgentTool, resolveGlobalSkillPath } from '../src/catalogs/tool-skill-paths';
+} from '../src/planners/mergeGoalIndex';
+import { detectAgentTool, resolveGlobalSkillPath } from '../src/catalogs/toolSkillPaths';
 
 const VALID_BUYER = renderBuyerGoalExtensionSkill({
   goalStem: 'referral-program',

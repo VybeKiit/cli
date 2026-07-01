@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-shot parallel registrar setup — sign in when prompted; automation continues on redirect.
-#   bash packages/browser-automation/scripts/operator-registrar-verify.sh
+#   bash packages/browserAutomation/scripts/operator-registrar-verify.sh
 #
 # Profile overrides (never deletes profile directories — only starts or attaches Chrome):
 #   NC_PROFILE / GD_PROFILE — explicit user-data-dir paths

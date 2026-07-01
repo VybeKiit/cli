@@ -4,7 +4,7 @@ import {
   PAYMENTS_VOCABULARY,
   renderPaymentsVocabularyTable,
   renderServiceNameBanList,
-} from '../../src/vocabulary/domain-vocabulary';
+} from '../../src/vocabulary/domainVocabulary';
 
 describe('PAYMENTS_VOCABULARY', () => {
   it('includes MoR and tax terms', () => {

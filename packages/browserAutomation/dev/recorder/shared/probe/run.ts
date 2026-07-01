@@ -3,7 +3,7 @@ import type { Page } from 'playwright';
 import { classifyCrawlPages, missingFieldKeys } from './classify';
 import { crawlHrefPages, LS_PRIORITY_PATH_RE } from './crawl';
 import { emitProbeResults, printProbeSummary } from './emit';
-import { expandModals } from './expand-modals';
+import { expandModals } from './expandModals';
 import type { ProbeReport } from './types';
 import { verifyEntryOnPage, verifyMatches } from './verify';
 

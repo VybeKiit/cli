@@ -1,5 +1,5 @@
 import { type Result, fail, ok } from '@vybekiit/core';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effect-bridge';
+import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
 import type { AuthProvider } from '../../types';
 import type { AuthUser } from '../../user';
 import { LOCAL_DEV_SESSION_TOKEN, type AuthSession, toSessionResult } from '../../session';

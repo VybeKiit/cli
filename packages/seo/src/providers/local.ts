@@ -23,6 +23,7 @@ function buildCanonical(base: string, input: MetadataInput): string {
 }
 
 export function createLocalSeo(app: AppConfig, _config: SeoConfig): SeoProvider {
+  // drop a trailing slash from the base URL: "https://x.com/" → "https://x.com"
   const base = app.APP_URL.replace(/\/$/, '');
 
   return {

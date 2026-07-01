@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createCloudflareR2Delivery } from '../src/providers/index';
+import { createCloudflareR2Delivery } from '../src/providers';
 import { resolveAssetDelivery } from '../src/resolve';
 
 const cloudflareEnv = {

@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 const docStore = new Map<string, Record<string, unknown>>();
@@ -35,7 +36,9 @@ vi.mock('firebase-admin/firestore', () => ({
   }),
 }));
 
-import { createFirebaseDataProvider } from '../src/providers/firebase/index';
+import { createFirebaseDataProvider } from '../src/providers/firebase';
+
+const run = Effect.runPromise;
 
 describe('firebase data provider', () => {
   it('inserts and reads a record', async () => {
@@ -49,13 +52,9 @@ describe('firebase data provider', () => {
       }),
     });
 
-    const inserted = await provider.insert('users', { id: 'u1', email: 'u@test.com' });
-    expect(inserted.ok).toBe(true);
+    await run(provider.insert('users', { id: 'u1', email: 'u@test.com' }));
 
-    const fetched = await provider.get<{ id: string; email: string }>('users', 'u1');
-    expect(fetched.ok).toBe(true);
-    if (fetched.ok) {
-      expect(fetched.value?.email).toBe('u@test.com');
-    }
+    const fetched = await run(provider.get<{ id: string; email: string }>('users', 'u1'));
+    expect(fetched?.email).toBe('u@test.com');
   });
 });

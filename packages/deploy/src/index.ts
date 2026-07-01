@@ -11,20 +11,20 @@ export {
   type CloudflareDeployAction,
   type CloudflareRunResult,
   type CloudflareRunner,
-} from './providers/cloudflare/index';
+} from './providers/cloudflare';
 export {
   createVercelHosting,
   type VercelDeployAction,
   type VercelRunResult,
   type VercelRunner,
-} from './providers/vercel/index';
+} from './providers/vercel';
 export {
   createRailwayHosting,
   type RailwayDeployAction,
   type RailwayRunResult,
   type RailwayRunner,
-} from './providers/railway/index';
-export { createAwsHosting, type AmplifyRunner } from './providers/aws/index';
+} from './providers/railway';
+export { createAwsHosting, type AmplifyRunner } from './providers/aws';
 export {
   getOrCreateZone,
   type CloudflareZone,

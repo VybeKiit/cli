@@ -2,7 +2,7 @@ import baseManifest from './platform-skills-base.manifest.json' with { type: 'js
 import type {
   PlatformSkillsManifest,
   PlatformSkillsSource,
-} from '../planners/update-platform-skills';
+} from '../planners/updatePlatformSkills';
 
 export { baseManifest as PLATFORM_SKILLS_BASE_MANIFEST };
 

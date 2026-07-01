@@ -19,7 +19,7 @@ import {
   createCloudflareSupabaseDelivery,
   createLocalAssetDelivery,
   createVercelDelivery,
-} from './providers/index';
+} from './providers';
 import type { AssetDeliveryProvider } from './types';
 
 const STORAGE_ANCHOR_KEYS = ['R2_BUCKET', 'SUPABASE_URL'] as const;

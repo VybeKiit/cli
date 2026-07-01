@@ -4,6 +4,7 @@ import { type MongoConfig, type Result, fail, ok } from '@vybekiit/core';
 // connection string in `MONGODB_URI`. Chosen over a thin REST wrapper because the
 // driver pools connections internally and is the canonical, well-supported client.
 import { type Collection, type Filter, MongoClient } from 'mongodb';
+import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
@@ -40,7 +41,7 @@ export function createMongoDataProvider(config: MongoConfig): DataProvider {
   // rather than wrestling the driver's generic `Document` per call.
   const records = (name: string): Collection<DbRecord> => db.collection<DbRecord>(name);
 
-  return {
+  const impl: DataProviderResult = {
     name: 'mongodb',
     capabilities: MINIMAL_CAPABILITIES,
 
@@ -105,6 +106,7 @@ export function createMongoDataProvider(config: MongoConfig): DataProvider {
       }
     },
   };
+  return toEffectDataProvider(impl);
 }
 
 /** Narrow an unknown caught value to a developer-facing message string. */

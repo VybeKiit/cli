@@ -7,9 +7,9 @@ import {
   resolveEnvProvider,
   type EnvSource,
 } from '@vybekiit/core';
-import { type FetchLike, createCloudflareEmail } from './providers/cloudflare/index';
-import { createSesEmail } from './providers/ses/index';
-import { createResendEmail } from './providers/resend/index';
+import { type FetchLike, createCloudflareEmail } from './providers/cloudflare';
+import { createSesEmail } from './providers/ses';
+import { createResendEmail } from './providers/resend';
 import type { EmailProvider } from './types';
 
 /**

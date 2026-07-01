@@ -6,7 +6,7 @@ import {
   isRailwayStackActive,
   isSupabaseUnconfigured,
   needsAwsCliFromAuxiliaryProviders,
-} from '../src/provider-dispatch';
+} from '../src/providerDispatch';
 
 describe('isBackendUnconfigured', () => {
   it('is true when no provider or anchor keys are set', () => {

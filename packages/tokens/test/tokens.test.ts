@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { colors, cssVariables, hsl, radius } from '../src/index';
+import { colors, cssVariables, hsl, radius } from '../src';
 
 describe('colors', () => {
   it('encodes the exact light + dark base values', () => {

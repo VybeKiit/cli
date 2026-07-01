@@ -6,7 +6,7 @@ import {
   parseEnv,
   storageConfigSchema,
 } from './config';
-import type { EnvSource } from './env-source';
+import type { EnvSource } from './envSource';
 
 /**
  * Canonical backend anchor keys — any one signals the builder wired a real backend.

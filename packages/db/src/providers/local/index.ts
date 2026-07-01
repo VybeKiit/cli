@@ -1,4 +1,5 @@
 import { type Result, fail, ok } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { LOCAL_CAPABILITIES } from '../postgres/shared';
 
@@ -59,7 +60,7 @@ export function createLocalDataProvider(): DataProvider {
     return rows;
   };
 
-  return {
+  const impl: DataProviderResult = {
     name: 'local',
     capabilities: LOCAL_CAPABILITIES,
 
@@ -167,4 +168,5 @@ export function createLocalDataProvider(): DataProvider {
       return ok(inserted);
     },
   };
+  return toEffectDataProvider(impl);
 }

@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 const sqlMock = vi.fn<(strings: TemplateStringsArray, ...values: unknown[]) => Promise<unknown[]>>(
@@ -8,7 +9,9 @@ vi.mock('@neondatabase/serverless', () => ({
   neon: () => sqlMock,
 }));
 
-import { createNeonDataProvider } from '../src/providers/neon/index';
+import { createNeonDataProvider } from '../src/providers/neon';
+
+const run = Effect.runPromise;
 
 describe('neon data provider', () => {
   it('inserts and reads a record', async () => {
@@ -26,13 +29,9 @@ describe('neon data provider', () => {
       DATABASE_URL: 'postgresql://user:pass@localhost/neondb',
     });
 
-    const inserted = await provider.insert('users', { id: 'a1', email: 'a@test.com' });
-    expect(inserted.ok).toBe(true);
+    await run(provider.insert('users', { id: 'a1', email: 'a@test.com' }));
 
-    const fetched = await provider.get<{ id: string; email: string }>('users', 'a1');
-    expect(fetched.ok).toBe(true);
-    if (fetched.ok) {
-      expect(fetched.value?.email).toBe('a@test.com');
-    }
+    const fetched = await run(provider.get<{ id: string; email: string }>('users', 'a1'));
+    expect(fetched?.email).toBe('a@test.com');
   });
 });

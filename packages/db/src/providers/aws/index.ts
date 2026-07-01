@@ -13,6 +13,7 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { type AwsConfig, type Result, fail, ok } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
@@ -56,7 +57,7 @@ export function createAwsDataProvider(config: AwsConfig): DataProvider {
   const tableName = (collection: string): string =>
     `${config.AWS_DYNAMODB_TABLE_PREFIX}${collection}`;
 
-  return {
+  const impl: DataProviderResult = {
     name: 'aws',
     capabilities: MINIMAL_CAPABILITIES,
 
@@ -128,6 +129,7 @@ export function createAwsDataProvider(config: AwsConfig): DataProvider {
       }
     },
   };
+  return toEffectDataProvider(impl);
 }
 
 /**

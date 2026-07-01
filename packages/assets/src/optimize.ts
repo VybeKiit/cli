@@ -36,6 +36,7 @@ async function optimizeRaster(
   const width = meta.width ?? MAX_WIDTH;
   const resizeWidth = width > MAX_WIDTH ? MAX_WIDTH : undefined;
 
+  // swap the trailing file extension: "img.png" → "img.webp" / "img.avif"
   const webpPath = outputPath.replace(/\.[^.]+$/, '.webp');
   const avifPath = outputPath.replace(/\.[^.]+$/, '.avif');
   const variants: Record<string, string> = {};

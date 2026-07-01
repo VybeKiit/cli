@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TONE_RULES, renderToneSection } from '../../src/contract/tone-rules';
+import { TONE_RULES, renderToneSection } from '../../src/contract/toneRules';
 
 describe('renderToneSection', () => {
   it('renders the heading and every tone rule', () => {

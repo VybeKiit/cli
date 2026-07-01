@@ -1,3 +1,5 @@
+import { Schema } from 'effect';
+
 import type { VerbContext } from '../types';
 
 import { connectToCwsChrome } from '../connect';
@@ -65,7 +67,7 @@ export async function readListingState(ctx: VerbContext): Promise<CwsListing> {
     await session.page.goto(statusUrl(groupId, ctx.extension.chromeWebStoreId));
     const status = await readStatusTab(session.page);
 
-    return CwsListingSchema.parse({
+    return Schema.decodeUnknownSync(CwsListingSchema)({
       distribution,
       listing,
       package: packageState,

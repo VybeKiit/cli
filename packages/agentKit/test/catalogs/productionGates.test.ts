@@ -3,7 +3,7 @@ import {
   formatChecklistEntry,
   planProductionChecklist,
   renderProductionGates,
-} from '../../src/catalogs/production-gates';
+} from '../../src/catalogs/productionGates';
 
 describe('production-gates', () => {
   it('returns gates per template', () => {

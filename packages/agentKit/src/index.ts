@@ -1,35 +1,35 @@
 export { CONTRACT, renderContract, type Contract, type ContractRule } from './contract/contract';
-export { TONE_RULES, renderToneSection, type ToneRule } from './contract/tone-rules';
+export { TONE_RULES, renderToneSection, type ToneRule } from './contract/toneRules';
 export {
   PEOPLE_VOCABULARY,
   renderPeopleVocabularyTable,
   type PeopleVocabularyEntry,
-} from './vocabulary/people-vocabulary';
+} from './vocabulary/peopleVocabulary';
 export {
   AGENT_RUNTIME_VOCABULARY,
   renderAgentRuntimeVocabularyTable,
   type AgentRuntimeVocabularyEntry,
-} from './vocabulary/agent-runtime-vocabulary';
+} from './vocabulary/agentRuntimeVocabulary';
 export {
   CODE_EDIT_VOCABULARY,
   renderCodeEditVocabularyTable,
   type CodeEditVocabularyEntry,
-} from './vocabulary/code-edit-vocabulary';
+} from './vocabulary/codeEditVocabulary';
 export {
   VYBEKIIT_LAYER_VOCABULARY,
   renderVybekiitLayerVocabularyTable,
   type VybekiitLayerVocabularyEntry,
-} from './vocabulary/vybekiit-layer-vocabulary';
+} from './vocabulary/vybekiitLayerVocabulary';
 export {
   TOOL_VOCABULARY,
   renderToolVocabularyTable,
   type ToolVocabularyEntry,
-} from './vocabulary/tool-vocabulary';
+} from './vocabulary/toolVocabulary';
 export {
   SDLC_VOCABULARY,
   renderSdlcVocabularyTable,
   type SdlcVocabularyEntry,
-} from './vocabulary/sdlc-vocabulary';
+} from './vocabulary/sdlcVocabulary';
 export {
   AGENT_INTERNAL_VOCABULARY,
   FAILURE_VOCABULARY,
@@ -38,14 +38,14 @@ export {
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
   type UiVocabularyEntry,
-} from './vocabulary/ui-vocabulary';
+} from './vocabulary/uiVocabulary';
 export {
   EXTENDED_SERVICE_NAME_BANS,
   PAYMENTS_VOCABULARY,
   renderPaymentsVocabularyTable,
   renderServiceNameBanList,
   type DomainVocabularyEntry,
-} from './vocabulary/domain-vocabulary';
+} from './vocabulary/domainVocabulary';
 export {
   FORBIDDEN_WEB_UI_LIBS,
   UI_MIRROR_NAMESPACES,
@@ -53,23 +53,23 @@ export {
   renderForbiddenWebUiLibsList,
   renderWebUiSourcesTable,
   type UiSourceEntry,
-} from './catalogs/ui-sources';
+} from './catalogs/uiSources';
 export {
   GOAL_CATALOG,
   GOAL_ENTRIES,
   type GoalCatalogEntry,
   type TemplateId,
-} from './catalogs/goal-catalog';
+} from './catalogs/goalCatalog';
 export {
   BACKEND_CAPABILITIES,
   BACKEND_CLI_COMMANDS,
   type BackendCapability,
-} from './catalogs/backend-capabilities';
+} from './catalogs/backendCapabilities';
 export {
   planKitUpdate,
   type KitPackageUpdate,
   type UpdatePlan,
-} from './planners/update-kit';
+} from './planners/updateKit';
 export {
   expectedSkillNamesFromManifest,
   expectedSkillNamesFromLock,
@@ -80,7 +80,7 @@ export {
   type SkillsLockEntry,
   type SkillsLockFile,
   type PlatformSkillsUpdatePlan,
-} from './planners/update-platform-skills';
+} from './planners/updatePlatformSkills';
 export {
   AGENT_LAYER_PATHS,
   AGENT_LAYER_EXTENSION_PREFIX,
@@ -88,7 +88,7 @@ export {
   isAgentLayerExtensionPath,
   planAgentLayerSync,
   type AgentLayerSyncPlan,
-} from './planners/agent-layer-sync';
+} from './planners/agentLayerSync';
 export {
   TOOL_SKILL_PATHS,
   EXTENSION_PATHS,
@@ -96,7 +96,7 @@ export {
   resolveGlobalSkillPath,
   type AgentToolId,
   type ToolSkillPathEntry,
-} from './catalogs/tool-skill-paths';
+} from './catalogs/toolSkillPaths';
 export {
   renderBuyerGoalExtensionSkill,
   renderPlatformWrapperExtensionSkill,
@@ -105,33 +105,33 @@ export {
   type BuyerGoalSkillDraft,
   type PlatformWrapperDraft,
   type ExtensionSkillKind,
-} from './render/extension-skill-templates';
+} from './render/extensionSkillTemplates';
 export {
   lintExtensionSkill,
   type ExtensionSkillLintKind,
   type ExtensionSkillLintIssue,
   type ExtensionSkillLintInput,
   type ExtensionSkillLintReport,
-} from './lint/lint-extension-skill';
+} from './lint/lintExtensionSkill';
 export {
   extractExtensionGoalIndexRows,
   mergeGoalIndexOnSync,
   formatExtensionGoalIndexRow,
-} from './planners/merge-goal-index';
+} from './planners/mergeGoalIndex';
 export {
   planDataModel,
   renderDataModelSummary,
   type DataModelPlan,
   type DataProviderName,
   type EntityInput,
-} from './planners/plan-data-model';
+} from './planners/planDataModel';
 export {
   planGoalRouting,
   checkGoalDrift,
   type GoalRoutingPlan,
   type GoalDriftReport,
   type GoalDriftIssue,
-} from './planners/plan-goal-routing';
+} from './planners/planGoalRouting';
 export {
   planFeatureReadiness,
   resolveTemplateTopology,
@@ -142,13 +142,13 @@ export {
   type OrchestrationStep,
   type TemplateTopologyCombo,
   type TemplateTopologyContext,
-} from './planners/plan-feature-readiness';
+} from './planners/planFeatureReadiness';
 export {
   planSetup,
   type SetupDomain,
   type SetupPlan,
   type SetupStep,
-} from './planners/plan-setup';
+} from './planners/planSetup';
 export {
   GENERATED_SECTION_MARKERS,
   replaceGeneratedSection,
@@ -162,7 +162,7 @@ export {
   applyAgentLayerSections,
   type AgentLayerRenderTarget,
   type ApplyAgentLayerOptions,
-} from './render/agent-layer';
+} from './render/agentLayer';
 export {
   AGENT_SKILL_SYMLINKS,
   BUYER_SKILL_STUB_MARKER,
@@ -184,13 +184,13 @@ export {
   type AgentSkillSymlinkPlan,
   type AgentSkillSymlinkReport,
   type AgentSkillSymlinkState,
-} from './render/buyer-skill-stubs';
+} from './render/buyerSkillStubs';
 export {
   TECH_REFERENCES,
   TECH_REFERENCE_MAP,
   renderTechReferencesTable,
   type TechReference,
-} from './catalogs/tech-references';
+} from './catalogs/techReferences';
 export {
   PLATFORM_SKILLS_AUDIT_PROVIDERS,
   DOCS_ONLY_PLATFORM_PROVIDERS,
@@ -203,14 +203,14 @@ export {
   type PlatformSkillsAuditResult,
   type PlatformSkillsAuditStatus,
   type PlatformSkillsAuditInput,
-} from './catalogs/platform-skills-audit';
+} from './catalogs/platformSkillsAudit';
 export {
   PLATFORM_SKILLS_BASE_MANIFEST,
   mergePlatformSkillsManifests,
   checkBaseManifestParity,
   findDocsOnlyViolations,
   type PlatformSkillsTemplateManifest,
-} from './catalogs/platform-skills-merge';
+} from './catalogs/platformSkillsMerge';
 export {
   planProductionChecklist,
   renderProductionGates,
@@ -218,31 +218,31 @@ export {
   formatChecklistEntry,
   type ProductionGate,
   type ChecklistEntryInput,
-} from './catalogs/production-gates';
+} from './catalogs/productionGates';
 export {
   planDocFallback,
   formatBuilderStuckMessage,
   type DocFallbackPlan,
-} from './planners/plan-doc-fallback';
+} from './planners/planDocFallback';
 export {
   AGENT_RUNTIME_DOC_SOURCES,
   type AgentRuntimeDocSource,
-} from './catalogs/agent-runtime-doc-sources';
+} from './catalogs/agentRuntimeDocSources';
 export {
   planAgentRuntimeCompliance,
   type AgentRuntimeComplianceReport,
   type AgentRuntimeComplianceIssue,
   type AgentRuntimeComplianceCheckId,
   type AgentRuntimeComplianceInput,
-} from './planners/plan-agent-runtime-compliance';
+} from './planners/planAgentRuntimeCompliance';
 export {
   planAgentLayerCompliance,
   type AgentLayerComplianceReport,
   type AgentLayerComplianceIssue,
   type AgentLayerComplianceInput,
   type AgentLayerComplianceCheckId,
-} from './planners/plan-agent-layer-compliance';
+} from './planners/planAgentLayerCompliance';
 export {
   renderAgentSessionBootstrap,
   renderSessionBootstrapFile,
-} from './contract/session-bootstrap';
+} from './contract/sessionBootstrap';

@@ -3,7 +3,7 @@ import {
   expectedSkillNamesFromManifest,
   planPlatformSkillsUpdate,
   shouldRunPlatformSkillsUpdate,
-} from '../../src/planners/update-platform-skills';
+} from '../../src/planners/updatePlatformSkills';
 
 describe('planPlatformSkillsUpdate', () => {
   it('reports up to date when manifest has no sources', () => {

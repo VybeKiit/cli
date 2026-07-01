@@ -1,6 +1,6 @@
 import { type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
-import type { SqlClient } from '../providers/postgres/hybrid-provider';
+import type { SqlClient } from '../providers/postgres/hybridProvider';
 import type { PostgresProviderName, PresetManifest } from './types';
 import { getPreset } from './catalog';
 import { renderPreset } from './render';
@@ -12,9 +12,11 @@ function errorMessage(error: unknown): string {
 type MigrationSqlClient = SqlClient;
 
 async function executeMigration(sql: MigrationSqlClient, migrationSql: string): Promise<void> {
+  // split into statements on one-or-more blank lines: "a;\n\nb;" → ["a;", "b;"]
   const blocks = migrationSql
     .split(/\n\n+/)
     .map((block) => block.trim())
+    // drop blanks and lone SQL comment lines: keeps "select 1", removes "-- note"
     .filter((block) => block.length > 0 && !block.match(/^--[^\n]*$/));
   for (const block of blocks) {
     await sql(block);

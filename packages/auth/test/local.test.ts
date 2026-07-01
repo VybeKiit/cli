@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { createLocalAuthProvider } from '../src/providers/local/index';
+import { createLocalAuthProvider } from '../src/providers/local';
 import { LOCAL_DEV_SESSION_TOKEN } from '../src/session';
 
 const DEV_USER = { id: 'local-dev-user', email: 'you@local.dev' };

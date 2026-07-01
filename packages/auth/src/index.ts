@@ -1,7 +1,8 @@
 export { Auth, makeAuthLive, resolveAuthProvider } from './resolve';
-export { createBetterAuthProvider } from './providers/better-auth/index';
-export { createCognitoAuthProvider } from './providers/cognito/index';
-export { createLocalAuthProvider } from './providers/local/index';
+export { createBetterAuthProvider } from './providers/betterAuth';
+export { createCognitoAuthProvider } from './providers/cognito';
+export { createLocalAuthProvider } from './providers/local';
+export { createSupabaseAuthProvider } from './providers/supabase';
 export { normalizeAuthUser, type AuthUser } from './user';
 export { AuthError } from './types';
 export type { AuthCapabilities, AuthProvider, AuthProviderName } from './types';
@@ -14,6 +15,7 @@ export {
   CognitoConfigSchema,
   DataConfigSchema,
   MongoConfigSchema,
+  SupabaseAuthConfigSchema,
 } from './config';
 export type {
   AuthConfig,
@@ -21,4 +23,5 @@ export type {
   CognitoConfig,
   DataConfig,
   MongoConfig,
+  SupabaseAuthConfig,
 } from './config';

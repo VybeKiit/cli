@@ -1,15 +1,15 @@
-import type { TemplateId } from '../catalogs/goal-catalog';
+import type { TemplateId } from '../catalogs/goalCatalog';
 import {
   checkBaseManifestParity,
   mergePlatformSkillsManifests,
   type PlatformSkillsTemplateManifest,
-} from '../catalogs/platform-skills-merge';
-import { checkAgentSkillSymlinks, checkBuyerSkillStubDrift } from '../render/buyer-skill-stubs';
-import { checkGoalDrift } from './plan-goal-routing';
+} from '../catalogs/platformSkillsMerge';
+import { checkAgentSkillSymlinks, checkBuyerSkillStubDrift } from '../render/buyerSkillStubs';
+import { checkGoalDrift } from './planGoalRouting';
 import {
   planAgentRuntimeCompliance,
   type AgentRuntimeComplianceInput,
-} from './plan-agent-runtime-compliance';
+} from './planAgentRuntimeCompliance';
 import { GENERATED_SECTION_MARKERS, type GeneratedSectionId } from '../render/markdown';
 
 export type AgentLayerComplianceCheckId =
@@ -22,7 +22,7 @@ export type AgentLayerComplianceCheckId =
   | 'buyer-skill-stub-drift'
   | 'agent-skill-symlinks'
   | 'platform-skills-manifest-parity'
-  | import('./plan-agent-runtime-compliance').AgentRuntimeComplianceCheckId;
+  | import('./planAgentRuntimeCompliance').AgentRuntimeComplianceCheckId;
 
 export interface AgentLayerComplianceIssue {
   readonly check: AgentLayerComplianceCheckId;

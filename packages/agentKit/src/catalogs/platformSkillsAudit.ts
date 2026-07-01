@@ -89,7 +89,7 @@ function daysBetween(older: Date, newer: Date): number {
 }
 
 /**
- * Pure freshness evaluation — network I/O lives in scripts/audit-platform-skills.mjs.
+ * Pure freshness evaluation — network I/O lives in scripts/auditPlatformSkills.mjs.
  */
 export function evaluatePlatformSkillsAudit(
   input: PlatformSkillsAuditInput,

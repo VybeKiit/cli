@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planAgentRuntimeCompliance } from '../../src/planners/plan-agent-runtime-compliance';
+import { planAgentRuntimeCompliance } from '../../src/planners/planAgentRuntimeCompliance';
 
 const LIVE_DOCS = {
   'cursor-rules': 'Project rules use .mdc with alwaysApply and AGENTS.md alternative',

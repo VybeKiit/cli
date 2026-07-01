@@ -1,4 +1,4 @@
-import { AGENT_RUNTIME_DOC_SOURCES } from '../catalogs/agent-runtime-doc-sources';
+import { AGENT_RUNTIME_DOC_SOURCES } from '../catalogs/agentRuntimeDocSources';
 
 export type AgentRuntimeComplianceCheckId =
   | 'runtime-docs-live'

@@ -4,7 +4,7 @@ import {
   formatAgentLayerSyncSummary,
   isAgentLayerExtensionPath,
   planAgentLayerSync,
-} from '../../src/planners/agent-layer-sync';
+} from '../../src/planners/agentLayerSync';
 
 describe('AGENT_LAYER_PATHS', () => {
   it('includes core agent layer files', () => {

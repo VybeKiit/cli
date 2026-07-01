@@ -3,6 +3,7 @@
 // as the AWS S3 adapter, different endpoint + credential keys.
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { type R2Config, type Result, fail, ok } from '@vybekiit/core';
+import { type StorageProviderResult, toEffectStorageProvider } from '../../effectBridge';
 import type { StorageProvider } from '../../types';
 
 /**
@@ -21,9 +22,10 @@ export function createR2StorageProvider(config: R2Config): StorageProvider {
   });
 
   const bucket = config.R2_BUCKET;
+  // drop a trailing slash from the public base: "https://x.com/" → "https://x.com"
   const publicBase = config.R2_PUBLIC_URL.replace(/\/$/, '');
 
-  return {
+  const impl: StorageProviderResult = {
     name: 'r2',
 
     async upload(
@@ -48,6 +50,7 @@ export function createR2StorageProvider(config: R2Config): StorageProvider {
     },
 
     getUrl(_bucket: string, key: string): Promise<Result<{ url: string }>> {
+      // drop a leading slash from the object key: "/logo.png" → "logo.png"
       const url = `${publicBase}/${key.replace(/^\//, '')}`;
       return Promise.resolve(ok({ url }));
     },
@@ -61,6 +64,7 @@ export function createR2StorageProvider(config: R2Config): StorageProvider {
       }
     },
   };
+  return toEffectStorageProvider(impl);
 }
 
 function errorMessage(error: unknown): string {

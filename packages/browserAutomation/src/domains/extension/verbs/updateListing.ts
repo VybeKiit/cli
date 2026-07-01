@@ -4,6 +4,8 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { Schema } from 'effect';
+
 import type { VerbContext } from '../types';
 
 import { connectToCwsChrome } from '../connect';
@@ -269,5 +271,5 @@ async function loadLocalListing(ctx: VerbContext): Promise<CwsListing> {
   }
   const moduleUrl = pathToFileURL(filePath).href;
   const imported: { default?: unknown } = await import(moduleUrl);
-  return CwsListingSchema.parse(imported.default);
+  return Schema.decodeUnknownSync(CwsListingSchema)(imported.default);
 }

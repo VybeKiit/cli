@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { LOCAL_DEV_SESSION_TOKEN, createLocalAuthProvider } from '../src/index';
+import { LOCAL_DEV_SESSION_TOKEN, createLocalAuthProvider } from '../src';
 
 describe('createLocalAuthProvider sessions', () => {
   it('signInWithPassword returns user + session token', async () => {

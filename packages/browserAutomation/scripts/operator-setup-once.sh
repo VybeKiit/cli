@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # One-shot LS operator run — sign in to Lemon Squeezy in Chrome first, then:
-#   bash packages/browser-automation/scripts/operator-setup-once.sh
+#   bash packages/browserAutomation/scripts/operator-setup-once.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-BA="$ROOT/packages/browser-automation"
+BA="$ROOT/packages/browserAutomation"
 LANDING="$ROOT/apps/landing"
 WEBHOOK_URL="${LS_WEBHOOK_URL:-https://cubical-trident-anthology.ngrok-free.dev/api/webhook}"
 IMAGE="$ROOT/apps/landing/app/icon.svg"

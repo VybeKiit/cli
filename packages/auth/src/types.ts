@@ -2,7 +2,7 @@ import { Data, type Effect } from 'effect';
 import type { AuthSession } from './session';
 import type { AuthUser } from './user';
 
-export type AuthProviderName = 'better-auth' | 'cognito' | 'local';
+export type AuthProviderName = 'supabase' | 'better-auth' | 'cognito' | 'local';
 
 /**
  * The tagged failure every {@link AuthProvider} method can produce (ADR-0023).

@@ -1,5 +1,6 @@
+import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createAwsDataProvider } from '../src/providers/aws/index';
+import { createAwsDataProvider } from '../src/providers/aws';
 
 /**
  * `vi.mock` is hoisted above imports, so anything its factory references must be
@@ -37,6 +38,7 @@ function sentCommand(): { name: string; input: Record<string, unknown> } {
 }
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
+const run = Effect.runPromise;
 
 interface Order {
   readonly id: string;
@@ -56,21 +58,20 @@ describe('createAwsDataProvider', () => {
     send.mockResolvedValue({});
     const order: Order = { id: 'o1', email: 'a@b.c' };
 
-    const result = await createAwsDataProvider(config).insert('orders', order);
+    const value = await run(createAwsDataProvider(config).insert('orders', order));
 
     expect(sentCommand().name).toBe('Put');
     expect(sentCommand().input).toEqual({ TableName: 'orders', Item: order });
-    expect(result.ok && result.value).toEqual(order);
+    expect(value).toEqual(order);
   });
 
   it('applies the table prefix to the table name', async () => {
     send.mockResolvedValue({});
-    await createAwsDataProvider({ ...config, AWS_DYNAMODB_TABLE_PREFIX: 'prod_' }).insert(
-      'orders',
-      {
+    await run(
+      createAwsDataProvider({ ...config, AWS_DYNAMODB_TABLE_PREFIX: 'prod_' }).insert('orders', {
         id: 'o1',
         email: 'a@b.c',
-      },
+      }),
     );
     expect(sentCommand().input.TableName).toBe('prod_orders');
   });
@@ -78,33 +79,32 @@ describe('createAwsDataProvider', () => {
   it('get issues a GetCommand keyed by id and unwraps Item', async () => {
     send.mockResolvedValue({ Item: { id: 'o1', email: 'a@b.c' } });
 
-    const result = await createAwsDataProvider(config).get<Order>('orders', 'o1');
+    const value = await run(createAwsDataProvider(config).get<Order>('orders', 'o1'));
 
     expect(sentCommand().name).toBe('Get');
     expect(sentCommand().input).toEqual({ TableName: 'orders', Key: { id: 'o1' } });
-    expect(result.ok && result.value).toEqual({ id: 'o1', email: 'a@b.c' });
+    expect(value).toEqual({ id: 'o1', email: 'a@b.c' });
   });
 
   it('get returns null when DynamoDB has no Item', async () => {
     send.mockResolvedValue({});
-    const result = await createAwsDataProvider(config).get<Order>('orders', 'missing');
-    expect(result.ok && result.value).toBeNull();
+    const value = await run(createAwsDataProvider(config).get<Order>('orders', 'missing'));
+    expect(value).toBeNull();
   });
 
   it('get maps an SDK error to fail("db_get_failed")', async () => {
     send.mockRejectedValue(new Error('throttled'));
-    const result = await createAwsDataProvider(config).get<Order>('orders', 'o1');
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('db_get_failed');
-      expect(result.error.message).toBe('throttled');
-    }
+    const error = await run(Effect.flip(createAwsDataProvider(config).get<Order>('orders', 'o1')));
+    expect(error.code).toBe('db_get_failed');
+    expect(error.message).toBe('throttled');
   });
 
   it('query issues a ScanCommand with a reserved-word-safe FilterExpression', async () => {
     send.mockResolvedValue({ Items: [{ id: 'o1', email: 'a@b.c' }] });
 
-    const result = await createAwsDataProvider(config).query<Order>('orders', { email: 'a@b.c' });
+    const value = await run(
+      createAwsDataProvider(config).query<Order>('orders', { email: 'a@b.c' }),
+    );
 
     expect(sentCommand().name).toBe('Scan');
     expect(sentCommand().input).toEqual({
@@ -113,21 +113,21 @@ describe('createAwsDataProvider', () => {
       ExpressionAttributeNames: { '#k0': 'email' },
       ExpressionAttributeValues: { ':v0': 'a@b.c' },
     });
-    expect(result.ok && result.value).toEqual([{ id: 'o1', email: 'a@b.c' }]);
+    expect(value).toEqual([{ id: 'o1', email: 'a@b.c' }]);
   });
 
   it('query with an empty filter scans the whole table', async () => {
     send.mockResolvedValue({ Items: [] });
-    await createAwsDataProvider(config).query<Order>('orders', {});
+    await run(createAwsDataProvider(config).query<Order>('orders', {}));
     expect(sentCommand().input).toEqual({ TableName: 'orders' });
   });
 
   it('update issues an UpdateCommand with a SET expression and ALL_NEW', async () => {
     send.mockResolvedValue({ Attributes: { id: 'o1', email: 'new@b.c' } });
 
-    const result = await createAwsDataProvider(config).update<Order>('orders', 'o1', {
-      email: 'new@b.c',
-    });
+    const value = await run(
+      createAwsDataProvider(config).update<Order>('orders', 'o1', { email: 'new@b.c' }),
+    );
 
     expect(sentCommand().name).toBe('Update');
     expect(sentCommand().input).toEqual({
@@ -138,16 +138,16 @@ describe('createAwsDataProvider', () => {
       ExpressionAttributeNames: { '#k0': 'email' },
       ExpressionAttributeValues: { ':v0': 'new@b.c' },
     });
-    expect(result.ok && result.value).toEqual({ id: 'o1', email: 'new@b.c' });
+    expect(value).toEqual({ id: 'o1', email: 'new@b.c' });
   });
 
   it('remove issues a DeleteCommand and returns true', async () => {
     send.mockResolvedValue({});
 
-    const result = await createAwsDataProvider(config).remove('orders', 'o1');
+    const value = await run(createAwsDataProvider(config).remove('orders', 'o1'));
 
     expect(sentCommand().name).toBe('Delete');
     expect(sentCommand().input).toEqual({ TableName: 'orders', Key: { id: 'o1' } });
-    expect(result.ok && result.value).toBe(true);
+    expect(value).toBe(true);
   });
 });

@@ -11,32 +11,34 @@ import {
   CognitoConfigSchema,
   DataConfigSchema,
   MongoConfigSchema,
+  SupabaseAuthConfigSchema,
 } from './config';
-import { type BetterAuthInstance, createBetterAuthProvider } from './providers/better-auth/index';
-import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito/index';
-import { createLocalAuthProvider } from './providers/local/index';
+import { type BetterAuthInstance, createBetterAuthProvider } from './providers/betterAuth';
+import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito';
+import { createLocalAuthProvider } from './providers/local';
+import { type SupabaseAuthClientLike, createSupabaseAuthProvider } from './providers/supabase';
 import type { AuthProvider } from './types';
 
+/** Test seams for {@link resolveAuthProvider}; omit in production. */
 export interface ResolveAuthInjections {
   readonly betterAuthInstance?: BetterAuthInstance;
   readonly cognitoClient?: CognitoClientLike;
+  readonly supabaseAuthClient?: SupabaseAuthClientLike;
 }
 
 /**
  * Construct the configured auth provider from the environment — the single call site
- * the add-signin skill and server routes use, so they never name better-auth or
- * Cognito (ADR-0003).
+ * the add-signin skill and server routes use, so they never name Supabase Auth,
+ * better-auth, or Cognito (ADR-0003, ADR-0024).
  *
- * Resolution order (auth follows data):
- * - Nothing configured (no `AUTH_PROVIDER`/`DATA_PROVIDER`/backend keys) → the local
- *   dev identity, so a fresh scaffold signs in offline with no secrets (ADR-0008).
- * - `AUTH_PROVIDER=local` → the local dev identity explicitly.
- * - `AUTH_PROVIDER=cognito` → Cognito directly.
- * - `AUTH_PROVIDER=better-auth` (default) → branch on `DATA_PROVIDER`:
- *   - `aws` → **Cognito**. DynamoDB has no better-auth adapter, so AWS-data apps use
- *     Cognito behind the same interface; the builder never hears the name (ADR-0003).
- *   - `mongodb` → better-auth bound to the Mongo database.
- *   - default (`supabase`/postgres) → better-auth bound to Postgres via `DATABASE_URL`.
+ * Resolution:
+ * - Nothing configured → the local dev identity (ADR-0008).
+ * - `AUTH_PROVIDER=local|cognito|supabase` → that adapter directly.
+ * - `AUTH_PROVIDER=better-auth` → better-auth bound to Mongo (`DATA_PROVIDER=mongodb`)
+ *   else Postgres.
+ * - `AUTH_PROVIDER` unset → **auth follows data**: `supabase` → Supabase Auth (the
+ *   default), `aws` → Cognito, `mongodb` → better-auth-on-Mongo, other Postgres
+ *   (`neon`/`railway`/`firebase`) → better-auth, `local` → local.
  *
  * @param env - environment source (defaults to `process.env`)
  * @param injections - test seams; omit in production
@@ -48,6 +50,11 @@ export function resolveAuthProvider(
 ): AuthProvider {
   if (isBackendUnconfigured(env)) return createLocalAuthProvider();
 
+  const supabaseAuth = (): AuthProvider =>
+    createSupabaseAuthProvider({
+      config: parseEnv(SupabaseAuthConfigSchema, env),
+      ...(injections.supabaseAuthClient ? { client: injections.supabaseAuthClient } : {}),
+    });
   const cognito = (): AuthProvider =>
     createCognitoAuthProvider({
       config: parseEnv(CognitoConfigSchema, env),
@@ -56,43 +63,38 @@ export function resolveAuthProvider(
   const injectedInstance = injections.betterAuthInstance
     ? { instance: injections.betterAuthInstance }
     : {};
+  const betterAuthPostgres = (source: EnvSource): AuthProvider =>
+    createBetterAuthProvider({
+      config: parseEnv(BetterAuthConfigSchema, source),
+      ...injectedInstance,
+    });
+  const betterAuthMongo = (source: EnvSource): AuthProvider =>
+    createBetterAuthProvider({
+      config: parseEnv(BetterAuthConfigSchema, source),
+      mongo: parseEnv(MongoConfigSchema, source),
+      ...injectedInstance,
+    });
+  const betterAuth = (source: EnvSource): AuthProvider =>
+    parseEnv(DataConfigSchema, source).DATA_PROVIDER === 'mongodb'
+      ? betterAuthMongo(source)
+      : betterAuthPostgres(source);
 
   const { AUTH_PROVIDER } = parseEnv(AuthConfigSchema, env);
   if (AUTH_PROVIDER === 'local') return createLocalAuthProvider();
   if (AUTH_PROVIDER === 'cognito') return cognito();
+  if (AUTH_PROVIDER === 'supabase') return supabaseAuth();
+  if (AUTH_PROVIDER === 'better-auth') return betterAuth(env);
 
-  const { DATA_PROVIDER } = parseEnv(DataConfigSchema, env);
-  return resolveEnvProvider(
-    DATA_PROVIDER,
+  return resolveEnvProvider<AuthProvider>(
+    parseEnv(DataConfigSchema, env).DATA_PROVIDER,
     {
       local: () => createLocalAuthProvider(),
+      supabase: () => supabaseAuth(),
       aws: () => cognito(),
-      mongodb: (source) =>
-        createBetterAuthProvider({
-          config: parseEnv(BetterAuthConfigSchema, source),
-          mongo: parseEnv(MongoConfigSchema, source),
-          ...injectedInstance,
-        }),
-      supabase: (source) =>
-        createBetterAuthProvider({
-          config: parseEnv(BetterAuthConfigSchema, source),
-          ...injectedInstance,
-        }),
-      neon: (source) =>
-        createBetterAuthProvider({
-          config: parseEnv(BetterAuthConfigSchema, source),
-          ...injectedInstance,
-        }),
-      firebase: (source) =>
-        createBetterAuthProvider({
-          config: parseEnv(BetterAuthConfigSchema, source),
-          ...injectedInstance,
-        }),
-      railway: (source) =>
-        createBetterAuthProvider({
-          config: parseEnv(BetterAuthConfigSchema, source),
-          ...injectedInstance,
-        }),
+      mongodb: (source) => betterAuthMongo(source),
+      neon: (source) => betterAuthPostgres(source),
+      firebase: (source) => betterAuthPostgres(source),
+      railway: (source) => betterAuthPostgres(source),
     },
     env,
     'supabase',
@@ -103,9 +105,8 @@ export function resolveAuthProvider(
 export class Auth extends Context.Tag('@vybekiit/auth/Auth')<Auth, AuthProvider>() {}
 
 /**
- * `Live` layer building {@link Auth} from the environment. Wraps the existing
- * {@link resolveAuthProvider} factory, so config still fails loud when the layer is
- * built at a composition root.
+ * `Live` layer building {@link Auth} from the environment. Wraps {@link resolveAuthProvider},
+ * so config still fails loud when the layer is built at a composition root.
  */
 export function makeAuthLive(
   env: EnvSource = process.env,

@@ -1,5 +1,5 @@
-import { BACKEND_CLI_COMMANDS } from '../catalogs/backend-capabilities';
-import type { TemplateId } from '../catalogs/goal-catalog';
+import { BACKEND_CLI_COMMANDS } from '../catalogs/backendCapabilities';
+import type { TemplateId } from '../catalogs/goalCatalog';
 
 export type FeatureName = 'sign-in' | 'payments' | 'save-data' | 'deploy' | 'email' | 'file-upload';
 

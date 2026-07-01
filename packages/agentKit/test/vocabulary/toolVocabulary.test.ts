@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TOOL_VOCABULARY, renderToolVocabularyTable } from '../../src/vocabulary/tool-vocabulary';
+import { TOOL_VOCABULARY, renderToolVocabularyTable } from '../../src/vocabulary/toolVocabulary';
 
 describe('renderToolVocabularyTable', () => {
   const lines = renderToolVocabularyTable().split('\n');

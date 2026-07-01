@@ -1,4 +1,4 @@
-import type { TemplateId } from './goal-catalog';
+import type { TemplateId } from './goalCatalog';
 
 export interface ProductionGate {
   readonly id: string;
