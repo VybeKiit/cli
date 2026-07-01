@@ -1,3 +1,4 @@
+import { forbidden, tooManyRequests } from '@vybekiit/http';
 import { SecurityGuard, resolveSecurityPolicy } from '@vybekiit/security';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -34,6 +35,7 @@ export function evaluateApiSecurity(request: NextRequest): NextResponse | null {
   if (verdict.retryAfterSeconds !== undefined) {
     headers.set('Retry-After', String(verdict.retryAfterSeconds));
   }
-  const status = verdict.reason === 'origin' ? 403 : 429;
-  return NextResponse.json({ error: verdict.message }, { status, headers });
+  const response =
+    verdict.reason === 'origin' ? forbidden(verdict.message) : tooManyRequests(verdict.message);
+  return NextResponse.json(response.body, { status: response.status, headers });
 }

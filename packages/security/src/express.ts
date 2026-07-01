@@ -1,4 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
+import { forbidden, tooManyRequests } from '@vybekiit/http';
+import { sendHttpResponse } from '@vybekiit/http/express';
 import { SecurityGuard } from './guard';
 import { resolveSecurityPolicy } from './policy';
 import type { SecurityRequest } from './types';
@@ -41,8 +43,9 @@ export function createExpressSecurityMiddleware(
       if (verdict.retryAfterSeconds !== undefined) {
         res.setHeader('Retry-After', String(verdict.retryAfterSeconds));
       }
-      const status = verdict.reason === 'origin' ? 403 : 429;
-      res.status(status).json({ error: verdict.message });
+      const response =
+        verdict.reason === 'origin' ? forbidden(verdict.message) : tooManyRequests(verdict.message);
+      sendHttpResponse(res, response);
       return;
     }
     next();

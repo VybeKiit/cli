@@ -46,6 +46,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.1075.0",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/http": "workspace:*",
     "@vybekiit/notifications": "workspace:*",
     "better-auth": "^1.6.22",
     "mongodb": "^7.4.0",

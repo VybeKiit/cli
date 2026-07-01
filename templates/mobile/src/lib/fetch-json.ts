@@ -1,4 +1,4 @@
-import { createJsonClient } from '@vybekiit/http-client';
+import { createJsonClient } from '@vybekiit/http/client';
 import { APP_URL } from './config';
 
 /** Resolve relative API paths against the configured app origin. */

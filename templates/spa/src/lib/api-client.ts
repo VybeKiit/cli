@@ -1,4 +1,4 @@
-import { createJsonClient } from '@vybekiit/http-client';
+import { createJsonClient } from '@vybekiit/http/client';
 
 /** Backend origin for API calls (Express template default :4000). */
 export const APP_URL = import.meta.env.VITE_PUBLIC_APP_URL ?? 'http://localhost:4000';

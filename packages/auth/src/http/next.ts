@@ -1,4 +1,5 @@
-import type { AuthHttpDeps, AuthHttpResponse } from './handlers';
+import { toNextResponse } from '@vybekiit/http/next';
+import type { AuthHttpDeps } from './handlers';
 import {
   handleForgotPassword,
   handleMe,
@@ -21,10 +22,6 @@ export type {
   AuthHttpSession,
   AuthHttpTelemetry,
 } from './handlers';
-
-function toNextResponse(result: AuthHttpResponse): Response {
-  return Response.json(result.body, { status: result.status });
-}
 
 async function readJson<T extends Record<string, unknown>>(request: Request): Promise<T> {
   return (await request.json()) as T;

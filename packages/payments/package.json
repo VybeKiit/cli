@@ -37,6 +37,7 @@
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
     "@paypal/paypal-server-sdk": "^2.4.0",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/http": "workspace:*",
     "stripe": "^22.3.0",
     "zod": "^3.24.1"
   },

@@ -1,4 +1,5 @@
 import type { Result } from '@vybekiit/core';
+import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/http';
 import { isPaymentsUnconfigured } from '../practice';
 import { resolvePaymentProvider } from '../resolve';
 import type { OrderEvent } from '../types';
@@ -11,8 +12,15 @@ export interface CheckoutBody {
 
 export interface CheckoutHttpDeps {
   env?: Record<string, string | undefined>;
+  /** Server origin (API base). Used for real provider success URLs. */
   appUrl?: string | undefined;
+  /** Buyer-facing origin for practice checkout redirects (SPA/web). */
+  frontendUrl?: string | undefined;
   requestOrigin?: string | null;
+}
+
+export interface PracticeCompleteHttpDeps {
+  fulfillOrder: (event: OrderEvent) => Promise<Result<true>>;
 }
 
 export interface WebhookHttpDeps {
@@ -20,10 +28,9 @@ export interface WebhookHttpDeps {
   env?: Record<string, string | undefined>;
 }
 
-export interface PaymentsHttpResponse {
-  status: number;
-  body: unknown;
-}
+export type PaymentsHttpResponse = HttpResponse<
+  { readonly url: string } | { readonly ok: true; readonly orderId?: string }
+>;
 
 /** Start a purchase — provider-agnostic checkout handler shared by Next and Express. */
 export async function handleCheckout(
@@ -32,14 +39,14 @@ export async function handleCheckout(
 ): Promise<PaymentsHttpResponse> {
   const { productId, githubUsername, email } = body;
   if (!productId) {
-    return { status: 400, body: { error: 'productId is required.' } };
+    return badInput('productId is required.');
   }
 
   const env = deps.env ?? process.env;
   if (isPaymentsUnconfigured(env)) {
-    const base = deps.appUrl ?? deps.requestOrigin ?? 'http://localhost:3000';
+    const base = deps.frontendUrl ?? deps.requestOrigin ?? deps.appUrl ?? 'http://localhost:3000';
     const url = `${base}/checkout/practice?productId=${encodeURIComponent(productId)}`;
-    return { status: 200, body: { url } };
+    return ok({ url });
   }
 
   const result = await resolvePaymentProvider(env).createCheckout({
@@ -50,9 +57,9 @@ export async function handleCheckout(
   });
 
   if (!result.ok) {
-    return { status: 502, body: { error: result.error.message } };
+    return upstreamFailed(result.error.message);
   }
-  return { status: 200, body: { url: result.value.url } };
+  return ok({ url: result.value.url });
 }
 
 /** Verify a provider webhook and run fulfillment. */
@@ -63,14 +70,40 @@ export async function handleWebhook(
 ): Promise<PaymentsHttpResponse> {
   const event = await resolvePaymentProvider(deps.env).parseWebhook(rawBody, headers);
   if (!event.ok) {
-    return { status: 400, body: { error: event.error.message } };
+    return badInput(event.error.message);
   }
 
   const fulfilled = await deps.fulfillOrder(event.value);
   if (!fulfilled.ok) {
-    return { status: 502, body: { error: fulfilled.error.message } };
+    return upstreamFailed(fulfilled.error.message);
   }
-  return { status: 200, body: { ok: true } };
+  return ok({ ok: true });
+}
+
+/** Complete a practice-mode checkout — simulates provider success + fulfillment. */
+export async function handlePracticeComplete(
+  body: { productId?: string },
+  deps: PracticeCompleteHttpDeps,
+): Promise<PaymentsHttpResponse> {
+  const { productId } = body;
+  if (!productId) {
+    return badInput('productId is required.');
+  }
+
+  const orderId = `practice_${productId}_${Date.now()}`;
+  const result = await deps.fulfillOrder({
+    provider: 'lemon-squeezy',
+    eventName: 'practice_checkout_completed',
+    orderId,
+    customerEmail: 'practice@example.com',
+    githubUsername: null,
+    isRefund: false,
+  });
+
+  if (!result.ok) {
+    return upstreamFailed(result.error.message);
+  }
+  return ok({ ok: true, orderId });
 }
 
 /** Read a raw webhook body from Express when `express.raw()` is mounted. */

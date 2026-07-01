@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handleCheckout, readWebhookRawBody } from '../src/http/handlers';
+import { handleCheckout, handlePracticeComplete, readWebhookRawBody } from '../src/http/handlers';
 import { isPaymentsUnconfigured } from '../src/practice';
 
 describe('isPaymentsUnconfigured', () => {
@@ -24,9 +24,45 @@ describe('handleCheckout', () => {
     });
   });
 
+  it('prefers frontendUrl for practice redirect', async () => {
+    const result = await handleCheckout(
+      { productId: 'plan_pro' },
+      {
+        env: {},
+        appUrl: 'http://localhost:4000',
+        frontendUrl: 'http://localhost:5173',
+        requestOrigin: null,
+      },
+    );
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual({
+      url: 'http://localhost:5173/checkout/practice?productId=plan_pro',
+    });
+  });
+
   it('requires productId', async () => {
     const result = await handleCheckout({}, {});
     expect(result.status).toBe(400);
+    expect(result.body).toEqual({
+      code: 'bad_input',
+      error: 'productId is required.',
+    });
+  });
+});
+
+describe('handlePracticeComplete', () => {
+  it('fulfills a practice order', async () => {
+    const result = await handlePracticeComplete(
+      { productId: 'plan_pro' },
+      {
+        fulfillOrder: async () => ({ ok: true, value: true }),
+      },
+    );
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+    if ('orderId' in result.body) {
+      expect(result.body.orderId).toMatch(/^practice_plan_pro_/);
+    }
   });
 });
 

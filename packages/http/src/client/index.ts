@@ -1,7 +1,9 @@
 import { type Result, fail, ok } from '@vybekiit/core';
+import { HTTP_OUTCOMES, type HttpOutcomeCode } from '../outcomes';
 
 /** Shape we opportunistically read an error message from on a non-2xx body. */
 interface ErrorBody {
+  readonly code?: string;
   readonly error?: string;
   readonly message?: string;
 }
@@ -12,18 +14,36 @@ export interface JsonClientOptions {
   readonly fetch?: typeof fetch;
 }
 
-async function readErrorMessage(response: Response): Promise<string> {
+const OUTCOME_CODES = new Set<string>(Object.keys(HTTP_OUTCOMES));
+
+function isHttpOutcomeCode(code: string): code is HttpOutcomeCode {
+  return OUTCOME_CODES.has(code);
+}
+
+function outcomeCodeFromStatus(status: number): HttpOutcomeCode {
+  for (const [code, mappedStatus] of Object.entries(HTTP_OUTCOMES)) {
+    if (mappedStatus === status) return code as HttpOutcomeCode;
+  }
+  return 'server_error';
+}
+
+async function readErrorResult(response: Response): Promise<Result<never>> {
   try {
     const body = (await response.json()) as ErrorBody;
-    return body.error ?? body.message ?? `Request failed (${response.status}).`;
+    const message = body.error ?? body.message ?? `Request failed (${response.status}).`;
+    const code =
+      body.code && isHttpOutcomeCode(body.code)
+        ? body.code
+        : outcomeCodeFromStatus(response.status);
+    return fail(code, message);
   } catch {
-    return `Request failed (${response.status}).`;
+    return fail(outcomeCodeFromStatus(response.status), `Request failed (${response.status}).`);
   }
 }
 
 async function toResult<T>(response: Response): Promise<Result<T>> {
   if (!response.ok) {
-    return fail('http_error', await readErrorMessage(response));
+    return readErrorResult(response);
   }
   return ok((await response.json()) as T);
 }
