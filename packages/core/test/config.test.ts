@@ -3,6 +3,8 @@ import {
   appConfigSchema,
   googleOAuthConfigSchema,
   lemonSqueezyConfigSchema,
+  namecheapConfigSchema,
+  godaddyConfigSchema,
   parseEnv,
   securityConfigSchema,
 } from '../src/config';
@@ -78,6 +80,30 @@ describe('googleOAuthConfigSchema', () => {
     expect(() =>
       parseEnv(googleOAuthConfigSchema, { GOOGLE_OAUTH_REDIRECT_URI: 'not-a-url' }),
     ).toThrowError(/GOOGLE_OAUTH_REDIRECT_URI/);
+  });
+});
+
+describe('namecheapConfigSchema', () => {
+  it('allows all Namecheap vars to be absent', () => {
+    expect(parseEnv(namecheapConfigSchema, {})).toEqual({});
+  });
+
+  it('requires all core keys when any Namecheap var is set', () => {
+    expect(() => parseEnv(namecheapConfigSchema, { NAMECHEAP_API_USER: 'user' })).toThrowError(
+      /NAMECHEAP_API_KEY/,
+    );
+  });
+});
+
+describe('godaddyConfigSchema', () => {
+  it('allows all GoDaddy vars to be absent', () => {
+    expect(parseEnv(godaddyConfigSchema, {})).toEqual({});
+  });
+
+  it('requires both keys when any GoDaddy var is set', () => {
+    expect(() => parseEnv(godaddyConfigSchema, { GODADDY_API_KEY: 'key' })).toThrowError(
+      /GODADDY_API_SECRET/,
+    );
   });
 });
 

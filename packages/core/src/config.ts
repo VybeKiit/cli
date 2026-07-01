@@ -106,6 +106,10 @@ export const lemonSqueezyConfigSchema = z.object({
   LEMONSQUEEZY_API_KEY: z.string().min(1, 'LEMONSQUEEZY_API_KEY is required'),
   LEMONSQUEEZY_STORE_ID: z.string().min(1, 'LEMONSQUEEZY_STORE_ID is required'),
   LEMONSQUEEZY_WEBHOOK_SECRET: z.string().min(1, 'LEMONSQUEEZY_WEBHOOK_SECRET is required'),
+  LEMONSQUEEZY_TEST_MODE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
 });
 
 /** Stripe credentials — used by `@vybekiit/payments` (stripe adapter). */
@@ -349,6 +353,87 @@ export const cloudflareConfigSchema = z.object({
 });
 
 /**
+ * Cloudflare email worker credentials — used by `@vybekiit/email` (cloudflare adapter).
+ * Separate from deploy creds so sending does not require a full CF API token at runtime.
+ */
+export const cloudflareEmailConfigSchema = z.object({
+  EMAIL_WORKER_SECRET: z.string().min(1, 'EMAIL_WORKER_SECRET is required'),
+  CLOUDFLARE_EMAIL_ENDPOINT: z.string().url('CLOUDFLARE_EMAIL_ENDPOINT must be a valid URL'),
+  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_FROM_NAME: z.string().min(1).optional(),
+});
+
+/**
+ * Namecheap registrar API — optional; used by `@vybekiit/deploy` and `vybekiit doctor`
+ * to automate nameserver delegation when a domain is registered at Namecheap.
+ * All three core keys must be set together when any is present.
+ */
+export const namecheapConfigSchema = z
+  .object({
+    NAMECHEAP_API_USER: z.string().min(1).optional(),
+    NAMECHEAP_API_KEY: z.string().min(1).optional(),
+    NAMECHEAP_CLIENT_IP: z.string().min(1).optional(),
+    NAMECHEAP_USERNAME: z.string().min(1).optional(),
+    NAMECHEAP_SANDBOX: z
+      .enum(['0', '1', 'true', 'false', ''])
+      .optional()
+      .transform((raw) => {
+        if (raw === undefined || raw === '') return;
+        return raw === '1' || raw === 'true';
+      }),
+  })
+  .superRefine((value, ctx) => {
+    const required = ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY', 'NAMECHEAP_CLIENT_IP'] as const;
+    const present = required.filter((key) => Boolean(value[key]));
+    if (present.length === 0 || present.length === required.length) {
+      return;
+    }
+    for (const key of required) {
+      if (!value[key]) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${key} is required when any Namecheap env var is set`,
+          path: [key],
+        });
+      }
+    }
+  });
+
+/**
+ * GoDaddy registrar API — optional; used by `@vybekiit/deploy` and `vybekiit doctor`
+ * to automate nameserver delegation when a domain is registered at GoDaddy.
+ * Both core keys must be set together when any is present.
+ */
+export const godaddyConfigSchema = z
+  .object({
+    GODADDY_API_KEY: z.string().min(1).optional(),
+    GODADDY_API_SECRET: z.string().min(1).optional(),
+    GODADDY_OTE: z
+      .enum(['0', '1', 'true', 'false', ''])
+      .optional()
+      .transform((raw) => {
+        if (raw === undefined || raw === '') return;
+        return raw === '1' || raw === 'true';
+      }),
+  })
+  .superRefine((value, ctx) => {
+    const required = ['GODADDY_API_KEY', 'GODADDY_API_SECRET'] as const;
+    const present = required.filter((key) => Boolean(value[key]));
+    if (present.length === 0 || present.length === required.length) {
+      return;
+    }
+    for (const key of required) {
+      if (!value[key]) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${key} is required when any GoDaddy env var is set`,
+          path: [key],
+        });
+      }
+    }
+  });
+
+/**
  * Vercel credentials — used by `@vybekiit/deploy` (vercel adapter, ADR-0006).
  *
  * `VERCEL_TOKEN` is a personal/team token from the Vercel dashboard (Settings → Tokens).
@@ -570,6 +655,9 @@ export type FirebaseConfig = z.infer<typeof firebaseConfigSchema>;
 export type BetterAuthConfig = z.infer<typeof betterAuthConfigSchema>;
 export type CognitoConfig = z.infer<typeof cognitoConfigSchema>;
 export type CloudflareConfig = z.infer<typeof cloudflareConfigSchema>;
+export type CloudflareEmailConfig = z.infer<typeof cloudflareEmailConfigSchema>;
+export type NamecheapConfig = z.infer<typeof namecheapConfigSchema>;
+export type GodaddyConfig = z.infer<typeof godaddyConfigSchema>;
 export type VercelConfig = z.infer<typeof vercelConfigSchema>;
 export type GithubGateConfig = z.infer<typeof githubGateConfigSchema>;
 export type StoreConfig = z.infer<typeof storeConfigSchema>;
