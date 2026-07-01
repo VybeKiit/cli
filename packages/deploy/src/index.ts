@@ -25,3 +25,18 @@ export {
   type RailwayRunner,
 } from './providers/railway/index';
 export { createAwsHosting, type AmplifyRunner } from './providers/aws/index';
+export {
+  getOrCreateZone,
+  type CloudflareZone,
+} from './cloudflare/zones';
+export {
+  NamecheapError,
+  parseNamecheapDomain,
+  verifyNamecheapCredentials,
+  setCustomNameservers,
+} from './registrar/namecheap';
+export {
+  GodaddyError,
+  verifyGodaddyCredentials,
+  setGodaddyNameservers,
+} from './registrar/godaddy';
