@@ -39,8 +39,10 @@ const REPO_ROOT = new URL('..', import.meta.url).pathname;
  */
 const MIRRORS = [
   { repo: 'web', path: 'templates/web' },
+  { repo: 'spa', path: 'templates/spa' },
   { repo: 'mobile', path: 'templates/mobile' },
   { repo: 'extension', path: 'templates/extension' },
+  { repo: 'backend', path: 'templates/backend' },
   { repo: 'cli', path: 'cli' },
   { repo: 'infra', path: 'infra' },
 ];

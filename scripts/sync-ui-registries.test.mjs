@@ -57,4 +57,37 @@ describe('sync-ui-registries', () => {
     expect(tags).toContain('pricing');
     expect(tags).toContain('shadcn');
   });
+
+  it('filters ai-elements components and examples', () => {
+    expect(
+      passesRegistryFilter({ type: 'registry:component', name: 'message' }, 'ai-elements'),
+    ).toBe(true);
+    expect(
+      passesRegistryFilter({ type: 'registry:block', name: 'example-chatbot' }, 'ai-elements'),
+    ).toBe(true);
+    expect(passesRegistryFilter({ type: 'registry:block', name: 'workflow' }, 'ai-elements')).toBe(
+      false,
+    );
+  });
+
+  it('resolves kibo and ai-elements paths', () => {
+    const kibo = resolveTargetPath(
+      '/tmp/web',
+      'kibo',
+      { path: 'index.tsx', target: 'components/kibo-ui/kanban/index.tsx' },
+      'kanban',
+    );
+    expect(kibo).toContain('src/components/kibo/kanban/index.tsx');
+
+    const ai = resolveTargetPath(
+      '/tmp/web',
+      'ai-elements',
+      {
+        path: 'registry/default/ai-elements/message.tsx',
+        target: 'components/ai-elements/message.tsx.tsx',
+      },
+      'message',
+    );
+    expect(ai).toContain('src/components/ai-elements/message.tsx');
+  });
 });

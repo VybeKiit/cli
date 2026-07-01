@@ -32,6 +32,9 @@ describe('renderFailureVocabularyTable', () => {
   it('covers doctor-adjacent failure terms', () => {
     const table = renderFailureVocabularyTable();
     expect(table).toContain("| not working / broken | something broke — I'll figure it out |");
+    expect(table).toContain(
+      "| 401 / unauthorized / not signed in | you'll need to sign in first — I'll walk you through it |",
+    );
     expect(table.split('\n')).toHaveLength(FAILURE_VOCABULARY.length + 2);
   });
 });

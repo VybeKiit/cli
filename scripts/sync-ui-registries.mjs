@@ -34,7 +34,21 @@ const WEB_ONLY_DEPS = new Set([
   '@number-flow/react',
 ]);
 
-/** @typedef {{ type: string, namespace: string, tags?: string[], discover?: boolean, filter?: string, registryIndex?: string, itemUrlTemplate?: string, urls?: string[], requiresAuth?: boolean, repo?: string, branch?: string, paths?: string[] }} SourceConfig */
+const SHADCN_PRIMITIVE_URL = 'https://ui.shadcn.com/r/styles/new-york/{name}.json';
+const WEB_PACKAGE_JSON = join(REPO_ROOT, 'templates/web/package.json');
+
+/** Catalog sources used for exact-name dedup when syncing new libraries. */
+const LEGACY_DEDUP_SOURCES = new Set([
+  'bundui',
+  'magicui',
+  'kokonutui',
+  'aceternity',
+  'untitled',
+  'gluestack',
+  '21st',
+]);
+
+/** @typedef {{ type: string, namespace: string, tags?: string[], discover?: boolean, filter?: string, registryIndex?: string, itemUrlTemplate?: string, urls?: string[], requiresAuth?: boolean, repo?: string, branch?: string, paths?: string[], skipNames?: string[] }} SourceConfig */
 
 /**
  * @param {string} url
@@ -65,20 +79,38 @@ function passesRegistryFilter(item, filter) {
   if (filter === 'ui-only') {
     return item.type === 'registry:ui' || item.type === 'registry:component';
   }
+  if (filter === 'magicui') {
+    return item.type === 'registry:ui' || item.type === 'registry:example';
+  }
+  if (filter === 'aceternity') {
+    return item.type === 'registry:ui' || item.type === 'registry:block';
+  }
+  if (filter === 'ai-elements') {
+    const name = String(item.name ?? '');
+    if (item.type === 'registry:component') {
+      return true;
+    }
+    if (item.type === 'registry:block' && name.startsWith('example-')) {
+      return true;
+    }
+    return false;
+  }
   return true;
 }
 
 /**
  * @param {SourceConfig} source
+ * @param {Set<string>} skipNames
  * @returns {Promise<string[]>}
  */
-async function discoverRegistryItems(source) {
+async function discoverRegistryItems(source, skipNames) {
   /** @type {{ items?: Array<Record<string, unknown>> }} */
   const registry = await fetchJson(source.registryIndex);
   return (registry.items ?? [])
     .filter((item) => typeof item.name === 'string')
     .filter((item) => passesRegistryFilter(item, source.filter ?? 'all'))
-    .map((item) => String(item.name));
+    .map((item) => String(item.name))
+    .filter((name) => !skipNames.has(name));
 }
 
 /**
@@ -107,10 +139,26 @@ function namespaceIsUntitledArtifact(filePath) {
  * @param {{ path?: string, target?: string }} file
  * @param {string} itemName
  */
+function normalizeRegistryTarget(target, namespace) {
+  if (!target) {
+    return null;
+  }
+  let rel = target.replace(/^components\//, '');
+  if (namespace === 'ai-elements') {
+    rel = rel.replace(/^ai-elements\//, '');
+    rel = rel.replace(/\.tsx\.tsx$/, '.tsx');
+  }
+  if (namespace === 'kibo') {
+    rel = rel.replace(/^kibo-ui\//, '');
+  }
+  return rel;
+}
+
 function resolveTargetPath(templateRoot, namespace, file, itemName) {
   const filePath = file.path ?? '';
+  const fromTarget = normalizeRegistryTarget(file.target, namespace);
   const rel =
-    file.target?.replace(/^components\//, '') ??
+    fromTarget ??
     (filePath.includes('registry/magicui/')
       ? filePath.replace(/^registry\/magicui\//, '')
       : null) ??
@@ -118,12 +166,21 @@ function resolveTargetPath(templateRoot, namespace, file, itemName) {
     (filePath.startsWith('components/kokonutui/')
       ? filePath.replace(/^components\/kokonutui\//, '')
       : null) ??
+    (filePath.includes('registry/default/ai-elements/')
+      ? filePath.replace(/^registry\/default\/ai-elements\//, '')
+      : null) ??
+    (filePath.includes('registry/default/examples/') ? `examples/${basename(filePath)}` : null) ??
+    (filePath.includes('registry/example/') ? `${itemName}.tsx` : null) ??
+    (namespace === 'aceternity' && filePath.startsWith('components/')
+      ? basename(filePath)
+      : null) ??
     (filePath.includes('/hooks/') && namespace === 'kokonutui'
       ? `../hooks/mirror/kokonutui/${basename(filePath)}`
       : null) ??
     (filePath.includes('/icons/') && namespace === 'kokonutui'
       ? `icons/${basename(filePath)}`
       : null) ??
+    (namespace === 'kibo' && filePath === 'index.tsx' ? `${itemName}/index.tsx` : null) ??
     `${itemName}.tsx`;
 
   if (rel.startsWith('../hooks/mirror/')) {
@@ -140,6 +197,16 @@ function resolveTargetPath(templateRoot, namespace, file, itemName) {
  * @param {Record<string, unknown>} item
  * @param {boolean} dryRun
  */
+/**
+ * @param {string} content
+ */
+function normalizeMirroredContent(content) {
+  return content
+    .replace(/@\/registry\/magicui\//g, '@/components/magicui/')
+    .replace(/@\/registry\/default\/ui\//g, '@/components/ui/')
+    .replace(/@\/registry\/new-york\/ui\//g, '@/components/ui/');
+}
+
 async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
   const files = item.files ?? [];
   const itemName = String(item.name ?? 'component');
@@ -152,13 +219,188 @@ async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
       continue;
     }
     const target = resolveTargetPath(templateRoot, namespace, file, itemName);
+    const content = normalizeMirroredContent(String(file.content));
     if (!dryRun) {
       await mkdir(dirname(target), { recursive: true });
-      await writeFile(target, file.content, 'utf8');
+      await writeFile(target, content, 'utf8');
     }
     written.push(relative(templateRoot, target));
   }
   return written;
+}
+
+/**
+ * @param {string} dep
+ */
+function isShadcnPrimitiveName(dep) {
+  return /^[a-z][a-z0-9-]*$/.test(dep);
+}
+
+/**
+ * @param {string} templateRoot
+ * @param {string} primitiveName
+ * @param {boolean} dryRun
+ * @param {Set<string>} installed
+ */
+async function installShadcnPrimitive(templateRoot, primitiveName, dryRun, installed) {
+  if (!isShadcnPrimitiveName(primitiveName) || installed.has(primitiveName)) {
+    return;
+  }
+  const uiDir = join(templateRoot, 'src/components/ui');
+  const candidates = [
+    join(uiDir, `${primitiveName}.tsx`),
+    join(uiDir, `${primitiveName}/index.tsx`),
+  ];
+  for (const candidate of candidates) {
+    try {
+      const st = await stat(candidate);
+      if (st.isFile()) {
+        installed.add(primitiveName);
+        return;
+      }
+    } catch {
+      // not installed yet
+    }
+  }
+
+  installed.add(primitiveName);
+  const url = SHADCN_PRIMITIVE_URL.replace('{name}', primitiveName);
+  try {
+    /** @type {Record<string, unknown>} */
+    const item = await fetchJson(url);
+    const files = item.files ?? [];
+    for (const file of files) {
+      if (!file.content) {
+        continue;
+      }
+      const fromTarget = file.target?.replace(/^components\/ui\//, '');
+      const rel =
+        (fromTarget && fromTarget.length > 0 ? fromTarget : null) ??
+        file.path?.replace(/^ui\//, '') ??
+        file.path?.replace(/^registry\/new-york\/ui\//, '') ??
+        `${primitiveName}.tsx`;
+      if (!(rel && rel.endsWith('.tsx'))) {
+        continue;
+      }
+      const target = join(uiDir, basename(rel));
+      if (!dryRun) {
+        await mkdir(dirname(target), { recursive: true });
+        await writeFile(target, file.content, 'utf8');
+      }
+    }
+    await ensureRegistryDependencies(
+      templateRoot,
+      item.registryDependencies ?? [],
+      dryRun,
+      installed,
+    );
+  } catch (error) {
+    console.warn(`[ui] skip primitive ${primitiveName}: ${error.message}`);
+  }
+}
+
+/**
+ * @param {string} templateRoot
+ * @param {string[]} registryDeps
+ * @param {boolean} dryRun
+ * @param {Set<string>} installed
+ */
+async function ensureRegistryDependencies(templateRoot, registryDeps, dryRun, installed) {
+  for (const dep of registryDeps ?? []) {
+    const name = String(dep);
+    if (!isShadcnPrimitiveName(name)) {
+      continue;
+    }
+    await installShadcnPrimitive(templateRoot, name, dryRun, installed);
+  }
+}
+
+/**
+ * @param {string} name
+ * @param {string} namespace
+ * @param {Record<string, unknown>} item
+ * @param {Set<string>} catalogNames
+ */
+function inferKind(name, namespace, item, catalogNames) {
+  if (name.startsWith('example-')) {
+    return 'example';
+  }
+  if (namespace === 'magicui' && (item.type === 'registry:example' || /-demo(-\d+)?$/.test(name))) {
+    return 'example';
+  }
+  if (namespace === 'aceternity' && item.type === 'registry:block') {
+    return 'example';
+  }
+  if (namespace === 'bundui') {
+    const dash = name.indexOf('-');
+    if (dash > 0) {
+      const base = name.slice(0, dash);
+      if (catalogNames.has(base)) {
+        return 'example';
+      }
+    }
+  }
+  return 'component';
+}
+
+/**
+ * @param {string} depSpec
+ */
+function parsePackageName(depSpec) {
+  if (!depSpec || typeof depSpec !== 'string') {
+    return null;
+  }
+  if (depSpec.startsWith('@')) {
+    const versionAt = depSpec.lastIndexOf('@');
+    if (versionAt > 0) {
+      return depSpec.slice(0, versionAt);
+    }
+    return depSpec;
+  }
+  const versionAt = depSpec.indexOf('@');
+  return versionAt > 0 ? depSpec.slice(0, versionAt) : depSpec;
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} catalog
+ * @param {boolean} dryRun
+ */
+async function collectNpmDependencies(catalog, dryRun) {
+  /** @type {Set<string>} */
+  const deps = new Set();
+  for (const entry of catalog) {
+    for (const dep of entry.dependencies ?? []) {
+      if (typeof dep === 'string' && !dep.startsWith('@/')) {
+        deps.add(parsePackageName(dep));
+      }
+    }
+  }
+  if (deps.size === 0 || dryRun) {
+    return;
+  }
+
+  const pkg = JSON.parse(await readFile(WEB_PACKAGE_JSON, 'utf8'));
+  pkg.dependencies ??= {};
+  let changed = false;
+  for (const dep of deps) {
+    if (!(dep && /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/i.test(dep))) {
+      continue;
+    }
+    if (!pkg.dependencies[dep]) {
+      pkg.dependencies[dep] = 'latest';
+      changed = true;
+    }
+  }
+  if (changed) {
+    const sorted = Object.keys(pkg.dependencies).sort();
+    const nextDeps = {};
+    for (const key of sorted) {
+      nextDeps[key] = pkg.dependencies[key];
+    }
+    pkg.dependencies = nextDeps;
+    await writeFile(WEB_PACKAGE_JSON, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
+    console.log(`\nMerged ${deps.size} mirrored npm dependencies into templates/web/package.json`);
+  }
 }
 
 /**
@@ -167,15 +409,27 @@ async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
  * @param {SourceConfig} source
  * @param {{ dryRun: boolean, limit?: number }} opts
  */
-async function syncShadcnRegistrySource(templateRoot, sourceId, source, opts) {
-  const names = source.discover ? await discoverRegistryItems(source) : (source.items ?? []);
+async function syncShadcnRegistrySource(templateRoot, sourceId, source, opts, skipNames) {
+  const names = source.discover
+    ? await discoverRegistryItems(source, skipNames)
+    : (source.items ?? []).filter((name) => !skipNames.has(name));
   const slice = opts.limit ? names.slice(0, opts.limit) : names;
+  /** @type {Set<string>} */
+  const catalogNames = new Set(slice);
   const results = [];
+  /** @type {Set<string>} */
+  const installedPrimitives = new Set();
 
   for (const name of slice) {
     const url = source.itemUrlTemplate.replace('{name}', name);
     try {
       const item = await fetchJson(url);
+      await ensureRegistryDependencies(
+        templateRoot,
+        item.registryDependencies ?? [],
+        opts.dryRun,
+        installedPrimitives,
+      );
       const paths = await writeShadcnRegistryItem(
         templateRoot,
         source.namespace,
@@ -185,12 +439,14 @@ async function syncShadcnRegistrySource(templateRoot, sourceId, source, opts) {
       if (paths.length > 0) {
         results.push({
           source: sourceId,
+          namespace: source.namespace,
           name,
           paths,
           dependencies: item.dependencies ?? [],
           tags: inferTags(name, item, source.tags ?? []),
           portable: isPortable(item.dependencies ?? []),
           category: inferCategory(name, item),
+          kind: inferKind(name, source.namespace, item, catalogNames),
         });
       }
     } catch (error) {
@@ -464,6 +720,8 @@ async function writeLockFile(templateRoot, catalog, dryRun) {
     'untitled',
     'gluestack',
     'blocks/21st',
+    'ai-elements',
+    'kibo',
   ];
   /** @type {Record<string, Array<{ path: string, sha256: string }>>} */
   const files = {};
@@ -652,6 +910,24 @@ async function removeBunduiOrphans(templateRoot, dryRun) {
   }
 }
 
+function buildSkipNames(existingCatalog, source) {
+  /** @type {Set<string>} */
+  const skip = new Set(source.skipNames ?? []);
+  for (const entry of existingCatalog) {
+    const entrySource = String(entry.source ?? '');
+    if (entrySource === source.namespace) {
+      continue;
+    }
+    if (!LEGACY_DEDUP_SOURCES.has(entrySource)) {
+      continue;
+    }
+    if (typeof entry.name === 'string') {
+      skip.add(entry.name);
+    }
+  }
+  return skip;
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const manifest = JSON.parse(await readFile(MANIFEST_PATH, 'utf8'));
@@ -665,16 +941,14 @@ async function main() {
   );
 
   const sourceIds = sourceEntries.map(([id]) => id);
-  const existingCatalog =
-    sourceIds.length > 0 && sourceIds.length < Object.keys(manifest.sources).length
-      ? await loadExistingCatalog(templateRoot)
-      : [];
+  const existingCatalog = await loadExistingCatalog(templateRoot);
 
   for (const [sourceId, source] of sourceEntries) {
     console.log(`\n==> Syncing ${sourceId} (${source.type})`);
     let results = [];
     if (source.type === 'shadcn-registry') {
-      results = await syncShadcnRegistrySource(templateRoot, sourceId, source, opts);
+      const skipNames = buildSkipNames(existingCatalog, source);
+      results = await syncShadcnRegistrySource(templateRoot, sourceId, source, opts, skipNames);
     } else if (source.type === 'shadcn-url') {
       results = await syncShadcnUrlSource(templateRoot, sourceId, source, opts);
     } else if (source.type === '21st-registry') {
@@ -696,6 +970,7 @@ async function main() {
 
   await writeCatalogIndexes(templateRoot, catalog, opts.dryRun);
   await writeLockFile(templateRoot, catalog, opts.dryRun);
+  await collectNpmDependencies(catalog, opts.dryRun);
 
   if (!opts.dryRun) {
     try {
@@ -704,6 +979,7 @@ async function main() {
       const exec = promisify(execFile);
       await exec('node', ['scripts/audit-mirror-deps.mjs'], { cwd: REPO_ROOT });
       await exec('node', ['scripts/build-saas-showcase-manifest.mjs'], { cwd: REPO_ROOT });
+      await exec('node', ['scripts/build-component-library-index.mjs'], { cwd: REPO_ROOT });
     } catch (error) {
       console.warn(`Post-sync hook warning: ${error.message}`);
     }
@@ -725,7 +1001,9 @@ if (isDirectRun) {
 
 export {
   discoverRegistryItems,
+  ensureRegistryDependencies,
   inferCategory,
+  inferKind,
   inferTags,
   isPortable,
   passesRegistryFilter,

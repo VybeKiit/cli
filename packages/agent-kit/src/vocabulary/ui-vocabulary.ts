@@ -97,6 +97,56 @@ export const FAILURE_VOCABULARY: readonly UiVocabularyEntry[] = [
     say: "I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment.",
     why: 'never say MCP; run vybekiit doc-fallback then follow official docs',
   },
+  {
+    jargon: '400 / bad input / bad request',
+    say: "something's missing or mistyped — I'll fix the form or the data we're sending",
+    why: 'client-side fix framing without HTTP jargon',
+  },
+  {
+    jargon: '401 / unauthorized / not signed in',
+    say: "you'll need to sign in first — I'll walk you through it",
+    why: 'routes to add-signin without status codes',
+  },
+  {
+    jargon: '403 / forbidden',
+    say: "that action isn't allowed from here — I'll fix the setup",
+    why: 'origin or permission block in plain words',
+  },
+  {
+    jargon: '404 / not found',
+    say: "I couldn't find that — I'll check the link or data",
+    why: 'missing resource without HTTP jargon',
+  },
+  {
+    jargon: '409 / conflict',
+    say: "that already exists — I'll adjust what we're saving",
+    why: 'duplicate or version clash',
+  },
+  {
+    jargon: '422 / validation error',
+    say: "something in the form needs a quick fix — I'll point at it",
+    why: 'field-level validation without schema jargon',
+  },
+  {
+    jargon: '429 / too many requests / rate limit',
+    say: "too many tries too fast — wait a moment and I'll retry",
+    why: 'rate limit without Retry-After jargon',
+  },
+  {
+    jargon: '500 / server error',
+    say: "something went wrong on our side — I'll fix it and try again",
+    why: 'server fault without stack traces',
+  },
+  {
+    jargon: '502 / upstream failed',
+    say: "the payment service hiccuped — I'll retry or switch to practice mode",
+    why: 'provider outage with a next step',
+  },
+  {
+    jargon: '503 / service unavailable',
+    say: "that service is briefly down — I'll retry in a moment",
+    why: 'temporary outage without availability jargon',
+  },
 ];
 
 /** Engineering internals the builder must never hear. */

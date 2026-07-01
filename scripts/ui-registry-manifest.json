@@ -18,7 +18,7 @@
       "itemUrlTemplate": "https://magicui.design/r/{name}.json",
       "namespace": "magicui",
       "discover": true,
-      "filter": "ui-only",
+      "filter": "magicui",
       "tags": ["animated", "marketing", "hero", "bento"]
     },
     "kokonutui": {
@@ -36,7 +36,7 @@
       "itemUrlTemplate": "https://ui.aceternity.com/registry/{name}.json",
       "namespace": "aceternity",
       "discover": true,
-      "filter": "ui-only",
+      "filter": "aceternity",
       "tags": ["animated", "background", "hero", "motion"]
     },
     "21st": {
@@ -97,6 +97,26 @@
       ],
       "namespace": "gluestack",
       "tags": ["cross-platform", "patterns"]
+    },
+    "ai-elements": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://elements.ai-sdk.dev/api/registry/registry.json",
+      "itemUrlTemplate": "https://elements.ai-sdk.dev/api/registry/{name}.json",
+      "namespace": "ai-elements",
+      "discover": true,
+      "filter": "ai-elements",
+      "skipNames": ["terminal", "toolbar"],
+      "tags": ["ai", "chat", "agent", "streaming"]
+    },
+    "kibo": {
+      "type": "shadcn-registry",
+      "registryIndex": "https://www.kibo-ui.com/r/registry.json",
+      "itemUrlTemplate": "https://www.kibo-ui.com/r/{name}.json",
+      "namespace": "kibo",
+      "discover": true,
+      "filter": "ui-only",
+      "skipNames": ["calendar", "code-block", "combobox", "marquee", "table", "tags"],
+      "tags": ["application", "admin", "data-display", "editor"]
     }
   }
 }
