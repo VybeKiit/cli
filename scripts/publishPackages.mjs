@@ -6,9 +6,13 @@
  * Usage: pnpm publish:packages [--dry-run]
  */
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import process from 'node:process';
 
-const PACKAGES = [
+// Folder names under packages/ (camelCase). The published @vybekiit/* name is read
+// from each package.json, so the directory and the npm name can differ (e.g. the
+// folder `agentKit` publishes as `@vybekiit/agent-kit`).
+const PACKAGE_DIRS = [
   'core',
   'payments',
   'auth',
@@ -19,11 +23,11 @@ const PACKAGES = [
   'observability',
   'security',
   'assets',
-  'agent-kit',
-  'client-state',
+  'agentKit',
+  'clientState',
   'http',
-  'browser-automation',
-  'report-mode',
+  'browserAutomation',
+  'reportMode',
   'i18n',
   'seo',
   'compliance',
@@ -36,21 +40,22 @@ const PACKAGES = [
   'tenancy',
   'ai',
   'cms',
-  'ui-catalog-mcp',
+  'uiCatalogMcp',
 ];
 
 const dryRun = process.argv.includes('--dry-run');
 
-for (const name of PACKAGES) {
-  const dir = `packages/${name}`;
-  console.log(`Publishing @vybekiit/${name}...`);
+for (const dir of PACKAGE_DIRS) {
+  const cwd = `packages/${dir}`;
+  const { name } = JSON.parse(readFileSync(`${cwd}/package.json`, 'utf8'));
+  console.log(`Publishing ${name}...`);
   const result = spawnSync(
     'pnpm',
     ['publish', '--access', 'public', '--no-git-checks', ...(dryRun ? ['--dry-run'] : [])],
-    { cwd: dir, stdio: 'inherit', env: process.env },
+    { cwd, stdio: 'inherit', env: process.env },
   );
   if (result.status !== 0) {
-    console.error(`Failed to publish @vybekiit/${name}`);
+    console.error(`Failed to publish ${name}`);
     process.exit(1);
   }
 }

@@ -3,7 +3,7 @@
  * Sync UI component mirrors from upstream registries into templates/web.
  *
  * Usage:
- *   node scripts/sync-ui-registries.mjs [--source bundui] [--dry-run] [--limit 10]
+ *   node scripts/syncUiRegistries.mjs [--source bundui] [--dry-run] [--limit 10]
  *
  * Writes:
  *   - templates/web/src/components/{namespace}/
@@ -977,9 +977,9 @@ async function main() {
       const { execFile } = await import('node:child_process');
       const { promisify } = await import('node:util');
       const exec = promisify(execFile);
-      await exec('node', ['scripts/audit-mirror-deps.mjs'], { cwd: REPO_ROOT });
-      await exec('node', ['scripts/build-saas-showcase-manifest.mjs'], { cwd: REPO_ROOT });
-      await exec('node', ['scripts/build-component-library-index.mjs'], { cwd: REPO_ROOT });
+      await exec('node', ['scripts/auditMirrorDeps.mjs'], { cwd: REPO_ROOT });
+      await exec('node', ['scripts/buildSaasShowcaseManifest.mjs'], { cwd: REPO_ROOT });
+      await exec('node', ['scripts/buildComponentLibraryIndex.mjs'], { cwd: REPO_ROOT });
     } catch (error) {
       console.warn(`Post-sync hook warning: ${error.message}`);
     }

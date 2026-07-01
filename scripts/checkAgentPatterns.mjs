@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Mechanical agent-pattern checks for buyer templates.
- * Usage: node scripts/check-agent-patterns.mjs [--root templates/web] [--strict]
+ * Usage: node scripts/checkAgentPatterns.mjs [--root templates/web] [--strict]
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';

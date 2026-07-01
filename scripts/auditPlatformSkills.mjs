@@ -15,11 +15,11 @@ import process from 'node:process';
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BASE_MANIFEST_PATH = join(
   REPO_ROOT,
-  'packages/agent-kit/src/catalogs/platform-skills-base.manifest.json',
+  'packages/agentKit/src/catalogs/platform-skills-base.manifest.json',
 );
 const CACHE_PATH = join(
   REPO_ROOT,
-  'packages/agent-kit/src/catalogs/platform-skills-audit-cache.json',
+  'packages/agentKit/src/catalogs/platform-skills-audit-cache.json',
 );
 
 const REPO_MAX_AGE_DAYS = 90;

@@ -6,7 +6,7 @@ import {
   passesRegistryFilter,
   resolveTargetPath,
   shouldSkipMirrorFile,
-} from './sync-ui-registries.mjs';
+} from './syncUiRegistries.mjs';
 
 describe('sync-ui-registries', () => {
   it('filters bundui pro items', () => {

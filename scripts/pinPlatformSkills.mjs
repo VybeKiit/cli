@@ -14,7 +14,7 @@ const REPO_ROOT = new URL('..', import.meta.url).pathname;
 const TEMPLATES = ['web', 'mobile', 'extension', 'backend'];
 const BASE_MANIFEST_PATH = join(
   REPO_ROOT,
-  'packages/agent-kit/src/catalogs/platform-skills-base.manifest.json',
+  'packages/agentKit/src/catalogs/platform-skills-base.manifest.json',
 );
 
 /**

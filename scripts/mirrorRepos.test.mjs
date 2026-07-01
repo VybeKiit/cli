@@ -2,7 +2,7 @@ import { access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseArgs, redact } from './mirror-repos.mjs';
+import { parseArgs, redact } from './mirrorRepos.mjs';
 
 /**
  * Guard tests for the delivery-mirror sync (ADR-0005). The script self-guards its

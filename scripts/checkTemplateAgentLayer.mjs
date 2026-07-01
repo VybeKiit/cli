@@ -10,7 +10,7 @@ import process from 'node:process';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cli = join(repoRoot, 'cli/dist/index.js');
-const docsScript = join(repoRoot, 'scripts/check-agent-runtime-docs.mjs');
+const docsScript = join(repoRoot, 'scripts/checkAgentRuntimeDocs.mjs');
 
 const fetchDocs = spawnSync('node', [docsScript], { encoding: 'utf8' });
 if (fetchDocs.status !== 0) {
@@ -24,7 +24,7 @@ const liveDocs = fetchDocs.stdout.trim();
 const templates = ['web', 'mobile', 'extension', 'backend'];
 let failed = false;
 
-const discoveryScript = join(repoRoot, 'scripts/validate-agent-skill-discovery.mjs');
+const discoveryScript = join(repoRoot, 'scripts/validateAgentSkillDiscovery.mjs');
 const discovery = spawnSync('node', [discoveryScript], { encoding: 'utf8' });
 if (discovery.status === 0) {
   console.log(discovery.stdout.trim());

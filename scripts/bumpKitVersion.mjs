@@ -4,7 +4,7 @@
  * Root package.json version is the canonical kit release line (vX.Y.Z tag source).
  * All maintained packages and the CLI share the same semver after bump.
  *
- * Usage: node scripts/bump-kit-version.mjs patch|minor|major
+ * Usage: node scripts/bumpKitVersion.mjs patch|minor|major
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -14,7 +14,7 @@ const REPO_ROOT = new URL('..', import.meta.url).pathname;
 const BUMP = process.argv[2];
 
 if (!(BUMP && ['patch', 'minor', 'major'].includes(BUMP))) {
-  console.error('Usage: node scripts/bump-kit-version.mjs <patch|minor|major>');
+  console.error('Usage: node scripts/bumpKitVersion.mjs <patch|minor|major>');
   process.exit(1);
 }
 

@@ -3,10 +3,10 @@
  * Push a unified kit release tag to each delivery mirror at its current main HEAD.
  * Run after `pnpm mirror` so tags point at the freshly force-pushed mirror commits.
  *
- * Usage: node scripts/tag-mirror-repos.mjs v1.2.3 [--dry-run]
+ * Usage: node scripts/tagMirrorRepos.mjs v1.2.3 [--dry-run]
  */
 import process from 'node:process';
-import { MIRROR_ORG, prefixExists, redact } from './mirror-tag-shared.mjs';
+import { MIRROR_ORG, prefixExists, redact } from './mirrorTagShared.mjs';
 
 const MIRRORS = [
   { repo: 'web', path: 'templates/web' },
@@ -20,7 +20,7 @@ const tag = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
 
 if (!(tag && /^v\d+\.\d+\.\d+$/.test(tag))) {
-  console.error('Usage: node scripts/tag-mirror-repos.mjs vX.Y.Z [--dry-run]');
+  console.error('Usage: node scripts/tagMirrorRepos.mjs vX.Y.Z [--dry-run]');
   process.exit(1);
 }
 

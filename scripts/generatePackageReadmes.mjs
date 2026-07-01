@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generate npm README.md for each @vybekiit/* package.
- * Run: node scripts/generate-package-readmes.mjs
+ * Run: node scripts/generatePackageReadmes.mjs
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -16,7 +16,7 @@ const HERO = `<p align="center">
 
 `;
 
-/** @type {Array<{ name: string; tagline: string; body: string; exports: string; config: string; skills: string; inScope: string; outScope?: string }>} */
+/** @type {Array<{ name: string; dir?: string; tagline: string; body: string; exports: string; config: string; skills: string; inScope: string; outScope?: string }>} */
 const PACKAGES = [
   {
     name: 'core',
@@ -124,6 +124,7 @@ const PACKAGES = [
   },
   {
     name: 'agent-kit',
+    dir: 'agentKit',
     tagline:
       'The rules your AI assistant follows — plain language, safe updates, one step at a time.',
     body: 'Shared agent-layer contract: the five buyer promises, jargon→plain vocabulary, and the kit-update planner. Template-specific skills stay in your app; this is what must never drift.',
@@ -136,6 +137,7 @@ const PACKAGES = [
   },
   {
     name: 'browser-automation',
+    dir: 'browserAutomation',
     tagline: 'Dashboard automation CLI for Lemon Squeezy and Chrome Web Store.',
     body: 'Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls. Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.',
     exports: 'CWS verbs, `runLsSetup`, `standbyLogin`, `vybekiit-automate` CLI',
@@ -146,6 +148,7 @@ const PACKAGES = [
   },
   {
     name: 'client-state',
+    dir: 'clientState',
     tagline: 'Client cache and UI prefs for web, mobile, and extension.',
     body: '`resolveClientState()` wires TanStack Query defaults and Zustand/MMKV UI store factories per surface.',
     exports: '`resolveClientState`, `createQueryClient`, `createUiStore`, `./mobile`',
@@ -156,6 +159,7 @@ const PACKAGES = [
   },
   {
     name: 'report-mode',
+    dir: 'reportMode',
     tagline:
       'Report a bug in one hotkey — captures context and opens your AI assistant ready to fix it.',
     body: 'Dev-only Report Mode for vibe coders: structured reports, console error buffer, native assistant deeplink. Never ships to production builds.',
@@ -346,7 +350,7 @@ MIT
 }
 
 for (const pkg of PACKAGES) {
-  const path = join(ROOT, 'packages', pkg.name, 'README.md');
+  const path = join(ROOT, 'packages', pkg.dir ?? pkg.name, 'README.md');
   writeFileSync(path, render(pkg));
   console.log(`Wrote ${path}`);
 }

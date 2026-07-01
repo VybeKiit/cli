@@ -12,8 +12,8 @@ const repoRoot = join(import.meta.dirname, '..');
 const SCAN_ROOTS = [join(repoRoot, 'packages'), join(repoRoot, 'cli', 'src', 'doctor')];
 
 const ALLOWLIST = new Set([
-  // provider-dispatch.ts may compare parsed provider keys for stack helpers
-  'packages/core/src/provider-dispatch.ts',
+  // providerDispatch.ts may compare parsed provider keys for stack helpers
+  'packages/core/src/providerDispatch.ts',
 ]);
 
 function collectResolveFiles(dir, acc = []) {
