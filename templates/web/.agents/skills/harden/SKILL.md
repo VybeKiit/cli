@@ -66,8 +66,9 @@ translate every error · celebrate. You do all the work; the builder just approv
    **Verify:** `/api/contact` survives human-paced submits while `/api/auth/signin` blocks hammering.
 
 8. **Database safety.** Confirm all data access uses `@vybekiit/db` (no raw SQL). Grep for `$executeRaw`
-   or string-built queries and replace them. If Supabase: RLS enabled on buyer tables.
-   **Verify:** no raw SQL in the app; zod on every API body.
+   or string-built queries and replace them. Run `vybekiit apply-preset audit_log` and confirm RLS on
+   buyer tables (`platform-skills/db-presets-vybekiit.md`).
+   **Verify:** `vybekiit verify-presets audit_log`; no raw SQL in the app; zod on every API body.
 
 9. **Optional edge KV (agent-only).** `@vybekiit/kv` may back feature flags when you extend hardening —
    never Redis or Upstash for buyers. Client-side cache is `@vybekiit/client-state` (TanStack Query).

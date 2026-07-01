@@ -17,6 +17,8 @@ it.
 
 > (Under the hood — agent-only) Register and connect through `@vybekiit/deploy`'s `resolveHosting()`
 > — Cloudflare by default, AWS if the builder's setup uses it. Never name the host to the builder.
+> When nameserver automation needs registrar API keys (Namecheap or GoDaddy), use
+> `registrar-vybekiit.md` + `vybekiit-automate nc|gd setup --json` before step 2.
 
 ## Steps
 

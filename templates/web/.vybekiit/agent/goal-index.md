@@ -27,6 +27,7 @@ translate errors · celebrate.
 | "see who uses my app", "visitor stats", "analytics", "track usage" | `skills/add-analytics.md` |
 | "add AI", "smart replies", "chatbot", "AI helper" | `skills/add-ai.md` |
 | "let users search", "find things", "search my data" | `skills/add-search.md` |
+| "live updates", "real-time", "push changes instantly", "refresh without reload" | `skills/add-realtime.md` |
 | "add a blog", "changelog", "write articles on my site" | `skills/add-blog.md` |
 | "AI search", "ChatGPT find my site", "get quoted by Perplexity", "llms.txt", "answer engines" | `skills/add-blog.md` (content + GEO) or `skills/go-live.md` (verify `/llms.txt` live) |
 | "get a domain", "buy a web address", "use my own URL" | `skills/buy-domain.md` |

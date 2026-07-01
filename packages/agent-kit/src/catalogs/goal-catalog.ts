@@ -253,6 +253,11 @@ export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
     skills: { web: 'add-search', mobile: null, extension: null, spa: null, backend: null },
   },
   {
+    id: 'add-realtime',
+    phrases: ['live updates', 'real-time', 'push changes instantly', 'refresh without reload'],
+    skills: { web: 'add-realtime', mobile: null, extension: null, spa: null, backend: null },
+  },
+  {
     id: 'add-blog',
     phrases: ['add a blog', 'write articles', 'changelog'],
     skills: { web: 'add-blog', mobile: null, extension: null, spa: null, backend: null },
