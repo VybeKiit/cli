@@ -9,13 +9,13 @@ export interface ResolveTenancyInjections {
 interface OrgRow {
   readonly id: string;
   readonly name: string;
-  readonly ownerUserId: string;
+  readonly owner_user_id: string;
 }
 
 interface MemberRow {
   readonly id: string;
-  readonly orgId: string;
-  readonly userId: string;
+  readonly org_id: string;
+  readonly user_id: string;
   readonly email: string;
   readonly role: string;
 }
@@ -31,7 +31,7 @@ export function createBetterAuthTenancy(
       const result = await data.insert<OrgRow>('organizations', {
         id,
         name,
-        ownerUserId,
+        owner_user_id: ownerUserId,
       });
       if (!result.ok) return fail(result.error.code, result.error.message);
       return ok({ orgId: id });
@@ -40,8 +40,8 @@ export function createBetterAuthTenancy(
       const id = `invite_${Date.now()}`;
       const result = await data.insert<MemberRow>('organization_members', {
         id,
-        orgId,
-        userId: id,
+        org_id: orgId,
+        user_id: id,
         email,
         role,
       });
@@ -49,18 +49,21 @@ export function createBetterAuthTenancy(
       return ok(true);
     },
     async listMembers(orgId: string): Promise<Result<readonly OrgMember[]>> {
-      const result = await data.query<MemberRow>('organization_members', { orgId });
+      const result = await data.query<MemberRow>('organization_members', { org_id: orgId });
       if (!result.ok) return fail(result.error.code, result.error.message);
       return ok(
         result.value.map((row) => ({
-          userId: row.userId,
+          userId: row.user_id,
           email: row.email,
           role: row.role,
         })),
       );
     },
     async removeMember(orgId: string, userId: string): Promise<Result<true>> {
-      const members = await data.query<MemberRow>('organization_members', { orgId, userId });
+      const members = await data.query<MemberRow>('organization_members', {
+        org_id: orgId,
+        user_id: userId,
+      });
       if (!members.ok) return members;
       for (const member of members.value) {
         const removed = await data.remove('organization_members', member.id);

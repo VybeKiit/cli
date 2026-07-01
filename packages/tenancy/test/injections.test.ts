@@ -7,6 +7,7 @@ describe('resolveTenancyProvider injections', () => {
   it('uses injected data provider for better-auth tenancy', async () => {
     const inserts: unknown[] = [];
     const data = {
+      capabilities: {},
       insert: async (_table: string, row: unknown) => {
         inserts.push(row);
         return ok(row);
