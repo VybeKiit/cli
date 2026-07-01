@@ -10,8 +10,9 @@
 ## Steps
 
 1. Explain: *"I'll add search so people can find things quickly."*
-2. Wire index on create/update and a search UI calling `getSearch().search(query)`.
-3. **Verify:** index + search test green.
+2. Run `vybekiit apply-preset search_documents` then wire index on create/update and a search UI calling
+   `getSearch().search(query)` (see `platform-skills/db-presets-vybekiit.md`).
+3. **Verify:** `vybekiit verify-presets search_documents` + search test green.
 
 ## Definition of done
 

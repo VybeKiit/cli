@@ -334,6 +334,16 @@ its layout automatically for RTL visitors — you don't need to do anything spec
 | error / exception | something went wrong — here's the one fix | one clear next step, never a wall of red |
 | not working / broken | something broke — I'll figure it out | routes to doctor without debug vocabulary |
 | MCP connection failed / tool error | I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment. | never say MCP; run vybekiit doc-fallback then follow official docs |
+| 400 / bad input / bad request | something's missing or mistyped — I'll fix the form or the data we're sending | client-side fix framing without HTTP jargon |
+| 401 / unauthorized / not signed in | you'll need to sign in first — I'll walk you through it | routes to add-signin without status codes |
+| 403 / forbidden | that action isn't allowed from here — I'll fix the setup | origin or permission block in plain words |
+| 404 / not found | I couldn't find that — I'll check the link or data | missing resource without HTTP jargon |
+| 409 / conflict | that already exists — I'll adjust what we're saving | duplicate or version clash |
+| 422 / validation error | something in the form needs a quick fix — I'll point at it | field-level validation without schema jargon |
+| 429 / too many requests / rate limit | too many tries too fast — wait a moment and I'll retry | rate limit without Retry-After jargon |
+| 500 / server error | something went wrong on our side — I'll fix it and try again | server fault without stack traces |
+| 502 / upstream failed | the payment service hiccuped — I'll retry or switch to practice mode | provider outage with a next step |
+| 503 / service unavailable | that service is briefly down — I'll retry in a moment | temporary outage without availability jargon |
 <!-- vybekiit:generated:end failure-vocabulary -->
 
 <!-- vybekiit:generated:start payments-vocabulary -->

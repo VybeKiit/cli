@@ -1,3 +1,4 @@
+import { handlePracticeComplete } from '@vybekiit/payments/http';
 import { fulfillOrder } from '@/lib/fulfillment';
 import { NextResponse } from 'next/server';
 
@@ -9,23 +10,7 @@ import { NextResponse } from 'next/server';
  * POST body: `{ productId: string }`.
  */
 export async function POST(request: Request): Promise<NextResponse> {
-  const { productId } = await request.json();
-  if (!productId) {
-    return NextResponse.json({ error: 'productId is required.' }, { status: 400 });
-  }
-
-  const orderId = `practice_${productId}_${Date.now()}`;
-  const result = await fulfillOrder({
-    provider: 'lemon-squeezy',
-    eventName: 'practice_checkout_completed',
-    orderId,
-    customerEmail: 'practice@example.com',
-    githubUsername: null,
-    isRefund: false,
-  });
-
-  if (!result.ok) {
-    return NextResponse.json({ error: result.error.message }, { status: 502 });
-  }
-  return NextResponse.json({ ok: true, orderId });
+  const body = await request.json();
+  const result = await handlePracticeComplete(body, { fulfillOrder });
+  return NextResponse.json(result.body, { status: result.status });
 }

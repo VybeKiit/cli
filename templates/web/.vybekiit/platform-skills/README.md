@@ -41,6 +41,7 @@ when the buyer selects Cloudflare hosting (default).
 | `data-model-vybekiit.md` | `design-my-data`, `save-data` | `planDataModel()` + MCP tier |
 | `client-state-vybekiit.md` | generic coding (invisible) | `@vybekiit/client-state` + TanStack Query |
 | `browser-automation-vybekiit.md` | `setup-payments`, `publish-extension` | `@vybekiit/browser-automation` CLI |
+| `registrar-vybekiit.md` | `buy-domain` when registrar API keys needed | Namecheap / GoDaddy dashboards (`nc`, `gd`) |
 | `better-auth-vybekiit.md` | `add-signin` | better-auth.com/docs + `@vybekiit/auth` |
 | `lemon-squeezy-vybekiit.md` | `setup-payments` (default) | docs.lemonsqueezy.com + `vybekiit-automate ls` |
 | `stripe-vybekiit.md` | `setup-payments` when `PAYMENTS_PROVIDER=stripe` | docs.stripe.com + Stripe MCP |

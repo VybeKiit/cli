@@ -10,6 +10,8 @@
 |--------|---------|---------|
 | `ls` | `$HOME/.ls-chrome-profile` | Lemon Squeezy (fresh-squeezy) |
 | `cws` | `$HOME/.cws-chrome-profile` | Chrome Web Store extension publish |
+| `nc` | `$HOME/.nc-chrome-profile` | Namecheap API key setup |
+| `gd` | `$HOME/.gd-chrome-profile` | GoDaddy API key setup |
 
 ## CLI modes
 
@@ -18,6 +20,8 @@
 ```bash
 vybekiit-automate ls setup --json --name "Pro" --price-cents 2900 --mode test --webhook-url "https://…"
 vybekiit-automate ls standby --json
+vybekiit-automate nc setup --json
+vybekiit-automate gd setup --json
 vybekiit-automate cws publish --json   # CWS verbs also exported programmatically
 ```
 

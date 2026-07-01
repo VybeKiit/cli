@@ -11,7 +11,9 @@
 
 1. **Explain in one line.** *"I'll add a smart helper that answers using AI."*
 2. **Collect the API key** into secret settings if not already present (`OPENAI_API_KEY` default).
-   **Verify:** key saved.
+   Run `vybekiit apply-preset embeddings` and `vybekiit apply-preset ai_conversations` when chat history
+   is needed (`platform-skills/db-presets-vybekiit.md`).
+   **Verify:** keys saved; `vybekiit verify-presets embeddings` when presets applied.
 3. **Wire one feature** the builder asked for using `getAi().complete()` on the server only.
    **Verify:** build succeeds; test path returns text.
 4. **Celebrate** when a real response works in the app.

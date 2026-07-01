@@ -19,10 +19,10 @@ have access.
    people by email"). You decide the data model; they confirm the behavior.
    **Verify:** read the behavior back in one sentence and get a yes.
 
-3. **Wire organizations and invites.** Add org + membership tables via `resolveDataProvider()`; wire
-   invite flow through auth. Replace dashboard team placeholder
+3. **Wire organizations and invites.** Run `vybekiit apply-preset organizations`, then wire invite flow
+   through `@vybekiit/tenancy` → `resolveTenancyProvider()`. Replace dashboard team placeholder
    (`TODO(vybekiit): … — skill: add-teams`).
-   **Verify:** code builds; migration applies cleanly.
+   **Verify:** `vybekiit verify-presets organizations` passes; code builds.
 
 4. **Build the invite UI.** A simple page or modal where the owner enters an email and sends an
    invite. Plain copy only — no jargon.

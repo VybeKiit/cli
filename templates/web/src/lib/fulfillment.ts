@@ -1,5 +1,5 @@
-import { type Result, fail, ok, parseEnv, supabaseConfigSchema } from '@vybekiit/core';
-import { createDbClient, resolveDataProvider } from '@vybekiit/db';
+import { type Result, fail, ok } from '@vybekiit/core';
+import { resolveDataProvider } from '@vybekiit/db';
 import type { OrderEvent } from '@vybekiit/payments';
 
 /** Row shape stored in the practice `orders` collection / Supabase table. */
@@ -17,7 +17,7 @@ interface OrderRecord {
  * send a download). On refund it marks the order refunded.
  *
  * Uses the local in-memory adapter when no data backend is configured (ADR-0008),
- * otherwise the Supabase `orders` table (created by the `save-data` skill).
+ * otherwise upserts into the `orders` preset table via {@link DataProvider.upsert}.
  */
 export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
   const db = resolveDataProvider();
@@ -45,16 +45,20 @@ export async function fulfillOrder(event: OrderEvent): Promise<Result<true>> {
     return inserted.ok ? ok(true) : inserted;
   }
 
-  const client = createDbClient(parseEnv(supabaseConfigSchema));
-  const { error } = await client
-    .from('orders')
-    .upsert(
-      { order_id: event.orderId, email: event.customerEmail, refunded: event.isRefund },
-      { onConflict: 'order_id' },
-    );
-
-  if (error) {
-    return fail('fulfillment_failed', error.message);
+  if (!(db.capabilities.upsert && db.upsert)) {
+    return fail('fulfillment_failed', 'The data adapter does not support order upserts.');
   }
-  return ok(true);
+
+  const upserted = await db.upsert<OrderRecord>(
+    'orders',
+    {
+      id: event.orderId,
+      order_id: event.orderId,
+      email: event.customerEmail ?? '',
+      refunded: event.isRefund,
+    },
+    'order_id',
+  );
+
+  return upserted.ok ? ok(true) : fail('fulfillment_failed', upserted.error.message);
 }

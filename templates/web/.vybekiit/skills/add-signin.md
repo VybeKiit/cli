@@ -18,6 +18,8 @@ translate every error · celebrate. You wire all the code; the builder only past
 2. **Set the sign-in secret settings.** Generate `BETTER_AUTH_SECRET` and collect `DATABASE_URL`
    through the `doctor` flow — never ask the builder to type these by hand. Save them to the secret
    settings file.
+   **Apply DB preset:** run `vybekiit apply-preset auth-bridge` (see `platform-skills/db-presets-vybekiit.md`).
+   **Verify:** `vybekiit verify-presets auth-bridge` passes.
    **Verify:** both values are present and non-empty.
 
 3. **Add the sign-in handler.** Create the auth server route at `app/api/auth/[...all]/route.ts`

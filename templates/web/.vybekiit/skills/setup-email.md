@@ -8,7 +8,7 @@ when asked.
 
 > (Under the hood — agent-only) Send through `@vybekiit/email`'s `resolveEmailProvider()`. Read
 > `EMAIL_PROVIDER` and follow the matching platform wrapper:
-> - default / `cloudflare` → Cloudflare email via `resolveEmailProvider()` (no separate wrapper)
+> - default / `cloudflare` → `platform-skills/cloudflare-email-vybekiit.md`
 > - `resend` → `platform-skills/resend-vybekiit.md`
 > - `ses` → `platform-skills/ses-vybekiit.md`
 > Same skill, whichever is set — never name the service to the builder.

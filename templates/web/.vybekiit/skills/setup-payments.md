@@ -38,6 +38,8 @@ translate every error · celebrate. You wire all the code; the builder only sign
 5. **Connect the automatic payment message (webhook).** Webhook URL is `/api/webhook` on the deployed app
    (`app/api/webhook/route.ts` → `src/lib/fulfillment.ts`). For LS, `ls setup` configures this when given
    `--webhook-url`.
+   **Apply DB presets:** run `vybekiit apply-preset orders` and `vybekiit apply-preset webhook_events`
+   (see `platform-skills/db-presets-vybekiit.md`). **Verify:** `vybekiit verify-presets orders webhook_events`.
    **Verify:** provider shows webhook connected.
 
 6. **Test a purchase.** Use test mode for a fake purchase.

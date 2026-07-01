@@ -15,6 +15,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const result = await handleCheckout(body, {
     env,
     appUrl: env.APP_URL,
+    frontendUrl: env.APP_URL,
     requestOrigin: request.headers.get('origin'),
   });
   return NextResponse.json(result.body, { status: result.status });
