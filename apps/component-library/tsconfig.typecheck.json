@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "app/layout.tsx",
+    "app/page.tsx",
+    "app/components/**/*.ts",
+    "app/components/**/*.tsx",
+    "src/components/**/*.ts",
+    "src/components/**/*.tsx",
+    "src/data/**/*.ts",
+    "src/lib/resolve-preview-export.ts",
+    "next-env.d.ts"
+  ],
+  "exclude": ["node_modules", "app/embed/**", "src/lib/load-preview.client.ts", "src/demos/**"]
+}
