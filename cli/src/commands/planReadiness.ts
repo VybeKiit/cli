@@ -2,8 +2,8 @@ import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
 import { planFeatureReadiness, type FeatureName, type TemplateId } from '@vybekiit/agent-kit';
-import { detectTemplateName } from '../lib/detect-template';
-import { inferProjectSurfaceSync } from '../lib/infer-project-surface';
+import { detectTemplateName } from '../lib/detectTemplate';
+import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 import { isTemplateName } from '../lib/scaffold';
 
 const FEATURES: readonly FeatureName[] = [

@@ -1,9 +1,10 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scaffold } from '../lib/scaffold';
-import { resolveTemplatesSource, cloneMirror } from '../lib/resolve-templates';
+import { resolveTemplatesSource, cloneMirror } from '../lib/resolveTemplates';
 
 function pascalCase(name: string): string {
+  // PascalCase, splitting on "-", "_", "/": "add-user" → "AddUser"
   return name
     .split(/[-_/]/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
@@ -11,6 +12,7 @@ function pascalCase(name: string): string {
 }
 
 function kebabCase(name: string): string {
+  // kebab slug: spaces → "-", then drop anything not [a-z0-9-]: "My Route!" → "my-route"
   return name
     .trim()
     .toLowerCase()

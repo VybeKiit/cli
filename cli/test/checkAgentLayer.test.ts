@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { runCheckAgentLayer } from '../src/commands/check-agent-layer';
+import { runCheckAgentLayer } from '../src/commands/checkAgentLayer';
 
 describe('runCheckAgentLayer', () => {
   it('returns exit 1 when checklist structure missing', async () => {

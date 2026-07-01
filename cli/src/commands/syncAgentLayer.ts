@@ -11,12 +11,12 @@ import {
   mergeGoalIndexOnSync,
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
-import { loadExistingAgentLayerRenderInputs } from '../lib/agent-layer-io';
-import { detectTemplateName } from '../lib/detect-template';
-import { cloneMirror, resolveTemplatesSource } from '../lib/resolve-templates';
+import { loadExistingAgentLayerRenderInputs } from '../lib/agentLayerIo';
+import { detectTemplateName } from '../lib/detectTemplate';
+import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
 
-export { detectTemplateName } from '../lib/detect-template';
+export { detectTemplateName } from '../lib/detectTemplate';
 
 const execFileAsync = promisify(execFile);
 

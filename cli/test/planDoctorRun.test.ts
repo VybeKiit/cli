@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeDoctorExitCode } from '../src/doctor/plan-doctor-run';
+import { computeDoctorExitCode } from '../src/doctor/planDoctorRun';
 
 describe('computeDoctorExitCode', () => {
   const allPass = {

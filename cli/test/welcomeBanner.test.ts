@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { applyShimmerSweep, supportsColor } from '../src/ui/ansi-shimmer';
+import { applyShimmerSweep, supportsColor } from '../src/ui/ansiShimmer';
 import {
   playWelcomeBanner,
   WELCOME_ART,
   WELCOME_MOTTO,
   welcomeArtMinWidth,
-} from '../src/ui/welcome-banner';
+} from '../src/ui/welcomeBanner';
 
 describe('supportsColor', () => {
   it('returns false when NO_COLOR is set', () => {

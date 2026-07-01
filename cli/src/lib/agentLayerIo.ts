@@ -1,7 +1,7 @@
 import { access, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { AGENT_LAYER_RENDER_FILES, buyerSkillStubPath, type TemplateId } from '@vybekiit/agent-kit';
-import { detectTemplateName } from './detect-template';
+import { detectTemplateName } from './detectTemplate';
 import { isTemplateName } from './scaffold';
 
 export const COMPLIANCE_FILES = [

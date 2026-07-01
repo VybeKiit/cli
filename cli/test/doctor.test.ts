@@ -14,8 +14,8 @@ import {
   type ToolReport,
 } from '../src/doctor/toolchain';
 import { expectedSkillNamesFromManifest } from '@vybekiit/agent-kit';
-import { verifyPlatformSkills } from '../src/doctor/platform-skills';
-import { verifyProjectHealth } from '../src/doctor/project-health';
+import { verifyPlatformSkills } from '../src/doctor/platformSkills';
+import { verifyProjectHealth } from '../src/doctor/projectHealth';
 
 describe('selectToolchain', () => {
   it('returns [gh, wrangler, supabase] for the defaults (empty env)', () => {

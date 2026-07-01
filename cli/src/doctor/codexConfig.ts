@@ -10,12 +10,15 @@ function codexConfigPath(): string {
 }
 
 function upsertFeaturesSkills(content: string): string {
+  // already enabled? matches a [features] block that already contains "skills = true"
   if (/\[features\][\s\S]*?\bskills\s*=\s*true\b/m.test(content)) {
     return content;
   }
 
-  if (/\[features\]/m.test(content)) {
+  if (content.includes('[features]')) {
+    // rewrite the [features] block (its text up to the next "[section]"), forcing skills = true
     return content.replace(/(\[features\][^[]*)/m, (block) =>
+      // block already has a skills line? "skills = false" → "skills = true"; else append it
       /\bskills\s*=/m.test(block)
         ? block.replace(/\bskills\s*=\s*.*/m, 'skills = true')
         : `${block.trimEnd()}\nskills = true\n`,
@@ -61,6 +64,7 @@ export async function isCodexSkillsEnabled(): Promise<boolean> {
   try {
     await access(path);
     const content = await readFile(path, 'utf8');
+    // skills feature on? matches "skills = true", not "skills = false"
     return /\bskills\s*=\s*true\b/m.test(content);
   } catch {
     return false;

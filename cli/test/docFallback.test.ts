@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runDocFallback } from '../src/commands/doc-fallback';
+import { runDocFallback } from '../src/commands/docFallback';
 
 describe('runDocFallback', () => {
   it('returns JSON plan for twilio', () => {

@@ -1,6 +1,6 @@
 import { access, cp, readdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
-import { type DependencyMap, rewriteWorkspaceDeps } from './rewrite-deps';
+import { type DependencyMap, rewriteWorkspaceDeps } from './rewriteDeps';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
 export const TEMPLATES = ['web', 'spa', 'mobile', 'extension', 'backend'] as const;

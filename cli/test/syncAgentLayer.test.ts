@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { detectTemplateName, runSyncAgentLayer } from '../src/commands/sync-agent-layer';
+import { detectTemplateName, runSyncAgentLayer } from '../src/commands/syncAgentLayer';
 
 describe('detectTemplateName', () => {
   afterEach(() => {

@@ -7,22 +7,22 @@ import {
   runBackendAddRoute,
   runBackendAddUpload,
   runScaffoldBackend,
-} from './commands/backend-cli';
-import { runCheckGoals } from './commands/check-goals';
-import { runCheckAgentLayer } from './commands/check-agent-layer';
-import { runLintExtensionSkill } from './commands/lint-extension-skill';
-import { runDocFallback } from './commands/doc-fallback';
+} from './commands/backendCli';
+import { runCheckGoals } from './commands/checkGoals';
+import { runCheckAgentLayer } from './commands/checkAgentLayer';
+import { runLintExtensionSkill } from './commands/lintExtensionSkill';
+import { runDocFallback } from './commands/docFallback';
 import { runDoctor } from './doctor/run';
 import { runNew } from './commands/new';
 import { runSetup } from './commands/setup';
-import { runPlanDataModel } from './commands/plan-data-model-cmd';
-import { runPlanReadiness } from './commands/plan-readiness';
-import { runPlanSetup } from './commands/plan-setup-cmd';
-import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/presets-cmd';
-import { runRenderAgentLayer } from './commands/render-agent-layer';
-import { runSyncAgentLayer } from './commands/sync-agent-layer';
-import { cloneMirror, resolveTemplatesSource } from './lib/resolve-templates';
-import { runEnvWizard } from './prompts/env-wizard';
+import { runPlanDataModel } from './commands/planDataModelCmd';
+import { runPlanReadiness } from './commands/planReadiness';
+import { runPlanSetup } from './commands/planSetupCmd';
+import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/presetsCmd';
+import { runRenderAgentLayer } from './commands/renderAgentLayer';
+import { runSyncAgentLayer } from './commands/syncAgentLayer';
+import { cloneMirror, resolveTemplatesSource } from './lib/resolveTemplates';
+import { runEnvWizard } from './prompts/envWizard';
 import { isInteractive } from './prompts/tty';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -107,7 +107,7 @@ export {
   type ResolveDeps,
   type ResolvedSource,
   resolveTemplatesSource,
-} from './lib/resolve-templates';
+} from './lib/resolveTemplates';
 
 async function main(argv: string[]): Promise<number> {
   const [command, subcommand, ...rest] = argv;

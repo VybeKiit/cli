@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { applyShimmerSweep, DIM, sleep, supportsColor } from './ansi-shimmer';
+import { applyShimmerSweep, DIM, sleep, supportsColor } from './ansiShimmer';
 
 /** Triple chevron mark + spaced VybeKiit wordmark (mirrors VybeBrandMark). */
 export const WELCOME_ART = [

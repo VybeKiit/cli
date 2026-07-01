@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ensureCodexSkillsEnabled, isCodexSkillsEnabled } from '../../src/doctor/codex-config';
+import { ensureCodexSkillsEnabled, isCodexSkillsEnabled } from '../../src/doctor/codexConfig';
 
 describe('codex-config', () => {
   it('writes features.skills = true when config is missing', async () => {
