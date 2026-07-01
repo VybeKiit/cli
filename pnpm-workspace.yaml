@@ -12,6 +12,8 @@
 #   - apps/landing → the VybeKiit store. A real Next.js marketing + checkout site that
 #     dogfoods templates/web; now a workspace member in the gate (next build + tsc +
 #     tests), joining alongside its real UI (issue #3, closing #2 — no more empty shell).
+#   - apps/component-library → public UI browser at ui.vybekiit.com; imports mirrored
+#     blocks from templates/web via webpack alias (SSOT).
 #
 # Still excluded on purpose:
 #   (none — extension WXT scaffold is now in the workspace gate)
@@ -24,3 +26,4 @@ packages:
   - "templates/backend"
   - "templates/spa"
   - "apps/landing"
+  - "apps/component-library"

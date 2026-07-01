@@ -26,11 +26,13 @@
     "mirror": "node scripts/mirror-repos.mjs",
     "sync:ui": "node scripts/sync-ui-registries.mjs",
     "sync:ui:dry-run": "node scripts/sync-ui-registries.mjs --dry-run",
+    "dev:ui-library": "pnpm --filter vybekiit-component-library dev",
     "publish:packages": "node scripts/publish-packages.mjs",
     "publish:packages:dry-run": "node scripts/publish-packages.mjs --dry-run",
     "bump-kit-version": "node scripts/bump-kit-version.mjs",
     "tag-mirrors": "node scripts/tag-mirror-repos.mjs",
     "test:scripts": "vitest run --root scripts",
+    "email:test-send": "node scripts/test-email-send.mjs",
     "prepare": "husky"
   },
   "devDependencies": {

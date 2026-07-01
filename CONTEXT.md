@@ -13,10 +13,10 @@
 
 | Area | Web | Mobile | Extension |
 |---|---|---|---|
-| UI kit | 15 shadcn primitives + Sonner + 474 mirrored blocks (6 namespaces) | StyleSheet ports of new primitives | WXT popup: Button, Input, Card, Alert |
+| UI kit | 15 shadcn primitives + Sonner + 640 mirrored blocks (8 namespaces) | StyleSheet ports of new primitives | WXT popup: Button, Input, Card, Alert |
 | Marketing / auth UX | Normalized hero, legal defaults | Hero + feature cards | Popup + backend URL |
-| Signed-in guard | `useUser` dashboard layout | Dashboard redirect | N/A (calls web backend) |
-| Practice checkout | Local `/checkout/practice` + fulfillment | `billing-client` → web `/api/checkout` | N/A |
+| Signed-in guard | `useUser` dashboard layout | Dashboard redirect | `useUser` + practice sign-in in popup |
+| Practice checkout | Local `/checkout/practice` + fulfillment | `billing-client` → web `/api/checkout` | `billing-client` → web `/api/checkout` |
 | Quality gate | vitest + Playwright smoke | vitest + typecheck | build + typecheck + vitest |
 | Open issues | **#6 closed** (screens) | — | **#20 scaffold shipped** (store publish still skill-driven) |
 
@@ -90,7 +90,7 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
 │  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
 │  ├─ client-state/             TanStack Query + Zustand/MMKV via resolveClientState() — ADR-0014
-│  ├─ browser-automation/       unified Playwright CLI — domains: extension/, payments/ls, dbs/, infra/ — ADR-0015
+│  ├─ browser-automation/       unified Playwright CLI — domains: extension/, payments/ls, registrars/, dbs/, infra/ — ADR-0015/0021
 │  ├─ report-mode/            dev-only Report Mode — structured reports + assistant deeplink handoff
 │  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
 │  └─ agent-kit/              shared agent-layer source — the skill contract, language.md vocabulary,
@@ -417,6 +417,7 @@ matches.
 | WXT | [wxt.dev](https://wxt.dev) | docs-only in wrapper (no custom WXT skill yet) |
 | Chrome Extension APIs | [developer.chrome.com/docs/extensions](https://developer.chrome.com/docs/extensions) | `chrome-extension-vybekiit.md` |
 | CWS publish | `@vybekiit/browser-automation` (`cws`) + CWS docs | `publish-extension` buyer skill |
+| Registrar API keys | Namecheap / GoDaddy dashboards (no OAuth) | `registrar-vybekiit.md` (`nc`, `gd`) | `buy-domain` when NS automation needed |
 
 ### Scorecard
 
@@ -697,8 +698,23 @@ etc. Read before adding helpers.
 `NODE_ENV`; optional `LOG_LEVEL` override for agents only.
 
 **UI source catalog**:
-Agent-only list of approved shadcn-compatible block libraries (BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack, 21st.dev, …) in
+Agent-only list of approved shadcn-compatible block libraries (BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack, AI Elements, Kibo UI, 21st.dev, …) in
 `.vybekiit/agent/ui-sources.md`. The builder never picks; the agent normalizes every import.
+
+**AI Elements namespace**:
+Mirrored Vercel AI Elements blocks under `src/components/ai-elements/` — chat, agent, streaming, tool-call UI built for the AI SDK. Includes core components and `example-*` demo compositions.
+
+**Kibo namespace**:
+Mirrored Kibo UI blocks under `src/components/kibo/` — application-grade components (kanban, editor, gantt, etc.) from the shadcnblocks registry.
+
+**Component library app**:
+Public browsable gallery at `ui.vybekiit.com` (`apps/component-library`) — catalog of mirrored blocks with Primary Previews (demo wrappers) and a separate Examples tab for upstream demos; maintainer monorepo app, not shipped to buyers.
+
+**Primary preview**:
+Live render on a component detail page via a demo wrapper (`apps/component-library/src/demos/{namespace}/{name}.tsx`) — required for component entries to show a live preview.
+
+**Example entry**:
+Upstream demo synced as its own catalog item (`kind: example`, e.g. Magic UI `magic-card-demo`, AI Elements `example-message`) — browsable on the global Examples tab, separate from the component's Primary Preview.
 
 **UI namespace**:
 Per-source folder under `src/components/` (`bundui/`, `magicui/`, …) holding mirrored upstream components — not merged into kit `ui/`.
@@ -806,6 +822,42 @@ Orgs and invites — `@vybekiit/tenancy`; buyer skill: `add-teams`.
 **Fast storage**:
 KV cache — `@vybekiit/kv` (Cloudflare default). **Agent-only / harden** — not a buyer onboarding path. Redis is not a VybeKiit buyer path; use TanStack Query for client cache (ADR-0014).
 
+**Web stack**:
+The default buyer path — **web** template serves API + UI on one origin (`:3000`). **Mobile** and
+**extension** clients call the web backend for auth, billing, and data. Practice auth + checkout
+work with blank secrets.
+_Avoid_: telling the builder to run a separate API server unless they chose the SPA stack.
+
+**SPA stack**:
+Alternate buyer path — **spa** (Vite admin UI, `:5173`) always pairs with **backend** (Express API,
+`:4000`). SPA never calls the web template; auth + billing wire through `@vybekiit/auth` and
+`@vybekiit/payments` on the backend. Practice checkout completes on SPA `/checkout/practice`.
+_Avoid_: conflating SPA stack with web stack — they are separate scaffolds.
+
+**Maintained package reuse**:
+Every template imports SaaS logic from `@vybekiit/*` packages — auth, payments, http, db, etc.
+Template-owned files are thin wire points (`auth-client.ts`, `billing-client.ts`) the agent skills
+touch once. No duplicated provider logic in templates.
+_Avoid_: custom fetch/auth code that bypasses the packages.
+
+**DB preset**:
+A composable SaaS table bundle (schema + indexes + RLS) for one kit feature — e.g. `orders`, `organizations`.
+Applied via `vybekiit apply-preset`; verified by doctor and goal skills. Agent-only term; buyer hears
+"setting up your app's data for [feature]."
+_Avoid_: migration, DDL, or preset jargon in buyer speech.
+
+**Feature module**:
+Synonym for a single DB preset entry in the catalog — one feature, one manifest, one apply command.
+_Avoid_: conflating with npm packages (packages consume feature modules).
+
+**Preset manifest**:
+The JSON SSOT for a feature module — entities, relations, indexes with `reason`, RLS mode, capabilities.
+Lives at `packages/db/presets/<feature>/preset.manifest.json`. Agent-only.
+
+**Capability flag**:
+A boolean on `DataProvider.capabilities` declaring optional ops (`upsert`, `fullTextSearch`, etc.).
+Callers check before using extended methods. Agent-only.
+
 **Client cache**:
 What the app remembers from the server while browsing — TanStack Query via `@vybekiit/client-state` (never say the name to the builder).
 
@@ -814,6 +866,13 @@ Agent-only Playwright CLI for dashboards without API/MCP (`@vybekiit/browser-aut
 
 **Fresh-squeezy**:
 Agent codename for the Lemon Squeezy `ls` target inside browser-automation.
+
+**Registrar credential setup**:
+Agent-only browser step to mint Namecheap or GoDaddy API keys (`vybekiit-automate nc|gd setup`) when OAuth is unavailable. Distinct from **Nameserver delegation**, which uses `@vybekiit/deploy` REST after keys exist.
+_Avoid_: conflating with domain purchase — the builder still registers and pays at the registrar manually in v1.
+
+**Nameserver delegation**:
+Pointing registrar nameserver records at Cloudflare (or another host). Automated via `@vybekiit/deploy` when registrar API env vars are set — not via browser automation.
 
 **Payment MCP tier**:
 Stripe and PayPal via hosted MCP; Lemon Squeezy via browser-automation CLI.
@@ -835,8 +894,11 @@ commands — one module, not parallel heuristics.
 _Avoid_: duplicating `isMobileProject` / `detectTemplateName` logic in new call sites.
 
 **JSON client**:
-Maintained `@vybekiit/http-client` — Result-typed fetch helpers. Templates keep a thin origin seam
-(same-origin web vs absolute URL on mobile/spa).
+Maintained `@vybekiit/http/client` — Result-typed fetch helpers that preserve semantic HTTP outcome codes. Templates keep a thin origin seam (same-origin web vs absolute URL on mobile/spa).
+
+**HTTP outcome**:
+Stable semantic code on API error responses (`bad_input`, `unauthorized`, `forbidden`, …) paired with a plain `error` message. Agents branch on `code`; vibe coders see only the message. Shipped by `@vybekiit/http`; agent-internal on the wire.
+_Avoid_: saying status codes or outcome names to the vibe coder.
 
 **Agentic toolchain**:
 The CLIs the agent must have to act (supabase, wrangler, Expo/EAS, etc.), provisioned globally by
