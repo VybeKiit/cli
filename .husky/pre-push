@@ -20,7 +20,7 @@ esac
 
 pnpm quality
 
-node scripts/pin-platform-skills.mjs
+node scripts/pinPlatformSkills.mjs
 # subtree split publishes committed history only — abort if pin left uncommitted changes
 if ! git diff --quiet; then
   echo "pre-push: pin-platform-skills changed files — commit them, then push again." >&2
