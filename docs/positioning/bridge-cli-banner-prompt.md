@@ -6,14 +6,14 @@ Generates **concept images** (terminal screenshots with ASCII-style art) for pic
 
 ```bash
 # Preview prompts (no browser)
-node scripts/run-bridge-cli-banner-queue.mjs --dry-run
+node scripts/runBridgeCliBannerQueue.mjs --dry-run
 
 # Run all 10 (~several minutes each — batch with --from/--to)
-node scripts/run-bridge-cli-banner-queue.mjs
+node scripts/runBridgeCliBannerQueue.mjs
 
 # Single direction
-node scripts/run-bridge-cli-banner-queue.mjs --only chevron-shimmer
-node scripts/run-bridge-cli-banner-queue.mjs --only ship-launch
+node scripts/runBridgeCliBannerQueue.mjs --only chevron-shimmer
+node scripts/runBridgeCliBannerQueue.mjs --only ship-launch
 ```
 
 **Output:** `out/cli-banner-inspirations/<id>/`

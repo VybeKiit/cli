@@ -1,6 +1,6 @@
 # ADR-0003 — better-auth as the auth provider (DB-bound)
 
-- **Status:** Accepted
+- **Status:** Accepted — default provider superseded by [ADR-0024](./0024-supabase-auth-default.md) (Supabase Auth is now the default; better-auth backs non-Supabase Postgres/Mongo)
 - **Date:** 2026-06-27
 - **Deciders:** Yosef (owner), via `/grill-with-docs`
 

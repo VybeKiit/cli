@@ -49,6 +49,7 @@
     "@vybekiit/http": "workspace:*",
     "@vybekiit/notifications": "workspace:*",
     "better-auth": "^1.6.22",
+    "effect": "3.21.4",
     "mongodb": "^7.4.0",
     "pg": "^8.13.1"
   },
@@ -66,7 +67,7 @@
     "express": "^4.21.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^3.2.6"
   },
   "publishConfig": {
     "access": "public"

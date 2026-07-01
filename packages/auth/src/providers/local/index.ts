@@ -1,4 +1,5 @@
 import { type Result, fail, ok } from '@vybekiit/core';
+import { type AuthProviderResult, toEffectAuthProvider } from '../../effect-bridge';
 import type { AuthProvider } from '../../types';
 import type { AuthUser } from '../../user';
 import { LOCAL_DEV_SESSION_TOKEN, type AuthSession, toSessionResult } from '../../session';
@@ -19,7 +20,7 @@ function okSession(): Promise<Result<AuthSession>> {
 }
 
 export function createLocalAuthProvider(): AuthProvider {
-  return {
+  const impl: AuthProviderResult = {
     name: 'local',
     capabilities: LOCAL_CAPABILITIES,
 
@@ -76,4 +77,5 @@ export function createLocalAuthProvider(): AuthProvider {
       return Promise.resolve(ok(DEV_USER));
     },
   };
+  return toEffectAuthProvider(impl);
 }

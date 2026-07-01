@@ -1,6 +1,6 @@
 {
-  "description": "Batch queue for ChatGPT CLI welcome-banner concept images via ai-browser-bridge. Full prompts live in scripts/run-bridge-cli-banner-queue.mjs.",
-  "run": "node scripts/run-bridge-cli-banner-queue.mjs",
+  "description": "Batch queue for ChatGPT CLI welcome-banner concept images via ai-browser-bridge. Full prompts live in scripts/runBridgeCliBannerQueue.mjs.",
+  "run": "node scripts/runBridgeCliBannerQueue.mjs",
   "outputDir": "out/cli-banner-inspirations",
   "context": "docs/positioning/cli-banner-direction.md",
   "items": [

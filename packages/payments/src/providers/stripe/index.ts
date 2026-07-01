@@ -1,4 +1,5 @@
 import type { StripeConfig } from '@vybekiit/core';
+import { fromResult, fromResultPromise } from '../../effect-bridge';
 import type { PaymentProvider } from '../../types';
 import { createStripeCheckout } from './checkout';
 import { parseStripeWebhook } from './webhook';
@@ -11,8 +12,8 @@ import { parseStripeWebhook } from './webhook';
 export function createStripeProvider(config: StripeConfig): PaymentProvider {
   return {
     name: 'stripe',
-    createCheckout: (params) => createStripeCheckout(config, params),
+    createCheckout: (params) => fromResultPromise(createStripeCheckout(config, params)),
     parseWebhook: (rawBody, headers) =>
-      Promise.resolve(parseStripeWebhook(config, rawBody, headers['stripe-signature'] ?? '')),
+      fromResult(parseStripeWebhook(config, rawBody, headers['stripe-signature'] ?? '')),
   };
 }

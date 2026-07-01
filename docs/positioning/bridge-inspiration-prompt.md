@@ -6,16 +6,16 @@ Use the batch runner — one ChatGPT turn per direction, downloads to `out/landi
 
 ```bash
 # Preview the list (no browser)
-node scripts/run-bridge-landing-queue.mjs --dry-run
+node scripts/runBridgeLandingQueue.mjs --dry-run
 
 # Run all 10 (image model in ChatGPT; ~10min each — use --from/--to to batch)
-node scripts/run-bridge-landing-queue.mjs
+node scripts/runBridgeLandingQueue.mjs
 
 # Single direction
-node scripts/run-bridge-landing-queue.mjs --only before-after
+node scripts/runBridgeLandingQueue.mjs --only before-after
 ```
 
-Index: `docs/positioning/bridge-landing-queue.json` · Prompts: `scripts/run-bridge-landing-queue.mjs`
+Index: `docs/positioning/bridge-landing-queue.json` · Prompts: `scripts/runBridgeLandingQueue.mjs`
 
 **Note:** `bridge ask` alone prints text only. This queue asks ChatGPT to **generate images**; `bridge download` saves them. For **code** into the repo use `--tools` (separate pass).
 

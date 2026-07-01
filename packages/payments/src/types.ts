@@ -1,4 +1,4 @@
-import type { Result } from '@vybekiit/core';
+import { Data, type Effect } from 'effect';
 
 /**
  * The payment processors VybeKiit ships an adapter for. A buyer runs exactly one
@@ -64,18 +64,26 @@ export interface OrderEvent {
 export type WebhookHeaders = Record<string, string | undefined>;
 
 /**
+ * Expected payment failure — a bad signature, an unknown variant, an upstream/network
+ * blip. A tagged error (ADR-0023) callers recover with `Effect.catchTag('PaymentError', …)`;
+ * `code` is the stable machine discriminant, `message` the developer detail.
+ */
+export class PaymentError extends Data.TaggedError('PaymentError')<{
+  readonly code: string;
+  readonly message: string;
+}> {}
+
+/**
  * The swappable payment seam. Each adapter is constructed from its own validated
  * config (api keys + webhook secret live in the factory, not per call), so both
- * methods are credential-free at the call site and uniform across vendors.
- *
- * `parseWebhook` is async because PayPal verifies signatures with a live API call;
- * the Lemon Squeezy and Stripe adapters verify locally and resolve immediately.
+ * methods are credential-free at the call site and uniform across vendors. Both
+ * return an `Effect` that fails with a {@link PaymentError} (ADR-0023).
  */
 export interface PaymentProvider {
   /** Which vendor this instance talks to. */
   readonly name: PaymentProviderName;
   /** Create a hosted checkout and return its redirect URL. */
-  createCheckout(params: CheckoutParams): Promise<Result<CheckoutResult>>;
+  createCheckout(params: CheckoutParams): Effect.Effect<CheckoutResult, PaymentError>;
   /** Verify + parse a raw webhook body into a normalized {@link OrderEvent}. */
-  parseWebhook(rawBody: string, headers: WebhookHeaders): Promise<Result<OrderEvent>>;
+  parseWebhook(rawBody: string, headers: WebhookHeaders): Effect.Effect<OrderEvent, PaymentError>;
 }

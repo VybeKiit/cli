@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 import { LOCAL_DEV_SESSION_TOKEN } from '../src/session';
 import { handleSignIn, handleMe } from '../src/http/handlers';
@@ -30,13 +31,12 @@ function deps(overrides: Partial<AuthHttpDeps> & { provider: AuthProvider }): Au
 describe('auth http handlers', () => {
   it('handleSignIn persists sessionToken and returns user only', async () => {
     const provider = {
-      signInWithPassword: vi.fn().mockResolvedValue({
-        ok: true,
-        value: {
+      signInWithPassword: vi.fn().mockReturnValue(
+        Effect.succeed({
           user: { id: 'u1', email: 'a@b.com' },
           sessionToken: 'bearer-token',
-        },
-      }),
+        }),
+      ),
     } as unknown as AuthProvider;
 
     const httpDeps = deps({ provider });
@@ -49,10 +49,7 @@ describe('auth http handlers', () => {
 
   it('handleMe reads cookie token and calls getUser', async () => {
     const provider = {
-      getUser: vi.fn().mockResolvedValue({
-        ok: true,
-        value: { id: 'u1', email: 'a@b.com' },
-      }),
+      getUser: vi.fn().mockReturnValue(Effect.succeed({ id: 'u1', email: 'a@b.com' })),
     } as unknown as AuthProvider;
 
     const httpDeps = deps({

@@ -73,12 +73,12 @@ Two hard constraints shape the answer:
 
 ## Update (2026-06-29) — generalized to all five repos, populated, triggers widened
 
-The original sync (`scripts/mirror-templates.mjs` + `mirror-templates.yml`) only ever covered the
+The original sync (`scripts/mirrorTemplates.mjs` + `mirror-templates.yml`) only ever covered the
 three templates, fired `on: release` only, and silently swallowed push failures. With zero releases
 cut, every mirror sat **empty** — so a real `npx vybekiit web` would clone an empty repo. This
 session closed that gap and reconciled the code with the prose above:
 
-1. **One registry, five repos.** `scripts/mirror-repos.mjs` replaces the templates-only script with a
+1. **One registry, five repos.** `scripts/mirrorRepos.mjs` replaces the templates-only script with a
    `MIRRORS` map of `{ repo, path }`: `web`/`mobile`/`extension` (`templates/<name>`), `cli` (root
    `cli/`), and `infra` (`infra/`). The split prefix is now the mapped `path`, so a mirror's source
    need not sit under `templates/` — this is what lets `cli` mirror at all (its prefix is the repo
@@ -96,7 +96,7 @@ session closed that gap and reconciled the code with the prose above:
    code rather than the last tag. The release trigger stays for deliberate versioned snapshots.
 5. **Failures now surface.** The previously dead `redact()` helper is wired into real per-mirror
    success/failure logging (token-redacted), replacing the silent swallow.
-6. **Guarded by a test in CI.** `scripts/mirror-repos.test.mjs` (run via `pnpm test:scripts`) locks
+6. **Guarded by a test in CI.** `scripts/mirrorRepos.test.mjs` (run via `pnpm test:scripts`) locks
    the registry invariants: arg validation rejects typos, the token never leaks into a log line, and
    every present mirror's source prefix exists on disk (drift guard).
 

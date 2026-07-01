@@ -1,3 +1,4 @@
+import { Schema } from 'effect';
 import { z } from 'zod';
 import { DEFAULT_APP_URL } from './constants';
 
@@ -691,29 +692,27 @@ export type CloudflareKvConfig = z.infer<typeof cloudflareKvConfigSchema>;
 export type I18nConfig = z.infer<typeof i18nConfigSchema>;
 export type ResendConfig = z.infer<typeof resendConfigSchema>;
 
-/**
- * Parse + validate one config slice from the environment, failing loud.
- *
- * On invalid/missing keys it throws a single error listing every offending key —
- * a misconfigured deploy should crash at startup with an actionable message, not
- * limp along and surface a confusing failure deep in a request (the `doctor`
- * skill relies on this clarity to translate the problem for a non-coder).
- *
- * Returns the schema's *output* type, so fields with `.default(...)` are
- * non-optional for callers (the env may omit them; the parsed result never does).
- *
- * @param schema - one of the per-concern schemas in this module
- * @param env - environment source (defaults to `process.env`)
- */
-export function parseEnv<S extends z.ZodTypeAny>(
-  schema: S,
+/** Parse + validate one config slice from the environment, failing loud (ADR-0023 dual-mode: Effect `Schema` or zod). */
+export function parseEnv<A, I>(schema: Schema.Schema<A, I>, env?: EnvSource): A;
+export function parseEnv<S extends z.ZodTypeAny>(schema: S, env?: EnvSource): z.infer<S>;
+export function parseEnv(
+  schema: Schema.Schema<unknown, unknown> | z.ZodTypeAny,
   env: EnvSource = process.env,
-): z.infer<S> {
-  const parsed = schema.safeParse(env);
-  if (parsed.success) return parsed.data;
-
-  const issues = parsed.error.issues
-    .map((issue) => `  - ${issue.path.join('.') || '(root)'}: ${issue.message}`)
-    .join('\n');
-  throw new Error(`Invalid VybeKiit configuration:\n${issues}`);
+): unknown {
+  // zod schemas expose `safeParse`; Effect Schemas don't — the strangler-fig discriminator.
+  // Both branches live until Slice 8 drops zod; every call-site keeps the same signature.
+  if ('safeParse' in schema && typeof schema.safeParse === 'function') {
+    const parsed = schema.safeParse(env);
+    if (parsed.success) return parsed.data;
+    const issues = parsed.error.issues
+      .map((issue) => `  - ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+      .join('\n');
+    throw new Error(`Invalid VybeKiit configuration:\n${issues}`);
+  }
+  try {
+    return Schema.decodeUnknownSync(schema as Schema.Schema<unknown, unknown>)(env);
+  } catch (caught) {
+    const detail = caught instanceof Error ? caught.message : String(caught);
+    throw new Error(`Invalid VybeKiit configuration:\n${detail}`);
+  }
 }

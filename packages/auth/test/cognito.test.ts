@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCognitoAuthProvider } from '../src/providers/cognito/index';
 
@@ -56,10 +57,10 @@ describe('createCognitoAuthProvider', () => {
 
   it('signUpWithPassword issues SignUpCommand and maps UserSub to id', async () => {
     send.mockResolvedValue({ UserSub: 'sub-1' });
-    const result = await provider().signUpWithPassword('a@b.com', 'pw');
+    const session = await Effect.runPromise(provider().signUpWithPassword('a@b.com', 'pw'));
 
-    expect(result.ok && result.value.user).toEqual({ id: 'sub-1', email: 'a@b.com' });
-    expect(result.ok && result.value.sessionToken).toBe('sub-1');
+    expect(session.user).toEqual({ id: 'sub-1', email: 'a@b.com' });
+    expect(session.sessionToken).toBe('sub-1');
     expect(issued(0).type).toBe('SignUp');
     expect(issued(0).input).toMatchObject({
       ClientId: 'client',
@@ -79,10 +80,10 @@ describe('createCognitoAuthProvider', () => {
         ],
       });
 
-    const result = await provider().signInWithPassword('a@b.com', 'pw');
+    const session = await Effect.runPromise(provider().signInWithPassword('a@b.com', 'pw'));
 
-    expect(result.ok && result.value.user).toEqual({ id: 'sub-9', email: 'a@b.com' });
-    expect(result.ok && result.value.sessionToken).toBe('acc');
+    expect(session.user).toEqual({ id: 'sub-9', email: 'a@b.com' });
+    expect(session.sessionToken).toBe('acc');
     expect(issued(0).type).toBe('InitiateAuth');
     expect(issued(0).input).toMatchObject({ AuthFlow: 'USER_PASSWORD_AUTH' });
     expect(issued(1).type).toBe('GetUser');
@@ -91,24 +92,26 @@ describe('createCognitoAuthProvider', () => {
 
   it('signInWithPassword fails when Cognito returns no access token', async () => {
     send.mockResolvedValue({ AuthenticationResult: {} });
-    const result = await provider().signInWithPassword('a@b.com', 'pw');
-    expect(!result.ok && result.error.code).toBe('signin_failed');
+    const error = await Effect.runPromise(
+      Effect.flip(provider().signInWithPassword('a@b.com', 'pw')),
+    );
+    expect(error.code).toBe('signin_failed');
   });
 
   it('sendEmailCode issues ResendConfirmationCode', async () => {
     send.mockResolvedValue({});
-    const result = await provider().sendEmailCode('a@b.com');
+    const value = await Effect.runPromise(provider().sendEmailCode('a@b.com'));
 
-    expect(result.ok).toBe(true);
+    expect(value).toBe(true);
     expect(issued(0).type).toBe('ResendConfirmationCode');
     expect(issued(0).input).toMatchObject({ ClientId: 'client', Username: 'a@b.com' });
   });
 
   it('verifyEmailCode issues ConfirmSignUp and keys the user by email', async () => {
     send.mockResolvedValue({});
-    const result = await provider().verifyEmailCode('a@b.com', '123456');
+    const session = await Effect.runPromise(provider().verifyEmailCode('a@b.com', '123456'));
 
-    expect(result.ok && result.value.user).toEqual({ id: 'a@b.com', email: 'a@b.com' });
+    expect(session.user).toEqual({ id: 'a@b.com', email: 'a@b.com' });
     expect(issued(0).type).toBe('ConfirmSignUp');
     expect(issued(0).input).toMatchObject({ Username: 'a@b.com', ConfirmationCode: '123456' });
   });
@@ -121,9 +124,9 @@ describe('createCognitoAuthProvider', () => {
         { Name: 'email', Value: 'a@b.com' },
       ],
     });
-    const result = await provider().getUser('acc-token');
+    const user = await Effect.runPromise(provider().getUser('acc-token'));
 
-    expect(result.ok && result.value).toEqual({ id: 'sub-3', email: 'a@b.com' });
+    expect(user).toEqual({ id: 'sub-3', email: 'a@b.com' });
     expect(issued(0).type).toBe('GetUser');
     expect(issued(0).input).toEqual({ AccessToken: 'acc-token' });
   });
@@ -132,15 +135,14 @@ describe('createCognitoAuthProvider', () => {
     send.mockRejectedValue(new Error('cognito boom'));
     const p = provider();
 
-    expect((await p.signUpWithPassword('a@b.com', 'pw')).ok).toBe(false);
-    const signup = await p.signUpWithPassword('a@b.com', 'pw');
-    const send_ = await p.sendEmailCode('a@b.com');
-    const verify = await p.verifyEmailCode('a@b.com', '0');
-    const get = await p.getUser('t');
+    const signup = await Effect.runPromise(Effect.flip(p.signUpWithPassword('a@b.com', 'pw')));
+    const sent = await Effect.runPromise(Effect.flip(p.sendEmailCode('a@b.com')));
+    const verify = await Effect.runPromise(Effect.flip(p.verifyEmailCode('a@b.com', '0')));
+    const get = await Effect.runPromise(Effect.flip(p.getUser('t')));
 
-    expect(!signup.ok && signup.error.code).toBe('signup_failed');
-    expect(!send_.ok && send_.error.code).toBe('otp_send_failed');
-    expect(!verify.ok && verify.error.code).toBe('otp_verify_failed');
-    expect(!get.ok && get.error.code).toBe('get_user_failed');
+    expect(signup.code).toBe('signup_failed');
+    expect(sent.code).toBe('otp_send_failed');
+    expect(verify.code).toBe('otp_verify_failed');
+    expect(get.code).toBe('get_user_failed');
   });
 });

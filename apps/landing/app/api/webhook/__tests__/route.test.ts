@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { POST } from '../route';
 
@@ -29,17 +30,16 @@ describe('POST /api/webhook', () => {
     vi.mocked(resolvePaymentProvider).mockReturnValue({
       name: 'lemon-squeezy',
       createCheckout: vi.fn(),
-      parseWebhook: vi.fn().mockResolvedValue({
-        ok: true,
-        value: {
+      parseWebhook: vi.fn().mockReturnValue(
+        Effect.succeed({
           provider: 'lemon-squeezy',
           eventName: 'order_created',
           orderId: '1',
           customerEmail: 'a@b.com',
           githubUsername: 'buyer',
           isRefund: false,
-        },
-      }),
+        }),
+      ),
     });
 
     const req = new Request('http://localhost/api/webhook', {

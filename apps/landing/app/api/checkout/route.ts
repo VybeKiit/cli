@@ -1,6 +1,7 @@
 import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 import { type AppConfig, appConfigSchema, parseEnv, storeConfigSchema } from '@vybekiit/core';
 import { resolvePaymentProvider } from '@vybekiit/payments';
+import { Cause, Effect, Exit, Option } from 'effect';
 import { NextResponse } from 'next/server';
 
 /**
@@ -41,18 +42,22 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Checkout is not available right now.' }, { status: 500 });
   }
 
-  const result = await resolvePaymentProvider().createCheckout({
-    productId,
-    githubUsername,
-    email,
-    successUrl: `${app.APP_URL}/success`,
-    cancelUrl: `${app.APP_URL}/cancel`,
-  });
+  const exit = await Effect.runPromiseExit(
+    resolvePaymentProvider().createCheckout({
+      productId,
+      githubUsername,
+      email,
+      successUrl: `${app.APP_URL}/success`,
+      cancelUrl: `${app.APP_URL}/cancel`,
+    }),
+  );
 
-  if (!result.ok) {
-    return NextResponse.json({ error: result.error.message }, { status: 502 });
+  if (Exit.isFailure(exit)) {
+    const message =
+      Option.getOrNull(Cause.failureOption(exit.cause))?.message ?? 'Checkout failed.';
+    return NextResponse.json({ error: message }, { status: 502 });
   }
-  return NextResponse.json({ url: result.value.url });
+  return NextResponse.json({ url: exit.value.url });
 }
 
 /** The fields the checkout form posts. Strings default to empty so absent keys validate as invalid. */

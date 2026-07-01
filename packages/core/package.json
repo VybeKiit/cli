@@ -29,12 +29,14 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "effect": "3.21.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@effect/vitest": "0.29.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^3.2.6"
   },
   "publishConfig": {
     "access": "public"

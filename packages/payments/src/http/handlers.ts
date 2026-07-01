@@ -1,8 +1,9 @@
 import type { Result } from '@vybekiit/core';
 import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/http';
+import { Cause, Effect, Exit, Option } from 'effect';
 import { isPaymentsUnconfigured } from '../practice';
-import { resolvePaymentProvider } from '../resolve';
-import type { OrderEvent } from '../types';
+import { Payments, resolvePaymentProvider } from '../resolve';
+import type { OrderEvent, PaymentError } from '../types';
 
 export interface CheckoutBody {
   productId?: string;
@@ -32,6 +33,13 @@ export type PaymentsHttpResponse = HttpResponse<
   { readonly url: string } | { readonly ok: true; readonly orderId?: string }
 >;
 
+/** Pull the {@link PaymentError} message from a failed run's cause; a defect falls back to a generic line. */
+function paymentErrorMessage(cause: Cause.Cause<PaymentError>): string {
+  return (
+    Option.getOrNull(Cause.failureOption(cause))?.message ?? 'Payment provider request failed.'
+  );
+}
+
 /** Start a purchase — provider-agnostic checkout handler shared by Next and Express. */
 export async function handleCheckout(
   body: CheckoutBody,
@@ -49,17 +57,21 @@ export async function handleCheckout(
     return ok({ url });
   }
 
-  const result = await resolvePaymentProvider(env).createCheckout({
-    productId,
-    ...(githubUsername ? { githubUsername } : {}),
-    ...(email ? { email } : {}),
-    ...(deps.appUrl ? { successUrl: deps.appUrl } : {}),
+  const provider = resolvePaymentProvider(env);
+  const program = Effect.gen(function* () {
+    const payments = yield* Payments;
+    return yield* payments.createCheckout({
+      productId,
+      ...(githubUsername ? { githubUsername } : {}),
+      ...(email ? { email } : {}),
+      ...(deps.appUrl ? { successUrl: deps.appUrl } : {}),
+    });
   });
-
-  if (!result.ok) {
-    return upstreamFailed(result.error.message);
+  const exit = await Effect.runPromiseExit(Effect.provideService(program, Payments, provider));
+  if (Exit.isFailure(exit)) {
+    return upstreamFailed(paymentErrorMessage(exit.cause));
   }
-  return ok({ url: result.value.url });
+  return ok({ url: exit.value.url });
 }
 
 /** Verify a provider webhook and run fulfillment. */
@@ -68,12 +80,17 @@ export async function handleWebhook(
   headers: Record<string, string>,
   deps: WebhookHttpDeps,
 ): Promise<PaymentsHttpResponse> {
-  const event = await resolvePaymentProvider(deps.env).parseWebhook(rawBody, headers);
-  if (!event.ok) {
-    return badInput(event.error.message);
+  const provider = resolvePaymentProvider(deps.env);
+  const program = Effect.gen(function* () {
+    const payments = yield* Payments;
+    return yield* payments.parseWebhook(rawBody, headers);
+  });
+  const exit = await Effect.runPromiseExit(Effect.provideService(program, Payments, provider));
+  if (Exit.isFailure(exit)) {
+    return badInput(paymentErrorMessage(exit.cause));
   }
 
-  const fulfilled = await deps.fulfillOrder(event.value);
+  const fulfilled = await deps.fulfillOrder(exit.value);
   if (!fulfilled.ok) {
     return upstreamFailed(fulfilled.error.message);
   }

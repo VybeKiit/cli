@@ -1,6 +1,7 @@
 import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 import { githubGateConfigSchema, parseEnv } from '@vybekiit/core';
 import { resolvePaymentProvider } from '@vybekiit/payments';
+import { Cause, Effect, Exit, Option } from 'effect';
 import { NextResponse } from 'next/server';
 
 /**
@@ -15,12 +16,14 @@ export async function POST(request: Request): Promise<NextResponse> {
   const rawBody = await request.text();
   const headers = Object.fromEntries(request.headers);
 
-  const event = await resolvePaymentProvider().parseWebhook(rawBody, headers);
-  if (!event.ok) {
-    return NextResponse.json({ error: event.error.message }, { status: 400 });
+  const exit = await Effect.runPromiseExit(resolvePaymentProvider().parseWebhook(rawBody, headers));
+  if (Exit.isFailure(exit)) {
+    const message =
+      Option.getOrNull(Cause.failureOption(exit.cause))?.message ?? 'Invalid webhook.';
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const { githubUsername, isRefund } = event.value;
+  const { githubUsername, isRefund } = exit.value;
   if (!githubUsername) {
     return NextResponse.json({ ok: true, gated: false });
   }

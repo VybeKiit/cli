@@ -1,14 +1,17 @@
 import {
-  authConfigSchema,
-  betterAuthConfigSchema,
-  cognitoConfigSchema,
-  dataConfigSchema,
+  type EnvSource,
   isBackendUnconfigured,
-  mongoConfigSchema,
   parseEnv,
   resolveEnvProvider,
-  type EnvSource,
 } from '@vybekiit/core';
+import { Context, Effect, Layer } from 'effect';
+import {
+  AuthConfigSchema,
+  BetterAuthConfigSchema,
+  CognitoConfigSchema,
+  DataConfigSchema,
+  MongoConfigSchema,
+} from './config';
 import { type BetterAuthInstance, createBetterAuthProvider } from './providers/better-auth/index';
 import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito/index';
 import { createLocalAuthProvider } from './providers/local/index';
@@ -47,18 +50,18 @@ export function resolveAuthProvider(
 
   const cognito = (): AuthProvider =>
     createCognitoAuthProvider({
-      config: parseEnv(cognitoConfigSchema, env),
+      config: parseEnv(CognitoConfigSchema, env),
       ...(injections.cognitoClient ? { client: injections.cognitoClient } : {}),
     });
   const injectedInstance = injections.betterAuthInstance
     ? { instance: injections.betterAuthInstance }
     : {};
 
-  const { AUTH_PROVIDER } = parseEnv(authConfigSchema, env);
+  const { AUTH_PROVIDER } = parseEnv(AuthConfigSchema, env);
   if (AUTH_PROVIDER === 'local') return createLocalAuthProvider();
   if (AUTH_PROVIDER === 'cognito') return cognito();
 
-  const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
+  const { DATA_PROVIDER } = parseEnv(DataConfigSchema, env);
   return resolveEnvProvider(
     DATA_PROVIDER,
     {
@@ -66,32 +69,50 @@ export function resolveAuthProvider(
       aws: () => cognito(),
       mongodb: (source) =>
         createBetterAuthProvider({
-          config: parseEnv(betterAuthConfigSchema, source),
-          mongo: parseEnv(mongoConfigSchema, source),
+          config: parseEnv(BetterAuthConfigSchema, source),
+          mongo: parseEnv(MongoConfigSchema, source),
           ...injectedInstance,
         }),
       supabase: (source) =>
         createBetterAuthProvider({
-          config: parseEnv(betterAuthConfigSchema, source),
+          config: parseEnv(BetterAuthConfigSchema, source),
           ...injectedInstance,
         }),
       neon: (source) =>
         createBetterAuthProvider({
-          config: parseEnv(betterAuthConfigSchema, source),
+          config: parseEnv(BetterAuthConfigSchema, source),
           ...injectedInstance,
         }),
       firebase: (source) =>
         createBetterAuthProvider({
-          config: parseEnv(betterAuthConfigSchema, source),
+          config: parseEnv(BetterAuthConfigSchema, source),
           ...injectedInstance,
         }),
       railway: (source) =>
         createBetterAuthProvider({
-          config: parseEnv(betterAuthConfigSchema, source),
+          config: parseEnv(BetterAuthConfigSchema, source),
           ...injectedInstance,
         }),
     },
     env,
     'supabase',
+  );
+}
+
+/** The auth provider as an injectable service — composition roots `Effect.provide` it (ADR-0023 DI). */
+export class Auth extends Context.Tag('@vybekiit/auth/Auth')<Auth, AuthProvider>() {}
+
+/**
+ * `Live` layer building {@link Auth} from the environment. Wraps the existing
+ * {@link resolveAuthProvider} factory, so config still fails loud when the layer is
+ * built at a composition root.
+ */
+export function makeAuthLive(
+  env: EnvSource = process.env,
+  injections: ResolveAuthInjections = {},
+): Layer.Layer<Auth> {
+  return Layer.effect(
+    Auth,
+    Effect.sync(() => resolveAuthProvider(env, injections)),
   );
 }

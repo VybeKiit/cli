@@ -13,7 +13,9 @@ import {
   ResendConfirmationCodeCommand,
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { type CognitoConfig, type Result, fail, ok } from '@vybekiit/core';
+import { type Result, fail, ok } from '@vybekiit/core';
+import type { CognitoConfig } from '../../config';
+import { type AuthProviderResult, toEffectAuthProvider } from '../../effect-bridge';
 import { toSessionResult } from '../../session';
 import type { AuthProvider } from '../../types';
 import { type AuthUser, normalizeAuthUser } from '../../user';
@@ -75,7 +77,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
   const client = options.client ?? buildCognitoClient(config);
   const clientId = config.COGNITO_CLIENT_ID;
 
-  return {
+  const impl: AuthProviderResult = {
     name: 'cognito',
     capabilities: COGNITO_CAPABILITIES,
 
@@ -212,6 +214,7 @@ export function createCognitoAuthProvider(options: CognitoProviderOptions): Auth
       return resolveUserFromAccessToken(client, sessionToken, 'get_user_failed');
     },
   };
+  return toEffectAuthProvider(impl);
 }
 
 /** Resolve a Cognito user from an access token via `GetUserCommand`. */

@@ -36,20 +36,52 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 
 ## Conventions
 
-Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
-traceable code). Specifically:
+<!-- rules digest — full guide in CODE-STYLE.md; edit there -->
 
-- **JSDoc/TSDoc** on every exported function, type/interface, and non-trivial pipeline — document
-  *why* and non-obvious constraints, not line-by-line restatement.
-- **One source of truth** for config: `packages/core` owns the `.env` loader + typed,
-  Zod-validated config. The root `.env.example` is the single source of truth for all keys.
-- **No scattered URLs/secrets.** Centralize endpoints in `core`. Never commit secrets.
-- Keep files readable (~200–400 lines); split when a file does multiple jobs.
-- Match the nearest sibling file's style; reuse existing helpers before writing new ones.
-- **Provider dispatch (ADR-0018):** before changing any `*_PROVIDER` adapter or `resolve.ts`, read
-  `.agents/skills/extend-provider-dispatch/SKILL.md`. Use `parseEnv` + `resolveEnvProvider` from
-  `@vybekiit/core`; never hand-roll `switch` on provider keys or raw `env.*_PROVIDER` compares.
-  Reference: `packages/payments/src/resolve.ts`.
+Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
+traceable code). **In flight: the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer` replace
+`Result` / zod / factory-wiring end-to-end, one gate-green slice at a time. The load-bearing rules —
+**full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
+
+- **A new module is not a new published package (ADR-0022).** Earn a public `@vybekiit/*` slot only
+  with real headless logic AND (a buyer-runtime consumer OR ≥2 adapters). Else: `shared/`
+  copy-on-scaffold, template-owned, or a `private: true` workspace package. Published spine is 6:
+  `core` (+`http`), `payments`, `auth`, `db`, `tokens`, `client-state`.
+- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (interface + DTOs + tagged `*Error`) ·
+  `config.ts` (`Schema.Struct` + Config `Tag`/`Layer`) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
+  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core`/`tokens` are library packages (exempt).
+- **Provider dispatch (ADR-0018, now Effect):** wire each provider as a `Live` `Layer`; the
+  `resolveEnvProvider` selector picks the adapter from `*_PROVIDER`. Never `new` a provider at a call
+  site, never hand-roll `switch`/`===` on `*_PROVIDER`. Before editing any adapter or `resolve.ts`,
+  read `.agents/skills/extend-provider-dispatch/SKILL.md`. Ref: `packages/payments/src/resolve.ts`.
+- **One source of truth for config:** per-concern **`Schema.Struct`** in each package's `config.ts`
+  (`core` keeps only the `parseEnv` engine); parse only your slice via `parseEnv`, fail loud. **No zod.**
+  Root `.env.example` is the SSOT for keys. No scattered URLs/secrets — centralize endpoints in `core`;
+  never commit secrets.
+- **Errors (ADR-0023):** return `Effect<A, E>` with a `Data.TaggedError` (`code` + `message`) for
+  expected failures; `throw` only for programmer/config errors; recover with `Effect.catchTag`. No
+  `Result`, no raw `try/catch` across an Effect seam. No bare `console.*` in published packages —
+  return an `Effect` (log via `Effect.log*`) or use `createLogger`.
+- **DI (ADR-0023):** providers + config are `Context.Tag` services wired by `Layer`; composition roots
+  `Effect.provide` them and run at the edge (`runPromiseExit` on servers, one `ManagedRuntime` on clients).
+- **Naming:** first-party module **folders and files are camelCase** — everything we author + import by
+  path (`providerDispatch.ts`, `useAsync.ts`, `mirrorRepos.mjs`); canonical role files keep fixed names
+  (`types.ts`/`config.ts`/`resolve.ts`/`index.ts`). **Kept on framework/ecosystem convention:** UI
+  components (`.tsx` + anything under `components/`, `dropdown-menu.tsx`), mirrored registry blocks, Next.js
+  reserved files, `*.config.ts`/`*.d.ts`, `.agents/skills/**`, `.py`/`.sh`. **Identity stays kebab:** the
+  `@vybekiit/*` name, public subpath exports, config values, route segments (`agentKit` →
+  `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
+- **Regex:** prefer a plain string method when it's as clear (`.replaceAll('x', y)` over `/x/g`); a kept
+  regex gets a one-line example comment above it (`input → output` or match/no-match). Full rule in CODE-STYLE.
+- **Types:** `interface` for contracts, `type` for unions + `Schema.Schema.Type<>`; fields `readonly`;
+  `unknown` over `any`; no casts except a vendor-type seam. Named exports only; no `export default` in
+  package source (except a Worker handler / `tsup.config.ts`).
+- **Docs (changed):** a **one-line** TSDoc on each export — no multi-line "why" essays inline; put
+  durable rationale in an ADR / `CONTEXT.md`. Keep files ~200–400 lines; match the nearest sibling;
+  reuse helpers before writing new ones.
+- **Tests:** colocate `*.test.ts` next to source (not a per-package `test/` dir). Effectful code uses
+  `@effect/vitest` (`it.effect` + `Exit`/`Either`). Vitest `3.2.6`, TDD red→green→refactor.
+- **Maintainer scripts** are `.mjs` + JSDoc types, `execFile`+`promisify`, secrets scrubbed from logs.
 
 ## TDD & quality gate (this is load-bearing — it's also the product promise)
 
@@ -111,7 +143,7 @@ you can take $1 and auto-invite yourself, the business is real.
 ## Current state (after the v1.0 scaffold)
 
 - **Built + green** (workspace members, in the CI gate): `packages/core`,
-  `packages/payments`, `packages/auth`, `packages/db`, `packages/browser-automation`, `packages/client-state`, `cli`
+  `packages/payments`, `packages/auth`, `packages/db`, `packages/browserAutomation`, `packages/clientState`, `cli`
   (the `vybekiit` scaffolder), and `templates/web` (a real Next.js app, `next build` + `tsc`
   gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
   the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —

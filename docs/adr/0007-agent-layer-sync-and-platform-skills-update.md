@@ -28,7 +28,7 @@ upstream before mirror sync.
    `platform-skills.manifest.json`, `skills-lock.json`, `.agents/skills/`.
    Never `src/`, `.env`, or buyer customizations.
 
-3. **Maintainer pin script:** `scripts/pin-platform-skills.mjs` reads per-template
+3. **Maintainer pin script:** `scripts/pinPlatformSkills.mjs` reads per-template
    `platform-skills.manifest.json`, runs `npx skills add`, updates `skills-lock.json`. CI runs it
    before mirror sync.
 
@@ -50,5 +50,5 @@ upstream before mirror sync.
 ## References
 
 - ADR-0005 — template mirror distribution
-- `scripts/pin-platform-skills.mjs`
+- `scripts/pinPlatformSkills.mjs`
 - `cli/src/sync-agent-layer.ts`

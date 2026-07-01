@@ -1,0 +1,285 @@
+# CODE-STYLE.md
+
+How code is written in **VybeKiit** (the maintainer monorepo — `packages/*`, `shared/*`, `cli/`,
+`scripts/`, `apps/*`). Prescriptive: _how to write_, not _what exists_ (that's `AGENTS.md`). The
+rules digest in `AGENTS.md` is mirrored **from** this file — edit here.
+
+> This file records the **desired end-state**. The load-bearing divergence from today's code is the
+> **Effect migration (ADR-0023)**: the kit is moving from `Result`/zod/factory-wiring to Effect +
+> `Schema` + `Layer`, end-to-end, one gate-green slice at a time. Where a rule below shows the Effect
+> shape but the code you're touching still shows the old shape, you're converting it — that's expected
+> mid-migration; `deslop` enforces per-diff. Buyer-facing template prose has its own voice — see
+> `templates/*/language.md`, not this file.
+
+## Stack & framework practices
+
+For framework/library best-practices, follow these skills — **do not restate them here**:
+
+- Cloudflare Workers / Pages, wrangler, edge → `workers-best-practices`, `cloudflare`, `wrangler`
+- Durable Objects / Agents SDK (realtime, jobs) → `durable-objects`, `agents-sdk`
+- Next.js web template → `vercel-react-best-practices`, `vercel-composition-patterns`
+- Expo mobile template → `building-native-ui`, `native-data-fetching`, `expo-*` family
+- Claude API usage (runtime `ai` concern, agent tooling) → `claude-api`
+- Cloudflare email → `cloudflare-email-service`
+- Schema / migration review (`db` presets) → `dba-schema-reviewer`
+- **Effect (effect system, `Schema`, `Layer`/`Context`)** → ADR-0023 + the Effect docs
+  (`effect.website`). Pinned at `effect@3.21.4`; this file covers only how VybeKiit uses it.
+
+This file covers only what's specific to VybeKiit on top of those.
+
+## Rules
+
+Load-bearing, project-specific rules. Each is one line + a real before/after.
+
+### A new module is not a new published package
+Sort every `packages/*` concern into one of four buckets (ADR-0022). Earn a **published**
+`@vybekiit/*` slot only with real headless logic **AND** (a buyer-runtime consumer **OR** ≥2 real
+adapters). Otherwise it is `shared/` copy-on-scaffold code, template-owned code, or a private
+workspace package.
+```jsonc
+// before  (packages/seo/package.json) — a 269-LOC local-only stub, published to npm
+{ "name": "@vybekiit/seo", "publishConfig": { "access": "public" } }
+// after — folded into the template as owned code; no package, no version to bump
+// templates/web/src/lib/seo.ts
+```
+_Why:_ 28 published packages is 28 version/changelog/publish targets; most were single-`local`
+stubs. Cutting to 6 keeps KISS without moving a module boundary. Buckets: **public npm** (`core`+`http`,
+`payments`, `auth`, `db`, `tokens`, `client-state`) · **`shared/` copied on scaffold** (`report-mode`,
+`observability`, `security`, `analytics`) · **template-owned** (the thin long tail) · **private
+workspace** (`browser-automation`, `agent-kit`, `ui-catalog-mcp`, `deploy`).
+
+### Concern packages follow the same skeleton (Effect DI)
+Every surviving provider package (`payments`, `auth`, `db`, …) has the same shape: `types.ts`
+(interface + DTOs + **tagged errors**) · `config.ts` (`Schema.Struct` + Config `Tag` + Config `Layer`) ·
+`resolve.ts` (the service `Tag` + `Live` `Layer`) · `providers/<name>/index.ts` (one adapter) ·
+`index.ts` (named-export barrel). Library packages (`core`, `tokens`) are the exempt second kind.
+```
+// exemplar  packages/payments/src/
+types.ts          → interface PaymentProvider + PaymentError (Data.TaggedError) + DTOs
+config.ts         → PaymentsConfigSchema (Schema.Struct) + PaymentsConfig Tag + PaymentsConfigLive
+resolve.ts        → Payments Tag + PaymentsLive Layer (wires an adapter over the config)
+providers/{lemonSqueezy,stripe,paypal}/index.ts → createXProvider(config) — Effect-returning methods
+index.ts          → export { ... } (explicit, named)
+```
+_Why:_ one predictable shape per concern → the agent (and a junior) can navigate any package blind.
+
+### Return `Effect<A, E>`; model expected failures as tagged errors
+Package boundaries that can fail for expected reasons return `Effect.Effect<A, E>`, where `E` is a
+`Data.TaggedError` carrying a stable `code` + `message`. Bugs and missing config still **throw**
+(fail-loud at boot). No `Result`, no `ok`/`err`/`fail`, no raw `try/catch` across an Effect seam —
+recover with `Effect.catchTag`/`catchAll`.
+```ts
+// packages/payments/src/types.ts — expected failure → typed error channel
+export class PaymentError extends Data.TaggedError('PaymentError')<{
+  readonly code: string; readonly message: string;
+}> {}
+createCheckout(params: CheckoutParams): Effect.Effect<CheckoutResult, PaymentError>;
+// packages/core/src/config.ts — config error → throw (fail loud)
+throw new Error(`Invalid VybeKiit configuration:\n${issues}`);
+```
+_Why:_ the buyer's agent branches on the tagged `code` to translate failures into plain language, and
+Effect composes the error channel through the whole program instead of hand-plumbed `Result`.
+
+### Config is a per-concern `Schema.Struct`; parse only your slice, fail loud
+Each concern owns its `XConfigSchema` (`Schema.Struct`) in its own `config.ts`; `core` keeps only the
+`parseEnv` engine + shared primitives. Consumers call `parseEnv(schema, env)` on their slice only.
+`.env.example` is the single source of truth for keys. **No zod** — `Schema` only.
+```ts
+// packages/payments/src/config.ts — payments owns its keys
+export const StripeConfigSchema = Schema.Struct({
+  STRIPE_SECRET_KEY: Schema.String.pipe(Schema.minLength(1)),
+});
+// packages/core/src/config.ts — the engine only (Schema.decodeUnknownSync under the hood)
+export const parseEnv = <A, I>(schema: Schema.Schema<A, I>, env = process.env): A => /* … */;
+```
+_Why:_ a feature never fails because an *unrelated* group of keys is blank; a misconfigured deploy
+crashes at startup with one actionable message the `doctor` skill can translate; `core` stops knowing
+about `stripe`.
+
+### Wire providers + config as Effect services (`Layer`/`Context`)
+Every concern exposes a service `Context.Tag` and a `Live` `Layer` built from its Config Layer.
+Composition roots (routes, cli, hooks) `Effect.provide` the Layers and run at the edge —
+`Effect.runPromiseExit` on servers, one `ManagedRuntime.make(AppLive)` on clients. Never `new` a
+provider at a call site.
+```ts
+// packages/payments/src/resolve.ts
+export class Payments extends Context.Tag('Payments')<Payments, PaymentProvider>() {}
+export const PaymentsLive = Layer.effect(
+  Payments,
+  Effect.gen(function* () { return resolvePaymentProvider(yield* PaymentsConfig); }),
+).pipe(Layer.provide(PaymentsConfigLive));
+// apps/landing/app/api/checkout/route.ts — provide + run at the edge
+const exit = await Effect.runPromiseExit(program.pipe(Effect.provide(PaymentsLive)));
+```
+_Why:_ one wiring shape; adding an adapter or swapping a provider is a Layer change, not a call-site
+edit, and tests inject a fake `Payments` Layer instead of mocking modules.
+
+### `interface` for contracts, `type` for unions & inferred; fields `readonly`
+`interface XProvider`/`XParams` for object shapes and the provider seam; `type` for unions,
+`Record`, and `Schema.Schema.Type<>` aliases. Contract fields are `readonly`. Never `any` — use
+`unknown` and narrow. No `I`-prefix on interfaces.
+```ts
+export type PaymentProviderName = 'lemon-squeezy' | 'stripe' | 'paypal';       // union
+export interface CheckoutParams { readonly productId: string; /* … */ }        // contract
+export type PaymentsConfig = Schema.Schema.Type<typeof PaymentsConfigSchema>;   // inferred
+```
+_Why:_ readonly DTOs + no `any` keep the headless packages safe to hand a non-coder's agent.
+
+### One-line TSDoc on exports — no multi-line "why" essays inline
+Every exported symbol gets a **one-line** summary. Non-obvious rationale (why a key is optional, why
+blank→default, threat model) goes in an **ADR or `CONTEXT.md`**, not a paragraph on the symbol.
+```ts
+// before  (packages/core/src/config.ts:securityConfigSchema) — ~15 lines of prose inline
+/**
+ * App-layer security — the protection every SaaS needs but a non-coder never thinks
+ * to ask for, so the kit ships it on by default ... one source of truth, three
+ * enforcement points ... `SECURITY_ORIGIN_LOCK`: reject cross-site POSTs whose ...
+ */
+// after — one line; the "why" lives in ADR-0009
+/** Secure-by-default app-layer limits (rate limit, origin lock). Rationale: ADR-0009. */
+```
+_Why:_ the dense essays are the single biggest driver of file length (`config.ts` was 719 lines).
+One-liners keep files inside the ~200–400 line rule; durable "why" belongs where decisions live.
+
+### camelCase folders and files; UI + contracts keep framework convention; verb-first functions
+First-party module folders are **camelCase** (`packages/clientState`, `packages/browserAutomation`,
+`providers/betterAuth`, `providers/lemonSqueezy`, `src/uiStore`). The published `@vybekiit/*` name and
+config values stay kebab, so folder and identity diverge on purpose: `agentKit` → `@vybekiit/agent-kit`,
+`providers/lemonSqueezy` → `PAYMENTS_PROVIDER=lemon-squeezy`. Folders whose name **is** an external
+contract keep that form and are never camelCased: Next.js route segments (the folder is the URL,
+`app/api/auth/forgot-password`), mirrored UI-registry blocks and feature replicas (`bundui/animated-beam`,
+`registry/new-york`, a template's `report-mode`), pinned platform-skill folders (`.agents/skills/add-crud`),
+preset identity folders (`presets/auth-bridge`, folder = preset id), and public asset dirs (`public/brand-marks`).
+Files are **camelCase** too — everything we author and import by relative/`@/` path
+(`providerDispatch.ts`, `envSource.ts`, `useAsync.ts`, our `.mjs` scripts like `mirrorRepos.mjs`) — with
+the fixed single-word role names kept as-is: `types.ts`, `config.ts`, `resolve.ts`, `index.ts`,
+`client.ts`. **Kept on their framework/ecosystem convention (never camelCased):** every UI component file
+(`.tsx` and anything under a `components/` tree — `dropdown-menu.tsx`, `hero-section.tsx`), mirrored
+registry blocks, Next.js reserved files (`global-error.tsx`), `*.config.ts`/`*.d.ts` contracts, pinned
+`.agents/skills/**` payloads, and `.py`/`.sh` files. **A public subpath export keeps its kebab identity
+even when the file is camelCase:** src `localeRules.ts` → `@vybekiit/i18n/locale-rules`, bridged by the
+tsup entry map. Functions are verb-first (`resolve*`,
+`parse*`, `create*`, `is*`); types use `*Provider`/`*Config`/`*Options`/`*Result` suffixes; tagged
+errors are `*Error`; service Tags + `Live` Layers share the concern's name (`Payments`/`PaymentsLive`).
+Everything else we author — including private tooling like `browserAutomation` — is camelCase; match the nearest sibling.
+```ts
+// packages/core/src/envSource.ts   (renames: provider-dispatch.ts → providerDispatch.ts · use-async.ts → useAsync.ts)
+// unchanged: templates/web/src/components/hero-section.tsx (UI component keeps framework convention)
+export function resolveEnvProvider<P>(/* … */) { /* … */ }
+```
+
+### Prefer a plain condition over a regex; else a one-line example comment
+Reach for a string method (`.startsWith`/`.endsWith`/`.includes`/`.replaceAll('x', y)`/`.split(',')`)
+over a regex whenever it reads as clearly — a literal `.replaceAll(',', '')` beats `/,/g`. When a regex
+genuinely earns its place (character classes, quantifiers, anchors, groups), put a **one-line comment
+with a concrete example directly above it** — `input → output` for a transform, or a match / no-match
+pair for a test.
+```ts
+// simpler wins — no regex needed
+const digits = value.replaceAll(',', ''); // was value.replace(/,/g, '')
+// regex earns it → one-line example above (keep [a-z0-9-], squeeze repeats, trim: "My R2!!Bucket " → "my-r2-bucket")
+const bucket = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+```
+_Why:_ half the kit's regexes are really a `startsWith`; the rest are opaque, and one example turns
+"what does this match?" into a fact the buyer's agent can verify without running it.
+
+### Named exports only; one explicit barrel per package
+Re-export the public surface explicitly from `index.ts` (with `type` modifiers on types). No
+`export default` except a framework requirement (Cloudflare Worker handler, `tsup.config.ts`).
+```ts
+// packages/payments/src/index.ts
+export { Payments, PaymentsLive } from './resolve';
+export { type CheckoutParams, type CheckoutResult, PaymentError } from './types';
+```
+_Why:_ named exports keep re-exports greppable and tree-shakeable; a default export hides the name.
+
+### Colocate tests as `*.test.ts`; use `@effect/vitest`
+New tests live beside their subject (`foo.ts` + `foo.test.ts`), not in a per-package `test/` dir.
+Effectful code is tested with `@effect/vitest` (`it.effect` + `Exit`/`Either` assertions), not
+`await runPromise` + `.ok`. Vitest `3.2.6`, TDD red→green→refactor. Tests never bundle (tsup entry is
+`src/index.ts`).
+```ts
+// packages/payments/src/providers/stripe/index.test.ts
+import { it } from '@effect/vitest';
+import { Effect, Exit } from 'effect';
+it.effect('parses a valid webhook into an OrderEvent', () =>
+  Effect.gen(function* () {
+    const event = yield* createStripeProvider(cfg).parseWebhook(body, headers);
+    expect(event.orderId).toBe('cs_test_1');
+  }));
+```
+_Why:_ the test moves/renames/deletes with the code it covers; `@effect/vitest` runs the effect and
+asserts on the typed success/failure channel instead of unwrapping by hand.
+
+### No bare `console.*` in published packages
+Headless packages return an `Effect` (log via `Effect.log*`) or use `createLogger`
+(production-silent). `console` is for `cli/`, `shared/report-mode`, and private tooling — code whose
+job is terminal/agent output.
+_Why:_ a stray `console.log` in a buyer's `node_modules` is noise they can't turn off.
+
+### Maintainer scripts are `.mjs` + JSDoc types
+`scripts/*.mjs` stay plain ESM typed via JSDoc (`@typedef`/`@type`), lead with a why + ADR header,
+shell out via `execFile` + `promisify` (not `execSync`), and **scrub secrets/tokens from logs**.
+```js
+// scripts/mirrorRepos.mjs
+/** @typedef {{ repo: string, path: string }} MirrorTarget */
+/** @type {readonly MirrorTarget[]} */
+const MIRRORS = [ /* … */ ];
+```
+
+## Recipes
+
+### Add an adapter to an existing concern (`payments`, `auth`, `db`, …)
+1. Add the vendor's `XConfigSchema` (`Schema.Struct`) in that concern's `config.ts`.
+2. Add the enum value to the concern's `*_PROVIDER` schema.
+3. Write `providers/<name>/index.ts` → `createXProvider(config)` with **Effect-returning** methods (errors as tagged `XError`).
+4. Register it in `resolve.ts` (the `Live` Layer's provider selector).
+5. Add `providers/<name>/index.test.ts` (colocated, `@effect/vitest`). Add keys to `.env.example`.
+6. **No new skill** — goal-named buyer skills already route to the interface.
+
+### Add a new capability — decide the bucket first (ADR-0022)
+Default to **template-owned code** (`templates/*/src/lib/…`) or **`shared/`** (if 2+ templates need
+it). Create a **published `@vybekiit/*` package only** when it has real headless logic AND a
+buyer-runtime consumer OR ≥2 real adapters. Never publish a single-`local`-provider stub.
+
+### Add shared cross-template code
+Put the single source in `shared/<name>/`; the CLI copies it into each scaffold on `vybekiit new`
+(like the agent layer, ADR-0007). It is owned in the buyer's repo — off npm.
+
+## Exemplars
+
+Write new code like these:
+- `packages/payments/` — the concern-package skeleton (types/config/resolve-Layer/providers/barrel).
+- `packages/core/src/config.ts` — `parseEnv` over `Schema.decodeUnknownSync`.
+- `packages/core/src/envSource.ts` — `resolveEnvProvider` dispatch.
+- `packages/payments/src/resolve.ts` — a service `Tag` + `Live` `Layer`.
+- `scripts/mirrorRepos.mjs` — a typed `.mjs` maintainer script.
+
+## Never
+
+- **Publish a single-`local`-provider stub** as `@vybekiit/*` — fold it into the template (ADR-0022).
+- **Create a new published package for a new module** — earn the slot first.
+- `Result`/`ok`/`err`/`fail` or `Promise<Result<…>>` — return `Effect<A, E>` with a tagged error (ADR-0023).
+- Raw `try/catch` across an Effect seam — recover with `Effect.catchTag`/`catchAll`.
+- `zod` anywhere — validate with Effect `Schema` (ADR-0023).
+- A regex where a plain string method reads as clearly, or a kept regex with **no one-line example comment** above it.
+- `new`-ing a provider at a call site — resolve it from its `Layer`.
+- `switch`/`===` on a `*_PROVIDER` value — use the Layer selector / `resolveEnvProvider` (ADR-0018).
+- `export default` in package source (except Worker handler / `tsup.config.ts`).
+- Bare `console.*` in a published package — return an `Effect` or use `createLogger`.
+- `any`, or a cast except at a vendor-type seam (e.g. Supabase dynamic tables).
+- Multi-line "why" essays on a symbol — one line; put the why in an ADR/`CONTEXT.md`.
+- Two libraries for one job (the CLI currently ships **both** `@clack/prompts` and
+  `@inquirer/prompts` — pick one).
+- Scattered URLs/secrets — centralize endpoints in `core`; keys live only in `.env`.
+
+## Dependency notes
+
+Library decisions live in ADRs; this section only flags health.
+- **Adopted (ADR-0023):** `effect@3.21.4` (effect system + `Schema` + `Layer`), `@effect/vitest@0.29.0`.
+  Pinned exactly — the API moves fast; bump deliberately.
+- **Removed (ADR-0023):** `zod` — replaced everywhere by Effect `Schema`. The zod 3→4 upgrade is cancelled.
+- **Pinned:** `vitest@3.2.6` — capped at 3.x because stable `@effect/vitest@0.29.0` peers `vitest ^3.2.0` (vitest 4 needs a `@effect/vitest` beta).
+- **Duplicative:** `@clack/prompts` + `@inquirer/prompts` in `cli/` — two prompt libs, one job. Resolve to one (ADR follow-up).
+- **Stale (accepted):** `@lemonsqueezy/lemonsqueezy.js` — treat as docs-only; drive via `browser-automation` `ls` (CONTEXT.md).
+- **Pre-1.0 (watch):** `agnix ^0.36` (agent-config linter).

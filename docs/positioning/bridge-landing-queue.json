@@ -1,6 +1,6 @@
 {
-  "description": "Batch queue for ChatGPT hero mockup images via ai-browser-bridge. Full prompts live in scripts/run-bridge-landing-queue.mjs.",
-  "run": "node scripts/run-bridge-landing-queue.mjs",
+  "description": "Batch queue for ChatGPT hero mockup images via ai-browser-bridge. Full prompts live in scripts/runBridgeLandingQueue.mjs.",
+  "run": "node scripts/runBridgeLandingQueue.mjs",
   "outputDir": "out/landing-inspirations",
   "items": [
     {
