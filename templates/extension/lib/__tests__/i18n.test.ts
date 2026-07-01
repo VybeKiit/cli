@@ -13,7 +13,8 @@ describe('i18n', () => {
       string,
       { message: string }
     >;
-    expect(messages['popup.title']?.message).toBe('My VybeKiit Extension');
-    expect(messages['popup.openWebApp']?.message).toBe('Open web app');
+    expect(messages.ext_name?.message).toBe('My VybeKiit Extension');
+    expect(messages.popup_title?.message).toBe('My VybeKiit Extension');
+    expect(messages.popup_openWebApp?.message).toBe('Open web app');
   });
 });
