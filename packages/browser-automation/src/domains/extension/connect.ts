@@ -34,7 +34,7 @@ export async function connectToCwsChrome(ctx: VerbContext): Promise<AttachedSess
 
   let browser: Browser;
   try {
-    browser = await chromium.connectOverCDP(endpoint, { timeout: 15_000 });
+    browser = await chromium.connectOverCDP(endpoint, { timeout: 15_000, noDefaults: true });
   } catch (err) {
     throw new CdpUnreachableError(endpoint, err);
   }

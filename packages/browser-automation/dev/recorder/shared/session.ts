@@ -19,7 +19,7 @@ export async function attachRecorderSession(options: {
 
   let browser: Browser;
   try {
-    browser = await chromium.connectOverCDP(cdpEndpoint, { timeout: 15_000 });
+    browser = await chromium.connectOverCDP(cdpEndpoint, { timeout: 15_000, noDefaults: true });
   } catch (err) {
     throw new CdpUnreachableError(cdpEndpoint, profileHint, err);
   }

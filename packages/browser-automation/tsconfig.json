@@ -3,7 +3,12 @@
   "compilerOptions": {
     "noEmit": true,
     "lib": ["ES2022", "DOM"],
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@vybekiit/deploy": ["../deploy/src/registrar/index.ts"],
+      "@vybekiit/core": ["../core/src/index.ts"]
+    }
   },
   "include": ["src", "test", "dev", "tsup.config.ts", "vitest.config.ts"]
 }
