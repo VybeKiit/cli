@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HERO_STACK_MARKS } from '@/data/brand-marks-3d';
+import { HERO_STACK_MARKS } from '@/data/brandMarks3d';
 import { PRODUCT_STACK_MARKS } from '@/data/landing';
 
 describe('hero stack marks manifest', () => {

@@ -1,5 +1,5 @@
 import { inviteToRepo, removeFromRepo } from '@/lib/gate';
-import { type GithubGateConfig, githubGateConfigSchema } from '@vybekiit/core';
+import { type GithubGateConfig, githubGateConfigSchema, parseEnv } from '@vybekiit/core';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const gateConfig: GithubGateConfig = {
@@ -61,7 +61,7 @@ describe('gate multi-mirror invite/remove', () => {
 
 describe('githubGateConfigSchema', () => {
   it('parses CSV repos with defaults', () => {
-    const parsed = githubGateConfigSchema.parse({
+    const parsed = parseEnv(githubGateConfigSchema, {
       GITHUB_GATE_TOKEN: 'tok',
     });
     expect(parsed.GITHUB_GATE_ORG).toBe('VybeKiit');

@@ -21,12 +21,13 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
     return null;
   }
 
+  // "$1,200k" → ["", "$", "1,200", "k"]; optional +/$ sign, then $, grouped number, optional k/+
   const currencyMatch = trimmed.match(/^([+$]?)(\$)([\d,]+(?:\.\d+)?)(k|\+)?$/i);
   if (currencyMatch) {
     const sign = currencyMatch[1] ?? '';
     const numPart = currencyMatch[3] ?? '';
     const unit = currencyMatch[4] ?? '';
-    const numeric = Number(numPart.replace(/,/g, ''));
+    const numeric = Number(numPart.replaceAll(',', ''));
     if (Number.isNaN(numeric)) {
       return null;
     }
@@ -39,6 +40,7 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
     );
   }
 
+  // "+12.5%" → ["+12.5", "%"]; optional leading +, a number, required trailing %
   const percentMatch = trimmed.match(/^([+]?\d+(?:\.\d+)?)(%)$/);
   if (percentMatch) {
     const numPart = percentMatch[1] ?? '';
@@ -57,16 +59,19 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
     );
   }
 
+  // "500+" → ["500", "+"]; digits then a trailing +
   const plusSuffixMatch = trimmed.match(/^(\d+)(\+)$/);
   if (plusSuffixMatch) {
     return { value: Number(plusSuffixMatch[1]), prefix: '', suffix: plusSuffixMatch[2] ?? '' };
   }
 
+  // "1,200 users" → ["1,200", " users"]; optional +, grouped/decimal number, then any suffix
   const plainNumberMatch = trimmed.match(/^([+]?\d[\d,]*(?:\.\d+)?)(.*)$/);
   if (plainNumberMatch) {
     const numPart = plainNumberMatch[1] ?? '';
     const rest = plainNumberMatch[2] ?? '';
-    const normalizedNum = numPart.replace(/^\+/, '').replace(/,/g, '');
+    // strip a leading "+" then thousands separators: "+1,200" → "1200"
+    const normalizedNum = numPart.replace(/^\+/, '').replaceAll(',', '');
     const numeric = Number(normalizedNum);
     if (Number.isNaN(numeric)) {
       return null;

@@ -1,5 +1,5 @@
 import { BUILDER_TOOL_MARKS, PRODUCT_STACK_MARKS } from '@/data/landing';
-import { VIBE_HINTS } from '@/data/vibe-hints';
+import { VIBE_HINTS } from '@/data/vibeHints';
 import { describe, expect, it } from 'vitest';
 
 function allBrandMarkSlugs(): string[] {

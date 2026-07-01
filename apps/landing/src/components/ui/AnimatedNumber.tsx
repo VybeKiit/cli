@@ -3,7 +3,7 @@
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 import { spinTiming } from '@/components/ui/TypewriterText';
-import { parseDisplayNumber } from '@/lib/parse-display-number';
+import { parseDisplayNumber } from '@/lib/parseDisplayNumber';
 import { cn } from '@/lib/utils';
 import NumberFlow from '@number-flow/react';
 

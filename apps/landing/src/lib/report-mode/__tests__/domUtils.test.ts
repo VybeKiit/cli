@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { countElementsWithExactLabel, getShortestUniqueLabel } from '@/lib/report-mode/dom-utils';
+import { countElementsWithExactLabel, getShortestUniqueLabel } from '@/lib/report-mode/domUtils';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('getShortestUniqueLabel', () => {

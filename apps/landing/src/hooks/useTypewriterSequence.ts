@@ -2,7 +2,7 @@
 
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useReducedMotion } from '@/lib/motion';
-import { sanitizeTypewriterText } from '@/lib/sanitize-typewriter-text';
+import { sanitizeTypewriterText } from '@/lib/sanitizeTypewriterText';
 import { useEffect, useState } from 'react';
 
 export interface UseTypewriterSequenceOptions {

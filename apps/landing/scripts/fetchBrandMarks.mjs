@@ -1,6 +1,6 @@
 /**
  * One-off: fetch official brand logos and emit 64×64 WebP @ quality 90.
- * Run: node scripts/fetch-brand-marks.mjs
+ * Run: node scripts/fetchBrandMarks.mjs
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';

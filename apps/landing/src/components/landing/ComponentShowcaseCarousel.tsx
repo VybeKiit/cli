@@ -2,7 +2,7 @@
 
 import { ComponentPreviewCard } from '@/components/landing/ComponentPreviewCard';
 import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
-import { SHOWCASE_WEB } from '@/data/component-showcase';
+import { SHOWCASE_WEB } from '@/data/componentShowcase';
 
 /** Auto-scrolling row of curated SaaS UI mirror previews for the hero. */
 export function ComponentShowcaseCarousel() {

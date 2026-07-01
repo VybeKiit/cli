@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { VIBE_HINTS } from '@/data/vibe-hints';
+import { VIBE_HINTS } from '@/data/vibeHints';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 

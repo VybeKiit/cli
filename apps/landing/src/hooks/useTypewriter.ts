@@ -1,6 +1,6 @@
 'use client';
 
-import { sanitizeTypewriterText } from '@/lib/sanitize-typewriter-text';
+import { sanitizeTypewriterText } from '@/lib/sanitizeTypewriterText';
 import { useReducedMotion } from '@/lib/motion';
 import { useEffect, useMemo, useState } from 'react';
 

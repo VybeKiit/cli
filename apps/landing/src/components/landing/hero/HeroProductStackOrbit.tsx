@@ -1,6 +1,6 @@
 'use client';
 
-import { HERO_STACK_MARKS } from '@/data/brand-marks-3d';
+import { HERO_STACK_MARKS } from '@/data/brandMarks3d';
 import { cn } from '@/lib/utils';
 
 /** Static product-stack marks behind the hero headline — CSS float only, no WebGL. */

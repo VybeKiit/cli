@@ -4,7 +4,7 @@ import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { PRICE } from '@/data/site';
-import { postJson } from '@/lib/fetch-json';
+import { postJson } from '@/lib/fetchJson';
 import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 import { type FormEvent, useState } from 'react';
 

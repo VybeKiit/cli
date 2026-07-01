@@ -1,4 +1,4 @@
-import { COMPONENT_CATALOG_COUNT } from '@/data/component-showcase';
+import { COMPONENT_CATALOG_COUNT } from '@/data/componentShowcase';
 
 /** Dynamic badge showing total mirrored UI building blocks. */
 export function HeroComponentCountBadge() {

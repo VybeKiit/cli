@@ -19,8 +19,8 @@ import {
   getCssPath,
   getShortestUniqueLabel,
   getVisibleText,
-} from '@/lib/report-mode/dom-utils';
-import { submitReportHandoff } from '@/lib/report-mode/submit-report';
+} from '@/lib/report-mode/domUtils';
+import { submitReportHandoff } from '@/lib/report-mode/submitReport';
 import { cn } from '@/lib/utils';
 import {
   getDockPlacementStyle,

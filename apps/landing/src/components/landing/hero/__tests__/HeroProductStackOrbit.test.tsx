@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { HeroProductStackOrbit } from '@/components/landing/hero/HeroProductStackOrbit';
-import { HERO_STACK_MARKS } from '@/data/brand-marks-3d';
+import { HERO_STACK_MARKS } from '@/data/brandMarks3d';
 
 describe('HeroProductStackOrbit', () => {
   it('renders static orbit layer with one img per manifest entry', () => {
