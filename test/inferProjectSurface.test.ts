@@ -3,7 +3,7 @@ import {
   inferProjectSurfaceSync,
   reportModeEnvKeysForSurface,
   type ProjectSurfaceProbe,
-} from '../src/lib/infer-project-surface';
+} from '../src/lib/inferProjectSurface';
 
 function probe(files: Record<string, string>): ProjectSurfaceProbe {
   return {

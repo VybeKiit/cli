@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { planAgentLayerCompliance } from '@vybekiit/agent-kit';
-import { loadAgentLayerSnapshot } from '../lib/agent-layer-snapshot';
-import { resolveTemplateArg } from '../lib/agent-layer-io';
+import { loadAgentLayerSnapshot } from '../lib/agentLayerSnapshot';
+import { resolveTemplateArg } from '../lib/agentLayerIo';
 
 function parseLiveDocsEnv(): Record<string, string> | undefined {
   const raw = process.env.VYBEKIIT_AGENT_RUNTIME_DOCS;

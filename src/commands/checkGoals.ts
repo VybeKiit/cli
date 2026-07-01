@@ -1,6 +1,6 @@
 import process from 'node:process';
 import { checkGoalDrift } from '@vybekiit/agent-kit';
-import { listSkillPaths, resolveTemplateArg } from '../lib/agent-layer-io';
+import { listSkillPaths, resolveTemplateArg } from '../lib/agentLayerIo';
 
 export async function runCheckGoals(
   args: string[],

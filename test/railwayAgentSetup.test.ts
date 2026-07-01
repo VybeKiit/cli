@@ -4,7 +4,7 @@ import {
   isRailwayStackActive,
   runRailwayAgentSetup,
   verifyCoupledStack,
-} from '../src/doctor/railway-agent-setup';
+} from '../src/doctor/railwayAgentSetup';
 
 describe('railway agent setup', () => {
   it('detects active railway stack from hosting or data', () => {

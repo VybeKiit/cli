@@ -7,7 +7,7 @@ import {
   type PlatformSkillsManifest,
   type SkillsLockFile,
 } from '@vybekiit/agent-kit';
-import { inferProjectSurfaceSync } from '../lib/infer-project-surface';
+import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 
 export interface PlatformSkillsReport {
   readonly ok: boolean;

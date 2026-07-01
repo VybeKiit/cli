@@ -2,22 +2,22 @@ import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
-import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/infer-project-surface';
-import { formatPlatformSkillsReport, verifyPlatformSkills } from './platform-skills';
-import { computeDoctorExitCode, reportFor } from './plan-doctor-run';
-import { verifyProjectHealth } from './project-health';
-import { provisionR2Storage } from './storage-r2';
-import { formatProductSurfaceHints } from './product-surface';
-import { ensureCodexSkillsEnabled } from './codex-config';
-import { verifyPresetsDoctor } from './verify-presets';
-import { verifyNamecheapDoctor } from './verify-namecheap';
-import { verifyGodaddyDoctor } from './verify-godaddy';
-import { verifyEmailWorkerDoctor } from './verify-email-worker';
+import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
+import { formatPlatformSkillsReport, verifyPlatformSkills } from './platformSkills';
+import { computeDoctorExitCode, reportFor } from './planDoctorRun';
+import { verifyProjectHealth } from './projectHealth';
+import { provisionR2Storage } from './storageR2';
+import { formatProductSurfaceHints } from './productSurface';
+import { ensureCodexSkillsEnabled } from './codexConfig';
+import { verifyPresetsDoctor } from './verifyPresets';
+import { verifyNamecheapDoctor } from './verifyNamecheap';
+import { verifyGodaddyDoctor } from './verifyGodaddy';
+import { verifyEmailWorkerDoctor } from './verifyEmailWorker';
 import {
   formatRailwayStackReport,
   isRailwayStackActive,
   runRailwayAgentSetup,
-} from './railway-agent-setup';
+} from './railwayAgentSetup';
 import {
   formatReport,
   type InstallAction,

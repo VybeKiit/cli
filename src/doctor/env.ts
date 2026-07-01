@@ -11,4 +11,4 @@ export function mergeEnv(
   return mergeEnvFile(processEnv, fileEnv);
 }
 
-export { writeEnvKeys } from './write-env-keys';
+export { writeEnvKeys } from './writeEnvKeys';

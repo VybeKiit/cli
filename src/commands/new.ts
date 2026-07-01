@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveTemplatesSource } from '../lib/resolve-templates';
+import { resolveTemplatesSource } from '../lib/resolveTemplates';
 import { isTemplateName, ScaffoldError, scaffold, type TemplateName } from '../lib/scaffold';
-import { promptTemplateSelect } from '../prompts/template-select';
+import { promptTemplateSelect } from '../prompts/templateSelect';
 import { isInteractive } from '../prompts/tty';
 
 const HERE = dirname(fileURLToPath(import.meta.url));

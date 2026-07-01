@@ -1,4 +1,4 @@
-import { inferProjectSurfaceSync } from './infer-project-surface';
+import { inferProjectSurfaceSync } from './inferProjectSurface';
 import type { TemplateName } from './scaffold';
 
 /**

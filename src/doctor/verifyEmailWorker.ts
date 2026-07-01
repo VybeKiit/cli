@@ -13,8 +13,10 @@ export type EmailWorkerDoctorReport = {
 
 function healthUrl(endpoint: string): string {
   const url = new URL(endpoint);
+  // swap a trailing "/send" or "/send/" for "/health": "/api/send" → "/api/health"
   url.pathname = url.pathname.replace(/\/send\/?$/, '/health');
   if (!url.pathname.endsWith('/health')) {
+    // drop a trailing slash before appending: "/api/" → "/api"
     url.pathname = `${url.pathname.replace(/\/$/, '')}/health`;
   }
   return url.toString();

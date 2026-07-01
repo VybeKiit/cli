@@ -9,6 +9,7 @@ export interface R2ProvisionResult {
 }
 
 function sanitizeBucketName(name: string): string {
+  // R2 slug: lowercase, non-[a-z0-9-] → "-", squeeze repeats, trim edges: "My App!!" → "my-app"
   return name
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, '-')

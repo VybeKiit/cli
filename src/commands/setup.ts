@@ -1,5 +1,5 @@
 import { runDoctor } from '../doctor/run';
-import { playWelcomeBanner } from '../ui/welcome-banner';
+import { playWelcomeBanner } from '../ui/welcomeBanner';
 
 /** Post-purchase welcome: brand banner → toolchain doctor → scaffold CTA. */
 export async function runSetup(): Promise<number> {

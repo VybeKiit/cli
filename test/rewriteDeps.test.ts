@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rewriteWorkspaceDeps } from '../src/lib/rewrite-deps';
+import { rewriteWorkspaceDeps } from '../src/lib/rewriteDeps';
 import { isTemplateName } from '../src/lib/scaffold';
 
 describe('rewriteWorkspaceDeps', () => {

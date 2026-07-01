@@ -28,12 +28,14 @@ export async function runEnvWizard(cwd: string = process.cwd()): Promise<number>
   for (const key of keys) {
     const ref = Object.values(TECH_REFERENCE_MAP).find((r) => r.envKeys?.includes(key));
     const docsHint = ref ? ` (Docs: ${ref.docsUrl})` : '';
+    // read this key's current line and unquote it: 'PORT="3000"' → '3000'
     const current = envContent.match(new RegExp(`^${key}=(.*)$`, 'm'))?.[1]?.replace(/^"|"$/g, '');
     const value = await input({
       message: `${key}${docsHint}`,
       default: current ?? '',
     });
     if (envContent.includes(`${key}=`)) {
+      // replace the whole KEY=... line: 'PORT=old' → 'PORT="new"'
       envContent = envContent.replace(new RegExp(`^${key}=.*$`, 'm'), `${key}="${value}"`);
     } else {
       envContent += `${envContent.endsWith('\n') || envContent === '' ? '' : '\n'}${key}="${value}"\n`;

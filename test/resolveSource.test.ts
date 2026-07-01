@@ -2,7 +2,7 @@ import { stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type ResolveDeps, resolveTemplatesSource } from '../src/index';
+import { type ResolveDeps, resolveTemplatesSource } from '../src';
 import { ScaffoldError } from '../src/lib/scaffold';
 
 /**

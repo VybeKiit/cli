@@ -1,5 +1,5 @@
 import type { PlatformSkillsTemplateManifest } from '@vybekiit/agent-kit';
-import { readAgentSkillSymlinkStates } from './agent-skill-symlinks';
+import { readAgentSkillSymlinkStates } from './agentSkillSymlinks';
 import {
   COMPLIANCE_FILES,
   listPlatformSkillWrappers,
@@ -7,7 +7,7 @@ import {
   readBuyerSkillStubContents,
   readFilesByPath,
   readOptionalFile,
-} from './agent-layer-io';
+} from './agentLayerIo';
 
 /** Everything check-agent-layer needs from disk — one loader, one test fixture tree. */
 export interface AgentLayerSnapshot {
