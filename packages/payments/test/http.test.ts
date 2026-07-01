@@ -59,6 +59,9 @@ describe('handlePracticeComplete', () => {
       },
     );
     expect(result.status).toBe(200);
+    if (!('ok' in result.body)) {
+      throw new Error('Expected practice completion body');
+    }
     expect(result.body.ok).toBe(true);
     if ('orderId' in result.body) {
       expect(result.body.orderId).toMatch(/^practice_plan_pro_/);
