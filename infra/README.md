@@ -21,13 +21,29 @@ the source that the mirror's README is generated from.
 ```
 infra/
 ├── cloudflare/
-│   ├── wrangler.toml          # Worker/Pages skeleton + where the rate-limit/WAF rules attach
+│   ├── wrangler.toml          # Edge security Worker skeleton
 │   └── security-worker.ts     # Edge security Worker — mirrors the app-layer policy
+├── scripts/
+│   ├── provision-domain.mjs   # CF zone + optional Namecheap NS + email sending
+│   └── deploy-landing.mjs     # CF Pages deploy helper
 ├── supabase/
-│   └── migrations/            # SQL migrations (placeholder — lands with issue #7)
-├── scripts/                   # Provisioning/deploy helpers (placeholder — lands with issue #7)
-└── README.md                  # ← you are here (the mirror's README is derived from this)
+│   └── migrations/
+└── README.md
 ```
+
+Transactional email worker: **`packages/email/worker/`** (see that README).
+
+## Domain + email setup
+
+All secrets live in the **monorepo root `.env`** (copy from `.env.example`).
+
+```bash
+DOMAIN=yourdomain.com node infra/scripts/provision-domain.mjs
+cd packages/email/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET && npm run deploy
+pnpm email:test-send you@example.com
+```
+
+See `templates/web/.vybekiit/platform-skills/cloudflare-email-vybekiit.md` for the full buyer path.
 
 ## The security edge layer
 
@@ -75,8 +91,6 @@ non-secret policy toggles only.
 
 ## Status
 
-- **Shipping now:** the security edge config — `security-worker.ts` + `wrangler.toml`,
-  reading the same env toggles as the app layer.
-- **Lands with issue #7:** Supabase SQL migrations (`supabase/migrations/`) and deploy helper
-  scripts (`scripts/deploy-landing.mjs`). Cloudflare Ruleset/WAF automation still documented in
-  `wrangler.toml` for a later pass.
+- **Shipping now:** the security edge config — `security-worker.ts` + `wrangler.toml`.
+- **Shipping now:** email worker at `packages/email/worker/` + `scripts/provision-domain.mjs`.
+- **Lands with issue #7:** Supabase SQL migrations and full deploy helper automation.
