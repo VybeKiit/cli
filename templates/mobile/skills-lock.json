@@ -239,7 +239,7 @@
       "source": "mongodb/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/mongodb-schema-design/SKILL.md",
-      "computedHash": "1324e3d2f8d0dc487a5d2921cd81f28e4c4205861ab5b2a9408ed68f758e9ac0"
+      "computedHash": "627fd7407c033de8364bd44a599adff29cbb863a71ebea88a2f8fe7170baa7cb"
     },
     "mongodb-search-and-ai": {
       "source": "mongodb/agent-skills",
@@ -359,6 +359,12 @@
       "sourceType": "github",
       "skillPath": "skills/react-best-practices/SKILL.md",
       "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
+    },
+    "web-to-native": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/web-to-native/SKILL.md",
+      "computedHash": "80590c29476850ecbfc0a483515056614e15f274010e4aa2fc4edd76224e28b6"
     },
     "workers-best-practices": {
       "source": "cloudflare/skills",

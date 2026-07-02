@@ -155,7 +155,7 @@
       "source": "mongodb/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/mongodb-schema-design/SKILL.md",
-      "computedHash": "1324e3d2f8d0dc487a5d2921cd81f28e4c4205861ab5b2a9408ed68f758e9ac0"
+      "computedHash": "627fd7407c033de8364bd44a599adff29cbb863a71ebea88a2f8fe7170baa7cb"
     },
     "mongodb-search-and-ai": {
       "source": "mongodb/agent-skills",
