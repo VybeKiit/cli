@@ -26,6 +26,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # browser-automation's field-locator suite launches a real Chromium (hermetic —
+      # it drives local HTML via page.setContent, no network). The cold runner ships no
+      # browser binaries, so install Chromium + its OS deps before the suite. Only this
+      # one test file launches a browser, and only chromium, so we skip firefox/webkit.
+      - run: pnpm --filter @vybekiit/browser-automation exec playwright install --with-deps chromium
+
       - run: pnpm test
 
       - run: pnpm test:scripts
