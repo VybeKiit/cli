@@ -1,7 +1,8 @@
 {
   "name": "@vybekiit/ui-catalog-mcp",
   "version": "0.3.0",
-  "description": "MCP server for searching VybeKiit mirrored UI component catalogs.",
+  "private": true,
+  "description": "MCP server for searching VybeKiit mirrored UI component catalogs. Private maintainer tooling (ADR-0025).",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -32,8 +33,5 @@
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "vitest": "^3.2.6"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

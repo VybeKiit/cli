@@ -1,51 +1,33 @@
 #!/usr/bin/env node
 /**
- * Publish all maintained @vybekiit/* packages to npm (issue #17).
- * Requires NPM_TOKEN in env and write access to @vybekiit org.
+ * Publish the maintained @vybekiit/* spine to npm (issue #17; ADR-0025 → 5 published).
+ * The set is DERIVED, not hard-coded: every `packages/*` whose package.json is not
+ * `private: true`. Privatizing or deleting a package removes it from the release with
+ * no list here to edit — the one source of truth is each package's own `private` flag.
+ * Requires OIDC trusted publishing (see publish.yml) and write access to @vybekiit.
  *
  * Usage: pnpm publish:packages [--dry-run]
  */
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import process from 'node:process';
-
-// Folder names under packages/ (camelCase). The published @vybekiit/* name is read
-// from each package.json, so the directory and the npm name can differ (e.g. the
-// folder `agentKit` publishes as `@vybekiit/agent-kit`).
-const PACKAGE_DIRS = [
-  'core',
-  'payments',
-  'auth',
-  'db',
-  'deploy',
-  'email',
-  'tokens',
-  'observability',
-  'security',
-  'assets',
-  'agentKit',
-  'clientState',
-  'http',
-  'browserAutomation',
-  'reportMode',
-  'i18n',
-  'seo',
-  'compliance',
-  'kv',
-  'analytics',
-  'jobs',
-  'notifications',
-  'search',
-  'realtime',
-  'tenancy',
-  'ai',
-  'cms',
-  'uiCatalogMcp',
-];
 
 const dryRun = process.argv.includes('--dry-run');
 
-for (const dir of PACKAGE_DIRS) {
+/** Folder names under packages/ whose package.json is published (not `private: true`). */
+function publishableDirs() {
+  return readdirSync('packages')
+    .filter((dir) => existsSync(`packages/${dir}/package.json`))
+    .filter(
+      (dir) => JSON.parse(readFileSync(`packages/${dir}/package.json`, 'utf8')).private !== true,
+    )
+    .sort();
+}
+
+const dirs = publishableDirs();
+console.log(`Publishing ${dirs.length} package(s): ${dirs.join(', ')}`);
+
+for (const dir of dirs) {
   const cwd = `packages/${dir}`;
   const { name } = JSON.parse(readFileSync(`${cwd}/package.json`, 'utf8'));
   console.log(`Publishing ${name}...`);
