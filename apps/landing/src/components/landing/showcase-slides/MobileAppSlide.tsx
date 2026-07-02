@@ -36,7 +36,12 @@ export function MobileAppSlide() {
             <span className="mb-0.5 text-[9px] text-[var(--green)]">+12.5%</span>
           </div>
 
-          <svg aria-hidden="true" className="mt-3 h-20 w-full" preserveAspectRatio="none" viewBox="0 0 200 70">
+          <svg
+            aria-hidden="true"
+            className="mt-3 h-20 w-full"
+            preserveAspectRatio="none"
+            viewBox="0 0 200 70"
+          >
             <defs>
               <linearGradient id="mobile-spark" x1="0" x2="0" y1="0" y2="1">
                 <stop offset="0%" stopColor="var(--blue)" stopOpacity="0.35" />
@@ -67,7 +72,11 @@ export function MobileAppSlide() {
               <div className="rounded-xl bg-white/[0.04] p-2.5" key={stat.label}>
                 <p className="text-[8px] text-white/40">{stat.label}</p>
                 <p className="font-bold text-[13px] text-white leading-tight">{stat.value}</p>
-                <p className={stat.up ? 'text-[8px] text-[var(--green)]' : 'text-[8px] text-[#f87171]'}>
+                <p
+                  className={
+                    stat.up ? 'text-[8px] text-[var(--green)]' : 'text-[8px] text-[#f87171]'
+                  }
+                >
                   {stat.delta}
                 </p>
               </div>

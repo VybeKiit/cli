@@ -151,10 +151,7 @@ export function ThreeDeviceMock() {
         </div>
         <ul className="mt-3 space-y-2">
           {EXT_ACTIONS.map((action) => (
-            <li
-              className="flex items-center gap-2.5 text-[11px] text-white/85"
-              key={action.label}
-            >
+            <li className="flex items-center gap-2.5 text-[11px] text-white/85" key={action.label}>
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/60">
                 <action.icon className="h-3.5 w-3.5" strokeWidth={1.8} />
               </span>

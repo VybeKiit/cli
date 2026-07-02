@@ -106,7 +106,8 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
         'You still have to wire auth, payments, databases, emails, analytics, and more. Days disappear.',
       solutionLabel: 'THE SOLUTION',
       solutionHeading: 'VybeKiit operates the stack.',
-      solutionBody: 'Our AI operator configures, connects, and keeps everything running, end to end.',
+      solutionBody:
+        'Our AI operator configures, connects, and keeps everything running, end to end.',
     },
   },
   {

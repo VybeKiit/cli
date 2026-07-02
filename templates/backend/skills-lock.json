@@ -243,8 +243,8 @@
     "use-railway": {
       "source": "railwayapp/railway-skills",
       "sourceType": "github",
-      "skillPath": "skills/use-railway/SKILL.md",
-      "computedHash": "7045ad8dc382af94e3ce345b69fcab7a7466914d6d052f157a8a440ec21ec099"
+      "skillPath": "plugins/railway/skills/use-railway/SKILL.md",
+      "computedHash": "1d66d45f9e78a1a8623899b92848eb8595baa252582dbf5f98c731397462f6b2"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
