@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { SecurityGuard } from '../src/guard';
-import { isOriginAllowed } from '../src/origin';
-import type { SecurityPolicy, SecurityRequest } from '../src/types';
+import { SecurityGuard } from './guard';
+import { isOriginAllowed } from './origin';
+import type { SecurityPolicy, SecurityRequest } from './types';
 
 const APP_ORIGIN = 'https://myapp.com';
 

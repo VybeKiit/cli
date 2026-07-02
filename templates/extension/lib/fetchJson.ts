@@ -1,4 +1,4 @@
-import { createJsonClient } from '@vybekiit/http/client';
+import { createJsonClient } from '@vybekiit/core/http/client';
 
 const APP_URL = import.meta.env.WXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 

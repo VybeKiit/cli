@@ -1,5 +1,5 @@
-import { forbidden, tooManyRequests } from '@vybekiit/http';
-import { SecurityGuard, resolveSecurityPolicy } from '@vybekiit/security';
+import { forbidden, tooManyRequests } from '@vybekiit/core/http';
+import { SecurityGuard, resolveSecurityPolicy } from '@vybekiit/core/security';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

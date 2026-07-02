@@ -10,7 +10,7 @@ vi.mock('@vybekiit/analytics', () => ({
   resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
 }));
 
-vi.mock('@vybekiit/observability', () => ({
+vi.mock('@vybekiit/core/observability', () => ({
   resolveObservabilityProvider: vi.fn(() => ({
     captureException: mocks.captureException,
     captureMessage: mocks.captureMessage,

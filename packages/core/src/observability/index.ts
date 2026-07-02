@@ -1,4 +1,4 @@
-import { observabilityConfigSchema, parseEnv, sentryConfigSchema } from '@vybekiit/core';
+import { observabilityConfigSchema, parseEnv, sentryConfigSchema } from '../config';
 
 import { createLocalObservabilityProvider } from './providers/local';
 import { createSentryObservabilityProvider, initSentry } from './providers/sentry';

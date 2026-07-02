@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { badInput, created, forbidden, ok, unauthorized, upstreamFailed } from '../src/builders';
-import { HTTP_OUTCOMES } from '../src/outcomes';
-import { createJsonClient } from '../src/client';
+import { badInput, created, forbidden, ok, unauthorized, upstreamFailed } from './builders';
+import { HTTP_OUTCOMES } from './outcomes';
+import { createJsonClient } from './client';
 
 describe('HTTP outcome builders', () => {
   it('maps each builder to status + { code, error } body', () => {

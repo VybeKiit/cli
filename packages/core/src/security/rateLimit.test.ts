@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RateLimiter } from '../src/rateLimit';
+import { RateLimiter } from './rateLimit';
 
 /** A controllable clock so window expiry is deterministic, not wall-clock dependent. */
 function fakeClock(start = 0) {

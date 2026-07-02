@@ -16,7 +16,6 @@ const nextConfig = {
     '@vybekiit/auth',
     '@vybekiit/db',
     '@vybekiit/payments',
-    '@vybekiit/security',
     '@vybekiit/assets',
     '@vybekiit/analytics',
     '@vybekiit/ai',

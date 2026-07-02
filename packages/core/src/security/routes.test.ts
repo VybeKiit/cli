@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyRoute, isOriginLockExempt } from '../src/routes';
+import { classifyRoute, isOriginLockExempt } from './routes';
 
 describe('classifyRoute', () => {
   it('classifies auth routes as auth-strict', () => {

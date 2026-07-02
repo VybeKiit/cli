@@ -168,7 +168,7 @@ const PACKAGES = [
     config: 'None — dev-only, tree-shaken from prod.',
     skills: 'Report Mode section in agent layer docs',
     inScope: 'Bug report formatting, deeplink handoff.',
-    outScope: 'Not production error tracking — use `@vybekiit/observability`.',
+    outScope: 'Not production error tracking — use `@vybekiit/core/observability`.',
   },
   {
     name: 'i18n',

@@ -6,7 +6,7 @@ import {
   unauthorized,
   upstreamFailed,
   type HttpResponse,
-} from '@vybekiit/http';
+} from '@vybekiit/core/http';
 import { Cause, Effect, Exit, Option } from 'effect';
 import { resolveAuthProvider } from '../resolve';
 import type { AuthError, AuthProvider } from '../types';

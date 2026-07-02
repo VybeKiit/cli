@@ -1,4 +1,4 @@
-import { type SecurityConfig, parseEnv, securityConfigSchema } from '@vybekiit/core';
+import { type SecurityConfig, parseEnv, securityConfigSchema } from '../config';
 import type { SecurityPolicy } from './types';
 
 /** Methods that carry no state change and need no origin check (they're safe + idempotent). */

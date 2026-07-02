@@ -1,5 +1,5 @@
 import type { Result } from '@vybekiit/core';
-import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/http';
+import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/core/http';
 import { Cause, Effect, Exit, Option } from 'effect';
 import { isPaymentsUnconfigured } from '../practice';
 import { Payments, resolvePaymentProvider } from '../resolve';

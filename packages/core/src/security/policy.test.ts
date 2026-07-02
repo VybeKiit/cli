@@ -1,6 +1,6 @@
-import { parseEnv, securityConfigSchema } from '@vybekiit/core';
+import { parseEnv, securityConfigSchema } from '../config';
 import { describe, expect, it } from 'vitest';
-import { isStateChanging, parseAllowedOrigins, resolveSecurityPolicy } from '../src/policy';
+import { isStateChanging, parseAllowedOrigins, resolveSecurityPolicy } from './policy';
 
 describe('parseAllowedOrigins', () => {
   it('splits, trims, lowercases, and drops blanks', () => {

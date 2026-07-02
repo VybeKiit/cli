@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import { forbidden, tooManyRequests } from '@vybekiit/http';
-import { sendHttpResponse } from '@vybekiit/http/express';
+import { forbidden, tooManyRequests } from '../http';
+import { sendHttpResponse } from '../http/express';
 import { SecurityGuard } from './guard';
 import { resolveSecurityPolicy } from './policy';
 import type { SecurityRequest } from './types';

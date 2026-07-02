@@ -1,5 +1,5 @@
 import type { Request, Response, Router } from 'express';
-import { sendHttpResponse } from '@vybekiit/http/express';
+import { sendHttpResponse } from '@vybekiit/core/http/express';
 import { Router as createRouter } from 'express';
 import {
   type CheckoutHttpDeps,

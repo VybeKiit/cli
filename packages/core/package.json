@@ -17,6 +17,41 @@
       "types": "./dist/node.d.ts",
       "import": "./dist/node.js",
       "require": "./dist/node.cjs"
+    },
+    "./http": {
+      "types": "./dist/http/index.d.ts",
+      "import": "./dist/http/index.js",
+      "require": "./dist/http/index.cjs"
+    },
+    "./http/client": {
+      "types": "./dist/http/client/index.d.ts",
+      "import": "./dist/http/client/index.js",
+      "require": "./dist/http/client/index.cjs"
+    },
+    "./http/express": {
+      "types": "./dist/http/express.d.ts",
+      "import": "./dist/http/express.js",
+      "require": "./dist/http/express.cjs"
+    },
+    "./http/next": {
+      "types": "./dist/http/next.d.ts",
+      "import": "./dist/http/next.js",
+      "require": "./dist/http/next.cjs"
+    },
+    "./observability": {
+      "types": "./dist/observability/index.d.ts",
+      "import": "./dist/observability/index.js",
+      "require": "./dist/observability/index.cjs"
+    },
+    "./security": {
+      "types": "./dist/security/index.d.ts",
+      "import": "./dist/security/index.js",
+      "require": "./dist/security/index.cjs"
+    },
+    "./security/express": {
+      "types": "./dist/security/express.d.ts",
+      "import": "./dist/security/express.js",
+      "require": "./dist/security/express.cjs"
     }
   },
   "files": [
@@ -29,15 +64,26 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "effect": "3.21.4"
+    "effect": "3.21.4",
+    "@sentry/node": "^9.5.0"
   },
   "devDependencies": {
     "@effect/vitest": "0.29.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "express": ">=4"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
   }
 }

@@ -6,7 +6,7 @@ import {
   initSentry,
   resetSentryForTests,
   resolveObservabilityProvider,
-} from '../src';
+} from './index';
 
 vi.mock('@sentry/node', () => ({
   init: vi.fn(),

@@ -1,4 +1,4 @@
-import { toNextResponse } from '@vybekiit/http/next';
+import { toNextResponse } from '@vybekiit/core/http/next';
 import type { AuthHttpDeps } from './handlers';
 import {
   handleForgotPassword,

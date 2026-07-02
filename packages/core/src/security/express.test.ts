@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createExpressSecurityMiddleware } from '../src/express';
-import { SecurityGuard } from '../src/guard';
-import type { SecurityPolicy } from '../src/types';
+import { createExpressSecurityMiddleware } from './express';
+import { SecurityGuard } from './guard';
+import type { SecurityPolicy } from './types';
 
 const APP_ORIGIN = 'https://myapp.com';
 

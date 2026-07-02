@@ -1,4 +1,4 @@
-import { resolveObservabilityProvider } from '@vybekiit/observability';
+import { resolveObservabilityProvider } from '@vybekiit/core/observability';
 import { resolveAnalyticsProvider } from '@vybekiit/analytics';
 
 export const observability = resolveObservabilityProvider(process.env);

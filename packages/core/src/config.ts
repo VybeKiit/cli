@@ -78,7 +78,7 @@ export const appConfigSchema = Schema.Struct({
 
 /**
  * Secure-by-default app-layer limits (rate limit, origin lock) — shipped on so a
- * non-coder never has to ask for them. Read by `@vybekiit/security`, the web
+ * non-coder never has to ask for them. Read by `@vybekiit/core/security`, the web
  * `middleware.ts`, and the Cloudflare edge config: one source, three enforcement
  * points. Rationale + threat model: ADR-0009.
  */
@@ -425,7 +425,7 @@ export const storeConfigSchema = Schema.Struct({
 });
 
 /**
- * Which observability adapter `@vybekiit/observability` constructs. `local` is the
+ * Which observability adapter `@vybekiit/core/observability` constructs. `local` is the
  * no-op default; `sentry` sends errors when `SENTRY_DSN` is set (track-errors skill).
  */
 export const observabilityConfigSchema = Schema.Struct({
@@ -434,7 +434,7 @@ export const observabilityConfigSchema = Schema.Struct({
   }),
 });
 
-/** Sentry credentials — used by `@vybekiit/observability` (sentry adapter). */
+/** Sentry credentials — used by `@vybekiit/core/observability` (sentry adapter). */
 export const sentryConfigSchema = Schema.Struct({
   SENTRY_DSN: Schema.optional(NonEmpty),
 });
