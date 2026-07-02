@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { input } from '@inquirer/prompts';
+import * as clack from '@clack/prompts';
 import { TECH_REFERENCE_MAP } from '@vybekiit/agent-kit';
 
 /**
@@ -30,10 +30,15 @@ export async function runEnvWizard(cwd: string = process.cwd()): Promise<number>
     const docsHint = ref ? ` (Docs: ${ref.docsUrl})` : '';
     // read this key's current line and unquote it: 'PORT="3000"' → '3000'
     const current = envContent.match(new RegExp(`^${key}=(.*)$`, 'm'))?.[1]?.replace(/^"|"$/g, '');
-    const value = await input({
+    const value = await clack.text({
       message: `${key}${docsHint}`,
-      default: current ?? '',
+      defaultValue: current ?? '',
+      placeholder: current ?? '',
     });
+    if (clack.isCancel(value)) {
+      clack.cancel('Cancelled.');
+      return 1;
+    }
     if (envContent.includes(`${key}=`)) {
       // replace the whole KEY=... line: 'PORT=old' → 'PORT="new"'
       envContent = envContent.replace(new RegExp(`^${key}=.*$`, 'm'), `${key}="${value}"`);

@@ -63,7 +63,15 @@
         "useExportsLast": "warn",
         "noIncrementDecrement": "off",
         "noProcessEnv": "off",
-        "noExcessiveLinesPerFile": "warn"
+        "noExcessiveLinesPerFile": "warn",
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "@inquirer/prompts": "Use @clack/prompts — the CLI standardizes on one prompt library (ADR-0025)."
+            }
+          }
+        }
       },
       "correctness": {
         "useImageSize": "warn",

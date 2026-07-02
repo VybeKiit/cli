@@ -39,17 +39,20 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 <!-- rules digest — full guide in CODE-STYLE.md; edit there -->
 
 Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
-traceable code). **In flight: the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer` replace
-`Result` / zod / factory-wiring end-to-end, one gate-green slice at a time. The load-bearing rules —
-**full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
+traceable code). **Two refactors in flight, sequenced: (1) the publish-surface collapse (ADR-0025,
+28→5 published) — do this first; (2) the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer`
+replace `Result` / zod / factory-wiring end-to-end, one gate-green slice at a time, **in progress not
+complete**. The load-bearing rules — **full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
 
-- **A new module is not a new published package (ADR-0022).** Earn a public `@vybekiit/*` slot only
-  with real headless logic AND (a buyer-runtime consumer OR ≥2 adapters). Else: `shared/`
-  copy-on-scaffold, template-owned, or a `private: true` workspace package. Published spine is 6:
-  `core` (+`http`), `payments`, `auth`, `db`, `tokens`, `client-state`.
+- **A new module is not a new published package (ADR-0025).** Earn a public `@vybekiit/*` slot only
+  with real headless logic AND (a buyer-runtime consumer OR ≥2 adapters). Else: template-owned code
+  or a `private: true` workspace package — there is **no `shared/` tier**. Published spine is **5**:
+  `core` (absorbs `http`/`observability`/`security` as subpaths), `payments`, `auth`, `db`,
+  `client-state`. `tokens`/`report-mode`/`analytics` + the thin long tail are template-owned; the 4
+  tooling packages (`browser-automation`, `agent-kit`, `ui-catalog-mcp`, `deploy`) are `private: true`.
 - **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (interface + DTOs + tagged `*Error`) ·
   `config.ts` (`Schema.Struct` + Config `Tag`/`Layer`) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
-  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core`/`tokens` are library packages (exempt).
+  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core` is the exempt library package.
 - **Provider dispatch (ADR-0018, now Effect):** wire each provider as a `Live` `Layer`; the
   `resolveEnvProvider` selector picks the adapter from `*_PROVIDER`. Never `new` a provider at a call
   site, never hand-roll `switch`/`===` on `*_PROVIDER`. Before editing any adapter or `resolve.ts`,
@@ -89,9 +92,9 @@ traceable code). **In flight: the Effect migration (ADR-0023)** — Effect + `Sc
   gate and is what makes the buyer's `update-kit` safe (green suite = safe to bump).
 - **Pre-commit runs Biome check** (format + lint-fix) on maintainer and buyer templates — it must
   never block on a failing test, so it can be inherited without trapping a non-coder.
-- **Pre-push + CI are the heavy gate** — both run `pnpm quality` (lint, typecheck, test,
+- **Pre-push + CI are the heavy gate** — both run `pnpm verify` (lint, typecheck, test,
   script tests, build). A red gate is a check *the agent* fixes before push/merge.
-- Run `pnpm quality` after substantial changes (pre-push runs the same commands automatically).
+- Run `pnpm verify` after substantial changes (pre-push runs the same commands automatically).
 - Never `git push --no-verify` to skip a red gate unless you are deliberately re-running mirror
   sync only — then use the **mirror-repos** workflow or `pnpm mirror` manually.
 - Run `./scripts/setup-branch-protection.sh` once if GitHub Team/Pro is available on private repos.
@@ -148,6 +151,16 @@ you can take $1 and auto-invite yourself, the business is real.
   gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
   the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —
   it just no longer ships untyped/unbuilt.
+- **Two refactors in progress — the docs (CODE-STYLE / CONTEXT / ADR-0025) describe the target, the
+  code is catching up:**
+  - **Publish-surface collapse (ADR-0025):** all **28** packages still physically exist in
+    `packages/`. The decision to collapse to **5** published (+ template-owned + 4 private) is
+    accepted; the reorg lands as its own `reorg/organize-by-purpose` PR. Until it does, treat the
+    28-package tree as legacy — do not add a new published package.
+  - **Effect migration (ADR-0023): partial.** The spine (`core`, `payments`, `auth`, `db`,
+    `clientState`) is on Effect + `Schema` + tagged errors; `packages/core/src/result.ts` +
+    `effectInterop.ts` still exist as the bridge, and templates, tooling, `cli`, and the buyer agent
+    layer are **not yet** converted. Slices 5–8 remain. Convert-as-you-touch; `deslop` enforces per-diff.
 - **Payload, NOT yet workspace members** (see `pnpm-workspace.yaml`): `templates/{mobile,extension}`
   (v2/v3 placeholders, nothing to build) and `apps/landing`, which today is a stub (webhook + the
   GitHub-invite **gate** only). `apps/landing` joins the workspace alongside its real UI in issue #3,

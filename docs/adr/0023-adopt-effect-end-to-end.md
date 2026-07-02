@@ -1,7 +1,13 @@
 # ADR-0023: Adopt Effect end-to-end (Schema replaces zod, tagged errors replace Result, Layer/Context DI)
 
-**Status:** Accepted (supersedes the `Result` error model; refines ADR-0018)
+**Status:** Accepted · **migration in progress** (supersedes the `Result` error model; refines ADR-0018)
 **Date:** 2026-07-01
+
+> **Progress (2026-07-02): partial.** The spine (`core`, `payments`, `auth`, `db`, `client-state`) is
+> on Effect + `Schema` + tagged errors; `packages/core/src/result.ts` + `effectInterop.ts` remain as
+> the bridge, and templates, the 4 tooling packages, `cli`, and the buyer agent layer are **not yet**
+> converted (slices 5–8). Sequenced **after** the ADR-0025 collapse, so the remaining slices run
+> against 5 packages instead of 28. `CODE-STYLE.md` shows the Effect end-state; convert-as-you-touch.
 
 ## Context
 

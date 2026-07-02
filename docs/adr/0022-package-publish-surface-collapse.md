@@ -1,7 +1,13 @@
 # ADR-0022: Package publish-surface collapse
 
-**Status:** Accepted (refines ADR-0012)
+**Status:** Superseded on the publish axis by **ADR-0025** (refines ADR-0012)
 **Date:** 2026-07-01
+
+> **Superseded (2026-07-02) by [ADR-0025](./0025-publish-surface-collapse-to-five.md).** The collapse
+> is retained, but the target is **5** published (not 6 — `tokens` becomes template-owned) and the
+> **`shared/` tier is dropped**: `observability`/`security` fold into `core` alongside `http`, and
+> `report-mode`/`analytics`/`tokens` become template-owned. Read ADR-0025 for the current shape; this
+> ADR's adapter-behind-one-interface design and bucket-decision rule still stand.
 
 ## Context
 
