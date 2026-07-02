@@ -10,12 +10,13 @@ import { createLocalAnalytics } from './providers/local';
 import { createPlausibleAnalytics } from './providers/plausible';
 import { createPosthogAnalytics } from './providers/posthog';
 import type { AnalyticsProvider } from './types';
+import { readNodeEnv } from '@/lib/nodeEnv';
 
 function isPlausibleUnconfigured(env: EnvSource): boolean {
   return !env.PLAUSIBLE_DOMAIN;
 }
 
-export function resolveAnalyticsProvider(env: EnvSource = process.env): AnalyticsProvider {
+export function resolveAnalyticsProvider(env: EnvSource = readNodeEnv()): AnalyticsProvider {
   const { ANALYTICS_PROVIDER } = parseEnv(analyticsConfigSchema, env);
   return resolveEnvProvider(
     ANALYTICS_PROVIDER,
