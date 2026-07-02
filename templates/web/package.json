@@ -83,7 +83,6 @@
     "@vybekiit/db": "workspace:*",
     "@vybekiit/notifications": "workspace:*",
     "@vybekiit/payments": "workspace:*",
-    "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "@xyflow/react": "^12.11.1",

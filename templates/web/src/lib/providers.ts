@@ -5,7 +5,7 @@ import { resolveComplianceProvider } from '@/vybekiit/compliance';
 import { resolveJobsProvider } from '@/vybekiit/jobs';
 import { resolveKvProvider } from '@/vybekiit/kv';
 import { resolveNotificationsProvider } from '@vybekiit/notifications';
-import { resolveRealtimeProvider } from '@vybekiit/realtime';
+import { resolveRealtimeProvider } from '@/vybekiit/realtime';
 import { resolveSearchProvider } from '@/vybekiit/search';
 import { resolveTenancyProvider } from '@/vybekiit/tenancy';
 

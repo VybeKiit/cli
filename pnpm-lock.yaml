@@ -597,22 +597,6 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/realtime:
-    dependencies:
-      '@vybekiit/core':
-        specifier: workspace:*
-        version: link:../core
-    devDependencies:
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
-
   packages/reportMode:
     devDependencies:
       tsup:
@@ -1003,9 +987,6 @@ importers:
       '@vybekiit/payments':
         specifier: workspace:*
         version: link:../../packages/payments
-      '@vybekiit/realtime':
-        specifier: workspace:*
-        version: link:../../packages/realtime
       '@vybekiit/report-mode':
         specifier: workspace:*
         version: link:../../packages/reportMode
@@ -1289,9 +1270,6 @@ importers:
       '@vybekiit/payments':
         specifier: workspace:*
         version: link:../../packages/payments
-      '@vybekiit/realtime':
-        specifier: workspace:*
-        version: link:../../packages/realtime
       '@vybekiit/report-mode':
         specifier: workspace:*
         version: link:../../packages/reportMode

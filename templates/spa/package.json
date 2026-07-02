@@ -43,7 +43,6 @@
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/payments": "workspace:*",
-    "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "apexcharts": "^4.1.0",

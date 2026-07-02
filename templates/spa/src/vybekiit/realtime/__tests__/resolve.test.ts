@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveRealtimeProvider } from '../src/resolve';
+import { resolveRealtimeProvider } from '../resolve';
 
 describe('resolveRealtimeProvider', () => {
   it('falls back to local for unshipped cloudflare-do provider', () => {
