@@ -18,16 +18,9 @@ const nextConfig = {
     '@vybekiit/payments',
     '@vybekiit/assets',
     '@vybekiit/analytics',
-    '@vybekiit/ai',
-    '@vybekiit/cms',
-    '@vybekiit/compliance',
     '@vybekiit/i18n',
-    '@vybekiit/jobs',
-    '@vybekiit/kv',
     '@vybekiit/notifications',
     '@vybekiit/realtime',
-    '@vybekiit/search',
-    '@vybekiit/tenancy',
   ],
   // @sentry/node is Node-only. It now arrives via the transpiled @vybekiit/core/observability
   // subpath (was an external dep of the standalone @vybekiit/observability), so keep it a

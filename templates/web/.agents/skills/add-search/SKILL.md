@@ -14,7 +14,7 @@ metadata:
 
 **Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
 
-> (Under the hood — agent-only) `@vybekiit/search` → `resolveSearchProvider()` via `src/lib/search-client.ts`.
+> (Under the hood — agent-only) `@/vybekiit/search` → `resolveSearchProvider()` via `src/lib/search-client.ts`.
 
 ## Steps
 

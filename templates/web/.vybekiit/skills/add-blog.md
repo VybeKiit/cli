@@ -5,7 +5,7 @@
 
 **Contract:** one action at a time · verify-before-advance · plain language (`language.md`) · translate every error · celebrate. Decide all technical choices yourself.
 
-> (Under the hood — agent-only) `@vybekiit/cms` + `@/vybekiit/seo` via `cms-client.ts` and `seo.ts`.
+> (Under the hood — agent-only) `@/vybekiit/cms` + `@/vybekiit/seo` via `cms-client.ts` and `seo.ts`.
 > Content lives in `content/*.mdx`; routes under `app/[locale]/blog/`; sitemap via `app/sitemap.ts`;
 > GEO via `app/llms.txt/route.ts`, `VybeJsonLd`, and `buildBlogGeo()`.
 
