@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { MdxCmsConfig } from '@vybekiit/core';
 import type { CmsPage, CmsProvider } from '../types';
+import process from 'node:process';
 
 type ParsedMdx = {
   readonly title: string;

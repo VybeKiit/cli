@@ -1,6 +1,7 @@
 import { complianceConfigSchema, parseEnv, type EnvSource } from '@vybekiit/core';
 import { createLocalCompliance } from './providers/local';
 import type { ComplianceProvider } from './types';
+import process from 'node:process';
 
 /** Build the default compliance module from env — single adapter until #2 ships. */
 export function createComplianceFromEnv(env: EnvSource = process.env): ComplianceProvider {

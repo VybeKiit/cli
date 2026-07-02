@@ -18,7 +18,6 @@ const nextConfig = {
     '@vybekiit/payments',
     '@vybekiit/assets',
     '@vybekiit/analytics',
-    '@vybekiit/i18n',
     '@vybekiit/notifications',
     '@vybekiit/realtime',
   ],

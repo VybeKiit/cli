@@ -8,6 +8,7 @@ import {
 import { createLocalAi } from './providers/local';
 import { createOpenAiProvider } from './providers/openai';
 import type { AiProvider } from './types';
+import process from 'node:process';
 
 function isOpenAiUnconfigured(env: EnvSource): boolean {
   return !env.OPENAI_API_KEY;

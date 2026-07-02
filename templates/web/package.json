@@ -81,7 +81,6 @@
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
-    "@vybekiit/i18n": "workspace:*",
     "@vybekiit/notifications": "workspace:*",
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/realtime": "workspace:*",

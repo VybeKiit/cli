@@ -8,6 +8,7 @@ import {
 import { createLocalSearch } from './providers/local';
 import { createSupabaseSearch } from './providers/supabase';
 import type { SearchProvider } from './types';
+import process from 'node:process';
 
 /** typesense/algolia registry entries resolve to local until those adapters ship (ADR-0012). */
 export function resolveSearchProvider(env: EnvSource = process.env): SearchProvider {

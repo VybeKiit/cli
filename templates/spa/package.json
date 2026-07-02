@@ -42,7 +42,6 @@
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
-    "@vybekiit/i18n": "workspace:*",
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",

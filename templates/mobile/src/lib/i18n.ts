@@ -1,6 +1,6 @@
 import { getLocales } from 'expo-localization';
 import { I18n } from 'i18n-js';
-import { resolveLocaleOrDefault } from '@vybekiit/i18n/locale-rules';
+import { resolveLocaleOrDefault } from '@/vybekiit/i18n/localeRules';
 import en from '../../messages/en.json' with { type: 'json' };
 import { applyRtlForLocale } from './direction';
 

@@ -10,6 +10,7 @@ import {
 import { createCloudflareKv } from './providers/cloudflare';
 import { createLocalKv } from './providers/local';
 import type { KvProvider } from './types';
+import process from 'node:process';
 
 export function resolveKvProvider(env: EnvSource = process.env): KvProvider {
   const { KV_PROVIDER } = parseEnv(kvConfigSchema, env);

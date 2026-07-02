@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { isRtlLocale, resolveLocaleOrDefault } from '@vybekiit/i18n/locale-rules';
+import { isRtlLocale, resolveLocaleOrDefault } from '@/vybekiit/i18n/localeRules';
 import en from '../../messages/en.json';
 
 type Messages = typeof en;
