@@ -18,14 +18,15 @@ export const LANDING_NAV: readonly LandingNavLink[] = [
   { href: '#showcase', label: 'Extension' },
   { href: '#pricing', label: "What's Included" },
   { href: '#showcase', label: 'Showcase' },
+  { href: '#faq', label: 'FAQ' },
 ];
 
 /** Hero section copy. */
 export const LANDING_HERO = {
-  label: 'AI OPERATOR + WEB MOBILE EXTENSION BUNDLE',
-  headlineLines: ['Your entire stack', 'Operated by AI'] as const,
+  label: 'AI OPERATOR + WEB, MOBILE, EXTENSION BUNDLE',
+  headlineLines: ['Your entire stack.', 'Operated by AI.'] as const,
   subhead:
-    'Launch and scale your product with an AI operator that runs the work so you can focus on growth',
+    'Launch and scale your product with an AI operator that runs the work so you can focus on growth.',
   ctaLabel: 'Get VybeKiit',
 } as const;
 
@@ -63,16 +64,15 @@ export const SHOWCASE_SECTION = {
 } as const;
 
 export const SHOWCASE_SLIDES: readonly ShowcaseSlideMeta[] = [
-  { id: 'operator', title: 'AI Operator', subtitle: 'Automate Respond Resolve' },
-  { id: 'web', title: 'Web App', subtitle: 'Launch a polished product' },
-  { id: 'mobile', title: 'Mobile App', subtitle: 'iOS & Android Native feel' },
+  { id: 'operator', title: 'AI Operator', subtitle: 'Automate. Respond. Resolve.' },
+  { id: 'web', title: 'Web App', subtitle: 'Launch a polished product.' },
+  { id: 'mobile', title: 'Mobile App', subtitle: 'iOS & Android. Native feel.' },
   {
     id: 'extension',
     title: 'Browser Extension',
-    subtitle: "Power in your users' workflow",
+    subtitle: "Power in your users' workflow.",
   },
-  { id: 'marketing', title: 'Web App', subtitle: 'Everything you need to ship' },
-  { id: 'pricing-plan', title: 'Pricing Plan', subtitle: 'Confetti-ready checkout tiers' },
+  { id: 'marketing', title: 'Web App', subtitle: 'Everything you need to ship.' },
 ];
 
 /** Problem/solution copy block inside a zig-zag row. */
@@ -101,12 +101,12 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
     mock: 'operator',
     copy: {
       problemLabel: 'THE PROBLEM',
-      problemHeading: 'Boilerplates still leave you holding the bag',
+      problemHeading: 'Boilerplates still leave you holding the bag.',
       problemBody:
-        'You still have to wire auth payments databases emails analytics and more Days disappear',
+        'You still have to wire auth, payments, databases, emails, analytics, and more. Days disappear.',
       solutionLabel: 'THE SOLUTION',
-      solutionHeading: 'VybeKiit operates the stack',
-      solutionBody: 'Our AI operator configures connects and keeps everything running—end to end',
+      solutionHeading: 'VybeKiit operates the stack.',
+      solutionBody: 'Our AI operator configures, connects, and keeps everything running, end to end.',
     },
   },
   {
@@ -115,12 +115,12 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
     mock: 'payments',
     copy: {
       problemLabel: 'THE PROBLEM',
-      problemHeading: 'Payments setup kills momentum',
-      problemBody: "Integrations webhooks taxes invoices — it's a rabbit hole",
+      problemHeading: 'Payments setup kills momentum.',
+      problemBody: "Integrations, webhooks, taxes, invoices. It's a rabbit hole.",
       solutionLabel: 'THE SOLUTION',
-      solutionHeading: 'Take payments in your first session',
+      solutionHeading: 'Take payments in your first session.',
       solutionBody:
-        'VybeKiit connects payments handles webhooks and gives you a working flow instantly',
+        'VybeKiit connects payments, handles webhooks, and gives you a working flow instantly.',
     },
   },
   {
@@ -129,11 +129,11 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
     mock: 'three-device',
     copy: {
       problemLabel: 'THE PROBLEM',
-      problemHeading: 'Maintaining multiple platforms drains time',
-      problemBody: 'Web here Mobile there Extension somewhere else Every update costs you',
+      problemHeading: 'Maintaining multiple platforms drains time.',
+      problemBody: 'Web here. Mobile there. Extension somewhere else. Every update costs you.',
       solutionLabel: 'THE SOLUTION',
-      solutionHeading: 'Ship web mobile and extension together',
-      solutionBody: 'One codebase One operator Everywhere your users are',
+      solutionHeading: 'Ship web, mobile, and extension together.',
+      solutionBody: 'One codebase. One operator. Everywhere your users are.',
     },
   },
 ];
@@ -141,15 +141,15 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
 /** Pricing CTA bullet lines. */
 export const PRICING_BULLETS: readonly string[] = [
   'AI Operator + Web + Mobile + Extension',
-  'All features No limits',
-  'Lifetime access Yours forever',
-  '14-day money-back guarantee',
+  'All features. No limits.',
+  'Lifetime access. Yours forever.',
+  '14-day money-back guarantee.',
 ];
 
 /** Social proof taglines. */
 export const SOCIAL_PROOF = {
-  tagline: 'Join founders shipping faster with VybeKiit',
-  subtagline: 'Build less Ship more',
+  tagline: 'Join founders shipping faster with VybeKiit.',
+  subtagline: 'Build less. Ship more.',
 } as const;
 
 /** Builder-tool wordmarks for hero orbit — assistants + dev toolchain only. */

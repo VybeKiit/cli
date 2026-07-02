@@ -3,7 +3,6 @@
 import { OperatorConsoleMock } from '@/components/landing/mockups/OperatorConsole';
 import { PaymentsMock } from '@/components/landing/mockups/PaymentsMock';
 import { ThreeDeviceMock } from '@/components/landing/mockups/ThreeDeviceMock';
-import { TypewriterSequence } from '@/components/ui/TypewriterSequence';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { ZIGZAG_ROWS } from '@/data/landing';
 import { cn } from '@/lib/utils';
@@ -15,49 +14,20 @@ const MOCK_COMPONENTS = {
   'three-device': ThreeDeviceMock,
 } as const;
 
-function CopyBlock({
-  copy,
-  uiOnRight,
-}: {
-  copy: (typeof ZIGZAG_ROWS)[number]['copy'];
-  uiOnRight: boolean;
-}) {
+function CopyBlock({ copy }: { copy: (typeof ZIGZAG_ROWS)[number]['copy'] }) {
   return (
-    <div
-      className={cn(
-        'zigzag-copy-side flex flex-col justify-center gap-10',
-        !uiOnRight && 'zigzag-copy-side--left',
-      )}
-    >
+    <div className="zigzag-copy-side flex flex-col justify-center gap-10">
       <div>
-        <p className="landing-label">{copy.problemLabel}</p>
-        <TypewriterSequence
-          lines={[
-            { text: copy.problemHeading, as: 'h3', className: 'problem-heading mt-3 text-white' },
-            {
-              text: copy.problemBody,
-              as: 'p',
-              className: 'mt-4 text-xl leading-relaxed text-[var(--text-muted)]',
-            },
-          ]}
-        />
+        <p className="font-bold text-[13px] text-[var(--text-faint)] uppercase tracking-[0.12em]">
+          {copy.problemLabel}
+        </p>
+        <h3 className="problem-heading mt-3 text-white">{copy.problemHeading}</h3>
+        <p className="mt-4 text-xl leading-relaxed text-[var(--text-muted)]">{copy.problemBody}</p>
       </div>
       <div>
         <p className="landing-label">{copy.solutionLabel}</p>
-        <TypewriterSequence
-          lines={[
-            {
-              text: copy.solutionHeading,
-              as: 'h3',
-              className: 'solution-heading text-blue-gradient mt-3',
-            },
-            {
-              text: copy.solutionBody,
-              as: 'p',
-              className: 'mt-4 text-xl leading-relaxed text-[var(--text-muted)]',
-            },
-          ]}
-        />
+        <h3 className="solution-heading text-blue-gradient mt-3">{copy.solutionHeading}</h3>
+        <p className="mt-4 text-xl leading-relaxed text-[var(--text-muted)]">{copy.solutionBody}</p>
       </div>
     </div>
   );
@@ -78,7 +48,7 @@ export function ZigZagSection() {
                   !row.uiOnRight && 'md:[&>*:first-child]:order-2',
                 )}
               >
-                <CopyBlock copy={row.copy} uiOnRight={row.uiOnRight} />
+                <CopyBlock copy={row.copy} />
                 <motion.div
                   className="zigzag-visual-side relative z-[2] flex items-center"
                   initial={{ opacity: 0, y: 32, scale: 0.98 }}

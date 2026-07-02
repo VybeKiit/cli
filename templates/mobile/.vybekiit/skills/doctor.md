@@ -27,7 +27,7 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
      `env-secrets-vybekiit.md`; never read secret values aloud.
    - **App identity (for publishing):** is the app's unique id set in `app.json`? Blank or still the
      example id blocks a store build.
-   - **Code health:** run `pnpm quality` (format, lint, typecheck, tests). Read the first real error (not the noise).
+   - **Code health:** run `pnpm verify` (format, lint, typecheck, tests). Read the first real error (not the noise).
    - **Platform instructions stale?** If errors mention deprecated Expo or mobile patterns, run
      `update-kit` first — tell the builder *"I'll refresh my instructions first"* (never name Expo).
    - **Backend reachable:** for sign-in / data / payment trouble, confirm the backend itself works

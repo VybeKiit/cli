@@ -55,7 +55,7 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    - Arbitrary Tailwind `h-[`, `w-[`, `gap-[`, `mt-[` in `app/` → review and normalize
    **Verify:** tell the builder *"Your app's buttons, spacing, and colors all match — it looks like one professional product."*
 
-8. **Quality smoke (soft).** Run `pnpm quality` — format, lint, typecheck, and tests. Report pass/fail
+8. **Quality smoke (soft).** Run `pnpm verify` — format, lint, typecheck, and tests. Report pass/fail
    in plain English. On warn-only Biome issues: fix obvious ones; do not block ship on style warnings
    unless egregious.
    **Verify:** tell the builder *"Your app is tested and tidy."*

@@ -34,7 +34,7 @@ export function Footer() {
                 {link.label}
               </Link>
             ))}
-            <Link className="text-[var(--text-soft)] text-sm hover:text-white" href="/checkout">
+            <Link className="text-[var(--text-soft)] text-sm hover:text-white" href="/terms">
               Refund Policy
             </Link>
             <a

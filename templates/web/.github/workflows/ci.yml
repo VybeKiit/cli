@@ -39,7 +39,7 @@ jobs:
         if: matrix.playwright == 'true'
         run: npx playwright install --with-deps chromium
 
-      - run: pnpm quality
+      - run: pnpm verify
 
       - name: UI walkthrough tests
         if: matrix.playwright == 'true'

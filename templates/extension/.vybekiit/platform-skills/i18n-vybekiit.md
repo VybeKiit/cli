@@ -36,4 +36,4 @@ Extension-specific: `ext.*` (manifest), `popup.*` (UI). No web/mobile parity req
 
 ## Verify-before-advance
 
-`pnpm quality` green; reload extension in Chrome; confirm popup + manifest name in new language.
+`pnpm verify` green; reload extension in Chrome; confirm popup + manifest name in new language.

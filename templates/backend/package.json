@@ -12,7 +12,7 @@
     "test": "vitest run",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "quality": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/checkAgentPatterns.mjs"
+    "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/checkAgentPatterns.mjs"
   },
   "dependencies": {
     "@vybekiit/agent-kit": "workspace:*",

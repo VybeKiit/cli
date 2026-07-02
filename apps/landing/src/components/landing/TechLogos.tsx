@@ -1,54 +1,37 @@
-'use client';
-
-import { BrandMarkVibeHint, BrandMarkVibeHintMobile } from '@/components/landing/BrandMarkVibeHint';
 import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
 import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
-import { PRODUCT_STACK_MARKS } from '@/data/landing';
 
-function TechLogoItem({
-  label,
-  slug,
-  hoverColor,
-}: {
-  label: string;
-  slug: string;
-  hoverColor: string;
-}) {
-  return (
-    <li className="tech-logo-item group shrink-0">
-      <BrandMarkVibeHint mode="tooltip-and-mobile-subtitle" slug={slug}>
-        <span
-          className="tech-logo inline-flex items-center gap-3"
-          style={{ ['--brand-color' as string]: hoverColor }}
-        >
-          <LogoMarkIcon className="tech-logo-icon h-[22px] w-[22px] shrink-0" slug={slug} />
-          <span className="flex flex-col gap-0.5">
-            <span className="tech-logo-label">{label}</span>
-            <BrandMarkVibeHintMobile slug={slug} />
-          </span>
-        </span>
-      </BrandMarkVibeHint>
-    </li>
-  );
+interface TechLogo {
+  readonly slug: string;
+  readonly label: string;
 }
 
-/** Infinite product-stack wordmark row with per-logo hover glow. */
+/** The core stack shown as social proof — the marks in the design. */
+const TESTIMONIAL_LOGOS: readonly TechLogo[] = [
+  { slug: 'nextdotjs', label: 'NEXT.js' },
+  { slug: 'tailwindcss', label: 'tailwindcss' },
+  { slug: 'supabase', label: 'supabase' },
+  { slug: 'stripe', label: 'stripe' },
+  { slug: 'openai', label: 'OpenAI' },
+  { slug: 'resend', label: 'resend' },
+  { slug: 'vercel', label: 'Vercel' },
+];
+
+/** Infinite marquee of the core stack, mono silhouettes on the dark band. */
 export function TechLogos() {
   return (
     <AutoScrollRow
       ariaLabel="Built with"
       className="testimonials-logos-marquee"
-      durationDesktop="58s"
-      durationMobile="58s"
+      durationDesktop="55s"
+      durationMobile="38s"
     >
-      <ul aria-label="Built with" className="testimonials-logos-row">
-        {PRODUCT_STACK_MARKS.map((mark) => (
-          <TechLogoItem
-            hoverColor={mark.hoverColor}
-            key={mark.slug}
-            label={mark.label}
-            slug={mark.slug}
-          />
+      <ul className="testimonials-logos-row">
+        {TESTIMONIAL_LOGOS.map((logo) => (
+          <li className="tech-logo" key={logo.slug}>
+            <LogoMarkIcon className="h-6 w-6 shrink-0" mono slug={logo.slug} />
+            <span className="tech-logo-label">{logo.label}</span>
+          </li>
         ))}
       </ul>
     </AutoScrollRow>

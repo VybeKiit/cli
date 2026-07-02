@@ -2,7 +2,7 @@ name: ci
 
 # CI gate — composes the single-purpose reusable legs (biome / typecheck / test /
 # build / checks) via local `./` refs; each is `on: workflow_call`. Together they
-# are the same set `pnpm quality` runs locally, split so a red leg is easy to spot.
+# are the same set `pnpm verify` runs locally, split so a red leg is easy to spot.
 #
 # - `CI Gate` is the single aggregated status check: require it in branch
 #   protection so any red leg blocks the merge.

@@ -1,3 +1,4 @@
+import { FaqSection } from '@/components/landing/FaqSection';
 import { FeatureStrip } from '@/components/landing/FeatureStrip';
 import { Footer } from '@/components/landing/Footer';
 import { Header } from '@/components/landing/Header';
@@ -17,6 +18,7 @@ export default function HomePage() {
         <FeatureStrip />
         <ShowcaseCarousel />
         <ZigZagSection />
+        <FaqSection />
         <PricingCTA />
       </main>
       <Footer />

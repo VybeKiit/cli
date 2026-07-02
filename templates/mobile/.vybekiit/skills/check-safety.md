@@ -27,7 +27,7 @@ backend, clean code on the phone, consistent UI. Plain pass/fail summary for the
 
 6. **Error alerts (optional).** If `track-errors` ran: confirm `SENTRY_DSN` when `OBSERVABILITY_PROVIDER=sentry`.
 
-7. **Quality smoke (soft).** Run `pnpm quality`. Fix obvious failures; warn-only Biome issues need not block ship.
+7. **Quality smoke (soft).** Run `pnpm verify`. Fix obvious failures; warn-only Biome issues need not block ship.
    **Verify:** *"Your app is tested and tidy."*
 
 ## Definition of done

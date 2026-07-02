@@ -32,7 +32,7 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
      Google sign-in). It also checks official platform skills are present. If it reports "not signed
      in yet," walk the builder through the one sign-in command it prints (a browser window opens;
      they click approve). Then make sure the project's dependencies are installed.
-   - **Code health:** run `pnpm quality` (format, lint, typecheck, tests). Read the first real error (not the noise).
+   - **Code health:** run `pnpm verify` (format, lint, typecheck, tests). Read the first real error (not the noise).
    - **Platform instructions stale?** If symptoms match outdated framework patterns (old routing,
      deprecated APIs), suggest running `update-kit` before deep debugging — say *"I'll refresh my
      instructions first"* in plain words, never name upstream tools.

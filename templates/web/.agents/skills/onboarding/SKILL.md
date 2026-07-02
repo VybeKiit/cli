@@ -34,7 +34,7 @@ translate every error · celebrate. Decide all technical choices yourself.
    putting the app online) so the builder never configures anything. It may say a tool "isn't signed
    in yet" — that's fine for now; sign-in happens later, only when a step needs it (one browser click
    each). Then install the project's building blocks and start the app yourself, in plain words.
-   After dependencies install, run **quality smoke** yourself: `pnpm quality` (format, lint, typecheck,
+   After dependencies install, run **quality smoke** yourself: `pnpm verify` (format, lint, typecheck,
    tests). Confirm `.cursorignore` hides `.env` (doctor checks this). Optionally install UI walkthrough
    browsers: `pnpm exec playwright install chromium` (agent-only — see `playwright-vybekiit.md`).
    Fix anything red before showing the preview. The builder hears: *"Everything checks out."*

@@ -23,7 +23,7 @@ account steps the stores legally require, one at a time.
 ## Steps
 
 1. **Pre-flight (code readiness).** Run `check-safety` steps 3–4 (no debug console, kit logger, UI
-   consistency, no forbidden libs) and **quality smoke** (`pnpm quality`) before packaging. Fix
+   consistency, no forbidden libs) and **quality smoke** (`pnpm verify`) before packaging. Fix
    anything red before continuing.
    **Verify:** code checks and quality smoke green.
 

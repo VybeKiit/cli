@@ -11,7 +11,7 @@
    - `npm update @vybekiit/*` (or `planKitUpdate` via package.json compare)
    - `vybekiit sync-agent-layer backend` (preserves `.vybekiit/extensions/**` and extension goal-index rows)
    - `npx skills update -y` when `skills-lock.json` exists
-2. **Verify:** `pnpm quality` passes.
+2. **Verify:** `pnpm verify` passes.
 
 ## After completing this skill
 

@@ -23,7 +23,7 @@ bugs that ship to buyers as npm bumps and `doctor` behavior.
 3. **Package-specific pre-checks stay local** when domain-specific (e.g. `isDataUnconfigured` in
    `@vybekiit/db`, `isAuthUnconfigured` in `@vybekiit/auth` per ADR-0008) but must not re-parse
    provider keys with raw env string compares.
-4. **Mechanical enforcement** — `scripts/checkProviderDispatch.mjs` in `pnpm quality`; maintainer
+4. **Mechanical enforcement** — `scripts/checkProviderDispatch.mjs` in `pnpm verify`; maintainer
    skill `.agents/skills/extend-provider-dispatch/SKILL.md`; Biome `noNestedTernary` as error.
 
 ## Consequences

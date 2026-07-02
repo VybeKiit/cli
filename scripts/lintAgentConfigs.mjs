@@ -3,7 +3,7 @@
  * Lint VybeKiit-owned agent config (AGENTS.md, CLAUDE.md, .cursor/rules) via agnix.
  * Auto-fixes safe issues, then blocks if fixes are uncommitted or errors remain.
  *
- * Used by `pnpm quality` / pre-push. Run manually: pnpm check:agent-configs
+ * Used by `pnpm verify` / pre-push. Run manually: pnpm check:agent-configs
  */
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

@@ -1,15 +1,25 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useReducedMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { motion, type HTMLMotionProps } from 'framer-motion';
+import { Database, FileText, Languages, Reply } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-const EXT_ACTIONS = ['Summarize page', 'Extract data', 'Generate reply', 'Translate'] as const;
+const EXT_ACTIONS = [
+  { label: 'Summarize page', icon: FileText },
+  { label: 'Extract data', icon: Database },
+  { label: 'Generate reply', icon: Reply },
+  { label: 'Translate', icon: Languages },
+] as const;
+
+const PHONE_STATS = [
+  { label: 'Users', value: '2,401' },
+  { label: 'MRR', value: '$1,380' },
+] as const;
+
+const AREA_LINE = 'M0,32 C15,30 22,22 38,24 C55,26 62,14 80,16 C98,18 108,8 120,10';
+const AREA_FILL = `${AREA_LINE} L120,40 L0,40 Z`;
 
 function FloatPanel({
   children,
@@ -41,140 +51,117 @@ function FloatPanel({
   return <motion.div {...props}>{children}</motion.div>;
 }
 
-/** Three-device compositing mockup for zig-zag row 3. */
+/** Three-device compositing mockup for zig-zag row 3 — web, mobile, extension in one bundle. */
 export function ThreeDeviceMock() {
   return (
     <div className="grid w-full gap-4 lg:grid-cols-3">
       <FloatPanel className="light-ui-card min-h-[420px] rounded-2xl" duration={6}>
         <div className="mb-3 flex items-center justify-between">
           <p className="font-bold text-[var(--light-text)] text-sm">Dashboard</p>
-          <div className="flex items-center gap-1.5">
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[10px] text-[var(--green)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
-            <Badge className="text-[10px]" variant="secondary">
-              Web
-            </Badge>
-          </div>
-        </div>
-        <p className="text-[var(--light-muted)] text-xs">Welcome back, Alex.</p>
-        <p className="mt-3 text-[var(--light-muted)] text-xs">Total Volume</p>
-        <p className="font-bold text-[var(--light-text)] text-xl">
-          <AnimatedNumber value="$24,880" />{' '}
-          <span className="font-normal text-[var(--green)] text-sm">
-            <AnimatedNumber value="+12.5%" />
+          <span className="rounded-full bg-[var(--light-card-muted)] px-2 py-0.5 text-[10px] text-[var(--light-muted)]">
+            Web
           </span>
-        </p>
-        <svg aria-hidden="true" className="mt-3 h-14 w-full" viewBox="0 0 120 40">
-          {[0, 30, 60, 90, 120].map((x) => (
-            <line key={x} stroke="rgba(0,0,0,0.06)" strokeWidth="1" x1={x} x2={x} y1="0" y2="40" />
-          ))}
-          <polyline
+        </div>
+        <p className="text-[var(--light-muted)] text-xs">Total Revenue</p>
+        <p className="font-bold text-[var(--light-text)] text-2xl tracking-tight">$24,880</p>
+        <p className="text-[var(--green)] text-xs">+12.5%</p>
+        <svg
+          aria-hidden="true"
+          className="mt-3 h-16 w-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 120 40"
+        >
+          <defs>
+            <linearGradient id="device-web-area" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="var(--blue)" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="var(--blue)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={AREA_FILL} fill="url(#device-web-area)" />
+          <path
+            d={AREA_LINE}
             fill="none"
-            points="0,32 30,28 60,18 90,22 120,10"
             stroke="var(--blue)"
+            strokeLinecap="round"
             strokeWidth="2"
           />
         </svg>
-        <p className="mt-4 font-semibold text-[var(--light-text)] text-xs">Recent Activity</p>
-        <ul className="mt-2 space-y-1.5 text-[11px] text-[var(--light-muted)]">
-          <li className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--green)]" />
-            Payment received — <AnimatedNumber value="$99" />
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--blue)]" />
-            New user signup
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--blue)]" />
-            Report exported
-          </li>
-        </ul>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="rounded-lg border border-black/6 bg-white/60 p-2.5">
+            <p className="text-[9px] text-[var(--light-muted)]">Active</p>
+            <p className="font-bold text-[var(--light-text)] text-sm">1,204</p>
+          </div>
+          <div className="rounded-lg border border-black/6 bg-white/60 p-2.5">
+            <p className="text-[9px] text-[var(--light-muted)]">Growth</p>
+            <p className="font-bold text-[var(--light-text)] text-sm">+8.2%</p>
+          </div>
+        </div>
       </FloatPanel>
 
       <FloatPanel
-        className="mx-auto w-full max-w-[190px] rounded-[28px] border-[#222] border-[3px] bg-[#0a0a0a] p-2.5 shadow-xl"
+        className="mx-auto w-full max-w-[190px] rounded-[28px] border-[3px] border-[#1b1f26] bg-[#050810] p-2.5 shadow-xl"
         delay={0.5}
         duration={7}
       >
         <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-white/20" />
-        <div className="rounded-[20px] bg-[#111] p-3.5">
-          <div className="mb-1 flex items-center justify-between">
-            <p className="font-semibold text-[11px] text-white">Dashboard</p>
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[8px] text-[var(--green)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
-          </div>
-          <Badge className="mb-2 scale-90 text-[8px]" variant="outline">
-            iOS
-          </Badge>
-          <p className="mt-1 text-[10px] text-[var(--text-muted)]">Total Volume</p>
-          <p className="font-bold text-base text-white">
-            <AnimatedNumber value="$24,880" />
-          </p>
-          <div className="mt-3 grid grid-cols-3 gap-1">
-            {['Overview', 'Revenue', 'Growth'].map((t) => (
-              <div
-                className="rounded bg-white/5 py-1.5 text-center text-[8px] text-[var(--text-muted)]"
-                key={t}
-              >
-                {t}
+        <div className="rounded-[20px] bg-[#080d16] p-3.5">
+          <p className="font-semibold text-[11px] text-white">Dashboard</p>
+          <p className="mt-2 text-[9px] text-white/45">Total Revenue</p>
+          <p className="font-bold text-base text-white">$24,880</p>
+          <p className="text-[8px] text-[var(--green)]">+12.5%</p>
+          <svg
+            aria-hidden="true"
+            className="mt-2 h-10 w-full"
+            preserveAspectRatio="none"
+            viewBox="0 0 120 40"
+          >
+            <path d={AREA_FILL} fill="url(#device-web-area)" />
+            <path
+              d={AREA_LINE}
+              fill="none"
+              stroke="var(--blue-soft)"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+            />
+          </svg>
+          <div className="mt-3 grid grid-cols-2 gap-1.5">
+            {PHONE_STATS.map((stat) => (
+              <div className="rounded-lg bg-white/5 p-1.5" key={stat.label}>
+                <p className="text-[7px] text-white/40">{stat.label}</p>
+                <p className="font-bold text-[11px] text-white">{stat.value}</p>
               </div>
             ))}
           </div>
-          <div className="mt-3 h-8 rounded bg-[var(--blue)]/20" />
         </div>
       </FloatPanel>
 
       <FloatPanel
-        className="min-h-[420px] rounded-2xl border border-white/15 bg-[#0d1117] p-6"
+        className="min-h-[420px] rounded-2xl border border-white/15 bg-[#0b111b] p-5"
         delay={1}
         duration={5.5}
       >
-        <div className="mb-2 flex items-center justify-between">
-          <p className="font-semibold text-white text-xs">VybeKiit Assistant</p>
-          <div className="flex items-center gap-1">
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[9px] text-[var(--green)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[9px] text-[var(--green)]"
-              variant="outline"
-            >
-              Ext
-            </Badge>
-          </div>
+        <div className="mb-3 flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#62a1ff] to-[#1e6bff]">
+            <span className="h-2 w-2 rounded-[1px] bg-white" />
+          </span>
+          <p className="font-semibold text-white text-xs">VybeKit Assistant</p>
         </div>
-        <Input
-          className="mt-2 h-9 border-white/15 bg-white/5 text-white text-xs"
-          placeholder="Ask anything..."
-          readOnly={true}
-          tabIndex={-1}
-        />
+        <div className="rounded-lg border border-white/12 bg-white/[0.04] px-2.5 py-2 text-[10px] text-white/40">
+          Ask anything...
+        </div>
         <ul className="mt-3 space-y-2">
           {EXT_ACTIONS.map((action) => (
-            <li key={action}>
-              <Button
-                className="h-8 w-full justify-start border-white/10 bg-white/5 text-[11px] text-white"
-                tabIndex={-1}
-                variant="outline"
-              >
-                {action}
-              </Button>
+            <li
+              className="flex items-center gap-2.5 text-[11px] text-white/85"
+              key={action.label}
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/60">
+                <action.icon className="h-3.5 w-3.5" strokeWidth={1.8} />
+              </span>
+              {action.label}
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[10px] text-[var(--text-faint)]">Last used: Summarize page</p>
       </FloatPanel>
     </div>
   );

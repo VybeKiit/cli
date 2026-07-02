@@ -20,7 +20,7 @@ Follow `i18n-vybekiit.md` for technical steps.
 2. **Duplicate the catalog** — `messages/en.json` → `messages/{locale}.json`; translate values.
 3. **Register** — call `registerLocale()` in `src/lib/i18n.ts`; update device locale resolution if needed.
 4. **RTL** — for `ar`, `he`, `fa`, `ur`: verify mirrored layout after app reload.
-5. **Verify** — `pnpm quality`; builder confirms a screen in the new language.
+5. **Verify** — `pnpm verify`; builder confirms a screen in the new language.
 6. **Celebrate** 🎉
 
 ## Definition of done

@@ -16,7 +16,7 @@ metadata:
 
 ## Steps
 
-1. Run `pnpm quality`.
+1. Run `pnpm verify`.
 2. Run `vybekiit doctor`.
 3. Check `/health` responds.
 

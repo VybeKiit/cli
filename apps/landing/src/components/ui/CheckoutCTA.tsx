@@ -1,6 +1,6 @@
 'use client';
 
-import { CartIcon } from '@/components/ui/CustomIcons';
+import { CartIcon, LockIcon } from '@/components/ui/CustomIcons';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useCallback, useState, type ReactNode } from 'react';
@@ -10,6 +10,8 @@ interface CheckoutCTAProps {
   readonly children: ReactNode;
   readonly className?: string;
   readonly size?: 'hero' | 'pricing';
+  /** Trailing glyph — the cart flies on click; the lock is a static trust cue. */
+  readonly icon?: 'cart' | 'lock';
 }
 
 /** Checkout link with cart fly animation on click (RTL-aware). */
@@ -18,6 +20,7 @@ export function CheckoutCTA({
   children,
   className,
   size = 'hero',
+  icon = 'cart',
 }: CheckoutCTAProps) {
   const [proceeding, setProceeding] = useState(false);
 
@@ -37,9 +40,13 @@ export function CheckoutCTA({
       onClick={handleClick}
     >
       <span className="checkout-cta-label">{children}</span>
-      <CartIcon
-        className={cn('checkout-cta-cart shrink-0', size === 'pricing' ? 'h-6 w-6' : 'h-5 w-5')}
-      />
+      {icon === 'lock' ? (
+        <LockIcon className="ms-1 h-5 w-5 shrink-0" />
+      ) : (
+        <CartIcon
+          className={cn('checkout-cta-cart shrink-0', size === 'pricing' ? 'h-6 w-6' : 'h-5 w-5')}
+        />
+      )}
     </Link>
   );
 }

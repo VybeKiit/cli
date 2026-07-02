@@ -34,7 +34,7 @@ translate every error · celebrate. Decide all technical choices yourself.
    build and publish to the app stores) so the builder never configures anything. It may say a tool
    "isn't signed in yet" — that's fine for now; sign-in happens later, only when a step needs it.
    Then install the project's building blocks and start the app yourself, in plain words.
-   After dependencies install, run **quality smoke** yourself: `pnpm quality`. Confirm `.cursorignore`
+   After dependencies install, run **quality smoke** yourself: `pnpm verify`. Confirm `.cursorignore`
    hides `.env` (doctor checks this). Fix anything red before showing the preview code. The builder
    hears: *"Everything checks out."*
    **Verify:** the app starts with no errors and shows a code (a square QR) to scan.

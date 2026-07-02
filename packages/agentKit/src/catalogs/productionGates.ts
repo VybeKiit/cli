@@ -7,7 +7,7 @@ export interface ProductionGate {
 
 const COMMON_GATES: readonly ProductionGate[] = [
   { id: 'sign-in', label: 'Sign-in works with real accounts' },
-  { id: 'quality', label: '`pnpm quality` passes' },
+  { id: 'quality', label: '`pnpm verify` passes' },
   { id: 'doctor', label: 'Doctor reports all tools ready' },
   { id: 'analytics-test', label: 'Visitor stats record a test event (when analytics is enabled)' },
   { id: 'sentry-test', label: 'Error alerts received a test event (when Sentry is enabled)' },

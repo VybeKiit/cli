@@ -332,10 +332,10 @@
 
 .landing-page .hero-title {
   max-width: 1180px;
-  font-size: clamp(72px, 8.2vw, 132px);
-  font-weight: 900;
-  letter-spacing: -0.07em;
-  line-height: 0.9;
+  font-size: clamp(48px, 6.6vw, 104px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
 }
 
 .landing-page .hero-cta {
@@ -541,16 +541,18 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 
 .landing-page .feature-strip {
   display: grid;
-  gap: 64px;
-  margin-top: 80px;
-  margin-bottom: 120px;
+  gap: 40px 32px;
+  margin-top: 72px;
+  margin-bottom: 96px;
 }
 
 .landing-page .auto-scroll-row-showcase {
   display: flex;
   align-items: stretch;
   gap: 24px;
-  padding-right: 24px;
+  margin: 0;
+  padding: 0 24px 0 0;
+  list-style: none;
 }
 
 .landing-page .showcase-card {
@@ -580,40 +582,14 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 }
 
 .landing-page .zigzag-copy-side {
-  padding: 72px 56px;
-  clip-path: polygon(0 0, 94% 0, 100% 100%, 0 100%);
-}
-
-.landing-page .zigzag-copy-side--left {
-  clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%);
+  padding: 64px 56px;
 }
 
 .landing-page .zigzag-visual-side {
   padding: 56px;
 }
 
-@media (min-width: 768px) {
-  .landing-page .zigzag-row::after {
-    content: "";
-    position: absolute;
-    top: 8%;
-    bottom: 8%;
-    left: 50%;
-    width: 2px;
-    transform: translateX(-50%) rotate(7deg);
-    background: linear-gradient(
-      180deg,
-      transparent,
-      rgba(47, 128, 255, 0.15) 15%,
-      rgba(47, 128, 255, 0.55) 50%,
-      rgba(47, 128, 255, 0.15) 85%,
-      transparent
-    );
-    box-shadow: 0 0 24px rgba(47, 128, 255, 0.35);
-    pointer-events: none;
-    z-index: 1;
-  }
-}
+/* Straight zig-zag panels — the slanted clip-path and diagonal divider were removed to match the design. */
 
 .landing-page .pricing-panel {
   min-height: 520px;
@@ -896,18 +872,19 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 }
 
 .landing-page .tech-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: #9aa6b5;
-  opacity: 0.5;
+  opacity: 0.55;
   transition:
     color 0.35s ease,
-    opacity 0.35s ease,
-    filter 0.35s ease;
+    opacity 0.35s ease;
 }
 
 .landing-page .tech-logo:hover {
-  color: var(--brand-color);
+  color: #ffffff;
   opacity: 1;
-  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--brand-color) 65%, transparent));
 }
 
 .landing-page .testimonials-logos-row {
@@ -915,8 +892,8 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   flex-shrink: 0;
   align-items: center;
   gap: 72px;
-  padding-right: 72px;
   margin: 0;
+  padding: 0 72px 0 0;
   list-style: none;
 }
 
@@ -962,6 +939,12 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
     flex-wrap: wrap;
     justify-content: center;
     gap: 48px;
+    padding-right: 0;
+  }
+
+  .landing-page .auto-scroll-row-showcase {
+    flex-wrap: wrap;
+    justify-content: center;
     padding-right: 0;
   }
 

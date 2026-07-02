@@ -7,7 +7,7 @@
 File: `.github/workflows/ci.yml`
 
 - **Matrix:** ubuntu-latest, macos-latest, windows-latest
-- **Steps:** `pnpm install --frozen-lockfile` → `pnpm quality` (same as local pre-push)
+- **Steps:** `pnpm install --frozen-lockfile` → `pnpm verify` (same as local pre-push)
 - **Playwright:** ubuntu job only, when the template ships UI walkthrough tests
 - **Cache:** `setup-node` with `cache: pnpm` — key includes lockfile hash automatically
 
@@ -19,7 +19,7 @@ File: `.github/workflows/ci.yml`
 
 ## Pre-push alignment
 
-Local `.husky/pre-push` runs the same `pnpm quality` (+ optional e2e) so pushes rarely fail CI.
+Local `.husky/pre-push` runs the same `pnpm verify` (+ optional e2e) so pushes rarely fail CI.
 
 ## Verify
 
