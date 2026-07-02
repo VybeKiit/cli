@@ -5,7 +5,7 @@
 // or `mongodbAdapter` (over the official `mongodb` driver) for Mongo. Chosen over Lucia
 // because it ships the email/password + email-OTP + bearer plugins we need.
 import { parseEnv, twilioConfigSchema, type Result, fail, ok } from '@vybekiit/core';
-import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications';
+import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '../../smsOtp';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { bearer, emailOTP } from 'better-auth/plugins';

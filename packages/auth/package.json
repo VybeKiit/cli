@@ -47,7 +47,6 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.1075.0",
     "@supabase/supabase-js": "^2.47.10",
     "@vybekiit/core": "workspace:*",
-    "@vybekiit/notifications": "workspace:*",
     "better-auth": "^1.6.22",
     "effect": "3.21.4",
     "mongodb": "^7.4.0",

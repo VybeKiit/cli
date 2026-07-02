@@ -30,6 +30,10 @@ const nextConfig = {
     '@vybekiit/seo',
     '@vybekiit/tenancy',
   ],
+  // @sentry/node is Node-only. It now arrives via the transpiled @vybekiit/core/observability
+  // subpath (was an external dep of the standalone @vybekiit/observability), so keep it a
+  // server external — never webpack-bundled — matching its pre-ADR-0025 treatment.
+  serverExternalPackages: ['@sentry/node'],
   images: {
     remotePatterns: getNextImageRemotePatterns(process.env),
   },
