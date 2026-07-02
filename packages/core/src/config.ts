@@ -239,8 +239,8 @@ export const awsHostingConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and `@vybekiit/assets`
- * (CDN delivery). `R2_PUBLIC_URL` is the public bucket origin for readable object URLs.
+ * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and the templates'
+ * asset delivery (CDN). `R2_PUBLIC_URL` is the public bucket origin for readable object URLs.
  */
 export const r2ConfigSchema = Schema.Struct({
   R2_ACCOUNT_ID: NonEmpty,

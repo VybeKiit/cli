@@ -6,13 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "wxt",
-    "prebuild": "node scripts/optimizeAssets.mjs",
+    "prebuild": "tsx scripts/optimizeAssets.mts",
     "build": "wxt build",
     "postinstall": "wxt prepare",
     "lint": "biome check .",
     "format": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "pretypecheck": "node scripts/optimizeAssets.mjs",
+    "pretypecheck": "tsx scripts/optimizeAssets.mts",
     "test": "vitest run --passWithNoTests",
     "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build && node scripts/checkAgentPatterns.mjs",
     "test:e2e": "node scripts/runE2e.mjs",
@@ -25,7 +25,6 @@
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/payments": "workspace:*",
-    "@vybekiit/assets": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
@@ -49,6 +48,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "vitest": "^3.2.6",
-    "wxt": "^0.20.7"
+    "wxt": "^0.20.7",
+    "svgo": "^3.3.2",
+    "tsx": "^4.19.2"
   }
 }

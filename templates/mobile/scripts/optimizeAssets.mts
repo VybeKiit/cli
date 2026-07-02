@@ -2,13 +2,11 @@ import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { resolveAssetDelivery } from '@vybekiit/assets';
-import process from 'node:process';
+import { runOptimizeForBuild } from './optimize.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const assetsDir = join(root, 'assets');
-const delivery = resolveAssetDelivery(process.env);
-const result = await delivery.optimizeForBuild({ sourceDir: assetsDir });
+const result = await runOptimizeForBuild({ sourceDir: assetsDir });
 console.log(`[optimize-assets] processed ${result.processedCount} raster/SVG file(s) in assets/`);
 
 const iconSvg = join(assetsDir, 'icon.svg');

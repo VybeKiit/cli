@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { AssetManifest } from './types';
+import process from 'node:process';
 
 /**
  * Next.js `images.remotePatterns` derived from the active stack — allows optimized

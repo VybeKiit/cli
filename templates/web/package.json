@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/optimizeAssets.mjs",
+    "prebuild": "tsx scripts/optimizeAssets.ts",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
@@ -75,7 +75,6 @@
     "@tsparticles/slim": "^3.9.1",
     "@types/canvas-confetti": "^1.9.0",
     "@uidotdev/usehooks": "^2.4.1",
-    "@vybekiit/assets": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
@@ -164,6 +163,9 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "sharp": "^0.33.5",
+    "svgo": "^3.3.2",
+    "tsx": "^4.19.2"
   }
 }

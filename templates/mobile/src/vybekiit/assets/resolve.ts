@@ -21,6 +21,7 @@ import {
   createVercelDelivery,
 } from './providers';
 import type { AssetDeliveryProvider } from './types';
+import { readNodeEnv } from '@/lib/nodeEnv';
 
 const STORAGE_ANCHOR_KEYS = ['R2_BUCKET', 'SUPABASE_URL'] as const;
 
@@ -67,7 +68,7 @@ function resolveCloudflareStackDelivery(env: EnvSource, app: AppConfig): AssetDe
  * Construct the asset delivery provider from HOSTING + STORAGE env. The builder never
  * picks a CDN — the agent's stack settings route here automatically.
  */
-export function resolveAssetDelivery(env: EnvSource = process.env): AssetDeliveryProvider {
+export function resolveAssetDelivery(env: EnvSource = readNodeEnv()): AssetDeliveryProvider {
   const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, env);
   const app = parseEnv(appConfigSchema, env);
 

@@ -6,11 +6,11 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "prestart": "node scripts/optimizeAssets.mjs",
+    "prestart": "tsx scripts/optimizeAssets.mts",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit",
-    "pretypecheck": "node scripts/optimizeAssets.mjs",
+    "pretypecheck": "tsx scripts/optimizeAssets.mts",
     "test": "vitest run",
     "lint": "biome check .",
     "format": "biome check --write .",
@@ -20,7 +20,6 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@vybekiit/assets": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",
@@ -55,6 +54,8 @@
     "sharp": "^0.34.5",
     "typescript": "^5.7.2",
     "msw": "^2.7.0",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "svgo": "^3.3.2",
+    "tsx": "^4.19.2"
   }
 }

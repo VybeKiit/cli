@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createCloudflareR2Delivery } from '../src/providers';
-import { resolveAssetDelivery } from '../src/resolve';
+import { createCloudflareR2Delivery } from '../providers';
+import { resolveAssetDelivery } from '../resolve';
 
 const cloudflareEnv = {
   CLOUDFLARE_ACCOUNT_ID: 'acct',

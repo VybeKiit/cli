@@ -1,6 +1,6 @@
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveAssetDelivery } from '@vybekiit/assets';
+import { resolveAssetDelivery } from '@/vybekiit/assets';
 import process from 'node:process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
