@@ -21,16 +21,16 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
-    "@vybekiit/agent-kit": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
-    "@vybekiit/deploy": "workspace:*",
     "@vybekiit/report-mode": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "@vybekiit/agent-kit": "workspace:*",
+    "@vybekiit/deploy": "workspace:*"
   }
 }

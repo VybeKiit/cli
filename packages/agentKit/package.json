@@ -31,7 +31,5 @@
     "typescript": "^5.7.2",
     "vitest": "^3.2.6"
   },
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }

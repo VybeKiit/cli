@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
-    "@vybekiit/agent-kit": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",

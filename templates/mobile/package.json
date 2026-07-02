@@ -20,7 +20,6 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@vybekiit/agent-kit": "workspace:*",
     "@vybekiit/assets": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
