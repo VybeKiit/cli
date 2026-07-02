@@ -92,7 +92,6 @@
     "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@vybekiit/search": "workspace:*",
-    "@vybekiit/seo": "workspace:*",
     "@vybekiit/tenancy": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "@xyflow/react": "^12.11.1",

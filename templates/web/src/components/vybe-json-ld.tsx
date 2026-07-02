@@ -1,4 +1,4 @@
-import type { JsonLdBlock } from '@vybekiit/seo';
+import type { JsonLdBlock } from '@/vybekiit/seo';
 
 /** Injects Schema.org JSON-LD for GEO/AEO crawlers — skill: add-blog */
 export function VybeJsonLd({ data }: { data: JsonLdBlock | readonly JsonLdBlock[] }) {

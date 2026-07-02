@@ -27,7 +27,6 @@ const nextConfig = {
     '@vybekiit/notifications',
     '@vybekiit/realtime',
     '@vybekiit/search',
-    '@vybekiit/seo',
     '@vybekiit/tenancy',
   ],
   // @sentry/node is Node-only. It now arrives via the transpiled @vybekiit/core/observability

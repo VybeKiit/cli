@@ -30,7 +30,6 @@
     "@vybekiit/analytics": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
-    "@vybekiit/seo": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-query-persist-client": "^5.101.1",
     "class-variance-authority": "^0.7.1",

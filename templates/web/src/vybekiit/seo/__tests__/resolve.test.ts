@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSeoProvider } from '../src/resolve';
+import { resolveSeoProvider } from '../resolve';
 
 const env = {
   APP_URL: 'https://example.com',
