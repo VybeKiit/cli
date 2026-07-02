@@ -113,13 +113,13 @@
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-feature-flags/SKILL.md",
-      "computedHash": "22a5d7a40e963b1a4b905d37d48b547d5344359cb6347a329348a47e0d2033d6"
+      "computedHash": "243c344401724f3c133bceee927ba86447de26c72676be2fdccbb80f7f5a9ad8"
     },
     "instrument-product-analytics": {
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-product-analytics/SKILL.md",
-      "computedHash": "03bb4b25195e0d3cd6467f4bcacdd689f211d436b7a763973293e7174b3eb605"
+      "computedHash": "cc6b39e945dcb8c1ef42374f802694af70f026b9765706e983eb35030116fa63"
     },
     "mongodb-atlas-stream-processing": {
       "source": "mongodb/agent-skills",

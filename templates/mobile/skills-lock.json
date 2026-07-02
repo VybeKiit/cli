@@ -55,6 +55,12 @@
       "skillPath": "better-auth/create-auth/SKILL.md",
       "computedHash": "31c027d02dbf1faa37f58191f574b9443143042fb2b684fe32df53ab0270487c"
     },
+    "eas-simulator": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/expo/skills/eas-simulator/SKILL.md",
+      "computedHash": "5d60602a54e2c089abdc0c93e3288905c6a5c484f92f35899d7e8040fbcebd45"
+    },
     "eas-update-insights": {
       "source": "expo/skills",
       "sourceType": "github",
@@ -197,13 +203,13 @@
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-feature-flags/SKILL.md",
-      "computedHash": "22a5d7a40e963b1a4b905d37d48b547d5344359cb6347a329348a47e0d2033d6"
+      "computedHash": "243c344401724f3c133bceee927ba86447de26c72676be2fdccbb80f7f5a9ad8"
     },
     "instrument-product-analytics": {
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-product-analytics/SKILL.md",
-      "computedHash": "03bb4b25195e0d3cd6467f4bcacdd689f211d436b7a763973293e7174b3eb605"
+      "computedHash": "cc6b39e945dcb8c1ef42374f802694af70f026b9765706e983eb35030116fa63"
     },
     "mongodb-atlas-stream-processing": {
       "source": "mongodb/agent-skills",
