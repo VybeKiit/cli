@@ -36,3 +36,7 @@ apps/landing/downloads/
 packages/browserAutomation/.cws-selectors.draft.txt
 packages/browserAutomation/.ls-selectors.draft.txt
 packages/browserAutomation/dev/recorder/logs/
+
+# skills/pi CLI local cache — a scratch workdir the skill-pinning CLI drops into each
+# template. The tracked skill content lives under templates/*/.agents/skills; this is cache.
+.pi/
