@@ -15,7 +15,6 @@
     "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && node scripts/checkAgentPatterns.mjs"
   },
   "dependencies": {
-    "@vybekiit/analytics": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",

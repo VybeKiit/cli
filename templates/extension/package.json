@@ -27,7 +27,6 @@
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/assets": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
-    "@vybekiit/analytics": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-query-persist-client": "^5.101.1",

@@ -17,7 +17,6 @@ const nextConfig = {
     '@vybekiit/db',
     '@vybekiit/payments',
     '@vybekiit/assets',
-    '@vybekiit/analytics',
     '@vybekiit/notifications',
   ],
   // @sentry/node is Node-only. It now arrives via the transpiled @vybekiit/core/observability

@@ -28,7 +28,6 @@
     "@vybekiit/tokens": "workspace:*",
     "@vybekiit/db": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
-    "@vybekiit/analytics": "workspace:*",
     "@vybekiit/notifications": "workspace:*",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-query-persist-client": "^5.101.1",

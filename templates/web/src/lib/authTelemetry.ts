@@ -1,4 +1,4 @@
-import { resolveAnalyticsProvider } from '@vybekiit/analytics';
+import { resolveAnalyticsProvider } from '@/vybekiit/analytics';
 import { observability } from '@/lib/observability';
 
 export type AuthEventName = 'signup_completed' | 'sign_in_completed';

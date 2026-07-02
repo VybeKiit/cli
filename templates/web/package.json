@@ -75,7 +75,6 @@
     "@tsparticles/slim": "^3.9.1",
     "@types/canvas-confetti": "^1.9.0",
     "@uidotdev/usehooks": "^2.4.1",
-    "@vybekiit/analytics": "workspace:*",
     "@vybekiit/assets": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",

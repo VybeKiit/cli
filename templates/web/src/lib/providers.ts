@@ -1,4 +1,4 @@
-import { resolveAnalyticsProvider } from '@vybekiit/analytics';
+import { resolveAnalyticsProvider } from '@/vybekiit/analytics';
 import { resolveAiProvider } from '@/vybekiit/ai';
 import { createCmsFromEnv } from '@/vybekiit/cms';
 import { resolveComplianceProvider } from '@/vybekiit/compliance';

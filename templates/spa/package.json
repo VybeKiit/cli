@@ -38,7 +38,6 @@
     "@tanstack/react-router": "^1.114.29",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
-    "@vybekiit/analytics": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
     "@vybekiit/core": "workspace:*",

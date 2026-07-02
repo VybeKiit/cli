@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   track: vi.fn(),
 }));
 
-vi.mock('@vybekiit/analytics', () => ({
+vi.mock('../../vybekiit/analytics/index.js', () => ({
   resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
 }));
 
