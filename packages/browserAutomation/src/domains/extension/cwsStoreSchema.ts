@@ -2,8 +2,7 @@ import { Either, Schema } from 'effect';
 
 import type { CwsStoreConfig } from './store';
 
-const nonEmptyOr =
-  (fallback: string) =>
+const nonEmptyOr = (fallback: string) =>
   Schema.transform(Schema.String, Schema.String, {
     strict: true,
     decode: (value) => (value.length > 0 ? value : fallback),
@@ -30,6 +29,6 @@ export function parseCwsStoreConfig(parsed: unknown): CwsStoreConfig {
     chromeWebStoreId,
     key,
     name,
-    ...(version !== undefined ? { version } : {}),
+    ...(version === undefined ? {} : { version }),
   };
 }

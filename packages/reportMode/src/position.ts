@@ -1,11 +1,6 @@
 import { Either, Schema } from 'effect';
 
-const CornerAnchor = Schema.Literal(
-  'top-left',
-  'top-right',
-  'bottom-left',
-  'bottom-right',
-);
+const CornerAnchor = Schema.Literal('top-left', 'top-right', 'bottom-left', 'bottom-right');
 
 const CornerPositionSchema = Schema.Struct({
   anchor: CornerAnchor,

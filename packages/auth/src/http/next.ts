@@ -86,11 +86,7 @@ export function createNextAuthRoutes(deps: AuthHttpDeps) {
       return toNextResponse(await handleForgotPassword(parsed.body, deps));
     },
     resetPassword: async (request: Request) => {
-      const parsed = await parseBody(
-        request,
-        ResetPasswordBodySchema,
-        'Enter your new password.',
-      );
+      const parsed = await parseBody(request, ResetPasswordBodySchema, 'Enter your new password.');
       if (!parsed.ok) return toNextResponse(parsed.response);
       return toNextResponse(await handleResetPassword(parsed.body, deps));
     },
@@ -100,7 +96,11 @@ export function createNextAuthRoutes(deps: AuthHttpDeps) {
       return toNextResponse(await handleSendMagicLink(parsed.body, deps));
     },
     verifyMagicLink: async (request: Request) => {
-      const parsed = await parseBody(request, TokenOnlyBodySchema, 'That sign-in link is not valid.');
+      const parsed = await parseBody(
+        request,
+        TokenOnlyBodySchema,
+        'That sign-in link is not valid.',
+      );
       if (!parsed.ok) return toNextResponse(parsed.response);
       return toNextResponse(await handleVerifyMagicLink(parsed.body, deps));
     },

@@ -1,7 +1,4 @@
-import {
-  handlePracticeComplete,
-  PracticeCompleteBodySchema,
-} from '@vybekiit/payments/http';
+import { handlePracticeComplete, PracticeCompleteBodySchema } from '@vybekiit/payments/http';
 import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
 import { fulfillOrder } from '@/lib/fulfillment';
 import { NextResponse } from 'next/server';

@@ -82,10 +82,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleSendEmailCode(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleSendEmailCode(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/verify', async (req, res) => {
     const parsed = parseBody(req.body, EmailCodeBodySchema, 'Enter the code we sent you.');
@@ -93,10 +90,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleVerifyEmailCode(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleVerifyEmailCode(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/forgot-password', async (req, res) => {
     const parsed = parseBody(req.body, EmailOnlyBodySchema, 'Enter your email address.');
@@ -104,10 +98,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleForgotPassword(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleForgotPassword(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/reset-password', async (req, res) => {
     const parsed = parseBody(req.body, ResetPasswordBodySchema, 'Enter your new password.');
@@ -115,10 +106,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleResetPassword(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleResetPassword(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/magic-link', async (req, res) => {
     const parsed = parseBody(req.body, EmailOnlyBodySchema, 'Enter your email address.');
@@ -126,10 +114,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleSendMagicLink(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleSendMagicLink(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/magic-link/verify', async (req, res) => {
     const parsed = parseBody(req.body, TokenOnlyBodySchema, 'That sign-in link is not valid.');
@@ -137,10 +122,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleVerifyMagicLink(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleVerifyMagicLink(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/send-sms-code', async (req, res) => {
     const parsed = parseBody(req.body, PhoneOnlyBodySchema, 'Enter your phone number.');
@@ -148,10 +130,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleSendSmsCode(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleSendSmsCode(parsed.body, resolveDeps(deps, req, res)));
   });
   router.post('/verify-sms-code', async (req, res) => {
     const parsed = parseBody(req.body, PhoneCodeBodySchema, 'Enter the code we sent you.');
@@ -159,10 +138,7 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
       sendHttpResponse(res, parsed.response);
       return;
     }
-    sendHttpResponse(
-      res,
-      await handleVerifySmsCode(parsed.body, resolveDeps(deps, req, res)),
-    );
+    sendHttpResponse(res, await handleVerifySmsCode(parsed.body, resolveDeps(deps, req, res)));
   });
 
   return router;

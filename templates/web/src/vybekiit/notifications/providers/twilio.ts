@@ -1,5 +1,8 @@
 import { type TwilioConfig, fail, ok, type Result } from '@vybekiit/core';
-import { decodeTwilioMessageResponse, decodeTwilioVerificationCheckResponse } from '../../http/responseSchemas';
+import {
+  decodeTwilioMessageResponse,
+  decodeTwilioVerificationCheckResponse,
+} from '../../http/responseSchemas';
 
 const pendingCodes = new Map<string, string>();
 

@@ -1,4 +1,4 @@
-import { Effect, Schema, type ParseResult } from 'effect';
+import { type Effect, Schema, type ParseResult } from 'effect';
 
 import type { SendEmailParams } from '../types';
 
@@ -47,11 +47,7 @@ export function toWorkerSendBody(params: SendEmailParams): CloudflareWorkerSendB
 /** Validates and normalizes an unknown JSON value into a worker send body. */
 export function parseWorkerSendBody(
   raw: unknown,
-): Effect.Effect<
-  typeof CloudflareWorkerSendBodySchema.Type,
-  ParseResult.ParseError,
-  never
-> {
+): Effect.Effect<typeof CloudflareWorkerSendBodySchema.Type, ParseResult.ParseError, never> {
   return decodeWorkerSendBody(raw);
 }
 
