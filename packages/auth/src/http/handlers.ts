@@ -11,6 +11,16 @@ import { Cause, Effect, Exit, Option } from 'effect';
 import { resolveAuthProvider } from '../resolve';
 import type { AuthError, AuthProvider } from '../types';
 import type { AuthUser } from '../user';
+import type {
+  EmailCodeBody,
+  EmailOnlyBody,
+  PhoneCodeBody,
+  PhoneOnlyBody,
+  ResetPasswordBody,
+  SignInBody,
+  SignUpBody,
+  TokenOnlyBody,
+} from './schemas';
 
 export type AuthHttpMethod = 'password' | 'magic_link' | 'sms' | 'email_code';
 
@@ -68,15 +78,12 @@ function authError(cause: Cause.Cause<AuthError>): AuthError | null {
 }
 
 export async function handleSignUp(
-  body: { email?: string; password?: string },
+  body: SignUpBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { email, password } = body;
-    if (!(email && password)) {
-      return badInput('Enter your email and password.');
-    }
     const exit = await Effect.runPromiseExit(resolveAuth(deps).signUpWithPassword(email, password));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -94,15 +101,12 @@ export async function handleSignUp(
 }
 
 export async function handleSignIn(
-  body: { email?: string; password?: string },
+  body: SignInBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { email, password } = body;
-    if (!(email && password)) {
-      return badInput('Enter your email and password.');
-    }
     const exit = await Effect.runPromiseExit(resolveAuth(deps).signInWithPassword(email, password));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -133,11 +137,10 @@ export async function handleMe(deps: AuthHttpDeps): Promise<AuthHttpResponse> {
 }
 
 export async function handleSendEmailCode(
-  body: { email?: string },
+  body: EmailOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const { email } = body;
-  if (!email) return badInput('Enter your email.');
   const exit = await Effect.runPromiseExit(resolveAuth(deps).sendEmailCode(email));
   if (Exit.isFailure(exit)) {
     return upstreamFailed(authError(exit.cause)?.message ?? 'Could not send the code.');
@@ -146,15 +149,12 @@ export async function handleSendEmailCode(
 }
 
 export async function handleVerifyEmailCode(
-  body: { email?: string; code?: string },
+  body: EmailCodeBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { email, code } = body;
-    if (!(email && code)) {
-      return badInput('Enter the code we sent you.');
-    }
     const exit = await Effect.runPromiseExit(resolveAuth(deps).verifyEmailCode(email, code));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -172,13 +172,12 @@ export async function handleVerifyEmailCode(
 }
 
 export async function handleForgotPassword(
-  body: { email?: string },
+  body: EmailOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { email } = body;
-    if (!email) return badInput('Enter your email address.');
     const exit = await Effect.runPromiseExit(resolveAuth(deps).requestPasswordReset(email));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -194,15 +193,12 @@ export async function handleForgotPassword(
 }
 
 export async function handleResetPassword(
-  body: { token?: string; newPassword?: string },
+  body: ResetPasswordBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { token, newPassword } = body;
-    if (!(token && newPassword)) {
-      return badInput('Enter your new password.');
-    }
     const exit = await Effect.runPromiseExit(resolveAuth(deps).resetPassword(token, newPassword));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -220,13 +216,12 @@ export async function handleResetPassword(
 }
 
 export async function handleSendMagicLink(
-  body: { email?: string },
+  body: EmailOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { email } = body;
-    if (!email) return badInput('Enter your email address.');
     const exit = await Effect.runPromiseExit(resolveAuth(deps).sendMagicLink(email));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -242,13 +237,12 @@ export async function handleSendMagicLink(
 }
 
 export async function handleVerifyMagicLink(
-  body: { token?: string },
+  body: TokenOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { token } = body;
-    if (!token) return badInput('That sign-in link is not valid.');
     const exit = await Effect.runPromiseExit(resolveAuth(deps).verifyMagicLink(token));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -266,13 +260,12 @@ export async function handleVerifyMagicLink(
 }
 
 export async function handleSendSmsCode(
-  body: { phone?: string },
+  body: PhoneOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { phone } = body;
-    if (!phone) return badInput('Enter your phone number.');
     const exit = await Effect.runPromiseExit(resolveAuth(deps).sendSmsCode(phone));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);
@@ -288,15 +281,12 @@ export async function handleSendSmsCode(
 }
 
 export async function handleVerifySmsCode(
-  body: { phone?: string; code?: string },
+  body: PhoneCodeBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> {
   const tel = telemetry(deps);
   try {
     const { phone, code } = body;
-    if (!(phone && code)) {
-      return badInput('Enter the code we sent you.');
-    }
     const exit = await Effect.runPromiseExit(resolveAuth(deps).verifySmsCode(phone, code));
     if (Exit.isFailure(exit)) {
       const failure = authError(exit.cause);

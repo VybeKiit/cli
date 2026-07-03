@@ -1,3 +1,26 @@
+import { Either, Schema } from 'effect';
+
+const CornerAnchor = Schema.Literal(
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+);
+
+const CornerPositionSchema = Schema.Struct({
+  anchor: CornerAnchor,
+});
+
+const CustomPositionSchema = Schema.Struct({
+  anchor: Schema.Literal('custom'),
+  customX: Schema.Number,
+  customY: Schema.Number,
+});
+
+export const ReportDockPositionSchema = Schema.Union(CornerPositionSchema, CustomPositionSchema);
+
+const decodeDockPosition = Schema.decodeUnknownEither(ReportDockPositionSchema);
+
 /** Corner anchors for the dev-only Report dock. */
 export type ReportDockAnchor = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'custom';
 
@@ -35,29 +58,11 @@ function parsePosition(raw: string | null): ReportDockPosition {
     return DEFAULT_DOCK_POSITION;
   }
   try {
-    const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== 'object' || parsed === null || !('anchor' in parsed)) {
+    const parsed = decodeDockPosition(JSON.parse(raw));
+    if (Either.isLeft(parsed)) {
       return DEFAULT_DOCK_POSITION;
     }
-    const anchor = (parsed as { anchor: string }).anchor;
-    if (
-      anchor !== 'top-left' &&
-      anchor !== 'top-right' &&
-      anchor !== 'bottom-left' &&
-      anchor !== 'bottom-right' &&
-      anchor !== 'custom'
-    ) {
-      return DEFAULT_DOCK_POSITION;
-    }
-    const customX = (parsed as { customX?: unknown }).customX;
-    const customY = (parsed as { customY?: unknown }).customY;
-    if (anchor === 'custom') {
-      if (typeof customX !== 'number' || typeof customY !== 'number') {
-        return DEFAULT_DOCK_POSITION;
-      }
-      return { anchor, customX, customY };
-    }
-    return { anchor };
+    return parsed.right;
   } catch {
     return DEFAULT_DOCK_POSITION;
   }

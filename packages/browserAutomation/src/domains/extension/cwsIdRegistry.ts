@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
+import { parseCwsStoreConfig } from './cwsStoreSchema';
 import { cwsJsonPath, type CwsStoreConfig } from './store';
 
 /**
@@ -57,19 +58,6 @@ async function readCwsStoreConfig(path: string): Promise<CwsStoreConfig> {
     }
     throw error;
   }
-}
-
-function parseCwsStoreConfig(parsed: unknown): CwsStoreConfig {
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('cws.json must be a JSON object.');
-  }
-  const o = parsed as Record<string, unknown>;
-  return {
-    chromeWebStoreId: typeof o.chromeWebStoreId === 'string' ? o.chromeWebStoreId : '',
-    key: typeof o.key === 'string' && o.key.length > 0 ? o.key : 'extension',
-    name: typeof o.name === 'string' && o.name.length > 0 ? o.name : 'Extension',
-    ...(typeof o.version === 'string' ? { version: o.version } : {}),
-  };
 }
 
 const CHROME_WEB_STORE_ID_PATTERN = /^[a-z0-9]{32}$/;

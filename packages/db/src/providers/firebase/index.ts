@@ -5,6 +5,7 @@ import { getFirestore, type Firestore, type Query } from 'firebase-admin/firesto
 import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
 import type { DataProvider, DbRecord, QueryFilter } from '../../types';
 import { MINIMAL_CAPABILITIES } from '../postgres/shared';
+import { parseFirebaseServiceAccount } from './serviceAccountSchema';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -12,10 +13,12 @@ function errorMessage(error: unknown): string {
 
 function loadServiceAccount(config: FirebaseConfig): Record<string, unknown> {
   if (config.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    return JSON.parse(config.FIREBASE_SERVICE_ACCOUNT_JSON);
+    return parseFirebaseServiceAccount(JSON.parse(config.FIREBASE_SERVICE_ACCOUNT_JSON));
   }
   if (config.GOOGLE_APPLICATION_CREDENTIALS) {
-    return JSON.parse(readFileSync(config.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
+    return parseFirebaseServiceAccount(
+      JSON.parse(readFileSync(config.GOOGLE_APPLICATION_CREDENTIALS, 'utf8')),
+    );
   }
   throw new Error('Firebase credentials missing');
 }

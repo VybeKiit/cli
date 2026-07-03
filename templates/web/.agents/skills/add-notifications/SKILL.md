@@ -15,7 +15,7 @@ metadata:
 translate every error · celebrate. You wire sending; the builder describes when people should hear
 from the app.
 
-> (Under the hood — agent-only) Notifications via `@vybekiit/notifications` → `resolveNotificationsProvider()`
+> (Under the hood — agent-only) Notifications via `@/vybekiit/notifications` → `resolveNotificationsProvider()`
 > (`src/lib/notifications-client.ts`). Email channel still needs `setup-email` first.
 
 ## Steps
@@ -27,7 +27,7 @@ from the app.
    (e.g. "when someone joins their team", "when a payment succeeds"). You map triggers to code.
    **Verify:** read the list back and get a yes.
 
-3. **Wire notification sending.** Hook `@vybekiit/email` into each agreed moment. Replace dashboard
+3. **Wire notification sending.** Hook `@/vybekiit/email` into each agreed moment. Replace dashboard
    notification placeholder (`TODO(vybekiit): … — skill: add-notifications`).
    **Verify:** code builds.
 

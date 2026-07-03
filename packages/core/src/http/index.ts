@@ -14,5 +14,6 @@ export {
   validationError,
 } from './builders';
 export type { HttpErrorBody, HttpResponse } from './response';
+export { decodeJsonBody, readRequestJson, type JsonBodyResult } from './body';
 export { sendHttpResponse } from './express';
 export { toNextResponse } from './next';

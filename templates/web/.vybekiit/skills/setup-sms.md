@@ -5,7 +5,7 @@
 **Contract:** one action at a time · verify-before-advance · plain language · translate errors · celebrate.
 
 > (Agent-only) Merge `mcp-twilio-docs.json` and optionally `mcp-twilio-alpha.json`. Env keys in
-> `.env.example` with `# Docs:` links. Provider: `@vybekiit/notifications` Twilio adapter.
+> `.env.example` with `# Docs:` links. Provider: `@/vybekiit/notifications` Twilio adapter.
 
 ## Steps
 

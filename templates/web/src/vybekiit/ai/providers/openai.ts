@@ -1,4 +1,5 @@
 import { type OpenaiConfig, fail, ok, type Result } from '@vybekiit/core';
+import { decodeOpenAiChatCompletionResponse } from '../../http/responseSchemas';
 import type { AiProvider, CompleteParams, CompleteResult } from '../types';
 
 export function createOpenAiProvider(config: OpenaiConfig): AiProvider {
@@ -23,10 +24,8 @@ export function createOpenAiProvider(config: OpenaiConfig): AiProvider {
       if (!res.ok) {
         return fail('ai_failed', `OpenAI returned ${res.status}`);
       }
-      const json = (await res.json()) as {
-        choices?: Array<{ message?: { content?: string } }>;
-      };
-      const text = json.choices?.[0]?.message?.content ?? '';
+      const json = decodeOpenAiChatCompletionResponse(await res.json());
+      const text = json?.choices?.[0]?.message?.content ?? '';
       return ok({ text });
     },
     async stream(params: CompleteParams): Promise<Result<AsyncIterable<string>>> {

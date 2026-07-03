@@ -4,12 +4,13 @@ import { Cause, Effect, Exit, Option } from 'effect';
 import { isPaymentsUnconfigured } from '../practice';
 import { Payments, resolvePaymentProvider } from '../resolve';
 import type { OrderEvent, PaymentError } from '../types';
+import type { CheckoutBody, PracticeCompleteBody } from './schemas';
 
-export interface CheckoutBody {
-  productId?: string;
-  githubUsername?: string;
-  email?: string;
-}
+export type { CheckoutBody, PracticeCompleteBody } from './schemas';
+export {
+  CheckoutBodySchema,
+  PracticeCompleteBodySchema,
+} from './schemas';
 
 export interface CheckoutHttpDeps {
   env?: Record<string, string | undefined>;
@@ -46,9 +47,6 @@ export async function handleCheckout(
   deps: CheckoutHttpDeps = {},
 ): Promise<PaymentsHttpResponse> {
   const { productId, githubUsername, email } = body;
-  if (!productId) {
-    return badInput('productId is required.');
-  }
 
   const env = deps.env ?? process.env;
   if (isPaymentsUnconfigured(env)) {
@@ -99,13 +97,10 @@ export async function handleWebhook(
 
 /** Complete a practice-mode checkout — simulates provider success + fulfillment. */
 export async function handlePracticeComplete(
-  body: { productId?: string },
+  body: PracticeCompleteBody,
   deps: PracticeCompleteHttpDeps,
 ): Promise<PaymentsHttpResponse> {
   const { productId } = body;
-  if (!productId) {
-    return badInput('productId is required.');
-  }
 
   const orderId = `practice_${productId}_${Date.now()}`;
   const result = await deps.fulfillOrder({

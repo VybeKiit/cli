@@ -19,3 +19,15 @@ export type {
   AuthHttpSession,
   AuthHttpTelemetry,
 } from './handlers';
+export {
+  EmailCodeBodySchema,
+  EmailOnlyBodySchema,
+  PhoneCodeBodySchema,
+  PhoneOnlyBodySchema,
+  ResetPasswordBodySchema,
+  SignInBodySchema,
+  SignUpBodySchema,
+  TokenOnlyBodySchema,
+} from './schemas';
+export { createExpressAuthRouter } from './express';
+export { createNextAuthRoutes, type NextAuthRoutes } from './next';

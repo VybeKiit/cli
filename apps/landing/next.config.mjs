@@ -34,7 +34,6 @@ if (existsSync(envPath)) {
 const nextConfig = {
   transpilePackages: [
     '@vybekiit/core',
-    '@vybekiit/email',
     '@vybekiit/payments',
     '@vybekiit/report-mode',
     '@vybekiit/tokens',

@@ -15,16 +15,11 @@ import { getNextImageRemotePatterns } from './src/vybekiit/assets/next';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  transpilePackages: [
-    '@vybekiit/core',
-    '@vybekiit/auth',
-    '@vybekiit/db',
-    '@vybekiit/payments',
-    '@vybekiit/notifications',
-  ],
-  // @sentry/node is Node-only. It arrives via the transpiled @vybekiit/core/observability
-  // subpath, so keep it a server external — never webpack-bundled.
-  serverExternalPackages: ['@sentry/node'],
+  transpilePackages: ['@vybekiit/core', '@vybekiit/auth', '@vybekiit/db', '@vybekiit/payments'],
+  // Node-only packages that must never be webpack-bundled: @sentry/node arrives via the
+  // transpiled @vybekiit/core/observability subpath; @aws-sdk/client-sesv2 backs the
+  // template-owned SES email adapter (src/vybekiit/email/providers/ses).
+  serverExternalPackages: ['@sentry/node', '@aws-sdk/client-sesv2'],
   images: {
     remotePatterns: getNextImageRemotePatterns(process.env),
   },

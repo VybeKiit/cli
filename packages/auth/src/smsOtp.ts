@@ -1,4 +1,5 @@
 import { fail, ok, type Result, type TwilioConfig } from '@vybekiit/core';
+import { readTwilioVerificationStatus } from './twilioSchemas';
 
 // SMS one-time-code send/verify, absorbed from @vybekiit/notifications so auth is
 // self-contained and the spine no longer depends on a template-owned concern (ADR-0025).
@@ -79,8 +80,8 @@ export async function verifyTwilioSmsOtp(
     if (!res.ok) {
       return fail('sms_verify_failed', `Code check failed (${res.status}).`);
     }
-    const json = (await res.json()) as { status?: string };
-    if (json.status !== 'approved') {
+    const status = readTwilioVerificationStatus(await res.json());
+    if (status !== 'approved') {
       return fail('sms_verify_failed', 'That code did not match.');
     }
     return ok(true);

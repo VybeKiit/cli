@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { decodeJsonBody } from '@vybekiit/core/http';
 import { handleCheckout, handlePracticeComplete, readWebhookRawBody } from '../src/http/handlers';
+import { CheckoutBodySchema, PracticeCompleteBodySchema } from '../src/http/schemas';
 import { isPaymentsUnconfigured } from '../src/practice';
 
 describe('isPaymentsUnconfigured', () => {
@@ -39,11 +41,15 @@ describe('handleCheckout', () => {
       url: 'http://localhost:5173/checkout/practice?productId=plan_pro',
     });
   });
+});
 
-  it('requires productId', async () => {
-    const result = await handleCheckout({}, {});
-    expect(result.status).toBe(400);
-    expect(result.body).toEqual({
+describe('checkout body schema', () => {
+  it('requires productId', () => {
+    const result = decodeJsonBody({}, CheckoutBodySchema, 'productId is required.');
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.response.status).toBe(400);
+    expect(result.response.body).toEqual({
       code: 'bad_input',
       error: 'productId is required.',
     });
@@ -66,6 +72,18 @@ describe('handlePracticeComplete', () => {
     if ('orderId' in result.body) {
       expect(result.body.orderId).toMatch(/^practice_plan_pro_/);
     }
+  });
+});
+
+describe('practice complete body schema', () => {
+  it('requires productId', () => {
+    const result = decodeJsonBody({}, PracticeCompleteBodySchema, 'productId is required.');
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.response.body).toEqual({
+      code: 'bad_input',
+      error: 'productId is required.',
+    });
   });
 });
 

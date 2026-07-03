@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AssetManifest } from './types';
+import { decodeAssetManifest } from '../http/responseSchemas';
 import process from 'node:process';
 
 /**
@@ -49,7 +49,10 @@ export function resolveLocalAssetSrc(
     return src;
   }
   try {
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as AssetManifest;
+    const manifest = decodeAssetManifest(JSON.parse(readFileSync(manifestPath, 'utf8')));
+    if (!manifest) {
+      return src;
+    }
     const rel = src.replace(/^\//, '');
     const entry = manifest.files[rel];
     if (entry?.variants?.webp) {

@@ -1,4 +1,5 @@
 import type { Request, Response, Router } from 'express';
+import { decodeJsonBody } from '@vybekiit/core/http';
 import { sendHttpResponse } from '@vybekiit/core/http/express';
 import { Router as createRouter } from 'express';
 import {
@@ -7,6 +8,7 @@ import {
   handleCheckout,
   handlePracticeComplete,
 } from './handlers';
+import { CheckoutBodySchema, PracticeCompleteBodySchema } from './schemas';
 
 export type {
   CheckoutBody,
@@ -16,6 +18,8 @@ export type {
   WebhookHttpDeps,
 } from './handlers';
 export {
+  CheckoutBodySchema,
+  PracticeCompleteBodySchema,
   handleCheckout,
   handlePracticeComplete,
   handleWebhook,
@@ -45,7 +49,15 @@ export function createExpressPaymentsRouter(
   const router = createRouter();
 
   router.post('/checkout', async (req, res) => {
-    sendHttpResponse(res, await handleCheckout(req.body, resolveCheckoutDeps(checkoutDeps, req)));
+    const parsed = decodeJsonBody(req.body, CheckoutBodySchema, 'productId is required.');
+    if (!parsed.ok) {
+      sendHttpResponse(res, parsed.response);
+      return;
+    }
+    sendHttpResponse(
+      res,
+      await handleCheckout(parsed.body, resolveCheckoutDeps(checkoutDeps, req)),
+    );
   });
 
   if (practiceCompleteDeps) {
@@ -55,7 +67,12 @@ export function createExpressPaymentsRouter(
         res.status(500).json({ error: 'Practice checkout is not configured.' });
         return;
       }
-      sendHttpResponse(res, await handlePracticeComplete(req.body, resolved));
+      const parsed = decodeJsonBody(req.body, PracticeCompleteBodySchema, 'productId is required.');
+      if (!parsed.ok) {
+        sendHttpResponse(res, parsed.response);
+        return;
+      }
+      sendHttpResponse(res, await handlePracticeComplete(parsed.body, resolved));
     });
   }
 

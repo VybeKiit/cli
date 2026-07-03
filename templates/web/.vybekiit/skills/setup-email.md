@@ -6,7 +6,7 @@
 translate every error · celebrate. You wire all the sending; the builder only confirms one detail
 when asked.
 
-> (Under the hood — agent-only) Send through `@vybekiit/email`'s `resolveEmailProvider()`. Read
+> (Under the hood — agent-only) Send through `@/vybekiit/email`'s `resolveEmailProvider()`. Read
 > `EMAIL_PROVIDER` and follow the matching platform wrapper:
 > - default / `cloudflare` → `platform-skills/cloudflare-email-vybekiit.md`
 > - `resend` → `platform-skills/resend-vybekiit.md`

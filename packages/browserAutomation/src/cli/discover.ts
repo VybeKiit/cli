@@ -2,12 +2,15 @@ import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 import type { ExtensionConfig, VerbContext } from '../domains/extension/types';
+import { parseCwsStoreConfig } from '../domains/extension/cwsStoreSchema';
 import { cwsJsonPath, type CwsStoreConfig } from '../domains/extension/store';
 
 export type DiscoverResult = {
   repoRoot: string;
   store: CwsStoreConfig;
 };
+
+export { parseCwsStoreConfig } from '../domains/extension/cwsStoreSchema';
 
 /** Walk up from startDir until `.vybekiit/store/extension/cws.json` exists. */
 export async function discoverStore(startDir = process.cwd()): Promise<DiscoverResult> {
@@ -34,20 +37,6 @@ export async function discoverStore(startDir = process.cwd()): Promise<DiscoverR
   );
 }
 
-export function parseCwsStoreConfig(parsed: unknown): CwsStoreConfig {
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('cws.json must be a JSON object.');
-  }
-  const o = parsed as Record<string, unknown>;
-  const chromeWebStoreId = typeof o.chromeWebStoreId === 'string' ? o.chromeWebStoreId : '';
-  const key = typeof o.key === 'string' && o.key.length > 0 ? o.key : 'extension';
-  const name = typeof o.name === 'string' && o.name.length > 0 ? o.name : 'Extension';
-  const version = typeof o.version === 'string' ? o.version : undefined;
-  const config: CwsStoreConfig = { chromeWebStoreId, key, name };
-  if (version !== undefined) config.version = version;
-  return config;
-}
-
 /** Build verb context for buyer repos (WXT workspace at repo root). */
 export function buildVerbContext(
   discovered: DiscoverResult,
@@ -58,7 +47,11 @@ export function buildVerbContext(
     dir: '.',
     key: discovered.store.key,
     name: discovered.store.name,
+    ...(discovered.store.version ? { version: discovered.store.version } : {}),
   };
-  if (log) return { extension, repoRoot: discovered.repoRoot, log };
-  return { extension, repoRoot: discovered.repoRoot };
+  return {
+    repoRoot: discovered.repoRoot,
+    extension,
+    ...(log ? { log } : {}),
+  };
 }

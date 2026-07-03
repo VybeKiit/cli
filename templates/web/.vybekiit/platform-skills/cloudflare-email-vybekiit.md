@@ -9,8 +9,9 @@
 
 ## Kit wiring
 
-1. Email via `@vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=cloudflare`
-2. Deploy the worker at `packages/email/worker` (handler lives in `@vybekiit/email`)
+1. Email via `@/vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=cloudflare`
+2. Deploy the Cloudflare email worker (a small `fetch` handler that receives the POST from
+   `createCloudflareEmail` and calls the Email Sending binding); point `CLOUDFLARE_EMAIL_ENDPOINT` at it
 3. Root `.env` keys:
 
    ```bash
@@ -32,7 +33,7 @@
 
 5. Domain provisioning: `DOMAIN=yourdomain.com node infra/scripts/provisionDomain.mjs`
 6. Enable sending: `npx wrangler email sending enable yourdomain.com`
-7. Test: `pnpm email:test-send you@example.com`
+7. Test: trigger a real send from the app (e.g. a sign-in email) and confirm it arrives
 
 ## Verify-before-advance
 

@@ -123,9 +123,6 @@ importers:
       '@vybekiit/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@vybekiit/email':
-        specifier: workspace:*
-        version: link:../../packages/email
       '@vybekiit/payments':
         specifier: workspace:*
         version: link:../../packages/payments
@@ -481,47 +478,6 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  packages/email:
-    dependencies:
-      '@aws-sdk/client-sesv2':
-        specifier: ^3.1075.0
-        version: 3.1075.0
-      '@vybekiit/core':
-        specifier: workspace:*
-        version: link:../core
-    devDependencies:
-      '@cloudflare/workers-types':
-        specifier: ^4.20250523.0
-        version: 4.20260630.1
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
-
-  packages/notifications:
-    dependencies:
-      '@vybekiit/core':
-        specifier: workspace:*
-        version: link:../core
-      '@vybekiit/email':
-        specifier: workspace:*
-        version: link:../email
-    devDependencies:
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.1(@swc/core@1.15.43)(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.6
-        version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
-
   packages/payments:
     dependencies:
       '@lemonsqueezy/lemonsqueezy.js':
@@ -560,6 +516,10 @@ importers:
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.20.0)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(msw@2.14.6(@types/node@22.20.0)(typescript@5.9.3))(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/reportMode:
+    dependencies:
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
     devDependencies:
       tsup:
         specifier: ^8.3.5
@@ -588,6 +548,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.1
         version: 1.29.0(zod@3.25.76)
+      effect:
+        specifier: 3.21.4
+        version: 3.21.4
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -774,9 +737,6 @@ importers:
       '@vybekiit/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@vybekiit/notifications':
-        specifier: workspace:*
-        version: link:../../packages/notifications
       '@vybekiit/payments':
         specifier: workspace:*
         version: link:../../packages/payments
@@ -1037,6 +997,9 @@ importers:
 
   templates/web:
     dependencies:
+      '@aws-sdk/client-sesv2':
+        specifier: ^3.1075.0
+        version: 3.1075.0
       '@codesandbox/sandpack-react':
         specifier: ^2.20.0
         version: 2.20.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1214,9 +1177,6 @@ importers:
       '@vybekiit/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@vybekiit/notifications':
-        specifier: workspace:*
-        version: link:../../packages/notifications
       '@vybekiit/payments':
         specifier: workspace:*
         version: link:../../packages/payments
@@ -14186,7 +14146,8 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
-  '@cloudflare/workers-types@4.20260630.1': {}
+  '@cloudflare/workers-types@4.20260630.1':
+    optional: true
 
   '@codemirror/autocomplete@6.20.3':
     dependencies:

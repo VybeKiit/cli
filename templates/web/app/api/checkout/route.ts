@@ -1,4 +1,5 @@
-import { handleCheckout, handleWebhook } from '@vybekiit/payments/http';
+import { handleCheckout, CheckoutBodySchema } from '@vybekiit/payments/http';
+import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
 import { readNodeEnv } from '@/lib/nodeEnv';
 import { fulfillOrder } from '@/lib/fulfillment';
 import { NextResponse } from 'next/server';
@@ -11,8 +12,15 @@ import { NextResponse } from 'next/server';
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const env = readNodeEnv();
-  const body = await request.json();
-  const result = await handleCheckout(body, {
+  const json = await readRequestJson(request);
+  if (!json.ok) {
+    return NextResponse.json(json.response.body, { status: json.response.status });
+  }
+  const parsed = decodeJsonBody(json.body, CheckoutBodySchema, 'productId is required.');
+  if (!parsed.ok) {
+    return NextResponse.json(parsed.response.body, { status: parsed.response.status });
+  }
+  const result = await handleCheckout(parsed.body, {
     env,
     appUrl: env.APP_URL,
     frontendUrl: env.APP_URL,

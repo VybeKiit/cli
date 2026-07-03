@@ -33,7 +33,6 @@
     "bump-kit-version": "node scripts/bumpKitVersion.mjs",
     "tag-mirrors": "node scripts/tagMirrorRepos.mjs",
     "test:scripts": "vitest run --root scripts",
-    "email:test-send": "node scripts/testEmailSend.mjs",
     "prepare": "husky"
   },
   "devDependencies": {

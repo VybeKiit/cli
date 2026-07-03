@@ -197,8 +197,8 @@ export const hostingConfigSchema = Schema.Struct({
 });
 
 /**
- * Which email adapter `@vybekiit/email` constructs. Cloudflare is the default (reuses
- * {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in (ADR-0002).
+ * Which email adapter the templates' email delivery constructs. Cloudflare is the default
+ * (reuses {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in (ADR-0002).
  */
 export const emailConfigSchema = Schema.Struct({
   EMAIL_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'ses', 'resend'), {
@@ -325,8 +325,8 @@ export const cognitoConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by
- * `@vybekiit/email`. `CLOUDFLARE_EMAIL_ENDPOINT` is optional (transactional sends run
+ * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by the templates'
+ * email delivery. `CLOUDFLARE_EMAIL_ENDPOINT` is optional (transactional sends run
  * from the deployed Worker/Pages context, which exposes its own send route).
  */
 export const cloudflareConfigSchema = Schema.Struct({
@@ -336,7 +336,7 @@ export const cloudflareConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare email worker credentials — used by `@vybekiit/email` (cloudflare adapter).
+ * Cloudflare email worker credentials — used by the templates' cloudflare email adapter.
  * Separate from deploy creds so sending does not require a full CF API token at runtime.
  */
 export const cloudflareEmailConfigSchema = Schema.Struct({
@@ -469,7 +469,7 @@ export const posthogConfigSchema = Schema.Struct({
   POSTHOG_HOST: Schema.optional(UrlString),
 });
 
-/** Which notifications adapter `@vybekiit/notifications` constructs. */
+/** Which notifications adapter the templates' notifications delivery constructs. */
 export const notificationsConfigSchema = Schema.Struct({
   NOTIFICATIONS_PROVIDER: Schema.optionalWith(Schema.Literal('expo', 'twilio', 'email', 'local'), {
     default: () => 'expo' as const,
@@ -596,7 +596,7 @@ export const i18nConfigSchema = Schema.Struct({
   MESSAGES_DIR: Schema.optionalWith(NonEmpty, { default: () => 'messages' }),
 });
 
-/** Resend transactional email — `@vybekiit/email` (resend adapter). */
+/** Resend transactional email — the templates' resend email adapter. */
 export const resendConfigSchema = Schema.Struct({
   RESEND_API_KEY: NonEmpty,
 });

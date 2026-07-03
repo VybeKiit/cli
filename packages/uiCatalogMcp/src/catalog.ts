@@ -1,20 +1,27 @@
-export interface CatalogComponent {
-  source: string;
-  name: string;
-  paths: string[];
-  dependencies: string[];
-  tags: string[];
-  portable: boolean;
-  category: string;
-}
+import { Either, Schema } from 'effect';
 
-export interface UiCatalogIndex {
-  version: number;
-  generatedAt: string;
-  componentCount: number;
-  sources: Record<string, number>;
-  components: CatalogComponent[];
-}
+const CatalogComponentSchema = Schema.Struct({
+  source: Schema.String,
+  name: Schema.String,
+  paths: Schema.Array(Schema.String),
+  dependencies: Schema.Array(Schema.String),
+  tags: Schema.Array(Schema.String),
+  portable: Schema.Boolean,
+  category: Schema.String,
+});
+
+export const UiCatalogIndexSchema = Schema.Struct({
+  version: Schema.Number,
+  generatedAt: Schema.String,
+  componentCount: Schema.Number,
+  sources: Schema.Record({ key: Schema.String, value: Schema.Number }),
+  components: Schema.Array(CatalogComponentSchema),
+});
+
+export type CatalogComponent = typeof CatalogComponentSchema.Type;
+export type UiCatalogIndex = typeof UiCatalogIndexSchema.Type;
+
+const decodeCatalogIndex = Schema.decodeUnknownEither(UiCatalogIndexSchema);
 
 const INTENT_ROUTING: ReadonlyArray<{
   keywords: string[];
@@ -44,7 +51,11 @@ const INTENT_ROUTING: ReadonlyArray<{
 ];
 
 export function loadCatalog(json: string): UiCatalogIndex {
-  return JSON.parse(json) as UiCatalogIndex;
+  const parsed = decodeCatalogIndex(JSON.parse(json));
+  if (Either.isLeft(parsed)) {
+    throw new Error('Invalid UI catalog index JSON.');
+  }
+  return parsed.right;
 }
 
 export function searchComponents(
@@ -98,7 +109,7 @@ export function suggestBlend(
   catalog: UiCatalogIndex,
   intent: string,
   limit = 10,
-): Array<{ source: string; name: string; score: number; paths: string[] }> {
+): Array<{ source: string; name: string; score: number; paths: readonly string[] }> {
   const lower = intent.toLowerCase();
   const matchedRoutes = INTENT_ROUTING.filter((route) =>
     route.keywords.some((keyword) => lower.includes(keyword)),
