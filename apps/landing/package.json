@@ -9,10 +9,14 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "process-3d-marks": "node scripts/processBrandMarks3d.mjs"
+    "process-3d-marks": "node scripts/processBrandMarks3d.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.0",
+    "@opennextjs/cloudflare": "^1.20.1",
     "@radix-ui/react-dialog": "^1.1.17",
     "@radix-ui/react-dropdown-menu": "^2.1.18",
     "@radix-ui/react-label": "^2.1.10",
@@ -20,9 +24,24 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.15",
     "@radix-ui/react-tooltip": "^1.2.10",
+    "@vybekiit/ai": "workspace:*",
+    "@vybekiit/analytics": "workspace:*",
+    "@vybekiit/assets": "workspace:*",
+    "@vybekiit/assistant-chat": "workspace:*",
+    "@vybekiit/cms": "workspace:*",
+    "@vybekiit/compliance": "workspace:*",
     "@vybekiit/core": "workspace:*",
+    "@vybekiit/email": "workspace:*",
+    "@vybekiit/i18n": "workspace:*",
+    "@vybekiit/jobs": "workspace:*",
+    "@vybekiit/kv": "workspace:*",
+    "@vybekiit/notifications": "workspace:*",
     "@vybekiit/payments": "workspace:*",
+    "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
+    "@vybekiit/search": "workspace:*",
+    "@vybekiit/seo": "workspace:*",
+    "@vybekiit/tenancy": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
@@ -56,6 +75,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.6"
+    "vitest": "^3.2.6",
+    "wrangler": "^4.107.0"
   }
 }

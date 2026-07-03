@@ -33,11 +33,16 @@ if (existsSync(envPath)) {
 
 const nextConfig = {
   transpilePackages: [
+    '@vybekiit/assistant-chat',
     '@vybekiit/core',
     '@vybekiit/payments',
     '@vybekiit/report-mode',
-    '@vybekiit/tokens',
   ],
 };
 
 export default nextConfig;
+
+// Enables the Cloudflare bindings/context during `next dev` (OpenNext adapter).
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+
+initOpenNextCloudflareForDev();
