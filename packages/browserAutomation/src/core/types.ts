@@ -23,6 +23,7 @@ export const PROFILE_PATHS = {
   ls: `${process.env.HOME ?? '~'}/.ls-chrome-profile`,
   namecheap: `${process.env.HOME ?? '~'}/.nc-chrome-profile`,
   godaddy: `${process.env.HOME ?? '~'}/.gd-chrome-profile`,
+  google: `${process.env.HOME ?? '~'}/.google-chrome-profile`,
 } as const;
 
 /** @deprecated Use PROFILE_PATHS.extension */

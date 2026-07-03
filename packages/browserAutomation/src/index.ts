@@ -8,6 +8,7 @@ export {
   getChromeUserDataDirForPort,
   isCdpReachable,
 } from './core/launchChrome';
-export { DEFAULT_CDP_ENDPOINT, PROFILE_PATHS, type BaseVerbContext } from './core/types';
+export { type BaseVerbContext, DEFAULT_CDP_ENDPOINT, PROFILE_PATHS } from './core/types';
 export * from './domains/extension';
+export * from './domains/google';
 export * from './domains/payments';

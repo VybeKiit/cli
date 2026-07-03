@@ -10,7 +10,7 @@ Dashboard automation CLI for Lemon Squeezy and Chrome Web Store.
 
 ## What it does
 
-Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls. Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
+Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls, registrars (nc/gd), google (OAuth consent + Web client). Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
 
 ## In your app
 

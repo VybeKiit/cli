@@ -16,6 +16,7 @@ const ENV_KEYS: Record<AutomateProfileKey, string> = {
   ls: 'AUTOMATE_PROFILE_LS',
   namecheap: 'AUTOMATE_PROFILE_NC',
   godaddy: 'AUTOMATE_PROFILE_GD',
+  google: 'AUTOMATE_PROFILE_GOOGLE',
 };
 
 async function readManifest(): Promise<ProfileManifest> {

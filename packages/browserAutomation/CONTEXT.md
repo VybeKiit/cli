@@ -10,6 +10,7 @@ Unified Playwright dashboard automation for VybeKiit agents. **Sole SSOT** for C
 | `domains/payments/ls/` | `$HOME/.ls-chrome-profile` | Lemon Squeezy onboarding |
 | `domains/registrars/namecheap/` | `$HOME/.nc-chrome-profile` | Namecheap API key setup (`nc`) |
 | `domains/registrars/godaddy/` | `$HOME/.gd-chrome-profile` | GoDaddy API key setup (`gd`) |
+| `domains/google/` | `$HOME/.google-chrome-profile` | Google OAuth consent screen + Web client (`google`) |
 | `domains/payments/stripe|paypal/` | — | MCP setup docs (no Playwright) |
 | `domains/dbs/`, `domains/infra/` | — | MCP/doctor scaffolds |
 
@@ -30,6 +31,9 @@ vybekiit-automate ls standby --json
 vybekiit-automate payments ls setup --json
 vybekiit-automate nc setup --json
 vybekiit-automate gd setup --json
+vybekiit-automate google standby --json
+vybekiit-automate google oauth --project=<id> --app-name=<name> --support-email=<email> \
+    --app-url=https://example.com --redirect=https://example.com/api/auth/callback/google [--reset-secret] --json
 ```
 
 **Sign-in UX:** `setup` waits for sign-in and continues on redirect. If the profile is already signed in (no login controls in DOM), logs `session active — continuing automation` and proceeds immediately. Profile paths are never deleted.

@@ -4,8 +4,10 @@
     "noEmit": true,
     "lib": ["ES2022", "DOM"],
     "types": ["node"],
-    "baseUrl": ".",
+    "baseUrl": "../..",
     "paths": {
+      "@vybekiit/browserAutomation": ["packages/browserAutomation/src/index.ts"],
+      "@vybekiit/browserAutomation/*": ["packages/browserAutomation/src/*"],
       "@vybekiit/deploy": ["../deploy/src/registrar/index.ts"],
       "@vybekiit/core": ["../core/src/index.ts"]
     }
