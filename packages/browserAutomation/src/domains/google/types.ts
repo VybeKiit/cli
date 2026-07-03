@@ -13,7 +13,7 @@ export interface GoogleOAuthParams {
   appName: string;
   /** Developer/support contact email on the consent screen. */
   supportEmail: string;
-  /** Public app base URL — privacy/terms default to `${appUrl}/privacy` and `/terms`. */
+  /** Public app base URL — the consent-screen "App home page"; privacy/terms default off it. */
   appUrl: string;
   /** Authorized redirect URIs registered on the Web client. */
   redirectUris: readonly string[];
@@ -21,9 +21,26 @@ export interface GoogleOAuthParams {
   privacyUrl?: string;
   /** Terms of service URL (defaults to `${appUrl}/terms`). */
   termsUrl?: string;
-  /** Reset the secret on a same-named existing client instead of failing. */
+  /** Local path to a square PNG/JPG/BMP ≤1MB (ideally 120×120) for the consent-screen logo. */
+  logoPath?: string;
+  /** OAuth scopes to register on the consent screen (defaults to `openid email profile`). */
+  scopes?: readonly string[];
+  /** Publish the app to Production (any Google user can sign in) instead of leaving it in Testing. */
+  publish?: boolean;
+  /** Add a fresh secret to a same-named existing client instead of failing (secrets are view-once). */
   resetSecret?: boolean;
 }
+
+/**
+ * Default non-sensitive identity scopes — sign-in only, no Google verification review required.
+ * These are the fully-qualified scope identifiers the Data Access picker expects when pasted
+ * (`email`/`profile` are the userinfo URLs; `openid` is bare).
+ */
+export const DEFAULT_OAUTH_SCOPES: readonly string[] = [
+  'openid',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
+];
 
 /** Credentials read back after the Web OAuth client is created or its secret reset. */
 export interface GoogleOAuthResult {

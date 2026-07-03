@@ -17,6 +17,7 @@ export function parseGoogleOAuthArgs(args: string[]): {
 } {
   const params: Partial<GoogleOAuthParams> = {};
   const redirectUris: string[] = [];
+  const scopes: string[] = [];
   for (const arg of args) {
     if (arg.startsWith('--project=')) params.projectId = arg.slice('--project='.length);
     else if (arg.startsWith('--app-name=')) params.appName = arg.slice('--app-name='.length);
@@ -26,9 +27,13 @@ export function parseGoogleOAuthArgs(args: string[]): {
     else if (arg.startsWith('--redirect=')) redirectUris.push(arg.slice('--redirect='.length));
     else if (arg.startsWith('--privacy=')) params.privacyUrl = arg.slice('--privacy='.length);
     else if (arg.startsWith('--terms=')) params.termsUrl = arg.slice('--terms='.length);
+    else if (arg.startsWith('--logo=')) params.logoPath = arg.slice('--logo='.length);
+    else if (arg.startsWith('--scope=')) scopes.push(arg.slice('--scope='.length));
+    else if (arg === '--publish') params.publish = true;
     else if (arg === '--reset-secret') params.resetSecret = true;
   }
   if (redirectUris.length > 0) params.redirectUris = redirectUris;
+  if (scopes.length > 0) params.scopes = scopes;
 
   const missing: string[] = [];
   if (!params.projectId) missing.push('project');
@@ -56,7 +61,7 @@ export function registerGoogleDomain(registry: CommandRegistry): void {
       },
       oauth: {
         description:
-          'Configure OAuth consent screen and create Web OAuth client (--project --app-name --support-email --app-url --redirect...)',
+          'Configure OAuth consent screen and create Web OAuth client (--project --app-name --support-email --app-url --redirect... [--privacy=url] [--terms=url] [--logo=path] [--scope=... ] [--publish] [--reset-secret])',
         run: async ({ args, flags }) => {
           const { params, missing } = parseGoogleOAuthArgs(args);
           if (missing.length > 0) {

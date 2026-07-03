@@ -10,6 +10,10 @@ describe('parseGoogleOAuthArgs', () => {
       '--app-url=https://il-alg.com',
       '--redirect=https://il-alg.com/api/auth/callback/google',
       '--redirect=http://localhost:3000/api/auth/callback/google',
+      '--logo=/tmp/consent-logo-120.png',
+      '--scope=openid',
+      '--scope=email',
+      '--publish',
       '--reset-secret',
     ]);
     expect(missing).toEqual([]);
@@ -21,6 +25,9 @@ describe('parseGoogleOAuthArgs', () => {
       'https://il-alg.com/api/auth/callback/google',
       'http://localhost:3000/api/auth/callback/google',
     ]);
+    expect(params.logoPath).toBe('/tmp/consent-logo-120.png');
+    expect(params.scopes).toEqual(['openid', 'email']);
+    expect(params.publish).toBe(true);
     expect(params.resetSecret).toBe(true);
   });
 
@@ -39,6 +46,8 @@ describe('parseGoogleOAuthArgs', () => {
     ]);
     expect(params.privacyUrl).toBeUndefined();
     expect(params.termsUrl).toBeUndefined();
+    expect(params.scopes).toBeUndefined();
+    expect(params.publish).toBeUndefined();
     expect(params.resetSecret).toBeUndefined();
   });
 });

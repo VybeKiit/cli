@@ -33,8 +33,26 @@ vybekiit-automate nc setup --json
 vybekiit-automate gd setup --json
 vybekiit-automate google standby --json
 vybekiit-automate google oauth --project=<id> --app-name=<name> --support-email=<email> \
-    --app-url=https://example.com --redirect=https://example.com/api/auth/callback/google [--reset-secret] --json
+    --app-url=https://example.com --redirect=https://example.com/api/auth/callback/google \
+    [--privacy=url] [--terms=url] [--logo=/path/to/120x120.png] \
+    [--scope=openid --scope=email --scope=profile] [--publish] [--reset-secret] --json
 ```
+
+**Google console specifics (redesigned Auth Platform, 2026):** the OAuth setup is a single-page
+stepper at `/auth/overview/create` (App Information → Audience → Contact → Finish), with forms built
+on Angular Material `cfc-*` controls. Two gotchas the verbs handle: (1) a floating `cfc-page-overlay-cover`
+intercepts real pointer clicks, so every click goes through `pacedDispatchClick` (a dispatched DOM
+event) while text/file inputs use fill/`setInputFiles`; (2) client secrets are **view-once** — the
+console no longer shows or downloads an existing secret, so `--reset-secret` (reuse) opens the client's
+"Information and summary" panel and clicks **Add secret** to mint a fresh readable `GOCSPX-` value.
+`--support-email` must be the signed-in Google account or a group it owns (a forwarded/aliased address
+is not selectable). `--logo` uploads a square PNG/JPG/BMP ≤1MB on the branding page. The verb also
+fills the **App domain** links (home page = `--app-url`; privacy/terms default to `${app-url}/privacy`
+and `/terms`, overridable via `--privacy`/`--terms`), registers the **scopes** on the Data Access page
+(`--scope` repeatable; defaults to `openid email profile`), and — with `--publish` — moves the app
+from **Testing to Production** on the Audience page. Because the default scopes are non-sensitive,
+Production is instant with **no verification review**; the one thing that can trigger Google's review
+is brand verification of an uploaded `--logo` once the app is in Production.
 
 **Sign-in UX:** `setup` waits for sign-in and continues on redirect. If the profile is already signed in (no login controls in DOM), logs `session active — continuing automation` and proceeds immediately. Profile paths are never deleted.
 
