@@ -1,8 +1,8 @@
-import { classifyRoute, isOriginLockExempt } from './routes';
 import { isOriginAllowed } from './origin';
 import { isStateChanging, rateLimitMaxForTier, resolveSecurityPolicy } from './policy';
 import { type Clock, RateLimiter } from './rateLimit';
 import type { RouteTier } from './routes';
+import { classifyRoute, isOriginLockExempt } from './routes';
 import type { SecurityPolicy, SecurityRequest, SecurityVerdict } from './types';
 
 /**

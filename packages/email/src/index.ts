@@ -1,9 +1,9 @@
-export type { EmailProvider, EmailProviderName, SendEmailParams } from './types';
-export { resolveEmailProvider } from './resolve';
+export {
+  type CloudflareWorkerSendBody,
+  parseWorkerSendBody,
+  toWorkerSendBody,
+} from './cloudflare/workerContract';
 export { createCloudflareEmail, type FetchLike } from './providers/cloudflare';
 export { createSesEmail } from './providers/ses';
-export {
-  toWorkerSendBody,
-  parseWorkerSendBody,
-  type CloudflareWorkerSendBody,
-} from './cloudflare/workerContract';
+export { resolveEmailProvider } from './resolve';
+export type { EmailProvider, EmailProviderName, SendEmailParams } from './types';

@@ -1,16 +1,22 @@
-import type { TemplateId } from '../catalogs/goalCatalog';
+import type { TemplateId } from '@vybekiit/agentKit/catalogs/goalCatalog';
 import {
   checkBaseManifestParity,
   mergePlatformSkillsManifests,
   type PlatformSkillsTemplateManifest,
-} from '../catalogs/platformSkillsMerge';
-import { checkAgentSkillSymlinks, checkBuyerSkillStubDrift } from '../render/buyerSkillStubs';
-import { checkGoalDrift } from './planGoalRouting';
+} from '@vybekiit/agentKit/catalogs/platformSkillsMerge';
 import {
-  planAgentRuntimeCompliance,
+  checkAgentSkillSymlinks,
+  checkBuyerSkillStubDrift,
+} from '@vybekiit/agentKit/render/buyerSkillStubs';
+import {
+  GENERATED_SECTION_MARKERS,
+  type GeneratedSectionId,
+} from '@vybekiit/agentKit/render/markdown';
+import {
   type AgentRuntimeComplianceInput,
+  planAgentRuntimeCompliance,
 } from './planAgentRuntimeCompliance';
-import { GENERATED_SECTION_MARKERS, type GeneratedSectionId } from '../render/markdown';
+import { checkGoalDrift } from './planGoalRouting';
 
 export type AgentLayerComplianceCheckId =
   | 'generated-markers'

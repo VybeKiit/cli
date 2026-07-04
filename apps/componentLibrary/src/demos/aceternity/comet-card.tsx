@@ -1,19 +1,13 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/comet-card';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { CometCard } from '@/components/aceternity/comet-card';
 
 export default function CometCardPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <CometCard>
+        <span className="text-sm text-muted-foreground">Preview</span>
+      </CometCard>
     </div>
   );
 }

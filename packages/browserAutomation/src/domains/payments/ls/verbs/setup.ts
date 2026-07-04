@@ -1,7 +1,14 @@
-import { connectToLsChrome } from '../connect';
-import { createWebhookViaApi, listVariantsForProduct } from '../api/provision';
-import { ensureTestModeDashboard } from '../dashboard/ensureTestModeDashboard';
-import type { LsSetupParams, LsSetupResult, LsVerbContext } from '../types';
+import {
+  createWebhookViaApi,
+  listVariantsForProduct,
+} from '@vybekiit/browserAutomation/domains/payments/ls/api/provision';
+import { connectToLsChrome } from '@vybekiit/browserAutomation/domains/payments/ls/connect';
+import { ensureTestModeDashboard } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/ensureTestModeDashboard';
+import type {
+  LsSetupParams,
+  LsSetupResult,
+  LsVerbContext,
+} from '@vybekiit/browserAutomation/domains/payments/ls/types';
 import { createApiKeyInDashboard } from './createApiKey';
 import { createProduct } from './createProduct';
 import { uploadProductFiles } from './uploadProductFiles';

@@ -1,9 +1,9 @@
 import type { Result } from '@vybekiit/core';
-import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/core/http';
+import { badInput, type HttpResponse, ok, upstreamFailed } from '@vybekiit/core/http';
+import { isPaymentsUnconfigured } from '@vybekiit/payments/practice';
+import { Payments, resolvePaymentProvider } from '@vybekiit/payments/resolve';
+import type { OrderEvent, PaymentError } from '@vybekiit/payments/types';
 import { Cause, Effect, Exit, Option } from 'effect';
-import { isPaymentsUnconfigured } from '../practice';
-import { Payments, resolvePaymentProvider } from '../resolve';
-import type { OrderEvent, PaymentError } from '../types';
 import type { CheckoutBody, PracticeCompleteBody } from './schemas';
 
 export type { CheckoutBody, PracticeCompleteBody } from './schemas';

@@ -1,8 +1,8 @@
-import baseManifest from './platform-skills-base.manifest.json' with { type: 'json' };
 import type {
   PlatformSkillsManifest,
   PlatformSkillsSource,
-} from '../planners/updatePlatformSkills';
+} from '@vybekiit/agentKit/planners/updatePlatformSkills';
+import baseManifest from './platform-skills-base.manifest.json' with { type: 'json' };
 
 export { baseManifest as PLATFORM_SKILLS_BASE_MANIFEST };
 

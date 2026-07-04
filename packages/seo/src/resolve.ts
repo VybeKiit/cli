@@ -1,7 +1,7 @@
-import { appConfigSchema, parseEnv, seoConfigSchema, type EnvSource } from '@vybekiit/core';
+import process from 'node:process';
+import { appConfigSchema, type EnvSource, parseEnv, seoConfigSchema } from '@vybekiit/core';
 import { createLocalSeo } from './providers/local';
 import type { SeoProvider } from './types';
-import process from 'node:process';
 
 /** Build the default SEO module from env — single adapter until #2 ships. */
 export function createSeoFromEnv(env: EnvSource = process.env): SeoProvider {

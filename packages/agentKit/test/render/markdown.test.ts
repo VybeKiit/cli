@@ -1,5 +1,5 @@
+import { replaceGeneratedSection, wrapGeneratedSection } from '@vybekiit/agentKit/render/markdown';
 import { describe, expect, it } from 'vitest';
-import { replaceGeneratedSection, wrapGeneratedSection } from '../../src/render/markdown';
 
 describe('replaceGeneratedSection', () => {
   it('wraps and replaces marked sections', () => {

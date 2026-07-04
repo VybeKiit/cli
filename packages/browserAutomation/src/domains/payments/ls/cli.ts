@@ -1,10 +1,14 @@
-import type { CommandRegistry } from '../../../cli/registry';
-import { baseVerbContext } from '../../../cli/verbContext';
-import { printJson } from '../../../cli/output';
-import { parseSetupArgs, requireNonInteractive, type LsSetupCliArgs } from '../../../cli/flags';
-import { promptLsSetup } from '../../../cli/wizard';
-import { lsSetupEnvBlock, verifyVariantViaApi } from './api/verifyVariant';
+import {
+  type LsSetupCliArgs,
+  parseSetupArgs,
+  requireNonInteractive,
+} from '@vybekiit/browserAutomation/cli/flags';
+import { printJson } from '@vybekiit/browserAutomation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
+import { promptLsSetup } from '@vybekiit/browserAutomation/cli/wizard';
 import { runLsSetup, standbyLogin } from '.';
+import { lsSetupEnvBlock, verifyVariantViaApi } from './api/verifyVariant';
 
 export function registerLsDomain(registry: CommandRegistry): void {
   registry.register({

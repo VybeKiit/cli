@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PRICE } from '@/data/site';
 import { cn } from '@/lib/utils';
-import { useCallback } from 'react';
 
 const PLANS = [
   {

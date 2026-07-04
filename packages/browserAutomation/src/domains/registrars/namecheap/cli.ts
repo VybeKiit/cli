@@ -1,6 +1,6 @@
-import type { CommandRegistry } from '../../../cli/registry';
-import { baseVerbContext } from '../../../cli/verbContext';
-import { printJson } from '../../../cli/output';
+import { printJson } from '@vybekiit/browserAutomation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
 import { ncSetupEnvBlock, verifyNcCredentialsViaApi } from './api/verify';
 import { runNcSetup, standbyLogin } from './verbs/standbyLogin';
 

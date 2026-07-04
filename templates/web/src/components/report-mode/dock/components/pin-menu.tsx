@@ -2,9 +2,6 @@
 
 import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
 import { ReportHoldOption } from '@/components/report-mode/dock/components/hold-option';
-import { useReportFlyoutPosition } from '@/components/report-mode/dock/hooks/use-report-flyout-position';
-import { useReportHoldSelect } from '@/components/report-mode/dock/hooks/use-report-hold-select';
-import { useReportHoverMenu } from '@/components/report-mode/dock/hooks/use-report-hover-menu';
 import { CornerAnchorIcon, ReportPinIcon } from '@/components/report-mode/shared/report-mode-icons';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
@@ -14,6 +11,11 @@ import {
   DOCK_CORNER_PRESETS,
   type ReportDockAnchor,
 } from '@vybekiit/report-mode';
+import {
+  useReportFlyoutPosition,
+  useReportHoldSelect,
+  useReportHoverMenu,
+} from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
 
 type ReportPinMenuProps = {
@@ -25,8 +27,9 @@ type ReportPinMenuProps = {
 /** Pin control — hover to reveal corners, hold 2s on a corner to snap the dock. */
 export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: ReportPinMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
-  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center');
+  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center', flyoutRef);
   const { pending, progress, startHold, cancelHold } = useReportHoldSelect<
     Exclude<ReportDockAnchor, 'custom'>
   >((corner) => {
@@ -70,6 +73,7 @@ export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: Repo
           scheduleClose();
         }}
         open={open}
+        ref={flyoutRef}
         role="menu"
         style={flyoutStyle}
       >

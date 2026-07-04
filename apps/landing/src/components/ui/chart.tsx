@@ -232,4 +232,4 @@ const ChartTooltipContent = ({
 };
 ChartTooltipContent.displayName = 'ChartTooltipContent';
 
-export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartStyle };
+export { ChartContainer, ChartStyle, ChartTooltip, ChartTooltipContent };

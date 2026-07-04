@@ -9,7 +9,7 @@ vi.mock('@neondatabase/serverless', () => ({
   neon: () => sqlMock,
 }));
 
-import { createRailwayDataProvider } from '../src/providers/railway';
+import { createRailwayDataProvider } from '@vybekiit/db/providers/railway';
 
 const run = Effect.runPromise;
 

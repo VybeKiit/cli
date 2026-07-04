@@ -1,6 +1,6 @@
+import { Providers } from '@library/components/Providers';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Providers } from '@library/components/Providers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className="ui-library-page antialiased">
+      <body className="ui-library-page antialiased" suppressHydrationWarning={true}>
         <Providers>{children}</Providers>
       </body>
     </html>

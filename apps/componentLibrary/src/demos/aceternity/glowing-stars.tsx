@@ -1,19 +1,11 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/glowing-stars';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { GlowingStarsBackgroundCard } from '@/components/aceternity/glowing-stars';
 
 export default function GlowingStarsPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <GlowingStarsBackgroundCard />
     </div>
   );
 }

@@ -1,9 +1,12 @@
 import { Either, Schema } from 'effect';
 import { NextResponse } from 'next/server';
 
+/** Basic email shape — e.g. `you@example.com`; rejects `you@` or missing domain. */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const contactSchema = Schema.Struct({
   name: Schema.String.pipe(Schema.minLength(1), Schema.maxLength(200)),
-  email: Schema.String.pipe(Schema.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
+  email: Schema.String.pipe(Schema.pattern(EMAIL_PATTERN)),
   message: Schema.String.pipe(Schema.minLength(1), Schema.maxLength(5000)),
 });
 

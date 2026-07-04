@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest';
 import { decodeJsonBody } from '@vybekiit/core/http';
-import { handleCheckout, handlePracticeComplete, readWebhookRawBody } from '../src/http/handlers';
-import { CheckoutBodySchema, PracticeCompleteBodySchema } from '../src/http/schemas';
-import { isPaymentsUnconfigured } from '../src/practice';
+import {
+  handleCheckout,
+  handlePracticeComplete,
+  readWebhookRawBody,
+} from '@vybekiit/payments/http/handlers';
+import { CheckoutBodySchema, PracticeCompleteBodySchema } from '@vybekiit/payments/http/schemas';
+import { isPaymentsUnconfigured } from '@vybekiit/payments/practice';
+import { describe, expect, it } from 'vitest';
 
 describe('isPaymentsUnconfigured', () => {
   it('is true when no payment anchor keys are set', () => {

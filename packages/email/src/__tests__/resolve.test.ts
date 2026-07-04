@@ -1,5 +1,5 @@
+import { resolveEmailProvider } from '@vybekiit/email/resolve';
 import { describe, expect, it, vi } from 'vitest';
-import { resolveEmailProvider } from '../resolve';
 
 // Stub the SES client so resolving the ses adapter never opens a real connection —
 // construction must succeed offline and deterministically.

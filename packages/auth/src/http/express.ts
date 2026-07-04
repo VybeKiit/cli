@@ -1,6 +1,6 @@
-import type { Request, Response, Router } from 'express';
 import { decodeJsonBody } from '@vybekiit/core/http';
 import { sendHttpResponse } from '@vybekiit/core/http/express';
+import type { Request, Response, Router } from 'express';
 import { Router as createRouter } from 'express';
 import type { AuthHttpDeps } from './handlers';
 import {

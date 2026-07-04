@@ -1,5 +1,5 @@
+import { resolveAiProvider } from '@vybekiit/ai/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveAiProvider } from '../resolve';
 
 describe('resolveAiProvider', () => {
   it('uses local when openai key missing', () => {

@@ -337,7 +337,7 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 `resolve*Provider()`, `TODO(vybekiit)` markers, and verify-before-advance. Shared base manifest at
 `packages/agentKit/src/catalogs/platform-skills-base.manifest.json`; each template's
 `platform-skills.manifest.json` extends it (mobile adds `expo/skills`). Maintainer CI re-pins via
-`scripts/pinPlatformSkills.mjs` after `scripts/auditPlatformSkills.mjs` (strict 90d repo / 180d npm gate).
+`scripts/pinPlatformSkills.mjs` after `scripts/dev/checks/auditPlatformSkills.mjs` (strict 90d repo / 180d npm gate).
 
 ### Three-channel update (buyer `update-kit`)
 

@@ -1,19 +1,19 @@
-import { type Result, type SupabaseConfig, fail, ok } from '@vybekiit/core';
-import { createDbClient } from '../../client';
+import { fail, ok, type Result, type SupabaseConfig } from '@vybekiit/core';
+import { createDbClient } from '@vybekiit/db/client';
 import {
   type DataProviderResult,
   type StorageProviderResult,
   toEffectDataProvider,
   toEffectStorageProvider,
-} from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '../../types';
-import { POSTGRES_CAPABILITIES } from '../postgres/shared';
+} from '@vybekiit/db/effectBridge';
+import { POSTGRES_CAPABILITIES } from '@vybekiit/db/providers/postgres/shared';
 import {
   supabaseBulkInsert,
   supabaseFullTextSearch,
   supabaseIdempotentInsert,
   supabaseUpsert,
-} from '../postgres/supabaseCapabilities';
+} from '@vybekiit/db/providers/postgres/supabaseCapabilities';
+import type { DataProvider, DbRecord, QueryFilter, StorageProvider } from '@vybekiit/db/types';
 
 /**
  * The slice of the Supabase query builder this adapter uses, typed for *dynamic*

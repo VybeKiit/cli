@@ -9,7 +9,7 @@
 
 ## Kit wiring
 
-1. Email via `@/vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=cloudflare`
+1. Email via `@vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=cloudflare`
 2. Deploy the Cloudflare email worker (a small `fetch` handler that receives the POST from
    `createCloudflareEmail` and calls the Email Sending binding); point `CLOUDFLARE_EMAIL_ENDPOINT` at it
 3. Root `.env` keys:

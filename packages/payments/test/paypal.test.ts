@@ -1,5 +1,5 @@
+import { mapPayPalEvent } from '@vybekiit/payments/providers/paypal/webhook';
 import { describe, expect, it } from 'vitest';
-import { mapPayPalEvent } from '../src/providers/paypal/webhook';
 
 describe('mapPayPalEvent', () => {
   it('reads github username from a purchase unit on an order event', () => {

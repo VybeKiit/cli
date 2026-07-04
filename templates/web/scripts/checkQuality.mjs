@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 
 const templateRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const result = spawnSync('pnpm', ['quality'], {
+const result = spawnSync('pnpm', ['verify'], {
   cwd: templateRoot,
   stdio: 'inherit',
   shell: process.platform === 'win32',

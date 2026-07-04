@@ -1,9 +1,9 @@
 import { createHmac } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
 import {
   parseLemonSqueezyWebhook,
   verifyLemonSqueezySignature,
-} from '../src/providers/lemonSqueezy/webhook';
+} from '@vybekiit/payments/providers/lemonSqueezy/webhook';
+import { describe, expect, it } from 'vitest';
 
 const SECRET = 'test-secret';
 

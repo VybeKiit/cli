@@ -1,5 +1,5 @@
+import type { SearchDocument, SearchHit, SearchProvider } from '@vybekiit/search/types';
 import { Effect } from 'effect';
-import type { SearchDocument, SearchHit, SearchProvider } from '../types';
 
 const docs = new Map<string, SearchDocument>();
 

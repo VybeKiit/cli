@@ -1,7 +1,15 @@
 'use client';
 
 import { applyPrimaryVars, DEFAULT_PRIMARY, PRIMARY_STORAGE_KEY } from '@library/lib/theme';
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 interface PreviewThemeValue {
   readonly primary: string;
@@ -36,11 +44,12 @@ export function PreviewThemeProvider({ children }: { children: ReactNode }) {
     window.localStorage.removeItem(PRIMARY_STORAGE_KEY);
   }, []);
 
-  return (
-    <PreviewThemeContext.Provider value={{ primary, setPrimary, resetPrimary }}>
-      {children}
-    </PreviewThemeContext.Provider>
+  const value = useMemo(
+    () => ({ primary, setPrimary, resetPrimary }),
+    [primary, setPrimary, resetPrimary],
   );
+
+  return <PreviewThemeContext.Provider value={value}>{children}</PreviewThemeContext.Provider>;
 }
 
 export function usePreviewTheme(): PreviewThemeValue {

@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import {
   AGENT_LAYER_PATHS,
   formatAgentLayerSyncSummary,
   isAgentLayerExtensionPath,
   planAgentLayerSync,
-} from '../../src/planners/agentLayerSync';
+} from '@vybekiit/agentKit/planners/agentLayerSync';
+import { describe, expect, it } from 'vitest';
 
 describe('AGENT_LAYER_PATHS', () => {
   it('includes core agent layer files', () => {

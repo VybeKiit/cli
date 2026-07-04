@@ -1,4 +1,4 @@
-import { observabilityConfigSchema, parseEnv, sentryConfigSchema } from '../config';
+import { observabilityConfigSchema, parseEnv, sentryConfigSchema } from '@vybekiit/core/config';
 
 import { createLocalObservabilityProvider } from './providers/local';
 import { createSentryObservabilityProvider, initSentry } from './providers/sentry';
@@ -33,9 +33,12 @@ export function resolveObservabilityProvider(env: EnvSource = process.env): Obse
   return createLocalObservabilityProvider();
 }
 
-export { initSentry, resetSentryForTests } from './providers/sentry';
 export { createLocalObservabilityProvider } from './providers/local';
-export { createSentryObservabilityProvider } from './providers/sentry';
+export {
+  createSentryObservabilityProvider,
+  initSentry,
+  resetSentryForTests,
+} from './providers/sentry';
 export type {
   InitSentryOptions,
   ObservabilityProvider,

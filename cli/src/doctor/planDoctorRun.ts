@@ -7,16 +7,20 @@ export interface DoctorReadinessInput {
   readonly agentReady: boolean;
   readonly skillsReady: boolean;
   readonly projectHealthOk: boolean;
+  /** When omitted, treated as pass (non-mobile projects). */
+  readonly mobilePublishOk?: boolean;
 }
 
 /** Exit code policy: 0 when every gate passes, 1 otherwise. */
 export function computeDoctorExitCode(input: DoctorReadinessInput): number {
+  const mobileOk = input.mobilePublishOk ?? true;
   const ready =
     input.cloudReady &&
     input.r2Ok &&
     input.agentReady &&
     input.skillsReady &&
-    input.projectHealthOk;
+    input.projectHealthOk &&
+    mobileOk;
   return ready ? 0 : 1;
 }
 

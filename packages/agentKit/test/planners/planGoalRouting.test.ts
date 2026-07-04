@@ -1,6 +1,6 @@
+import { GOAL_ENTRIES } from '@vybekiit/agentKit/catalogs/goalCatalog';
+import { checkGoalDrift, planGoalRouting } from '@vybekiit/agentKit/planners/planGoalRouting';
 import { describe, expect, it } from 'vitest';
-import { GOAL_ENTRIES } from '../../src/catalogs/goalCatalog';
-import { planGoalRouting, checkGoalDrift } from '../../src/planners/planGoalRouting';
 
 describe('planGoalRouting', () => {
   it('routes onboarding phrase on web', () => {

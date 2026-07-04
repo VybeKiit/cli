@@ -15,15 +15,18 @@ export function AppNav({
   active,
   onChange,
   compact = false,
+  marketing = false,
 }: {
   active: ExtensionView;
   onChange: (view: ExtensionView) => void;
   compact?: boolean;
+  marketing?: boolean;
 }) {
   return (
     <nav
       className={cn(
-        'flex gap-1 border-border border-t bg-background p-2',
+        'flex gap-1 border-t p-2',
+        marketing ? 'border-white/10 bg-[#03070d]' : 'border-border bg-background',
         compact ? 'flex-col' : 'flex-row',
       )}
       aria-label={t('nav_label')}

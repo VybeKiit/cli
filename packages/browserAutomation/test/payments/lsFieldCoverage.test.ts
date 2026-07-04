@@ -1,8 +1,7 @@
+import { LS_FIELD_FALLBACKS } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldFallbacks';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import { LS_PRODUCT_FIELD_HINTS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/hints';
 import { describe, expect, it } from 'vitest';
-
-import { LS_FIELD_FALLBACKS } from '../../src/domains/payments/ls/dashboard/fieldFallbacks';
-import { LS_DRAFT_FIELDS } from '../../src/domains/payments/ls/selectors/fields';
-import { LS_PRODUCT_FIELD_HINTS } from '../../src/domains/payments/ls/selectors/hints';
 
 describe('LS draft field coverage', () => {
   it('every product editor field has a runtime fallback and probe hint', () => {

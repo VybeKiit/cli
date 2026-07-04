@@ -1,7 +1,7 @@
+import Link from 'next/link';
 import { CheckoutShell } from '@/components/checkout-shell';
 import { Button } from '@/components/ui/button';
 import { SUPPORT } from '@/data/site';
-import Link from 'next/link';
 
 export const metadata = {
   title: 'You are in — VybeKiit',

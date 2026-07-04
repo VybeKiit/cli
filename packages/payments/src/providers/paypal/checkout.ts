@@ -4,8 +4,8 @@ import {
   Environment,
   OrdersController,
 } from '@paypal/paypal-server-sdk';
-import { type PaypalConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { CheckoutParams, CheckoutResult } from '../../types';
+import { fail, ok, type PaypalConfig, type Result } from '@vybekiit/core';
+import type { CheckoutParams, CheckoutResult } from '@vybekiit/payments/types';
 
 /** Construct an SDK client bound to the configured sandbox/live environment. */
 function paypalClient(config: PaypalConfig): Client {

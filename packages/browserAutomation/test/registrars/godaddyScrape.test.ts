@@ -1,9 +1,8 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   scrapeGodaddyKeyPair,
   scrapeGodaddyKeysFromList,
-} from '../../src/domains/registrars/godaddy/scrape';
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/scrape';
+import { describe, expect, it } from 'vitest';
 
 describe('godaddy scrape', () => {
   it('parses key and secret from reveal dialog html', () => {

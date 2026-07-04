@@ -1,18 +1,26 @@
 #!/usr/bin/env node
+
 /**
  * vybekiit-automate — unified dashboard automation CLI (registry dispatch).
  */
 
-import { createRegistry } from './registry';
-import { parseGlobalFlags } from './flags';
-import { printError } from './output';
-import { registerExtensionDomain } from '../domains/extension/cli';
-import { registerLsDomain, registerLsTopLevelAlias } from '../domains/payments/ls/cli';
+import { registerExtensionDomain } from '@vybekiit/browserAutomation/domains/extension/cli';
+import { registerGoogleDomain } from '@vybekiit/browserAutomation/domains/google/cli';
+import {
+  registerLsDomain,
+  registerLsTopLevelAlias,
+} from '@vybekiit/browserAutomation/domains/payments/ls/cli';
+import {
+  registerGdTopLevelAlias,
+  registerGodaddyDomain,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/cli';
 import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
-} from '../domains/registrars/namecheap/cli';
-import { registerGodaddyDomain, registerGdTopLevelAlias } from '../domains/registrars/godaddy/cli';
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+import { parseGlobalFlags } from './flags';
+import { printError } from './output';
+import { createRegistry } from './registry';
 
 const registry = createRegistry();
 registerExtensionDomain(registry);
@@ -22,6 +30,7 @@ registerNamecheapDomain(registry);
 registerNcTopLevelAlias(registry);
 registerGodaddyDomain(registry);
 registerGdTopLevelAlias(registry);
+registerGoogleDomain(registry);
 
 async function main(argv: string[]): Promise<number> {
   const { flags, rest } = parseGlobalFlags(argv);

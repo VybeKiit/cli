@@ -1,5 +1,5 @@
-import { type Result, fail, ok } from '@vybekiit/core';
-import type { DbRecord } from '../../types';
+import { fail, ok, type Result } from '@vybekiit/core';
+import type { DbRecord } from '@vybekiit/db/types';
 
 interface UpsertTable {
   upsert(

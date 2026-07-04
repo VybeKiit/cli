@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import {
   EXTENDED_SERVICE_NAME_BANS,
   PAYMENTS_VOCABULARY,
   renderPaymentsVocabularyTable,
   renderServiceNameBanList,
-} from '../../src/vocabulary/domainVocabulary';
+} from '@vybekiit/agentKit/vocabulary/domainVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('PAYMENTS_VOCABULARY', () => {
   it('includes MoR and tax terms', () => {

@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { type FirebaseConfig, type Result, fail, ok } from '@vybekiit/core';
+import { type FirebaseConfig, fail, ok, type Result } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+import { MINIMAL_CAPABILITIES } from '@vybekiit/db/providers/postgres/shared';
+import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore, type Firestore, type Query } from 'firebase-admin/firestore';
-import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter } from '../../types';
-import { MINIMAL_CAPABILITIES } from '../postgres/shared';
+import { type Firestore, getFirestore, type Query } from 'firebase-admin/firestore';
 import { parseFirebaseServiceAccount } from './serviceAccountSchema';
 
 function errorMessage(error: unknown): string {

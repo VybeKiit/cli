@@ -1,6 +1,10 @@
-import { connectToNcChrome } from '../connect';
-import { waitForNcAuthenticated } from '../dashboard/waitForAuthenticated';
-import type { NcSetupParams, NcSetupResult, NcVerbContext } from '../types';
+import { connectToNcChrome } from '@vybekiit/browserAutomation/domains/registrars/namecheap/connect';
+import { waitForNcAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/namecheap/dashboard/waitForAuthenticated';
+import type {
+  NcSetupParams,
+  NcSetupResult,
+  NcVerbContext,
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/types';
 import { setupApiAccess } from './setupApiAccess';
 
 /** Wait until builder reaches Namecheap after manual sign-in. */

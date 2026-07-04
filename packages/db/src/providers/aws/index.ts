@@ -12,10 +12,10 @@ import {
   ScanCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { type AwsConfig, type Result, fail, ok } from '@vybekiit/core';
-import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter } from '../../types';
-import { MINIMAL_CAPABILITIES } from '../postgres/shared';
+import { type AwsConfig, fail, ok, type Result } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+import { MINIMAL_CAPABILITIES } from '@vybekiit/db/providers/postgres/shared';
+import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
 
 /**
  * Build the AWS DynamoDB {@link DataProvider} — the opt-in key-value backend a buyer

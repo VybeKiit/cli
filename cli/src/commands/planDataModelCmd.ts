@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import process from 'node:process';
-import { planDataModel, type DataProviderName, type EntityInput } from '@vybekiit/agent-kit';
+import { type DataProviderName, type EntityInput, planDataModel } from '@vybekiit/agent-kit';
 
 const PROVIDERS: readonly DataProviderName[] = [
   'supabase',

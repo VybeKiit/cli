@@ -6,6 +6,6 @@ export {
   rateLimitMaxForTier,
   resolveSecurityPolicy,
 } from './policy';
+export { type Clock, RateLimiter, type RateLimitResult } from './rateLimit';
 export { classifyRoute, isOriginLockExempt, type RouteTier } from './routes';
-export { type Clock, type RateLimitResult, RateLimiter } from './rateLimit';
 export type { SecurityPolicy, SecurityRequest, SecurityVerdict } from './types';

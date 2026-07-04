@@ -4,7 +4,7 @@
 
 **Contract:** one action at a time · verify-before-advance · plain language · translate errors · celebrate.
 
-> (Under the hood — agent-only) Wire `@/vybekiit/ai` → `resolveAiProvider()` via `src/lib/ai-client.ts`.
+> (Under the hood — agent-only) Wire `@vybekiit/ai` → `resolveAiProvider()` via `src/lib/ai-client.ts`.
 > Never name OpenAI/Anthropic to the builder — say "smart replies" or "AI helper".
 
 ## Steps

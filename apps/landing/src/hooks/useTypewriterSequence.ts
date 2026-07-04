@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useReducedMotion } from '@/lib/motion';
 import { sanitizeTypewriterText } from '@/lib/sanitizeTypewriterText';
-import { useEffect, useState } from 'react';
 
 export interface UseTypewriterSequenceOptions {
   readonly start?: boolean;

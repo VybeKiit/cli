@@ -6,6 +6,7 @@ import {
   ReportSendIcon,
 } from '@/components/report-mode/shared/report-mode-icons';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 interface ReportModeNotePanelProps {
@@ -57,8 +58,9 @@ export function ReportModeNotePanel({
           disabled={!spotLabel.trim() || copying}
           onClick={onCopySpot}
           type="button"
+          aria-busy={copying}
         >
-          <ReportCopyIcon />
+          {copying ? <Spinner className="size-3.5" /> : <ReportCopyIcon />}
           <span>Copy</span>
         </button>
       </div>
@@ -87,8 +89,9 @@ export function ReportModeNotePanel({
             disabled={submitting || !note.trim()}
             onClick={onSubmit}
             type="button"
+            aria-busy={submitting}
           >
-            <ReportSendIcon />
+            {submitting ? <Spinner className="size-3.5" /> : <ReportSendIcon />}
             <span>Send</span>
           </button>
           <button

@@ -1,6 +1,6 @@
-import { type Result, type StripeConfig, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result, type StripeConfig } from '@vybekiit/core';
+import type { OrderEvent } from '@vybekiit/payments/types';
 import Stripe from 'stripe';
-import type { OrderEvent } from '../../types';
 
 /**
  * Map a verified Stripe event to the normalized {@link OrderEvent} (pure — unit

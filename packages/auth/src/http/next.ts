@@ -1,3 +1,5 @@
+import { decodeJsonBody, readRequestJson, toNextResponse } from '@vybekiit/core/http';
+import type { AuthHttpDeps } from './handlers';
 import {
   handleForgotPassword,
   handleMe,
@@ -12,7 +14,6 @@ import {
   handleVerifyMagicLink,
   handleVerifySmsCode,
 } from './handlers';
-import type { AuthHttpDeps } from './handlers';
 import {
   EmailCodeBodySchema,
   EmailOnlyBodySchema,
@@ -23,7 +24,6 @@ import {
   SignUpBodySchema,
   TokenOnlyBodySchema,
 } from './schemas';
-import { decodeJsonBody, readRequestJson, toNextResponse } from '@vybekiit/core/http';
 
 export type {
   AuthHttpDeps,

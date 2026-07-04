@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { type Result, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 /**
  * Confirm the database is reachable and the credentials work.

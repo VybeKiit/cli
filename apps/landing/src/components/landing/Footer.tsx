@@ -1,7 +1,7 @@
+import Link from 'next/link';
 import { VybeBrandMark } from '@/components/ui/CustomIcons';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { BRAND, FOOTER_LINKS, SUPPORT } from '@/data/site';
-import Link from 'next/link';
 
 /** Landing footer — logo, copyright, legal links. */
 export function Footer() {

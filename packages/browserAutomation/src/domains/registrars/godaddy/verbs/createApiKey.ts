@@ -1,8 +1,14 @@
+import { waitForGdAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/godaddy/dashboard/waitForAuthenticated';
+import {
+  scrapeGodaddyKeyPair,
+  scrapeGodaddyKeysFromList,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/scrape';
+import {
+  GD_KEYS_URL,
+  type GdSetupParams,
+  type GdSetupResult,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/types';
 import type { BrowserContext, Locator, Page } from 'playwright';
-
-import { waitForGdAuthenticated } from '../dashboard/waitForAuthenticated';
-import { scrapeGodaddyKeyPair, scrapeGodaddyKeysFromList } from '../scrape';
-import { GD_KEYS_URL, type GdSetupParams, type GdSetupResult } from '../types';
 
 function envCredentials(): { apiKey?: string; apiSecret?: string } {
   const apiKey = process.env.GODADDY_API_KEY?.trim();

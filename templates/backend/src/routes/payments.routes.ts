@@ -1,7 +1,7 @@
-import { createExpressPaymentsRouter } from '@vybekiit/payments/http/express';
 import { handleWebhook, readWebhookRawBody } from '@vybekiit/payments/http';
+import { createExpressPaymentsRouter } from '@vybekiit/payments/http/express';
 import type { Request, Response } from 'express';
-import { fulfillOrder } from '../lib/fulfillment.js';
+import { fulfillOrder } from '@/lib/fulfillment.js';
 
 function checkoutDeps(req: Request) {
   return {

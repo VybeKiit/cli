@@ -1,6 +1,6 @@
-import { type Result, type StripeConfig, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result, type StripeConfig } from '@vybekiit/core';
+import type { CheckoutParams, CheckoutResult } from '@vybekiit/payments/types';
 import Stripe from 'stripe';
-import type { CheckoutParams, CheckoutResult } from '../../types';
 
 /**
  * Create a Stripe Checkout Session and return its hosted URL.

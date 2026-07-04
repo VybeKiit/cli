@@ -2,7 +2,7 @@ import {
   TECH_REFERENCE_MAP,
   TECH_REFERENCES,
   type TechReference,
-} from '../catalogs/techReferences';
+} from '@vybekiit/agentKit/catalogs/techReferences';
 
 export interface DocFallbackPlan {
   readonly techId: string;

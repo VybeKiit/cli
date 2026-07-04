@@ -1,5 +1,5 @@
 import { DEFAULT_APP_URL } from '@vybekiit/core';
-import process from 'node:process';
+import { readNodeEnv } from '@/lib/nodeEnv';
 
 /**
  * Mobile app runtime config — the one place the base API URL is resolved.
@@ -12,4 +12,4 @@ import process from 'node:process';
  *
  * TODO(vybekiit): set EXPO_PUBLIC_APP_URL in `.env` to your deployed backend's address — skill: connect-account
  */
-export const APP_URL: string = process.env.EXPO_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
+export const APP_URL: string = readNodeEnv().EXPO_PUBLIC_APP_URL ?? DEFAULT_APP_URL;

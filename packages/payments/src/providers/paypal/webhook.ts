@@ -1,6 +1,6 @@
-import { PAYPAL_API_BASE, type PaypalConfig, type Result, fail, ok } from '@vybekiit/core';
+import { fail, ok, PAYPAL_API_BASE, type PaypalConfig, type Result } from '@vybekiit/core';
+import type { OrderEvent } from '@vybekiit/payments/types';
 import { Either, Schema } from 'effect';
-import type { OrderEvent } from '../../types';
 
 /**
  * PayPal webhook envelope (only the fields VybeKiit reads). PayPal nests the

@@ -1,8 +1,10 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { discoverDeveloperGroupId, statusUrl } from '../urls';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  statusUrl,
+} from '@vybekiit/browserAutomation/domains/extension/urls';
 
 /**
  * Shape of one violation as scraped from the dev console issues panel.

@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import {
   formatChecklistEntry,
   planProductionChecklist,
   renderProductionGates,
-} from '../../src/catalogs/productionGates';
+} from '@vybekiit/agentKit/catalogs/productionGates';
+import { describe, expect, it } from 'vitest';
 
 describe('production-gates', () => {
   it('returns gates per template', () => {

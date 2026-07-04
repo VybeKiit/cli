@@ -1,6 +1,8 @@
+import {
+  type NcSetupResult,
+  ncSetupEnvBlock,
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/types';
 import { verifyNamecheapCredentials } from '@vybekiit/deploy';
-
-import { ncSetupEnvBlock, type NcSetupResult } from '../types';
 
 /** Validates scraped Namecheap credentials against the live API. */
 export async function verifyNcCredentialsViaApi(result: NcSetupResult): Promise<void> {

@@ -19,6 +19,7 @@
 #   (none — extension WXT scaffold is now in the workspace gate)
 packages:
   - "packages/*"
+  - "packages/tools/*"
   - "cli"
   - "templates/web"
   - "templates/mobile"

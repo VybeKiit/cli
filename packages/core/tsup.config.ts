@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
 /**
  * Browser-safe main entry + Node-only helpers (`loadEnvFile`) on `./node`, plus the
@@ -10,6 +11,7 @@ export default defineConfig({
     'src/index.ts',
     'src/node.ts',
     'src/http/index.ts',
+    'src/http/responseSchemas.ts',
     'src/http/client/index.ts',
     'src/http/express.ts',
     'src/http/next.ts',
@@ -22,4 +24,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
+  esbuildPlugins: [createWorkspaceAliasPlugin()],
 });

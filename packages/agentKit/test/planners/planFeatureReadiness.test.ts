@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import {
   planFeatureReadiness,
   resolveTemplateTopology,
-} from '../../src/planners/planFeatureReadiness';
+} from '@vybekiit/agentKit/planners/planFeatureReadiness';
+import { describe, expect, it } from 'vitest';
 
 describe('planFeatureReadiness', () => {
   it('web is always ready', () => {

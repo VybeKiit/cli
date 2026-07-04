@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 
-import type { InitSentryOptions, ObservabilityProvider } from '../types';
-import { toSentryLevel } from '../types';
+import type { InitSentryOptions, ObservabilityProvider } from '@vybekiit/core/observability/types';
+import { toSentryLevel } from '@vybekiit/core/observability/types';
 
 let sentryInitialized = false;
 

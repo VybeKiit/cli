@@ -1,4 +1,4 @@
-import { type Result, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 /**
  * The single place the store's client talks to its own API routes.

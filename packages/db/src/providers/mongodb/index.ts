@@ -1,12 +1,12 @@
-import { type MongoConfig, type Result, fail, ok } from '@vybekiit/core';
+import { fail, type MongoConfig, ok, type Result } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+import { MINIMAL_CAPABILITIES } from '@vybekiit/db/providers/postgres/shared';
+import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
 // `mongodb` is the official MongoDB driver. We target MongoDB Atlas — the managed
 // cloud Mongo the agent's save-data skill provisions — reached via the SRV
 // connection string in `MONGODB_URI`. Chosen over a thin REST wrapper because the
 // driver pools connections internally and is the canonical, well-supported client.
 import { type Collection, type Filter, MongoClient } from 'mongodb';
-import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter } from '../../types';
-import { MINIMAL_CAPABILITIES } from '../postgres/shared';
 
 /**
  * Build the MongoDB (Atlas) {@link DataProvider} — the opt-in document backend a

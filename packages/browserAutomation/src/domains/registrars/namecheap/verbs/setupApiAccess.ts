@@ -1,13 +1,16 @@
-import type { BrowserContext, Page } from 'playwright';
-
-import { fetchPublicIpv4 } from '../../shared/publicIp';
-import { waitForNcAuthenticated } from '../dashboard/waitForAuthenticated';
+import { waitForNcAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/namecheap/dashboard/waitForAuthenticated';
 import {
   htmlContainsWhitelistedIp,
   scrapeNamecheapApiKey,
   scrapeNamecheapApiUser,
-} from '../scrape';
-import { NC_API_ACCESS_URL, type NcSetupParams, type NcSetupResult } from '../types';
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/scrape';
+import {
+  NC_API_ACCESS_URL,
+  type NcSetupParams,
+  type NcSetupResult,
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/types';
+import { fetchPublicIpv4 } from '@vybekiit/browserAutomation/domains/registrars/shared/publicIp';
+import type { BrowserContext, Page } from 'playwright';
 
 function envCredentials(): { apiKey?: string; apiUser?: string } {
   const apiKey = process.env.NAMECHEAP_API_KEY?.trim();

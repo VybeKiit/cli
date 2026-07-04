@@ -1,5 +1,5 @@
+import { resolveCmsProvider } from '@vybekiit/cms/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveCmsProvider } from '../resolve';
 
 describe('resolveCmsProvider', () => {
   it('returns mdx provider by default', () => {

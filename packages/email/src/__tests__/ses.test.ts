@@ -1,5 +1,5 @@
+import { createSesEmail } from '@vybekiit/email/providers/ses';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createSesEmail } from '../providers/ses';
 
 /**
  * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. The

@@ -1,0 +1,813 @@
+/* Deluxe Claude octopus scenes — animation layer for the illustrated scene tier.
+ * Positioning lives on SVG transform attributes; every rule here animates an
+ * element that carries NO transform attribute (or an inner wrapper), so CSS
+ * transforms never clobber placement. All motion is disabled under
+ * prefers-reduced-motion at the bottom of the file. */
+
+.claude-scene {
+  display: block;
+  overflow: visible;
+}
+
+/* —— Hero (the octopus) motions —— */
+.claude-scene__hero--type {
+  animation: claude-scene-type 0.5s ease-in-out infinite;
+}
+
+.claude-scene__hero--hop {
+  animation: claude-scene-hop 1.1s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+}
+
+@keyframes claude-scene-type {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  40% {
+    transform: translateY(-0.4px) rotate(-1.2deg);
+  }
+  70% {
+    transform: translateY(0.2px) rotate(1deg);
+  }
+}
+
+@keyframes claude-scene-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  30% {
+    transform: translateY(-3px) scale(0.96, 1.05);
+  }
+  55% {
+    transform: translateY(0.6px) scale(1.04, 0.95);
+  }
+}
+
+/* —— Terminal caret —— */
+.claude-scene__caret {
+  animation: claude-scene-blink 1s step-end infinite;
+}
+
+@keyframes claude-scene-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* —— Coffee steam —— */
+.scene-steam {
+  opacity: 0;
+}
+
+.scene-steam--a {
+  animation: claude-scene-steam 2.4s ease-in-out infinite;
+}
+
+.scene-steam--b {
+  animation: claude-scene-steam 2.4s ease-in-out 0.7s infinite;
+}
+
+@keyframes claude-scene-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  40% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* —— Confetti field — staggered tumbling fall —— */
+.scene-confetti {
+  animation-name: claude-scene-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.scene-confetti--0 {
+  animation-duration: 2.6s;
+  animation-delay: 0s;
+}
+.scene-confetti--1 {
+  animation-duration: 3.1s;
+  animation-delay: 0.4s;
+}
+.scene-confetti--2 {
+  animation-duration: 2.9s;
+  animation-delay: 0.9s;
+}
+.scene-confetti--3 {
+  animation-duration: 3.4s;
+  animation-delay: 0.2s;
+}
+.scene-confetti--4 {
+  animation-duration: 2.7s;
+  animation-delay: 1.2s;
+}
+.scene-confetti--5 {
+  animation-duration: 3.2s;
+  animation-delay: 0.6s;
+}
+
+@keyframes claude-scene-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(210px) rotate(320deg);
+  }
+}
+
+/* —— Deploy — rocket lift, exhaust, smoke, stars —— */
+.claude-scene__launch {
+  animation: claude-scene-lift 2.4s ease-in-out infinite;
+}
+
+@keyframes claude-scene-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.claude-scene__exhaust {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: claude-scene-flame 0.24s ease-in-out infinite;
+}
+
+@keyframes claude-scene-flame {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.3);
+  }
+}
+
+.claude-scene__smoke {
+  animation: claude-scene-puff 2.8s ease-in-out infinite;
+}
+
+.claude-scene__smoke:nth-of-type(2) {
+  animation-delay: 0.6s;
+}
+
+@keyframes claude-scene-puff {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.claude-scene__star {
+  animation: claude-scene-twinkle 2s ease-in-out infinite;
+}
+
+.claude-scene__star:nth-of-type(2) {
+  animation-delay: 0.5s;
+}
+
+.claude-scene__star:nth-of-type(3) {
+  animation-delay: 1s;
+}
+
+@keyframes claude-scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* —— Shipped — badge pop + popper streamers —— */
+.claude-scene__badge {
+  animation: claude-scene-pop 2.2s cubic-bezier(0.34, 1.5, 0.64, 1) infinite;
+}
+
+@keyframes claude-scene-pop {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.12);
+  }
+  24% {
+    transform: scale(0.98);
+  }
+}
+
+.claude-scene__popper-streamer {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: claude-scene-streamer 1.6s ease-in-out infinite;
+}
+
+@keyframes claude-scene-streamer {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* ————————————————————————————————————————————————————————————————
+ * Hero (octopus) motions — the inner <g> already carries
+ * transform-box: fill-box; transform-origin: center bottom, so these
+ * pivot at the feet.
+ * ———————————————————————————————————————————————————————————————— */
+.claude-scene__hero--sip {
+  animation: claude-scene-sip 3s ease-in-out infinite;
+}
+.claude-scene__hero--lean {
+  animation: claude-scene-lean 4s ease-in-out infinite;
+}
+.claude-scene__hero--dance {
+  animation: claude-scene-dance 0.8s ease-in-out infinite;
+}
+.claude-scene__hero--pop {
+  animation: claude-scene-bop 1.6s cubic-bezier(0.34, 1.5, 0.64, 1) infinite;
+}
+.claude-scene__hero--float {
+  animation: claude-scene-hover 3s ease-in-out infinite;
+}
+.claude-scene__hero--sway {
+  animation: claude-scene-sway 1.8s ease-in-out infinite;
+}
+.claude-scene__hero--think {
+  animation: claude-scene-tilt 3.4s ease-in-out infinite;
+}
+.claude-scene__hero--shake {
+  animation: claude-scene-shake 0.5s ease-in-out infinite;
+}
+.claude-scene__hero--slump {
+  animation: claude-scene-slump 4s ease-in-out infinite;
+}
+
+@keyframes claude-scene-sip {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  30%,
+  45% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+}
+@keyframes claude-scene-lean {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(4deg) translateY(1px);
+  }
+}
+@keyframes claude-scene-dance {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(5deg);
+  }
+}
+@keyframes claude-scene-bop {
+  0%,
+  60%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  20% {
+    transform: scale(1.08) translateY(-3px);
+  }
+  40% {
+    transform: scale(0.97) translateY(0.5px);
+  }
+}
+@keyframes claude-scene-hover {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes claude-scene-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+@keyframes claude-scene-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(3deg);
+  }
+  70% {
+    transform: rotate(-2deg);
+  }
+}
+@keyframes claude-scene-shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-1.5px) rotate(-2deg);
+  }
+  75% {
+    transform: translateX(1.5px) rotate(2deg);
+  }
+}
+@keyframes claude-scene-slump {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(1.5deg);
+  }
+}
+
+/* —— Thinking: thought bubble bob —— */
+.claude-scene__thought {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: claude-scene-bubble 3.2s ease-in-out infinite;
+}
+@keyframes claude-scene-bubble {
+  0%,
+  100% {
+    opacity: 0.92;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* —— Eureka: lightbulb glow + rays —— */
+.claude-scene__bulb {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-bulb 1.8s ease-in-out infinite;
+}
+@keyframes claude-scene-bulb {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+.claude-scene__bulb-rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-rays 1.8s ease-in-out infinite;
+}
+@keyframes claude-scene-rays {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* —— First sale: floating dollars —— */
+.claude-scene__money {
+  transform-box: fill-box;
+  animation: claude-scene-money 2.6s ease-in-out infinite;
+}
+@keyframes claude-scene-money {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) rotate(-6deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) rotate(6deg);
+  }
+}
+
+/* —— Sleeping: rising Zzz —— */
+.claude-scene__zzz {
+  transform-box: fill-box;
+}
+.claude-scene__zzz--1 {
+  animation: claude-scene-zzz 2.4s ease-in-out infinite;
+}
+.claude-scene__zzz--2 {
+  animation: claude-scene-zzz 2.4s ease-in-out 0.4s infinite;
+}
+.claude-scene__zzz--3 {
+  animation: claude-scene-zzz 2.4s ease-in-out 0.8s infinite;
+}
+@keyframes claude-scene-zzz {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* —— Loving: rising hearts —— */
+.claude-scene__heart {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.claude-scene__heart--1 {
+  animation: claude-scene-heart 2.8s ease-in-out infinite;
+}
+.claude-scene__heart--2 {
+  animation: claude-scene-heart 2.8s ease-in-out 0.6s infinite;
+}
+.claude-scene__heart--3 {
+  animation: claude-scene-heart 2.8s ease-in-out 1.2s infinite;
+}
+@keyframes claude-scene-heart {
+  0% {
+    opacity: 0;
+    transform: translateY(3px) scale(0.8);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(1.05);
+  }
+}
+
+/* —— Celebrate + vibe: music notes —— */
+.claude-scene__note {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.claude-scene__note--a {
+  animation: claude-scene-note 2.6s ease-in-out infinite;
+}
+.claude-scene__note--b {
+  animation: claude-scene-note 2.6s ease-in-out 0.9s infinite;
+}
+@keyframes claude-scene-note {
+  0% {
+    opacity: 0;
+    transform: translate(0, 4px) rotate(-8deg);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(3px, -8px) rotate(8deg);
+  }
+}
+
+/* —— Panic: dripping sweat —— */
+.claude-scene__sweat {
+  transform-box: fill-box;
+}
+.claude-scene__sweat--1 {
+  animation: claude-scene-sweat 1.6s ease-in infinite;
+}
+.claude-scene__sweat--2 {
+  animation: claude-scene-sweat 1.6s ease-in 0.5s infinite;
+}
+@keyframes claude-scene-sweat {
+  0% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* —— Sad: falling rain —— */
+.claude-scene__rain {
+  transform-box: fill-box;
+}
+.claude-scene__rain--1 {
+  animation: claude-scene-rain 1.1s linear infinite;
+}
+.claude-scene__rain--2 {
+  animation: claude-scene-rain 1.1s linear 0.35s infinite;
+}
+.claude-scene__rain--3 {
+  animation: claude-scene-rain 1.1s linear 0.7s infinite;
+}
+@keyframes claude-scene-rain {
+  0% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* —— Hotfix + panic: blinking alerts (opacity only — safe over a
+ * positioning transform attribute) —— */
+.claude-scene__alert--a {
+  animation: claude-scene-alert 1s ease-in-out infinite;
+}
+.claude-scene__alert--b {
+  animation: claude-scene-alert 1s ease-in-out 0.33s infinite;
+}
+.claude-scene__alert--c {
+  animation: claude-scene-alert 1s ease-in-out 0.66s infinite;
+}
+@keyframes claude-scene-alert {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* —— Merging: pulsing merge node —— */
+.claude-scene__merge-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-merge 1.8s ease-in-out infinite;
+}
+@keyframes claude-scene-merge {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+/* —— Hotfix: wiggling wrench + flickering flame —— */
+.claude-scene__wrench {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-wrench 1.4s ease-in-out infinite;
+}
+@keyframes claude-scene-wrench {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+.claude-scene__flame {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.claude-scene__flame--1 {
+  animation: claude-scene-flicker 0.5s ease-in-out infinite;
+}
+.claude-scene__flame--2 {
+  animation: claude-scene-flicker 0.5s ease-in-out 0.15s infinite;
+}
+@keyframes claude-scene-flicker {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scaleY(1) scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.25) scaleX(0.9);
+  }
+}
+
+/* —— Celebrate: spinning disco ball (facets only, wire stays put) —— */
+.claude-scene__disco {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-disco 2.4s linear infinite;
+}
+@keyframes claude-scene-disco {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* —— Debugging: crawling bug + scanning magnifier —— */
+.claude-scene__screen-bug {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-crawl 1.4s ease-in-out infinite;
+}
+@keyframes claude-scene-crawl {
+  0%,
+  100% {
+    transform: translateX(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateX(-2px) rotate(4deg);
+  }
+}
+.claude-scene__loupe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-scan 3s ease-in-out infinite;
+}
+@keyframes claude-scene-scan {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-6px, -4px);
+  }
+}
+
+/* —— Prompting: sparkle —— */
+.claude-scene__prompt-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-spark 1.6s ease-in-out infinite;
+}
+@keyframes claude-scene-spark {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(20deg);
+  }
+}
+
+/* —— Broke: throbbing error mark —— */
+.claude-scene__err-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-scene-errmark 1.4s ease-in-out infinite;
+}
+@keyframes claude-scene-errmark {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claude-scene__hero--type,
+  .claude-scene__hero--hop,
+  .claude-scene__hero--sip,
+  .claude-scene__hero--lean,
+  .claude-scene__hero--dance,
+  .claude-scene__hero--pop,
+  .claude-scene__hero--float,
+  .claude-scene__hero--sway,
+  .claude-scene__hero--think,
+  .claude-scene__hero--shake,
+  .claude-scene__hero--slump,
+  .claude-scene__caret,
+  .scene-steam--a,
+  .scene-steam--b,
+  .scene-confetti,
+  .claude-scene__launch,
+  .claude-scene__exhaust,
+  .claude-scene__smoke,
+  .claude-scene__star,
+  .claude-scene__badge,
+  .claude-scene__popper-streamer,
+  .claude-scene__thought,
+  .claude-scene__bulb,
+  .claude-scene__bulb-rays,
+  .claude-scene__money,
+  .claude-scene__zzz--1,
+  .claude-scene__zzz--2,
+  .claude-scene__zzz--3,
+  .claude-scene__heart--1,
+  .claude-scene__heart--2,
+  .claude-scene__heart--3,
+  .claude-scene__note--a,
+  .claude-scene__note--b,
+  .claude-scene__sweat--1,
+  .claude-scene__sweat--2,
+  .claude-scene__rain--1,
+  .claude-scene__rain--2,
+  .claude-scene__rain--3,
+  .claude-scene__alert--a,
+  .claude-scene__alert--b,
+  .claude-scene__alert--c,
+  .claude-scene__merge-node,
+  .claude-scene__wrench,
+  .claude-scene__flame--1,
+  .claude-scene__flame--2,
+  .claude-scene__disco,
+  .claude-scene__screen-bug,
+  .claude-scene__loupe,
+  .claude-scene__prompt-spark,
+  .claude-scene__err-mark {
+    animation: none;
+  }
+
+  .scene-steam {
+    opacity: 0.6;
+  }
+
+  .scene-confetti,
+  .claude-scene__money,
+  .claude-scene__zzz--1,
+  .claude-scene__zzz--2,
+  .claude-scene__zzz--3,
+  .claude-scene__heart--1,
+  .claude-scene__heart--2,
+  .claude-scene__heart--3,
+  .claude-scene__note--a,
+  .claude-scene__note--b,
+  .claude-scene__sweat--1,
+  .claude-scene__sweat--2,
+  .claude-scene__rain--1,
+  .claude-scene__rain--2,
+  .claude-scene__rain--3 {
+    opacity: 1;
+  }
+}

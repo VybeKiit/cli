@@ -1,12 +1,12 @@
 import {
-  parseEnv,
-  twilioConfigSchema,
-  type TwilioConfig,
   fail,
   ok,
+  parseEnv,
   type Result,
+  type TwilioConfig,
+  twilioConfigSchema,
 } from '@vybekiit/core';
-import type { NotificationsProvider, SendNotificationParams } from '../types';
+import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
 import { sendTwilioSmsOtp, sendTwilioWhatsApp } from './twilio';
 
 export function createTwilioNotifications(config: TwilioConfig): NotificationsProvider {

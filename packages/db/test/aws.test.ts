@@ -1,6 +1,6 @@
+import { createAwsDataProvider } from '@vybekiit/db/providers/aws';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createAwsDataProvider } from '../src/providers/aws';
 
 /**
  * `vi.mock` is hoisted above imports, so anything its factory references must be

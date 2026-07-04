@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+import { type ReactNode, useCallback, useState } from 'react';
 import { CartIcon, LockIcon } from '@/components/ui/CustomIcons';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { useCallback, useState, type ReactNode } from 'react';
 
 interface CheckoutCTAProps {
   readonly href?: string;

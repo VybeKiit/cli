@@ -1,4 +1,4 @@
-import { renderContract } from '../contract/contract';
+import { renderContract } from '@vybekiit/agentKit/contract/contract';
 
 export type ExtensionSkillKind = 'buyer-goal' | 'platform-wrapper' | 'agent-skills-global';
 

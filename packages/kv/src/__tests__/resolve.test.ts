@@ -1,5 +1,5 @@
+import { resolveKvProvider } from '@vybekiit/kv/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveKvProvider } from '../resolve';
 
 describe('resolveKvProvider', () => {
   it('falls back to local when cloudflare is unconfigured', () => {

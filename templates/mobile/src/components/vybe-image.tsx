@@ -1,5 +1,5 @@
 import { Image, type ImageProps } from 'expo-image';
-import { resolveAssetDelivery } from '@/vybekiit/assets';
+import { resolveAssetDelivery } from '@vybekiit/assets';
 
 type VybeImageProps = Omit<ImageProps, 'source'> & {
   /** Local require path, `/assets` path, or remote URL. */

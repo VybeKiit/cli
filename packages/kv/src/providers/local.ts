@@ -1,5 +1,5 @@
-import { type Result, ok } from '@vybekiit/core';
-import type { KvProvider } from '../types';
+import { ok, type Result } from '@vybekiit/core';
+import type { KvProvider } from '@vybekiit/kv/types';
 
 const store = new Map<string, { value: string; expiresAt?: number }>();
 

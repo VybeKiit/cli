@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import {
   AGENT_RUNTIME_VOCABULARY,
   renderAgentRuntimeVocabularyTable,
-} from '../../src/vocabulary/agentRuntimeVocabulary';
+} from '@vybekiit/agentKit/vocabulary/agentRuntimeVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('renderAgentRuntimeVocabularyTable', () => {
   const lines = renderAgentRuntimeVocabularyTable().split('\n');

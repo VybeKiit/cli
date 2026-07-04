@@ -1,8 +1,10 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { discoverDeveloperGroupId, packageUrl } from '../urls';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  packageUrl,
+} from '@vybekiit/browserAutomation/domains/extension/urls';
 
 /**
  * One row of the published-versions table. Captures version string,

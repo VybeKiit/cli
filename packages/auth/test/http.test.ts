@@ -1,9 +1,9 @@
+import type { AuthHttpDeps } from '@vybekiit/auth/http/handlers';
+import { handleMe, handleSignIn } from '@vybekiit/auth/http/handlers';
+import { LOCAL_DEV_SESSION_TOKEN } from '@vybekiit/auth/session';
+import type { AuthProvider } from '@vybekiit/auth/types';
 import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
-import { LOCAL_DEV_SESSION_TOKEN } from '../src/session';
-import { handleSignIn, handleMe } from '../src/http/handlers';
-import type { AuthHttpDeps } from '../src/http/handlers';
-import type { AuthProvider } from '../src/types';
 
 function deps(overrides: Partial<AuthHttpDeps> & { provider: AuthProvider }): AuthHttpDeps {
   const sessionToken = { current: null as string | null };

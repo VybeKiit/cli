@@ -1,5 +1,5 @@
+import { selectDbKey } from '@vybekiit/db/key';
 import { describe, expect, it } from 'vitest';
-import { selectDbKey } from '../src/key';
 
 const base = { SUPABASE_URL: 'https://x.supabase.co', SUPABASE_ANON_KEY: 'anon' };
 

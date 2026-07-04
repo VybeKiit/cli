@@ -1,7 +1,7 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import type { ShowcaseEntry } from '@/data/componentShowcase';
+import { cn } from '@/lib/utils';
 
 const SOURCE_LABELS: Record<string, string> = {
   bundui: 'BundUI',

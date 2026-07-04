@@ -1,5 +1,5 @@
+import type { AnalyticsProvider, ScriptConfig } from '@vybekiit/analytics/types';
 import type { PosthogConfig } from '@vybekiit/core';
-import type { AnalyticsProvider, ScriptConfig } from '../types';
 
 export function createPosthogAnalytics(config: PosthogConfig): AnalyticsProvider {
   const host = config.POSTHOG_HOST ?? 'https://us.i.posthog.com';

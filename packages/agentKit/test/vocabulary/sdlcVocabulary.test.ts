@@ -1,5 +1,8 @@
+import {
+  renderSdlcVocabularyTable,
+  SDLC_VOCABULARY,
+} from '@vybekiit/agentKit/vocabulary/sdlcVocabulary';
 import { describe, expect, it } from 'vitest';
-import { SDLC_VOCABULARY, renderSdlcVocabularyTable } from '../../src/vocabulary/sdlcVocabulary';
 
 describe('renderSdlcVocabularyTable', () => {
   const lines = renderSdlcVocabularyTable().split('\n');

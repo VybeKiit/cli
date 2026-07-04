@@ -90,16 +90,45 @@ export function applyPrimaryVars(root: HTMLElement, hex: string): void {
   root.style.setProperty('--ring', triplet);
 }
 
-/** Build the embed iframe URL carrying the chosen mode + primary. */
+export interface PreviewSrcOptions {
+  readonly thumb?: boolean;
+  readonly interactive?: boolean;
+}
+
+/** Stable embed URL — theme/primary are pushed via postMessage after load. */
 export function buildPreviewSrc(
   namespace: string,
   name: string,
+  options?: PreviewSrcOptions,
+): string {
+  const params = new URLSearchParams();
+  if (options?.thumb) {
+    params.set('thumb', '1');
+  }
+  if (options?.interactive) {
+    params.set('interactive', '1');
+  }
+  const qs = params.toString();
+  return `/embed/${namespace}/${encodeURIComponent(name)}${qs ? `?${qs}` : ''}`;
+}
+
+/** @deprecated Pass theme via postPreviewTheme — kept for direct embed / e2e links. */
+export function buildPreviewSrcWithTheme(
+  namespace: string,
+  name: string,
   mode: PreviewMode,
-  primary: string,
+  primary: string = DEFAULT_PRIMARY,
+  options?: PreviewSrcOptions,
 ): string {
   const params = new URLSearchParams({ theme: mode });
   if (primary && primary.toLowerCase() !== DEFAULT_PRIMARY) {
     params.set('primary', primary);
+  }
+  if (options?.thumb) {
+    params.set('thumb', '1');
+  }
+  if (options?.interactive) {
+    params.set('interactive', '1');
   }
   return `/embed/${namespace}/${encodeURIComponent(name)}?${params.toString()}`;
 }

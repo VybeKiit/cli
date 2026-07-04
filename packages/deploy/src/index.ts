@@ -1,42 +1,42 @@
-export type {
-  Hosting,
-  HostingProviderName,
-  DeployOptions,
-  DeployResult,
-  DeployStatus,
-} from './types';
-export { resolveHosting, type HostingRunners } from './resolve';
 export {
-  createCloudflareHosting,
+  type CloudflareZone,
+  getOrCreateZone,
+} from './cloudflare/zones';
+export { type AmplifyRunner, createAwsHosting } from './providers/aws';
+export {
   type CloudflareDeployAction,
-  type CloudflareRunResult,
   type CloudflareRunner,
+  type CloudflareRunResult,
+  createCloudflareHosting,
 } from './providers/cloudflare';
-export {
-  createVercelHosting,
-  type VercelDeployAction,
-  type VercelRunResult,
-  type VercelRunner,
-} from './providers/vercel';
 export {
   createRailwayHosting,
   type RailwayDeployAction,
-  type RailwayRunResult,
   type RailwayRunner,
+  type RailwayRunResult,
 } from './providers/railway';
-export { createAwsHosting, type AmplifyRunner } from './providers/aws';
 export {
-  getOrCreateZone,
-  type CloudflareZone,
-} from './cloudflare/zones';
+  createVercelHosting,
+  type VercelDeployAction,
+  type VercelRunner,
+  type VercelRunResult,
+} from './providers/vercel';
+export {
+  GodaddyError,
+  setGodaddyNameservers,
+  verifyGodaddyCredentials,
+} from './registrar/godaddy';
 export {
   NamecheapError,
   parseNamecheapDomain,
-  verifyNamecheapCredentials,
   setCustomNameservers,
+  verifyNamecheapCredentials,
 } from './registrar/namecheap';
-export {
-  GodaddyError,
-  verifyGodaddyCredentials,
-  setGodaddyNameservers,
-} from './registrar/godaddy';
+export { type HostingRunners, resolveHosting } from './resolve';
+export type {
+  DeployOptions,
+  DeployResult,
+  DeployStatus,
+  Hosting,
+  HostingProviderName,
+} from './types';

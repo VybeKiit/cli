@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest';
 import {
   AGENT_INTERNAL_VOCABULARY,
   FAILURE_VOCABULARY,
-  UI_VOCABULARY,
   renderAgentInternalVocabularyTable,
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
-} from '../../src/vocabulary/uiVocabulary';
+  UI_VOCABULARY,
+} from '@vybekiit/agentKit/vocabulary/uiVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('renderUiVocabularyTable', () => {
   const lines = renderUiVocabularyTable().split('\n');

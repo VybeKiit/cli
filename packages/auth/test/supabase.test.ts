@@ -1,6 +1,9 @@
+import {
+  createSupabaseAuthProvider,
+  type SupabaseAuthClientLike,
+} from '@vybekiit/auth/providers/supabase';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type SupabaseAuthClientLike, createSupabaseAuthProvider } from '../src/providers/supabase';
 
 const config = { SUPABASE_URL: 'https://demo.supabase.co', SUPABASE_ANON_KEY: 'anon-key' };
 const user = { id: 'u1', email: 'a@b.com' };

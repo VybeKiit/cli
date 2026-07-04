@@ -1,4 +1,4 @@
-import { type NamecheapConfig, parseEnv, namecheapConfigSchema } from '@vybekiit/core';
+import { type NamecheapConfig, namecheapConfigSchema, parseEnv } from '@vybekiit/core';
 import { verifyNamecheapCredentials } from '@vybekiit/deploy';
 
 export type NamecheapDoctorReport = {

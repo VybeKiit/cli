@@ -1,6 +1,5 @@
+import { fetchPublicIpv4 } from '@vybekiit/browserAutomation/domains/registrars/shared/publicIp';
 import { describe, expect, it } from 'vitest';
-
-import { fetchPublicIpv4 } from '../../src/domains/registrars/shared/publicIp';
 
 describe('fetchPublicIpv4', () => {
   it('validates ipv4 shape from mocked response', async () => {

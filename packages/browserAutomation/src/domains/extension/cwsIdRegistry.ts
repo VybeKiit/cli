@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
 import { parseCwsStoreConfig } from './cwsStoreSchema';
-import { cwsJsonPath, type CwsStoreConfig } from './store';
+import { type CwsStoreConfig, cwsJsonPath } from './store';
 
 /**
  * Record a freshly-minted Chrome Web Store item ID in `.vybekiit/store/extension/cws.json`.

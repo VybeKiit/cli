@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, afterEach } from 'vitest';
-import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '../providers/twilio';
+import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications/providers/twilio';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const config = {
   TWILIO_ACCOUNT_SID: 'ACtest',

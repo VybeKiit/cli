@@ -1,7 +1,6 @@
-export { resolveClientState } from './resolve';
 export { createQueryClient, defaultQueryOptions } from './query/client';
 export { queryKeys } from './queryKeys';
-export { createUiStore } from './uiStore/createStore';
+export { resolveClientState } from './resolve';
 export type {
   ClientStateProviderProps,
   ClientStateSurface,
@@ -9,3 +8,4 @@ export type {
   UiStore,
   UiStoreState,
 } from './types';
+export { createUiStore } from './uiStore/createStore';

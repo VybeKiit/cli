@@ -1,9 +1,8 @@
+import { LS_FIELD_FALLBACKS } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldFallbacks';
+import { lsField } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldLocator';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import { type Browser, chromium, type Page } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { chromium, type Browser, type Page } from 'playwright';
-
-import { LS_FIELD_FALLBACKS } from '../../src/domains/payments/ls/dashboard/fieldFallbacks';
-import { lsField } from '../../src/domains/payments/ls/dashboard/fieldLocator';
-import { LS_DRAFT_FIELDS } from '../../src/domains/payments/ls/selectors/fields';
 
 describe('LS field fallbacks coverage', () => {
   it('covers every product editor draft field except dashboard reads', () => {

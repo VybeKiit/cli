@@ -1,16 +1,29 @@
-import { describe, expect, it } from 'vitest';
-import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
+import {
+  buildAssistantDeepLink,
+  inferVybeAssistant,
+  resolveVybeAssistant,
+} from '@vybekiit/reportMode/deeplink';
+import { formatReportPrompt } from '@vybekiit/reportMode/formatPrompt';
+import {
+  loadReportHandoffTarget,
+  saveReportHandoffTarget,
+} from '@vybekiit/reportMode/handoffTarget';
 import {
   DEFAULT_INSPECT_HIGHLIGHT_COLOR,
   hexToRgba,
   INSPECT_HIGHLIGHT_PRESETS,
   loadInspectHighlightColor,
   saveInspectHighlightColor,
-} from '../src/inspectHighlightColor';
-import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoffTarget';
-import { formatReportPrompt } from '../src/formatPrompt';
-import { getDockInsetStyle, loadDockCornerOnly, snapDockToNearestCorner } from '../src/position';
-import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
+} from '@vybekiit/reportMode/inspectHighlightColor';
+import {
+  computeFlyoutPlacement,
+  type FlyoutRect,
+  getDockInsetStyle,
+  loadDockCornerOnly,
+  snapDockToNearestCorner,
+} from '@vybekiit/reportMode/position';
+import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '@vybekiit/reportMode/types';
+import { describe, expect, it } from 'vitest';
 
 describe('formatReportPrompt', () => {
   it('includes the VybeKiit Report prefix and builder note', () => {
@@ -132,6 +145,80 @@ describe('snapDockToNearestCorner', () => {
   });
 });
 
+describe('computeFlyoutPlacement', () => {
+  const viewport = { width: 1000, height: 800 };
+  const flyout = { width: 160, height: 120 };
+  // A trigger with room above and to both sides.
+  const midTrigger: FlyoutRect = {
+    left: 480,
+    right: 520,
+    top: 400,
+    bottom: 428,
+    width: 40,
+    height: 28,
+  };
+
+  it('places the flyout above the trigger, centered, when there is room', () => {
+    const { left, top } = computeFlyoutPlacement({ trigger: midTrigger, flyout, viewport });
+    // centered: 500 - 80 = 420; above: 400 - 8 - 120 = 272
+    expect(left).toBe(420);
+    expect(top).toBe(272);
+  });
+
+  it('flips below the trigger when near the top edge', () => {
+    const topTrigger: FlyoutRect = {
+      left: 480,
+      right: 520,
+      top: 10,
+      bottom: 38,
+      width: 40,
+      height: 28,
+    };
+    const { top } = computeFlyoutPlacement({ trigger: topTrigger, flyout, viewport });
+    // no room above (10 - 8 < 120 + margin) → below: bottom + gap = 38 + 8 = 46
+    expect(top).toBe(46);
+  });
+
+  it('clamps to the left margin when the trigger hugs the left edge', () => {
+    const leftTrigger: FlyoutRect = {
+      left: 0,
+      right: 40,
+      top: 400,
+      bottom: 428,
+      width: 40,
+      height: 28,
+    };
+    const { left } = computeFlyoutPlacement({ trigger: leftTrigger, flyout, viewport });
+    // raw centered = 20 - 80 = -60 → clamped to margin 8
+    expect(left).toBe(8);
+  });
+
+  it('clamps to the right margin when the trigger hugs the right edge', () => {
+    const rightTrigger: FlyoutRect = {
+      left: 960,
+      right: 1000,
+      top: 400,
+      bottom: 428,
+      width: 40,
+      height: 28,
+    };
+    const { left } = computeFlyoutPlacement({ trigger: rightTrigger, flyout, viewport });
+    // max left = 1000 - 160 - 8 = 832
+    expect(left).toBe(832);
+  });
+
+  it('honors end alignment (right edge of flyout meets right edge of trigger)', () => {
+    const { left } = computeFlyoutPlacement({
+      trigger: midTrigger,
+      flyout,
+      viewport,
+      align: 'end',
+    });
+    // end: right - width = 520 - 160 = 360
+    expect(left).toBe(360);
+  });
+});
+
 describe('getDockInsetStyle', () => {
   it('returns bottom-right insets by default margin', () => {
     expect(getDockInsetStyle('bottom-right')).toEqual({ bottom: 16, right: 16 });
@@ -247,5 +334,14 @@ describe('loadDockCornerOnly', () => {
       length: 0,
     } as Storage;
     expect(loadDockCornerOnly(storage)).toBe('bottom-right');
+  });
+});
+
+describe('devTools', () => {
+  it('gates report mode to local dev with opt-in flag', async () => {
+    const { shouldShowReportMode } = await import('../src/devTools');
+    expect(shouldShowReportMode({ NODE_ENV: 'development', VYBE_REPORT_MODE: '1' })).toBe(true);
+    expect(shouldShowReportMode({ NODE_ENV: 'production', VYBE_REPORT_MODE: '1' })).toBe(false);
+    expect(shouldShowReportMode({ NODE_ENV: 'development' })).toBe(false);
   });
 });

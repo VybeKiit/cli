@@ -1,11 +1,11 @@
 'use client';
 
+import NumberFlow from '@number-flow/react';
+import { spinTiming } from '@/components/ui/TypewriterText';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { useInViewOnce } from '@/hooks/useInViewOnce';
-import { spinTiming } from '@/components/ui/TypewriterText';
 import { parseDisplayNumber } from '@/lib/parseDisplayNumber';
 import { cn } from '@/lib/utils';
-import NumberFlow from '@number-flow/react';
 
 export interface AnimatedNumberProps {
   readonly value: string;

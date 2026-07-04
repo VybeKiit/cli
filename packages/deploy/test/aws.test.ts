@@ -1,5 +1,5 @@
-import { type Mock, describe, expect, it, vi } from 'vitest';
-import { type AmplifyRunner, createAwsHosting } from '../src/providers/aws';
+import { type AmplifyRunner, createAwsHosting } from '@vybekiit/deploy/providers/aws';
+import { describe, expect, it, type Mock, vi } from 'vitest';
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
 const hosting = { AWS_AMPLIFY_APP_ID: 'app123', AWS_AMPLIFY_BRANCH: 'main' };

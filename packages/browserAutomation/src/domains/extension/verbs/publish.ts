@@ -1,11 +1,13 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { fieldLocator } from '../locator';
-import { safeClick } from '../safeClick';
-import { discoverDeveloperGroupId, packageUrl } from '../urls';
-import { runVerifyGate } from '../verifyGate';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
+import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  packageUrl,
+} from '@vybekiit/browserAutomation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
 
 /**
  * Publish a draft that has already cleared review.

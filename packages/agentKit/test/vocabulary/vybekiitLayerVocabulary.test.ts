@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import {
-  VYBEKIIT_LAYER_VOCABULARY,
   renderVybekiitLayerVocabularyTable,
-} from '../../src/vocabulary/vybekiitLayerVocabulary';
+  VYBEKIIT_LAYER_VOCABULARY,
+} from '@vybekiit/agentKit/vocabulary/vybekiitLayerVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('renderVybekiitLayerVocabularyTable', () => {
   const lines = renderVybekiitLayerVocabularyTable().split('\n');

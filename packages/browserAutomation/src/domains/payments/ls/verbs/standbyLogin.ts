@@ -1,6 +1,6 @@
-import { connectToLsChrome } from '../connect';
-import { waitForLsAuthenticated } from '../dashboard/waitForAuthenticated';
-import type { LsVerbContext } from '../types';
+import { connectToLsChrome } from '@vybekiit/browserAutomation/domains/payments/ls/connect';
+import { waitForLsAuthenticated } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/waitForAuthenticated';
+import type { LsVerbContext } from '@vybekiit/browserAutomation/domains/payments/ls/types';
 
 /** Wait until builder reaches the LS dashboard after manual sign-in. */
 export async function standbyLogin(ctx: LsVerbContext): Promise<{ ready: boolean; url?: string }> {

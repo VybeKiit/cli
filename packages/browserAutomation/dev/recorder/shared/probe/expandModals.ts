@@ -1,7 +1,6 @@
+import { clickSectionCreate } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/clickSectionCreate';
+import { waitForDialogInputs } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/waitForDialogInputs';
 import type { Page } from 'playwright';
-
-import { clickSectionCreate } from '../../../../src/domains/payments/ls/dashboard/clickSectionCreate';
-import { waitForDialogInputs } from '../../../../src/domains/payments/ls/dashboard/waitForDialogInputs';
 import { snapshotPage } from './snapshot';
 import type { PageSnapshot } from './types';
 

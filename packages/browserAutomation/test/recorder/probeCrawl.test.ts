@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  isAllowedCrawlHref,
-  normalizeCrawlUrl,
   crawlPriorityFor,
+  isAllowedCrawlHref,
   LS_PROBE_SEED_PATHS,
+  normalizeCrawlUrl,
 } from '../../dev/recorder/shared/probe/crawl';
 
 const ORIGIN = 'https://app.lemonsqueezy.com';

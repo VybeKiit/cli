@@ -1,5 +1,5 @@
+import { resolveSeoProvider } from '@vybekiit/seo/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveSeoProvider } from '../resolve';
 
 const env = {
   APP_URL: 'https://example.com',

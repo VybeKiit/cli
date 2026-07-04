@@ -85,6 +85,36 @@
   "home_signOut": {
     "message": "Sign out"
   },
+  "popup_marketing_eyebrow": {
+    "message": "AI Operator + Web, Mobile, Extension"
+  },
+  "popup_marketing_headline_1": {
+    "message": "Your entire stack."
+  },
+  "popup_marketing_headline_2": {
+    "message": "Operated by AI."
+  },
+  "popup_marketing_subhead": {
+    "message": "Launch and scale with VybeKiit — web app, mobile, extension, and 744+ UI blocks ready to ship."
+  },
+  "popup_marketing_pill_web": {
+    "message": "Web app"
+  },
+  "popup_marketing_pill_mobile": {
+    "message": "Mobile app"
+  },
+  "popup_marketing_pill_extension": {
+    "message": "Extension"
+  },
+  "popup_marketing_pill_ui": {
+    "message": "744+ UI blocks"
+  },
+  "popup_marketing_cta_sidebar": {
+    "message": "Open side panel"
+  },
+  "popup_marketing_cta_uiLibrary": {
+    "message": "Browse UI library"
+  },
   "auth_shell_brand": {
     "message": "My App"
   },

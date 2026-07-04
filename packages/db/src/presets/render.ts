@@ -1,3 +1,4 @@
+import { PRESET_HELPERS, REALTIME_TABLES, renderRealtimeGrants } from './helpers';
 import type {
   PostgresProviderName,
   PresetColumn,
@@ -6,7 +7,6 @@ import type {
   PresetRlsMode,
   RenderedPreset,
 } from './types';
-import { PRESET_HELPERS, REALTIME_TABLES, renderRealtimeGrants } from './helpers';
 
 function sqlType(column: PresetColumn): string {
   switch (column.type) {

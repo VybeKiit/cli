@@ -1,20 +1,20 @@
-import {
-  type AppConfig,
-  type AwsConfig,
-  type CloudflareConfig,
-  type R2Config,
-  type SupabaseConfig,
-  fail,
-  ok,
-  type Result,
-} from '@vybekiit/core';
-import { runOptimizeForBuild } from '../optimize';
+import { runOptimizeForBuild } from '@vybekiit/assets/optimize';
 import type {
   AssetDeliveryProvider,
   AssetUrlOptions,
   OptimizeBuildOptions,
   OptimizeBuildResult,
-} from '../types';
+} from '@vybekiit/assets/types';
+import {
+  type AppConfig,
+  type AwsConfig,
+  type CloudflareConfig,
+  fail,
+  ok,
+  type R2Config,
+  type Result,
+  type SupabaseConfig,
+} from '@vybekiit/core';
 
 /** Build-time optimization only — used before Cloudflare/Supabase credentials exist. */
 export function createLocalAssetDelivery(): AssetDeliveryProvider {

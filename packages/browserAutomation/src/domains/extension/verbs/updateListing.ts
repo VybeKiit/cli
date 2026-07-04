@@ -1,17 +1,13 @@
-import type { Page } from 'playwright';
-
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-
-import { Schema } from 'effect';
-
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { type ListingFieldDiff, diffListing, formatListingDiff } from '../diff';
-import { MissingItemIdError } from '../errors';
-import { cwsListingPath } from '../store';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import {
+  diffListing,
+  formatListingDiff,
+  type ListingFieldDiff,
+} from '@vybekiit/browserAutomation/domains/extension/diff';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
 import {
   applyCertifications,
   applyDataUseDisclosure,
@@ -23,18 +19,25 @@ import {
   setRadioByLabel,
   setRemoteCodeRadio,
   setSwitchByKey,
-} from '../listingSourceFields';
-import { fieldLocator } from '../locator';
-import { safeClick } from '../safeClick';
-import { type CwsListing, CwsListingSchema } from '../schema';
+} from '@vybekiit/browserAutomation/domains/extension/listingSourceFields';
+import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
+import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+import {
+  type CwsListing,
+  CwsListingSchema,
+} from '@vybekiit/browserAutomation/domains/extension/schema';
+import { cwsListingPath } from '@vybekiit/browserAutomation/domains/extension/store';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
 import {
   discoverDeveloperGroupId,
   distributionUrl,
   listingUrl,
   packageUrl,
   privacyUrl,
-} from '../urls';
-import { runVerifyGate } from '../verifyGate';
+} from '@vybekiit/browserAutomation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
+import { Schema } from 'effect';
+import type { Page } from 'playwright';
 import { readListingState } from './readListingState';
 
 /**

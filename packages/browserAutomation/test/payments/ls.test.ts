@@ -1,14 +1,13 @@
-import { describe, expect, it } from 'vitest';
-
-import { LS_AUTOMATION_VERBS } from '../../src/domains/payments/ls/verbRegistry';
-import { resolveLsSelectorEntry } from '../../src/domains/payments/ls/selectors/registry';
 import {
   formatPriceFromCents,
   scrapeProductIdFromUrl,
   scrapeStoreIdFromHtml,
   scrapeVariantIdFromHtml,
-} from '../../src/domains/payments/ls/scrape';
-import { LS_DASHBOARD_URL } from '../../src/domains/payments/ls/types';
+} from '@vybekiit/browserAutomation/domains/payments/ls/scrape';
+import { resolveLsSelectorEntry } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/registry';
+import { LS_DASHBOARD_URL } from '@vybekiit/browserAutomation/domains/payments/ls/types';
+import { LS_AUTOMATION_VERBS } from '@vybekiit/browserAutomation/domains/payments/ls/verbRegistry';
+import { describe, expect, it } from 'vitest';
 
 describe('LS verbRegistry', () => {
   it('includes standbyLogin and setup flow verbs', () => {

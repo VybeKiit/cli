@@ -1,59 +1,12 @@
-export { CONTRACT, renderContract, type Contract, type ContractRule } from './contract/contract';
-export { TONE_RULES, renderToneSection, type ToneRule } from './contract/toneRules';
 export {
-  PEOPLE_VOCABULARY,
-  renderPeopleVocabularyTable,
-  type PeopleVocabularyEntry,
-} from './vocabulary/peopleVocabulary';
+  AGENT_RUNTIME_DOC_SOURCES,
+  type AgentRuntimeDocSource,
+} from './catalogs/agentRuntimeDocSources';
 export {
-  AGENT_RUNTIME_VOCABULARY,
-  renderAgentRuntimeVocabularyTable,
-  type AgentRuntimeVocabularyEntry,
-} from './vocabulary/agentRuntimeVocabulary';
-export {
-  CODE_EDIT_VOCABULARY,
-  renderCodeEditVocabularyTable,
-  type CodeEditVocabularyEntry,
-} from './vocabulary/codeEditVocabulary';
-export {
-  VYBEKIIT_LAYER_VOCABULARY,
-  renderVybekiitLayerVocabularyTable,
-  type VybekiitLayerVocabularyEntry,
-} from './vocabulary/vybekiitLayerVocabulary';
-export {
-  TOOL_VOCABULARY,
-  renderToolVocabularyTable,
-  type ToolVocabularyEntry,
-} from './vocabulary/toolVocabulary';
-export {
-  SDLC_VOCABULARY,
-  renderSdlcVocabularyTable,
-  type SdlcVocabularyEntry,
-} from './vocabulary/sdlcVocabulary';
-export {
-  AGENT_INTERNAL_VOCABULARY,
-  FAILURE_VOCABULARY,
-  UI_VOCABULARY,
-  renderAgentInternalVocabularyTable,
-  renderFailureVocabularyTable,
-  renderUiVocabularyTable,
-  type UiVocabularyEntry,
-} from './vocabulary/uiVocabulary';
-export {
-  EXTENDED_SERVICE_NAME_BANS,
-  PAYMENTS_VOCABULARY,
-  renderPaymentsVocabularyTable,
-  renderServiceNameBanList,
-  type DomainVocabularyEntry,
-} from './vocabulary/domainVocabulary';
-export {
-  FORBIDDEN_WEB_UI_LIBS,
-  UI_MIRROR_NAMESPACES,
-  WEB_UI_SOURCES,
-  renderForbiddenWebUiLibsList,
-  renderWebUiSourcesTable,
-  type UiSourceEntry,
-} from './catalogs/uiSources';
+  BACKEND_CAPABILITIES,
+  BACKEND_CLI_COMMANDS,
+  type BackendCapability,
+} from './catalogs/backendCapabilities';
 export {
   GOAL_CATALOG,
   GOAL_ENTRIES,
@@ -61,88 +14,125 @@ export {
   type TemplateId,
 } from './catalogs/goalCatalog';
 export {
-  BACKEND_CAPABILITIES,
-  BACKEND_CLI_COMMANDS,
-  type BackendCapability,
-} from './catalogs/backendCapabilities';
+  DOCS_ONLY_PLATFORM_PROVIDERS,
+  evaluatePlatformSkillsAudit,
+  isPlatformSkillsAuditBlocking,
+  normalizeSkillsRepoKey,
+  PLATFORM_SKILLS_AUDIT_PROVIDERS,
+  PLATFORM_SKILLS_NPM_MAX_AGE_DAYS,
+  PLATFORM_SKILLS_REPO_MAX_AGE_DAYS,
+  type PlatformSkillsAuditInput,
+  type PlatformSkillsAuditProvider,
+  type PlatformSkillsAuditResult,
+  type PlatformSkillsAuditStatus,
+} from './catalogs/platformSkillsAudit';
 export {
-  planKitUpdate,
-  type KitPackageUpdate,
-  type UpdatePlan,
-} from './planners/updateKit';
+  checkBaseManifestParity,
+  findDocsOnlyViolations,
+  mergePlatformSkillsManifests,
+  PLATFORM_SKILLS_BASE_MANIFEST,
+  type PlatformSkillsTemplateManifest,
+} from './catalogs/platformSkillsMerge';
 export {
-  expectedSkillNamesFromManifest,
-  expectedSkillNamesFromLock,
-  planPlatformSkillsUpdate,
-  shouldRunPlatformSkillsUpdate,
-  type PlatformSkillsManifest,
-  type PlatformSkillsSource,
-  type SkillsLockEntry,
-  type SkillsLockFile,
-  type PlatformSkillsUpdatePlan,
-} from './planners/updatePlatformSkills';
+  type ChecklistEntryInput,
+  formatChecklistEntry,
+  type ProductionGate,
+  planProductionChecklist,
+  renderChecklistSeed,
+  renderProductionGates,
+} from './catalogs/productionGates';
 export {
-  AGENT_LAYER_PATHS,
-  AGENT_LAYER_EXTENSION_PREFIX,
-  formatAgentLayerSyncSummary,
-  isAgentLayerExtensionPath,
-  planAgentLayerSync,
-  type AgentLayerSyncPlan,
-} from './planners/agentLayerSync';
+  renderTechReferencesTable,
+  TECH_REFERENCE_MAP,
+  TECH_REFERENCES,
+  type TechReference,
+} from './catalogs/techReferences';
 export {
-  TOOL_SKILL_PATHS,
-  EXTENSION_PATHS,
-  detectAgentTool,
-  resolveGlobalSkillPath,
   type AgentToolId,
+  detectAgentTool,
+  EXTENSION_PATHS,
+  resolveGlobalSkillPath,
+  TOOL_SKILL_PATHS,
   type ToolSkillPathEntry,
 } from './catalogs/toolSkillPaths';
 export {
-  renderBuyerGoalExtensionSkill,
-  renderPlatformWrapperExtensionSkill,
-  renderGlobalAgentSkill,
-  renderExtensionContractReference,
-  type BuyerGoalSkillDraft,
-  type PlatformWrapperDraft,
-  type ExtensionSkillKind,
-} from './render/extensionSkillTemplates';
+  FORBIDDEN_WEB_UI_LIBS,
+  renderForbiddenWebUiLibsList,
+  renderWebUiSourcesTable,
+  UI_MIRROR_NAMESPACES,
+  type UiSourceEntry,
+  WEB_UI_SOURCES,
+} from './catalogs/uiSources';
+export { CONTRACT, type Contract, type ContractRule, renderContract } from './contract/contract';
 export {
-  lintExtensionSkill,
-  type ExtensionSkillLintKind,
-  type ExtensionSkillLintIssue,
+  renderAgentSessionBootstrap,
+  renderSessionBootstrapFile,
+} from './contract/sessionBootstrap';
+export { renderToneSection, TONE_RULES, type ToneRule } from './contract/toneRules';
+export {
   type ExtensionSkillLintInput,
+  type ExtensionSkillLintIssue,
+  type ExtensionSkillLintKind,
   type ExtensionSkillLintReport,
+  lintExtensionSkill,
 } from './lint/lintExtensionSkill';
 export {
+  AGENT_LAYER_EXTENSION_PREFIX,
+  AGENT_LAYER_PATHS,
+  type AgentLayerSyncPlan,
+  formatAgentLayerSyncSummary,
+  isAgentLayerExtensionPath,
+  planAgentLayerSync,
+} from './planners/agentLayerSync';
+export {
   extractExtensionGoalIndexRows,
-  mergeGoalIndexOnSync,
   formatExtensionGoalIndexRow,
+  mergeGoalIndexOnSync,
 } from './planners/mergeGoalIndex';
 export {
-  planDataModel,
-  renderDataModelSummary,
+  type AgentLayerComplianceCheckId,
+  type AgentLayerComplianceInput,
+  type AgentLayerComplianceIssue,
+  type AgentLayerComplianceReport,
+  planAgentLayerCompliance,
+} from './planners/planAgentLayerCompliance';
+export {
+  type AgentRuntimeComplianceCheckId,
+  type AgentRuntimeComplianceInput,
+  type AgentRuntimeComplianceIssue,
+  type AgentRuntimeComplianceReport,
+  planAgentRuntimeCompliance,
+} from './planners/planAgentRuntimeCompliance';
+export {
   type DataModelPlan,
   type DataProviderName,
   type EntityInput,
+  planDataModel,
+  renderDataModelSummary,
 } from './planners/planDataModel';
 export {
-  planGoalRouting,
-  checkGoalDrift,
-  type GoalRoutingPlan,
-  type GoalDriftReport,
-  type GoalDriftIssue,
-} from './planners/planGoalRouting';
+  type DocFallbackPlan,
+  formatBuilderStuckMessage,
+  planDocFallback,
+} from './planners/planDocFallback';
 export {
-  planFeatureReadiness,
-  resolveTemplateTopology,
   type FeatureName,
   type FeatureReadinessContext,
   type FeatureReadinessPlan,
   type OrchestrationAction,
   type OrchestrationStep,
+  planFeatureReadiness,
+  resolveTemplateTopology,
   type TemplateTopologyCombo,
   type TemplateTopologyContext,
 } from './planners/planFeatureReadiness';
+export {
+  checkGoalDrift,
+  type GoalDriftIssue,
+  type GoalDriftReport,
+  type GoalRoutingPlan,
+  planGoalRouting,
+} from './planners/planGoalRouting';
 export {
   planSetup,
   type SetupDomain,
@@ -150,99 +140,109 @@ export {
   type SetupStep,
 } from './planners/planSetup';
 export {
-  GENERATED_SECTION_MARKERS,
-  replaceGeneratedSection,
-  wrapGeneratedSection,
-  type GeneratedSectionId,
-} from './render/markdown';
+  type KitPackageUpdate,
+  planKitUpdate,
+  type UpdatePlan,
+} from './planners/updateKit';
+export {
+  expectedSkillNamesFromLock,
+  expectedSkillNamesFromManifest,
+  type PlatformSkillsManifest,
+  type PlatformSkillsSource,
+  type PlatformSkillsUpdatePlan,
+  planPlatformSkillsUpdate,
+  type SkillsLockEntry,
+  type SkillsLockFile,
+  shouldRunPlatformSkillsUpdate,
+} from './planners/updatePlatformSkills';
 export {
   AGENT_LAYER_RENDER_FILES,
   AGENT_LAYER_RENDER_TARGETS,
-  renderAgentLayerSections,
-  applyAgentLayerSections,
   type AgentLayerRenderTarget,
   type ApplyAgentLayerOptions,
+  applyAgentLayerSections,
+  renderAgentLayerSections,
 } from './render/agentLayer';
 export {
   AGENT_SKILL_SYMLINKS,
-  BUYER_SKILL_STUB_MARKER,
-  buyerSkillStemFromPath,
-  buyerSkillStubPath,
-  checkAgentSkillSymlinks,
-  planAgentSkillSymlinks,
-  checkBuyerSkillStubDrift,
-  isGeneratedBuyerSkillStub,
-  lookupBuyerSkillTriggerPhrases,
-  parseBuyerSkillGoal,
-  planBuyerSkillStubOutputs,
-  renderBuyerSkillDescription,
-  renderBuyerSkillStub,
-  type BuyerSkillStubDriftIssue,
-  type BuyerSkillStubDriftReport,
-  type BuyerSkillStubOutput,
   type AgentSkillSymlinkIssue,
   type AgentSkillSymlinkPlan,
   type AgentSkillSymlinkReport,
   type AgentSkillSymlinkState,
+  BUYER_SKILL_STUB_MARKER,
+  type BuyerSkillStubDriftIssue,
+  type BuyerSkillStubDriftReport,
+  type BuyerSkillStubOutput,
+  buyerSkillStemFromPath,
+  buyerSkillStubPath,
+  checkAgentSkillSymlinks,
+  checkBuyerSkillStubDrift,
+  isGeneratedBuyerSkillStub,
+  lookupBuyerSkillTriggerPhrases,
+  parseBuyerSkillGoal,
+  planAgentSkillSymlinks,
+  planBuyerSkillStubOutputs,
+  renderBuyerSkillDescription,
+  renderBuyerSkillStub,
 } from './render/buyerSkillStubs';
 export {
-  TECH_REFERENCES,
-  TECH_REFERENCE_MAP,
-  renderTechReferencesTable,
-  type TechReference,
-} from './catalogs/techReferences';
+  type BuyerGoalSkillDraft,
+  type ExtensionSkillKind,
+  type PlatformWrapperDraft,
+  renderBuyerGoalExtensionSkill,
+  renderExtensionContractReference,
+  renderGlobalAgentSkill,
+  renderPlatformWrapperExtensionSkill,
+} from './render/extensionSkillTemplates';
 export {
-  PLATFORM_SKILLS_AUDIT_PROVIDERS,
-  DOCS_ONLY_PLATFORM_PROVIDERS,
-  PLATFORM_SKILLS_REPO_MAX_AGE_DAYS,
-  PLATFORM_SKILLS_NPM_MAX_AGE_DAYS,
-  evaluatePlatformSkillsAudit,
-  isPlatformSkillsAuditBlocking,
-  normalizeSkillsRepoKey,
-  type PlatformSkillsAuditProvider,
-  type PlatformSkillsAuditResult,
-  type PlatformSkillsAuditStatus,
-  type PlatformSkillsAuditInput,
-} from './catalogs/platformSkillsAudit';
+  GENERATED_SECTION_MARKERS,
+  type GeneratedSectionId,
+  replaceGeneratedSection,
+  wrapGeneratedSection,
+} from './render/markdown';
 export {
-  PLATFORM_SKILLS_BASE_MANIFEST,
-  mergePlatformSkillsManifests,
-  checkBaseManifestParity,
-  findDocsOnlyViolations,
-  type PlatformSkillsTemplateManifest,
-} from './catalogs/platformSkillsMerge';
+  AGENT_RUNTIME_VOCABULARY,
+  type AgentRuntimeVocabularyEntry,
+  renderAgentRuntimeVocabularyTable,
+} from './vocabulary/agentRuntimeVocabulary';
 export {
-  planProductionChecklist,
-  renderProductionGates,
-  renderChecklistSeed,
-  formatChecklistEntry,
-  type ProductionGate,
-  type ChecklistEntryInput,
-} from './catalogs/productionGates';
+  CODE_EDIT_VOCABULARY,
+  type CodeEditVocabularyEntry,
+  renderCodeEditVocabularyTable,
+} from './vocabulary/codeEditVocabulary';
 export {
-  planDocFallback,
-  formatBuilderStuckMessage,
-  type DocFallbackPlan,
-} from './planners/planDocFallback';
+  type DomainVocabularyEntry,
+  EXTENDED_SERVICE_NAME_BANS,
+  PAYMENTS_VOCABULARY,
+  renderPaymentsVocabularyTable,
+  renderServiceNameBanList,
+} from './vocabulary/domainVocabulary';
 export {
-  AGENT_RUNTIME_DOC_SOURCES,
-  type AgentRuntimeDocSource,
-} from './catalogs/agentRuntimeDocSources';
+  PEOPLE_VOCABULARY,
+  type PeopleVocabularyEntry,
+  renderPeopleVocabularyTable,
+} from './vocabulary/peopleVocabulary';
 export {
-  planAgentRuntimeCompliance,
-  type AgentRuntimeComplianceReport,
-  type AgentRuntimeComplianceIssue,
-  type AgentRuntimeComplianceCheckId,
-  type AgentRuntimeComplianceInput,
-} from './planners/planAgentRuntimeCompliance';
+  renderSdlcVocabularyTable,
+  SDLC_VOCABULARY,
+  type SdlcVocabularyEntry,
+} from './vocabulary/sdlcVocabulary';
 export {
-  planAgentLayerCompliance,
-  type AgentLayerComplianceReport,
-  type AgentLayerComplianceIssue,
-  type AgentLayerComplianceInput,
-  type AgentLayerComplianceCheckId,
-} from './planners/planAgentLayerCompliance';
+  renderToolVocabularyTable,
+  TOOL_VOCABULARY,
+  type ToolVocabularyEntry,
+} from './vocabulary/toolVocabulary';
 export {
-  renderAgentSessionBootstrap,
-  renderSessionBootstrapFile,
-} from './contract/sessionBootstrap';
+  AGENT_INTERNAL_VOCABULARY,
+  FAILURE_VOCABULARY,
+  renderAgentInternalVocabularyTable,
+  renderFailureVocabularyTable,
+  renderUiVocabularyTable,
+  UI_VOCABULARY,
+  type UiVocabularyEntry,
+} from './vocabulary/uiVocabulary';
+export {
+  renderVybekiitLayerVocabularyTable,
+  VYBEKIIT_LAYER_VOCABULARY,
+  type VybekiitLayerVocabularyEntry,
+} from './vocabulary/vybekiitLayerVocabulary';

@@ -78,6 +78,37 @@ export function VybeBrandMark({ accent = true, className, ...props }: VybeBrandM
   );
 }
 
+/** Two agent nodes linked by a swap cycle — the "switch agent" control mark. */
+export function SwitchAgentIcon({ className, ...props }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <circle cx="7" cy="7" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="17" cy="17" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M14 7 H17.5 A2.5 2.5 0 0 1 20 9.5 M17 6 L18 7 L17 8"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M10 17 H6.5 A2.5 2.5 0 0 1 4 14.5 M7 18 L6 17 L7 16"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 /** Hexagon badge with star — AI Operator feature icon. */
 export function AIOperatorIcon({ className, ...props }: IconProps) {
   return (

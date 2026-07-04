@@ -4,19 +4,20 @@
 // (Supabase stacks use Supabase Auth, ADR-0024): a `pg` Pool for Neon/Railway Postgres
 // or `mongodbAdapter` (over the official `mongodb` driver) for Mongo. Chosen over Lucia
 // because it ships the email/password + email-OTP + bearer plugins we need.
-import { parseEnv, twilioConfigSchema, type Result, fail, ok } from '@vybekiit/core';
-import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '../../smsOtp';
+
+import type { BetterAuthConfig, MongoConfig } from '@vybekiit/auth/config';
+import { type AuthProviderResult, toEffectAuthProvider } from '@vybekiit/auth/effectBridge';
+import type { SmsGateway } from '@vybekiit/auth/gateways';
+import { toSessionResult } from '@vybekiit/auth/session';
+import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/auth/smsOtp';
+import type { AuthProvider } from '@vybekiit/auth/types';
+import { type AuthUser, normalizeAuthUser } from '@vybekiit/auth/user';
+import { fail, ok, parseEnv, type Result, twilioConfigSchema } from '@vybekiit/core';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { bearer, emailOTP } from 'better-auth/plugins';
 import { type Db, MongoClient } from 'mongodb';
 import { Pool } from 'pg';
-import type { BetterAuthConfig, MongoConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import type { SmsGateway } from '../../gateways';
-import { toSessionResult } from '../../session';
-import type { AuthProvider } from '../../types';
-import { type AuthUser, normalizeAuthUser } from '../../user';
 
 /**
  * The narrow slice of a better-auth instance this adapter calls. We type the seam

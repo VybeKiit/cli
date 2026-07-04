@@ -1,5 +1,5 @@
-import { BACKEND_CLI_COMMANDS } from '../catalogs/backendCapabilities';
-import type { TemplateId } from '../catalogs/goalCatalog';
+import { BACKEND_CLI_COMMANDS } from '@vybekiit/agentKit/catalogs/backendCapabilities';
+import type { TemplateId } from '@vybekiit/agentKit/catalogs/goalCatalog';
 
 export type FeatureName = 'sign-in' | 'payments' | 'save-data' | 'deploy' | 'email' | 'file-upload';
 

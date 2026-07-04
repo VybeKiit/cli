@@ -1,5 +1,5 @@
+import type { AnalyticsProvider, ScriptConfig } from '@vybekiit/analytics/types';
 import type { PlausibleConfig } from '@vybekiit/core';
-import type { AnalyticsProvider, ScriptConfig } from '../types';
 
 export function createPlausibleAnalytics(config: PlausibleConfig): AnalyticsProvider {
   const host = config.PLAUSIBLE_API_HOST ?? 'https://plausible.io';

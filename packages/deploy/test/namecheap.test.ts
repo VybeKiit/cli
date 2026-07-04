@@ -1,5 +1,5 @@
+import { parseNamecheapDomain } from '@vybekiit/deploy/registrar/namecheap';
 import { describe, expect, it } from 'vitest';
-import { parseNamecheapDomain } from '../src/registrar/namecheap';
 
 describe('parseNamecheapDomain', () => {
   it('splits sld and tld', () => {

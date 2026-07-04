@@ -1,9 +1,9 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { BlueFlare } from '@/components/landing/BlueFlare';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { landingFontClasses } from '@/lib/fonts';
-import type { ReactNode } from 'react';
 
 interface LandingShellProps {
   children: ReactNode;

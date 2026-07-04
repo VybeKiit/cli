@@ -1,11 +1,5 @@
-export { connectToLsChrome } from './connect';
-export { runLsSetup } from './verbs/setup';
-export { standbyLogin } from './verbs/standbyLogin';
-export { createProduct } from './verbs/createProduct';
-export { uploadProductImage } from './verbs/uploadProductImage';
-export { uploadProductFiles } from './verbs/uploadProductFiles';
-export { createApiKeyInDashboard } from './verbs/createApiKey';
 export { createWebhookViaApi, listVariantsForProduct } from './api/provision';
+export { connectToLsChrome } from './connect';
 export {
   LS_DEFAULT_TAX_CATEGORY,
   LS_TAX_CATEGORY_OPTIONS,
@@ -22,3 +16,9 @@ export {
   type LsAutomationReadVerb,
   type LsAutomationVerb,
 } from './verbRegistry';
+export { createApiKeyInDashboard } from './verbs/createApiKey';
+export { createProduct } from './verbs/createProduct';
+export { runLsSetup } from './verbs/setup';
+export { standbyLogin } from './verbs/standbyLogin';
+export { uploadProductFiles } from './verbs/uploadProductFiles';
+export { uploadProductImage } from './verbs/uploadProductImage';

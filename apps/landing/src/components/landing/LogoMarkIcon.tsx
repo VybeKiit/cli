@@ -1,4 +1,8 @@
+'use client';
+
+import { CodexMark } from '@vybekiit-template-web/components/builder-assistant-mark';
 import {
+  type SimpleIcon,
   siCloudflare,
   siExpo,
   siGithub,
@@ -17,9 +21,7 @@ import {
   siTailwindcss,
   siTypescript,
   siVercel,
-  type SimpleIcon,
 } from 'simple-icons';
-
 import { cn } from '@/lib/utils';
 
 export type LogoMarkIconData = Pick<SimpleIcon, 'title' | 'slug' | 'path'> & {
@@ -27,12 +29,11 @@ export type LogoMarkIconData = Pick<SimpleIcon, 'title' | 'slug' | 'path'> & {
 };
 
 /**
- * Official full-color raster marks (64×64 WebP @ q90).
- * Shared: codex + openai → openai.webp (grill lock: Codex is the OpenAI mark).
+ * Official full-color raster marks (128×128 WebP @ q92, transparent).
+ * Codex uses the inline SVG cloud mark — not the OpenAI blossom raster.
  */
 export const LOGO_MARK_RASTERS: Record<string, string> = {
   openai: '/brand-marks/openai.webp',
-  codex: '/brand-marks/openai.webp',
   amazonaws: '/brand-marks/aws.webp',
   paypal: '/brand-marks/paypal.webp',
   figma: '/brand-marks/figma.webp',
@@ -125,6 +126,14 @@ interface LogoMarkIconProps {
 
 /** Official brand mark — raster WebP when available, otherwise mono SVG path. */
 export function LogoMarkIcon({ slug, className, mono = false }: LogoMarkIconProps) {
+  if (slug === 'codex') {
+    return (
+      <CodexMark
+        className={cn('logo-mark-icon object-contain transition-opacity duration-300', className)}
+      />
+    );
+  }
+
   const rasterSrc = mono ? undefined : LOGO_MARK_RASTERS[slug];
   if (rasterSrc) {
     return (

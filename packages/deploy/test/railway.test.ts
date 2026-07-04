@@ -1,5 +1,5 @@
+import { createRailwayHosting } from '@vybekiit/deploy/providers/railway';
 import { describe, expect, it, vi } from 'vitest';
-import { createRailwayHosting } from '../src/providers/railway';
 
 describe('createRailwayHosting', () => {
   it('builds a railway up action and returns the runner URL', async () => {

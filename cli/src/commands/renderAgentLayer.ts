@@ -6,13 +6,13 @@ import {
   planBuyerSkillStubOutputs,
   type TemplateId,
 } from '@vybekiit/agent-kit';
-import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import {
   listBuyerSkillContents,
   loadAgentLayerRenderInputs,
   resolveTemplateArg,
   writeAgentLayerRenderOutputs,
 } from '../lib/agentLayerIo';
+import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import { isTemplateName } from '../lib/scaffold';
 
 async function writeBuyerSkillStubs(

@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 
-import type { ClientStateConfig } from '../config';
+import type { ClientStateConfig } from '@vybekiit/clientState/config';
 
 export const defaultQueryOptions = {
   queries: {

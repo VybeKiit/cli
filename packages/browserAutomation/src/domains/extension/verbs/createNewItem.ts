@@ -1,12 +1,11 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { recordChromeWebStoreId } from '../cwsIdRegistry';
-import { fieldLocator } from '../locator';
-import { buildAndFindZip } from '../packageZip';
-import { safeClick } from '../safeClick';
-import { dashboardUrl } from '../urls';
-import { runVerifyGate } from '../verifyGate';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { recordChromeWebStoreId } from '@vybekiit/browserAutomation/domains/extension/cwsIdRegistry';
+import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
+import { buildAndFindZip } from '@vybekiit/browserAutomation/domains/extension/packageZip';
+import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import { dashboardUrl } from '@vybekiit/browserAutomation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
 
 /**
  * Create a brand-new dev-console item from an extension that doesn't yet

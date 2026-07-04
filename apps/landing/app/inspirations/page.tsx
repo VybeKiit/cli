@@ -1,5 +1,5 @@
-import { INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 import Link from 'next/link';
+import { INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 
 export const metadata = {
   title: 'VybeKiit — Landing inspirations',

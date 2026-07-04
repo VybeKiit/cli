@@ -1,6 +1,5 @@
+import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
 import type { Page } from 'playwright';
-
-import type { LsDraftFieldKey } from '../selectors/fields';
 
 export type LsFieldFallback = {
   /** Scope clicks/lookups under a section heading when set. */

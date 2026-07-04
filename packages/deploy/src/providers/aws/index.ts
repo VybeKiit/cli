@@ -4,8 +4,8 @@
 // static/CDN story), or hand-rolled S3+CloudFront (lots of glue) because it is the
 // least non-coder-hostile AWS web host: one app + branch, a deploy is a single job.
 import { AmplifyClient, GetJobCommand, StartJobCommand } from '@aws-sdk/client-amplify';
-import { type AwsConfig, type AwsHostingConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '../../types';
+import { type AwsConfig, type AwsHostingConfig, fail, ok, type Result } from '@vybekiit/core';
+import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '@vybekiit/deploy/types';
 
 /**
  * The only field this adapter reads off a job response: the latest deploy job's status

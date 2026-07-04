@@ -1,8 +1,23 @@
-import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 import { type AppConfig, appConfigSchema, parseEnv, storeConfigSchema } from '@vybekiit/core';
+import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
 import { resolvePaymentProvider } from '@vybekiit/payments';
-import { Cause, Effect, Exit, Option } from 'effect';
+import { Cause, Effect, Exit, Option, Schema } from 'effect';
 import { NextResponse } from 'next/server';
+
+const LandingCheckoutBodySchema = Schema.Struct({
+  githubUsername: Schema.String,
+  email: Schema.String,
+});
+
+function isValidGithubUsername(value: string): boolean {
+  // GitHub username rules — e.g. `octo-cat` ok, `-bad` rejected (must start/end alphanumeric)
+  return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/.test(value);
+}
+
+function isValidEmail(value: string): boolean {
+  // Simple email shape — e.g. `you@example.com`; not full RFC validation
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 /**
  * Start a purchase of VybeKiit itself.
@@ -13,15 +28,22 @@ import { NextResponse } from 'next/server';
  * checkout `{ url }` for the client to redirect to. Provider-agnostic via
  * {@link resolvePaymentProvider} — Lemon Squeezy is the default Merchant of Record.
  *
- * TODO(vybekiit): live checkout needs the store's real Lemon Squeezy keys
- * (LEMONSQUEEZY_API_KEY / _STORE_ID) plus STORE_PRODUCT_ID set to the kit's variant
- * id — tracked under issue #4 (live wiring). Without them `resolvePaymentProvider()`
- * throws on the missing config and this route returns a clean 500. — skill: setup-payments
- *
  * POST body: `{ githubUsername: string, email: string }`.
  */
 export async function POST(request: Request): Promise<NextResponse> {
-  const { githubUsername, email } = await readBody(request);
+  const json = await readRequestJson(request);
+  if (!json.ok) {
+    return NextResponse.json(json.response.body, { status: json.response.status });
+  }
+  const parsed = decodeJsonBody(
+    json.body,
+    LandingCheckoutBodySchema,
+    'Enter your GitHub username and email.',
+  );
+  if (!parsed.ok) {
+    return NextResponse.json(parsed.response.body, { status: parsed.response.status });
+  }
+  const { githubUsername, email } = parsed.body;
 
   if (!isValidGithubUsername(githubUsername)) {
     return NextResponse.json({ error: 'Enter a valid GitHub username.' }, { status: 400 });
@@ -30,15 +52,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
   }
 
-  // parseEnv throws if the store's product id / provider keys are missing; a
-  // misconfigured store fails loud here rather than creating an empty cart.
   let productId: string;
   let app: AppConfig;
   try {
     productId = parseEnv(storeConfigSchema).STORE_PRODUCT_ID;
     app = parseEnv(appConfigSchema);
   } catch {
-    // Do not echo the validation detail to the client — it can name env keys.
     return NextResponse.json({ error: 'Checkout is not available right now.' }, { status: 500 });
   }
 
@@ -58,24 +77,4 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: message }, { status: 502 });
   }
   return NextResponse.json({ url: exit.value.url });
-}
-
-/** The fields the checkout form posts. Strings default to empty so absent keys validate as invalid. */
-interface CheckoutBody {
-  readonly githubUsername: string;
-  readonly email: string;
-}
-
-/** Read + coerce the request body to {@link CheckoutBody}, tolerating a malformed/empty body. */
-async function readBody(request: Request): Promise<CheckoutBody> {
-  try {
-    const raw: unknown = await request.json();
-    const body = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
-    return {
-      githubUsername: typeof body.githubUsername === 'string' ? body.githubUsername : '',
-      email: typeof body.email === 'string' ? body.email : '',
-    };
-  } catch {
-    return { githubUsername: '', email: '' };
-  }
 }

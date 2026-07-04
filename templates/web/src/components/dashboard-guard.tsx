@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@/hooks/useUser';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { type ReactNode, useEffect } from 'react';
 
 /** Skeleton shown while the session check runs. */

@@ -2,8 +2,8 @@ import {
   createCheckout as createLemonSqueezyHostedCheckout,
   lemonSqueezySetup,
 } from '@lemonsqueezy/lemonsqueezy.js';
-import { type LemonSqueezyConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { CheckoutParams, CheckoutResult } from '../../types';
+import { fail, type LemonSqueezyConfig, ok, type Result } from '@vybekiit/core';
+import type { CheckoutParams, CheckoutResult } from '@vybekiit/payments/types';
 
 /**
  * Create a hosted Lemon Squeezy checkout and return its URL.

@@ -5,7 +5,7 @@ import {
   ok,
   type Result,
 } from '@vybekiit/core';
-import type { KvProvider } from '../types';
+import type { KvProvider } from '@vybekiit/kv/types';
 
 /**
  * Cloudflare KV via REST API — used when namespace id is configured.

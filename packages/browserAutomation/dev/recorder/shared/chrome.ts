@@ -5,7 +5,7 @@ export {
   ensureChromeWithCdp,
   getChromeUserDataDirForPort,
   isCdpReachable,
-} from '../../../src/core/launchChrome';
+} from '@vybekiit/browserAutomation/core/launchChrome';
 
 export function profileDirFor(domain: 'extension' | 'ls'): string {
   return domain === 'extension'

@@ -1,6 +1,6 @@
+import { createS3StorageProvider } from '@vybekiit/db/providers/s3';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createS3StorageProvider } from '../src/providers/s3';
 
 /**
  * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. Each

@@ -1,10 +1,11 @@
+import process from 'node:process';
 import {
+  type EnvSource,
   expoPushConfigSchema,
   notificationsConfigSchema,
   parseEnv,
   resolveEnvProvider,
   twilioConfigSchema,
-  type EnvSource,
 } from '@vybekiit/core';
 import {
   createEmailBridgeNotifications,
@@ -14,7 +15,6 @@ import { createExpoNotifications } from './providers/expo';
 import { createLocalNotifications } from './providers/local';
 import { createTwilioNotifications } from './providers/twilioNotifications';
 import type { NotificationsProvider } from './types';
-import process from 'node:process';
 
 export type { ResolveNotificationsInjections } from './providers/emailBridge';
 

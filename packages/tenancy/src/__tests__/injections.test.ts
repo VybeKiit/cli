@@ -1,7 +1,7 @@
 import type { DataProvider } from '@vybekiit/db';
+import { resolveTenancyProvider } from '@vybekiit/tenancy/resolve';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { resolveTenancyProvider } from '../resolve';
 
 describe('resolveTenancyProvider injections', () => {
   it('uses injected data provider for better-auth tenancy', async () => {

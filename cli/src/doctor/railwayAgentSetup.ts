@@ -1,10 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import {
   dataConfigSchema,
+  type EnvSource,
   hostingConfigSchema,
   isRailwayStackActive,
   parseEnv,
-  type EnvSource,
 } from '@vybekiit/core';
 
 export { isRailwayStackActive } from '@vybekiit/core';

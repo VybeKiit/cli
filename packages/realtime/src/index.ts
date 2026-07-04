@@ -1,7 +1,7 @@
+export { resolveRealtimeProvider } from './resolve';
 export type {
-  RealtimeProvider,
-  RealtimeProviderName,
   RealtimeChannel,
   RealtimeHandler,
+  RealtimeProvider,
+  RealtimeProviderName,
 } from './types';
-export { resolveRealtimeProvider } from './resolve';

@@ -1,6 +1,6 @@
+import { createLocalAuthProvider, LOCAL_DEV_SESSION_TOKEN } from '@vybekiit/auth';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { LOCAL_DEV_SESSION_TOKEN, createLocalAuthProvider } from '../src';
 
 describe('createLocalAuthProvider sessions', () => {
   it('signInWithPassword returns user + session token', async () => {

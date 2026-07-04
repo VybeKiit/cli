@@ -13,8 +13,8 @@
 import { ArrowRight, Bot, Check, ChevronDown, Paperclip } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import Anthropic from "@/components/icons/anthropic";
-import AnthropicDark from "@/components/icons/anthropic-dark";
+import Anthropic from "@/components/kokonutui/anthropic";
+import AnthropicDark from "@/components/kokonutui/anthropic-dark";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
+import { useAutoResizeTextarea } from "@/components/kokonutui/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 const OPENAI_SVG = (

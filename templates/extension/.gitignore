@@ -8,3 +8,6 @@ node_modules/
 
 # local agent state (planning intro seen, etc.)
 .vybekiit/state/
+
+# maintainer-only script scratch — never shipped to buyers (ADR-0027)
+scripts/dev/

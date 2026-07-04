@@ -1,7 +1,7 @@
 'use client';
 
-import { useReducedMotion } from '@/lib/motion';
 import { useEffect, useState } from 'react';
+import { useReducedMotion } from '@/lib/motion';
 
 /** Rolls from zero to target when `start` becomes true. */
 export function useAnimatedNumber(target: number, start: boolean): number {

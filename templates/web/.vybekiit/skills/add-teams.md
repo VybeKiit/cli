@@ -6,7 +6,7 @@
 translate every error · celebrate. You design and wire the org model; the builder describes who should
 have access.
 
-> (Under the hood — agent-only) Orgs via `@/vybekiit/tenancy` → `resolveTenancyProvider()` first;
+> (Under the hood — agent-only) Orgs via `@vybekiit/tenancy` → `resolveTenancyProvider()` first;
 > then extend UI. Follow `platform-skills/better-auth-vybekiit.md` when auth wiring is needed.
 
 ## Steps
@@ -20,7 +20,7 @@ have access.
    **Verify:** read the behavior back in one sentence and get a yes.
 
 3. **Wire organizations and invites.** Run `vybekiit apply-preset organizations`, then wire invite flow
-   through `@/vybekiit/tenancy` → `resolveTenancyProvider()`. Replace dashboard team placeholder
+   through `@vybekiit/tenancy` → `resolveTenancyProvider()`. Replace dashboard team placeholder
    (`TODO(vybekiit): … — skill: add-teams`).
    **Verify:** `vybekiit verify-presets organizations` passes; code builds.
 

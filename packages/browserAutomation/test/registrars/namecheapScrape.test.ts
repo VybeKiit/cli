@@ -1,10 +1,9 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   htmlContainsWhitelistedIp,
   scrapeNamecheapApiKey,
   scrapeNamecheapApiUser,
-} from '../../src/domains/registrars/namecheap/scrape';
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/scrape';
+import { describe, expect, it } from 'vitest';
 
 describe('namecheap scrape', () => {
   it('parses api key from labeled html', () => {

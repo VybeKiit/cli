@@ -2,18 +2,10 @@
 
 import { ReportDockBar } from '@/components/report-mode/dock/components/dock-bar';
 import { getBrandChevronDirection } from '@/components/report-mode/dock/utils/report-dock-utils';
-import { useReportDockCollapse } from '@/components/report-mode/dock/hooks/use-report-dock-collapse';
-import { useReportDockPosition } from '@/components/report-mode/dock/hooks/use-report-dock';
-import { useReportHandoffTarget } from '@/components/report-mode/dock/hooks/use-report-handoff-target';
-import { useReportInspectHighlightColor } from '@/components/report-mode/dock/hooks/use-report-inspect-highlight-color';
 import { ReportModeBanner } from '@/components/report-mode/inspect/report-mode-banner';
 import { ReportModeHighlight } from '@/components/report-mode/inspect/report-mode-highlight';
 import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
-import { useInspectMode } from '@/components/report-mode/inspect/use-inspect-mode';
-import { useReportHotkey } from '@/components/report-mode/inspect/use-report-hotkey';
-import { useConsoleErrorBuffer } from '@/components/report-mode/shared/use-console-errors';
 import { ReportModeTutorial } from '@/components/report-mode/tutorial/report-mode-tutorial';
-import { useReportTutorial } from '@/components/report-mode/tutorial/use-report-tutorial';
 import {
   getAccessibleName,
   getCssPath,
@@ -27,6 +19,16 @@ import {
   snapDockToNearestCorner,
   type VybeAssistant,
 } from '@vybekiit/report-mode';
+import {
+  useConsoleErrorBuffer,
+  useInspectMode,
+  useReportDockCollapse,
+  useReportDockPosition,
+  useReportHandoffTarget,
+  useReportHotkey,
+  useReportInspectHighlightColor,
+  useReportTutorial,
+} from '@vybekiit/report-mode/web';
 import { usePathname } from '@/i18n/navigation';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { toast } from 'sonner';
@@ -73,6 +75,27 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
   );
 
   useReportHotkey(toggleInspectActive);
+
+  // Escape backs out of pick mode one step: clear a selected element first, else exit + toast.
+  useEffect(() => {
+    if (!inspectActive) {
+      return;
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') {
+        return;
+      }
+      event.preventDefault();
+      if (inspectSelected) {
+        clearInspectSelection();
+        return;
+      }
+      deactivateInspect();
+      toast('Point & fix cancelled');
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [inspectActive, inspectSelected, clearInspectSelection, deactivateInspect]);
 
   useEffect(() => {
     if (tutorial.active && tutorial.stepIndex === 2 && !inspectActive) {

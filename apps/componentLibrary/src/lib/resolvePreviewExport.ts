@@ -1,5 +1,5 @@
-import type { ComponentType } from 'react';
 import type { RenderMode } from '@library/data/catalog';
+import type { ComponentType } from 'react';
 
 function isComponent(value: unknown): value is ComponentType {
   return typeof value === 'function';

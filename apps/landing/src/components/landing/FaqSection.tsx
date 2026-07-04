@@ -1,10 +1,10 @@
 'use client';
 
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { FAQ } from '@/data/faq';
 import { LANDING_EASE, LANDING_FAQ_IDS } from '@/data/landing';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 const LANDING_FAQ = FAQ.filter((item) => (LANDING_FAQ_IDS as readonly string[]).includes(item.id));
 

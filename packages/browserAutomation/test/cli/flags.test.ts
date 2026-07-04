@@ -1,6 +1,9 @@
+import {
+  parseGlobalFlags,
+  parseSetupArgs,
+  requireNonInteractive,
+} from '@vybekiit/browserAutomation/cli/flags';
 import { describe, expect, it } from 'vitest';
-
-import { parseGlobalFlags, parseSetupArgs, requireNonInteractive } from '../../src/cli/flags';
 
 describe('parseGlobalFlags', () => {
   it('extracts --json and --yes', () => {

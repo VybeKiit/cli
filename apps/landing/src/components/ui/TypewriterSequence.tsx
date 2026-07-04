@@ -1,9 +1,9 @@
 'use client';
 
+import type { ElementType, ReactNode } from 'react';
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 import { useTypewriterSequence } from '@/hooks/useTypewriterSequence';
 import { cn } from '@/lib/utils';
-import type { ElementType, ReactNode } from 'react';
 
 export interface TypewriterLine {
   readonly text: string;

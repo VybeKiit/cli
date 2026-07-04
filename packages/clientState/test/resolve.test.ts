@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { defaultQueryOptions } from '@vybekiit/clientState/query/client';
 
-import { resolveClientState } from '../src/resolve';
-import { defaultQueryOptions } from '../src/query/client';
+import { resolveClientState } from '@vybekiit/clientState/resolve';
+import { describe, expect, it } from 'vitest';
 
 describe('resolveClientState', () => {
   it('returns query client + zustand factory for web', () => {

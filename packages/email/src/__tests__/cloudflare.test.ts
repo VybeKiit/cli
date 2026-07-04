@@ -1,5 +1,5 @@
+import { createCloudflareEmail, type FetchLike } from '@vybekiit/email/providers/cloudflare';
 import { describe, expect, it, vi } from 'vitest';
-import { type FetchLike, createCloudflareEmail } from '../providers/cloudflare';
 
 const config = {
   EMAIL_WORKER_SECRET: 'worker-secret',

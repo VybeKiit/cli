@@ -1,8 +1,7 @@
+import { clickSectionCreate } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/clickSectionCreate';
+import { waitForDialogInputs } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/waitForDialogInputs';
+import { scrapeApiKeyFromHtml } from '@vybekiit/browserAutomation/domains/payments/ls/scrape';
 import type { Page } from 'playwright';
-
-import { clickSectionCreate } from '../dashboard/clickSectionCreate';
-import { waitForDialogInputs } from '../dashboard/waitForDialogInputs';
-import { scrapeApiKeyFromHtml } from '../scrape';
 
 const ORIGIN = 'https://app.lemonsqueezy.com';
 

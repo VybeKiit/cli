@@ -33,4 +33,12 @@ describe('computeDoctorExitCode', () => {
   it('returns 1 when project health checks fail', () => {
     expect(computeDoctorExitCode({ ...allPass, projectHealthOk: false })).toBe(1);
   });
+
+  it('returns 1 when mobile publish readiness fails on macOS', () => {
+    expect(computeDoctorExitCode({ ...allPass, mobilePublishOk: false })).toBe(1);
+  });
+
+  it('passes when mobilePublishOk is omitted (non-mobile)', () => {
+    expect(computeDoctorExitCode(allPass)).toBe(0);
+  });
 });

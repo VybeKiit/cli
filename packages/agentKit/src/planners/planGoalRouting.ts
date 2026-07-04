@@ -1,4 +1,8 @@
-import { GOAL_ENTRIES, type GoalCatalogEntry, type TemplateId } from '../catalogs/goalCatalog';
+import {
+  GOAL_ENTRIES,
+  type GoalCatalogEntry,
+  type TemplateId,
+} from '@vybekiit/agentKit/catalogs/goalCatalog';
 
 export interface GoalRoutingPlan {
   readonly goalId: string;

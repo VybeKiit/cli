@@ -1,6 +1,6 @@
+import { mapStripeEvent } from '@vybekiit/payments/providers/stripe/webhook';
 import type Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
-import { mapStripeEvent } from '../src/providers/stripe/webhook';
 
 /**
  * Minimal event fixtures cast to `Stripe.Event`: the mapper only touches a handful

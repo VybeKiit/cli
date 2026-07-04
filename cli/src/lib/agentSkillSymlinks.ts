@@ -2,8 +2,8 @@ import { lstat, mkdir, readlink, rm, symlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
   AGENT_SKILL_SYMLINKS,
-  planAgentSkillSymlinks,
   type AgentSkillSymlinkState,
+  planAgentSkillSymlinks,
 } from '@vybekiit/agent-kit';
 
 export async function readAgentSkillSymlinkStates(

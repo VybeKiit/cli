@@ -1,7 +1,7 @@
 'use client';
 
-import { AgentSessionDemo } from '@/components/inspirations/agent-session-demo';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AgentSessionDemo } from '@/components/inspirations/agent-session-demo';
 import type { InspirationDirection } from '@/data/inspirations';
 import { InspirationChrome, InspirationCta } from './inspiration-chrome';
 

@@ -1,18 +1,18 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
 import {
   AGENT_SKILL_SYMLINKS,
   buyerSkillStemFromPath,
   checkAgentSkillSymlinks,
-  planAgentSkillSymlinks,
   checkBuyerSkillStubDrift,
   lookupBuyerSkillTriggerPhrases,
+  planAgentSkillSymlinks,
   planBuyerSkillStubOutputs,
   renderBuyerSkillDescription,
   renderBuyerSkillStub,
-} from '../../src/render/buyerSkillStubs';
+} from '@vybekiit/agentKit/render/buyerSkillStubs';
+import { describe, expect, it } from 'vitest';
 
 const REPO_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const GO_LIVE = readFileSync(join(REPO_ROOT, 'templates/web/.vybekiit/skills/go-live.md'), 'utf8');

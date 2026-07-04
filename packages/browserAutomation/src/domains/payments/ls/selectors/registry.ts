@@ -1,5 +1,8 @@
-import { SelectorMissingError } from '../../../../core/errors';
-import { type SelectorEntry, resolveFreshSelectorEntry } from '../../../../core/selectors';
+import { SelectorMissingError } from '@vybekiit/browserAutomation/core/errors';
+import {
+  resolveFreshSelectorEntry,
+  type SelectorEntry,
+} from '@vybekiit/browserAutomation/core/selectors';
 import { LS_RECORDED_SELECTORS } from './registry.generated';
 
 const DEFAULT_SELECTORS: Record<string, SelectorEntry[]> = {};

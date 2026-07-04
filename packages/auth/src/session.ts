@@ -1,4 +1,4 @@
-import { type Result, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result } from '@vybekiit/core';
 import { type AuthUser, normalizeAuthUser } from './user';
 
 /** Signed-in state returned by session-establishing {@link AuthProvider} methods. */

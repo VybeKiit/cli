@@ -16,6 +16,16 @@ API route classified correctly. Output a plain pass/fail summary for the builder
 
 ## Steps
 
+**Start here — run the readable safety check.** Run `node scripts/safety-scan.mjs --html --lang <the
+builder's language, e.g. `he`>`. It reads the project on this machine (nothing leaves the computer),
+finds leaks from `scripts/safety-catalog.mjs`, and opens one report in the builder's language: a
+traffic-light headline, one card per finding, each with a clickable path that opens the exact file
+and line in their editor so they can see for themselves it is real. Walk them through it in plain
+words: fix every 🔴 before go-live, 🟡 are "worth doing soon", 🟢 is what the kit already protected.
+Fix, then re-run until it is green. The catalog and the script are plain and readable on purpose —
+the builder can trust the result without trusting an agent. The numbered steps below are the deeper
+manual audit for what the scan cannot check yet (endpoint taxonomy, database row rules, toolchain).
+
 1. **Abuse / DDoS layer.** Confirm `SECURITY_RATE_LIMIT` and `SECURITY_ORIGIN_LOCK` are `on` in
    `.env`. Confirm `middleware.ts` passes the request path for tiered limits. Confirm `/api/webhook`
    is **not** blocked by origin lock (payment providers POST cross-origin). Run quick probes: hammer

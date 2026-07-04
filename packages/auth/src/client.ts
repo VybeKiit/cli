@@ -1,5 +1,5 @@
+import { fail, ok, type Result } from '@vybekiit/core';
 import type { AuthUser } from './user';
-import { type Result, fail, ok } from '@vybekiit/core';
 
 /** Server routes buyer-facing auth clients call; one place so they never drift. */
 export const AUTH_CLIENT_ROUTES = {

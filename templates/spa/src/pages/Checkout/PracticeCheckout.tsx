@@ -1,4 +1,4 @@
-import { postJson } from '@/lib/apiClient';
+import { postJson } from '@/lib/fetchJson';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from '@tanstack/react-router';

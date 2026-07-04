@@ -2,9 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import type { Page } from 'playwright';
-
-import { runFourProductProbe } from './e2eProductFlow';
 import { createE2eArtifacts, LS_E2E_PREFIX } from './e2eNames';
+import { runFourProductProbe } from './e2eProductFlow';
 import { snapshotPage } from './snapshot';
 import type { ClassifiedMatch, PageSnapshot } from './types';
 

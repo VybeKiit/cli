@@ -1,12 +1,14 @@
-import { describe, expect, it } from 'vitest';
-
-import { createRegistry } from '../../src/cli/registry';
-import { registerExtensionDomain } from '../../src/domains/extension/cli';
-import { registerLsDomain, registerLsTopLevelAlias } from '../../src/domains/payments/ls/cli';
+import { createRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { registerExtensionDomain } from '@vybekiit/browserAutomation/domains/extension/cli';
+import {
+  registerLsDomain,
+  registerLsTopLevelAlias,
+} from '@vybekiit/browserAutomation/domains/payments/ls/cli';
 import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
-} from '../../src/domains/registrars/namecheap/cli';
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+import { describe, expect, it } from 'vitest';
 
 describe('CommandRegistry', () => {
   it('registers extension domain with cws alias', () => {

@@ -1,7 +1,7 @@
-import { type CloudflareEmailConfig, type Result, fail, ok } from '@vybekiit/core';
-import { decodeIdResponse } from '../../../http/responseSchemas';
-import { toWorkerSendBody } from '../../cloudflare/workerContract';
-import type { EmailProvider, SendEmailParams } from '../../types';
+import { type CloudflareEmailConfig, fail, ok, type Result } from '@vybekiit/core';
+import { decodeIdResponse } from '@vybekiit/core/http';
+import { toWorkerSendBody } from '@vybekiit/email/cloudflare/workerContract';
+import type { EmailProvider, SendEmailParams } from '@vybekiit/email/types';
 
 /**
  * The `fetch` implementation the adapter posts through. Injected (default

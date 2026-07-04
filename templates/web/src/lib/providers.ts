@@ -1,13 +1,13 @@
-import { resolveAnalyticsProvider } from '@/vybekiit/analytics';
-import { resolveAiProvider } from '@/vybekiit/ai';
-import { createCmsFromEnv } from '@/vybekiit/cms';
-import { resolveComplianceProvider } from '@/vybekiit/compliance';
-import { resolveJobsProvider } from '@/vybekiit/jobs';
-import { resolveKvProvider } from '@/vybekiit/kv';
-import { resolveNotificationsProvider } from '@/vybekiit/notifications';
-import { resolveRealtimeProvider } from '@/vybekiit/realtime';
-import { resolveSearchProvider } from '@/vybekiit/search';
-import { resolveTenancyProvider } from '@/vybekiit/tenancy';
+import { resolveAnalyticsProvider } from '@vybekiit/analytics';
+import { resolveAiProvider } from '@vybekiit/ai';
+import { createCmsFromEnv } from '@vybekiit/cms';
+import { resolveComplianceProvider } from '@vybekiit/compliance';
+import { resolveJobsProvider } from '@vybekiit/jobs';
+import { resolveKvProvider } from '@vybekiit/kv';
+import { resolveNotificationsProvider } from '@vybekiit/notifications';
+import { resolveRealtimeProvider } from '@vybekiit/realtime';
+import { resolveSearchProvider } from '@vybekiit/search';
+import { resolveTenancyProvider } from '@vybekiit/tenancy';
 
 /**
  * Utility provider registry — the ONE place server modules resolve kit providers.

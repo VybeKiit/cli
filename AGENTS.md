@@ -76,6 +76,10 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
 - **Regex:** prefer a plain string method when it's as clear (`.replaceAll('x', y)` over `/x/g`); a kept
   regex gets a one-line example comment above it (`input → output` or match/no-match). Full rule in CODE-STYLE.
+- **Import aliases (ADR-0026):** templates `@/*` → `./src/*`; packages `@vybekiit/<pkg>/*` everywhere
+  (self-imports too). `./` colocated OK; `../` banned. Order: external → `@vybekiit` → `@/` → `./`.
+  Domain adapters live in `packages/{seo,email,…}` — not `templates/*/src/vybekiit/`. Full rule in
+  CODE-STYLE.
 - **Types:** `interface` for contracts, `type` for unions + `Schema.Schema.Type<>`; fields `readonly`;
   `unknown` over `any`; no casts except a vendor-type seam. Named exports only; no `export default` in
   package source (except a Worker handler / `tsup.config.ts`).
@@ -123,6 +127,14 @@ catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing 
 - Pre-push hook (`.husky/pre-push`) is the local gate; CI is the remote gate.
 - Red CI on `main` opens an auto-issue (`ci-failure-issue.yml`) — fix via PR, do not push to main.
 - Branch protection: run `./scripts/setup-branch-protection.sh` (needs GitHub Team/Pro on private repos).
+
+## Scripts layout (maintainer vs buyer delivery)
+
+- **`scripts/dev/{mirror,sync,checks,codmods,publish,preview}/`** — maintainer-only tooling grouped by job. Never mirrored or scaffolded to buyers.
+- **`scripts/lib/`** — shared imports (`tsupWorkspaceAliases.mjs`, `uiCategoryTaxonomy.mjs`, `repoRoot.mjs`) used by packages and dev scripts.
+- **`scripts/data/`** — UI registry manifests, locks, and generated reports (SSOT for `pnpm sync:ui`).
+- **`templates/*/scripts/`** — buyer `pnpm verify` surface; each script must be **self-contained** (no monorepo parent paths). Local maintainer scratch may live in `templates/*/scripts/dev/` — gitignored + excluded by the CLI scaffold filter (ADR-0029).
+- **`apps/*/scripts/`**, **`infra/scripts/`** — app/infra delivery boundaries unchanged.
 
 ## Delivery mirror sync (maintainer-only)
 
@@ -174,6 +186,13 @@ you can take $1 and auto-invite yourself, the business is real.
 - **$29 pricing** is flagged as underpriced (parked, not settled).
 - Brand `vybekiit` availability confirmed free on **npm** (`@vybekiit/*` + unscoped) and **GitHub org**
   as of the scaffold; the org still has to be **created in the browser** (no API for that).
+
+## UI mirror + component library
+
+- After `pnpm sync:ui`, rebuild the gallery index: `node scripts/dev/sync/buildComponentLibraryIndex.mjs` (also runs via `apps/componentLibrary` `predev` / `build`).
+- Third-party license notes: [docs/THIRD_PARTY_UI_LICENSES.md](./docs/THIRD_PARTY_UI_LICENSES.md).
+- Dev UI library: `pnpm dev:ui-library` → `http://localhost:3002`.
+- Gallery previews cache compiled embeds in-session; card hover enables interactive iframes for hover effects without opening the detail page.
 
 <!-- vybekiit:generated:start contract -->
 ## The contract: Decide + Guide

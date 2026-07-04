@@ -1,11 +1,9 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-
-import type { CwsListing } from '../schema';
-import type { VerbContext } from '../types';
-
-import { isCwsAllRegions } from '../regions';
-import { cwsListingPath } from '../store';
+import { isCwsAllRegions } from '@vybekiit/browserAutomation/domains/extension/regions';
+import type { CwsListing } from '@vybekiit/browserAutomation/domains/extension/schema';
+import { cwsListingPath } from '@vybekiit/browserAutomation/domains/extension/store';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
 import { readListingState } from './readListingState';
 
 /**

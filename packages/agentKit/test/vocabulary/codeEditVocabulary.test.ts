@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import {
   CODE_EDIT_VOCABULARY,
   renderCodeEditVocabularyTable,
-} from '../../src/vocabulary/codeEditVocabulary';
+} from '@vybekiit/agentKit/vocabulary/codeEditVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('renderCodeEditVocabularyTable', () => {
   const lines = renderCodeEditVocabularyTable().split('\n');

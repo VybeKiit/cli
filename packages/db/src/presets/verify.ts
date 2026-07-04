@@ -1,11 +1,11 @@
-import { type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
+import { fail, ok, type Result } from '@vybekiit/core';
+import { ALL_PRESETS, getPreset } from './catalog';
 import type {
   PostgresProviderName,
   PresetVerificationIssue,
   PresetVerificationResult,
 } from './types';
-import { ALL_PRESETS, getPreset } from './catalog';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);

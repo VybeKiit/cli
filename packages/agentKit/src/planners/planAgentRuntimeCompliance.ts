@@ -1,4 +1,4 @@
-import { AGENT_RUNTIME_DOC_SOURCES } from '../catalogs/agentRuntimeDocSources';
+import { AGENT_RUNTIME_DOC_SOURCES } from '@vybekiit/agentKit/catalogs/agentRuntimeDocSources';
 
 export type AgentRuntimeComplianceCheckId =
   | 'runtime-docs-live'

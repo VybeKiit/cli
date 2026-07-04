@@ -61,7 +61,7 @@ translate every error · celebrate. You do all the work; the builder just approv
    buyer tables (`platform-skills/db-presets-vybekiit.md`).
    **Verify:** `vybekiit verify-presets audit_log`; no raw SQL in the app; zod on every API body.
 
-9. **Optional edge KV (agent-only).** `@/vybekiit/kv` may back feature flags when you extend hardening —
+9. **Optional edge KV (agent-only).** `@vybekiit/kv` may back feature flags when you extend hardening —
    never Redis or Upstash for buyers. Client-side cache is `@vybekiit/client-state` (TanStack Query).
    **Verify:** no buyer-facing Redis setup docs or env keys added.
 

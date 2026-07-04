@@ -1,7 +1,7 @@
 import { access } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
-import { planFeatureReadiness, type FeatureName, type TemplateId } from '@vybekiit/agent-kit';
+import { type FeatureName, planFeatureReadiness, type TemplateId } from '@vybekiit/agent-kit';
 import { detectTemplateName } from '../lib/detectTemplate';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 import { isTemplateName } from '../lib/scaffold';

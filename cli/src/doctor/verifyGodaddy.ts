@@ -1,4 +1,4 @@
-import { type GodaddyConfig, parseEnv, godaddyConfigSchema } from '@vybekiit/core';
+import { type GodaddyConfig, godaddyConfigSchema, parseEnv } from '@vybekiit/core';
 import { verifyGodaddyCredentials } from '@vybekiit/deploy';
 
 export type GodaddyDoctorReport = {

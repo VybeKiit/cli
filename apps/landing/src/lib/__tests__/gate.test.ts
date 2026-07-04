@@ -1,6 +1,6 @@
-import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 import { type GithubGateConfig, githubGateConfigSchema, parseEnv } from '@vybekiit/core';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 
 const gateConfig: GithubGateConfig = {
   GITHUB_GATE_TOKEN: 'test-token',

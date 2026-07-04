@@ -2,14 +2,16 @@
 
 import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
 import { ReportHoldOption } from '@/components/report-mode/dock/components/hold-option';
-import { useReportFlyoutPosition } from '@/components/report-mode/dock/hooks/use-report-flyout-position';
-import { useReportHoldSelect } from '@/components/report-mode/dock/hooks/use-report-hold-select';
-import { useReportHoverMenu } from '@/components/report-mode/dock/hooks/use-report-hover-menu';
 import { ReportChatHandoffIcon } from '@/components/report-mode/shared/report-mode-icons';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { cn } from '@/lib/utils';
 import { REPORT_HANDOFF_TARGET_LABELS, type ReportHandoffTarget } from '@vybekiit/report-mode';
+import {
+  useReportFlyoutPosition,
+  useReportHoldSelect,
+  useReportHoverMenu,
+} from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
 
 const HANDOFF_OPTIONS: readonly ReportHandoffTarget[] = ['current-chat', 'new-chat'];
@@ -32,8 +34,9 @@ export function ReportHandoffMenu({
   tutorialActive = false,
 }: ReportHandoffMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
-  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'end');
+  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'end', flyoutRef);
   const { pending, progress, startHold, cancelHold } = useReportHoldSelect<ReportHandoffTarget>(
     (target) => {
       onChange(target);
@@ -91,6 +94,7 @@ export function ReportHandoffMenu({
           scheduleClose();
         }}
         open={open}
+        ref={flyoutRef}
         role="listbox"
         style={flyoutStyle}
       >

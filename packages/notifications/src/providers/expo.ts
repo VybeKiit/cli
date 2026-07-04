@@ -1,6 +1,6 @@
 import { type ExpoPushConfig, fail, ok, type Result } from '@vybekiit/core';
-import { decodeExpoPushSendResponse } from '../../http/responseSchemas';
-import type { NotificationsProvider, SendNotificationParams } from '../types';
+import { decodeExpoPushSendResponse } from '@vybekiit/core/http';
+import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
 
 export function createExpoNotifications(config: ExpoPushConfig): NotificationsProvider {
   return {

@@ -1,14 +1,13 @@
-import { describe, expect, it } from 'vitest';
-
-import { createRegistry } from '../../src/cli/registry';
+import { createRegistry } from '@vybekiit/browserAutomation/cli/registry';
 import {
-  registerGodaddyDomain,
   registerGdTopLevelAlias,
-} from '../../src/domains/registrars/godaddy/cli';
+  registerGodaddyDomain,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/cli';
 import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
-} from '../../src/domains/registrars/namecheap/cli';
+} from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+import { describe, expect, it } from 'vitest';
 
 describe('registrar CLI registry', () => {
   it('registers nc and gd aliases', () => {

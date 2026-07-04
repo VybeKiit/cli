@@ -22,6 +22,14 @@
     "@magicui": "https://magicui.design/r/{name}.json",
     "@kokonutui": "https://kokonutui.com/r/{name}.json",
     "@aielements": "https://elements.ai-sdk.dev/api/registry/{name}.json",
-    "@kibo": "https://www.kibo-ui.com/r/{name}.json"
+    "@kibo": "https://www.kibo-ui.com/r/{name}.json",
+    "@tailark": "https://tailark.com/r/{name}.json",
+    "@cult-ui": "https://www.cult-ui.com/r/{name}.json",
+    "@coss": "https://coss.com/ui/r/{name}.json",
+    "@prompt-kit": "https://www.prompt-kit.com/c/{name}.json",
+    "@supabase": "https://supabase.com/ui/r/{name}.json",
+    "@blocks-so": "https://blocks.so/r/{name}.json",
+    "@evilcharts": "https://evilcharts.com/r/{name}.json",
+    "@shadcnblocks": "https://shadcnblocks.com/r/{name}.json"
   }
 }

@@ -1,3 +1,13 @@
+export { getNextImageRemotePatterns, resolveLocalAssetSrc } from './next';
+export { runOptimizeForBuild } from './optimize';
+export {
+  createAwsS3Delivery,
+  createCloudflareR2Delivery,
+  createCloudflareSupabaseDelivery,
+  createLocalAssetDelivery,
+  createVercelDelivery,
+} from './providers';
+export { resolveAssetDelivery } from './resolve';
 export type {
   AssetDeliveryProvider,
   AssetDeliveryProviderName,
@@ -7,13 +17,3 @@ export type {
   OptimizeBuildOptions,
   OptimizeBuildResult,
 } from './types';
-export { resolveAssetDelivery } from './resolve';
-export { runOptimizeForBuild } from './optimize';
-export { getNextImageRemotePatterns, resolveLocalAssetSrc } from './next';
-export {
-  createCloudflareR2Delivery,
-  createCloudflareSupabaseDelivery,
-  createLocalAssetDelivery,
-  createVercelDelivery,
-  createAwsS3Delivery,
-} from './providers';

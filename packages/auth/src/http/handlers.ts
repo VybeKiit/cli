@@ -1,16 +1,16 @@
+import { resolveAuthProvider } from '@vybekiit/auth/resolve';
+import type { AuthError, AuthProvider } from '@vybekiit/auth/types';
+import type { AuthUser } from '@vybekiit/auth/user';
 import {
   badInput,
   created,
+  type HttpResponse,
   ok,
   serverError,
   unauthorized,
   upstreamFailed,
-  type HttpResponse,
 } from '@vybekiit/core/http';
 import { Cause, Effect, Exit, Option } from 'effect';
-import { resolveAuthProvider } from '../resolve';
-import type { AuthError, AuthProvider } from '../types';
-import type { AuthUser } from '../user';
 import type {
   EmailCodeBody,
   EmailOnlyBody,

@@ -1,5 +1,5 @@
+import type { AiProvider, CompleteParams, CompleteResult } from '@vybekiit/ai/types';
 import { ok, type Result } from '@vybekiit/core';
-import type { AiProvider, CompleteParams, CompleteResult } from '../types';
 
 export function createLocalAi(): AiProvider {
   return {

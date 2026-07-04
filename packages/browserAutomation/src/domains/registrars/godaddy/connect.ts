@@ -1,6 +1,9 @@
-import { connectToChrome } from '../../../core/connect';
-import { rememberProfilePath, resolveProfilePath } from '../../../core/profileResolve';
-import type { AttachedSession } from '../../../core/types';
+import { connectToChrome } from '@vybekiit/browserAutomation/core/connect';
+import {
+  rememberProfilePath,
+  resolveProfilePath,
+} from '@vybekiit/browserAutomation/core/profileResolve';
+import type { AttachedSession } from '@vybekiit/browserAutomation/core/types';
 import { waitForGdAuthenticated } from './dashboard/waitForAuthenticated';
 import { GD_KEYS_URL, type GdVerbContext } from './types';
 

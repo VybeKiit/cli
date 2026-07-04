@@ -3,8 +3,8 @@
 // structured Content.Simple shape maps cleanly onto our normalized SendEmailParams and
 // is AWS's current, recommended sending API.
 import { SESv2Client, SendEmailCommand, type SendEmailCommandOutput } from '@aws-sdk/client-sesv2';
-import { type AwsConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { EmailProvider, SendEmailParams } from '../../types';
+import { type AwsConfig, fail, ok, type Result } from '@vybekiit/core';
+import type { EmailProvider, SendEmailParams } from '@vybekiit/email/types';
 
 /**
  * Build the Amazon SES {@link EmailProvider} — the opt-in transactional sender a buyer

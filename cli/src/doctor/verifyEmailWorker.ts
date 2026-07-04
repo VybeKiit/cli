@@ -1,8 +1,8 @@
 import {
   type CloudflareEmailConfig,
-  parseEnv,
   cloudflareEmailConfigSchema,
   emailConfigSchema,
+  parseEnv,
 } from '@vybekiit/core';
 
 export type EmailWorkerDoctorReport = {

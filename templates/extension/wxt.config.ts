@@ -1,14 +1,16 @@
 import { resolve as pathResolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'wxt';
+import process from 'node:process';
 
 const extensionRoot = pathResolve(fileURLToPath(new URL('.', import.meta.url)));
 
 export default defineConfig({
+  srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   dev: {
     server: {
-      port: 3002,
+      port: Number(process.env.PLAYWRIGHT_PORT ?? process.env.WXT_DEV_SERVER_PORT ?? 3010),
     },
   },
   vite: () => ({

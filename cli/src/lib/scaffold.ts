@@ -1,5 +1,5 @@
 import { access, cp, readdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { type DependencyMap, rewriteWorkspaceDeps } from './rewriteDeps';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
@@ -13,9 +13,18 @@ export class ScaffoldError extends Error {}
  * Directories never copied into a buyer's repo (build artifacts / installed deps).
  * `.git` is here because a published install scaffolds from a *cloned* mirror — the
  * buyer must start a clean project, not inherit the mirror's shallow history + remote
- * (ADR-0005).
+ * (ADR-0005). `dev` skips maintainer-only `scripts/dev/` scratch (ADR-0027).
  */
-const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', '.turbo', '.git']);
+const SKIP_DIR_NAMES = new Set(['node_modules', '.next', 'dist', '.turbo', '.git', 'dev']);
+
+/** @returns whether a source path should be copied during scaffold */
+export function shouldCopyScaffoldPath(src: string): boolean {
+  const parts = src.split(/[/\\]/);
+  if (parts.some((part) => SKIP_DIR_NAMES.has(part))) {
+    return false;
+  }
+  return !/(?:^|[/\\])scripts[/\\]dev(?:[/\\]|$)/.test(src);
+}
 
 export function isTemplateName(value: string): value is TemplateName {
   return (TEMPLATES as readonly string[]).includes(value);
@@ -81,7 +90,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<{ dest: string
 
   await cp(sourceDir, options.dest, {
     recursive: true,
-    filter: (src) => !SKIP_DIRS.has(basename(src)),
+    filter: (src) => shouldCopyScaffoldPath(src),
   });
   await pinScaffoldedDeps(options.dest, options.packagesVersion);
 

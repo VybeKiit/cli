@@ -1,12 +1,12 @@
 'use client';
 
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useState } from 'react';
 import { VybeLogoIcon } from '@/components/ui/CustomIcons';
 import { LANDING_EASE, LANDING_HERO, LANDING_NAV } from '@/data/landing';
 import { BRAND } from '@/data/site';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useState } from 'react';
 
 /** Fixed header with nav anchors and checkout CTA. */
 export function Header() {

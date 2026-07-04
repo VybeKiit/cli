@@ -1,6 +1,6 @@
+import { createLocalDataProvider } from '@vybekiit/db/providers/local';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { createLocalDataProvider } from '../src/providers/local';
 
 interface Order {
   readonly id: string;

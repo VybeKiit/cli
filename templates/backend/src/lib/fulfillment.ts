@@ -1,5 +1,5 @@
-import { type Result, fail, ok, parseEnv, supabaseConfigSchema } from '@vybekiit/core';
-import { type DataProvider, createDbClient, resolveDataProvider } from '@vybekiit/db';
+import { fail, ok, parseEnv, type Result, supabaseConfigSchema } from '@vybekiit/core';
+import { createDbClient, type DataProvider, resolveDataProvider } from '@vybekiit/db';
 import type { OrderEvent } from '@vybekiit/payments';
 import { Cause, Effect, Exit, Option } from 'effect';
 

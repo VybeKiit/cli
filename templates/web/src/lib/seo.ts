@@ -1,5 +1,5 @@
-import type { MetadataInput, NextMetadataOutput, PageType } from '@/vybekiit/seo';
-import { createSeoFromEnv } from '@/vybekiit/seo';
+import type { MetadataInput, NextMetadataOutput, PageType } from '@vybekiit/seo';
+import { createSeoFromEnv } from '@vybekiit/seo';
 import type { Metadata } from 'next';
 import { getCms } from './providers';
 

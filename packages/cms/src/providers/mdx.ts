@@ -1,8 +1,8 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { MdxCmsConfig } from '@vybekiit/core';
-import type { CmsPage, CmsProvider } from '../types';
 import process from 'node:process';
+import type { CmsPage, CmsProvider } from '@vybekiit/cms/types';
+import type { MdxCmsConfig } from '@vybekiit/core';
 
 type ParsedMdx = {
   readonly title: string;

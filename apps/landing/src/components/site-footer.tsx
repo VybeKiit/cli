@@ -1,5 +1,5 @@
-import { BRAND, FOOTER_LINKS } from '@/data/site';
 import Link from 'next/link';
+import { BRAND, FOOTER_LINKS } from '@/data/site';
 
 const YEAR = new Date().getFullYear();
 

@@ -1,8 +1,8 @@
+export { resolveSearchProvider } from './resolve';
 export type {
-  SearchProvider,
-  SearchProviderName,
   SearchDocument,
   SearchHit,
+  SearchProvider,
+  SearchProviderName,
 } from './types';
 export { SearchError } from './types';
-export { resolveSearchProvider } from './resolve';

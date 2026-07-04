@@ -1,8 +1,8 @@
-import { type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
-import { PRESET_TABLE_NAMES } from '../../presets/catalog';
-import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter } from '../../types';
+import { fail, ok, type Result } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+import { PRESET_TABLE_NAMES } from '@vybekiit/db/presets/catalog';
+import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
 import { POSTGRES_CAPABILITIES } from './shared';
 
 export type SqlClient = {

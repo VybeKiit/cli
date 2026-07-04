@@ -1,5 +1,5 @@
+import { resolveDataProvider, resolveStorageProvider } from '@vybekiit/db/resolve';
 import { describe, expect, it, vi } from 'vitest';
-import { resolveDataProvider, resolveStorageProvider } from '../src/resolve';
 
 // Stub the native drivers so resolving the mongodb/aws adapters never opens a real
 // connection — construction must succeed offline and deterministically.

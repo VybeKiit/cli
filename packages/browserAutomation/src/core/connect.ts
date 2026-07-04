@@ -1,7 +1,7 @@
-import { type Browser, type Page, chromium } from 'playwright';
+import { type Browser, chromium, type Page } from 'playwright';
 
 import { CdpUnreachableError } from './errors';
-import { DEFAULT_CDP_ENDPOINT, type AttachedSession, type BaseVerbContext } from './types';
+import { type AttachedSession, type BaseVerbContext, DEFAULT_CDP_ENDPOINT } from './types';
 
 export type ConnectOptions = BaseVerbContext & {
   profileHint: string;

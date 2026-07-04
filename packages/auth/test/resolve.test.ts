@@ -1,7 +1,7 @@
+import type { BetterAuthInstance } from '@vybekiit/auth/providers/betterAuth';
+import type { SupabaseAuthClientLike } from '@vybekiit/auth/providers/supabase';
+import { resolveAuthProvider } from '@vybekiit/auth/resolve';
 import { describe, expect, it, vi } from 'vitest';
-import type { BetterAuthInstance } from '../src/providers/betterAuth';
-import type { SupabaseAuthClientLike } from '../src/providers/supabase';
-import { resolveAuthProvider } from '../src/resolve';
 
 // Stub the Cognito client so resolving the cognito adapter never opens a real
 // connection — construction must succeed offline and deterministically.

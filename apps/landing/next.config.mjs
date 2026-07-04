@@ -10,6 +10,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '../..');
+const webSrc = path.join(rootDir, 'templates/web/src');
+const webRoot = path.join(rootDir, 'templates/web');
 const envPath = path.join(rootDir, '.env');
 
 if (existsSync(envPath)) {
@@ -32,12 +34,34 @@ if (existsSync(envPath)) {
 }
 
 const nextConfig = {
+  experimental: {
+    externalDir: true,
+  },
   transpilePackages: [
     '@vybekiit/assistant-chat',
     '@vybekiit/core',
     '@vybekiit/payments',
     '@vybekiit/report-mode',
   ],
+  webpack: (config, { webpack }) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      '@vybekiit-template-web': webSrc,
+    };
+    config.resolve.modules = [
+      path.join(webRoot, 'node_modules'),
+      path.join(__dirname, 'node_modules'),
+      ...(config.resolve.modules ?? ['node_modules']),
+    ];
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^@\/(.*)$/, (resource) => {
+        if (resource.context?.includes(`${path.sep}templates${path.sep}web${path.sep}`)) {
+          resource.request = path.join(webSrc, resource.request.slice(2));
+        }
+      }),
+    );
+    return config;
+  },
 };
 
 export default nextConfig;

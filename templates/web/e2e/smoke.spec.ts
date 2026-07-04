@@ -1,22 +1,71 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-test('home page loads', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: /your app starts here/i })).toBeVisible();
-});
+/** Report Mode tutorial overlays block clicks in dev — dismiss when still visible. */
+async function dismissReportModeTutorial(page: Page): Promise<void> {
+  const skip = page.getByRole('button', { name: 'Skip' });
+  if (await skip.isVisible().catch(() => false)) {
+    await skip.click();
+  }
+}
 
-test('dashboard redirects to login when signed out', async ({ page }) => {
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/\/login/);
-});
+test.describe('Web template smoke', () => {
+  test.describe.configure({ mode: 'serial' });
 
-test('pricing practice checkout completes', async ({ page }) => {
-  await page.goto('/pricing');
-  await page
-    .getByRole('button', { name: /choose plan/i })
-    .nth(1)
-    .click();
-  await expect(page).toHaveURL(/checkout\/practice/);
-  await page.getByRole('button', { name: /complete practice purchase/i }).click();
-  await expect(page).toHaveURL(/\/pricing\?checkout=success/);
+  test.beforeEach(async ({ context }) => {
+    await context.addInitScript(() => {
+      localStorage.setItem('vybekiit-report-tutorial-done', 'true');
+    });
+  });
+
+  test('home page loads with translated hero', async ({ page }) => {
+    await page.goto('/en');
+    await dismissReportModeTutorial(page);
+    await expect(page.getByRole('heading', { name: 'Your app starts here.' })).toBeVisible();
+  });
+
+  test('dashboard redirects to login when signed out', async ({ page, context }) => {
+    await context.clearCookies();
+    await page.goto('/en');
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('vybekiit-report-tutorial-done', 'true');
+    });
+    await page.request.post('/api/auth/signout');
+    await page.goto('/en/dashboard');
+    await expect(page).toHaveURL((url) => url.pathname.endsWith('/en/login'), { timeout: 15_000 });
+  });
+
+  test('practice checkout without productId shows error alert', async ({ page }) => {
+    await page.goto('/en/checkout/practice');
+    await dismissReportModeTutorial(page);
+    const checkoutAlert = page.getByRole('alert').filter({ hasText: 'No plan was selected' });
+    await expect(checkoutAlert).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to pricing' })).toBeVisible();
+  });
+
+  test('pricing practice checkout completes', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/en/pricing');
+    await dismissReportModeTutorial(page);
+    const proPlan = page.getByRole('button', { name: 'Choose plan' }).nth(1);
+    await proPlan.click();
+    await expect(page).toHaveURL((url) => url.pathname.includes('/en/checkout/practice'), {
+      timeout: 30_000,
+    });
+    const completeButton = page.getByTestId('practice-checkout-complete');
+    await expect(completeButton).toHaveAttribute('data-ready', 'true', { timeout: 15_000 });
+    await expect(completeButton).toBeEnabled();
+    const checkoutComplete = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/checkout/practice/complete') && response.status() === 200,
+      { timeout: 45_000 },
+    );
+    await completeButton.click();
+    await checkoutComplete;
+    await expect(page).toHaveURL(
+      (url) =>
+        url.pathname.endsWith('/en/pricing') && url.searchParams.get('checkout') === 'success',
+      { timeout: 15_000 },
+    );
+  });
 });

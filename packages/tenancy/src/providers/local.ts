@@ -1,5 +1,5 @@
+import type { OrgMember, TenancyProvider } from '@vybekiit/tenancy/types';
 import { Effect } from 'effect';
-import type { OrgMember, TenancyProvider } from '../types';
 
 const orgs = new Map<string, { name: string; ownerUserId: string }>();
 const members = new Map<string, OrgMember & { orgId: string }>();

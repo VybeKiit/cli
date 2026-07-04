@@ -1,6 +1,5 @@
+import { waitForRedirectAfterSignIn } from '@vybekiit/browserAutomation/core/waitForRedirect';
 import { describe, expect, it, vi } from 'vitest';
-
-import { waitForRedirectAfterSignIn } from '../../src/core/waitForRedirect';
 
 describe('waitForRedirectAfterSignIn', () => {
   it('returns immediately when a tab is already authenticated', async () => {

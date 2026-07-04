@@ -6,7 +6,7 @@ export const VIBE_HINTS: Readonly<Record<string, string>> = {
   claude:
     'The assistant that reads your whole project and actually gets context. You talk goals; it writes the code.',
   codex:
-    "OpenAI's other brain — great at shipping features from a plain-English prompt. Your agent picks when to use it.",
+    'Another assistant you paste plain requests into — great when you want a second opinion on a screen.',
   github:
     'Where your code lives online so you never lose a file. Your agent pushes; you never learn git commands.',
   figma:

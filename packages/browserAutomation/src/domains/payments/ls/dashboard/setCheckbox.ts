@@ -1,7 +1,6 @@
+import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
 import type { Page } from 'playwright';
-
 import { lsField } from './fieldLocator';
-import type { LsDraftFieldKey } from '../selectors/fields';
 
 /** Set a checkbox field to the desired checked state via registry/fallback locators. */
 export async function setCheckboxField(

@@ -23,7 +23,7 @@ import {
   snapDockToNearestCorner,
 } from '@vybekiit/report-mode';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import '../../styles/report-mode-note.css';
+import '../../../styles/report-mode-note.css';
 
 function isReportHotkey(event: KeyboardEvent): boolean {
   return event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';

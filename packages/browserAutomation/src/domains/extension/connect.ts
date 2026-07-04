@@ -1,8 +1,6 @@
 import { type Browser, chromium } from 'playwright';
-
-import type { AttachedSession, VerbContext } from './types';
-
 import { CdpUnreachableError } from './errors';
+import type { AttachedSession, VerbContext } from './types';
 
 const DEFAULT_CDP_ENDPOINT = 'http://localhost:9222';
 

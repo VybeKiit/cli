@@ -1,5 +1,5 @@
-import { type Result, fail, ok } from '../../result';
-import { HTTP_OUTCOMES, type HttpOutcomeCode } from '../outcomes';
+import { HTTP_OUTCOMES, type HttpOutcomeCode } from '@vybekiit/core/http/outcomes';
+import { fail, ok, type Result } from '@vybekiit/core/result';
 
 /** Shape we opportunistically read an error message from on a non-2xx body. */
 interface ErrorBody {

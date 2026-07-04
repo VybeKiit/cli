@@ -1,19 +1,13 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/link-preview';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { LinkPreview } from '@/components/aceternity/link-preview';
 
 export default function LinkPreviewPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <LinkPreview>
+        <span className="text-sm text-muted-foreground">Preview</span>
+      </LinkPreview>
     </div>
   );
 }

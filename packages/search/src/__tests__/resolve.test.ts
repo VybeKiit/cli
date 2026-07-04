@@ -1,6 +1,6 @@
+import { resolveSearchProvider } from '@vybekiit/search/resolve';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { resolveSearchProvider } from '../resolve';
 
 describe('resolveSearchProvider', () => {
   it('uses local when supabase unconfigured', () => {

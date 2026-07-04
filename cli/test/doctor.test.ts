@@ -1,7 +1,10 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { expectedSkillNamesFromManifest } from '@vybekiit/agent-kit';
 import { describe, expect, it } from 'vitest';
+import { verifyPlatformSkills } from '../src/doctor/platformSkills';
+import { verifyProjectHealth } from '../src/doctor/projectHealth';
 import {
   AGENT_TOOLS,
   formatReport,
@@ -13,9 +16,6 @@ import {
   selectToolchain,
   type ToolReport,
 } from '../src/doctor/toolchain';
-import { expectedSkillNamesFromManifest } from '@vybekiit/agent-kit';
-import { verifyPlatformSkills } from '../src/doctor/platformSkills';
-import { verifyProjectHealth } from '../src/doctor/projectHealth';
 
 describe('selectToolchain', () => {
   it('returns [gh, wrangler, supabase] for the defaults (empty env)', () => {

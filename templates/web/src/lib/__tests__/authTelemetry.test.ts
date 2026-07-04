@@ -1,5 +1,5 @@
 import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '@/lib/authTelemetry';
-import { resolveAnalyticsProvider } from '@/vybekiit/analytics';
+import { resolveAnalyticsProvider } from '@vybekiit/analytics';
 import { observability } from '@/lib/observability';
 
 const mocks = vi.hoisted(() => ({
@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
   track: vi.fn(),
 }));
 
-vi.mock('@/vybekiit/analytics', () => ({
+vi.mock('@vybekiit/analytics', () => ({
   resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
 }));
 

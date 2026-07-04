@@ -1,10 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VIBE_HINTS } from '@/data/vibeHints';
+import { useFirstHoverTypewriter } from '@/hooks/useFirstHoverTypewriter';
 import { cn } from '@/lib/utils';
-import type { ReactNode } from 'react';
 
 const DESKTOP_MEDIA = '(min-width: 768px)';
 
@@ -81,11 +82,15 @@ export function BrandMarkVibeHint({
     setHoverOpen(false);
   }, [forceOpen]);
 
+  const open = Boolean(hint) && isDesktop && (forceOpen || hoverOpen);
+  const { text: tooltipText, showCursor } = useFirstHoverTypewriter(slug, hint ?? '', {
+    open,
+    enabled: !forceOpen && Boolean(hint),
+  });
+
   if (!hint) {
     return <>{children}</>;
   }
-
-  const open = isDesktop && (forceOpen || hoverOpen);
 
   return (
     <Tooltip open={open} onOpenChange={handleOpenChange}>
@@ -103,7 +108,7 @@ export function BrandMarkVibeHint({
         side={side}
         sideOffset={8}
       >
-        {hint}
+        <span className={cn(showCursor && 'typewriter-cursor')}>{tooltipText}</span>
       </TooltipContent>
     </Tooltip>
   );

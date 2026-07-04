@@ -1,6 +1,5 @@
+import type { UiStore, UiStoreState } from '@vybekiit/clientState/types';
 import { create } from 'zustand';
-
-import type { UiStore, UiStoreState } from '../types';
 
 export function createUiStore(): UiStore {
   return create<UiStoreState>((set) => ({

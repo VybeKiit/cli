@@ -36,7 +36,7 @@ vi.mock('firebase-admin/firestore', () => ({
   }),
 }));
 
-import { createFirebaseDataProvider } from '../src/providers/firebase';
+import { createFirebaseDataProvider } from '@vybekiit/db/providers/firebase';
 
 const run = Effect.runPromise;
 

@@ -1,5 +1,8 @@
+import {
+  formatBuilderStuckMessage,
+  planDocFallback,
+} from '@vybekiit/agentKit/planners/planDocFallback';
 import { describe, expect, it } from 'vitest';
-import { planDocFallback, formatBuilderStuckMessage } from '../../src/planners/planDocFallback';
 
 describe('planDocFallback', () => {
   it('returns twilio docs and MCP url', () => {

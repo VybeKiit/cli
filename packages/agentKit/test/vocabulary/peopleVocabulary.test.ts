@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import {
   PEOPLE_VOCABULARY,
   renderPeopleVocabularyTable,
-} from '../../src/vocabulary/peopleVocabulary';
+} from '@vybekiit/agentKit/vocabulary/peopleVocabulary';
+import { describe, expect, it } from 'vitest';
 
 describe('renderPeopleVocabularyTable', () => {
   const lines = renderPeopleVocabularyTable().split('\n');

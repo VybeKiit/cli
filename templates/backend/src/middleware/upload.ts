@@ -1,5 +1,5 @@
-import multer from 'multer';
 import { join } from 'node:path';
+import multer from 'multer';
 
 const ALLOWED_TYPES = new Set([
   'image/jpeg',

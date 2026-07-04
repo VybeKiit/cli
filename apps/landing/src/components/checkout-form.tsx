@@ -1,12 +1,13 @@
 'use client';
 
+import { type FormEvent, useState } from 'react';
 import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { PRICE } from '@/data/site';
 import { postJson } from '@/lib/fetchJson';
 import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
-import { type FormEvent, useState } from 'react';
 
 /** The JSON the checkout route returns on success. */
 interface CheckoutResponse {
@@ -92,8 +93,8 @@ export function CheckoutForm() {
           <AlertDescription>{submitError}</AlertDescription>
         </Alert>
       ) : null}
-      <Button type="submit" size="lg" disabled={submitting}>
-        {submitting ? 'Starting checkout…' : `Continue to payment — ${PRICE.display}`}
+      <Button type="submit" size="lg" disabled={submitting} aria-busy={submitting}>
+        {submitting ? <Spinner className="size-5" /> : `Continue to payment — ${PRICE.display}`}
       </Button>
       <p className="text-muted-foreground text-xs">
         We invite this GitHub account to the private repo the moment payment clears. Refundable for{' '}

@@ -16,7 +16,7 @@ import {
 import { type BetterAuthInstance, createBetterAuthProvider } from './providers/betterAuth';
 import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito';
 import { createLocalAuthProvider } from './providers/local';
-import { type SupabaseAuthClientLike, createSupabaseAuthProvider } from './providers/supabase';
+import { createSupabaseAuthProvider, type SupabaseAuthClientLike } from './providers/supabase';
 import type { AuthProvider } from './types';
 
 /** Test seams for {@link resolveAuthProvider}; omit in production. */

@@ -1,23 +1,22 @@
 import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
-import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
-import { formatPlatformSkillsReport, verifyPlatformSkills } from './platformSkills';
-import { computeDoctorExitCode, reportFor } from './planDoctorRun';
-import { verifyProjectHealth } from './projectHealth';
-import { provisionR2Storage } from './storageR2';
-import { formatProductSurfaceHints } from './productSurface';
 import { ensureCodexSkillsEnabled } from './codexConfig';
-import { verifyPresetsDoctor } from './verifyPresets';
-import { verifyNamecheapDoctor } from './verifyNamecheap';
-import { verifyGodaddyDoctor } from './verifyGodaddy';
-import { verifyEmailWorkerDoctor } from './verifyEmailWorker';
+import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
+import { createDefaultCommandProbe, verifyMobilePublishReadiness } from './mobilePublishReadiness';
+import { mergeDoctorTools, selectNativeTools } from './nativeToolchain';
+import { computeDoctorExitCode, reportFor } from './planDoctorRun';
+import { formatPlatformSkillsReport, verifyPlatformSkills } from './platformSkills';
+import { formatProductSurfaceHints } from './productSurface';
+import { verifyProjectHealth } from './projectHealth';
 import {
   formatRailwayStackReport,
   isRailwayStackActive,
   runRailwayAgentSetup,
 } from './railwayAgentSetup';
+import { runNativeProjectSetup } from './runNativeProjectSetup';
+import { provisionR2Storage } from './storageR2';
 import {
   formatReport,
   type InstallAction,
@@ -31,6 +30,10 @@ import {
   type ToolPresence,
   type ToolReport,
 } from './toolchain';
+import { verifyEmailWorkerDoctor } from './verifyEmailWorker';
+import { verifyGodaddyDoctor } from './verifyGodaddy';
+import { verifyNamecheapDoctor } from './verifyNamecheap';
+import { verifyPresetsDoctor } from './verifyPresets';
 
 /**
  * `vybekiit doctor` — provision + verify the agentic toolchain (ADR-0001).
@@ -115,7 +118,9 @@ export async function runDoctor(log: Console = console): Promise<number> {
     mobile: surface.mobile,
     wantsGoogleAuth: Boolean(env.GOOGLE_OAUTH_CLIENT_ID),
   });
-  const toolchain = mergeAgentAndProviderTools(providerTools);
+  const nativeTools = selectNativeTools(surface, platform);
+  const providerAndNative = mergeDoctorTools(providerTools, nativeTools);
+  const toolchain = mergeAgentAndProviderTools(providerAndNative);
 
   if (isCursorSession()) {
     log.log("✓ Cursor — you're in Cursor; no separate agent install needed.");
@@ -134,6 +139,24 @@ export async function runDoctor(log: Console = console): Promise<number> {
   const reports = toolchain.map((tool) => buildReport(tool, presence, installs));
   for (const line of formatReport(reports)) {
     log.log(line);
+  }
+
+  const nativeSetup = runNativeProjectSetup(cwd, surface, platform, log);
+  for (const line of nativeSetup.lines) {
+    log.log(line);
+  }
+
+  let mobilePublishOk = true;
+  if (surface.mobile) {
+    const mobilePublish = verifyMobilePublishReadiness(
+      platform,
+      env,
+      createDefaultCommandProbe(spawnSync),
+    );
+    mobilePublishOk = mobilePublish.ok;
+    for (const line of mobilePublish.lines) {
+      log.log(line);
+    }
   }
 
   const presetReport = await verifyPresetsDoctor(env);
@@ -181,7 +204,8 @@ export async function runDoctor(log: Console = console): Promise<number> {
     log.log(line);
   }
 
-  const cloudReady = providerTools.every((tool) => {
+  const infraTools = [...providerTools, ...nativeTools];
+  const cloudReady = infraTools.every((tool) => {
     const report = reportFor(reports, tool.name);
     return report?.installed === true;
   });
@@ -215,5 +239,6 @@ export async function runDoctor(log: Console = console): Promise<number> {
     agentReady,
     skillsReady,
     projectHealthOk: projectHealth.ok,
+    mobilePublishOk,
   });
 }

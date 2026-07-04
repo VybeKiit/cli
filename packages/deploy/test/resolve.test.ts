@@ -1,5 +1,5 @@
+import { resolveHosting } from '@vybekiit/deploy/resolve';
 import { describe, expect, it, vi } from 'vitest';
-import { resolveHosting } from '../src/resolve';
 
 // Stub the Amplify client so resolving the aws adapter never builds a real client or
 // touches the network — construction must succeed offline and deterministically.

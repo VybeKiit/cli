@@ -1,14 +1,13 @@
-import type { Page } from 'playwright';
-
-import { lsField } from '../dashboard/fieldLocator';
-import { setCheckboxField } from '../dashboard/setCheckbox';
+import { lsField } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldLocator';
+import { setCheckboxField } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/setCheckbox';
 import {
   formatPriceFromCents,
   scrapeProductIdFromUrl,
   scrapeStoreIdFromHtml,
   scrapeVariantIdFromHtml,
-} from '../scrape';
-import type { LsSetupParams } from '../types';
+} from '@vybekiit/browserAutomation/domains/payments/ls/scrape';
+import type { LsSetupParams } from '@vybekiit/browserAutomation/domains/payments/ls/types';
+import type { Page } from 'playwright';
 
 const ORIGIN = 'https://app.lemonsqueezy.com';
 

@@ -1,14 +1,14 @@
-import { describe, expect, it } from 'vitest';
 import {
   appConfigSchema,
+  godaddyConfigSchema,
   googleOAuthConfigSchema,
   lemonSqueezyConfigSchema,
   namecheapConfigSchema,
-  godaddyConfigSchema,
   parseEnv,
   securityConfigSchema,
-} from '../src/config';
-import { err, fail, ok } from '../src/result';
+} from '@vybekiit/core/config';
+import { err, fail, ok } from '@vybekiit/core/result';
+import { describe, expect, it } from 'vitest';
 
 describe('parseEnv', () => {
   it('applies defaults for the app config', () => {

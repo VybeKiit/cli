@@ -2,6 +2,19 @@
 
 .ui-library-page {
   min-height: 100vh;
+  --vk-z-tooltip: 40;
+  --vk-z-sticky-chrome: 30;
+  --vk-z-layout-popover: 100;
+  --vk-z-layout-dialog: 110;
+}
+
+[data-walkthrough-highlight] {
+  position: relative;
+  z-index: 55;
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / 0.35);
 }
 
 /*
@@ -32,6 +45,14 @@
   --border: 0 0% 89.8%;
   --input: 0 0% 89.8%;
   --ring: 0 0% 3.9%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 .dark {
@@ -55,10 +76,81 @@
   --border: 0 0% 14.9%;
   --input: 0 0% 14.9%;
   --ring: 0 0% 83.1%;
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 html {
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+
+/* Compact card thumbnails — clip full-viewport heroes inside scaled iframes */
+html.vk-embed-thumb,
+html.vk-embed-thumb body {
+  overflow: hidden;
+  min-height: 0;
+}
+
+html.vk-embed-thumb .vk-embed-thumb-host {
+  max-height: 680px;
+  overflow: hidden;
+}
+
+html.vk-embed-thumb .vk-embed-thumb-host [class*="min-h-screen"],
+html.vk-embed-thumb .vk-embed-thumb-host [class*="min-h-dvh"],
+html.vk-embed-thumb .vk-embed-thumb-host [class*="h-screen"],
+html.vk-embed-thumb .vk-embed-thumb-host [class*="h-dvh"] {
+  min-height: 28rem !important;
+  height: auto !important;
+}
+
+html.vk-embed-interactive,
+html.vk-embed-interactive body {
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Catalog card — gentle auto-pan when idle; pauses on hover for inline interaction */
+@keyframes vk-card-preview-pan {
+  0%,
+  12% {
+    transform: scale(0.5) translateY(0);
+  }
+  45% {
+    transform: scale(0.5) translateY(-32%);
+  }
+  55% {
+    transform: scale(0.5) translateY(-32%);
+  }
+  88%,
+  100% {
+    transform: scale(0.5) translateY(0);
+  }
+}
+
+.vk-card-preview-loop {
+  animation: vk-card-preview-pan 18s ease-in-out infinite;
+  transform: scale(0.5) translateY(0);
+  transform-origin: top left;
+  width: 200%;
+  contain: layout paint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vk-card-preview-loop {
+    animation: none;
+  }
+}
+
+/* Magic UI Marquee — v4-style gap utility used by mirrored components */
+[class*="gap-(--gap)"] {
+  gap: var(--gap, 1rem);
 }

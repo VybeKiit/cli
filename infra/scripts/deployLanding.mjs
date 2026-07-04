@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+import process from 'node:process';
 /**
  * Deploy apps/landing to Cloudflare via @vybekiit/deploy.
  * Maintainer helper — requires CLOUDFLARE_* env and wrangler login.
  */
 import { resolveHosting } from '@vybekiit/deploy';
-import process from 'node:process';
 
 const hosting = resolveHosting();
 const result = await hosting.deploy({

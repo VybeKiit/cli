@@ -122,6 +122,73 @@ export function snapDockToNearestCorner(
   return { anchor: 'custom', customX: x, customY: y };
 }
 
+/** How a flyout aligns to its trigger along the horizontal axis. */
+export type FlyoutAlign = 'center' | 'end';
+
+/** Minimal rect shape (a subset of DOMRect) so this stays testable without a DOM. */
+export interface FlyoutRect {
+  readonly top: number;
+  readonly left: number;
+  readonly right: number;
+  readonly bottom: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface FlyoutViewport {
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface ComputeFlyoutPlacementInput {
+  readonly trigger: FlyoutRect;
+  readonly flyout: Pick<FlyoutRect, 'width' | 'height'>;
+  readonly viewport: FlyoutViewport;
+  readonly align?: FlyoutAlign;
+  readonly gap?: number;
+  readonly margin?: number;
+}
+
+/** Fixed-position coordinates for a hover flyout, clamped inside the viewport. */
+export interface FlyoutPlacement {
+  readonly left: number;
+  readonly top: number;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (max < min) {
+    return min;
+  }
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Place a hover flyout above its trigger, flipping below when it would clip the top edge, and
+ * clamping horizontally + vertically so it never exceeds the viewport. Pure — no DOM, unit-testable.
+ * Returns top-left coordinates for a `position: fixed` element (no CSS transform needed).
+ */
+export function computeFlyoutPlacement({
+  trigger,
+  flyout,
+  viewport,
+  align = 'center',
+  gap = 8,
+  margin = 8,
+}: ComputeFlyoutPlacementInput): FlyoutPlacement {
+  const rawLeft =
+    align === 'end'
+      ? trigger.right - flyout.width
+      : trigger.left + trigger.width / 2 - flyout.width / 2;
+  const left = clamp(rawLeft, margin, viewport.width - flyout.width - margin);
+
+  const spaceAbove = trigger.top - gap;
+  const fitsAbove = spaceAbove >= flyout.height + margin;
+  const rawTop = fitsAbove ? trigger.top - gap - flyout.height : trigger.bottom + gap;
+  const top = clamp(rawTop, margin, viewport.height - flyout.height - margin);
+
+  return { left, top };
+}
+
 /** Numeric insets for React Native absolute positioning (FAB / dock). */
 export interface DockInsetStyle {
   readonly top?: number;

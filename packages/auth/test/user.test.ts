@@ -1,5 +1,5 @@
+import { normalizeAuthUser } from '@vybekiit/auth/user';
 import { describe, expect, it } from 'vitest';
-import { normalizeAuthUser } from '../src/user';
 
 describe('normalizeAuthUser', () => {
   it('maps a valid provider user', () => {

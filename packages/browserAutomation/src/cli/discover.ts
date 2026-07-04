@@ -1,16 +1,21 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-
-import type { ExtensionConfig, VerbContext } from '../domains/extension/types';
-import { parseCwsStoreConfig } from '../domains/extension/cwsStoreSchema';
-import { cwsJsonPath, type CwsStoreConfig } from '../domains/extension/store';
+import { parseCwsStoreConfig } from '@vybekiit/browserAutomation/domains/extension/cwsStoreSchema';
+import {
+  type CwsStoreConfig,
+  cwsJsonPath,
+} from '@vybekiit/browserAutomation/domains/extension/store';
+import type {
+  ExtensionConfig,
+  VerbContext,
+} from '@vybekiit/browserAutomation/domains/extension/types';
 
 export type DiscoverResult = {
   repoRoot: string;
   store: CwsStoreConfig;
 };
 
-export { parseCwsStoreConfig } from '../domains/extension/cwsStoreSchema';
+export { parseCwsStoreConfig } from '@vybekiit/browserAutomation/domains/extension/cwsStoreSchema';
 
 /** Walk up from startDir until `.vybekiit/store/extension/cws.json` exists. */
 export async function discoverStore(startDir = process.cwd()): Promise<DiscoverResult> {

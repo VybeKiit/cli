@@ -1,12 +1,12 @@
 'use client';
 
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import {
   buildRoundedRectStrokePath,
   HOLD_RECT_COMPACT,
   HOLD_RECT_WIDE,
 } from '@/components/report-mode/dock/utils/hold-rect-utils';
 import { cn } from '@/lib/utils';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ReportHoldOptionProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   readonly children: ReactNode;

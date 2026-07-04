@@ -2,9 +2,9 @@
 // so we reuse `@aws-sdk/client-s3` with a custom endpoint URL — same command pattern
 // as the AWS S3 adapter, different endpoint + credential keys.
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { type R2Config, type Result, fail, ok } from '@vybekiit/core';
-import { type StorageProviderResult, toEffectStorageProvider } from '../../effectBridge';
-import type { StorageProvider } from '../../types';
+import { fail, ok, type R2Config, type Result } from '@vybekiit/core';
+import { type StorageProviderResult, toEffectStorageProvider } from '@vybekiit/db/effectBridge';
+import type { StorageProvider } from '@vybekiit/db/types';
 
 /**
  * Build the Cloudflare R2 {@link StorageProvider} — selected with `STORAGE_PROVIDER=r2`

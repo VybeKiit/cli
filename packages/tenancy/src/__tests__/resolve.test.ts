@@ -1,6 +1,6 @@
+import { resolveTenancyProvider } from '@vybekiit/tenancy/resolve';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { resolveTenancyProvider } from '../resolve';
 
 describe('resolveTenancyProvider', () => {
   it('creates org locally', async () => {

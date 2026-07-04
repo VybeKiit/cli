@@ -1,9 +1,9 @@
-import { SelectorMissingError } from '../../core/errors';
+import { SelectorMissingError } from '@vybekiit/browserAutomation/core/errors';
 import {
-  type SelectorEntry,
   isSelectorFresh,
   resolveFreshSelectorEntry,
-} from '../../core/selectors';
+  type SelectorEntry,
+} from '@vybekiit/browserAutomation/core/selectors';
 import { RECORDED_SELECTORS } from './selectors.generated';
 
 export type { SelectorEntry };

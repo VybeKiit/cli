@@ -1,6 +1,6 @@
 # seo-vybekiit
 
-Use `resolveSeoProvider()` from `@/vybekiit/seo` — see package README and ADR-0012.
+Use `resolveSeoProvider()` from `@vybekiit/seo` — see package README and ADR-0012.
 
 Canonical GEO/SEO patterns: `docs/positioning/seo-geo-plan.md` (maintainer repo).
 

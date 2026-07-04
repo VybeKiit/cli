@@ -1,5 +1,5 @@
+import { createVercelHosting } from '@vybekiit/deploy/providers/vercel';
 import { describe, expect, it, vi } from 'vitest';
-import { createVercelHosting } from '../src/providers/vercel';
 
 describe('createVercelHosting', () => {
   it('builds a vercel deploy action and returns the runner URL', async () => {

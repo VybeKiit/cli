@@ -4,7 +4,7 @@
  * Last regenerated: 2026-06-29
  */
 
-import type { SelectorEntry } from '../../../extension/selectors';
+import type { SelectorEntry } from '@vybekiit/browserAutomation/domains/extension/selectors';
 
 export const LS_RECORDED_SELECTORS: Record<string, SelectorEntry[]> = {
   'product.createButton': [

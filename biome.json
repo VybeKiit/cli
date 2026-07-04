@@ -40,7 +40,7 @@
         "useSortedKeys": "off",
         "useSortedPackageJson": "off",
         "useSortedAttributes": "off",
-        "organizeImports": "off"
+        "organizeImports": "on"
       }
     }
   },

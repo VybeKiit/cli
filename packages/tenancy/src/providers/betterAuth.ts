@@ -1,6 +1,6 @@
 import { type DataProvider, resolveDataProvider } from '@vybekiit/db';
+import { type OrgMember, TenancyError, type TenancyProvider } from '@vybekiit/tenancy/types';
 import { Effect } from 'effect';
-import { type OrgMember, TenancyError, type TenancyProvider } from '../types';
 
 export interface ResolveTenancyInjections {
   readonly dataProvider?: DataProvider;

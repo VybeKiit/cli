@@ -1,10 +1,9 @@
+import { SelectorMissingError } from '@vybekiit/browserAutomation/core/errors';
+import type { SelectorEntry } from '@vybekiit/browserAutomation/domains/extension/selectors';
+import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import { resolveLsSelectorEntry } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/registry';
 import type { Locator, Page } from 'playwright';
-
-import { SelectorMissingError } from '../../../../core/errors';
-import type { SelectorEntry } from '../../../extension/selectors';
-import { resolveLsSelectorEntry } from '../selectors/registry';
-import type { LsDraftFieldKey } from '../selectors/fields';
-import { LS_FIELD_FALLBACKS, locatorFromFallback, type LsFieldFallback } from './fieldFallbacks';
+import { LS_FIELD_FALLBACKS, type LsFieldFallback, locatorFromFallback } from './fieldFallbacks';
 
 function locatorFromEntry(page: Page, entry: SelectorEntry): Locator {
   switch (entry.kind) {
@@ -116,4 +115,4 @@ export function lsFieldLocator(page: Page, fieldKey: LsDraftFieldKey): Locator {
   return locatorFromEntry(page, entry).first();
 }
 
-export { locatorFromEntry, type LsFieldFallback };
+export { type LsFieldFallback, locatorFromEntry };

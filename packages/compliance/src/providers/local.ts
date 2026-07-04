@@ -1,5 +1,5 @@
+import type { ComplianceProvider } from '@vybekiit/compliance/types';
 import type { ComplianceConfig } from '@vybekiit/core';
-import type { ComplianceProvider } from '../types';
 
 export function createLocalCompliance(config: ComplianceConfig): ComplianceProvider {
   return {

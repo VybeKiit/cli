@@ -1,20 +1,23 @@
-import { describe, expect, it } from 'vitest';
+import {
+  detectAgentTool,
+  resolveGlobalSkillPath,
+} from '@vybekiit/agentKit/catalogs/toolSkillPaths';
+import { lintExtensionSkill } from '@vybekiit/agentKit/lint/lintExtensionSkill';
 import {
   AGENT_LAYER_EXTENSION_PREFIX,
   isAgentLayerExtensionPath,
-} from '../src/planners/agentLayerSync';
-import { lintExtensionSkill } from '../src/lint/lintExtensionSkill';
-import {
-  renderBuyerGoalExtensionSkill,
-  renderPlatformWrapperExtensionSkill,
-  renderGlobalAgentSkill,
-} from '../src/render/extensionSkillTemplates';
+} from '@vybekiit/agentKit/planners/agentLayerSync';
 import {
   extractExtensionGoalIndexRows,
   formatExtensionGoalIndexRow,
   mergeGoalIndexOnSync,
-} from '../src/planners/mergeGoalIndex';
-import { detectAgentTool, resolveGlobalSkillPath } from '../src/catalogs/toolSkillPaths';
+} from '@vybekiit/agentKit/planners/mergeGoalIndex';
+import {
+  renderBuyerGoalExtensionSkill,
+  renderGlobalAgentSkill,
+  renderPlatformWrapperExtensionSkill,
+} from '@vybekiit/agentKit/render/extensionSkillTemplates';
+import { describe, expect, it } from 'vitest';
 
 const VALID_BUYER = renderBuyerGoalExtensionSkill({
   goalStem: 'referral-program',

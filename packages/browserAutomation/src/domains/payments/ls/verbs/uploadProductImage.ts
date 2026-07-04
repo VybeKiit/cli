@@ -1,6 +1,5 @@
+import { lsField } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldLocator';
 import type { Page } from 'playwright';
-
-import { lsField } from '../dashboard/fieldLocator';
 
 /** Upload product media on the product editor page (dashboard-only — no LS API). */
 export async function uploadProductImage(

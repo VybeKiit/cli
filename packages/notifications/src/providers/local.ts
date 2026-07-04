@@ -1,5 +1,5 @@
-import { type Result, ok } from '@vybekiit/core';
-import type { NotificationsProvider, SendNotificationParams } from '../types';
+import { ok, type Result } from '@vybekiit/core';
+import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
 
 export function createLocalNotifications(): NotificationsProvider {
   return {

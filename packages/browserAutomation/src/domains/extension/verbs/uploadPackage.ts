@@ -1,13 +1,14 @@
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+import { buildAndFindZip } from '@vybekiit/browserAutomation/domains/extension/packageZip';
+import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  packageUrl,
+} from '@vybekiit/browserAutomation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
 import type { Page } from 'playwright';
-
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { buildAndFindZip } from '../packageZip';
-import { safeClick } from '../safeClick';
-import { discoverDeveloperGroupId, packageUrl } from '../urls';
-import { runVerifyGate } from '../verifyGate';
 
 /**
  * Public contract for upload package result at the Chrome Web Store automation module boundary.

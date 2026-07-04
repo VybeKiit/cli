@@ -1,9 +1,8 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   LS_DEFAULT_TAX_CATEGORY,
   LS_TAX_CATEGORY_OPTIONS,
-} from '../../src/domains/payments/ls/selectors/taxCategories';
+} from '@vybekiit/browserAutomation/domains/payments/ls/selectors/taxCategories';
+import { describe, expect, it } from 'vitest';
 
 describe('LS_TAX_CATEGORY_OPTIONS', () => {
   it('lists 12 unique Lemon Squeezy tax categories', () => {

@@ -1,4 +1,4 @@
-import { type AppConfig, appConfigSchema, type SeoConfig, ok } from '@vybekiit/core';
+import { type AppConfig, appConfigSchema, ok, type SeoConfig } from '@vybekiit/core';
 import type {
   FaqEntry,
   InternalLinkSpoke,
@@ -11,7 +11,7 @@ import type {
   OpenGraphOutput,
   SeoProvider,
   SitemapEntry,
-} from '../types';
+} from '@vybekiit/seo/types';
 
 function resolvePath(base: string, path?: string | undefined): string {
   const normalized = path?.startsWith('/') ? path : `/${path ?? ''}`;

@@ -1,5 +1,5 @@
+import { resolveJobsProvider } from '@vybekiit/jobs/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveJobsProvider } from '../resolve';
 
 describe('resolveJobsProvider', () => {
   it('uses local when cloudflare queue not configured', () => {

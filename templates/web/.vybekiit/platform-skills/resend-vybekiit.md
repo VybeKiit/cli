@@ -9,7 +9,7 @@
 
 ## Kit wiring
 
-1. Email via `@/vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=resend`
+1. Email via `@vybekiit/email` → `resolveEmailProvider()` when `EMAIL_PROVIDER=resend`
 2. Set `RESEND_API_KEY` and verified sender in `.env`
 3. Wire sending through the provider interface; hook into sign-in codes, welcome, receipts as needed
 4. Replace any `TODO(vybekiit): … — skill: setup-email` markers

@@ -1,6 +1,8 @@
+import {
+  type GdSetupResult,
+  gdSetupEnvBlock,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/types';
 import { verifyGodaddyCredentials } from '@vybekiit/deploy';
-
-import { gdSetupEnvBlock, type GdSetupResult } from '../types';
 
 /** Validates scraped GoDaddy credentials against the live API. */
 export async function verifyGdCredentialsViaApi(result: GdSetupResult): Promise<void> {

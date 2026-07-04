@@ -1,11 +1,13 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { fieldLocator } from '../locator';
-import { safeClick } from '../safeClick';
-import { discoverDeveloperGroupId, listingUrl } from '../urls';
-import { runVerifyGate } from '../verifyGate';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
+import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  listingUrl,
+} from '@vybekiit/browserAutomation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
 
 /**
  * Submit the current draft to Google's review queue. Push verb — runs

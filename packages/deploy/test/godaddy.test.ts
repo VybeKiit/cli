@@ -1,5 +1,5 @@
+import { GodaddyError } from '@vybekiit/deploy/registrar/godaddy';
 import { describe, expect, it } from 'vitest';
-import { GodaddyError } from '../src/registrar/godaddy';
 
 describe('GodaddyError', () => {
   it('sets name and fields', () => {

@@ -1,9 +1,9 @@
-import { type Result, fail, ok } from '@vybekiit/core';
 import { neon } from '@neondatabase/serverless';
-import type { SqlClient } from '../providers/postgres/hybridProvider';
-import type { PostgresProviderName, PresetManifest } from './types';
+import { fail, ok, type Result } from '@vybekiit/core';
+import type { SqlClient } from '@vybekiit/db/providers/postgres/hybridProvider';
 import { getPreset } from './catalog';
 import { renderPreset } from './render';
+import type { PostgresProviderName, PresetManifest } from './types';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);

@@ -1,4 +1,4 @@
-import { GITHUB_API_BASE, type GithubGateConfig, type Result, fail, ok } from '@vybekiit/core';
+import { fail, GITHUB_API_BASE, type GithubGateConfig, ok, type Result } from '@vybekiit/core';
 
 /**
  * "The gate" — VybeKiit's single paid wall (see CONTEXT.md → Distribution).

@@ -1,3 +1,11 @@
+export { createExpressAuthRouter } from './express';
+export type {
+  AuthHttpDeps,
+  AuthHttpMethod,
+  AuthHttpResponse,
+  AuthHttpSession,
+  AuthHttpTelemetry,
+} from './handlers';
 export {
   handleForgotPassword,
   handleMe,
@@ -12,13 +20,7 @@ export {
   handleVerifyMagicLink,
   handleVerifySmsCode,
 } from './handlers';
-export type {
-  AuthHttpDeps,
-  AuthHttpMethod,
-  AuthHttpResponse,
-  AuthHttpSession,
-  AuthHttpTelemetry,
-} from './handlers';
+export { createNextAuthRoutes, type NextAuthRoutes } from './next';
 export {
   EmailCodeBodySchema,
   EmailOnlyBodySchema,
@@ -29,5 +31,3 @@ export {
   SignUpBodySchema,
   TokenOnlyBodySchema,
 } from './schemas';
-export { createExpressAuthRouter } from './express';
-export { createNextAuthRoutes, type NextAuthRoutes } from './next';

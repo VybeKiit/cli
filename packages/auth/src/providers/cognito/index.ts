@@ -13,12 +13,12 @@ import {
   ResendConfirmationCodeCommand,
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { type Result, fail, ok } from '@vybekiit/core';
-import type { CognitoConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import { toSessionResult } from '../../session';
-import type { AuthProvider } from '../../types';
-import { type AuthUser, normalizeAuthUser } from '../../user';
+import type { CognitoConfig } from '@vybekiit/auth/config';
+import { type AuthProviderResult, toEffectAuthProvider } from '@vybekiit/auth/effectBridge';
+import { toSessionResult } from '@vybekiit/auth/session';
+import type { AuthProvider } from '@vybekiit/auth/types';
+import { type AuthUser, normalizeAuthUser } from '@vybekiit/auth/user';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 /**
  * The narrow slice of the Cognito client this adapter calls: just `.send(command)`.

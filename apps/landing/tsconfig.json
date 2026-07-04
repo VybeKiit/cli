@@ -19,8 +19,21 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "types": ["vitest/globals", "@testing-library/jest-dom"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@vybekiit-template-web/*": ["../../templates/web/src/*"],
+      "@/components/ui/button-group": ["../../templates/web/src/components/ui/button-group"],
+      "@/components/ui/button": ["../../templates/web/src/components/ui/button"],
+      "@/components/ui/command": ["../../templates/web/src/components/ui/command"],
+      "@/components/ui/dialog": ["../../templates/web/src/components/ui/dialog"],
+      "@/components/ui/hover-card": ["../../templates/web/src/components/ui/hover-card"],
+      "@/components/ui/input": ["../../templates/web/src/components/ui/input"],
+      "@/components/ui/input-group": ["../../templates/web/src/components/ui/input-group"],
+      "@/components/ui/select": ["../../templates/web/src/components/ui/select"],
+      "@/components/ui/textarea": ["../../templates/web/src/components/ui/textarea"],
+      "@/registry/new-york/ui/*": ["../../templates/web/src/registry/new-york/ui/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "vitest.config.ts"]
+  "exclude": ["node_modules", "vitest.config.ts", ".open-next", ".next"]
 }

@@ -1,4 +1,4 @@
-import { parseEnv, securityConfigSchema } from '../config';
+import { parseEnv, securityConfigSchema } from '@vybekiit/core/config';
 import { describe, expect, it } from 'vitest';
 import { isStateChanging, parseAllowedOrigins, resolveSecurityPolicy } from './policy';
 

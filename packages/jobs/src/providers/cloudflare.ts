@@ -1,5 +1,5 @@
 import { type CloudflareJobsConfig, fail, ok, type Result } from '@vybekiit/core';
-import type { JobPayload, JobsProvider } from '../types';
+import type { JobPayload, JobsProvider } from '@vybekiit/jobs/types';
 
 export function createCloudflareJobs(config: CloudflareJobsConfig): JobsProvider {
   return {

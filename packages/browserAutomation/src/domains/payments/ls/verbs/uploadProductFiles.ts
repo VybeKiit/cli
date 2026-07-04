@@ -1,6 +1,5 @@
+import { lsField } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldLocator';
 import type { Page } from 'playwright';
-
-import { lsField } from '../dashboard/fieldLocator';
 
 /** Upload deliverable files on the product editor page (second file input). */
 export async function uploadProductFiles(

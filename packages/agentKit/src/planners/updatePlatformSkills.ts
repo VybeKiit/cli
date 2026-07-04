@@ -1,4 +1,4 @@
-import { type Result, ok } from '@vybekiit/core';
+import { ok, type Result } from '@vybekiit/core';
 
 /** One upstream source declared in `platform-skills.manifest.json`. */
 export interface PlatformSkillsSource {

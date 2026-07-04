@@ -1,6 +1,6 @@
 import type { StripeConfig } from '@vybekiit/core';
-import { fromResult, fromResultPromise } from '../../effectBridge';
-import type { PaymentProvider } from '../../types';
+import { fromResult, fromResultPromise } from '@vybekiit/payments/effectBridge';
+import type { PaymentProvider } from '@vybekiit/payments/types';
 import { createStripeCheckout } from './checkout';
 import { parseStripeWebhook } from './webhook';
 

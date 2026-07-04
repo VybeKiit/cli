@@ -1,7 +1,7 @@
-import { resolveEmailProvider, type EmailProvider } from '../../email';
-import { fail, ok, type Result } from '@vybekiit/core';
-import type { NotificationsProvider, SendNotificationParams } from '../types';
 import process from 'node:process';
+import { fail, ok, type Result } from '@vybekiit/core';
+import { type EmailProvider, resolveEmailProvider } from '@vybekiit/email';
+import type { NotificationsProvider, SendNotificationParams } from './types';
 
 export interface ResolveNotificationsInjections {
   readonly emailProvider?: EmailProvider;

@@ -1,7 +1,7 @@
 import type { AuthHttpDeps } from '@vybekiit/auth/http';
 import type { Request, Response } from 'express';
+import { clearSessionCookie, SESSION_COOKIE, setSessionCookie } from '@/middleware/session.js';
 import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from './authTelemetry.js';
-import { clearSessionCookie, SESSION_COOKIE, setSessionCookie } from '../middleware/session.js';
 
 /** Per-request Express session + telemetry deps for {@link createExpressAuthRouter}. */
 export function createBackendAuthHttpDeps(req: Request, res: Response): AuthHttpDeps {

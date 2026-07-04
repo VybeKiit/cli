@@ -1,11 +1,10 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { findFreshestZip } from '@vybekiit/browserAutomation/domains/extension/packageZip';
+
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-import type { VerbContext } from '../types';
-
-import { findFreshestZip } from '../packageZip';
 
 let repoRoot: string;
 

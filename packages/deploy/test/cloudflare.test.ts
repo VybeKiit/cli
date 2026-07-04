@@ -1,5 +1,8 @@
+import {
+  type CloudflareDeployAction,
+  createCloudflareHosting,
+} from '@vybekiit/deploy/providers/cloudflare';
 import { describe, expect, it, vi } from 'vitest';
-import { type CloudflareDeployAction, createCloudflareHosting } from '../src/providers/cloudflare';
 
 const config = { CLOUDFLARE_ACCOUNT_ID: 'acct', CLOUDFLARE_API_TOKEN: 'token' };
 const options = { projectName: 'my-app', buildDir: './dist' };

@@ -1,9 +1,7 @@
 import { spawn } from 'node:child_process';
 import { isAbsolute, relative } from 'node:path';
-
-import type { VerbContext } from './types';
-
 import { VerifyGateFailedError } from './errors';
+import type { VerbContext } from './types';
 
 type VerifyGateStep = {
   args: string[];

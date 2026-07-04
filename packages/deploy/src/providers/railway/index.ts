@@ -1,5 +1,5 @@
-import { type RailwayHostingConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '../../types';
+import { fail, ok, type RailwayHostingConfig, type Result } from '@vybekiit/core';
+import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '@vybekiit/deploy/types';
 
 /**
  * A deploy action the adapter hands to its runner: conceptually

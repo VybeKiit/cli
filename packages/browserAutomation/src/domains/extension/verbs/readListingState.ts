@@ -1,9 +1,5 @@
-import { Schema } from 'effect';
-
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
+import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
 import {
   readAssetSlots,
   readCertifications,
@@ -15,9 +11,13 @@ import {
   readRegions,
   readRemoteCodeJustification,
   readRemoteCodeRadio,
-} from '../listingSourceFields';
-import { fieldLocator } from '../locator';
-import { type CwsListing, CwsListingSchema } from '../schema';
+} from '@vybekiit/browserAutomation/domains/extension/listingSourceFields';
+import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
+import {
+  type CwsListing,
+  CwsListingSchema,
+} from '@vybekiit/browserAutomation/domains/extension/schema';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
 import {
   discoverDeveloperGroupId,
   distributionUrl,
@@ -25,7 +25,8 @@ import {
   packageUrl,
   privacyUrl,
   statusUrl,
-} from '../urls';
+} from '@vybekiit/browserAutomation/domains/extension/urls';
+import { Schema } from 'effect';
 
 /**
  * Read the live store-listing state for an extension and return it as a

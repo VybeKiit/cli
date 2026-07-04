@@ -1,6 +1,6 @@
+import { getPreset, PRESET_CATALOG, PRESET_TABLE_NAMES } from '@vybekiit/db/presets/catalog';
+import { renderPostgresPreset, renderPreset } from '@vybekiit/db/presets/render';
 import { describe, expect, it } from 'vitest';
-import { getPreset, PRESET_CATALOG, PRESET_TABLE_NAMES } from '../src/presets/catalog';
-import { renderPostgresPreset, renderPreset } from '../src/presets/render';
 
 describe('preset catalog', () => {
   it('registers all full-catalog presets', () => {

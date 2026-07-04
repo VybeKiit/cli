@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
 export default defineConfig({
   entry: ['src/index.ts', 'src/bin.ts'],
@@ -10,4 +11,5 @@ export default defineConfig({
   banner: {
     js: '',
   },
+  esbuildPlugins: [createWorkspaceAliasPlugin()],
 });

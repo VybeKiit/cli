@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import {
   expectedSkillNamesFromManifest,
   planPlatformSkillsUpdate,
   shouldRunPlatformSkillsUpdate,
-} from '../../src/planners/updatePlatformSkills';
+} from '@vybekiit/agentKit/planners/updatePlatformSkills';
+import { describe, expect, it } from 'vitest';
 
 describe('planPlatformSkillsUpdate', () => {
   it('reports up to date when manifest has no sources', () => {

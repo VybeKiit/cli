@@ -1,4 +1,4 @@
-import type { BaseVerbContext } from '../../../core/types';
+import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
 
 export type LsSetupMode = 'test' | 'live';
 

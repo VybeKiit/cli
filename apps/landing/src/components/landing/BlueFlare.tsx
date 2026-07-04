@@ -1,9 +1,9 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { LANDING_EASE } from '@/data/landing';
 import { useReducedMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 interface BlueFlareProps {
   className?: string;

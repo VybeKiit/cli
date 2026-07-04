@@ -1,7 +1,7 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { decodeAssetManifest } from '../http/responseSchemas';
 import process from 'node:process';
+import { decodeAssetManifest } from '@vybekiit/core/http';
 
 /**
  * Next.js `images.remotePatterns` derived from the active stack — allows optimized

@@ -13,7 +13,6 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
-  transpilePackages: ['@vybekiit/tokens'],
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -3,9 +3,9 @@
 // like the step-4 DynamoDB adapter — one client constructed here, commands sent
 // through `.send` — rather than the legacy v2 callback client.
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { type AwsConfig, type Result, fail, ok } from '@vybekiit/core';
-import { type StorageProviderResult, toEffectStorageProvider } from '../../effectBridge';
-import type { StorageProvider } from '../../types';
+import { type AwsConfig, fail, ok, type Result } from '@vybekiit/core';
+import { type StorageProviderResult, toEffectStorageProvider } from '@vybekiit/db/effectBridge';
+import type { StorageProvider } from '@vybekiit/db/types';
 
 /**
  * Build the AWS S3 {@link StorageProvider} — the opt-in object store a buyer selects

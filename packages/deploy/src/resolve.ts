@@ -2,17 +2,17 @@ import {
   awsConfigSchema,
   awsHostingConfigSchema,
   cloudflareConfigSchema,
+  type EnvSource,
   hostingConfigSchema,
   parseEnv,
   railwayHostingConfigSchema,
   resolveEnvProvider,
-  type EnvSource,
   vercelConfigSchema,
 } from '@vybekiit/core';
 import { type AmplifyRunner, createAwsHosting } from './providers/aws';
 import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare';
-import { type RailwayRunner, createRailwayHosting } from './providers/railway';
-import { type VercelRunner, createVercelHosting } from './providers/vercel';
+import { createRailwayHosting, type RailwayRunner } from './providers/railway';
+import { createVercelHosting, type VercelRunner } from './providers/vercel';
 import type { Hosting } from './types';
 
 /**

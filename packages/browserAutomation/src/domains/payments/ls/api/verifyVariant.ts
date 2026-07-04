@@ -1,4 +1,7 @@
-import type { LsSetupMode, LsSetupResult } from '../types';
+import type {
+  LsSetupMode,
+  LsSetupResult,
+} from '@vybekiit/browserAutomation/domains/payments/ls/types';
 
 type VariantApiResponse = {
   data?: {

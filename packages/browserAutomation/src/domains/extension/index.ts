@@ -18,8 +18,8 @@
 // dry-run probe that need to drive a CDP-attached page without going
 // through a verb).
 export { connectToCwsChrome } from './connect';
-export { diffListing } from './diff';
 export type { ListingFieldDiff } from './diff';
+export { diffListing } from './diff';
 // Error classes — exported so callers can switch on `instanceof`.
 export {
   CdpUnreachableError,
@@ -52,13 +52,12 @@ export { importListing } from './verbs/importListing';
 export { publish } from './verbs/publish';
 // Read verbs
 export { readListingState } from './verbs/readListingState';
-
-export { readReviewStatus } from './verbs/readReviewStatus';
 export type { CwsReviewStatus } from './verbs/readReviewStatus';
-export { readVersionHistory } from './verbs/readVersionHistory';
+export { readReviewStatus } from './verbs/readReviewStatus';
 export type { CwsVersionRow } from './verbs/readVersionHistory';
-export { readViolations } from './verbs/readViolations';
+export { readVersionHistory } from './verbs/readVersionHistory';
 export type { CwsViolation } from './verbs/readViolations';
+export { readViolations } from './verbs/readViolations';
 export { submitForReview } from './verbs/submitForReview';
 export { applyTabChanges, updateListing } from './verbs/updateListing';
-export { uploadPackage, type UploadPackageResult } from './verbs/uploadPackage';
+export { type UploadPackageResult, uploadPackage } from './verbs/uploadPackage';

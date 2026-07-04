@@ -1,5 +1,5 @@
+import { resolveRealtimeProvider } from '@vybekiit/realtime/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveRealtimeProvider } from '../resolve';
 
 describe('resolveRealtimeProvider', () => {
   it('falls back to local for unshipped cloudflare-do provider', () => {

@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" aria-label="Extension icon" viewBox="0 0 128 128"><rect width="128" height="128" fill="#0f172a" rx="24"/><text x="64" y="78" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="48" font-weight="700" text-anchor="middle">E</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="VybeKiit">
+  <rect width="32" height="32" rx="8" fill="#070b12"/>
+  <path d="M6 9 L16 14.5 L26 9" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+  <path d="M6 14.5 L16 20 L26 14.5" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+  <path d="M6 20 L16 25.5 L26 20" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+</svg>

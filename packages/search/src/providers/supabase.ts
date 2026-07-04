@@ -1,6 +1,11 @@
 import { resolveDataProvider } from '@vybekiit/db';
+import {
+  type SearchDocument,
+  SearchError,
+  type SearchHit,
+  type SearchProvider,
+} from '@vybekiit/search/types';
 import { Effect } from 'effect';
-import { SearchError, type SearchDocument, type SearchHit, type SearchProvider } from '../types';
 
 interface SearchRow {
   readonly id: string;

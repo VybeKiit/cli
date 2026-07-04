@@ -1,4 +1,4 @@
-import { type Result, makeResultLifter } from '@vybekiit/core';
+import { makeResultLifter, type Result } from '@vybekiit/core';
 import { Effect } from 'effect';
 import {
   type DataProvider,

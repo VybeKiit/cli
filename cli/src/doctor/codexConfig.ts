@@ -1,6 +1,6 @@
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const FEATURES_BLOCK = '[features]\nskills = true';
 

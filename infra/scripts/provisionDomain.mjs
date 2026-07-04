@@ -12,7 +12,7 @@
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseEnv, cloudflareConfigSchema, namecheapConfigSchema } from '@vybekiit/core';
+import { cloudflareConfigSchema, namecheapConfigSchema, parseEnv } from '@vybekiit/core';
 import { loadEnvFile, mergeEnvFile } from '@vybekiit/core/node';
 import { getOrCreateZone, setCustomNameservers } from '@vybekiit/deploy';
 

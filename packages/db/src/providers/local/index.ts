@@ -1,7 +1,7 @@
-import { type Result, fail, ok } from '@vybekiit/core';
-import { type DataProviderResult, toEffectDataProvider } from '../../effectBridge';
-import type { DataProvider, DbRecord, QueryFilter } from '../../types';
-import { LOCAL_CAPABILITIES } from '../postgres/shared';
+import { fail, ok, type Result } from '@vybekiit/core';
+import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+import { LOCAL_CAPABILITIES } from '@vybekiit/db/providers/postgres/shared';
+import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
 
 /**
  * A stored row: a {@link DbRecord} widened with a string index signature. Each

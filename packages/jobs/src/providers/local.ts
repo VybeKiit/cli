@@ -1,5 +1,5 @@
-import { type Result, ok } from '@vybekiit/core';
-import type { JobPayload, JobsProvider } from '../types';
+import { ok, type Result } from '@vybekiit/core';
+import type { JobPayload, JobsProvider } from '@vybekiit/jobs/types';
 
 const queue: JobPayload[] = [];
 

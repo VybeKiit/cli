@@ -1,12 +1,11 @@
 'use client';
 
 import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
-import { useReportFlyoutPosition } from '@/components/report-mode/dock/hooks/use-report-flyout-position';
-import { useReportHoverMenu } from '@/components/report-mode/dock/hooks/use-report-hover-menu';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { cn } from '@/lib/utils';
 import { DEFAULT_INSPECT_HIGHLIGHT_COLOR, INSPECT_HIGHLIGHT_PRESETS } from '@vybekiit/report-mode';
+import { useReportFlyoutPosition, useReportHoverMenu } from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
 
 interface ReportHighlightColorMenuProps {
@@ -24,8 +23,9 @@ export function ReportHighlightColorMenu({
   tutorialActive = false,
 }: ReportHighlightColorMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
-  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center');
+  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center', flyoutRef);
 
   return (
     <div
@@ -65,6 +65,7 @@ export function ReportHighlightColorMenu({
         onMouseEnter={openMenu}
         onMouseLeave={scheduleClose}
         open={open}
+        ref={flyoutRef}
         role="dialog"
         style={flyoutStyle}
       >

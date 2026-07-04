@@ -1,5 +1,5 @@
+import { planKitUpdate } from '@vybekiit/agentKit/planners/updateKit';
 import { describe, expect, it } from 'vitest';
-import { planKitUpdate } from '../../src/planners/updateKit';
 
 describe('planKitUpdate', () => {
   it('flags packages with a strictly newer published version', () => {

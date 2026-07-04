@@ -1,26 +1,25 @@
-import type { PresetManifest } from './types';
-
-import authBridge from '../../presets/auth-bridge/preset.manifest.json' with { type: 'json' };
-import orders from '../../presets/orders/preset.manifest.json' with { type: 'json' };
-import webhookEvents from '../../presets/webhook_events/preset.manifest.json' with { type: 'json' };
-import organizations from '../../presets/organizations/preset.manifest.json' with { type: 'json' };
-import searchDocuments from '../../presets/search_documents/preset.manifest.json' with {
-  type: 'json',
-};
-import auditLog from '../../presets/audit_log/preset.manifest.json' with { type: 'json' };
-import embeddings from '../../presets/embeddings/preset.manifest.json' with { type: 'json' };
 import aiConversations from '../../presets/ai_conversations/preset.manifest.json' with {
   type: 'json',
 };
-import realtimePublications from '../../presets/realtime_publications/preset.manifest.json' with {
-  type: 'json',
-};
-import notificationsLog from '../../presets/notifications_log/preset.manifest.json' with {
-  type: 'json',
-};
+import auditLog from '../../presets/audit_log/preset.manifest.json' with { type: 'json' };
+import authBridge from '../../presets/auth-bridge/preset.manifest.json' with { type: 'json' };
+import embeddings from '../../presets/embeddings/preset.manifest.json' with { type: 'json' };
 import featureFlags from '../../presets/feature_flags/preset.manifest.json' with { type: 'json' };
 import fileMetadata from '../../presets/file_metadata/preset.manifest.json' with { type: 'json' };
 import jobRuns from '../../presets/job_runs/preset.manifest.json' with { type: 'json' };
+import notificationsLog from '../../presets/notifications_log/preset.manifest.json' with {
+  type: 'json',
+};
+import orders from '../../presets/orders/preset.manifest.json' with { type: 'json' };
+import organizations from '../../presets/organizations/preset.manifest.json' with { type: 'json' };
+import realtimePublications from '../../presets/realtime_publications/preset.manifest.json' with {
+  type: 'json',
+};
+import searchDocuments from '../../presets/search_documents/preset.manifest.json' with {
+  type: 'json',
+};
+import webhookEvents from '../../presets/webhook_events/preset.manifest.json' with { type: 'json' };
+import type { PresetManifest } from './types';
 
 /** All registered DB feature presets, keyed by id. */
 export const PRESET_CATALOG: Readonly<Record<string, PresetManifest>> = {

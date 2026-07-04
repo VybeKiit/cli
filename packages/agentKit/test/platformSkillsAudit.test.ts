@@ -1,17 +1,17 @@
-import { describe, expect, it } from 'vitest';
 import {
   DOCS_ONLY_PLATFORM_PROVIDERS,
   evaluatePlatformSkillsAudit,
   isPlatformSkillsAuditBlocking,
   normalizeSkillsRepoKey,
   PLATFORM_SKILLS_AUDIT_PROVIDERS,
-} from '../src/catalogs/platformSkillsAudit';
+} from '@vybekiit/agentKit/catalogs/platformSkillsAudit';
 import {
   checkBaseManifestParity,
   findDocsOnlyViolations,
   mergePlatformSkillsManifests,
   PLATFORM_SKILLS_BASE_MANIFEST,
-} from '../src/catalogs/platformSkillsMerge';
+} from '@vybekiit/agentKit/catalogs/platformSkillsMerge';
+import { describe, expect, it } from 'vitest';
 
 describe('mergePlatformSkillsManifests', () => {
   it('returns base sources when template override is empty', () => {

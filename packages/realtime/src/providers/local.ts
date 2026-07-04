@@ -1,4 +1,4 @@
-import type { RealtimeChannel, RealtimeHandler, RealtimeProvider } from '../types';
+import type { RealtimeChannel, RealtimeHandler, RealtimeProvider } from '@vybekiit/realtime/types';
 
 export function createLocalRealtime(): RealtimeProvider {
   const channels = new Map<string, Set<RealtimeHandler>>();

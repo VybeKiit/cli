@@ -1,6 +1,10 @@
-import { connectToGdChrome } from '../connect';
-import { waitForGdAuthenticated } from '../dashboard/waitForAuthenticated';
-import type { GdSetupParams, GdSetupResult, GdVerbContext } from '../types';
+import { connectToGdChrome } from '@vybekiit/browserAutomation/domains/registrars/godaddy/connect';
+import { waitForGdAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/godaddy/dashboard/waitForAuthenticated';
+import type {
+  GdSetupParams,
+  GdSetupResult,
+  GdVerbContext,
+} from '@vybekiit/browserAutomation/domains/registrars/godaddy/types';
 import { createApiKeyInPortal } from './createApiKey';
 
 export async function standbyLogin(

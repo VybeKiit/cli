@@ -1,6 +1,6 @@
-import { type OpenaiConfig, fail, ok, type Result } from '@vybekiit/core';
-import { decodeOpenAiChatCompletionResponse } from '../../http/responseSchemas';
-import type { AiProvider, CompleteParams, CompleteResult } from '../types';
+import type { AiProvider, CompleteParams, CompleteResult } from '@vybekiit/ai/types';
+import { fail, type OpenaiConfig, ok, type Result } from '@vybekiit/core';
+import { decodeOpenAiChatCompletionResponse } from '@vybekiit/core/http';
 
 export function createOpenAiProvider(config: OpenaiConfig): AiProvider {
   return {

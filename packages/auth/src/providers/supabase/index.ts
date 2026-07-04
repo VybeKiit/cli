@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import { type Result, fail, ok } from '@vybekiit/core';
-import type { SupabaseAuthConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import { type AuthSession, toSessionResult } from '../../session';
-import type { AuthProvider } from '../../types';
-import { type AuthUser, normalizeAuthUser } from '../../user';
+import type { SupabaseAuthConfig } from '@vybekiit/auth/config';
+import { type AuthProviderResult, toEffectAuthProvider } from '@vybekiit/auth/effectBridge';
+import { type AuthSession, toSessionResult } from '@vybekiit/auth/session';
+import type { AuthProvider } from '@vybekiit/auth/types';
+import { type AuthUser, normalizeAuthUser } from '@vybekiit/auth/user';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 /** The GoTrue user shape this adapter reads (id + optional email). */
 interface SupabaseUserLike {

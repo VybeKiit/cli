@@ -1,17 +1,17 @@
+import process from 'node:process';
 import {
   awsConfigSchema,
   cloudflareEmailConfigSchema,
+  type EnvSource,
   emailConfigSchema,
   parseEnv,
   resendConfigSchema,
   resolveEnvProvider,
-  type EnvSource,
 } from '@vybekiit/core';
-import { type FetchLike, createCloudflareEmail } from './providers/cloudflare';
-import { createSesEmail } from './providers/ses';
+import { createCloudflareEmail, type FetchLike } from './providers/cloudflare';
 import { createResendEmail } from './providers/resend';
+import { createSesEmail } from './providers/ses';
 import type { EmailProvider } from './types';
-import process from 'node:process';
 
 /**
  * Construct the configured email provider from the environment — the single call

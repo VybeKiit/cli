@@ -1,7 +1,7 @@
-import { INSPIRATION_LAYOUTS } from '@/components/inspirations/layout-registry';
-import { getInspirationBySlug, INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { INSPIRATION_LAYOUTS } from '@/components/inspirations/layout-registry';
+import { getInspirationBySlug, INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 
 interface PageProps {
   params: Promise<{ slug: string }>;

@@ -1,8 +1,8 @@
-import { type Result, fail, ok } from '@vybekiit/core';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import type { AuthProvider } from '../../types';
-import type { AuthUser } from '../../user';
-import { LOCAL_DEV_SESSION_TOKEN, type AuthSession, toSessionResult } from '../../session';
+import { type AuthProviderResult, toEffectAuthProvider } from '@vybekiit/auth/effectBridge';
+import { type AuthSession, LOCAL_DEV_SESSION_TOKEN, toSessionResult } from '@vybekiit/auth/session';
+import type { AuthProvider } from '@vybekiit/auth/types';
+import type { AuthUser } from '@vybekiit/auth/user';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 const DEV_USER: AuthUser = { id: 'local-dev-user', email: 'you@local.dev' };
 const resetTokens = new Map<string, string>();

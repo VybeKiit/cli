@@ -1,7 +1,7 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { scaffold } from '../lib/scaffold';
-import { resolveTemplatesSource, cloneMirror } from '../lib/resolveTemplates';
 
 function pascalCase(name: string): string {
   // PascalCase, splitting on "-", "_", "/": "add-user" → "AddUser"

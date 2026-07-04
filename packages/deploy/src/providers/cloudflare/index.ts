@@ -1,5 +1,5 @@
-import { type CloudflareConfig, type Result, fail, ok } from '@vybekiit/core';
-import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '../../types';
+import { type CloudflareConfig, fail, ok, type Result } from '@vybekiit/core';
+import type { DeployOptions, DeployResult, DeployStatus, Hosting } from '@vybekiit/deploy/types';
 
 /**
  * A deploy action the adapter hands to its runner: the exact command + args it

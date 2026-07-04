@@ -1,21 +1,20 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import type { Page } from 'playwright';
-
-import type { LsDraftFieldKey } from '../../../../src/domains/payments/ls/selectors/fields';
 import {
   LS_FIELD_FALLBACKS,
-  locatorFromFallback,
   type LsFieldFallback,
-} from '../../../../src/domains/payments/ls/dashboard/fieldFallbacks';
+  locatorFromFallback,
+} from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldFallbacks';
+
+import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import type { Page } from 'playwright';
 import type { ParsedEntry } from '../draft';
-import { snapshotPage } from './snapshot';
+import { deleteProductOnCurrentPage, dismissProductEditorPanels } from './e2eCleanup';
+import { type LsE2eArtifacts, type LsPricingProbeType, probeProductName } from './e2eNames';
 import type { E2eTouchHooks } from './e2eTouch';
-import { probeProductName, type LsE2eArtifacts, type LsPricingProbeType } from './e2eNames';
+import { snapshotPage } from './snapshot';
 import type { ClassifiedMatch, PageSnapshot } from './types';
 import { verifyEntryOnPage } from './verify';
-import { deleteProductOnCurrentPage, dismissProductEditorPanels } from './e2eCleanup';
 
 const ORIGIN = 'https://app.lemonsqueezy.com';
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');

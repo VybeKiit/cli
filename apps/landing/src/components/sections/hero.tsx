@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import { AgentSessionDemo } from '@/components/sections/agent-session-demo';
 import { Button } from '@/components/ui/button';
 import { HERO } from '@/data/pillars';
 import { DEMO_VIDEO_EMBED_URL, PRICE, TRUST_BADGES } from '@/data/site';
-import Link from 'next/link';
 
 /**
  * Hero — Terminal-to-Live layout (landing-direction #1). Headline + CTA on the

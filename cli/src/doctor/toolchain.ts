@@ -28,13 +28,13 @@
 
 import {
   dataConfigSchema,
+  type EnvSource,
   hostingConfigSchema,
   isRailwayStackActive,
   needsAwsCliFromAuxiliaryProviders,
   parseEnv,
   resolveEnvProvider,
   resolveOptionalEnvProvider,
-  type EnvSource,
 } from '@vybekiit/core';
 
 /** OS families we know how to install on. `process.platform` maps onto this. */

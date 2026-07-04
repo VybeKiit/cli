@@ -1,5 +1,5 @@
+import { createLogger, resolveDefaultLogLevel } from '@vybekiit/core/logger';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createLogger, resolveDefaultLogLevel } from '../src/logger';
 
 describe('resolveDefaultLogLevel', () => {
   it('uses debug in development when LOG_LEVEL is absent', () => {

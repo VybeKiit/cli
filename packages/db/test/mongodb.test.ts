@@ -1,6 +1,6 @@
+import { createMongoDataProvider } from '@vybekiit/db/providers/mongodb';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMongoDataProvider } from '../src/providers/mongodb';
 
 /**
  * Per-test handles to the mocked collection methods, so each case can stub a return

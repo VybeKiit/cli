@@ -18,7 +18,10 @@ export default defineConfig({
         find: '@vybekiit/deploy',
         replacement: path.resolve(import.meta.dirname, '../deploy/src/registrar/index.ts'),
       },
-      { find: '@vybekiit/core', replacement: path.resolve(import.meta.dirname, '../core/src/index.ts') },
+      {
+        find: '@vybekiit/core',
+        replacement: path.resolve(import.meta.dirname, '../core/src/index.ts'),
+      },
     ],
   },
   test: {

@@ -1,8 +1,8 @@
-import { type Result, makeResultLifter } from '@vybekiit/core';
+import { makeResultLifter, type Result } from '@vybekiit/core';
 import type { AuthSession } from './session';
 import {
-  AuthError,
   type AuthCapabilities,
+  AuthError,
   type AuthProvider,
   type AuthProviderName,
 } from './types';

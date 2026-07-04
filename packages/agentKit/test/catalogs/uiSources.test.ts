@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import {
   FORBIDDEN_WEB_UI_LIBS,
   renderForbiddenWebUiLibsList,
   renderWebUiSourcesTable,
   WEB_UI_SOURCES,
-} from '../../src/catalogs/uiSources';
+} from '@vybekiit/agentKit/catalogs/uiSources';
+import { describe, expect, it } from 'vitest';
 
 describe('ui-sources', () => {
   it('includes core shadcn ecosystem sources', () => {
@@ -16,6 +16,13 @@ describe('ui-sources', () => {
     expect(names).toContain('21st.dev');
     expect(names).toContain('Untitled UI React');
     expect(names).toContain('Gluestack UI');
+    expect(names).toContain('AI Elements');
+    expect(names).toContain('Kibo UI');
+    expect(names).toContain('Tailark');
+    expect(names).toContain('COSS UI');
+    expect(names).toContain('Prompt Kit');
+    expect(names).toContain('Supabase UI');
+    expect(names).toContain('Shadcnblocks (free)');
   });
 
   it('renders a markdown table', () => {

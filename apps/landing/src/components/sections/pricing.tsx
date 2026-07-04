@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { INCLUDED, NOT_INCLUDED_NOTE, NOT_INCLUDED_YET } from '@/data/pricing';
 import { PRICE } from '@/data/site';
-import Link from 'next/link';
 
 /**
  * Pricing — the single one-time-price card: what is included and, per the honesty

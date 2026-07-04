@@ -1,12 +1,11 @@
+import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import { LS_PRODUCT_FIELD_HINTS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/hints';
 import type { Page } from 'playwright';
-
 import { classifyCrawlPages, missingFieldKeys } from './classify';
 import { cleanupAllE2eByPrefix, cleanupE2eArtifacts } from './e2eCleanup';
 import { LS_E2E_PREFIX } from './e2eNames';
 import { runE2eTouch } from './e2eTouch';
 import { emitProbeResults, printProbeSummary } from './emit';
-import { LS_PRODUCT_FIELD_HINTS } from '../../../../src/domains/payments/ls/selectors/hints';
-import { LS_DRAFT_FIELDS } from '../../../../src/domains/payments/ls/selectors/fields';
 import type { ProbeReport } from './types';
 import { verifyEntryOnPage, verifyMatch, verifyMatches } from './verify';
 

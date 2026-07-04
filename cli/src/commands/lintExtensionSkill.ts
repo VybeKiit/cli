@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import process from 'node:process';
-import { lintExtensionSkill, type ExtensionSkillLintKind } from '@vybekiit/agent-kit';
+import { type ExtensionSkillLintKind, lintExtensionSkill } from '@vybekiit/agent-kit';
 
 export interface LintExtensionSkillResult {
   readonly json: string;

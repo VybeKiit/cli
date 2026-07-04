@@ -1,6 +1,6 @@
 import type { Locator, Page } from 'playwright';
 
-import { type SelectorEntry, resolveSelectorEntry } from './selectors';
+import { resolveSelectorEntry, type SelectorEntry } from './selectors';
 
 /**
  * Build a Playwright `Locator` for a named field by looking up its entry in

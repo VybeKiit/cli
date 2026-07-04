@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
-import { createAuthClient, type AuthClientPostJson } from '../src/client';
+import { type AuthClientPostJson, createAuthClient } from '@vybekiit/auth/client';
 import { ok } from '@vybekiit/core';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('createAuthClient', () => {
   it('signs in via postJson', async () => {

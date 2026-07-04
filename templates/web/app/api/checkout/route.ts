@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const env = readNodeEnv();
+  const requestOrigin = new URL(request.url).origin;
   const json = await readRequestJson(request);
   if (!json.ok) {
     return NextResponse.json(json.response.body, { status: json.response.status });
@@ -22,9 +23,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
   const result = await handleCheckout(parsed.body, {
     env,
-    appUrl: env.APP_URL,
-    frontendUrl: env.APP_URL,
-    requestOrigin: request.headers.get('origin'),
+    appUrl: env.APP_URL ?? requestOrigin,
+    frontendUrl: `${requestOrigin}/en`,
+    requestOrigin,
   });
   return NextResponse.json(result.body, { status: result.status });
 }

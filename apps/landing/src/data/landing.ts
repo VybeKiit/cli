@@ -163,7 +163,7 @@ export interface BuilderToolMark {
 export const BUILDER_TOOL_MARKS: readonly BuilderToolMark[] = [
   { label: 'Cursor', slug: 'cursor', hoverColor: '#FFFFFF' },
   { label: 'Claude Code', slug: 'claude', hoverColor: '#D97757' },
-  { label: 'Codex', slug: 'codex', hoverColor: '#10A37F' },
+  { label: 'Codex', slug: 'codex', hoverColor: '#7B8CFF' },
   { label: 'GitHub', slug: 'github', hoverColor: '#FFFFFF' },
   { label: 'Figma', slug: 'figma', hoverColor: '#F24E1E' },
   { label: 'TypeScript', slug: 'typescript', hoverColor: '#3178C6' },

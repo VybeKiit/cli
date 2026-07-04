@@ -1,6 +1,5 @@
-import { chromium, type Browser, type Page } from 'playwright';
-
-import { CdpUnreachableError } from '../../../src/core/errors';
+import { CdpUnreachableError } from '@vybekiit/browserAutomation/core/errors';
+import { type Browser, chromium, type Page } from 'playwright';
 
 export type RecorderSession = {
   browser: Browser;

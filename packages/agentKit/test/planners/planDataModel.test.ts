@@ -1,6 +1,5 @@
+import { planDataModel, renderDataModelSummary } from '@vybekiit/agentKit/planners/planDataModel';
 import { describe, expect, it } from 'vitest';
-
-import { planDataModel, renderDataModelSummary } from '../../src/planners/planDataModel';
 
 describe('planDataModel', () => {
   it('produces FK internally for customers + orders without PK jargon in summary', () => {

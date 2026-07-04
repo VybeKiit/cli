@@ -1,6 +1,6 @@
-import { type ResendConfig, type Result, fail, ok } from '@vybekiit/core';
-import { decodeResendSendResponse } from '../../../http/responseSchemas';
-import type { EmailProvider, SendEmailParams } from '../../types';
+import { fail, ok, type ResendConfig, type Result } from '@vybekiit/core';
+import { decodeResendSendResponse } from '@vybekiit/core/http';
+import type { EmailProvider, SendEmailParams } from '@vybekiit/email/types';
 
 export function createResendEmail(config: ResendConfig): EmailProvider {
   return {

@@ -1,10 +1,9 @@
+import { waitForRedirectAfterSignIn } from '@vybekiit/browserAutomation/core/waitForRedirect';
 import type { BrowserContext, Page } from 'playwright';
-
-import { waitForRedirectAfterSignIn } from '../../../../core/waitForRedirect';
 import { isNcAuthenticatedDom } from './authDom';
 import { isNcAuthenticatedUrl } from './authUrl';
 
-export { NC_AUTHENTICATED_URL, NC_AUTH_URL_HINT, isNcAuthenticatedUrl } from './authUrl';
+export { isNcAuthenticatedUrl, NC_AUTH_URL_HINT, NC_AUTHENTICATED_URL } from './authUrl';
 
 export async function waitForNcAuthenticated(
   page: Page,

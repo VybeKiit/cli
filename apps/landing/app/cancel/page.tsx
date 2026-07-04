@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { CheckoutShell } from '@/components/checkout-shell';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 export const metadata = {
   title: 'Checkout canceled — VybeKiit',

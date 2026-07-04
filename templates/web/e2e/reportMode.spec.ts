@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 async function prepareReportDock(page: Page) {
-  await page.goto('/');
+  await page.goto('/en/');
   const skip = page.getByRole('button', { name: 'Skip' });
   if (await skip.isVisible()) {
     await skip.click();
@@ -14,6 +14,9 @@ async function prepareReportDock(page: Page) {
 test.describe('Report Mode (dev)', () => {
   test.beforeEach(async ({ context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await context.addInitScript(() => {
+      localStorage.setItem('vybekiit-report-tutorial-done', 'true');
+    });
   });
 
   test('dock is visible and toggles inspect mode', async ({ page }) => {
@@ -90,8 +93,12 @@ test.describe('Report Mode (dev)', () => {
 
   test('note panel uses plain language only', async ({ page }) => {
     await prepareReportDock(page);
-    const bodyText = await page.locator('body').innerText();
-    expect(bodyText.toLowerCase()).not.toContain('dom');
-    expect(bodyText.toLowerCase()).not.toContain('selector');
+    const reportUi = page.locator('[data-report-mode-ui="true"]');
+    const uiText = await reportUi.allInnerTexts();
+    const combined = uiText.join('\n').toLowerCase();
+    // `\bdom\b` = whole word "dom" only — matches "dom" but not "domain"
+    expect(combined).not.toMatch(/\bdom\b/);
+    // `\bselector\b` = whole word "selector" — e.g. blocks "CSS selector" in UI copy
+    expect(combined).not.toMatch(/\bselector\b/);
   });
 });

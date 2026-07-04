@@ -1,6 +1,9 @@
-import { connectToChrome } from '../../../core/connect';
-import { rememberProfilePath, resolveProfilePath } from '../../../core/profileResolve';
-import type { AttachedSession } from '../../../core/types';
+import { connectToChrome } from '@vybekiit/browserAutomation/core/connect';
+import {
+  rememberProfilePath,
+  resolveProfilePath,
+} from '@vybekiit/browserAutomation/core/profileResolve';
+import type { AttachedSession } from '@vybekiit/browserAutomation/core/types';
 import { waitForNcAuthenticated } from './dashboard/waitForAuthenticated';
 import { NC_API_ACCESS_URL, type NcVerbContext } from './types';
 

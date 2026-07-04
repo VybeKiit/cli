@@ -1,7 +1,7 @@
 import {
-  type EnvSource,
   awsConfigSchema,
   dataConfigSchema,
+  type EnvSource,
   firebaseConfigSchema,
   isBackendUnconfigured,
   mongoConfigSchema,

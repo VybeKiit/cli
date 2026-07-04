@@ -1,5 +1,5 @@
+import { resolveAnalyticsProvider } from '@vybekiit/analytics/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveAnalyticsProvider } from '../resolve';
 
 describe('resolveAnalyticsProvider', () => {
   it('defaults to local when plausible domain missing', () => {

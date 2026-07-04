@@ -1,5 +1,5 @@
+import { CONTRACT, renderContract } from '@vybekiit/agentKit/contract/contract';
 import { describe, expect, it } from 'vitest';
-import { CONTRACT, renderContract } from '../../src/contract/contract';
 
 describe('renderContract', () => {
   it('renders the heading and all seven rules in order', () => {

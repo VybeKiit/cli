@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import {
   BACKEND_ANCHOR_KEYS,
   isBackendUnconfigured,
@@ -6,7 +5,8 @@ import {
   isRailwayStackActive,
   isSupabaseUnconfigured,
   needsAwsCliFromAuxiliaryProviders,
-} from '../src/providerDispatch';
+} from '@vybekiit/core/providerDispatch';
+import { describe, expect, it } from 'vitest';
 
 describe('isBackendUnconfigured', () => {
   it('is true when no provider or anchor keys are set', () => {

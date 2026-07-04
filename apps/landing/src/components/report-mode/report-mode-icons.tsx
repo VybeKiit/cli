@@ -1,6 +1,6 @@
 import type { ReportDockAnchor, ReportHandoffTarget } from '@vybekiit/report-mode';
-import { cn } from '@/lib/utils';
 import type { SVGProps } from 'react';
+import { cn } from '@/lib/utils';
 
 type IconProps = SVGProps<SVGSVGElement>;
 

@@ -1,6 +1,6 @@
-import { buildVerbContext, discoverStore } from '../../cli/discover';
-import type { CommandRegistry } from '../../cli/registry';
-import { printJson } from '../../cli/output';
+import { buildVerbContext, discoverStore } from '@vybekiit/browserAutomation/cli/discover';
+import { printJson } from '@vybekiit/browserAutomation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
 import { createNewItem } from './verbs/createNewItem';
 import { importListing } from './verbs/importListing';
 import { publish } from './verbs/publish';

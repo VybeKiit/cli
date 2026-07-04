@@ -1,4 +1,4 @@
-import { type Result, fail, ok } from '@vybekiit/core';
+import { fail, ok, type Result } from '@vybekiit/core';
 
 /**
  * One package that has a newer published version than what the buyer has installed.

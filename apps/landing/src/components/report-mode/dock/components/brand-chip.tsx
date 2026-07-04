@@ -1,11 +1,11 @@
 'use client';
 
+import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
+import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import {
   ReportBrandChevronIcon,
   ReportVybeMarkIcon,
 } from '@/components/report-mode/shared/report-mode-icons';
-import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
-import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { cn } from '@/lib/utils';
 
 interface ReportModeBrandChipProps {

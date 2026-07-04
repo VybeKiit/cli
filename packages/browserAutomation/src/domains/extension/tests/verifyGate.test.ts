@@ -1,7 +1,6 @@
 import { EventEmitter } from 'node:events';
+import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import type { VerbContext } from '../types';
 
 const { spawnMock } = vi.hoisted(() => ({
   spawnMock: vi.fn(),
@@ -11,7 +10,7 @@ vi.mock('node:child_process', () => ({
   spawn: spawnMock,
 }));
 
-import { runVerifyGate } from '../verifyGate';
+import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
 
 beforeEach(() => {
   spawnMock.mockReset();

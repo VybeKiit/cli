@@ -1,4 +1,11 @@
 export { resolveUpgradeUrl } from './affiliate';
+export type {
+  AssistantCapability,
+  AssistantModelOption,
+  CapabilitiesResponse,
+  ModelsResponse,
+  SendTurnOptions,
+} from './capabilities';
 export {
   ASSISTANT_CHAT_ENABLED_ENV,
   ASSISTANT_CHAT_PORT_ENV,
@@ -6,6 +13,7 @@ export {
   DEFAULT_ASSISTANT_CHAT_PORT,
   isAssistantChatEnabled,
   resolveAssistantChatPort,
+  shouldShowAssistantChat,
 } from './config';
 export { describePageContext, PageContext } from './context';
 export {

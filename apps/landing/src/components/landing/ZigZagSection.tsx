@@ -1,12 +1,12 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { OperatorConsoleMock } from '@/components/landing/mockups/OperatorConsole';
 import { PaymentsMock } from '@/components/landing/mockups/PaymentsMock';
 import { ThreeDeviceMock } from '@/components/landing/mockups/ThreeDeviceMock';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { ZIGZAG_ROWS } from '@/data/landing';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 const MOCK_COMPONENTS = {
   operator: OperatorConsoleMock,
@@ -14,13 +14,22 @@ const MOCK_COMPONENTS = {
   'three-device': ThreeDeviceMock,
 } as const;
 
-function CopyBlock({ copy }: { copy: (typeof ZIGZAG_ROWS)[number]['copy'] }) {
+function CopyBlock({
+  copy,
+  uiOnRight,
+}: {
+  copy: (typeof ZIGZAG_ROWS)[number]['copy'];
+  uiOnRight: boolean;
+}) {
   return (
-    <div className="zigzag-copy-side flex flex-col justify-center gap-10">
+    <div
+      className={cn(
+        'zigzag-copy-side flex flex-col justify-center gap-10',
+        !uiOnRight && 'zigzag-copy-side--left',
+      )}
+    >
       <div>
-        <p className="font-bold text-[13px] text-[var(--text-faint)] uppercase tracking-[0.12em]">
-          {copy.problemLabel}
-        </p>
+        <p className="landing-label">{copy.problemLabel}</p>
         <h3 className="problem-heading mt-3 text-white">{copy.problemHeading}</h3>
         <p className="mt-4 text-xl leading-relaxed text-[var(--text-muted)]">{copy.problemBody}</p>
       </div>
@@ -48,7 +57,7 @@ export function ZigZagSection() {
                   !row.uiOnRight && 'md:[&>*:first-child]:order-2',
                 )}
               >
-                <CopyBlock copy={row.copy} />
+                <CopyBlock copy={row.copy} uiOnRight={row.uiOnRight} />
                 <motion.div
                   className="zigzag-visual-side relative z-[2] flex items-center"
                   initial={{ opacity: 0, y: 32, scale: 0.98 }}

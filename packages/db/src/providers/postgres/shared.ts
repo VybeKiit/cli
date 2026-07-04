@@ -1,5 +1,5 @@
-import { type Result, fail } from '@vybekiit/core';
-import type { DataProviderCapabilities, DbRecord } from '../../types';
+import { fail, type Result } from '@vybekiit/core';
+import type { DataProviderCapabilities, DbRecord } from '@vybekiit/db/types';
 
 export const POSTGRES_CAPABILITIES: DataProviderCapabilities = {
   upsert: true,

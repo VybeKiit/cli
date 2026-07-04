@@ -1,5 +1,5 @@
+import { resolveNotificationsProvider } from '@vybekiit/notifications/resolve';
 import { describe, expect, it } from 'vitest';
-import { resolveNotificationsProvider } from '../resolve';
 
 describe('resolveNotificationsProvider', () => {
   it('defaults to expo provider', () => {

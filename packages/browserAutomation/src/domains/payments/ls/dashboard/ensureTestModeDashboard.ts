@@ -1,7 +1,6 @@
+import type { LsSetupMode } from '@vybekiit/browserAutomation/domains/payments/ls/types';
+import { LS_DASHBOARD_URL } from '@vybekiit/browserAutomation/domains/payments/ls/types';
 import type { Page } from 'playwright';
-
-import type { LsSetupMode } from '../types';
-import { LS_DASHBOARD_URL } from '../types';
 
 /** Sidebar Test mode row: `div.flex.h-5.cursor-pointer…` with `[role=checkbox]`. */
 function testModeRow(page: Page) {

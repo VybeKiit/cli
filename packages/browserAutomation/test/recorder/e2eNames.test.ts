@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  LS_E2E_PREFIX,
   createE2eArtifacts,
+  LS_E2E_PREFIX,
   matchesE2ePrefix,
   probeProductName,
 } from '../../dev/recorder/shared/probe/e2eNames';

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
-import { CWS_DRAFT_FIELDS, LS_DRAFT_FIELDS } from '../../dev/recorder/shared/fields';
 import { parseDraft, parseExpression } from '../../dev/recorder/shared/draft';
+import { CWS_DRAFT_FIELDS, LS_DRAFT_FIELDS } from '../../dev/recorder/shared/fields';
 
 describe('parseExpression', () => {
   it('parses getByRole', () => {

@@ -1,4 +1,4 @@
-import type { AnalyticsProvider, ScriptConfig, TrackEvent } from '../types';
+import type { AnalyticsProvider, ScriptConfig, TrackEvent } from '@vybekiit/analytics/types';
 
 export function createLocalAnalytics(): AnalyticsProvider {
   const events: TrackEvent[] = [];

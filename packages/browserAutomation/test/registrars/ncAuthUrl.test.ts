@@ -1,6 +1,5 @@
+import { isNcAuthenticatedUrl } from '@vybekiit/browserAutomation/domains/registrars/namecheap/dashboard/authUrl';
 import { describe, expect, it } from 'vitest';
-
-import { isNcAuthenticatedUrl } from '../../src/domains/registrars/namecheap/dashboard/authUrl';
 
 describe('isNcAuthenticatedUrl', () => {
   it('rejects login page even when ReturnUrl points at ap.www', () => {

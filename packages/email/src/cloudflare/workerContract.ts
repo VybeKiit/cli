@@ -1,6 +1,5 @@
-import { type Effect, Schema, type ParseResult } from 'effect';
-
-import type { SendEmailParams } from '../types';
+import type { SendEmailParams } from '@vybekiit/email/types';
+import { type Effect, type ParseResult, Schema } from 'effect';
 
 /** JSON body for `POST /send` on the Cloudflare email worker — matches {@link SendEmailParams}. */
 export interface CloudflareWorkerSendBody {

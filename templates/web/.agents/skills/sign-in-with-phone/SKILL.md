@@ -14,7 +14,7 @@ metadata:
 **Contract:** one action at a time · verify-before-advance · plain language · translate errors · celebrate.
 
 > (Agent-only) Routes: `POST /api/auth/send-sms-code`, `POST /api/auth/verify-sms-code`. Twilio via
-> `@vybekiit/auth` + `@/vybekiit/notifications`.
+> `@vybekiit/auth` + `@vybekiit/notifications`.
 
 ## Steps
 

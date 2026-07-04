@@ -1,9 +1,8 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { recordChromeWebStoreId } from '@vybekiit/browserAutomation/domains/extension/cwsIdRegistry';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-import { recordChromeWebStoreId } from '../cwsIdRegistry';
 
 const NEW_EXTENSION_ID = 'abcdefghijklmnopabcdefghijklmnop';
 const EXISTING_EXTENSION_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';

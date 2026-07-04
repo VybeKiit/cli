@@ -57,10 +57,28 @@ template (a maintainer `check:templates` keeps copies in sync).
 _Why:_ 28 published packages is 28 version/changelog/publish targets; most were single-`local`
 stubs. Cutting to **5** keeps KISS without moving a module boundary. Buckets: **public npm (5)**
 (`core` — which absorbs `http`/`observability`/`security` as subpaths — `payments`, `auth`, `db`,
-`client-state`) · **template-owned** (`tokens`, `report-mode`, `analytics`, and the thin long tail:
-`seo` `cms` `compliance` `realtime` `i18n` `jobs` `kv` `search` `ai` `email` `assets`
-`notifications` `tenancy`) · **private workspace** (`browser-automation`, `agent-kit`,
-`ui-catalog-mcp`, `deploy`).
+`client-state`) · **workspace domain packages** (promoted from template adapters — `seo`, `cms`,
+`compliance`, `realtime`, `i18n`, `jobs`, `kv`, `search`, `ai`, `email`, `assets`,
+`notifications`, `tenancy`, `tokens`, `analytics`; see ADR-0026) · **private workspace**
+(`browser-automation`, `agent-kit`, `ui-catalog-mcp`, `deploy`).
+
+### Import aliases — one vocabulary everywhere (ADR-0026)
+Templates use `@/*` → `./src/*`. Packages use `@vybekiit/<pkg>` and `@vybekiit/<pkg>/*` for
+**all** cross-module imports (including inside the same package). Colocated `./` is fine; **`../` is
+banned** — reach for the alias instead. Biome `organizeImports` is on; order: external →
+`@vybekiit/*` → `@/*` → `./`. Template fetch helper SSOT: `@/lib/fetchJson`.
+```ts
+// templates/web/src/lib/providers.ts — spine imports
+import { resolveAnalyticsProvider } from '@vybekiit/analytics';
+import { readNodeEnv } from '@/lib/nodeEnv';
+// packages/auth/src/http/handlers.ts — self-import same as external
+import { resolveAuthProvider } from '@vybekiit/auth/resolve';
+import type { SignInBody } from './schemas';
+// templates/backend/src/routes/auth.routes.ts — no parent-relative
+import { createBackendAuthHttpDeps } from '@/lib/authHttpDeps.js';
+```
+_Why:_ greppable paths, one codemod target, no drift between “template copy” and package copy.
+Never: `@/vybekiit/*` (removed), `from '../lib/…'` in templates/backend, `from '../../email'` across packages.
 
 ### Concern packages follow the same skeleton (Effect DI)
 Every surviving provider package (`payments`, `auth`, `db`, …) has the same shape: `types.ts`

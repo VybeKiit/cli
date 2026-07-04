@@ -1,6 +1,6 @@
+import { createCloudflareR2Delivery } from '@vybekiit/assets/providers';
+import { resolveAssetDelivery } from '@vybekiit/assets/resolve';
 import { describe, expect, it } from 'vitest';
-import { createCloudflareR2Delivery } from '../providers';
-import { resolveAssetDelivery } from '../resolve';
 
 const cloudflareEnv = {
   CLOUDFLARE_ACCOUNT_ID: 'acct',

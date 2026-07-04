@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BRAND, HEADER_LINKS } from '@/data/site';
-import Link from 'next/link';
 
 /** Top navigation for the store. Logical spacing mirrors under RTL. */
 export function SiteHeader() {

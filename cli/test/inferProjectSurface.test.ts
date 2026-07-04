@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   inferProjectSurfaceSync,
-  reportModeEnvKeysForSurface,
   type ProjectSurfaceProbe,
+  reportModeEnvKeysForSurface,
 } from '../src/lib/inferProjectSurface';
 
 function probe(files: Record<string, string>): ProjectSurfaceProbe {

@@ -8,19 +8,19 @@ import {
   runBackendAddUpload,
   runScaffoldBackend,
 } from './commands/backendCli';
-import { runCheckGoals } from './commands/checkGoals';
 import { runCheckAgentLayer } from './commands/checkAgentLayer';
-import { runLintExtensionSkill } from './commands/lintExtensionSkill';
+import { runCheckGoals } from './commands/checkGoals';
 import { runDocFallback } from './commands/docFallback';
-import { runDoctor } from './doctor/run';
+import { runLintExtensionSkill } from './commands/lintExtensionSkill';
 import { runNew } from './commands/new';
-import { runSetup } from './commands/setup';
 import { runPlanDataModel } from './commands/planDataModelCmd';
 import { runPlanReadiness } from './commands/planReadiness';
 import { runPlanSetup } from './commands/planSetupCmd';
 import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/presetsCmd';
 import { runRenderAgentLayer } from './commands/renderAgentLayer';
+import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
+import { runDoctor } from './doctor/run';
 import { cloneMirror, resolveTemplatesSource } from './lib/resolveTemplates';
 import { runEnvWizard } from './prompts/envWizard';
 import { isInteractive } from './prompts/tty';

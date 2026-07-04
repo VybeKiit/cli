@@ -1,6 +1,10 @@
+import {
+  parseWorkerSendBody,
+  senderDomain,
+  toWorkerSendBody,
+} from '@vybekiit/email/cloudflare/workerContract';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
-import { parseWorkerSendBody, senderDomain, toWorkerSendBody } from '../cloudflare/workerContract';
 
 describe('worker-contract', () => {
   it('round-trips SendEmailParams through JSON', () => {

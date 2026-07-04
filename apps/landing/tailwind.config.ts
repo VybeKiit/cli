@@ -13,7 +13,13 @@ import type { Config } from 'tailwindcss';
  * detection. Copy stays English; the structure stays RTL-safe.
  */
 export default {
-  content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
+  content: [
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+    '../../templates/web/src/components/ai-elements/**/*.{ts,tsx}',
+    '../../templates/web/src/components/builder-assistant-mark/**/*.{ts,tsx}',
+    '../../templates/web/src/components/ui/**/*.{ts,tsx}',
+  ],
   theme: {
     container: { center: true, padding: '2rem', screens: { '2xl': '1400px' } },
     extend: {

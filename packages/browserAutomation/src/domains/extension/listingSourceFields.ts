@@ -1,9 +1,7 @@
 import type { Page } from 'playwright';
-
-import type { CwsListing } from './schema';
-
 import { fieldLocator } from './locator';
 import { safeClick } from './safeClick';
+import type { CwsListing } from './schema';
 
 /**
  * Asset slots that a verb cannot push without a real file path on disk and

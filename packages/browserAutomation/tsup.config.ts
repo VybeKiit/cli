@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
 export default defineConfig({
   entry: {
@@ -13,4 +14,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
+  esbuildPlugins: [createWorkspaceAliasPlugin()],
 });

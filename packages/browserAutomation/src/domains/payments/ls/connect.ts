@@ -1,6 +1,9 @@
-import { connectToChrome } from '../../../core/connect';
-import { rememberProfilePath, resolveProfilePath } from '../../../core/profileResolve';
-import type { AttachedSession } from '../../../core/types';
+import { connectToChrome } from '@vybekiit/browserAutomation/core/connect';
+import {
+  rememberProfilePath,
+  resolveProfilePath,
+} from '@vybekiit/browserAutomation/core/profileResolve';
+import type { AttachedSession } from '@vybekiit/browserAutomation/core/types';
 import { waitForLsAuthenticated } from './dashboard/waitForAuthenticated';
 import { LS_DASHBOARD_URL, type LsVerbContext } from './types';
 

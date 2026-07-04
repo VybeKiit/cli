@@ -1,14 +1,13 @@
+import { waitForRedirectAfterSignIn } from '@vybekiit/browserAutomation/core/waitForRedirect';
 import type { BrowserContext, Page } from 'playwright';
-
-import { waitForRedirectAfterSignIn } from '../../../../core/waitForRedirect';
 import { isLsAuthenticatedDom } from './authDom';
 import { isLsAuthenticatedUrl } from './authUrl';
 
 export {
-  LS_AUTHENTICATED_URL,
-  LS_AUTH_URL_HINT,
-  isLsAuthGateUrl,
   isLsAuthenticatedUrl,
+  isLsAuthGateUrl,
+  LS_AUTH_URL_HINT,
+  LS_AUTHENTICATED_URL,
 } from './authUrl';
 
 export type WaitForLsAuthOptions = {
