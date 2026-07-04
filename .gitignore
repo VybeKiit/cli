@@ -5,10 +5,22 @@ node_modules/
 # build output
 dist/
 .next/
+.open-next/
 .turbo/
 out/
 *.tsbuildinfo
 next-env.d.ts
+
+# test / local runtime output
+test-results/
+.playwright/
+
+# editor / agent local overrides
+.kimi-code/
+.kiro/
+
+# wrangler local state (config is tracked; state is not)
+.wrangler/state/
 
 # env / secrets — NEVER commit real values (only .env.example is tracked)
 .env
