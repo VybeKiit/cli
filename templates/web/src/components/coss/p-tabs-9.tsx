@@ -1,5 +1,5 @@
 import { BoxIcon, HouseIcon, PanelsTopLeftIcon } from 'lucide-react';
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@vybekiit/ui/tabs';
 
 export default function Particle() {
   return (

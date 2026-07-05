@@ -2,7 +2,7 @@
 
 import { CopyIcon, EllipsisIcon, PencilIcon, ShareIcon, TrashIcon } from 'lucide-react';
 import { useMediaQuery } from '@/registry/default/hooks/use-media-query';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Drawer,
   DrawerClose,
@@ -18,7 +18,7 @@ import {
   DrawerPanel,
   DrawerPopup,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from '@vybekiit/ui/drawer';
 import {
   Menu,
   MenuCheckboxItem,

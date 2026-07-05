@@ -22,7 +22,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   CommandDialog,
   CommandEmpty,
@@ -30,8 +30,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Kbd } from '@/components/ui/kbd';
+} from '@vybekiit/ui/command';
+import { Kbd } from '@vybekiit/ui/kbd';
 
 const workspaceItems = [
   { icon: IconLayoutDashboard, label: 'Dashboard' },

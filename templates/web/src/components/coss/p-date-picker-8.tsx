@@ -2,9 +2,9 @@
 
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover';
-import { SelectButton } from '@/components/ui/select';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { Popover, PopoverPopup, PopoverTrigger } from '@vybekiit/ui/popover';
+import { SelectButton } from '@vybekiit/ui/select';
 
 export default function Particle() {
   const [date, setDate] = useState<Date | undefined>();

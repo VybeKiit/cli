@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@vybekiit/ui/calendar';
 
 export default function Particle() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());

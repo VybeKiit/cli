@@ -1,6 +1,6 @@
 import { useId } from 'react';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Label } from '@vybekiit/ui/label';
+import { Switch } from '@vybekiit/ui/switch';
 
 export default function Particle() {
   const id = useId();

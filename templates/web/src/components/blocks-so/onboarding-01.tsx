@@ -9,14 +9,14 @@ import {
   IconMail,
 } from '@tabler/icons-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { Button } from '@vybekiit/ui/button';
+import { Collapsible, CollapsibleContent } from '@vybekiit/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@vybekiit/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 const steps = [

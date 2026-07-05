@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@vybekiit/ui/card';
 import type * as React from 'react';
 import { Gemini } from '@/components/ui/svgs/gemini';
 import { Replit } from '@/components/ui/svgs/replit';

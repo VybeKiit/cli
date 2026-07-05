@@ -2,7 +2,7 @@
 
 import { Pause, Play, RotateCcw } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Timer, TimerDisplay, TimerIcon, TimerRoot, useTimer } from '@/components/ui/timer';
 
 export default function TimerExamples() {

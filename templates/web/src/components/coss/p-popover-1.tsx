@@ -1,16 +1,16 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Field } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
+import { Button } from '@vybekiit/ui/button';
+import { Field } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
 import {
   Popover,
   PopoverDescription,
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/popover';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   return (

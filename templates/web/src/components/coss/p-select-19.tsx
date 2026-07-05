@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
 import {
   Select,
   SelectGroup,
@@ -9,7 +9,7 @@ import {
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 
 const users = [
   {

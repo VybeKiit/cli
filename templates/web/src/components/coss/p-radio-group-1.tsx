@@ -1,5 +1,5 @@
-import { Label } from '@/components/ui/label';
-import { Radio, RadioGroup } from '@/components/ui/radio-group';
+import { Label } from '@vybekiit/ui/label';
+import { Radio, RadioGroup } from '@vybekiit/ui/radio-group';
 
 export default function Particle() {
   return (

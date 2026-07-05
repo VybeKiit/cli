@@ -24,17 +24,17 @@ import {
   FloatingMenu,
   type FloatingMenuProps,
 } from '@tiptap/react/menus';
-import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandItem, CommandList } from '@/components/ui/command';
+import { Button } from '@vybekiit/ui/button';
+import { Command, CommandEmpty, CommandItem, CommandList } from '@vybekiit/ui/command';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+} from '@vybekiit/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
+import { Separator } from '@vybekiit/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 export type { Editor, JSONContent } from '@tiptap/react';

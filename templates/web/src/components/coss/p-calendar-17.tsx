@@ -3,9 +3,9 @@
 import { format, isValid, parse } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 
 export default function Particle() {
   const [date, setDate] = useState<Date | undefined>(() => new Date());

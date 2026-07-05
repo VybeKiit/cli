@@ -5,7 +5,7 @@ import { ArrowRight, Pause, Play, Sparkles, Wand2, Zap } from 'lucide-react';
 import type { MetalFxPreset } from 'metal-fx';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { MetalButton, MetalIconButton } from '@/components/ui/metal-button';
 
 const PRESET_ROW: { key: MetalFxPreset; label: string }[] = [

@@ -5,7 +5,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from '@vybekiit/ui/sidebar';
 import type { NavItem } from './types';
 
 export function NavMain({ items }: { items: NavItem[] }) {

@@ -1,5 +1,5 @@
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Kbd } from '@/components/ui/kbd';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Kbd } from '@vybekiit/ui/kbd';
 
 export default function Particle() {
   return (

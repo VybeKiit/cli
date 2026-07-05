@@ -2,7 +2,7 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Combobox,
   ComboboxEmpty,
@@ -11,8 +11,8 @@ import {
   ComboboxList,
   ComboboxPopup,
 } from '@/components/ui/combobox';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
+import { Field, FieldError, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
 
 const items = [
   { label: 'Apple', value: 'apple' },

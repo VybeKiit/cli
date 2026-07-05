@@ -6,7 +6,7 @@ import {
   ContextMenuPopup,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@vybekiit/ui/context-menu';
 
 export default function Particle() {
   return (

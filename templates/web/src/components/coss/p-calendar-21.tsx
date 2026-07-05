@@ -11,8 +11,8 @@ import {
 } from 'date-fns';
 import { useState } from 'react';
 import type { DateRange } from 'react-day-picker';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@vybekiit/ui/button';
+import { Calendar } from '@vybekiit/ui/calendar';
 
 export default function Particle() {
   const today = new Date();

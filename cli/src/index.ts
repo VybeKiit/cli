@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { runAddBridge } from './commands/addBridge';
 import {
   runBackendAddCrud,
   runBackendAddRoute,
@@ -10,8 +11,12 @@ import {
 } from './commands/backendCli';
 import { runCheckAgentLayer } from './commands/checkAgentLayer';
 import { runCheckGoals } from './commands/checkGoals';
+import { runDedup } from './commands/dedup';
 import { runDocFallback } from './commands/docFallback';
+import { runDrop } from './commands/drop';
+import { runInit } from './commands/init';
 import { runLintExtensionSkill } from './commands/lintExtensionSkill';
+import { runLocalDev } from './commands/localDev';
 import { runNew } from './commands/new';
 import { runPlanDataModel } from './commands/planDataModelCmd';
 import { runPlanReadiness } from './commands/planReadiness';
@@ -21,7 +26,6 @@ import { runRenderAgentLayer } from './commands/renderAgentLayer';
 import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
 import { runDoctor } from './doctor/run';
-import { cloneMirror, resolveTemplatesSource } from './lib/resolveTemplates';
 import { runEnvWizard } from './prompts/envWizard';
 import { isInteractive } from './prompts/tty';
 
@@ -32,6 +36,9 @@ const _HELP = `vybekiit — scaffold a VybeKiit template into your own repo
 Usage:
   vybekiit setup
   vybekiit new [template] [directory]
+  vybekiit drop <template> [path] [--force|--merge|--dry-run|--json]
+  vybekiit init [directory]
+  vybekiit local-dev
   vybekiit scaffold backend [directory]
   vybekiit doctor
   vybekiit sync-agent-layer [template]
@@ -46,6 +53,8 @@ Usage:
   vybekiit check-agent-layer [template]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
+  vybekiit dedup [--intent <desc>] [--target <file>] [--scope <dir>] [--index] [--json]
+  vybekiit add bridge
   vybekiit env wizard
   vybekiit backend add-route <name>
   vybekiit backend add-crud <resource>
@@ -60,7 +69,10 @@ Templates:
 
 Commands:
   setup               Welcome banner + set up the tools your app needs
-  new                 Scaffold a template (interactive menu when TTY)
+  new                 Scaffold a template into a NEW empty directory (interactive)
+  drop                Copy/paste/drop a template to ANY path (agent-friendly)
+  init                Bootstrap VybeKiit guardrails on an EXISTING project
+  local-dev           Open the visual local dev console in your browser
   scaffold backend    Add Express API server to an existing project
   doctor              Set up + check the tools your app needs
   sync-agent-layer    Refresh agent instructions from the latest template mirror
@@ -75,7 +87,9 @@ Commands:
   verify-presets      Verify preset tables exist; --fix applies missing
   lint-extension-skill Lint an extension skill draft before saving (JSON)
   doc-fallback        Official docs URLs when MCP or debug fails once (JSON)
+  dedup               Deduplication gate — check for existing duplicates before creating (JSON)
   env wizard          Interactive .env setup (TTY only)
+  add bridge          Install ai-browser-bridge globally + wire agent skills
   backend add-route   Append a route + controller to backend/
   backend add-crud    Scaffold CRUD routes for a resource
   backend add-upload  Add multer upload route
@@ -84,6 +98,9 @@ Examples:
   vybekiit setup
   vybekiit new
   vybekiit new web my-app
+  vybekiit drop mobile ~/Projects/my-app
+  vybekiit drop web . --force
+  vybekiit drop backend ./api --json
   vybekiit doc-fallback twilio
   vybekiit check-goals mobile
 
@@ -126,8 +143,17 @@ async function main(argv: string[]): Promise<number> {
   if (command === 'new') {
     return runNew(rest);
   }
+  if (command === 'drop') {
+    return runDrop(subcommand ? [subcommand, ...rest] : rest);
+  }
   if (command === 'doctor') {
     return await runDoctor();
+  }
+  if (command === 'init') {
+    return await runInit(rest);
+  }
+  if (command === 'local-dev') {
+    return await runLocalDev();
   }
   if (command === 'sync-agent-layer') {
     const result = await runSyncAgentLayer(rest);
@@ -189,6 +215,15 @@ async function main(argv: string[]): Promise<number> {
     const result = runDocFallback(rest);
     console.log(result.json);
     return result.exitCode;
+  }
+  if (command === 'dedup') {
+    const allArgs = subcommand ? [subcommand, ...rest] : rest;
+    const result = await runDedup(allArgs);
+    if (result.output) process.stdout.write(result.output);
+    return result.exitCode;
+  }
+  if (command === 'add' && subcommand === 'bridge') {
+    return await runAddBridge(rest);
   }
   if (command === 'env' && subcommand === 'wizard') {
     if (!isInteractive()) {

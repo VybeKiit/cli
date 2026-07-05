@@ -1,4 +1,4 @@
-import { Spinner as ShadcnSpinner } from '@/components/ui/spinner';
+import { Spinner as ShadcnSpinner } from '@vybekiit/ui/spinner';
 import { LoaderCircleIcon, LoaderIcon, LoaderPinwheelIcon, type LucideProps } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

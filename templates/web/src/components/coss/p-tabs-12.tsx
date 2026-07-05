@@ -1,6 +1,6 @@
 import { HouseIcon, InboxIcon, SettingsIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs';
+import { Badge } from '@vybekiit/ui/badge';
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@vybekiit/ui/tabs';
 
 export default function Particle() {
   return (

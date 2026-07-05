@@ -1,7 +1,7 @@
 'use client';
 
-import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Textarea } from '@vybekiit/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 import React, { createContext, useContext, useLayoutEffect, useRef, useState } from 'react';
 

@@ -2,8 +2,8 @@
 
 import { BellIcon, UserIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
 import {
   Popover,
   PopoverCreateHandle,
@@ -11,7 +11,7 @@ import {
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@vybekiit/ui/popover';
 
 const popoverHandle = PopoverCreateHandle<ComponentType>();
 

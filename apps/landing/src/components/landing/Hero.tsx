@@ -10,7 +10,7 @@ export function Hero() {
         <span className="block">{LANDING_HERO.headlineLines[0]}</span>
         <span className="block">{LANDING_HERO.headlineLines[1]}</span>
       </h1>
-      <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl md:leading-[1.55]">
+      <p className="hero-subtext mx-auto mt-12 max-w-[940px] text-[28px] leading-[1.42] text-[#B9BDC6]">
         {LANDING_HERO.subhead}
       </p>
     </SectionShell>

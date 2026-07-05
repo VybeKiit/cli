@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   const id = useId();

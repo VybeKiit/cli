@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { Card } from '@/components/ui/card';
+import { Card } from '@vybekiit/ui/card';
 import { Spotify } from '@/components/ui/svgs/spotify';
 import { SupabaseFull } from '@/components/ui/svgs/supabase';
 import { VercelFull } from '@/components/ui/svgs/vercel';

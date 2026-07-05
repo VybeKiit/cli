@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { ChevronRight, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'motion/react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@vybekiit/ui/skeleton';
 import { useUser } from '@/hooks/useUser';
 import { useRouter } from '@/i18n/navigation';
 import { type ReactNode, useEffect } from 'react';

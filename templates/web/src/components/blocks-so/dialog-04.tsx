@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@vybekiit/ui/dialog';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import { useState } from 'react';
 
 export default function Dialog03() {

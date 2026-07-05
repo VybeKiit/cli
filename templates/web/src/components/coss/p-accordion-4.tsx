@@ -1,13 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionPanel,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@vybekiit/ui/accordion';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   const [value, setValue] = useState<string[]>([]);

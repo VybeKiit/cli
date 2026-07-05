@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
 import { ChevronRight, Twitter } from 'lucide-react';
 import Link from 'next/link';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
 
 const members = [
   {

@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Separator } from '@vybekiit/ui/separator';
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { type JSX, type SVGProps, useState } from 'react';
 

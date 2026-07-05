@@ -2,8 +2,8 @@
 
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
 import { Slider } from '@/components/ui/slider';
 
 const min = 0;

@@ -1,6 +1,6 @@
 import { useId } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Label } from '@vybekiit/ui/label';
 
 export default function Particle() {
   const id = useId();

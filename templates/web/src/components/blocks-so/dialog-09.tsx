@@ -1,17 +1,17 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+} from '@vybekiit/ui/dialog';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Switch } from '@vybekiit/ui/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { CheckIcon, CopyIcon, ExternalLink, Link, Share2 } from 'lucide-react';
 import { useRef, useState } from 'react';

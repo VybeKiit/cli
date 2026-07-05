@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 
-import { Input } from '@/components/ui/input';
+import { Input } from '@vybekiit/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 
 import { TextGif } from '../ui/text-gif';
 

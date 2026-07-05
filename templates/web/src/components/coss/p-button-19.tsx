@@ -2,7 +2,7 @@
 
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);

@@ -1,1 +1,1 @@
-export * from '@/components/ui/alert';
+export * from '@vybekiit/ui/alert';

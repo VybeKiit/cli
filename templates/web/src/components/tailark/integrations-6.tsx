@@ -1,7 +1,7 @@
 import { Gemini } from '@/components/ui/svgs/gemini';
 import { Replit } from '@/components/ui/svgs/replit';
 import { GooglePaLM } from '@/components/ui/svgs/google-palm';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 

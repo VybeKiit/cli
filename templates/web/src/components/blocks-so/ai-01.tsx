@@ -2,15 +2,15 @@
 
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/dropdown-menu';
+import { Textarea } from '@vybekiit/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
   IconMicrophone,

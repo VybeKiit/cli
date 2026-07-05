@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent } from '@vybekiit/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@vybekiit/ui/dropdown-menu';
 import { MoreVertical } from 'lucide-react';
 
 const bookCollections = [

@@ -1,16 +1,10 @@
 'use client';
 
 import { ArrowRightIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator } from '@/components/ui/group';
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 interface Currency {
   value: string;

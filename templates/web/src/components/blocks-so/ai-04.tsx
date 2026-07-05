@@ -1,17 +1,17 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/dropdown-menu';
+import { Label } from '@vybekiit/ui/label';
+import { Switch } from '@vybekiit/ui/switch';
+import { Textarea } from '@vybekiit/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
   IconAdjustmentsHorizontal,

@@ -1,1 +1,1 @@
-export * from '@/components/ui/progress';
+export * from '@vybekiit/ui/progress';

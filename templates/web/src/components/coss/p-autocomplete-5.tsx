@@ -9,7 +9,7 @@ import {
   AutocompleteList,
   AutocompletePopup,
 } from '@/components/ui/autocomplete';
-import { Label } from '@/components/ui/label';
+import { Label } from '@vybekiit/ui/label';
 
 const items = [
   { label: 'Apple', value: 'apple' },

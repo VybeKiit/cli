@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@vybekiit/ui/progress';
 
 export default function Particle() {
   const [value, setValue] = useState(20);

@@ -1,13 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 export default function Particle() {
   const timezones = Intl.supportedValuesOf('timeZone');

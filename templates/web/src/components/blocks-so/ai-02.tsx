@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/select';
+import { Textarea } from '@vybekiit/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
   IconAlertTriangle,

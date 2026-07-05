@@ -1,5 +1,5 @@
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Spinner } from '@/components/ui/spinner';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Spinner } from '@vybekiit/ui/spinner';
 
 export default function Particle() {
   return (

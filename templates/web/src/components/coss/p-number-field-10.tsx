@@ -3,9 +3,9 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Field } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
+import { Button } from '@vybekiit/ui/button';
+import { Field } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
 import {
   NumberField,
   NumberFieldDecrement,

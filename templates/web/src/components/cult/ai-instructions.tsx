@@ -14,7 +14,7 @@ import { CheckmarkSquare02Icon, PlusSignIcon, SettingsIcon } from '@hugeicons/co
 import { HugeiconsIcon } from '@hugeicons/react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -23,7 +23,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
+} from '@vybekiit/ui/command';
 import {
   Dialog,
   DialogClose,
@@ -34,11 +34,11 @@ import {
   DialogTitle,
   type DialogDescriptionProps,
   type DialogTitleProps,
-} from '@/components/ui/dialog';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/dialog';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
+import { Input } from '@vybekiit/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 // ============================================================================
 // Types

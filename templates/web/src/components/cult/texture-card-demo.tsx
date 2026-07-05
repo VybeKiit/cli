@@ -2,8 +2,8 @@
 
 import { ArrowRight, Merge } from 'lucide-react';
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import { TextureButton } from '@/components/ui/texture-button';
 import {
   TextureCardContent,

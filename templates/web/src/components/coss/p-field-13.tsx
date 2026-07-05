@@ -1,8 +1,8 @@
 'use client';
 
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import { CheckboxGroup } from '@/components/ui/checkbox-group';
-import { Field, FieldItem, FieldLabel } from '@/components/ui/field';
+import { Field, FieldItem, FieldLabel } from '@vybekiit/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
 
 export default function Particle() {

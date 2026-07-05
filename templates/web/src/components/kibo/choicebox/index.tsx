@@ -1,6 +1,6 @@
 'use client';
 
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@vybekiit/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { type ComponentProps, createContext, type HTMLAttributes, useContext } from 'react';
 import {
@@ -9,7 +9,7 @@ import {
   FieldDescription,
   FieldLabel,
   FieldTitle,
-} from '@/components/ui/field';
+} from '@vybekiit/ui/field';
 
 export type ChoiceboxProps = ComponentProps<typeof RadioGroup>;
 

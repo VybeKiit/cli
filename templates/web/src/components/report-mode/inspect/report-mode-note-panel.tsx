@@ -5,7 +5,7 @@ import {
   ReportCopyIcon,
   ReportSendIcon,
 } from '@/components/report-mode/shared/report-mode-icons';
-import { Input } from '@/components/ui/input';
+import { Input } from '@vybekiit/ui/input';
 import { cn } from '@/lib/utils';
 
 type ReportModeNotePanelProps = {

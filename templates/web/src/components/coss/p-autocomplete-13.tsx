@@ -10,9 +10,9 @@ import {
   AutocompleteList,
   AutocompletePopup,
 } from '@/components/ui/autocomplete';
-import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldError, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
 
 const items = [
   { label: 'Apple', value: 'apple' },

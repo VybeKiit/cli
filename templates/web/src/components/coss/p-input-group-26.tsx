@@ -2,9 +2,9 @@
 
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Label } from '@vybekiit/ui/label';
 
 const requirements = [
   { regex: /.{8,}/, text: 'At least 8 characters' },

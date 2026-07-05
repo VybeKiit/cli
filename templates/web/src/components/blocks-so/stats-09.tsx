@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { Progress } from '@vybekiit/ui/progress';
 
 const data = [
   {

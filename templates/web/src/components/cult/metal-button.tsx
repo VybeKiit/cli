@@ -15,7 +15,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { MetalFx, type MetalFxProps, type MetalFxVariant } from 'metal-fx';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 const metalSurfaceVariants = cva('transition-colors', {
   variants: {

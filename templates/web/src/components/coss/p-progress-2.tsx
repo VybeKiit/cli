@@ -4,7 +4,7 @@ import {
   ProgressLabel,
   ProgressTrack,
   ProgressValue,
-} from '@/components/ui/progress';
+} from '@vybekiit/ui/progress';
 
 export default function Particle() {
   return (

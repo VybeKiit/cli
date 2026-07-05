@@ -1,6 +1,6 @@
 import { HouseIcon, PanelsTopLeftIcon, SettingsIcon } from 'lucide-react';
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs';
-import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@vybekiit/ui/tabs';
+import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   return (

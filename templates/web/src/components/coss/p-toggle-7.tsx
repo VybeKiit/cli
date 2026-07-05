@@ -1,5 +1,5 @@
 import { BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
-import { Toggle } from '@/components/ui/toggle';
+import { Toggle } from '@vybekiit/ui/toggle';
 
 export default function Particle() {
   return (

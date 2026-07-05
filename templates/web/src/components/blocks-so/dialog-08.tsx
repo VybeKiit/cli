@@ -3,9 +3,9 @@
 import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@vybekiit/ui/dialog';
+import { Input } from '@vybekiit/ui/input';
 
 const members = [
   {

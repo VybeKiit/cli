@@ -11,7 +11,7 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from '@/components/ui/combobox';
-import { SelectButton } from '@/components/ui/select';
+import { SelectButton } from '@vybekiit/ui/select';
 
 const items = [
   { label: 'Apple', value: 'apple' },

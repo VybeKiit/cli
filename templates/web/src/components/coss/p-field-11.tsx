@@ -1,11 +1,5 @@
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 const items = [
   { label: 'Select a country', value: null },

@@ -2,9 +2,9 @@
 
 import { SaveIcon } from 'lucide-react';
 import { useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { anchoredToastManager } from '@/components/ui/toast';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 const ANCHORED_SAVE_TOAST_ID = 'coss-demo-anchored-save-toast';
 

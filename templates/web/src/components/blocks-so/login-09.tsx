@@ -1,17 +1,17 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@vybekiit/ui/card';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 import { BarChart, Code, Eye, EyeOff, User } from 'lucide-react';
 import Link from 'next/link';
 import { type JSX, type SVGProps, useState } from 'react';

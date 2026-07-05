@@ -1,15 +1,15 @@
 'use client';
 
 import { SiteFooter } from '@/components/site-footer';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
+} from '@vybekiit/ui/dropdown-menu';
+import { Separator } from '@vybekiit/ui/separator';
 import { Link, useRouter } from '@/i18n/navigation';
 import { signOut } from '@/lib/authClient';
 import type { AuthUser } from '@vybekiit/auth';

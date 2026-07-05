@@ -5,8 +5,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
+} from '@vybekiit/ui/accordion';
+import { Badge } from '@vybekiit/ui/badge';
 import { cn } from '@/lib/utils';
 import type { Tool } from 'ai';
 import { BotIcon } from 'lucide-react';

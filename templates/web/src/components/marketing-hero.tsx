@@ -1,8 +1,8 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent } from '@vybekiit/ui/card';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 

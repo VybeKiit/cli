@@ -2,9 +2,9 @@
 
 import { RotateCcwIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
-import { Label } from '@/components/ui/label';
+import { Label } from '@vybekiit/ui/label';
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field';
 import { Slider } from '@/components/ui/slider';
 

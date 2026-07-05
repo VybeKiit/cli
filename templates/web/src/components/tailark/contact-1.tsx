@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Textarea } from '@vybekiit/ui/textarea';
 import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import { ClientStateProvider } from '@/lib/client-state';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@vybekiit/ui/sonner';
 import { ReportModeDevShell } from '@/components/report-mode/report-mode-shell';
 import { routing } from '@/i18n/routing';
 import { localeToDirection, localeToLang } from '@/lib/direction';

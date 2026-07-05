@@ -9,7 +9,7 @@ import {
   ComboboxList,
   ComboboxPopup,
 } from '@/components/ui/combobox';
-import { Label } from '@/components/ui/label';
+import { Label } from '@vybekiit/ui/label';
 
 const items = [
   { label: 'Apple', value: 'apple' },

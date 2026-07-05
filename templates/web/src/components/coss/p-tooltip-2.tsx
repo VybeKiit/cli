@@ -1,6 +1,6 @@
 import { BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ToggleGroup, ToggleGroupItem } from '@vybekiit/ui/toggle-group';
+import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   return (

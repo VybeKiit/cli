@@ -1,6 +1,6 @@
 'use client';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -9,7 +9,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuItem as SidebarMenuSubItem,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from '@vybekiit/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';

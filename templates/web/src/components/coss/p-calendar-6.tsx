@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import type { DropdownProps } from 'react-day-picker';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@vybekiit/ui/calendar';
 import {
   Combobox,
   ComboboxEmpty,

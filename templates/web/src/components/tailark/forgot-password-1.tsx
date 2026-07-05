@@ -1,8 +1,8 @@
 import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import Link from 'next/link';
 
 export default function ForgotPassword() {

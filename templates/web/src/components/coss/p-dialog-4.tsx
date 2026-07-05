@@ -9,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogPopup,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@vybekiit/ui/alert-dialog';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -21,10 +21,10 @@ import {
   DialogPopup,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Field } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/dialog';
+import { Field } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   const [dialogOpen, setDialogOpen] = useState(false);

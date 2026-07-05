@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { ChartContainer } from '@/components/ui/chart';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { ChartContainer } from '@vybekiit/ui/chart';
 import { cn } from '@/lib/utils';
 import { Area, AreaChart, XAxis } from 'recharts';
 

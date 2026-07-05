@@ -1,5 +1,5 @@
 import { SearchIcon } from 'lucide-react';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 
 export default function Particle() {
   return (

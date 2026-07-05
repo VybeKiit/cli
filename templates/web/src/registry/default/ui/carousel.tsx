@@ -1,1 +1,1 @@
-export * from '@/components/ui/carousel';
+export * from '@vybekiit/ui/carousel';

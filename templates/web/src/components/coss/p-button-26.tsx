@@ -2,7 +2,7 @@
 
 import { StarIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   const [isStarred, setIsStarred] = useState(false);

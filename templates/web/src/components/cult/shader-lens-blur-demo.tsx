@@ -5,19 +5,19 @@ import { useAtom } from 'jotai';
 import { Circle, CircleOff, Sliders, Square, Triangle } from 'lucide-react';
 import { motion } from 'motion/react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Label } from '@vybekiit/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from '@vybekiit/ui/select';
+import { Separator } from '@vybekiit/ui/separator';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@vybekiit/ui/switch';
 
 import ColorPicker from '../ui/color-picker';
 import ShaderLensBlur, { configAtom } from '../ui/shader-lens-blur';

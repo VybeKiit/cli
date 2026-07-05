@@ -1,8 +1,8 @@
 'use client';
 
 import { BuilderFeatureHint } from '@/components/builder-feature-hint';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Card, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { TooltipProvider } from '@vybekiit/ui/tooltip';
 import { HOME_FEATURES, type HomeFeatureIcon } from '@/data/marketing';
 import { BellRing, ChartLine, CircleHelp, Cloud, CreditCard, Database } from 'lucide-react';
 import { useTranslations } from 'next-intl';

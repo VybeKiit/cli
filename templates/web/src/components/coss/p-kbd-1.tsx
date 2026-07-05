@@ -1,4 +1,4 @@
-import { Kbd, KbdGroup } from '@/components/ui/kbd';
+import { Kbd, KbdGroup } from '@vybekiit/ui/kbd';
 
 export default function Particle() {
   return (

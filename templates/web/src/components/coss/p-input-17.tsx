@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@vybekiit/ui/input';
 
 export default function Particle() {
   const id = useId();

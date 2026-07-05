@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { GradientHeading } from '@/components/ui/gradient-heading';

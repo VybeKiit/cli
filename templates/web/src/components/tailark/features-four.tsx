@@ -1,9 +1,9 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@vybekiit/ui/toggle-group';
 import { Bold, Calendar1, Ellipsis, Italic, Strikethrough, Underline } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
 
 export default function FeaturesSection() {
   return (

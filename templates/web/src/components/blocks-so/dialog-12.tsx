@@ -3,17 +3,17 @@
 import { Plus, UserRoundIcon, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@vybekiit/ui/dialog';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 
 export default function Dialog12() {
   const [open, setOpen] = useState(true);

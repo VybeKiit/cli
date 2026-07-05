@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@vybekiit/ui/button';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   return (

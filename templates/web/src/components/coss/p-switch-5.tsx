@@ -2,10 +2,10 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Switch } from '@vybekiit/ui/switch';
 
 export default function Particle() {
   const [loading, setLoading] = useState(false);

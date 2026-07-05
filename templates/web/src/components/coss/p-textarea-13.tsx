@@ -1,4 +1,4 @@
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   return (

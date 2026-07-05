@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 
 export default function Particle() {
   return (

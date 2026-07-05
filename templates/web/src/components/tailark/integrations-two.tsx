@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Gemini } from '@/components/ui/svgs/gemini';
 import { GooglePaLM } from '@/components/ui/svgs/google-palm';
 import { Replit } from '@/components/ui/svgs/replit';

@@ -5,8 +5,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Card } from '@/components/ui/card';
+} from '@vybekiit/ui/accordion';
+import { Card } from '@vybekiit/ui/card';
 import Link from 'next/link';
 
 const faqItems = [

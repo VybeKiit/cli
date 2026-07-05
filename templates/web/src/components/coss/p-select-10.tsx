@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 const items = [
   { description: 'npx create-next-app', label: 'Next.js', value: 'next' },

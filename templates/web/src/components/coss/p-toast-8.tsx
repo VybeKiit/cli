@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@vybekiit/ui/button';
+import { Spinner } from '@vybekiit/ui/spinner';
 import { anchoredToastManager } from '@/components/ui/toast';
 
 export default function Particle() {

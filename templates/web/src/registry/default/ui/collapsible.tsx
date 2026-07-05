@@ -1,1 +1,1 @@
-export * from '@/components/ui/collapsible';
+export * from '@vybekiit/ui/collapsible';

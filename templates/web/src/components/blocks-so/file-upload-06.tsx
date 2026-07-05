@@ -2,10 +2,10 @@
 
 import type React from 'react';
 import { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@vybekiit/ui/button';
+import { Progress } from '@vybekiit/ui/progress';
+import { Card } from '@vybekiit/ui/card';
+import { Separator } from '@vybekiit/ui/separator';
 import { Upload, FileText, X, CheckCircle, Loader2 } from 'lucide-react';
 
 interface UploadItem {

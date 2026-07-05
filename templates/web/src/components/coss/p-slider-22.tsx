@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupText } from '@vybekiit/ui/input-group';
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field';
 import { Slider } from '@/components/ui/slider';
 

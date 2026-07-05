@@ -2,8 +2,8 @@
 
 import { AuthShell } from '@/components/auth-shell';
 import { FormField } from '@/components/form-field';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
+import { Button } from '@vybekiit/ui/button';
 import { useAsync } from '@/hooks/useAsync';
 import { Link, useRouter } from '@/i18n/navigation';
 import { signUpWithPassword } from '@/lib/authClient';

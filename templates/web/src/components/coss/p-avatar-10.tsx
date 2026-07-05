@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Badge } from '@vybekiit/ui/badge';
 
 export default function Particle() {
   return (

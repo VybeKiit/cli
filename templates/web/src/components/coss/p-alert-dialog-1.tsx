@@ -7,8 +7,8 @@ import {
   AlertDialogPopup,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@vybekiit/ui/alert-dialog';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   return (

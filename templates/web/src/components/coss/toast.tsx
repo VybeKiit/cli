@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import { cn } from '@/registry/default/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@vybekiit/ui/button';
 
 const TOAST_ICONS = {
   error: CircleAlertIcon,

@@ -4,9 +4,9 @@ import { File, FileSpreadsheet, X } from 'lucide-react';
 import { type ChangeEvent, type DragEvent, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
+import { Progress } from '@vybekiit/ui/progress';
 
 export default function FileUpload04() {
   const [uploadState, setUploadState] = useState<{

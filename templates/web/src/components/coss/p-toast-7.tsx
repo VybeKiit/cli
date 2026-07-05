@@ -3,9 +3,9 @@
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import { useRef } from 'react';
 import { useCopyToClipboard } from '@/registry/default/hooks/use-copy-to-clipboard';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { anchoredToastManager } from '@/components/ui/toast';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   const copyButtonRef = useRef<HTMLButtonElement>(null);

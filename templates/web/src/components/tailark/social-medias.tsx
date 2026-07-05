@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Twitter, Linkedin, Youtube } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';

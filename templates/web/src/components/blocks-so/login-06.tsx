@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Separator } from '@vybekiit/ui/separator';
 import type { JSX, SVGProps } from 'react';
 
 const Logo = (props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) => (

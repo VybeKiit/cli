@@ -38,7 +38,7 @@ import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Slider } from '@/components/ui/slider';
 
 const hoverTransition = {

@@ -4,7 +4,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@vybekiit/ui/accordion';
 import { ChartBarIncreasingIcon, Database, Fingerprint, IdCard } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';

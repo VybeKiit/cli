@@ -1,7 +1,7 @@
 import { EllipsisIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu';
 
 export default function Particle() {

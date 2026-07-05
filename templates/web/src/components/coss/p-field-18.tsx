@@ -2,18 +2,12 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Input } from '@vybekiit/ui/input';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 export default function Particle() {
   const [loading, setLoading] = useState(false);

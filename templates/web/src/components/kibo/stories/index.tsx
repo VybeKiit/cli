@@ -2,8 +2,8 @@
 
 import type { ComponentProps, HTMLAttributes, VideoHTMLAttributes } from 'react';
 import { useEffect, useRef } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Carousel, CarouselContent, CarouselItem } from '@vybekiit/ui/carousel';
 import { cn } from '@/lib/utils';
 
 export type StoriesProps = ComponentProps<typeof Carousel>;

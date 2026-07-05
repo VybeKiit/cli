@@ -4,9 +4,9 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
 import type { DateRange } from 'react-day-picker';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@vybekiit/ui/button';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { Popover, PopoverPopup, PopoverTrigger } from '@vybekiit/ui/popover';
 
 export default function Particle() {
   const [date, setDate] = useState<DateRange | undefined>();

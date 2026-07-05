@@ -2,14 +2,14 @@
 
 import { BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@vybekiit/ui/toggle-group';
 import {
   Tooltip,
   TooltipCreateHandle,
   TooltipPopup,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@vybekiit/ui/tooltip';
 
 const tooltipHandle = TooltipCreateHandle<ComponentType>();
 

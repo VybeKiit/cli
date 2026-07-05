@@ -1,13 +1,7 @@
 'use client';
 
 import { Code2Icon, GlobeIcon, LayersIcon, ZapIcon } from 'lucide-react';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 const items = [
   { icon: LayersIcon, label: 'Components', value: 'components' },

@@ -4,17 +4,17 @@ import { useId } from 'react';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/select';
+import { Textarea } from '@vybekiit/ui/textarea';
 import {
   ExpandableScreen,
   ExpandableScreenContent,

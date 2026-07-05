@@ -21,7 +21,7 @@ import { BarChart3Icon, CheckIcon, Vote } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@vybekiit/ui/dialog';
 import {
   Popover,
   PopoverContent,
@@ -39,7 +39,7 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@vybekiit/ui/popover';
 
 // ============================================================================
 // Types

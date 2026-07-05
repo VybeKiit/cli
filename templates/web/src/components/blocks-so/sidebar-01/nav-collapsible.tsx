@@ -1,5 +1,5 @@
 'use client';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -7,7 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from '@vybekiit/ui/sidebar';
 import { ChevronDown } from 'lucide-react';
 import type { FavoriteItem, TeamItem, TopicItem } from '@/components/sidebar-01/types';
 

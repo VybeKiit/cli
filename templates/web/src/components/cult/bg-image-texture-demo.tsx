@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Download } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Label } from '@vybekiit/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { BackgroundImageTexture } from '@/components/ui/bg-image-texture';
 import type { TextureVariant } from '@/components/ui/bg-image-texture';

@@ -2,16 +2,10 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 const items = [
   { label: 'Next.js', value: 'next' },

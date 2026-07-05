@@ -1,6 +1,6 @@
 import { Group, GroupSeparator, GroupText } from '@/components/ui/group';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 
 export default function Particle() {
   return (

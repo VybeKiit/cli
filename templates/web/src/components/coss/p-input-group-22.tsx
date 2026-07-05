@@ -2,8 +2,8 @@
 
 import { XIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 
 export default function Particle() {
   const [value, setValue] = useState('Clear me');

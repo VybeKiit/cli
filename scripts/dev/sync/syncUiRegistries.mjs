@@ -236,8 +236,8 @@ function resolveTargetPath(templateRoot, namespace, file, itemName) {
 function normalizeMirroredContent(content) {
   return content
     .replace(/@\/registry\/magicui\//g, '@/components/magicui/')
-    .replace(/@\/registry\/default\/ui\//g, '@/components/ui/')
-    .replace(/@\/registry\/new-york\/ui\//g, '@/components/ui/');
+    .replace(/@\/registry\/default\/ui\//g, '@vybekiit/ui/')
+    .replace(/@\/registry\/new-york\/ui\//g, '@vybekiit/ui/');
 }
 
 async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
@@ -279,7 +279,7 @@ async function installShadcnPrimitive(templateRoot, primitiveName, dryRun, insta
   if (!isShadcnPrimitiveName(primitiveName) || installed.has(primitiveName)) {
     return;
   }
-  const uiDir = join(templateRoot, 'src/components/ui');
+  const uiDir = join(REPO_ROOT, 'packages/ui/src');
   const candidates = [
     join(uiDir, `${primitiveName}.tsx`),
     join(uiDir, `${primitiveName}/index.tsx`),

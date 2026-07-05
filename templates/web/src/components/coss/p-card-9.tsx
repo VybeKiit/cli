@@ -1,16 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardPanel } from '@/components/ui/card';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardPanel } from '@vybekiit/ui/card';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
 import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/ui/frame';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@vybekiit/ui/input';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 const frameworkOptions = [
   { label: 'Next.js', value: 'next' },

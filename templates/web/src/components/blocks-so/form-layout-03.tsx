@@ -1,16 +1,16 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
+import { Input } from '@vybekiit/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/select';
+import { Separator } from '@vybekiit/ui/separator';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function FormLayout03() {
   return (

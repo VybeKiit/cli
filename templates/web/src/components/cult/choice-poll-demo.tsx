@@ -11,8 +11,8 @@ import {
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
 
 import { ChoicePoll } from '../ui/choice-poll';
 

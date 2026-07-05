@@ -2,11 +2,11 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Field, FieldItem, FieldLabel } from '@/components/ui/field';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldItem, FieldLabel } from '@vybekiit/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
-import { Form } from '@/components/ui/form';
-import { Radio, RadioGroup } from '@/components/ui/radio-group';
+import { Form } from '@vybekiit/ui/form';
+import { Radio, RadioGroup } from '@vybekiit/ui/radio-group';
 
 export default function Particle() {
   const [loading, setLoading] = useState(false);

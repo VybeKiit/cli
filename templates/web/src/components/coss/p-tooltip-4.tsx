@@ -2,7 +2,7 @@
 
 import { LinkIcon, MailIcon, Share2Icon } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator } from '@/components/ui/group';
 import {
   Tooltip,
@@ -10,7 +10,7 @@ import {
   TooltipPopup,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@vybekiit/ui/tooltip';
 
 const tooltipHandle = TooltipCreateHandle<ComponentType>();
 

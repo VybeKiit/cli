@@ -1,7 +1,7 @@
 'use client';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@vybekiit/ui/tabs';
 import { cn } from '@/lib/utils';
 import type { ToolUIPart } from 'ai';
 import { ChevronDownIcon, Code } from 'lucide-react';

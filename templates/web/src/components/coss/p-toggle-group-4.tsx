@@ -1,5 +1,5 @@
 import { BoldIcon, ItalicIcon, UnderlineIcon } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem, ToggleGroupSeparator } from '@/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem, ToggleGroupSeparator } from '@vybekiit/ui/toggle-group';
 
 export default function Particle() {
   return (

@@ -3,7 +3,7 @@
 import { OTPField as OTPFieldPrimitive } from '@base-ui/react/otp-field';
 import type * as React from 'react';
 import { cn } from '@/registry/default/lib/utils';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@vybekiit/ui/separator';
 
 export function OTPField({
   className,

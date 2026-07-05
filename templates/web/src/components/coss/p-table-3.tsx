@@ -3,8 +3,8 @@
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@vybekiit/ui/badge';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import { Frame } from '@/components/ui/frame';
 import {
   Table,
@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@vybekiit/ui/table';
 
 type Project = {
   id: string;

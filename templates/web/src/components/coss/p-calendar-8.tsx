@@ -2,7 +2,7 @@
 
 import { addDays, subDays } from 'date-fns';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@vybekiit/ui/calendar';
 
 export default function Particle() {
   const today = new Date();

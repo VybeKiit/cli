@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Label } from '@vybekiit/ui/label';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 
 export default function FileUpload05() {

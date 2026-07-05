@@ -14,6 +14,8 @@
 #     tests), joining alongside its real UI (issue #3, closing #2 — no more empty shell).
 #   - apps/componentLibrary → public UI browser at ui.vybekiit.com; imports mirrored
 #     blocks from templates/web via webpack alias (SSOT).
+#   - apps/localDevelopmentWebsite → local dev console opened by `vybekiit init`;
+#     visual sidecar for vibe coders watching the agent build step-by-step.
 #
 # Still excluded on purpose:
 #   (none — extension WXT scaffold is now in the workspace gate)
@@ -28,3 +30,4 @@ packages:
   - "templates/spa"
   - "apps/landing"
   - "apps/componentLibrary"
+  - "apps/localDevelopmentWebsite"

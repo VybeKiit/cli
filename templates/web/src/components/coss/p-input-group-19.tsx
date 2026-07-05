@@ -1,9 +1,9 @@
 'use client';
 
 import { BoldIcon, ItalicIcon, LinkIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupTextarea } from '@/components/ui/input-group';
-import { Toggle } from '@/components/ui/toggle';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupTextarea } from '@vybekiit/ui/input-group';
+import { Toggle } from '@vybekiit/ui/toggle';
 
 export default function Particle() {
   return (

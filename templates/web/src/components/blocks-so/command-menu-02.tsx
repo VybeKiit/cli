@@ -21,7 +21,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -29,15 +29,15 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from '@vybekiit/ui/command';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Kbd, KbdGroup } from '@/components/ui/kbd';
+} from '@vybekiit/ui/dialog';
+import { Kbd, KbdGroup } from '@vybekiit/ui/kbd';
 
 export function CommandMenu02() {
   const [open, setOpen] = useState(true);

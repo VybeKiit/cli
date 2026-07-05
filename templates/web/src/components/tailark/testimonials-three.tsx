@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
 import { Star } from 'lucide-react';
 
 export default function TestimonialSection() {

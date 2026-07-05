@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Sheet,
   SheetDescription,
@@ -7,7 +7,7 @@ import {
   SheetPopup,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@vybekiit/ui/sheet';
 
 export default function Particle() {
   return (

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
 
 type PaginationProps = {

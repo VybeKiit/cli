@@ -7,9 +7,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+} from '@vybekiit/ui/accordion';
+import { Button } from '@vybekiit/ui/button';
+import { Progress } from '@vybekiit/ui/progress';
 import { cn } from '@/lib/utils';
 
 const initialSteps = [

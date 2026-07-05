@@ -1,6 +1,6 @@
 'use client';
 
-import { Sidebar, SidebarContent } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent } from '@vybekiit/ui/sidebar';
 import {
   IconAd2,
   IconBellRinging,

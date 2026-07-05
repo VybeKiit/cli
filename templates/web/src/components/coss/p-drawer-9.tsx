@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Drawer,
   DrawerDescription,
@@ -10,7 +10,7 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from '@vybekiit/ui/drawer';
 
 export default function Particle() {
   const snapPoints = ['300px', 1] as const;

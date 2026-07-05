@@ -1,14 +1,14 @@
 'use client';
 
 import { ArrowRightIcon, MicIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   InputGroupTextarea,
-} from '@/components/ui/input-group';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+} from '@vybekiit/ui/input-group';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   return (

@@ -12,7 +12,7 @@ import {
 import Link from 'next/link';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAutocompleteFilter } from '@/components/ui/autocomplete';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandCollection,
@@ -29,13 +29,13 @@ import {
   CommandPanel,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command';
+} from '@vybekiit/ui/command';
 import { EmptyMedia } from '@/components/ui/empty';
-import { Input } from '@/components/ui/input';
-import { Kbd, KbdGroup } from '@/components/ui/kbd';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Spinner } from '@/components/ui/spinner';
+import { Input } from '@vybekiit/ui/input';
+import { Kbd, KbdGroup } from '@vybekiit/ui/kbd';
+import { ScrollArea } from '@vybekiit/ui/scroll-area';
+import { Skeleton } from '@vybekiit/ui/skeleton';
+import { Spinner } from '@vybekiit/ui/spinner';
 
 interface Item {
   value: string;

@@ -2,7 +2,7 @@
 
 import { IconCircleCheckFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@vybekiit/ui/progress';
 import { cn } from '@/lib/utils';
 
 const steps = [

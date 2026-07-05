@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 

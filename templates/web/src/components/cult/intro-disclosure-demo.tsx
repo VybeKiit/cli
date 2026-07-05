@@ -7,8 +7,8 @@ import { DatabaseIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@vybekiit/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 
 import { IntroDisclosure } from '../ui/intro-disclosure';
 

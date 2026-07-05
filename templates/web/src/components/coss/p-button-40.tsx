@@ -2,11 +2,11 @@
 
 import { DownloadIcon, XIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator, GroupText } from '@/components/ui/group';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@vybekiit/ui/spinner';
 import { toastManager } from '@/components/ui/toast';
-import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   const [isDownloading, setIsDownloading] = useState(false);

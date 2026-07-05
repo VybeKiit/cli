@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { HEADER_LINKS } from '@/data/nav';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';

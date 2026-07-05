@@ -7,17 +7,11 @@ import {
   DollarSignIcon,
   PercentIcon,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Button } from '@vybekiit/ui/button';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@vybekiit/ui/toggle-group';
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar';
-import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipPopup, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 const items = [
   { label: 'Helvetica', value: 'helvetica' },

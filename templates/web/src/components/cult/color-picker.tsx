@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@vybekiit/ui/button';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
 
 // Helper functions for color conversion
 const hslToHex = (h: number, s: number, l: number) => {

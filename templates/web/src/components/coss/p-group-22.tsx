@@ -1,5 +1,5 @@
 import { Group, GroupSeparator } from '@/components/ui/group';
-import { Label } from '@/components/ui/label';
+import { Label } from '@vybekiit/ui/label';
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field';
 
 export default function Particle() {

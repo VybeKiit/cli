@@ -8,9 +8,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+} from '@vybekiit/ui/table';
+import { Badge } from '@vybekiit/ui/badge';
+import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';
 import { cn } from '@/lib/utils';
 
 interface AssignedPerson {

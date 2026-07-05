@@ -8,7 +8,7 @@ import {
   ComboboxList,
   ComboboxPopup,
 } from '@/components/ui/combobox';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
 
 const items = [
   { label: 'Apple', value: 'apple' },

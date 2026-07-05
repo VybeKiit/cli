@@ -16,7 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
   type CarouselApi,
-} from '@/components/ui/carousel';
+} from '@vybekiit/ui/carousel';
 
 interface Tip {
   text: string;

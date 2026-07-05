@@ -3,10 +3,10 @@
 import { format, isValid, parse } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@vybekiit/ui/button';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Popover, PopoverPopup, PopoverTrigger } from '@vybekiit/ui/popover';
 
 export default function Particle() {
   const [date, setDate] = useState<Date | undefined>();

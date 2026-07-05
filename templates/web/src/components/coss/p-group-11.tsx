@@ -1,6 +1,6 @@
 import { ChevronDownIcon, GitForkIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator } from '@/components/ui/group';
 import {
   Popover,
@@ -8,7 +8,7 @@ import {
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@vybekiit/ui/popover';
 
 export default function Particle() {
   return (

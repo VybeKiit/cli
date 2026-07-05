@@ -2,10 +2,10 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Field, FieldDescription } from '@/components/ui/field';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldDescription } from '@vybekiit/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
-import { Form } from '@/components/ui/form';
+import { Form } from '@vybekiit/ui/form';
 import { Slider, SliderValue } from '@/components/ui/slider';
 
 export default function Particle() {

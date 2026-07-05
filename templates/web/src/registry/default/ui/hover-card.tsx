@@ -1,1 +1,1 @@
-export * from '@/components/ui/hover-card';
+export * from '@vybekiit/ui/hover-card';

@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Input } from '@vybekiit/ui/input';
 import {
   Sheet,
   SheetClose,
@@ -12,7 +12,7 @@ import {
   SheetPopup,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@vybekiit/ui/sheet';
 
 export default function Particle() {
   return (

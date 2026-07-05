@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Card } from '@/components/ui/card';
+import { Card } from '@vybekiit/ui/card';
 
 const testimonials = [
   {

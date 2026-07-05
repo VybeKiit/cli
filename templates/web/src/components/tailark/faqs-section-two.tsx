@@ -5,7 +5,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@vybekiit/ui/accordion';
 import Link from 'next/link';
 
 export default function FAQs() {

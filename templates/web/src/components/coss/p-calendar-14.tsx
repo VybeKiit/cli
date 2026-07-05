@@ -2,14 +2,8 @@
 
 import { useState } from 'react';
 import type { DropdownNavProps, DropdownProps } from 'react-day-picker';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 export default function Particle() {
   const [date, setDate] = useState<Date | undefined>(new Date());

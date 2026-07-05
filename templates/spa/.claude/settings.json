@@ -1,0 +1,84 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/detect-missing-skill.sh" }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/inject-recent-errors.sh" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/block-push-to-main.sh" },
+          { "type": "command", "command": ".claude/hooks/block-destructive-db.sh" },
+          { "type": "command", "command": ".claude/hooks/block-rm-rf.sh" },
+          { "type": "command", "command": ".claude/hooks/block-install-unknown-deps.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-semantic-commits.sh" }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/block-secrets-in-code.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-types-no-any.sh" }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/check-catalog-before-create.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-effect-validation.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-effect-log.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-error-handling.sh" },
+          { "type": "command", "command": ".claude/hooks/check-accessibility.sh" },
+          { "type": "command", "command": ".claude/hooks/check-i18n-hardcoded.sh" },
+          { "type": "command", "command": ".claude/hooks/block-env-in-client.sh" },
+          { "type": "command", "command": ".claude/hooks/block-hardcoded-urls.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-file-size.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-naming-conventions.sh" },
+          { "type": "command", "command": ".claude/hooks/block-relative-parent-imports.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-loading-states.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/auto-format.sh" },
+          { "type": "command", "command": ".claude/hooks/enforce-barrel-exports.sh" },
+          { "type": "command", "command": ".claude/hooks/check-import-cycle.sh" },
+          { "type": "command", "command": ".claude/hooks/check-package-json-sorted.sh" }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/capture-test-failures.sh" },
+          { "type": "command", "command": ".claude/hooks/auto-open-issue.sh" },
+          { "type": "command", "command": ".claude/hooks/auto-request-skill.sh" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/verify-before-done.sh" },
+          { "type": "command", "command": ".claude/hooks/report-feedback.sh" },
+          { "type": "command", "command": ".claude/hooks/update-changelog.sh" },
+          { "type": "command", "command": ".claude/hooks/check-test-coverage.sh" },
+          { "type": "command", "command": ".claude/hooks/check-dead-code.sh" }
+        ]
+      }
+    ]
+  }
+}

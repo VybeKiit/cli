@@ -1,14 +1,8 @@
 'use client';
 import * as React from 'react';
 import type { DropdownProps } from 'react-day-picker';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 
 function CalendarDropdown(props: DropdownProps) {
   const { options, value, onChange, 'aria-label': ariaLabel } = props;

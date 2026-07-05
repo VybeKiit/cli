@@ -5,7 +5,7 @@ import {
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 
 const items = [
   { label: 'Apple', value: 'apple' },

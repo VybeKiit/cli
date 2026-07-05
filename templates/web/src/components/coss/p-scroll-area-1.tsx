@@ -1,4 +1,4 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@vybekiit/ui/scroll-area';
 
 const tags = Array.from({ length: 50 }, (_, i) => `v1.0.0-alpha.${i}`);
 

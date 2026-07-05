@@ -3,9 +3,9 @@
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { CardFrame } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@vybekiit/ui/badge';
+import { CardFrame } from '@vybekiit/ui/card';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@vybekiit/ui/table';
 
 type Project = {
   id: string;

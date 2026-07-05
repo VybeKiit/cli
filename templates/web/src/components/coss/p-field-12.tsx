@@ -1,5 +1,5 @@
-import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
 
 export default function Particle() {
   return (

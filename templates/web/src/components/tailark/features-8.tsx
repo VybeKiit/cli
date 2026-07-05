@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@vybekiit/ui/card';
 import { Shield, Users } from 'lucide-react';
 
 export default function FeaturesSection() {

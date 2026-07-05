@@ -5,7 +5,7 @@ import {
   JSXPreviewContent,
   JSXPreviewError,
 } from '@/components/ai-elements/jsx-preview';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const handleError = (error: Error) => {

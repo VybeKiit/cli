@@ -7,7 +7,7 @@ import ReactPlayer from 'react-player/lazy';
 import useMeasure from 'react-use-measure';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 import { SidePanel } from '../ui/side-panel';
 

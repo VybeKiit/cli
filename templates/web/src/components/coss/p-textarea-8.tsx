@@ -1,6 +1,6 @@
 import { useId } from 'react';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@vybekiit/ui/label';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   const id = useId();

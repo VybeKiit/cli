@@ -1,5 +1,5 @@
 import { DownloadIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   return (

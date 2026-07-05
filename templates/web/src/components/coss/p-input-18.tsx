@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Field, FieldDescription } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Field, FieldDescription } from '@vybekiit/ui/field';
+import { Input } from '@vybekiit/ui/input';
 
 export default function Particle() {
   const maxLength = 14;

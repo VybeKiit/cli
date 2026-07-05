@@ -8,8 +8,8 @@ import {
   type ReactElement,
   useState,
 } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@vybekiit/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@vybekiit/ui/tabs';
 import { cn } from '@/lib/utils';
 
 export type SnippetProps = ComponentProps<typeof Tabs>;

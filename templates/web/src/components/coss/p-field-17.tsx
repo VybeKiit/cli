@@ -1,4 +1,4 @@
-import { Field, FieldDescription } from '@/components/ui/field';
+import { Field, FieldDescription } from '@vybekiit/ui/field';
 import {
   NumberField,
   NumberFieldDecrement,

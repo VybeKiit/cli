@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 
 import { LoadingCarousel } from '../ui/loading-carousel';
 

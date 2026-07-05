@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardHeader } from '@vybekiit/ui/card';
+import { ChartContainer, type ChartConfig } from '@vybekiit/ui/chart';
 import { Cell, Pie, PieChart } from 'recharts';
 
 interface UsageItem {

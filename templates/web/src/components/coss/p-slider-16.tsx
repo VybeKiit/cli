@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
 import { Slider } from '@/components/ui/slider';
 
 const labels = ['Awful', 'Poor', 'Okay', 'Good', 'Amazing'];

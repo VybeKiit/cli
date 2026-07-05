@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Drawer,
   DrawerClose,
@@ -9,10 +9,10 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@vybekiit/ui/drawer';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Input } from '@vybekiit/ui/input';
 
 export default function Particle() {
   return (

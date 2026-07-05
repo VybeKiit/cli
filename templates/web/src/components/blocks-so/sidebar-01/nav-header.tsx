@@ -11,8 +11,8 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
-import { SidebarHeader } from '@/components/ui/sidebar';
+} from '@vybekiit/ui/command';
+import { SidebarHeader } from '@vybekiit/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import type { SidebarData } from '@/components/sidebar-01/types';

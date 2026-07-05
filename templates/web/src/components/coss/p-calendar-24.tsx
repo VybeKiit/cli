@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import type { DayButtonProps } from 'react-day-picker';
 import { cn } from '@/registry/default/lib/utils';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@vybekiit/ui/calendar';
 
 const GOOD_PRICE_THRESHOLD = 100;
 

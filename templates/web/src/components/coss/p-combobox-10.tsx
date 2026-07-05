@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronsUpDownIcon, SearchIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Combobox,
   ComboboxEmpty,

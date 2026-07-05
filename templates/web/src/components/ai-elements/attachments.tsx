@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Button } from '@vybekiit/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
 import { cn } from '@/lib/utils';
 import type { FileUIPart, SourceDocumentUIPart } from 'ai';
 import {

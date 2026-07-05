@@ -3,7 +3,7 @@
 import { AppWindowIcon as Apps } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -11,16 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+} from '@vybekiit/ui/dialog';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from '@vybekiit/ui/select';
+import { Separator } from '@vybekiit/ui/separator';
 
 export default function Dialog11() {
   const [open, setOpen] = useState(true);

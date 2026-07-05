@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 import {
   Table,
   TableBody,
@@ -15,8 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from '@vybekiit/ui/table';
+import { Badge } from '@vybekiit/ui/badge';
 import { cn } from '@/lib/utils';
 
 type Status = 'active' | 'pending' | 'discontinued' | 'on-hold';

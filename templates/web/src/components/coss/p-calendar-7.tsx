@@ -1,7 +1,7 @@
 'use client';
 
 import { addDays } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@vybekiit/ui/calendar';
 
 export default function Particle() {
   const today = new Date();

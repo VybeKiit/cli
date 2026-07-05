@@ -2,7 +2,7 @@
 
 import { DownloadIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { toastManager } from '@/components/ui/toast';
 
 export default function Particle() {

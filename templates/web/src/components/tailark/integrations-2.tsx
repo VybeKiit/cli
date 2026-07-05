@@ -7,7 +7,7 @@ import { Firebase } from '@/components/ui/svgs/firebase';
 import { ClerkIconDark as Clerk } from '@/components/ui/svgs/clerk';
 import { LogoIcon } from '@/components/logo';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import Link from 'next/link';
 
 export default function Integrations() {

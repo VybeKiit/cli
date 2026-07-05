@@ -1,6 +1,6 @@
 import { InfoIcon } from 'lucide-react';
-import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertAction, AlertDescription, AlertTitle } from '@vybekiit/ui/alert';
+import { Button } from '@vybekiit/ui/button';
 
 export default function Particle() {
   return (

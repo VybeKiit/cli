@@ -1,8 +1,8 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@vybekiit/ui/toggle-group';
 import { Bold, Calendar1, Ellipsis, Italic, Strikethrough, Underline } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 export default function ContentSection() {
   return (

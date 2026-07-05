@@ -4,8 +4,8 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import * as React from 'react';
 import type { DropdownProps } from 'react-day-picker';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@vybekiit/ui/button';
+import { Calendar } from '@vybekiit/ui/calendar';
 import {
   Combobox,
   ComboboxEmpty,
@@ -14,8 +14,8 @@ import {
   ComboboxList,
   ComboboxPopup,
 } from '@/components/ui/combobox';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Popover, PopoverPopup, PopoverTrigger } from '@vybekiit/ui/popover';
 
 interface DropdownItem {
   disabled?: boolean;

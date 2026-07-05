@@ -8,7 +8,7 @@ import { Linear } from '@/components/ui/svgs/linear';
 import { Slack } from '@/components/ui/svgs/slack';
 import { Firebase } from '@/components/ui/svgs/firebase';
 import { ClerkIconDark as Clerk } from '@/components/ui/svgs/clerk';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 

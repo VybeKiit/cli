@@ -1,7 +1,7 @@
 'use client';
 
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import { Textarea } from '@/components/ui/textarea';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   return (

@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import type { ComponentProps } from 'react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
 
 export type GlimpseProps = ComponentProps<typeof HoverCard>;
 

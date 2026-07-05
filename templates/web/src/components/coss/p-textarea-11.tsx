@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Field, FieldDescription } from '@/components/ui/field';
-import { Textarea } from '@/components/ui/textarea';
+import { Field, FieldDescription } from '@vybekiit/ui/field';
+import { Textarea } from '@vybekiit/ui/textarea';
 
 export default function Particle() {
   const maxLength = 280;

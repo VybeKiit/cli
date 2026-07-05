@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardAction, CardHeader, CardPanel, CardTitle } from '@/components/ui/card';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardAction, CardHeader, CardPanel, CardTitle } from '@vybekiit/ui/card';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Form } from '@vybekiit/ui/form';
+import { Input } from '@vybekiit/ui/input';
 
 export default function Particle() {
   return (

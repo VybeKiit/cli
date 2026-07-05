@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
 import {
   ArrowUp,
   CalendarCheck,

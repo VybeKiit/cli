@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Button } from '@vybekiit/ui/button';
+import { Label } from '@vybekiit/ui/label';
+import { Input } from '@vybekiit/ui/input';
 import { Logo } from '@/components/logo';
 
 const enterpriseLinks = [

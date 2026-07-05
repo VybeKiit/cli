@@ -1,1 +1,1 @@
-export * from '@/components/ui/dialog';
+export * from '@vybekiit/ui/dialog';

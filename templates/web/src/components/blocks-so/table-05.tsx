@@ -13,23 +13,23 @@ import {
 } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, Eye, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@vybekiit/ui/dropdown-menu';
+import { Input } from '@vybekiit/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 import {
   Table,
   TableBody,
@@ -37,8 +37,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from '@vybekiit/ui/table';
+import { Badge } from '@vybekiit/ui/badge';
 import { cn } from '@/lib/utils';
 
 type Status = 'completed' | 'pending' | 'processing' | 'cancelled';

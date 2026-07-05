@@ -3,7 +3,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-} from '@/components/ui/input-group';
+} from '@vybekiit/ui/input-group';
 
 export default function Particle() {
   return (

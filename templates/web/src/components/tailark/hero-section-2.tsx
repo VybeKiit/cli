@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card } from '@vybekiit/ui/card';
 import { HeroHeader } from './header';
 import { ChevronRight } from 'lucide-react';
 import { Supabase } from '@/components/ui/svgs/supabase';

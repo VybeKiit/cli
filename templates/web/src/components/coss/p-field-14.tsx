@@ -1,8 +1,8 @@
 'use client';
 
-import { Field, FieldDescription, FieldItem, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldItem, FieldLabel } from '@vybekiit/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
-import { Radio, RadioGroup } from '@/components/ui/radio-group';
+import { Radio, RadioGroup } from '@vybekiit/ui/radio-group';
 
 export default function Particle() {
   return (

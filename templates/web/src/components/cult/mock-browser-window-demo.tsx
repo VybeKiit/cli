@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+} from '@vybekiit/ui/select';
+import { Switch } from '@vybekiit/ui/switch';
 import { BrowserWindow } from '@/components/ui/mock-browser-window';
 
 export default function DemoPage() {

@@ -12,7 +12,7 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from '@/components/ui/combobox';
-import { SelectButton } from '@/components/ui/select';
+import { SelectButton } from '@vybekiit/ui/select';
 
 export default function Particle() {
   const timezones = Intl.supportedValuesOf('timeZone');

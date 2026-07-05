@@ -1,6 +1,6 @@
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import { CheckboxGroup } from '@/components/ui/checkbox-group';
-import { Label } from '@/components/ui/label';
+import { Label } from '@vybekiit/ui/label';
 
 export default function Particle() {
   return (

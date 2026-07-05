@@ -7,7 +7,7 @@ import {
   SidebarHeader,
   SidebarTrigger,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from '@vybekiit/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import {

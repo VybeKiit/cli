@@ -2,12 +2,12 @@
 
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 import { CheckboxGroup } from '@/components/ui/checkbox-group';
-import { Field, FieldItem, FieldLabel } from '@/components/ui/field';
+import { Field, FieldItem, FieldLabel } from '@vybekiit/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
-import { Form } from '@/components/ui/form';
+import { Form } from '@vybekiit/ui/form';
 
 export default function Particle() {
   const [loading, setLoading] = useState(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';

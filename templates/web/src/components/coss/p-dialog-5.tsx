@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -8,7 +8,7 @@ import {
   DialogPopup,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@vybekiit/ui/dialog';
 
 export default function Particle() {
   return (

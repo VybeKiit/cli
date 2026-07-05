@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Menu, MenuLinkItem, MenuPopup, MenuTrigger } from '@/components/ui/menu';
 
 export default function Particle() {

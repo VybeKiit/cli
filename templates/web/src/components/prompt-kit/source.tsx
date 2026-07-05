@@ -1,6 +1,6 @@
 'use client';
 
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
 import { cn } from '@/lib/utils';
 import { createContext, useContext } from 'react';
 

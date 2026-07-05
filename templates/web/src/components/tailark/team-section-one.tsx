@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 

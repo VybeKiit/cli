@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { HeroHeader } from './header';
 import Image from 'next/image';
 import { Spotify } from '@/components/ui/svgs/spotify';

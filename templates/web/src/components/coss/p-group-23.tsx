@@ -3,9 +3,9 @@
 import { ChevronsUpDownIcon, FunnelIcon, SearchIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/registry/default/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button, buttonVariants } from '@vybekiit/ui/button';
 import {
   Combobox,
   ComboboxEmpty,

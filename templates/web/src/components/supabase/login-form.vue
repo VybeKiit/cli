@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
 
 const error = ref<string | null>(null);
 const isLoading = ref(false);

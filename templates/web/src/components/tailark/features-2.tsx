@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@vybekiit/ui/card';
 import { Shield } from 'lucide-react';
 import { Vercel } from '@/components/ui/svgs/vercel';
 import { Supabase } from '@/components/ui/svgs/supabase';

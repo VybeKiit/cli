@@ -1,8 +1,8 @@
 import { MicIcon, PaperclipIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group } from '@/components/ui/group';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   return (

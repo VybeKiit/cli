@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from '@vybekiit/ui/sidebar';
 import {
   IconBrandAmongUs,
   IconCarambola,

@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@vybekiit/ui/sidebar';
 import { AppSidebar } from '@/components/sidebar-06/app-sidebar';
 
 export default function Page() {

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@vybekiit/ui/card';
 import { Globe } from 'lucide-react';
 import Image from 'next/image';
 import { Linear } from '@/components/ui/svgs/linear';

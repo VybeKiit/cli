@@ -1,7 +1,7 @@
 'use client';
 
-import { Field, FieldLabel, FieldValidity } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Field, FieldLabel, FieldValidity } from '@vybekiit/ui/field';
+import { Input } from '@vybekiit/ui/input';
 
 export default function FieldWithValidityDemo() {
   return (

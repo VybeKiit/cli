@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { toastManager } from '@/components/ui/toast';
 
 const ERROR_TOAST_ID = 'coss-demo-error-upsert';

@@ -1,1 +1,1 @@
-export * from '@/components/ui/scroll-area';
+export * from '@vybekiit/ui/scroll-area';

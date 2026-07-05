@@ -2,7 +2,7 @@
 
 import { XIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@vybekiit/ui/badge';
 
 export default function Particle() {
   const [isActive, setIsActive] = useState(true);

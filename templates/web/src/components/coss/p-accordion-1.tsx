@@ -1,9 +1,4 @@
-import {
-  Accordion,
-  AccordionItem,
-  AccordionPanel,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from '@vybekiit/ui/accordion';
 
 export default function Particle() {
   const items = [

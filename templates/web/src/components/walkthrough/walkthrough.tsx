@@ -3,7 +3,7 @@
 import type { WalkthroughStep } from '@vybekiit/walkthrough';
 import type { WalkthroughState } from '@vybekiit/walkthrough/web';
 import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@vybekiit/ui/dialog';
 import { cn } from '@/lib/utils';
 import './walkthrough.css';
 

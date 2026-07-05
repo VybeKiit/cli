@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { CheckCircle, File, Loader2, X } from 'lucide-vue-next';
 import { formatBytes, useDropzoneContext } from './dropzone.vue';
 import { computed } from 'vue';

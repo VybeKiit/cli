@@ -4,8 +4,8 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@vybekiit/ui/button';
+import { Calendar } from '@vybekiit/ui/calendar';
 import {
   Dialog,
   DialogClose,
@@ -13,18 +13,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from '@vybekiit/ui/dialog';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@vybekiit/ui/select';
+import { Textarea } from '@vybekiit/ui/textarea';
 import { cn } from '@/lib/utils';
 
 export default function Dialog10() {

@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@vybekiit/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@vybekiit/ui/tabs';
 import { DASHBOARD_STATS, GETTING_STARTED_STEP_KEYS } from '@/data/dashboard';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 

@@ -1,4 +1,4 @@
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
 import { OTPField, OTPFieldInput } from '@/components/ui/otp-field';
 
 const OTP_LENGTH = 4;

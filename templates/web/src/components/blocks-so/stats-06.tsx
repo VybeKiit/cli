@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@vybekiit/ui/card';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, Check, ChevronRight, Eye } from 'lucide-react';
 import Link from 'next/link';

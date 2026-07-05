@@ -1,8 +1,86 @@
-# Project Instructions
+# GitHub Copilot Instructions
 
-> Thin pointer — single source of truth is **[AGENTS.md](../AGENTS.md)**.
+These instructions apply to all Copilot interactions in this repository.
 
-Read and follow `AGENTS.md` at the project root for all coding guidelines,
-architecture decisions, and workflow instructions.
+# VybeKiit Project Rules
 
-Do not duplicate guidance here.
+## Critical (Always Enforce)
+
+### No direct push to main/master
+Never push directly to main or master. Always use feature branches + PRs.
+
+### No force delete (rm -rf)
+Never run `rm -rf` on source directories. Only allowed for: node_modules, dist, .next, .turbo, target, .cache, build.
+
+### No destructive database operations
+Block DROP TABLE, DROP DATABASE, TRUNCATE TABLE, DELETE FROM without WHERE. Use migrations.
+
+### No secrets in source code
+Never hardcode secrets in source: AWS keys (AKIA...), OpenAI keys (sk-...), GitHub tokens (ghp_...), private keys, Slack tokens. Use env vars or secrets manager.
+
+### Verify before completing
+Before marking done: TypeScript compiles, tests pass, build succeeds.
+
+## Important
+
+### Auto-format on save
+Use Biome (preferred) or Prettier. Format all changed files.
+
+### Validate package installs
+Check packages aren't typosquatting. Flag names ≤2 chars or starting with numbers.
+
+### No server env vars in client code
+Client files only use: NEXT_PUBLIC_, VITE_, EXPO_PUBLIC_. Keep DATABASE_URL etc. server-side.
+
+## Quality
+
+### Use @effect/schema, not Zod
+This project uses Effect. Import `Schema` from `@effect/schema`.
+
+### No `any` type
+Never use `: any`, `as any`, `<any>`. Use `unknown` + type guards. Exception: `.d.ts` files.
+
+### No hardcoded URLs
+Don't hardcode deployment URLs. Use environment variables.
+
+## Hygiene
+
+### Use Effect.log, not console.log
+Production source: `Effect.log`/`Effect.logWarning`/`Effect.logError`. console.log allowed in tests/scripts/CLI only.
+
+### Error handling required
+All async functions must have try/catch, .catch(), or Effect.tryPromise.
+
+### File size limit: 300 lines
+Split files exceeding 300 lines into smaller modules.
+
+## Style
+
+### Accessibility
+Interactive elements need `aria-label`, `role`, or `accessibilityLabel`.
+
+### Loading + error states
+Data fetching components must handle loading AND error states.
+
+### Naming conventions
+- Components: PascalCase (`UserCard.tsx`)
+- Hooks: `useXxx` (`useAuth.ts`)
+- Utils: camelCase or kebab-case
+
+### No deep relative imports
+Use `@/` path aliases instead of `../../../`.
+
+### Conventional commits
+Format: `type(scope): description`
+Types: feat, fix, chore, docs, style, refactor, perf, test, build, ci, revert
+
+## Architecture
+
+### Effect-first patterns
+- Validation: `@effect/schema`
+- Logging: `Effect.log`
+- Error handling: `Effect.tryPromise`, `Effect.catchAll`
+- Services: Effect Layer pattern
+
+### Barrel exports
+Export new modules from the directory's `index.ts`.

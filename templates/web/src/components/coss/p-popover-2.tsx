@@ -1,7 +1,7 @@
 'use client';
 
 import { XIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Popover,
   PopoverClose,
@@ -9,7 +9,7 @@ import {
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@vybekiit/ui/popover';
 
 export default function Particle() {
   return (

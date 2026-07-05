@@ -15,7 +15,7 @@ import {
   WebPreviewNavigation,
   WebPreviewUrl,
 } from '@/components/ai-elements/web-preview';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@vybekiit/ui/spinner';
 import { nanoid } from 'nanoid';
 import { memo, useCallback, useState } from 'react';
 

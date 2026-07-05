@@ -1,4 +1,4 @@
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@vybekiit/ui/sidebar';
 import { DashboardSidebar } from '@/components/sidebar-02/app-sidebar';
 
 export default function Sidebar02() {

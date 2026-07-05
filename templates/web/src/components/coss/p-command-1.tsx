@@ -2,7 +2,7 @@
 
 import { ArrowDownIcon, ArrowUpIcon, CornerDownLeftIcon } from 'lucide-react';
 import { Fragment, useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandCollection,
@@ -19,8 +19,8 @@ import {
   CommandPanel,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command';
-import { Kbd, KbdGroup } from '@/components/ui/kbd';
+} from '@vybekiit/ui/command';
+import { Kbd, KbdGroup } from '@vybekiit/ui/kbd';
 
 export interface Item {
   value: string;

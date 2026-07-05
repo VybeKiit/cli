@@ -10,7 +10,7 @@ import {
   PlanTitle,
   PlanTrigger,
 } from '@/components/ai-elements/plan';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { FileText } from 'lucide-react';
 
 const Example = () => (

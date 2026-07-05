@@ -60,7 +60,7 @@
         "useNamingConvention": "off",
         "noMagicNumbers": "off",
         "noCommonJs": "off",
-        "useExportsLast": "warn",
+        "useExportsLast": "off",
         "noIncrementDecrement": "off",
         "noProcessEnv": "off",
         "noExcessiveLinesPerFile": "warn",

@@ -8,7 +8,7 @@ import {
   AutocompleteList,
   AutocompletePopup,
 } from '@/components/ui/autocomplete';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
 
 const items = [
   { label: 'Apple', value: 'apple' },

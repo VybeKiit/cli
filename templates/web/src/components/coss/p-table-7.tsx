@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
-import { CardFrame } from '@/components/ui/card';
+import { Badge } from '@vybekiit/ui/badge';
+import { CardFrame } from '@vybekiit/ui/card';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@vybekiit/ui/table';
 
 export default function Particle() {
   return (

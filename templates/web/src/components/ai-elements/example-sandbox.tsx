@@ -23,7 +23,7 @@ import {
   StackTraceFrames,
   StackTraceHeader,
 } from '@/components/ai-elements/stack-trace';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import type { ToolUIPart } from 'ai';
 import { memo, useCallback, useState } from 'react';
 

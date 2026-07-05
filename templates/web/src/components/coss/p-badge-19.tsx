@@ -2,8 +2,8 @@
 
 import { CheckIcon } from 'lucide-react';
 import { useId } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@vybekiit/ui/badge';
+import { Checkbox } from '@vybekiit/ui/checkbox';
 
 export default function Particle() {
   const id = useId();

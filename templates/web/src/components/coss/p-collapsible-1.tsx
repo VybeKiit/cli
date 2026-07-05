@@ -1,5 +1,5 @@
 import { ChevronDownIcon } from 'lucide-react';
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 
 export default function Particle() {
   return (

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Mail, SendHorizonal } from 'lucide-react';
 
 export default function CallToAction() {

@@ -1,19 +1,19 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
+import { Input } from '@vybekiit/ui/input';
+import { RadioGroup, RadioGroupItem } from '@vybekiit/ui/radio-group';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from '@vybekiit/ui/select';
+import { Separator } from '@vybekiit/ui/separator';
 import { cn } from '@/lib/utils';
 import { Check, CircleCheck, ExternalLink } from 'lucide-react';
 import { useState } from 'react';

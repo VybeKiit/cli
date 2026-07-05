@@ -16,7 +16,7 @@ import {
   VoiceSelectorPreview,
   VoiceSelectorTrigger,
 } from '@/components/ai-elements/voice-selector';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import type { ComponentProps } from 'react';
 import { memo, useCallback, useRef, useState } from 'react';
 

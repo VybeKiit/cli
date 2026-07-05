@@ -1,5 +1,5 @@
 import { FolderIcon, PlusIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Card,
   CardFrame,
@@ -8,7 +8,7 @@ import {
   CardFrameHeader,
   CardFrameTitle,
   CardPanel,
-} from '@/components/ui/card';
+} from '@vybekiit/ui/card';
 import {
   Empty,
   EmptyDescription,

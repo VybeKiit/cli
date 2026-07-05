@@ -5,9 +5,9 @@ import { Check, Copy, Lock, LockOpen, Palette, RefreshCw } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Poline, positionFunctions } from 'poline';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 import ColorPicker from '../ui/color-picker';
 

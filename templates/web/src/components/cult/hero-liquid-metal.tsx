@@ -5,8 +5,8 @@ import type { SVGProps } from 'react';
 import { LiquidMetal } from '@paper-design/shaders-react';
 
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
 
 const MemoizedLiquidMetal = React.memo(LiquidMetal);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@vybekiit/ui/card';
 import { cn } from '@/lib/utils';
 
 const data = [

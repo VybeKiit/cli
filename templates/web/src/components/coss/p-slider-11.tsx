@@ -2,7 +2,7 @@
 
 import { Volume2Icon, VolumeXIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
 import { Slider, SliderValue } from '@/components/ui/slider';
 
 export default function Particle() {

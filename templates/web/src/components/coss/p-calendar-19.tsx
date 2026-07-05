@@ -2,10 +2,10 @@
 
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Toggle } from '@/components/ui/toggle';
-import { ToggleGroup } from '@/components/ui/toggle-group';
+import { Calendar } from '@vybekiit/ui/calendar';
+import { ScrollArea } from '@vybekiit/ui/scroll-area';
+import { Toggle } from '@vybekiit/ui/toggle';
+import { ToggleGroup } from '@vybekiit/ui/toggle-group';
 
 export default function Particle() {
   const today = new Date();

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@vybekiit/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { CheckCircle, ChevronDown, Loader2, Settings, XCircle } from 'lucide-react';
 import { useState } from 'react';

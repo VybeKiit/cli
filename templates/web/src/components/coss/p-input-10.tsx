@@ -2,15 +2,15 @@
 
 import { InfoIcon, StarIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
 import {
   Popover,
   PopoverDescription,
   PopoverPopup,
   PopoverTitle,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@vybekiit/ui/popover';
 
 export default function Particle() {
   const [isFavorite, setIsFavorite] = useState(false);

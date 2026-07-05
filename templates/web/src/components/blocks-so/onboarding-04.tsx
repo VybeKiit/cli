@@ -13,8 +13,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+} from '@vybekiit/ui/accordion';
+import { Button } from '@vybekiit/ui/button';
 import { cn } from '@/lib/utils';
 
 const steps = [

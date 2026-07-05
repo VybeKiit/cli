@@ -1,5 +1,5 @@
 import { ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator } from '@/components/ui/group';
 
 export default function Particle() {

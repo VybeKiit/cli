@@ -6,7 +6,7 @@ import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { DirectionAwareTabs } from '@/components/ui/direction-aware-tabs';
 

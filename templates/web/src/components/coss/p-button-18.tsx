@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@vybekiit/ui/button';
+import { Spinner } from '@vybekiit/ui/spinner';
 
 export default function Particle() {
   return (

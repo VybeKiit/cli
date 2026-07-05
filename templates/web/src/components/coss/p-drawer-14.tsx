@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Drawer,
   DrawerHeader,
@@ -7,7 +7,7 @@ import {
   DrawerPopup,
   DrawerSwipeArea,
   DrawerTitle,
-} from '@/components/ui/drawer';
+} from '@vybekiit/ui/drawer';
 
 export default function Particle() {
   return (

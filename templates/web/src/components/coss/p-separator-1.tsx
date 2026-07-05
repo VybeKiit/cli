@@ -1,4 +1,4 @@
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@vybekiit/ui/separator';
 
 export default function Particle() {
   return (

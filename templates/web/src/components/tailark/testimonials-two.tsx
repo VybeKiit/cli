@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
 
 export default function TestimonialSection() {
   const testimonials = [

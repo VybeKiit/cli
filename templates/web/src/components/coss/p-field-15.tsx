@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Switch } from '@/components/ui/switch';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Switch } from '@vybekiit/ui/switch';
 
 export default function Particle() {
   return (

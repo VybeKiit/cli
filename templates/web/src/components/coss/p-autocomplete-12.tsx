@@ -11,7 +11,7 @@ import {
   AutocompleteStatus,
   useAutocompleteFilter,
 } from '@/components/ui/autocomplete';
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@vybekiit/ui/spinner';
 
 type Movie = { id: string; title: string; year: number };
 const top100Movies: Movie[] = [

@@ -1,4 +1,4 @@
-import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupText } from '@vybekiit/ui/input-group';
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field';
 
 export default function Particle() {

@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   ArrowPentagonShapeSvg,
   ChevronShapeSvg,

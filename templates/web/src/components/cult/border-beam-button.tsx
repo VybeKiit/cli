@@ -9,7 +9,7 @@ import { forwardRef } from 'react';
 import { BorderBeam, type BorderBeamProps, type BorderBeamSize } from 'border-beam';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 type BeamShellProps = Pick<
   BorderBeamProps,

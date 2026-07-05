@@ -1,6 +1,6 @@
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import '@/components/report-mode/dock/styles/report-mode-dock.css';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@vybekiit/ui/tooltip';
 import { readNodeCwd, readNodeEnv } from '@/lib/nodeEnv';
 import { resolveVybeAssistant, shouldShowReportMode } from '@vybekiit/report-mode';
 import { Toaster } from 'sonner';

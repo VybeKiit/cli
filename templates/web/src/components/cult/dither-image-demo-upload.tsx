@@ -12,10 +12,10 @@ import {
 } from 'react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@vybekiit/ui/button';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Switch } from '@vybekiit/ui/switch';
 import {
   DitherImage,
   DitherImageContent,

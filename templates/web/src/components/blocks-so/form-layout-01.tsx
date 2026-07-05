@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@vybekiit/ui/button';
+import { Field, FieldLabel } from '@vybekiit/ui/field';
+import { Input } from '@vybekiit/ui/input';
+import { Separator } from '@vybekiit/ui/separator';
 
 export default function FormLayout01() {
   return (

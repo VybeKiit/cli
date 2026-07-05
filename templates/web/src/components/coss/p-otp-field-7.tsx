@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@vybekiit/ui/field';
 import { OTPField, OTPFieldInput } from '@/components/ui/otp-field';
 
 const OTP_LENGTH = 6;

@@ -211,8 +211,8 @@ function packageNameFromSpecifier(specifier) {
 /** Map Kibo monorepo imports to web-template aliases (matches next.config). */
 function remapRepoAlias(alias) {
   return alias
-    .replace('@repo/shadcn-ui/lib/utils', '@/lib/utils')
-    .replace('@repo/shadcn-ui/components/ui/', '@/components/ui/');
+    .replace('@repo/shadcn-ui/lib/utils', '@vybekiit/ui/utils')
+    .replace('@repo/shadcn-ui/components/ui/', '@vybekiit/ui/');
 }
 
 /** Examples that need API keys or live backend — preview shows controlled fallback. */
@@ -230,7 +230,7 @@ const AUTO_DEMO_SKIP_NAMESPACES = new Set([]);
 
 /**
  * Import patterns that genuinely break an isolated preview build: native/WebGL
- * runtimes and deps that aren't installed. A missing `@/components/ui/*` primitive
+ * runtimes and deps that aren't installed. A missing `@vybekiit/ui/*` primitive
  * is NOT listed here — it's caught for real by resolving the alias against the
  * mirror (isBuildSafeShallow), so every primitive that actually exists is allowed.
  */
@@ -250,6 +250,9 @@ const BROKEN_IMPORT_PATTERNS = [
  * @param {string} importPath
  */
 function importPathToFile(importPath) {
+  if (importPath.startsWith('@vybekiit/ui/')) {
+    return join(REPO_ROOT, 'packages/ui/src', importPath.replace('@vybekiit/ui/', ''));
+  }
   return join(WEB_ROOT, importPath.replace(/^@\//, 'src/'));
 }
 
@@ -577,11 +580,11 @@ async function isDemoReExportSafe(filePath) {
       return false;
     }
   }
-  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+)['"]/g)].map((match) => match[1]);
+  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+|@vybekiit\/[^'"]+)['"]/g)].map((match) => match[1]);
   for (const alias of aliasImports) {
     const normalized = alias
-      .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-      .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+      .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+      .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
     if (!(await resolveAliasImport(normalized))) {
       return false;
     }
@@ -879,7 +882,7 @@ async function resolveRelativeImport(filePath, specifier) {
 }
 
 /**
- * @param {string} importPath e.g. @/components/foo/bar
+ * @param {string} importPath e.g. @/components/foo/bar or @vybekiit/ui/button
  */
 async function resolveAliasImport(importPath) {
   return resolveModuleFile(importPathToFile(importPath));
@@ -923,13 +926,13 @@ async function hasValidNamedImports(filePath, content) {
       continue;
     }
 
-    if (!specifier.startsWith('@/')) {
+    if (!specifier.startsWith('@/') && !specifier.startsWith('@vybekiit/')) {
       continue;
     }
 
     const normalized = specifier
-      .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-      .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+      .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+      .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
     const resolved = await resolveAliasImport(normalized);
     if (!resolved) {
       return false;
@@ -1001,16 +1004,16 @@ async function isBuildSafeFile(filePath, visited = new Set()) {
     }
   }
 
-  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+|@repo\/[^'"]+)['"]/g)].map(
+  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+|@repo\/[^'"]+|@vybekiit\/[^'"]+)['"]/g)].map(
     (m) => m[1],
   );
   for (const alias of aliasImports) {
     if (alias.startsWith('@repo/')) {
       const remapped = remapRepoAlias(alias);
-      if (remapped.startsWith('@/')) {
+      if (remapped.startsWith('@/') || remapped.startsWith('@vybekiit/')) {
         const normalized = remapped
-          .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-          .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+          .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+          .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
         const resolved = await resolveAliasImport(normalized);
         if (!(resolved && (await isBuildSafeFile(resolved, visited)))) {
           return false;
@@ -1020,10 +1023,10 @@ async function isBuildSafeFile(filePath, visited = new Set()) {
       return false;
     }
 
-    if (alias.startsWith('@/')) {
+    if (alias.startsWith('@/') || alias.startsWith('@vybekiit/')) {
       const normalized = alias
-        .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-        .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+        .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+        .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
       const resolved = await resolveAliasImport(normalized);
       if (!resolved) {
         return false;
@@ -1114,16 +1117,16 @@ async function isBuildSafeShallow(filePath) {
     }
   }
 
-  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+|@repo\/[^'"]+)['"]/g)].map(
+  const aliasImports = [...content.matchAll(/from ['"](@\/[^'"]+|@repo\/[^'"]+|@vybekiit\/[^'"]+)['"]/g)].map(
     (m) => m[1],
   );
   for (const alias of aliasImports) {
     if (alias.startsWith('@repo/')) {
       const remapped = remapRepoAlias(alias);
-      if (remapped.startsWith('@/')) {
+      if (remapped.startsWith('@/') || remapped.startsWith('@vybekiit/')) {
         const normalized = remapped
-          .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-          .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+          .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+          .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
         const resolved = await resolveAliasImport(normalized);
         if (!resolved) {
           return false;
@@ -1132,10 +1135,10 @@ async function isBuildSafeShallow(filePath) {
       }
       return false;
     }
-    if (alias.startsWith('@/')) {
+    if (alias.startsWith('@/') || alias.startsWith('@vybekiit/')) {
       const normalized = alias
-        .replace(/^@\/registry\/default\/ui\//, '@/components/ui/')
-        .replace(/^@\/registry\/new-york\/ui\//, '@/components/ui/');
+        .replace(/^@\/registry\/default\/ui\//, '@vybekiit/ui/')
+        .replace(/^@\/registry\/new-york\/ui\//, '@vybekiit/ui/');
       const resolved = await resolveAliasImport(normalized);
       if (!resolved) {
         return false;

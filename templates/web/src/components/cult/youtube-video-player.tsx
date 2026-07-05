@@ -5,7 +5,7 @@ import { Maximize2, Minimize2, Play } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 
 interface YouTubePlayerProps {
   videoId: string;

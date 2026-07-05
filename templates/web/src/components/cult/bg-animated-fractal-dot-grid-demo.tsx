@@ -8,20 +8,20 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@vybekiit/ui/accordion';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@vybekiit/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 
 import { FractalDotGrid } from '../ui/bg-animated-fractal-dot-grid';

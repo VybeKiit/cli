@@ -1,4 +1,4 @@
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldLabel } from '@vybekiit/ui/field';
 import { Slider } from '@/components/ui/slider';
 
 export default function Particle() {

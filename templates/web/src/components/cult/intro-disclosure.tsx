@@ -6,12 +6,12 @@ import { CheckIcon, ExternalLinkIcon } from 'lucide-react';
 import { AnimatePresence, motion, useAnimation, type PanInfo } from 'motion/react';
 
 import { cn } from '@/lib/utils';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { Progress } from '@/components/ui/progress';
+import { AspectRatio } from '@vybekiit/ui/aspect-ratio';
+import { Button } from '@vybekiit/ui/button';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@vybekiit/ui/dialog';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@vybekiit/ui/drawer';
+import { Progress } from '@vybekiit/ui/progress';
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState<boolean | null>(null);

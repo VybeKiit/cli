@@ -1,15 +1,15 @@
 'use client';
 
 import { useControllableState } from '@radix-ui/react-use-controllable-state';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from '@vybekiit/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@vybekiit/ui/popover';
 import { cn } from '@/lib/utils';
 import { ChevronsUpDownIcon } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';

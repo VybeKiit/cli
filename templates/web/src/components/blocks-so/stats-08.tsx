@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { type ChartConfig, ChartContainer } from '@/components/ui/chart';
+import { Card, CardContent, CardFooter } from '@vybekiit/ui/card';
+import { type ChartConfig, ChartContainer } from '@vybekiit/ui/chart';
 import { PolarAngleAxis, RadialBar, RadialBarChart } from 'recharts';
 
 const data = [

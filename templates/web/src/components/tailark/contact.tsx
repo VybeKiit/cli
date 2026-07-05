@@ -1,15 +1,15 @@
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Card } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Textarea } from '@vybekiit/ui/textarea';
+import { Button } from '@vybekiit/ui/button';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@vybekiit/ui/select';
 import Link from 'next/link';
 
 export default function ContactSection() {

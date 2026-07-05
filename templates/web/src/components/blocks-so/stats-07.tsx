@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { type ChartConfig, ChartContainer } from '@/components/ui/chart';
+import { Card, CardContent } from '@vybekiit/ui/card';
+import { type ChartConfig, ChartContainer } from '@vybekiit/ui/chart';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { PolarAngleAxis, RadialBar, RadialBarChart } from 'recharts';

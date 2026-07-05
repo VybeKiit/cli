@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@vybekiit/ui/card';
 import { cn } from '@/lib/utils';
 import { Calendar, type LucideIcon, MapIcon } from 'lucide-react';
 import Image from 'next/image';

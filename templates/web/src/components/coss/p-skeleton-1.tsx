@@ -2,9 +2,9 @@
 
 import { UserRoundPlusIcon, UsersRoundIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@vybekiit/ui/avatar';
+import { Button } from '@vybekiit/ui/button';
+import { Skeleton } from '@vybekiit/ui/skeleton';
 
 const users = [
   {

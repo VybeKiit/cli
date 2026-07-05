@@ -4,18 +4,18 @@ import { File, Trash } from 'lucide-react';
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from '@vybekiit/ui/select';
+import { Separator } from '@vybekiit/ui/separator';
 import { cn } from '@/lib/utils';
 
 export default function FileUpload03() {

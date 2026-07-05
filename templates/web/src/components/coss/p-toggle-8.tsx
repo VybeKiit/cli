@@ -3,8 +3,8 @@
 import { BookmarkIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { anchoredToastManager } from '@/components/ui/toast';
-import { Toggle } from '@/components/ui/toggle';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+import { Toggle } from '@vybekiit/ui/toggle';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   const [bookmarked, setBookmarked] = useState(false);

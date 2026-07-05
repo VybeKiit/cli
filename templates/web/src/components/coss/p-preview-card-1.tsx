@@ -1,5 +1,5 @@
 import { CornerUpLeftIcon, StarIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from '@/components/ui/preview-card';
 
 export default function Particle() {

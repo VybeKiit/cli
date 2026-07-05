@@ -6,9 +6,7 @@ import { ExtensionSlide } from '@/components/landing/showcase-slides/ExtensionSl
 import { MarketingBlocksSlide } from '@/components/landing/showcase-slides/MarketingBlocksSlide';
 import { MobileAppSlide } from '@/components/landing/showcase-slides/MobileAppSlide';
 import { WebAppSlide } from '@/components/landing/showcase-slides/WebAppSlide';
-import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
 import { ChevronIcon } from '@/components/ui/CustomIcons';
-import { GlowCard } from '@/components/ui/GlowCard';
 import { SHOWCASE_SLIDES, type ShowcaseSlideMeta } from '@/data/landing';
 
 const SLIDE_COMPONENTS: Record<string, () => ReactNode> = {
@@ -23,70 +21,98 @@ function ShowcaseCard({ slide }: { slide: ShowcaseSlideMeta }) {
   const SlideContent = SLIDE_COMPONENTS[slide.id];
 
   return (
-    <GlowCard className="showcase-card flex h-[520px] w-[min(85vw,360px)] shrink-0 flex-col overflow-hidden">
-      <div className="mb-4 shrink-0">
-        <h3 className="font-bold text-base text-white lg:text-lg">{slide.title}</h3>
-        <p className="text-[var(--text-muted)] text-xs lg:text-sm">{slide.subtitle}</p>
+    <div
+      className="showcase-card flex w-full shrink-0 flex-col overflow-hidden rounded-[16px] border border-[rgba(47,137,255,0.6)] p-[24px_22px_28px]"
+      style={{
+        background:
+          'radial-gradient(75% 55% at 50% 0%, rgba(24, 105, 230, 0.22) 0%, rgba(5, 18, 38, 0.94) 48%, rgba(2, 7, 15, 0.98) 100%)',
+        boxShadow:
+          '0 0 0 1px rgba(60, 150, 255, 0.2), 0 0 18px rgba(47, 137, 255, 0.5), 0 0 50px rgba(22, 102, 220, 0.25), inset 0 0 40px rgba(35, 118, 255, 0.08)',
+      }}
+    >
+      <div className="mb-[18px] shrink-0">
+        <h3 className="text-[18px] font-extrabold leading-[1.1] tracking-[-0.03em] text-[#f8fafc]">
+          {slide.title}
+        </h3>
+        <p className="mt-1.5 text-[13px] font-medium leading-[1.3] text-[rgba(226,232,240,0.7)]">
+          {slide.subtitle}
+        </p>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-white/8">
+      <div
+        className="min-h-[260px] flex-1 overflow-hidden rounded-[12px] border-[3px] border-[rgba(20,35,58,0.95)] bg-[rgba(2,8,18,0.96)]"
+        style={{
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.04)',
+        }}
+      >
         {SlideContent?.()}
       </div>
-    </GlowCard>
+    </div>
   );
 }
 
-/** Product-showcase carousel — an infinite auto-scrolling loop of the slides. */
+/** Product-showcase carousel — all 5 cards visible in a horizontal row. */
 export function ShowcaseCarousel() {
   return (
-    <section className="relative py-16 md:py-24" id="showcase">
-      <div className="relative mx-auto w-[calc(100%-48px)] max-w-[1520px]">
-        <div className="showcase-carousel-stage relative">
-          <div className="showcase-carousel-shell relative">
-            <div
-              aria-hidden="true"
-              className="showcase-carousel-nav showcase-carousel-nav--left pointer-events-none"
-            >
-              <ChevronIcon className="h-5 w-5 text-white/70" direction="left" />
-            </div>
-
-            <div className="showcase-carousel-track-wrap relative">
-              <div aria-hidden="true" className="showcase-carousel-beam pointer-events-none" />
-              <AutoScrollRow
-                ariaLabel="Product showcase"
-                durationDesktop="70s"
-                durationMobile="55s"
-                hoverBehavior="accelerate-reverse"
-                pauseOnHover={false}
-              >
-                <ul className="auto-scroll-row-showcase">
-                  {SHOWCASE_SLIDES.map((slide) => (
-                    <li key={slide.id}>
-                      <ShowcaseCard slide={slide} />
-                    </li>
-                  ))}
-                </ul>
-              </AutoScrollRow>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="showcase-carousel-nav showcase-carousel-nav--right pointer-events-none"
-            >
-              <ChevronIcon className="h-5 w-5 text-white/70" direction="right" />
-            </div>
+    <section
+      className="relative py-[60px]"
+      id="showcase"
+      style={{
+        background:
+          'radial-gradient(ellipse 70% 46% at 50% 36%, rgba(0, 73, 170, 0.36), transparent 68%), radial-gradient(ellipse 44% 38% at 50% 54%, rgba(0, 32, 92, 0.38), transparent 72%), #000',
+      }}
+    >
+      <div className="relative mx-auto w-full max-w-[1600px] px-[60px]">
+        <div className="relative flex items-center">
+          {/* Left Arrow */}
+          <div
+            aria-hidden="true"
+            className="absolute -left-[20px] top-1/2 z-10 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(3,6,10,0.8)]"
+            style={{
+              boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+            }}
+          >
+            <ChevronIcon
+              className="h-[18px] w-[18px] text-[rgba(255,255,255,0.5)]"
+              direction="left"
+            />
           </div>
 
-          <div aria-hidden="true" className="showcase-carousel-infinity">
-            <span className="showcase-carousel-infinity-glyph">∞</span>
-            <div className="showcase-carousel-infinity-track">
-              <span className="showcase-carousel-infinity-segment" />
-              <span className="showcase-carousel-infinity-segment" />
-              <span className="showcase-carousel-infinity-segment showcase-carousel-infinity-segment--active" />
-              <span className="showcase-carousel-infinity-segment" />
-              <span className="showcase-carousel-infinity-segment" />
-            </div>
-            <span className="showcase-carousel-infinity-glyph">∞</span>
+          {/* Cards Row — all 5 visible */}
+          <div className="grid w-full grid-cols-5 gap-[16px]">
+            {SHOWCASE_SLIDES.map((slide) => (
+              <ShowcaseCard key={slide.id} slide={slide} />
+            ))}
           </div>
+
+          {/* Right Arrow */}
+          <div
+            aria-hidden="true"
+            className="absolute -right-[20px] top-1/2 z-10 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(3,6,10,0.8)]"
+            style={{
+              boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+            }}
+          >
+            <ChevronIcon
+              className="h-[18px] w-[18px] text-[rgba(255,255,255,0.5)]"
+              direction="right"
+            />
+          </div>
+        </div>
+
+        {/* Pagination */}
+        <div
+          aria-hidden="true"
+          className="mt-[28px] flex h-[24px] items-center justify-center gap-[14px]"
+        >
+          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
+          <div className="flex w-[280px] items-center gap-[5px]">
+            <span className="h-[6px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[6px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[6px] flex-1 rounded-full bg-[#2f89ff] shadow-[0_0_12px_rgba(47,137,255,0.8)]" />
+            <span className="h-[6px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[6px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+          </div>
+          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
         </div>
       </div>
     </section>

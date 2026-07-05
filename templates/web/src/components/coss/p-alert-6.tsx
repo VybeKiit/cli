@@ -1,5 +1,5 @@
 import { TriangleAlertIcon } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@vybekiit/ui/alert';
 
 export default function Particle() {
   return (

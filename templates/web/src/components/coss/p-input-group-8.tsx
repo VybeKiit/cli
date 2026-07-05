@@ -3,9 +3,9 @@
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import { useRef } from 'react';
 import { useCopyToClipboard } from '@/registry/default/hooks/use-copy-to-clipboard';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@vybekiit/ui/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@vybekiit/ui/input-group';
+import { Tooltip, TooltipPopup, TooltipTrigger } from '@vybekiit/ui/tooltip';
 
 export default function Particle() {
   const { copyToClipboard, isCopied } = useCopyToClipboard();

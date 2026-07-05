@@ -1,5 +1,5 @@
 import { ChevronDownIcon, DownloadIcon, EditIcon, ShareIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import { Group, GroupSeparator } from '@/components/ui/group';
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu';
 

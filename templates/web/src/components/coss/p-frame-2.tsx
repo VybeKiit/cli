@@ -1,6 +1,6 @@
 import { ChevronDownIcon, TrashIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@vybekiit/ui/button';
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@vybekiit/ui/collapsible';
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame';
 
 export default function Particle() {
