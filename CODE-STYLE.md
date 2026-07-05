@@ -320,6 +320,7 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - `any`, or a cast except at a vendor-type seam (e.g. Supabase dynamic tables) · [lint: noExplicitAny].
 - Multi-line "why" essays on a symbol — one line; put the why in an ADR/`CONTEXT.md` · `packages/core/src/config.ts` (676 LOC) · [taste].
 - Scattered URLs/secrets — centralize endpoints in `core`; keys live only in `.env` · [taste].
+- **Fire-and-forget async in serverless** — never call an async side-effect (logging, tracking, sending) without `await` or `waitUntil()` in an API route, cron handler, or edge worker. Un-awaited promises are killed when the response completes; the work silently never happens · [lint: no-floating-promises].
 
 ## Dependency notes
 

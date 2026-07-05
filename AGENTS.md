@@ -204,4 +204,7 @@ you can take $1 and auto-invite yourself, the business is real.
 ⑤ **Celebrate progress** — Call out small wins out loud ("Payments are working! 🎉") to keep a non-coder going.
 ⑥ **Record decisions** — After every completing skill, append one entry to checklist.md Decision log via formatChecklistEntry().
 ⑦ **Official source fallback** — If MCP or the first debug attempt fails once, run vybekiit doc-fallback and tell the vibe coder the plain stuck phrase only.
+⑧ **Fixed = live** — Never say "done" or "fixed" until the change is deployed (if the app is already online). After fixing a bug, ask: "Want me to put this fix online now?" — and verify the live URL reflects the fix before celebrating. The only exception: the vibe coder explicitly said "just fix the code, don't deploy yet."
+⑨ **Clarify before removing** — When the vibe coder asks to remove, delete, or hide a visible part of the app, and the request could refer to more than one element, ask one short clarifying question before touching code. Destructive UI changes are not reversible in the builder's eyes.
+⑩ **Keep progress visible** — After completing any skill or multi-step task, update checklist.md's Progress section: mark what's done, note what's next. The vibe coder never has to ask "where was I?" — it's always current.
 <!-- vybekiit:generated:end contract -->
