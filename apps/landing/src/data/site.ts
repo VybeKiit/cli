@@ -5,7 +5,7 @@
  */
 
 /** The product's one-time price, in US dollars. */
-const PRICE_USD = 29.99;
+const PRICE_USD = 29;
 
 /** Post-launch-week price (early bird ends after launch week). */
 const PRICE_AFTER_LAUNCH_USD = 49;
@@ -20,14 +20,14 @@ const VALUE_STACK_USD = 655;
 export const PRICE = {
   /** Numeric amount in USD, for any math or schema markup. */
   amount: PRICE_USD,
-  /** Display string with currency symbol, e.g. "$29.99". */
-  display: `$${PRICE_USD.toFixed(2)}`,
+  /** Display string with currency symbol, e.g. "$29". */
+  display: `$${PRICE_USD}`,
   /** How the buyer is billed — a one-time purchase, not a subscription. */
   cadence: 'one-time',
   /** The risk-reversal window the offer promises. */
   refundDays: 14,
   /** Early-bird messaging for launch week. */
-  earlyBirdNote: `$${PRICE_USD.toFixed(2)} launch week → $${PRICE_AFTER_LAUNCH_USD} after`,
+  earlyBirdNote: `$${PRICE_USD} launch week → $${PRICE_AFTER_LAUNCH_USD} after`,
 } as const;
 
 /**

@@ -29,7 +29,7 @@ export function TechLogos() {
       <ul className="testimonials-logos-row">
         {TESTIMONIAL_LOGOS.map((logo) => (
           <li className="tech-logo" key={logo.slug}>
-            <LogoMarkIcon className="h-6 w-6 shrink-0" mono={true} slug={logo.slug} />
+            <LogoMarkIcon className="h-7 w-7 shrink-0" mono={true} slug={logo.slug} />
             <span className="tech-logo-label">{logo.label}</span>
           </li>
         ))}

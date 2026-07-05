@@ -27,6 +27,23 @@ const FLAT_MARK_SRC = {
   googlechrome: '/brand-marks/googlechrome.webp',
   appstore: '/brand-marks/appstore.webp',
   googleplay: '/brand-marks/googleplay.webp',
+  githubcopilot: '/brand-marks/githubcopilot.webp',
+  windsurf: '/brand-marks/windsurf.webp',
+  cline: '/brand-marks/cline.webp',
+  kiro: '/brand-marks/kiro.webp',
+  googlegemini: '/brand-marks/googlegemini.webp',
+  continue: '/brand-marks/continue.webp',
+  jetbrains: '/brand-marks/jetbrains.webp',
+  aider: '/brand-marks/aider.webp',
+  augment: '/brand-marks/augment.webp',
+  roo: '/brand-marks/roo.webp',
+  trae: '/brand-marks/trae.webp',
+  antigravity: '/brand-marks/antigravity.webp',
+  replit: '/brand-marks/replit.webp',
+  devin: '/brand-marks/devin.webp',
+  opencode: '/brand-marks/opencode.webp',
+  zed: '/brand-marks/zed.webp',
+  amazonq: '/brand-marks/amazonq.webp',
 };
 
 /**
@@ -75,11 +92,29 @@ const SLUG_SOURCES = {
   googlechrome: { tier: 'reuse2d' },
   appstore: { tier: 'reuse2d' },
   googleplay: { tier: 'reuse2d' },
+  // AI Agent runtimes (flat 2d marks)
+  githubcopilot: { tier: 'reuse2d' },
+  windsurf: { tier: 'reuse2d' },
+  cline: { tier: 'reuse2d' },
+  kiro: { tier: 'reuse2d' },
+  googlegemini: { tier: 'reuse2d' },
+  continue: { tier: 'reuse2d' },
+  jetbrains: { tier: 'reuse2d' },
+  aider: { tier: 'reuse2d' },
+  augment: { tier: 'reuse2d' },
+  roo: { tier: 'reuse2d' },
+  trae: { tier: 'reuse2d' },
+  antigravity: { tier: 'reuse2d' },
+  replit: { tier: 'reuse2d' },
+  devin: { tier: 'reuse2d' },
+  opencode: { tier: 'reuse2d' },
+  zed: { tier: 'reuse2d' },
+  amazonq: { tier: 'reuse2d' },
 };
 
 const PRODUCT_STACK_SLUGS = Object.keys(SLUG_SOURCES);
 
-/** Outer ring positions — reduced scale for 25 marks. */
+/** Outer ring positions — distributed scale for 42 marks. */
 const ORBIT_POSITIONS = [
   { x: 0.04, y: 0.06, scale: 0.28, floatPhase: 0 },
   { x: 0.96, y: 0.08, scale: 0.26, floatPhase: 0.8 },
@@ -106,6 +141,24 @@ const ORBIT_POSITIONS = [
   { x: 0.5, y: 0.08, scale: 0.18, floatPhase: 5.4 },
   { x: 0.48, y: 0.9, scale: 0.2, floatPhase: 6.2 },
   { x: 0.5, y: 0.48, scale: 0.16, floatPhase: 1.0 },
+  // AI Agent runtime positions (inner + fill)
+  { x: 0.38, y: 0.24, scale: 0.16, floatPhase: 0.3 },
+  { x: 0.62, y: 0.22, scale: 0.16, floatPhase: 1.1 },
+  { x: 0.42, y: 0.42, scale: 0.14, floatPhase: 1.9 },
+  { x: 0.58, y: 0.4, scale: 0.14, floatPhase: 2.7 },
+  { x: 0.44, y: 0.64, scale: 0.16, floatPhase: 3.5 },
+  { x: 0.56, y: 0.62, scale: 0.16, floatPhase: 4.3 },
+  { x: 0.36, y: 0.8, scale: 0.16, floatPhase: 5.1 },
+  { x: 0.64, y: 0.82, scale: 0.16, floatPhase: 5.9 },
+  { x: 0.24, y: 0.9, scale: 0.18, floatPhase: 0.7 },
+  { x: 0.76, y: 0.88, scale: 0.18, floatPhase: 1.5 },
+  { x: 0.08, y: 0.92, scale: 0.18, floatPhase: 2.3 },
+  { x: 0.92, y: 0.9, scale: 0.18, floatPhase: 3.1 },
+  { x: 0.4, y: 0.04, scale: 0.16, floatPhase: 3.9 },
+  { x: 0.6, y: 0.04, scale: 0.16, floatPhase: 4.7 },
+  { x: 0.26, y: 0.52, scale: 0.16, floatPhase: 5.5 },
+  { x: 0.74, y: 0.5, scale: 0.16, floatPhase: 6.3 },
+  { x: 0.5, y: 0.76, scale: 0.16, floatPhase: 0.2 },
 ];
 
 async function load3dSourceBuffer(source) {

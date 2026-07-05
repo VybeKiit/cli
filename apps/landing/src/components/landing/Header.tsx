@@ -25,10 +25,10 @@ export function Header() {
           <span className="font-extrabold text-[22px] tracking-tight">{BRAND.name}</span>
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-11 lg:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-12 lg:flex">
           {LANDING_NAV.map((link) => (
             <a
-              className="font-semibold text-[var(--text-soft)] text-sm transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
+              className="font-semibold text-[var(--text-soft)] text-[15px] transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
               href={link.href}
               key={link.label}
             >

@@ -107,7 +107,7 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
       solutionLabel: 'THE SOLUTION',
       solutionHeading: 'VybeKiit operates the stack.',
       solutionBody:
-        'Our AI operator configures, connects, and keeps everything running, end to end.',
+        'Our AI operator configures, connects, and keeps everything running—end to end.',
     },
   },
   {
@@ -117,7 +117,7 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
     copy: {
       problemLabel: 'THE PROBLEM',
       problemHeading: 'Payments setup kills momentum.',
-      problemBody: "Integrations, webhooks, taxes, invoices. It's a rabbit hole.",
+      problemBody: "Integrations, webhooks, taxes, invoices—it's a rabbit hole.",
       solutionLabel: 'THE SOLUTION',
       solutionHeading: 'Take payments in your first session.',
       solutionBody:

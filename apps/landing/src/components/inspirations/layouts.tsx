@@ -218,7 +218,7 @@ export function ReceiptMorLayout({ direction }: { direction: InspirationDirectio
           )}
           <div className="mt-4 flex justify-between font-mono text-sm">
             <span>VybeKiit</span>
-            <span>$29.00</span>
+            <span>$29</span>
           </div>
         </div>
         <div className="flex flex-1 flex-col gap-6">

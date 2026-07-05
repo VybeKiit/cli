@@ -7,10 +7,10 @@ import { useInViewOnce } from '@/hooks/useInViewOnce';
 import { parseDisplayNumber } from '@/lib/parseDisplayNumber';
 import { cn } from '@/lib/utils';
 
-/** Consistent cents display while rolling from compare-at to sale price. */
+/** Integer price display — design shows $29 with no cents. */
 const PRICE_ROLL_FORMAT = {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
 } as const;
 
 export interface CountdownPriceProps {
