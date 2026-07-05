@@ -2,3 +2,37 @@
 pnpm biome check --write --no-errors-on-unmatched .
 # Biome injects `node:process` into instrumentation.ts; that breaks Next client bundles.
 git checkout -- templates/web/instrumentation.ts 2>/dev/null || true
+
+# Dedup gate — block new exports that duplicate existing code (ADR-0031).
+# Only runs if the binary is built; skips silently otherwise (first-time contributors).
+DEDUP_BIN="tools/dedup/target/release/vybekiit-dedup"
+if [ ! -x "$DEDUP_BIN" ]; then
+  DEDUP_BIN="tools/dedup/target/debug/vybekiit-dedup"
+fi
+if [ -x "$DEDUP_BIN" ]; then
+  # Get staged .ts/.tsx files that are Added or Modified
+  STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E '\.(ts|tsx)$' | grep -v '\.test\.' | grep -v '\.d\.ts$' || true)
+  if [ -n "$STAGED_FILES" ]; then
+    DEDUP_FAILED=0
+    for FILE in $STAGED_FILES; do
+      if [ -f "$FILE" ]; then
+        RESULT=$("$DEDUP_BIN" --target "$FILE" --scope . --json 2>/dev/null || true)
+        STATUS=$(echo "$RESULT" | grep -o '"status":"blocked"' || true)
+        if [ -n "$STATUS" ]; then
+          # Check if file has a dedup-bypass comment
+          if ! grep -q "dedup-bypass:" "$FILE" 2>/dev/null; then
+            echo "🚫 dedup: $FILE has duplicates. Run 'vybekiit dedup --target $FILE --scope .' for details."
+            DEDUP_FAILED=1
+          fi
+        fi
+      fi
+    done
+    if [ "$DEDUP_FAILED" -eq 1 ]; then
+      echo ""
+      echo "Commit blocked by dedup gate. Either:"
+      echo "  1. Reuse the existing code (recommended)"
+      echo "  2. Add '// dedup-bypass: <reason>' to justify the duplicate"
+      exit 1
+    fi
+  fi
+fi

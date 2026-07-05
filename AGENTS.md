@@ -192,6 +192,7 @@ you can take $1 and auto-invite yourself, the business is real.
 - After `pnpm sync:ui`, rebuild the gallery index: `node scripts/dev/sync/buildComponentLibraryIndex.mjs` (also runs via `apps/componentLibrary` `predev` / `build`).
 - Third-party license notes: [docs/THIRD_PARTY_UI_LICENSES.md](./docs/THIRD_PARTY_UI_LICENSES.md).
 - Dev UI library: `pnpm dev:ui-library` → `http://localhost:3002`.
+- Local dev console: `pnpm dev:local` → `http://localhost:3005` (or `vybekiit local-dev`). A visual sidecar for vibe coders that detects the active agent and animates the agent's workflow steps.
 - Gallery previews cache compiled embeds in-session; card hover enables interactive iframes for hover effects without opening the detail page.
 
 <!-- vybekiit:generated:start contract -->

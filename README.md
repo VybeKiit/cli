@@ -43,14 +43,28 @@ actually work: updates ship as npm version bumps, never git merges.
 ## Develop
 
 ```bash
-pnpm install            # install the workspace
+pnpm install            # install the workspace (runs preflight checks automatically)
 pnpm build              # build all packages (turbo)
 pnpm test               # run tests
 pnpm typecheck          # strict tsc across the workspace
 pnpm lint               # biome check
 ```
 
-Requires Node ≥ 20 and pnpm ≥ 10 (see `.nvmrc` / `package.json` engines).
+### Prerequisites
+
+| Tool | Version | Required | Why |
+|------|---------|----------|-----|
+| Node.js | ≥ 20 | ✅ | runtime + build |
+| pnpm | ≥ 10 | ✅ | workspace package manager (pinned via `corepack`) |
+| git | ≥ 2.30 | ✅ | hooks + monorepo |
+| Rust | edition 2021+ | ✅ | builds `tools/dedup` (the dedup gate binary) |
+| corepack | any | optional | enables pnpm from `packageManager` field |
+| GitHub CLI (`gh`) | any | optional | mirror sync + PR creation |
+| Docker | any | optional | `pnpm verify:docker` native-deps check |
+
+Run `pnpm preflight` to check all prerequisites with install instructions for your OS.
+
+See `.nvmrc` / `package.json` engines.
 
 ## Build order
 

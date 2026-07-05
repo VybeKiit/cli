@@ -260,6 +260,33 @@ code whose job is terminal/agent output. Enforced: `noConsole` is `error` under 
 `biome.json`.
 _Why:_ a stray `console.log` in a buyer's `node_modules` is noise they can't turn off.
 
+### Deduplication gate — run before creating · [lint: dedup]
+Before creating a new file, exported function, class, or hook — run `vybekiit dedup`. If status is
+`blocked`: reuse or extend the existing match. Bypass only with an explicit `// dedup-bypass: <reason>`
+at the export site. The agent justifies — the vibe coder never sees this gate.
+```bash
+vybekiit dedup --intent "payment webhook handler" --scope packages/
+# → { "status": "blocked", "matches": [{ "existing": "packages/payments/src/…:handlePaymentEvent" }] }
+# Action: import from packages/payments, don't recreate
+```
+_Why:_ AI agents create duplicates silently; the codebase rots into near-identical functions that
+drift independently. This gate catches it at write-time; the pre-commit hook catches it at commit-time.
+ADR-0031.
+
+### Single home per concern · [taste]
+Every domain concept has exactly one home. If `packages/payments` exists, payment logic lives there —
+not in `src/utils/payments.ts`, not in a new helper. The domain map (`.vybekiit/domain-map.json`)
+declares the homes; the dedup tool enforces it (Level D). When in doubt, extend the existing module
+rather than creating a neighbor.
+```ts
+// ✓  extend the existing home
+// packages/payments/src/providers/stripe/webhooks.ts — new webhook handler lives here
+// ✗  create a neighbor
+// src/utils/payments.ts — blocked by dedup Level D: "packages/payments already owns this domain"
+```
+_Why:_ scattered domain logic is the #1 cause of buyer confusion and stale code that agents can't
+find when asked to modify a feature. ADR-0031.
+
 ### Maintainer scripts are `.mjs` + JSDoc types
 `scripts/*.mjs` stay plain ESM typed via JSDoc (`@typedef`/`@type`), lead with a why + ADR header,
 shell out via `execFile` + `promisify` (not `execSync`), and **scrub secrets/tokens from logs**.
@@ -293,6 +320,15 @@ Author it in each template as owned code (`templates/<t>/src/lib/<name>.ts`) and
 so this is never buyer-facing duplication — it is one owned file per template, kept consistent by a
 maintainer gate. Reach for a published package only if the code also earns a spine slot above.
 
+### Run the dedup gate (before creating any new export)
+1. Decide intent — what function/class/hook you're about to create.
+2. Run `vybekiit dedup --intent "<description>" --scope <relevant-dir>`.
+3. If `"status": "clear"` → proceed.
+4. If `"status": "blocked"` → read the top match's `suggestion`. Reuse/extend that code instead.
+5. If reuse genuinely doesn't fit (different purity, different ownership boundary) → add
+   `// dedup-bypass: <one-line reason>` above the export and proceed.
+6. Never paginate past the first 3 results — if none fit, the intent is unique enough.
+
 ## Exemplars
 
 Write new code like these:
@@ -321,6 +357,8 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - Multi-line "why" essays on a symbol — one line; put the why in an ADR/`CONTEXT.md` · `packages/core/src/config.ts` (676 LOC) · [taste].
 - Scattered URLs/secrets — centralize endpoints in `core`; keys live only in `.env` · [taste].
 - **Fire-and-forget async in serverless** — never call an async side-effect (logging, tracking, sending) without `await` or `waitUntil()` in an API route, cron handler, or edge worker. Un-awaited promises are killed when the response completes; the work silently never happens · [lint: no-floating-promises].
+- **Creating/extending an export without running `vybekiit dedup` first** — the gate catches exact dups, structural dups, and concern-overlap; skipping it is how the codebase rots · [lint: dedup] (ADR-0031).
+- **Silently bypassing a dedup block** — if the tool says `blocked`, reuse or add `// dedup-bypass: <reason>`. No silent overrides · [taste] (ADR-0031).
 
 ## Dependency notes
 
