@@ -16,21 +16,19 @@ API route classified correctly. Output a plain pass/fail summary for the builder
 
 ## Steps
 
-**Start here — run the readable safety check.** Run `node scripts/safety-scan.mjs --html --lang <the
-builder's language, e.g. `he`>`. It reads the project on this machine (nothing leaves the computer),
-finds leaks from `scripts/safety-catalog.mjs`, and opens one report in the builder's language: a
-traffic-light headline, one card per finding, each with a clickable path that opens the exact file
-and line in their editor so they can see for themselves it is real. Walk them through it in plain
-words: fix every 🔴 before go-live, 🟡 are "worth doing soon", 🟢 is what the kit already protected.
-Fix, then re-run until it is green. The catalog and the script are plain and readable on purpose —
-the builder can trust the result without trusting an agent. The numbered steps below are the deeper
-manual audit for what the scan cannot check yet (endpoint taxonomy, database row rules, toolchain).
-
 1. **Abuse / DDoS layer.** Confirm `SECURITY_RATE_LIMIT` and `SECURITY_ORIGIN_LOCK` are `on` in
    `.env`. Confirm `middleware.ts` passes the request path for tiered limits. Confirm `/api/webhook`
    is **not** blocked by origin lock (payment providers POST cross-origin). Run quick probes: hammer
    `/api/auth/signin` → expect "slow down"; submit `/api/contact` at human pace → still works.
    **Verify:** login protected; contact form not throttled like login.
+
+1b. **Scheduled tasks (cron safety).** If the app has any scheduled tasks (cron jobs, Vercel crons,
+   Supabase pg_cron, Cloudflare Cron Triggers):
+   - Confirm interval is 15 minutes or more for any task that touches the database
+   - Confirm tasks only run during active hours (not 24/7) unless truly needed
+   - If on a free-tier database (Supabase Free, Neon Free): warn that frequent crons prevent
+     auto-suspend and burn compute quota — the app will go down with no way to deploy a fix
+   **Verify:** no cron will silently exhaust the free tier.
 
 2. **SQL / database safety.** Grep for raw SQL, `$executeRaw`, or string-built queries — replace with
    `@vybekiit/db` `DataProvider`. If Supabase: confirm RLS on buyer tables. Every API route validates
@@ -56,6 +54,11 @@ manual audit for what the scan cannot check yet (endpoint taxonomy, database row
    - Scan `src/lib/` for duplicate exported function names; merge duplicates
    - Spot-check API routes use `@/lib/logger` instead of bare console
    - If going live with alerts: when `OBSERVABILITY_PROVIDER=sentry`, confirm `SENTRY_DSN` is set
+   - Scan for fire-and-forget async calls in API routes and crons: any `logX()`, `trackX()`, or
+     `sendX()` called without `await` (or without `waitUntil`). In serverless, un-awaited async
+     work is killed after response — the work silently never happens. Flag and fix.
+   - Never remove a navigation or layout component without confirming which element the builder
+     means (contract rule ⑨).
    **Verify:** tell the builder *"Your app is quiet in production and uses one place for each kind of logic."*
 
 7. **UI consistency (agent-only).** Grep checks:

@@ -77,6 +77,16 @@ for. Save progress for them (don't make them think about it).
 
 ## After completing this skill
 
+Update checklist.md Progress (mark done, note next). If checklist.md doesn't exist yet, create it:
+
+```markdown
+## Progress
+- [x] App running locally (onboarding)
+- [ ] ← next
+
+## Decision log
+```
+
 Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
 
 If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*

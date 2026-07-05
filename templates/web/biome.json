@@ -21,7 +21,10 @@
       "!!**/src/components/kibo",
       "!!**/src/components/ui/calendar.tsx",
       "!!**/src/components/ui/field.tsx",
-      "!!**/src/components/ui/input-group.tsx"
+      "!!**/src/components/ui/input-group.tsx",
+      "!!**/src/components/cult",
+      "!!**/src/components/tailark",
+      "!!**/src/components/blocks-so"
     ]
   },
   "formatter": {

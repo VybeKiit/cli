@@ -44,6 +44,11 @@ or describes, in plain words, what the app should remember.
 Run `doctor`. Most issues are a missing access key or the database not reachable yet — fix it for
 them, don't explain the internals.
 
+> ⚠️ (Agent-only) If the app will have scheduled tasks (crons), they must run ≥15 min apart and
+> only during active hours — otherwise a free-tier database never auto-suspends and will exhaust
+> its compute quota, causing the entire app to go down with no way to deploy a fix until the next
+> billing cycle resets the quota.
+
 ## Definition of done
 
 The app saves and reads back real data, a passing test covers it, and no save-data markers remain

@@ -1351,43 +1351,109 @@ const CONFETTI_ACCENTS: readonly RigAccent[] = (
   fill: CONFETTI[i % CONFETTI.length] as string,
   cls: `octo-rig__accent--confetti octo-rig__accent--c${(i % 4) + 1}`,
 }));
-
-/** Dancing — arms alternate overhead as the body sways and bounces (4 frames). */
+/** Dancing — full body metamorphosis: crouch→leap→peak→spin→land (5 frames). */
 const DANCE_FRAMES: readonly RigFrame[] = [
   {
-    id: 'd0',
-    tx: -2,
-    ty: 36,
-    body: [TORSO, ...LEGS, [0, 18, 22, 24], [107, 42, 22, 21]],
-    eyes: EYES_OPEN,
+    id: 'd-crouch',
+    tx: 0,
+    ty: 12,
+    body: [
+      [24, 38, 80, 40],
+      [16, 78, 18, 16],
+      [46, 78, 16, 16],
+      [66, 78, 16, 16],
+      [94, 78, 18, 16],
+      [8, 52, 18, 18],
+      [102, 52, 18, 18],
+    ],
+    eyes: [
+      [36, 52, 11, 8],
+      [82, 52, 11, 8],
+    ],
   },
-  { id: 'd1', tx: 0, ty: 32, body: STAND_BODY, eyes: EYES_OPEN },
   {
-    id: 'd2',
+    id: 'd-leap',
     tx: 2,
-    ty: 36,
-    body: [TORSO, ...LEGS, [0, 42, 22, 21], [107, 18, 22, 24]],
-    eyes: EYES_OPEN,
+    ty: -10,
+    body: [
+      [30, 18, 68, 54],
+      [0, 8, 30, 18],
+      [98, 12, 30, 16],
+      [34, 72, 18, 24],
+      [76, 72, 18, 24],
+    ],
+    eyes: [
+      [40, 36, 12, 12],
+      [78, 36, 12, 12],
+    ],
   },
-  { id: 'd3', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_OPEN },
+  {
+    id: 'd-peak',
+    tx: 0,
+    ty: -14,
+    body: [
+      [34, 26, 60, 52],
+      [36, 4, 22, 24],
+      [70, 4, 22, 24],
+      [38, 78, 18, 20],
+      [72, 78, 18, 20],
+    ],
+    eyes: [
+      [42, 42, 11, 11],
+      [76, 42, 11, 11],
+    ],
+  },
+  {
+    id: 'd-spin',
+    tx: -2,
+    ty: -4,
+    body: [
+      [20, 24, 88, 52],
+      [0, 32, 22, 16],
+      [96, 44, 32, 14],
+      [26, 76, 18, 22],
+      [74, 74, 18, 22],
+    ],
+    eyes: [
+      [32, 38, 11, 11],
+      [68, 34, 11, 11],
+    ],
+  },
+  {
+    id: 'd-land',
+    tx: 1,
+    ty: 6,
+    body: [
+      [26, 32, 76, 50],
+      [14, 82, 18, 16],
+      [96, 82, 18, 16],
+      [0, 40, 26, 16],
+      [102, 44, 27, 14],
+    ],
+    eyes: [
+      [36, 48, 11, 11],
+      [82, 48, 11, 11],
+    ],
+  },
 ];
 
-/** Two pink notes swinging beside the dancer. */
+/** Rich note/sparkle field — 12 particles scattered, multi-animation. */
 const DANCE_NOTES: readonly RigAccent[] = [
-  { rect: [98, 14, 3, 3], fill: PINK, cls: 'octo-rig__accent--swing' },
-  { rect: [100, 9, 1, 6], fill: PINK, cls: 'octo-rig__accent--swing' },
-  { rect: [100, 9, 3, 2], fill: PINK, cls: 'octo-rig__accent--swing' },
-  { rect: [116, 8, 3, 3], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
-  { rect: [118, 3, 1, 6], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
-  { rect: [118, 3, 3, 2], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
+  { rect: [2, 10, 7, 7], fill: PINK, cls: 'octo-rig__accent--swing' },
+  { rect: [4, 4, 2, 9], fill: PINK, cls: 'octo-rig__accent--swing' },
+  { rect: [4, 4, 6, 3], fill: PINK, cls: 'octo-rig__accent--swing' },
+  { rect: [112, 4, 7, 7], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
+  { rect: [114, 0, 2, 8], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
+  { rect: [114, 0, 6, 3], fill: PINK, cls: 'octo-rig__accent--swing octo-rig__accent--delay1' },
+  { rect: [56, 0, 7, 7], fill: CORAL, cls: 'octo-rig__accent--swing octo-rig__accent--delay2' },
+  { rect: [58, 0, 2, 5], fill: CORAL, cls: 'octo-rig__accent--swing octo-rig__accent--delay2' },
+  { rect: [18, 4, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [108, 20, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+  { rect: [8, 28, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2' },
+  { rect: [120, 30, 3, 3], fill: SKY, cls: 'octo-rig__accent--pop' },
 ];
 
-// --- Debugging — Clawd holds the glass and inspects the floor ----------------
-/**
- * A big magnifying glass (≈22-unit ring) held to inspect the floor: bold ink
- * ring + cream glass, with the handle rising UP so a reaching tentacle visibly
- * grips it (grip end lands near `x+22, y-6`). Absolute origin.
- */
+// --- Debugging — full metamorphosis bug hunt with ambient particles -----------
 function lensDown(x: number, y: number): readonly RigAccent[] {
   return [
     { rect: [x + 4, y + 4, 14, 14], fill: CREAM },
@@ -1399,34 +1465,23 @@ function lensDown(x: number, y: number): readonly RigAccent[] {
     { rect: [x + 20, y - 9, 5, 6], fill: INK },
   ];
 }
-/** A bold ink beetle — unmistakably a bug, high-contrast on the brand body. */
 function bug(x: number, y: number): readonly RigAccent[] {
   return [
     { rect: [x + 2, y, 9, 3], fill: INK },
     { rect: [x, y + 3, 13, 4], fill: INK },
-    { rect: [x + 13, y + 3, 3, 3], fill: INK },
     { rect: [x + 5, y, 1, 7], fill: CREAM },
-    { rect: [x - 2, y + 3, 2, 1], fill: INK },
-    { rect: [x - 2, y + 6, 2, 1], fill: INK },
-    { rect: [x + 3, y + 7, 1, 2], fill: INK },
-    { rect: [x + 9, y + 7, 1, 2], fill: INK },
-    { rect: [x + 12, y + 7, 2, 1], fill: INK },
     { rect: [x + 16, y + 1, 2, 1], fill: INK },
     { rect: [x + 16, y + 4, 1, 1], fill: CORAL },
   ];
 }
-/** Flattened bug — an ink smear with coral guts and stray flecks. */
 function splat(x: number, y: number): readonly RigAccent[] {
   return [
     { rect: [x, y, 16, 3], fill: INK },
     { rect: [x + 3, y - 2, 3, 2], fill: INK },
     { rect: [x + 9, y - 2, 3, 2], fill: INK },
     { rect: [x + 6, y - 1, 4, 1], fill: CORAL },
-    { rect: [x - 3, y + 1, 2, 1], fill: INK },
-    { rect: [x + 17, y + 1, 2, 1], fill: INK },
   ];
 }
-/** Green "caught it" check that snaps in on the final frame. */
 const DEBUG_CHECK: readonly RigAccent[] = [
   { rect: [94, 34, 4, 4], fill: GREEN },
   { rect: [98, 38, 4, 4], fill: GREEN },
@@ -1434,157 +1489,261 @@ const DEBUG_CHECK: readonly RigAccent[] = [
   { rect: [106, 24, 4, 4], fill: GREEN },
   { rect: [110, 18, 4, 4], fill: GREEN },
 ];
-/** Standing legs in absolute space (this pose bakes position, no frame translate). */
-const DEBUG_LEGS: readonly RigRect[] = [
-  [22, 101, 11, 12],
-  [43, 101, 11, 12],
-  [75, 101, 11, 12],
-  [96, 101, 11, 12],
-];
-/** Legs under the narrower hunched-over torso (peer/spot/pounce/squash). */
-const CROUCH_LEGS: readonly RigRect[] = [
-  [22, 101, 11, 12],
-  [40, 101, 11, 12],
-  [62, 101, 11, 12],
-  [80, 101, 11, 12],
-];
 
-/**
- * Bug hunt — peer → spot → pounce → squash → gotcha. Clawd hunches over the
- * floor with a tentacle visibly gripping the magnifier's handle, eyes aimed
- * DOWN through the glass; the bug scurries, gets pinned, splats, then a green
- * check snaps in. Magnifier + bug are per-frame props, choreographed by hand.
- */
 const DEBUG_FRAMES: readonly RigFrame[] = [
   {
-    // Hunched low over the floor, a tentacle gripping the big glass, eyes down.
     id: 'peer',
     tx: 0,
     ty: 0,
-    body: [[20, 48, 80, 53], ...CROUCH_LEGS, [2, 74, 18, 16], [84, 66, 22, 12], [100, 74, 14, 14]],
-    eyes: [
-      [38, 78, 13, 9],
-      [68, 78, 13, 9],
+    body: [
+      [14, 50, 86, 40],
+      [20, 90, 18, 18],
+      [64, 90, 18, 18],
+      [2, 66, 16, 18],
+      [88, 56, 22, 16],
     ],
-    props: [...lensDown(96, 84), ...bug(98, 100)],
+    eyes: [
+      [32, 68, 14, 8],
+      [62, 68, 14, 8],
+    ],
+    props: [...lensDown(100, 80), ...bug(54, 108)],
   },
   {
-    // Spotted it — eyes go wide, the glass tips toward the fleeing bug.
     id: 'spot',
-    tx: 0,
-    ty: 0,
-    body: [[20, 46, 80, 55], ...CROUCH_LEGS, [2, 74, 18, 16], [86, 66, 22, 12], [102, 74, 14, 14]],
-    eyes: [
-      [36, 76, 15, 10],
-      [66, 76, 15, 10],
+    tx: 3,
+    ty: -2,
+    body: [
+      [10, 44, 80, 48],
+      [86, 40, 28, 20],
+      [18, 92, 18, 16],
+      [62, 92, 18, 16],
+      [0, 60, 14, 18],
+      [92, 54, 22, 16],
     ],
-    props: [...lensDown(98, 86), ...bug(100, 101)],
+    eyes: [
+      [28, 62, 16, 14],
+      [58, 62, 16, 14],
+    ],
+    props: [...lensDown(104, 76), ...bug(58, 108)],
   },
   {
-    // Pounce — lunge down, press the glass onto the floor over the bug.
     id: 'pounce',
     tx: 0,
-    ty: 0,
-    body: [[22, 52, 80, 49], ...CROUCH_LEGS, [2, 74, 18, 16], [90, 72, 22, 12], [106, 80, 14, 12]],
-    eyes: [
-      [36, 80, 15, 11],
-      [66, 80, 15, 11],
+    ty: 6,
+    body: [
+      [8, 54, 98, 34],
+      [20, 88, 18, 20],
+      [72, 88, 18, 20],
+      [0, 64, 12, 14],
+      [100, 58, 28, 16],
     ],
-    props: [...lensDown(100, 90), ...bug(102, 103)],
+    eyes: [
+      [34, 70, 14, 6],
+      [64, 70, 14, 6],
+    ],
+    props: [...lensDown(102, 84), ...bug(58, 106)],
   },
   {
-    // Squash — the bug splats under the lens; the body compresses on impact.
     id: 'squash',
-    tx: 0,
-    ty: 0,
-    body: [[16, 56, 90, 45], ...CROUCH_LEGS, [2, 76, 18, 16], [86, 68, 20, 12], [100, 76, 14, 12]],
-    eyes: [
-      [38, 80, 13, 6],
-      [68, 80, 13, 6],
+    tx: -1,
+    ty: 2,
+    body: [
+      [14, 48, 92, 42],
+      [22, 90, 18, 18],
+      [72, 90, 18, 18],
+      [2, 62, 16, 16],
+      [96, 54, 22, 16],
     ],
-    props: [...lensDown(96, 84), ...splat(98, 104)],
+    eyes: [
+      [30, 66, 13, 8],
+      [66, 66, 13, 8],
+    ],
+    props: [...lensDown(98, 82), ...splat(56, 108)],
   },
   {
-    // Gotcha — back upright, glass raised like a trophy, green check + splat.
     id: 'gotcha',
     tx: 0,
-    ty: 0,
-    body: [[22, 42, 82, 59], ...DEBUG_LEGS, [0, 64, 22, 20], [98, 46, 16, 14]],
-    eyes: [
-      [34, 60, 11, 11],
-      [76, 60, 11, 11],
+    ty: -6,
+    body: [
+      [26, 36, 76, 58],
+      [28, 94, 18, 16],
+      [78, 94, 18, 16],
+      [6, 52, 22, 18],
+      [96, 18, 22, 24],
     ],
-    props: [...lensDown(96, 52), ...splat(98, 104), ...DEBUG_CHECK],
+    eyes: [
+      [36, 52, 12, 12],
+      [80, 52, 12, 12],
+    ],
+    props: [...lensDown(100, 20), ...splat(56, 108), ...DEBUG_CHECK],
   },
 ];
-
-// --- Meditating — cross-legged, levitating on a slow Y-axis flow -------------
-/** Seated body: compact torso, crossed/folded legs, hands resting on the knees. */
-const SEAT_BODY: readonly RigRect[] = [
-  [32, 40, 65, 42], // torso (narrower than the lap)
-  [24, 80, 82, 11], // folded lap — wider than the torso (the lotus base)
-  [24, 75, 15, 7], // left knee bumping up
-  [90, 75, 15, 7], // right knee bumping up
-  [50, 76, 12, 6], // left ankle, crossed
-  [67, 76, 12, 6], // right ankle, crossed (small gap between = the cross)
-  [20, 72, 15, 9], // left hand resting on the knee
-  [94, 72, 15, 9], // right hand resting on the knee
+const DEBUG_PARTICLES: readonly RigAccent[] = [
+  { rect: [8, 88, 4, 4], fill: CREAM, cls: 'octo-rig__accent--twinkle' },
+  { rect: [20, 106, 3, 3], fill: CREAM, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+  {
+    rect: [110, 100, 4, 4],
+    fill: CREAM,
+    cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2',
+  },
+  { rect: [4, 100, 3, 3], fill: GOLD, cls: 'octo-rig__accent--float' },
+  { rect: [118, 88, 3, 3], fill: GOLD, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [50, 2, 5, 5], fill: SKY, cls: 'octo-rig__accent--blink' },
+  { rect: [76, 4, 4, 4], fill: SKY, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [36, 110, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise' },
 ];
-/** Serene closed lids. */
+
+// --- Meditating — body breathes (expand/contract) with rich aura field --------
 const SEAT_EYES: readonly RigRect[] = [
   [34, 56, 11, 3],
   [84, 56, 11, 3],
 ];
-/** A floating gold halo above the head — rides each frame's lift. */
 const SEAT_HALO: readonly RigAccent[] = [
   { rect: [46, 30, 36, 3], fill: GOLD },
   { rect: [44, 27, 4, 3], fill: GOLD },
   { rect: [82, 27, 4, 3], fill: GOLD },
   { rect: [52, 25, 24, 2], fill: GOLD },
 ];
-/** Levitation: the whole seated rig eases up and settles back (Y-axis flow). */
-const MEDITATE_FRAMES: readonly RigFrame[] = [0, -2, -4, -5, -3, -1].map(
-  (dy, i): RigFrame => ({
-    id: `z${i}`,
+const MEDITATE_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'z0',
     tx: 0,
-    ty: dy,
-    body: SEAT_BODY,
+    ty: 0,
+    body: [
+      [34, 42, 60, 38],
+      [26, 78, 76, 12],
+      [26, 73, 14, 7],
+      [88, 73, 14, 7],
+      [50, 75, 12, 5],
+      [66, 75, 12, 5],
+      [22, 70, 14, 8],
+      [92, 70, 14, 8],
+    ],
     eyes: SEAT_EYES,
     props: SEAT_HALO,
-  }),
-);
-/** Calm aura — a few soft motes shimmering/rising beside the meditator. */
+  },
+  {
+    id: 'z1',
+    tx: 0,
+    ty: -2,
+    body: [
+      [32, 40, 64, 40],
+      [24, 78, 80, 13],
+      [22, 72, 16, 8],
+      [90, 72, 16, 8],
+      [48, 74, 14, 5],
+      [66, 74, 14, 5],
+      [18, 66, 16, 10],
+      [94, 66, 16, 10],
+    ],
+    eyes: SEAT_EYES,
+    props: SEAT_HALO,
+  },
+  {
+    id: 'z2',
+    tx: 0,
+    ty: -5,
+    body: [
+      [28, 36, 72, 44],
+      [22, 78, 84, 14],
+      [18, 70, 18, 10],
+      [92, 70, 18, 10],
+      [46, 73, 14, 6],
+      [68, 73, 14, 6],
+      [12, 58, 18, 12],
+      [98, 58, 18, 12],
+      [14, 54, 8, 6],
+      [106, 54, 8, 6],
+    ],
+    eyes: [
+      [34, 52, 11, 2],
+      [84, 52, 11, 2],
+    ],
+    props: SEAT_HALO,
+  },
+  {
+    id: 'z3',
+    tx: 0,
+    ty: -4,
+    body: [
+      [30, 37, 68, 43],
+      [24, 78, 80, 13],
+      [20, 71, 17, 9],
+      [91, 71, 17, 9],
+      [47, 73, 14, 6],
+      [67, 73, 14, 6],
+      [14, 60, 17, 11],
+      [97, 60, 17, 11],
+      [16, 56, 7, 5],
+      [105, 56, 7, 5],
+    ],
+    eyes: [
+      [34, 52, 11, 2],
+      [84, 52, 11, 2],
+    ],
+    props: SEAT_HALO,
+  },
+  {
+    id: 'z4',
+    tx: 0,
+    ty: -2,
+    body: [
+      [33, 40, 62, 40],
+      [26, 78, 76, 12],
+      [24, 73, 15, 7],
+      [89, 73, 15, 7],
+      [50, 75, 12, 5],
+      [66, 75, 12, 5],
+      [20, 68, 15, 9],
+      [93, 68, 15, 9],
+    ],
+    eyes: SEAT_EYES,
+    props: SEAT_HALO,
+  },
+  {
+    id: 'z5',
+    tx: 0,
+    ty: -1,
+    body: [
+      [36, 43, 56, 36],
+      [28, 78, 72, 11],
+      [28, 74, 13, 6],
+      [87, 74, 13, 6],
+      [52, 76, 11, 4],
+      [65, 76, 11, 4],
+      [24, 72, 13, 7],
+      [91, 72, 13, 7],
+    ],
+    eyes: SEAT_EYES,
+    props: SEAT_HALO,
+  },
+];
 const MEDITATE_AURA: readonly RigAccent[] = [
-  { rect: [18, 52, 3, 3], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
-  { rect: [108, 52, 3, 3], fill: GOLD, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
-  { rect: [22, 68, 2, 2], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
-  { rect: [105, 68, 2, 2], fill: CREAM, cls: 'octo-rig__accent--rise' },
+  { rect: [14, 48, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [110, 48, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+  { rect: [8, 64, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise' },
+  { rect: [116, 64, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+  { rect: [20, 34, 3, 3], fill: GOLD, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [106, 34, 3, 3], fill: GOLD, cls: 'octo-rig__accent--float' },
+  { rect: [12, 80, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2' },
+  { rect: [114, 80, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle' },
+  { rect: [6, 56, 2, 2], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [120, 56, 2, 2], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
 ];
 
-// --- Deploying — Clawd rides a rocket off the launch pad ----------------------
-/** The rider: compact octopus astride the tube, one tentacle thrown up. */
-const RIDER: readonly RigRect[] = [
-  [46, 34, 36, 30], // torso perched on the tube top
-  [78, 16, 11, 20], // right tentacle thrown up (yeehaw)
-  [82, 10, 9, 9], // ...its tip
-  [38, 50, 10, 16], // left tentacle gripping the tube
-  [42, 58, 8, 12], // left leg hugging the tube
-  [78, 58, 8, 12], // right leg hugging the tube
-];
-const RIDER_EYES: readonly RigRect[] = [
-  [52, 44, 10, 11],
-  [70, 44, 10, 11],
-];
-/** The big rocket under the rider: cream tube, coral band + fins, a sky window. */
+// --- Deploying — recognizable Claude octopus ON a big rocket, body reacts -----
 const ROCKET: readonly RigAccent[] = [
   { rect: [48, 62, 32, 34], fill: CREAM },
   { rect: [48, 62, 32, 4], fill: CORAL },
   { rect: [56, 70, 16, 12], fill: SKY },
   { rect: [59, 73, 10, 6], fill: WHITE },
+  { rect: [54, 56, 20, 8], fill: CREAM },
+  { rect: [58, 52, 12, 6], fill: CREAM },
   { rect: [38, 88, 12, 14], fill: CORAL },
   { rect: [78, 88, 12, 14], fill: CORAL },
+  { rect: [44, 94, 6, 10], fill: CORAL },
+  { rect: [78, 94, 6, 10], fill: CORAL },
 ];
-/** Exhaust plume — longer `len` trails further down (clipped by the viewBox). */
 function flame(len: number): readonly RigAccent[] {
   return [
     { rect: [52, 96, 24, 8], fill: GOLD },
@@ -1594,32 +1753,118 @@ function flame(len: number): readonly RigAccent[] {
     ...(len >= 3 ? [{ rect: [60, 135, 8, 16] as RigRect, fill: GOLD }] : []),
   ];
 }
-/** Countdown → ignition shudder → lift-off → soar (the whole ship shares ty). */
+/** The Claude octopus body — recognizable silhouette with torso+legs+hands+eyes sitting on rocket */
 const DEPLOY_FRAMES: readonly RigFrame[] = [
-  { id: 'count', tx: 0, ty: 0, body: RIDER, eyes: RIDER_EYES, props: [...ROCKET, ...flame(0)] },
-  { id: 'ignite', tx: 1, ty: 0, body: RIDER, eyes: RIDER_EYES, props: [...ROCKET, ...flame(1)] },
-  { id: 'lift1', tx: -1, ty: -10, body: RIDER, eyes: RIDER_EYES, props: [...ROCKET, ...flame(2)] },
-  { id: 'lift2', tx: 1, ty: -22, body: RIDER, eyes: RIDER_EYES, props: [...ROCKET, ...flame(3)] },
-  { id: 'soar', tx: 0, ty: -34, body: RIDER, eyes: RIDER_EYES, props: [...ROCKET, ...flame(3)] },
+  {
+    id: 'count',
+    tx: 0,
+    ty: 0,
+    body: [
+      [32, 18, 64, 38],
+      [24, 36, 16, 20],
+      [88, 36, 16, 20],
+      [40, 52, 14, 12],
+      [74, 52, 14, 12],
+    ],
+    eyes: [
+      [44, 28, 10, 10],
+      [74, 28, 10, 10],
+    ],
+    props: [...ROCKET, ...flame(0)],
+  },
+  {
+    id: 'ignite',
+    tx: 1,
+    ty: -4,
+    body: [
+      [30, 14, 68, 40],
+      [20, 18, 18, 20],
+      [90, 20, 18, 18],
+      [40, 50, 14, 14],
+      [74, 50, 14, 14],
+    ],
+    eyes: [
+      [44, 26, 12, 12],
+      [72, 26, 12, 12],
+    ],
+    props: [...ROCKET, ...flame(1)],
+  },
+  {
+    id: 'lift1',
+    tx: -1,
+    ty: -14,
+    body: [
+      [34, 20, 60, 34],
+      [26, 24, 14, 20],
+      [88, 24, 14, 20],
+      [42, 50, 12, 12],
+      [74, 50, 12, 12],
+    ],
+    eyes: [
+      [46, 28, 8, 8],
+      [74, 28, 8, 8],
+    ],
+    props: [...ROCKET, ...flame(2)],
+  },
+  {
+    id: 'lift2',
+    tx: 1,
+    ty: -26,
+    body: [
+      [30, 16, 68, 38],
+      [18, 18, 18, 16],
+      [92, 18, 18, 16],
+      [14, 14, 12, 10],
+      [104, 14, 12, 10],
+      [40, 50, 14, 14],
+      [74, 50, 14, 14],
+    ],
+    eyes: [
+      [44, 26, 10, 10],
+      [74, 26, 10, 10],
+    ],
+    props: [...ROCKET, ...flame(3)],
+  },
+  {
+    id: 'soar',
+    tx: 0,
+    ty: -36,
+    body: [
+      [30, 16, 68, 38],
+      [16, 4, 20, 18],
+      [22, 0, 12, 8],
+      [92, 4, 20, 18],
+      [96, 0, 12, 8],
+      [40, 50, 14, 14],
+      [74, 50, 14, 14],
+    ],
+    eyes: [
+      [44, 26, 10, 10],
+      [74, 26, 10, 10],
+    ],
+    props: [...ROCKET, ...flame(3)],
+  },
 ];
-/** Launch smoke left on the pad — drifts/rises independently as the ship climbs. */
 const DEPLOY_SMOKE: readonly RigAccent[] = [
-  { rect: [34, 100, 12, 9], fill: CREAM, cls: 'octo-rig__accent--rise' },
-  { rect: [82, 100, 12, 9], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
-  { rect: [50, 106, 26, 6], fill: WHITE, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
-  { rect: [26, 96, 9, 7], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
-  { rect: [92, 96, 9, 7], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [30, 100, 14, 10], fill: CREAM, cls: 'octo-rig__accent--rise' },
+  { rect: [84, 100, 14, 10], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+  { rect: [48, 108, 30, 7], fill: WHITE, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [22, 94, 10, 8], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [96, 94, 10, 8], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [38, 104, 8, 6], fill: WHITE, cls: 'octo-rig__accent--rise' },
+  { rect: [82, 104, 8, 6], fill: WHITE, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [14, 98, 7, 5], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [106, 98, 7, 5], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [60, 110, 8, 3], fill: WHITE, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
 ];
 
-// --- Eureka — think, then the lightbulb pops and Clawd grabs the idea ---------
-/** A dim, un-lit bulb over the head (the thinking beat). */
+// --- Eureka — think → ponder → POP → catch → hold with sparkle field ----------
 const BULB_DIM: readonly RigAccent[] = [
   { rect: [58, 14, 14, 12], fill: DIM },
   { rect: [60, 12, 10, 2], fill: DIM },
   { rect: [60, 26, 10, 3], fill: INK },
   { rect: [62, 29, 6, 2], fill: INK },
 ];
-/** The lit bulb — gold glass, white-hot filament, ink screw base, optional rays. */
 function bulbLit(rays: boolean): readonly RigAccent[] {
   return [
     { rect: [58, 12, 14, 12], fill: GOLD },
@@ -1642,49 +1887,84 @@ function bulbLit(rays: boolean): readonly RigAccent[] {
       : []),
   ];
 }
-/** Pondering → POP (rays burst) → reach up → cup the glowing idea. */
 const EUREKA_FRAMES: readonly RigFrame[] = [
   {
     id: 'think',
     tx: 0,
-    ty: 0,
-    body: [[22, 40, 85, 61], ...DEBUG_LEGS, [0, 66, 22, 22], [88, 56, 18, 14]],
+    ty: 4,
+    body: [
+      [28, 42, 72, 54],
+      [28, 96, 12, 14],
+      [46, 96, 11, 14],
+      [72, 96, 11, 14],
+      [90, 96, 12, 14],
+      [4, 60, 24, 18],
+      [92, 54, 16, 14],
+      [102, 48, 10, 10],
+    ],
     eyes: [
-      [34, 56, 11, 10],
-      [84, 56, 11, 10],
+      [36, 60, 10, 8],
+      [80, 60, 10, 8],
     ],
     props: BULB_DIM,
   },
   {
     id: 'ponder',
     tx: 0,
-    ty: 0,
-    body: [[22, 40, 85, 61], ...DEBUG_LEGS, [0, 66, 22, 22], [90, 60, 16, 12]],
+    ty: 2,
+    body: [
+      [26, 40, 76, 56],
+      [26, 96, 12, 14],
+      [44, 96, 11, 14],
+      [72, 96, 11, 14],
+      [90, 96, 12, 14],
+      [4, 58, 22, 18],
+      [96, 42, 18, 16],
+      [108, 36, 12, 10],
+    ],
     eyes: [
-      [36, 56, 11, 10],
-      [86, 56, 11, 10],
+      [36, 58, 11, 9],
+      [82, 58, 11, 9],
     ],
     props: BULB_DIM,
   },
   {
     id: 'pop',
     tx: 0,
-    ty: 0,
-    body: [[24, 30, 81, 71], ...DEBUG_LEGS, [4, 40, 20, 22], [105, 40, 20, 22]],
+    ty: -4,
+    body: [
+      [18, 30, 92, 68],
+      [22, 98, 14, 14],
+      [42, 98, 12, 14],
+      [74, 98, 12, 14],
+      [92, 98, 14, 14],
+      [0, 38, 20, 24],
+      [108, 38, 20, 24],
+    ],
     eyes: [
-      [30, 50, 15, 15],
-      [84, 50, 15, 15],
+      [30, 52, 18, 18],
+      [80, 52, 18, 18],
     ],
     props: bulbLit(true),
   },
   {
     id: 'catch',
     tx: 0,
-    ty: 0,
-    body: [[26, 30, 77, 71], ...DEBUG_LEGS, [34, 12, 15, 26], [80, 12, 15, 26]],
+    ty: -2,
+    body: [
+      [30, 34, 68, 64],
+      [30, 98, 12, 14],
+      [48, 98, 11, 14],
+      [70, 98, 11, 14],
+      [88, 98, 12, 14],
+      [34, 10, 18, 28],
+      [76, 10, 18, 28],
+      [38, 4, 12, 10],
+      [78, 4, 12, 10],
+    ],
     eyes: [
-      [32, 52, 12, 12],
-      [85, 52, 12, 12],
+      [38, 52, 12, 12],
+      [78, 52, 12, 12],
     ],
     props: bulbLit(true),
   },
@@ -1692,13 +1972,839 @@ const EUREKA_FRAMES: readonly RigFrame[] = [
     id: 'hold',
     tx: 0,
     ty: 0,
-    body: [[24, 34, 81, 67], ...DEBUG_LEGS, [12, 44, 18, 22], [101, 44, 18, 22]],
+    body: [
+      [26, 36, 76, 62],
+      [26, 98, 12, 14],
+      [44, 98, 11, 14],
+      [72, 98, 11, 14],
+      [90, 98, 12, 14],
+      [16, 40, 16, 22],
+      [96, 40, 16, 22],
+    ],
     eyes: [
-      [32, 54, 11, 11],
-      [86, 54, 11, 11],
+      [36, 54, 11, 11],
+      [82, 54, 11, 11],
     ],
     props: bulbLit(false),
   },
+];
+const EUREKA_SPARKLES: readonly RigAccent[] = [
+  { rect: [40, 4, 5, 5], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [84, 4, 5, 5], fill: GOLD, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+  { rect: [22, 18, 4, 4], fill: GOLD, cls: 'octo-rig__accent--pop' },
+  { rect: [102, 18, 4, 4], fill: GOLD, cls: 'octo-rig__accent--pop octo-rig__accent--delay1' },
+  { rect: [14, 34, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [112, 34, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [6, 50, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2' },
+  { rect: [120, 50, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle' },
+];
+
+// --- Walking — full stride cycle (5 frames, 800ms) ----------------------------
+const WALK_FRAMES: readonly RigFrame[] = [
+  // Contact: left leg forward, right arm forward — wide stance
+  {
+    id: 'w-contact',
+    tx: -4,
+    ty: 36,
+    body: [
+      [28, 0, 72, 52], // torso
+      [6, 28, 22, 18], // left arm back
+      [100, 20, 22, 18], // right arm forward
+      [30, 52, 18, 26], // left leg forward (extended)
+      [76, 52, 18, 22], // right leg back
+    ],
+    eyes: EYES_OPEN,
+  },
+  // Pass: legs together, arms mid-swing
+  {
+    id: 'w-pass',
+    tx: 0,
+    ty: 34,
+    body: [
+      [26, 0, 76, 54], // torso (slightly taller upright)
+      [8, 32, 20, 16], // left arm mid
+      [100, 32, 20, 16], // right arm mid
+      [42, 54, 18, 24], // left leg (under body)
+      [68, 54, 18, 24], // right leg (under body)
+    ],
+    eyes: EYES_OPEN,
+  },
+  // Push: right leg forward, left arm forward — opposite stride
+  {
+    id: 'w-push',
+    tx: 4,
+    ty: 32,
+    body: [
+      [28, 0, 72, 52], // torso
+      [100, 28, 22, 18], // right arm back
+      [6, 20, 22, 18], // left arm forward
+      [76, 52, 18, 26], // right leg forward (extended)
+      [30, 52, 18, 22], // left leg back
+    ],
+    eyes: EYES_OPEN,
+  },
+  // Swing: legs together again, arms swinging through
+  {
+    id: 'w-swing',
+    tx: 0,
+    ty: 30,
+    body: [
+      [26, 0, 76, 54], // torso
+      [100, 30, 20, 16], // right arm mid
+      [8, 30, 20, 16], // left arm mid
+      [42, 54, 18, 24], // legs together
+      [68, 54, 18, 24],
+    ],
+    eyes: EYES_OPEN,
+  },
+  // Land: back to contact mirror — right leg forward, left arm forward
+  {
+    id: 'w-land',
+    tx: -2,
+    ty: 36,
+    body: [
+      [28, 0, 72, 52], // torso
+      [6, 20, 22, 18], // left arm forward
+      [100, 28, 22, 18], // right arm back
+      [72, 52, 18, 26], // right leg forward
+      [34, 52, 18, 22], // left leg back
+    ],
+    eyes: EYES_OPEN,
+  },
+];
+const WALK_DUST: readonly RigAccent[] = [
+  { rect: [16, 92, 5, 4], fill: CREAM, cls: 'octo-rig__accent--rise' },
+  { rect: [86, 92, 5, 4], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+  { rect: [50, 94, 4, 3], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [108, 90, 4, 3], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [4, 90, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [34, 96, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+  { rect: [72, 96, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [60, 90, 4, 4], fill: WHITE, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+];
+
+// --- Weights — powerlifting: setup→deadlift→clean→press→flex (5 frames) -------
+function barbell(y: number): readonly RigAccent[] {
+  return [
+    { rect: [6, y, 116, 8], fill: INK }, // bar — thick & wide
+    { rect: [0, y - 6, 16, 20], fill: INK }, // left plate outer
+    { rect: [16, y - 4, 12, 16], fill: CORAL }, // left plate inner
+    { rect: [112, y - 6, 16, 20], fill: INK }, // right plate outer
+    { rect: [100, y - 4, 12, 16], fill: CORAL }, // right plate inner
+  ];
+}
+const WEIGHTS_FRAMES: readonly RigFrame[] = [
+  // Setup: crouching low, hands gripping bar at floor level
+  {
+    id: 'wt-setup',
+    tx: 0,
+    ty: 18,
+    body: [
+      [28, 26, 72, 36], // wide low torso (crouching)
+      [22, 60, 20, 22], // left leg bent
+      [86, 60, 20, 22], // right leg bent
+      [16, 48, 18, 16], // left arm reaching down
+      [94, 48, 18, 16], // right arm reaching down
+    ],
+    eyes: [
+      [40, 38, 10, 8],
+      [78, 38, 10, 8],
+    ],
+    props: barbell(78),
+  },
+  // Deadlift: pulling bar to waist, body straightening
+  {
+    id: 'wt-dead',
+    tx: 0,
+    ty: 10,
+    body: [
+      [30, 14, 68, 46], // torso rising
+      [24, 60, 20, 24], // left leg straightening
+      [84, 60, 20, 24], // right leg straightening
+      [18, 42, 16, 22], // left arm pulling
+      [94, 42, 16, 22], // right arm pulling
+    ],
+    eyes: [
+      [40, 26, 10, 10],
+      [78, 26, 10, 10],
+    ],
+    props: barbell(58),
+  },
+  // Clean: bar at chest height, elbows up
+  {
+    id: 'wt-clean',
+    tx: 0,
+    ty: 2,
+    body: [
+      [30, 10, 68, 52], // full torso upright
+      [26, 62, 18, 22], // left leg straight
+      [84, 62, 18, 22], // right leg straight
+      [14, 16, 18, 24], // left arm holding high
+      [96, 16, 18, 24], // right arm holding high
+    ],
+    eyes: [
+      [40, 22, 10, 10],
+      [78, 22, 10, 10],
+    ],
+    props: barbell(32),
+  },
+  // Press: bar overhead, body stretched tall
+  {
+    id: 'wt-press',
+    tx: 0,
+    ty: -4,
+    body: [
+      [32, 18, 64, 48], // torso compressed under effort
+      [28, 66, 18, 22], // left leg braced
+      [82, 66, 18, 22], // right leg braced
+      [22, 0, 16, 22], // left arm up
+      [90, 0, 16, 22], // right arm up
+    ],
+    eyes: [
+      [42, 30, 10, 10],
+      [76, 30, 10, 10],
+    ],
+    props: barbell(6),
+  },
+  // Flex: triumphant, bar held high, arms bulging
+  {
+    id: 'wt-flex',
+    tx: 0,
+    ty: -6,
+    body: [
+      [28, 20, 72, 50], // torso puffed proudly
+      [24, 70, 20, 22], // left leg wide stance
+      [84, 70, 20, 22], // right leg wide stance
+      [10, 2, 22, 24], // left arm flexed wide
+      [96, 2, 22, 24], // right arm flexed wide
+    ],
+    eyes: [
+      [38, 32, 12, 12],
+      [78, 32, 12, 12],
+    ],
+    props: barbell(2),
+  },
+];
+const WEIGHTS_EFFORT: readonly RigAccent[] = [
+  { rect: [14, 18, 4, 6], fill: SKY, cls: 'octo-rig__accent--drop' },
+  { rect: [110, 18, 4, 6], fill: SKY, cls: 'octo-rig__accent--drop octo-rig__accent--delay1' },
+  { rect: [6, 32, 3, 5], fill: SKY, cls: 'octo-rig__accent--drop octo-rig__accent--delay2' },
+  { rect: [120, 32, 3, 5], fill: SKY, cls: 'octo-rig__accent--drop' },
+  { rect: [50, 4, 4, 4], fill: GOLD, cls: 'octo-rig__accent--pop' },
+  { rect: [76, 4, 4, 4], fill: GOLD, cls: 'octo-rig__accent--pop octo-rig__accent--delay1' },
+  { rect: [20, 42, 3, 3], fill: CORAL, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2' },
+  { rect: [106, 42, 3, 3], fill: CORAL, cls: 'octo-rig__accent--twinkle' },
+];
+
+// --- Flag-wave — proud flag bearer (5 frames, 900ms) --------------------------
+const FLAG_CLOTH: readonly RigRect[][] = [
+  [
+    [80, 6, 30, 20],
+    [108, 10, 8, 12],
+  ],
+  [
+    [80, 4, 28, 22],
+    [106, 8, 10, 14],
+    [114, 12, 4, 8],
+  ],
+  [
+    [78, 6, 32, 18],
+    [108, 4, 8, 14],
+    [112, 10, 6, 6],
+  ],
+  [
+    [80, 8, 26, 20],
+    [104, 6, 10, 16],
+    [112, 10, 6, 8],
+  ],
+  [
+    [78, 4, 30, 22],
+    [106, 10, 8, 12],
+  ],
+];
+function flag(phase: number): readonly RigAccent[] {
+  const cloth = FLAG_CLOTH[phase] ?? FLAG_CLOTH[0] ?? [];
+  return [
+    { rect: [78, 24, 4, 44], fill: INK },
+    { rect: [76, 22, 8, 4], fill: GOLD },
+    ...cloth.map((r): RigAccent => ({ rect: r as RigRect, fill: CORAL })),
+    { rect: [82, 14, 20, 4], fill: WHITE },
+  ];
+}
+const FLAG_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'f-plant',
+    tx: 0,
+    ty: 36,
+    body: [
+      [22, 0, 80, 56], // torso
+      [0, 30, 22, 20], // left arm out
+      [96, 10, 18, 32], // right arm holding pole
+      [28, 56, 18, 18], // left leg
+      [82, 56, 18, 18], // right leg
+    ],
+    eyes: EYES_OPEN,
+    props: flag(0),
+  },
+  {
+    id: 'f-right',
+    tx: -2,
+    ty: 34,
+    body: [
+      [18, 2, 82, 54], // torso shifted
+      [0, 24, 20, 20], // left arm out wide
+      [94, 8, 18, 34], // right arm holding pole
+      [22, 56, 18, 20], // left leg
+      [78, 58, 18, 18], // right leg
+    ],
+    eyes: EYES_OPEN,
+    props: flag(1),
+  },
+  {
+    id: 'f-peak',
+    tx: 0,
+    ty: 30,
+    body: [
+      [26, 4, 72, 52], // torso (raised)
+      [6, 28, 22, 18], // left arm
+      [94, 2, 18, 36], // right arm reaching up
+      [32, 56, 18, 20], // left leg
+      [78, 56, 18, 20], // right leg
+    ],
+    eyes: EYES_UP,
+    props: flag(2),
+  },
+  {
+    id: 'f-left',
+    tx: 2,
+    ty: 34,
+    body: [
+      [24, 2, 82, 54], // torso shifted
+      [4, 28, 22, 20], // left arm
+      [100, 10, 18, 32], // right arm holding
+      [34, 56, 18, 20], // left leg
+      [84, 56, 18, 18], // right leg
+    ],
+    eyes: EYES_OPEN,
+    props: flag(3),
+  },
+  {
+    id: 'f-settle',
+    tx: 0,
+    ty: 36,
+    body: [
+      [24, 0, 78, 58], // torso
+      [2, 32, 22, 18], // left arm
+      [96, 10, 18, 32], // right arm holding
+      [30, 58, 18, 18], // left leg
+      [80, 58, 18, 18], // right leg
+    ],
+    eyes: EYES_OPEN,
+    props: flag(4),
+  },
+];
+const FLAG_BREEZE: readonly RigAccent[] = [
+  { rect: [4, 12, 4, 3], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [16, 6, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [62, 2, 4, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [118, 18, 4, 3], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [10, 24, 3, 3], fill: SKY, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [124, 8, 3, 3], fill: CORAL, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+  { rect: [46, 0, 3, 3], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [2, 38, 3, 3], fill: CREAM, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+];
+
+// --- Alive — idle breathing with body expansion/contraction (5 frames) --------
+const ALIVE_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'a-rest',
+    tx: 0,
+    ty: 36,
+    body: [
+      [24, 0, 80, 58], // torso neutral
+      [4, 34, 20, 20], // left hand
+      [104, 34, 20, 20], // right hand
+      [28, 58, 16, 16], // legs
+      [84, 58, 16, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+  {
+    id: 'a-inhale',
+    tx: 0,
+    ty: 34,
+    body: [
+      [22, 0, 84, 60], // torso expanding
+      [2, 32, 22, 22], // hands widen
+      [104, 32, 22, 22],
+      [26, 60, 18, 16], // legs stable
+      [84, 60, 18, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+  {
+    id: 'a-full',
+    tx: 0,
+    ty: 32,
+    body: [
+      [20, 0, 88, 62], // torso at max
+      [0, 30, 22, 24], // hands widest
+      [106, 30, 22, 24],
+      [24, 62, 18, 16], // legs push out
+      [86, 62, 18, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+  {
+    id: 'a-exhale',
+    tx: 0,
+    ty: 34,
+    body: [
+      [22, 0, 84, 60], // torso contracting
+      [2, 32, 22, 22],
+      [104, 32, 22, 22],
+      [26, 60, 18, 16],
+      [84, 60, 18, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+  {
+    id: 'a-settle',
+    tx: 0,
+    ty: 36,
+    body: [
+      [26, 0, 76, 56], // torso slightly smaller
+      [6, 36, 20, 20], // hands pulled in
+      [102, 36, 20, 20],
+      [30, 56, 16, 16],
+      [82, 56, 16, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+];
+const ALIVE_PARTICLES: readonly RigAccent[] = [
+  { rect: [60, 80, 4, 4], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [8, 66, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [118, 66, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [44, 82, 3, 3], fill: WHITE, cls: 'octo-rig__accent--rise' },
+  { rect: [80, 82, 3, 3], fill: WHITE, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+];
+
+// --- Working — typing at keyboard with body bob (5 frames) --------------------
+function keyboard(): readonly RigAccent[] {
+  return [
+    { rect: [24, 84, 80, 8], fill: INK }, // keyboard base
+    { rect: [28, 82, 8, 4], fill: CREAM }, // key row 1
+    { rect: [40, 82, 8, 4], fill: CREAM },
+    { rect: [52, 82, 8, 4], fill: CREAM },
+    { rect: [64, 82, 8, 4], fill: CREAM },
+    { rect: [76, 82, 8, 4], fill: CREAM },
+    { rect: [88, 82, 8, 4], fill: CREAM },
+    { rect: [18, 72, 92, 10], fill: DIM }, // screen
+    { rect: [20, 74, 88, 6], fill: SKY }, // screen glow
+  ];
+}
+const WORKING_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'wk-type1',
+    tx: 0,
+    ty: 36,
+    body: [
+      [28, 0, 72, 52], // torso
+      [10, 40, 20, 18], // left arm at keyboard
+      [98, 40, 20, 18], // right arm at keyboard
+      [34, 52, 16, 16], // legs
+      [78, 52, 16, 16],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+  {
+    id: 'wk-type2',
+    tx: 0,
+    ty: 34,
+    body: [
+      [28, 0, 72, 54], // torso dips
+      [8, 38, 22, 18], // left arm tapping
+      [98, 42, 20, 16], // right arm
+      [34, 54, 16, 14],
+      [78, 54, 16, 14],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+  {
+    id: 'wk-pause',
+    tx: 0,
+    ty: 32,
+    body: [
+      [30, 0, 68, 50], // torso leans back
+      [14, 36, 18, 18], // arms lifted off
+      [96, 36, 18, 18],
+      [36, 50, 16, 16],
+      [76, 50, 16, 16],
+    ],
+    eyes: EYES_UP,
+    props: keyboard(),
+  },
+  {
+    id: 'wk-type3',
+    tx: -1,
+    ty: 34,
+    body: [
+      [28, 0, 72, 54], // torso leans left
+      [6, 36, 22, 20], // left arm extended
+      [98, 42, 20, 16],
+      [34, 54, 16, 14],
+      [78, 54, 16, 14],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+  {
+    id: 'wk-type4',
+    tx: 1,
+    ty: 34,
+    body: [
+      [28, 0, 72, 54], // torso leans right
+      [10, 42, 20, 16],
+      [96, 36, 22, 20], // right arm extended
+      [34, 54, 16, 14],
+      [78, 54, 16, 14],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+];
+const WORKING_PARTICLES: readonly RigAccent[] = [
+  { rect: [36, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink' },
+  { rect: [56, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [76, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
+  { rect: [46, 64, 2, 3], fill: CREAM, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
+  { rect: [66, 64, 2, 3], fill: CREAM, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [110, 4, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [12, 8, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+];
+
+// --- Thinking — hand on chin, leaning, posture shifts (5 frames) --------------
+const THINKING_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'tk-ponder',
+    tx: 0,
+    ty: 36,
+    body: [
+      [26, 0, 76, 58], // torso neutral
+      [4, 34, 22, 20], // left hand at side
+      [98, 14, 18, 24], // right hand on chin
+      [30, 58, 16, 16], // legs
+      [82, 58, 16, 16],
+    ],
+    eyes: EYES_UP,
+  },
+  {
+    id: 'tk-lean',
+    tx: 2,
+    ty: 34,
+    body: [
+      [28, 2, 74, 56], // torso leaning right
+      [6, 30, 22, 20], // left hand drops
+      [100, 10, 20, 26], // right hand still on chin
+      [34, 58, 16, 16],
+      [84, 58, 16, 16],
+    ],
+    eyes: EYES_UP,
+  },
+  {
+    id: 'tk-tilt',
+    tx: -2,
+    ty: 32,
+    body: [
+      [22, 0, 80, 58], // torso tilts left
+      [2, 28, 22, 22], // left arm out for balance
+      [96, 16, 20, 22], // right hand high on chin
+      [28, 58, 16, 16],
+      [80, 58, 16, 16],
+    ],
+    eyes: [
+      [32, 21, 11, 11],
+      [86, 21, 11, 11],
+    ],
+  },
+  {
+    id: 'tk-aha',
+    tx: 0,
+    ty: 30,
+    body: [
+      [24, 0, 80, 56], // torso lifts
+      [4, 34, 22, 18], // left hand
+      [100, 4, 20, 22], // right hand raised (idea!)
+      [30, 56, 16, 16],
+      [82, 56, 16, 16],
+    ],
+    eyes: [
+      [32, 20, 12, 12],
+      [86, 20, 12, 12],
+    ],
+  },
+  {
+    id: 'tk-settle',
+    tx: 0,
+    ty: 36,
+    body: [
+      [26, 0, 76, 58], // back to ponder
+      [4, 34, 22, 20],
+      [98, 16, 18, 22],
+      [30, 58, 16, 16],
+      [82, 58, 16, 16],
+    ],
+    eyes: EYES_UP,
+  },
+];
+const THINKING_PARTICLES: readonly RigAccent[] = [
+  { rect: [108, 4, 5, 5], fill: INK, cls: 'octo-rig__accent--blink' },
+  { rect: [116, 0, 4, 4], fill: INK, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [122, 6, 3, 3], fill: INK, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
+  { rect: [4, 8, 4, 4], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [14, 4, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+  { rect: [120, 18, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay2' },
+  { rect: [2, 18, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle' },
+];
+
+// --- Sleeping — body settles/breathes slowly with Zzz (5 frames) --------------
+const SLEEPING_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'sl-rest',
+    tx: 0,
+    ty: 38,
+    body: [
+      [24, 2, 80, 56], // torso settled
+      [6, 38, 20, 18], // arms at sides relaxed
+      [102, 38, 20, 18],
+      [30, 58, 16, 14], // legs tucked
+      [82, 58, 16, 14],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'sl-deep',
+    tx: 0,
+    ty: 40,
+    body: [
+      [26, 4, 76, 54], // torso sinks
+      [8, 40, 18, 16], // arms droop
+      [102, 40, 18, 16],
+      [32, 58, 14, 12],
+      [82, 58, 14, 12],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'sl-breathe',
+    tx: 0,
+    ty: 38,
+    body: [
+      [22, 2, 84, 58], // torso expands (breath)
+      [4, 36, 20, 20], // arms pushed out
+      [104, 36, 20, 20],
+      [28, 60, 16, 14],
+      [84, 60, 16, 14],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'sl-exhale',
+    tx: 0,
+    ty: 40,
+    body: [
+      [26, 4, 76, 54], // contracts again
+      [8, 40, 18, 16],
+      [102, 40, 18, 16],
+      [32, 58, 14, 12],
+      [82, 58, 14, 12],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'sl-settle',
+    tx: 0,
+    ty: 39,
+    body: [
+      [24, 3, 80, 56], // neutral rest
+      [6, 38, 20, 18],
+      [102, 38, 20, 18],
+      [30, 58, 16, 14],
+      [82, 58, 16, 14],
+    ],
+    eyes: EYES_CLOSED,
+  },
+];
+const SLEEPING_PARTICLES: readonly RigAccent[] = [
+  { rect: [100, 8, 8, 8], fill: INK, cls: 'octo-rig__accent--rise' },
+  { rect: [110, 2, 7, 7], fill: INK, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
+  { rect: [118, 0, 6, 6], fill: INK, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
+  { rect: [4, 16, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float' },
+  { rect: [12, 10, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay2' },
+  { rect: [120, 20, 3, 3], fill: CREAM, cls: 'octo-rig__accent--float octo-rig__accent--delay1' },
+];
+
+// --- Loving — body hugs/expands with hearts floating up (5 frames) ------------
+const LOVING_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'lv-open',
+    tx: 0,
+    ty: 36,
+    body: [
+      [26, 0, 76, 58], // torso
+      [2, 28, 24, 22], // arms open wide
+      [102, 28, 24, 22],
+      [30, 58, 16, 16], // legs
+      [82, 58, 16, 16],
+    ],
+    eyes: EYES_OPEN,
+  },
+  {
+    id: 'lv-reach',
+    tx: 0,
+    ty: 34,
+    body: [
+      [24, 0, 80, 56], // torso widens
+      [0, 22, 26, 24], // arms reaching out
+      [102, 22, 26, 24],
+      [28, 56, 18, 18],
+      [82, 56, 18, 18],
+    ],
+    eyes: [
+      [32, 23, 12, 12],
+      [84, 23, 12, 12],
+    ],
+  },
+  {
+    id: 'lv-hug',
+    tx: 0,
+    ty: 32,
+    body: [
+      [20, 0, 88, 60], // torso biggest (hugging)
+      [8, 20, 20, 26], // arms wrapping in
+      [100, 20, 20, 26],
+      [26, 60, 18, 18],
+      [84, 60, 18, 18],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'lv-squeeze',
+    tx: 0,
+    ty: 30,
+    body: [
+      [22, 0, 84, 62], // torso pulsing
+      [12, 24, 18, 24], // arms tighter
+      [98, 24, 18, 24],
+      [28, 62, 18, 16],
+      [82, 62, 18, 16],
+    ],
+    eyes: EYES_CLOSED,
+  },
+  {
+    id: 'lv-release',
+    tx: 0,
+    ty: 34,
+    body: [
+      [26, 0, 76, 58], // back to open
+      [4, 28, 22, 22],
+      [102, 28, 22, 22],
+      [30, 58, 16, 16],
+      [82, 58, 16, 16],
+    ],
+    eyes: [
+      [32, 23, 12, 12],
+      [84, 23, 12, 12],
+    ],
+  },
+];
+const LOVING_PARTICLES: readonly RigAccent[] = [
+  ...heart(14, 4, 'octo-rig__accent--rise'),
+  ...heart(100, 0, 'octo-rig__accent--rise octo-rig__accent--delay1'),
+  ...heart(56, 0, 'octo-rig__accent--rise octo-rig__accent--delay2'),
+  ...heart(6, 18, 'octo-rig__accent--float'),
+  ...heart(112, 14, 'octo-rig__accent--float octo-rig__accent--delay1'),
+  { rect: [40, 4, 3, 3], fill: PINK, cls: 'octo-rig__accent--twinkle' },
+  { rect: [88, 4, 3, 3], fill: PINK, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
+];
+
+// --- Typing — fast finger tapping at keyboard (3 frames) ----------------------
+const TYPING_FRAMES: readonly RigFrame[] = [
+  {
+    id: 'tp-left',
+    tx: -1,
+    ty: 36,
+    body: [
+      [28, 0, 72, 52],
+      [6, 38, 24, 18],
+      [98, 42, 22, 16],
+      [34, 52, 16, 16],
+      [78, 52, 16, 16],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+  {
+    id: 'tp-right',
+    tx: 1,
+    ty: 34,
+    body: [
+      [28, 0, 72, 54],
+      [10, 42, 22, 16],
+      [96, 38, 24, 18],
+      [34, 54, 16, 14],
+      [78, 54, 16, 14],
+    ],
+    eyes: [
+      [38, 16, 10, 8],
+      [80, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+  {
+    id: 'tp-both',
+    tx: 0,
+    ty: 34,
+    body: [
+      [26, 0, 76, 54],
+      [6, 38, 24, 18],
+      [98, 38, 24, 18],
+      [32, 54, 16, 16],
+      [80, 54, 16, 16],
+    ],
+    eyes: [
+      [36, 16, 10, 8],
+      [82, 16, 10, 8],
+    ],
+    props: keyboard(),
+  },
+];
+const TYPING_ACCENTS: readonly RigAccent[] = [
+  { rect: [36, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink' },
+  { rect: [56, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [76, 66, 3, 4], fill: GREEN, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
+  { rect: [46, 64, 2, 3], fill: CREAM, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
+  { rect: [66, 64, 2, 3], fill: CREAM, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
+  { rect: [110, 4, 4, 4], fill: GOLD, cls: 'octo-rig__accent--twinkle' },
+  { rect: [12, 8, 3, 3], fill: SKY, cls: 'octo-rig__accent--twinkle octo-rig__accent--delay1' },
 ];
 
 const HAND_POSES: Readonly<Record<string, RigPose>> = {
@@ -1706,42 +2812,29 @@ const HAND_POSES: Readonly<Record<string, RigPose>> = {
     frames: [{ id: 'idle', tx: 0, ty: 36, body: STAND_BODY, eyes: [] }],
   },
   alive: {
-    frames: [
-      { id: 'down', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_OPEN },
-      { id: 'up', tx: 0, ty: 33, body: STAND_BODY, eyes: EYES_OPEN },
-    ],
+    frames: ALIVE_FRAMES,
     loopMs: 1100,
+    accents: ALIVE_PARTICLES,
   },
   working: {
-    frames: [
-      { id: 'a', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_OPEN },
-      { id: 'b', tx: 0, ty: 34, body: STAND_BODY, eyes: EYES_OPEN },
-    ],
+    frames: WORKING_FRAMES,
     loopMs: 460,
+    accents: WORKING_PARTICLES,
   },
   thinking: {
-    frames: [{ id: 'think', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_UP }],
-    accents: [
-      { rect: [110, 22, 6, 6], fill: INK, cls: 'octo-rig__accent--blink' },
-      { rect: [118, 14, 5, 5], fill: INK, cls: 'octo-rig__accent--blink octo-rig__accent--delay1' },
-      { rect: [124, 7, 4, 4], fill: INK, cls: 'octo-rig__accent--blink octo-rig__accent--delay2' },
-    ],
+    frames: THINKING_FRAMES,
+    loopMs: 1400,
+    accents: THINKING_PARTICLES,
   },
   sleeping: {
-    frames: [{ id: 'sleep', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_CLOSED }],
-    accents: [
-      { rect: [104, 20, 7, 7], fill: INK, cls: 'octo-rig__accent--rise' },
-      { rect: [112, 11, 6, 6], fill: INK, cls: 'octo-rig__accent--rise octo-rig__accent--delay1' },
-      { rect: [119, 4, 5, 5], fill: INK, cls: 'octo-rig__accent--rise octo-rig__accent--delay2' },
-    ],
+    frames: SLEEPING_FRAMES,
+    loopMs: 2200,
+    accents: SLEEPING_PARTICLES,
   },
   loving: {
-    frames: [{ id: 'love', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_OPEN }],
-    accents: [
-      ...heart(92, 12, 'octo-rig__accent--float'),
-      ...heart(108, 4, 'octo-rig__accent--float octo-rig__accent--delay1'),
-      ...heart(100, 22, 'octo-rig__accent--float octo-rig__accent--delay2'),
-    ],
+    frames: LOVING_FRAMES,
+    loopMs: 1000,
+    accents: LOVING_PARTICLES,
   },
   celebrating: {
     frames: CONFETTI_JUMP,
@@ -1750,12 +2843,18 @@ const HAND_POSES: Readonly<Record<string, RigPose>> = {
   },
   dancing: {
     frames: DANCE_FRAMES,
-    loopMs: 640,
+    loopMs: 700,
     accents: DANCE_NOTES,
+  },
+  typing: {
+    frames: TYPING_FRAMES,
+    loopMs: 500,
+    accents: TYPING_ACCENTS,
   },
   debugging: {
     frames: DEBUG_FRAMES,
     loopMs: 1200,
+    accents: DEBUG_PARTICLES,
   },
   meditating: {
     frames: MEDITATE_FRAMES,
@@ -1770,6 +2869,22 @@ const HAND_POSES: Readonly<Record<string, RigPose>> = {
   eureka: {
     frames: EUREKA_FRAMES,
     loopMs: 1600,
+    accents: EUREKA_SPARKLES,
+  },
+  walking: {
+    frames: WALK_FRAMES,
+    loopMs: 800,
+    accents: WALK_DUST,
+  },
+  weights: {
+    frames: WEIGHTS_FRAMES,
+    loopMs: 1000,
+    accents: WEIGHTS_EFFORT,
+  },
+  'flag-wave': {
+    frames: FLAG_FRAMES,
+    loopMs: 900,
+    accents: FLAG_BREEZE,
   },
 };
 

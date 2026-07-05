@@ -15,6 +15,12 @@ metadata:
 
 > (Under the hood — agent-only) Wire `@vybekiit/ai` → `resolveAiProvider()` via `src/lib/ai-client.ts`.
 > Never name OpenAI/Anthropic to the builder — say "smart replies" or "AI helper".
+>
+> ⚠️ This skill covers one-shot AI (single `complete()` call). If the builder asks for a **chatbot
+> or agent loop** (multi-turn with tool-calling), that requires anti-hallucination guards: track
+> whether tools were actually called, force a real tool call before accepting any data claim, and
+> never let the model describe tool usage without actually invoking the tool. This is out of scope
+> for v1 — surface it as a feature request and note the pattern in checklist.md.
 
 ## Steps
 

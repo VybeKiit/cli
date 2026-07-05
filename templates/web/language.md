@@ -56,6 +56,9 @@ read a definition aloud.
 | cache | a quick-access copy | makes repeat actions feel instant |
 | bucket / object storage | a place to keep uploaded files | where photos and attachments go |
 | cron job | a scheduled task | something the app does on its own, on a timer |
+| compute quota / free tier limit | your app's free allowance | how much running time the free plan includes before needing an upgrade |
+| fire-and-forget / un-awaited background work | background work that might get cut off | the app tried to do something after responding but the server shut down too early |
+| waitUntil / background task API | keep-alive for background work | tells the server "don't shut down yet, I'm still finishing something" |
 
 ## Email & messages
 
