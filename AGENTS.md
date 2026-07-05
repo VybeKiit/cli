@@ -96,8 +96,8 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   gate and is what makes the buyer's `update-kit` safe (green suite = safe to bump).
 - **Pre-commit runs Biome check** (format + lint-fix) on maintainer and buyer templates — it must
   never block on a failing test, so it can be inherited without trapping a non-coder.
-- **Pre-push + CI are the heavy gate** — both run `pnpm verify` (lint, typecheck, test,
-  script tests, build). A red gate is a check *the agent* fixes before push/merge.
+- **Pre-push + CI are the heavy gate** — both run `pnpm verify` (lint, typecheck, unit test,
+  script tests, build, e2e). A red gate is a check *the agent* fixes before push/merge.
 - Run `pnpm verify` after substantial changes (pre-push runs the same commands automatically).
 - Never `git push --no-verify` to skip a red gate unless you are deliberately re-running mirror
   sync only — then use the **mirror-repos** workflow or `pnpm mirror` manually.
