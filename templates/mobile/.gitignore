@@ -35,6 +35,25 @@ yarn-error.*
 # maintainer-only script scratch — never shipped to buyers (ADR-0027)
 scripts/dev/
 
+# dev-scripts — agent scratch scripts, never committed
+dev-scripts/
+
+# test artifacts
+test-results/
+playwright-report/
+coverage/
+
+# databases
+*.db
+*.sqlite
+
+# build logs
+*.log
+
+# deployment provider state
+.vercel/
+.wrangler/
+
 # Turbo
 .turbo/
 
