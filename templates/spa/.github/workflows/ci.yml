@@ -1,0 +1,143 @@
+name: CI
+
+# Security-first CI pipeline for VybeKiit templates.
+# Every push to main/dev and every PR triggers the full gate.
+# The "CI Gate" job is the SINGLE required status check — set it in branch
+# protection so a red leg blocks merges.
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  biome:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm biome ci .
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+  build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  gate:
+    name: CI Gate
+    needs: [biome, typecheck, test, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks must pass
+        run: |
+          echo "biome=${{ needs.biome.result }}"
+          echo "typecheck=${{ needs.typecheck.result }}"
+          echo "test=${{ needs.test.result }}"
+          echo "build=${{ needs.build.result }}"
+          test "${{ needs.biome.result }}" = "success" \
+            && test "${{ needs.typecheck.result }}" = "success" \
+            && test "${{ needs.test.result }}" = "success" \
+            && test "${{ needs.build.result }}" = "success"
+
+  report-failure:
+    name: Report failure on main
+    needs: [biome, typecheck, test, build]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create or update failure issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🔴 CI failed on main (${context.sha.slice(0, 7)})`;
+            const body = [
+              `**Commit:** ${context.sha}`,
+              `**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              `**Triggered by:** ${context.actor}`,
+              '',
+              '| Job | Result |',
+              '|-----|--------|',
+              `| biome | ${{ needs.biome.result }} |`,
+              `| typecheck | ${{ needs.typecheck.result }} |`,
+              `| test | ${{ needs.test.result }} |`,
+              `| build | ${{ needs.build.result }} |`,
+            ].join('\n');
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              ...context.repo,
+              state: 'open',
+              labels: 'ci-failure',
+            });
+
+            if (issues.length > 0) {
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: issues[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                ...context.repo,
+                title,
+                body,
+                labels: ['ci-failure'],
+              });
+            }
