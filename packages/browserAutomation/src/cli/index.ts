@@ -18,6 +18,8 @@ import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
 } from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+import { registerSupabaseDomain } from '@vybekiit/browserAutomation/domains/dbs/cli';
+import { registerCfDomain } from '@vybekiit/browserAutomation/domains/infra/cli';
 import { parseGlobalFlags } from './flags';
 import { printError } from './output';
 import { createRegistry } from './registry';
@@ -31,6 +33,8 @@ registerNcTopLevelAlias(registry);
 registerGodaddyDomain(registry);
 registerGdTopLevelAlias(registry);
 registerGoogleDomain(registry);
+registerSupabaseDomain(registry);
+registerCfDomain(registry);
 
 async function main(argv: string[]): Promise<number> {
   const { flags, rest } = parseGlobalFlags(argv);

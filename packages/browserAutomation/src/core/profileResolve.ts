@@ -12,11 +12,13 @@ const MANIFEST_PATH = join(MANIFEST_DIR, 'automate-profiles.json');
 type ProfileManifest = Partial<Record<AutomateProfileKey, { lastUsedAt: string; path: string }>>;
 
 const ENV_KEYS: Record<AutomateProfileKey, string> = {
+  cloudflare: 'AUTOMATE_PROFILE_CF',
   extension: 'AUTOMATE_PROFILE_CWS',
-  ls: 'AUTOMATE_PROFILE_LS',
-  namecheap: 'AUTOMATE_PROFILE_NC',
   godaddy: 'AUTOMATE_PROFILE_GD',
   google: 'AUTOMATE_PROFILE_GOOGLE',
+  ls: 'AUTOMATE_PROFILE_LS',
+  namecheap: 'AUTOMATE_PROFILE_NC',
+  supabase: 'AUTOMATE_PROFILE_SUPABASE',
 };
 
 async function readManifest(): Promise<ProfileManifest> {

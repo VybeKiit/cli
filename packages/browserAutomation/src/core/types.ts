@@ -19,11 +19,13 @@ export type BaseVerbContext = {
 export const DEFAULT_CDP_ENDPOINT = 'http://localhost:9222';
 
 export const PROFILE_PATHS = {
+  cloudflare: `${process.env.HOME ?? '~'}/.cf-chrome-profile`,
   extension: `${process.env.HOME ?? '~'}/.cws-chrome-profile`,
+  google: `${process.env.HOME ?? '~'}/.google-chrome-profile`,
   ls: `${process.env.HOME ?? '~'}/.ls-chrome-profile`,
   namecheap: `${process.env.HOME ?? '~'}/.nc-chrome-profile`,
   godaddy: `${process.env.HOME ?? '~'}/.gd-chrome-profile`,
-  google: `${process.env.HOME ?? '~'}/.google-chrome-profile`,
+  supabase: `${process.env.HOME ?? '~'}/.supabase-chrome-profile`,
 } as const;
 
 /** @deprecated Use PROFILE_PATHS.extension */
