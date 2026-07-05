@@ -38,11 +38,17 @@ docs/checklist.md
 downloads/
 apps/landing/public/brand-marks-3d/
 apps/landing/downloads/
+apps/landing/.inspiration/
+apps/landing/.compare-tmp/
+out/cli-banner-inspirations/
 
 # session scratch — agent worktrees + per-developer Claude Code local overrides
 # (never tracked). Ignoring the whole dir also keeps Biome's useIgnoreFile from
 # walking nested worktree configs into the lint gate.
 .claude/
+# But DO track .claude/ inside templates — those hooks ship to the buyer
+!templates/**/.claude/
+!templates/**/.claude/**
 
 # browser-automation maintainer recorder drafts (local only)
 packages/browserAutomation/.cws-selectors.draft.txt
@@ -52,3 +58,10 @@ packages/browserAutomation/dev/recorder/logs/
 # skills/pi CLI local cache — a scratch workdir the skill-pinning CLI drops into each
 # template. The tracked skill content lives under templates/*/.agents/skills; this is cache.
 .pi/
+
+# dedup tool — index is generated (ADR-0031), Rust build artifacts
+**/dedup-index.json
+tools/dedup/target/
+
+# local-only dev scripts
+scripts/dev/
