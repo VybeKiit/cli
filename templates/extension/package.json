@@ -10,6 +10,7 @@
     "build": "wxt build",
     "postinstall": "wxt prepare",
     "lint": "biome check .",
+    "check:ci": "biome ci .",
     "format": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "pretypecheck": "tsx scripts/optimizeAssets.mts",
