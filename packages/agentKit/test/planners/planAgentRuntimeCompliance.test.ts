@@ -6,6 +6,24 @@ const LIVE_DOCS = {
   'claude-code-index': 'Read CLAUDE.md at project root',
   'codex-agents-md': 'Codex reads AGENTS.md for project scope',
   'skills-sh': 'Install with npx skills add from skills.sh',
+  'copilot-instructions':
+    'Place a copilot-instructions.md file in .github to set repo-level instructions',
+  'kiro-steering': 'Place markdown files in .kiro/steering to configure agent behavior',
+  'windsurf-rules': 'Store project rules in .windsurf/rules for Cascade context',
+  'cline-rules': 'Add project-level rules in .clinerules directory',
+  'amazonq-rules': 'Project rules live in .amazonq/rules for Amazon Q Developer',
+  'continue-rules': 'Define project rules in .continue/rules for IDE assistant',
+  'junie-agents': 'Junie reads AGENTS.md and config from .junie folder',
+  'gemini-styleguide': 'Configure .gemini directory with a styleguide for Gemini Code Assist',
+  'augment-rules': 'Configure .augment/rules and guidelines for Augment Code',
+  'roo-rules': 'Custom instructions in .roo/rules for Roo Code',
+  'gemini-cli-md': 'Place GEMINI.md at project root for Gemini CLI context',
+  'trae-rules': 'Store rules in .trae directory for Trae IDE assistant',
+  'antigravity-rules': 'Define .agent/rules for Antigravity code agent',
+  'replit-md': 'Place replit.md at project root for Replit agent context',
+  'devin-rules': 'AGENTS.md is read by Devin for project rules',
+  'opencode-rules': 'AGENTS.md is the entry point for OpenCode rules',
+  'zed-instructions': 'AGENTS.md and instructions are used by Zed AI assistant',
 };
 
 describe('planAgentRuntimeCompliance', () => {

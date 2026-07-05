@@ -6,12 +6,32 @@ export type AgentRuntimeComplianceCheckId =
   | 'cursor-rule'
   | 'agents-ssot'
   | 'buyer-skill-format'
-  | 'platform-skill-wrapper';
+  | 'platform-skill-wrapper'
+  | 'copilot-instructions'
+  | 'kiro-steering'
+  | 'windsurf-rules'
+  | 'cline-rules'
+  | 'amazonq-rules'
+  | 'continue-rules'
+  | 'junie-pointer'
+  | 'gemini-styleguide'
+  | 'aider-conventions'
+  | 'augment-rules'
+  | 'roo-rules'
+  | 'gemini-cli-md'
+  | 'trae-rules'
+  | 'antigravity-rules'
+  | 'replit-md'
+  | 'devin-rules'
+  | 'opencode-rules'
+  | 'zed-instructions';
 
 export interface AgentRuntimeComplianceIssue {
   readonly check: AgentRuntimeComplianceCheckId;
   readonly message: string;
   readonly file?: string;
+  /** 'error' blocks ok, 'warn' is advisory (e.g. optional pointer not yet added). */
+  readonly severity: 'error' | 'warn';
 }
 
 export interface AgentRuntimeComplianceInput {
@@ -59,6 +79,7 @@ function validateLiveDocs(
       issues.push({
         check: 'runtime-docs-live',
         message: `Missing live doc body for ${source.id} (${source.url})`,
+        severity: 'error',
       });
       continue;
     }
@@ -67,6 +88,7 @@ function validateLiveDocs(
         issues.push({
           check: 'runtime-docs-live',
           message: `Official doc drift: ${source.id} no longer mentions "${phrase}" — update agent-runtime rules`,
+          severity: 'error',
         });
       }
     }
@@ -76,7 +98,14 @@ function validateLiveDocs(
 
 function validateClaudePointer(content: string | undefined): AgentRuntimeComplianceIssue[] {
   if (content === undefined) {
-    return [{ check: 'claude-pointer', message: 'Missing CLAUDE.md', file: 'CLAUDE.md' }];
+    return [
+      {
+        check: 'claude-pointer',
+        message: 'Missing CLAUDE.md',
+        file: 'CLAUDE.md',
+        severity: 'error',
+      },
+    ];
   }
   const issues: AgentRuntimeComplianceIssue[] = [];
   if (!/AGENTS\.md/i.test(content)) {
@@ -84,6 +113,7 @@ function validateClaudePointer(content: string | undefined): AgentRuntimeComplia
       check: 'claude-pointer',
       message: 'CLAUDE.md must point to AGENTS.md (Claude Code project instructions)',
       file: 'CLAUDE.md',
+      severity: 'error',
     });
   }
   if (/single source of truth/i.test(content) === false && !/thin pointer/i.test(content)) {
@@ -91,6 +121,7 @@ function validateClaudePointer(content: string | undefined): AgentRuntimeComplia
       check: 'claude-pointer',
       message: 'CLAUDE.md should state it is a thin pointer to AGENTS.md',
       file: 'CLAUDE.md',
+      severity: 'error',
     });
   }
   return issues;
@@ -103,7 +134,7 @@ function validateCursorRule(
 ): AgentRuntimeComplianceIssue[] {
   if (content === undefined) {
     if (options.required) {
-      return [{ check: 'cursor-rule', message: `Missing ${file}`, file }];
+      return [{ check: 'cursor-rule', message: `Missing ${file}`, file, severity: 'error' }];
     }
     return [];
   }
@@ -113,6 +144,7 @@ function validateCursorRule(
         check: 'cursor-rule',
         message: 'Cursor project rules must use .mdc extension',
         file,
+        severity: 'error',
       },
     ];
   }
@@ -123,6 +155,7 @@ function validateCursorRule(
       check: 'cursor-rule',
       message: 'Cursor rule missing YAML frontmatter (---)',
       file,
+      severity: 'error',
     });
   }
   if (options.expectAlwaysApply && frontmatter.alwaysApply !== 'true') {
@@ -130,6 +163,7 @@ function validateCursorRule(
       check: 'cursor-rule',
       message: 'vybekiit.mdc must set alwaysApply: true (Cursor always-apply rule)',
       file,
+      severity: 'error',
     });
   }
   if (!/AGENTS\.md/i.test(content)) {
@@ -137,6 +171,7 @@ function validateCursorRule(
       check: 'cursor-rule',
       message: 'Cursor rule must point readers to AGENTS.md',
       file,
+      severity: 'error',
     });
   }
   if (content.split('\n').length > 500) {
@@ -144,6 +179,7 @@ function validateCursorRule(
       check: 'cursor-rule',
       message: 'Cursor rule exceeds 500 lines — split per Cursor best practices',
       file,
+      severity: 'error',
     });
   }
   return issues;
@@ -151,7 +187,9 @@ function validateCursorRule(
 
 function validateAgentsSsot(content: string | undefined): AgentRuntimeComplianceIssue[] {
   if (content === undefined) {
-    return [{ check: 'agents-ssot', message: 'Missing AGENTS.md', file: 'AGENTS.md' }];
+    return [
+      { check: 'agents-ssot', message: 'Missing AGENTS.md', file: 'AGENTS.md', severity: 'error' },
+    ];
   }
   const issues: AgentRuntimeComplianceIssue[] = [];
   if (!(/single source of truth/i.test(content) || /SSOT/i.test(content))) {
@@ -160,6 +198,7 @@ function validateAgentsSsot(content: string | undefined): AgentRuntimeCompliance
       message:
         'AGENTS.md should declare itself as single source of truth for all agents (Codex reads it natively)',
       file: 'AGENTS.md',
+      severity: 'error',
     });
   }
   return issues;
@@ -172,6 +211,7 @@ function validateBuyerSkill(path: string, content: string): AgentRuntimeComplian
       check: 'buyer-skill-format',
       message: 'Buyer skill must start with "# Skill: <name>"',
       file: path,
+      severity: 'error',
     });
   }
   if (!/\*\*Goal:\*\*/.test(content)) {
@@ -179,6 +219,7 @@ function validateBuyerSkill(path: string, content: string): AgentRuntimeComplian
       check: 'buyer-skill-format',
       message: 'Buyer skill missing **Goal:**',
       file: path,
+      severity: 'error',
     });
   }
   if (!/\*\*Contract:\*\*/.test(content)) {
@@ -186,6 +227,7 @@ function validateBuyerSkill(path: string, content: string): AgentRuntimeComplian
       check: 'buyer-skill-format',
       message: 'Buyer skill missing **Contract:**',
       file: path,
+      severity: 'error',
     });
   }
   if (!BUYER_SKILL_STEPS_HEADERS.test(content)) {
@@ -194,6 +236,7 @@ function validateBuyerSkill(path: string, content: string): AgentRuntimeComplian
       message:
         'Buyer skill missing procedural section (## Steps, ## How to run, or ## When to run)',
       file: path,
+      severity: 'error',
     });
   }
   if (content.split('\n').length > 500) {
@@ -201,6 +244,7 @@ function validateBuyerSkill(path: string, content: string): AgentRuntimeComplian
       check: 'buyer-skill-format',
       message: 'Buyer skill exceeds 500 lines — split per agent best practices',
       file: path,
+      severity: 'error',
     });
   }
   return issues;
@@ -213,6 +257,7 @@ function validatePlatformWrapper(path: string, content: string): AgentRuntimeCom
       check: 'platform-skill-wrapper',
       message: 'Platform skill wrapper must start with a markdown heading',
       file: path,
+      severity: 'error',
     });
   }
   if (content.split('\n').length > 500) {
@@ -220,6 +265,34 @@ function validatePlatformWrapper(path: string, content: string): AgentRuntimeCom
       check: 'platform-skill-wrapper',
       message: 'Platform skill wrapper exceeds 500 lines',
       file: path,
+      severity: 'error',
+    });
+  }
+  return issues;
+}
+
+function validatePointerFile(
+  check: AgentRuntimeComplianceCheckId,
+  file: string,
+  content: string | undefined,
+): AgentRuntimeComplianceIssue[] {
+  if (content === undefined) {
+    return [
+      {
+        check,
+        message: `Optional: ${file} not found — add it to support this runtime`,
+        file,
+        severity: 'warn',
+      },
+    ];
+  }
+  const issues: AgentRuntimeComplianceIssue[] = [];
+  if (!/AGENTS\.md/i.test(content)) {
+    issues.push({
+      check,
+      message: `${file} must reference AGENTS.md (the SSOT)`,
+      file,
+      severity: 'error',
     });
   }
   return issues;
@@ -241,6 +314,76 @@ export function planAgentRuntimeCompliance(
       expectAlwaysApply: false,
     }),
     ...validateAgentsSsot(input.files['AGENTS.md']),
+    ...validatePointerFile(
+      'copilot-instructions',
+      '.github/copilot-instructions.md',
+      input.files['.github/copilot-instructions.md'],
+    ),
+    ...validatePointerFile(
+      'kiro-steering',
+      '.kiro/steering/vybekiit.md',
+      input.files['.kiro/steering/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'windsurf-rules',
+      '.windsurf/rules/vybekiit.md',
+      input.files['.windsurf/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'cline-rules',
+      '.clinerules/vybekiit.md',
+      input.files['.clinerules/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'amazonq-rules',
+      '.amazonq/rules/vybekiit.md',
+      input.files['.amazonq/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'continue-rules',
+      '.continue/rules/vybekiit.md',
+      input.files['.continue/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile('junie-pointer', '.junie/AGENTS.md', input.files['.junie/AGENTS.md']),
+    ...validatePointerFile(
+      'gemini-styleguide',
+      '.gemini/styleguide.md',
+      input.files['.gemini/styleguide.md'],
+    ),
+    ...validatePointerFile('aider-conventions', 'CONVENTIONS.md', input.files['CONVENTIONS.md']),
+    ...validatePointerFile(
+      'augment-rules',
+      '.augment/rules/vybekiit.md',
+      input.files['.augment/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'roo-rules',
+      '.roo/rules/vybekiit.md',
+      input.files['.roo/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile('gemini-cli-md', 'GEMINI.md', input.files['GEMINI.md']),
+    ...validatePointerFile(
+      'trae-rules',
+      '.trae/rules/vybekiit.md',
+      input.files['.trae/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile(
+      'antigravity-rules',
+      '.agent/rules/vybekiit.md',
+      input.files['.agent/rules/vybekiit.md'],
+    ),
+    ...validatePointerFile('replit-md', 'replit.md', input.files['replit.md']),
+    ...validatePointerFile('devin-rules', '.devin/rules.md', input.files['.devin/rules.md']),
+    ...validatePointerFile(
+      'opencode-rules',
+      '.opencode/rules.md',
+      input.files['.opencode/rules.md'],
+    ),
+    ...validatePointerFile(
+      'zed-instructions',
+      '.zed/instructions.md',
+      input.files['.zed/instructions.md'],
+    ),
   ];
 
   for (const [path, content] of Object.entries(input.skillContents)) {
@@ -250,5 +393,5 @@ export function planAgentRuntimeCompliance(
     issues.push(...validatePlatformWrapper(path, content));
   }
 
-  return { issues, ok: issues.length === 0 };
+  return { issues, ok: issues.filter((i) => i.severity === 'error').length === 0 };
 }
