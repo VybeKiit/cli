@@ -28,6 +28,7 @@ const UrlString = Schema.String.pipe(
 
 /** A string shaped like an email address — the Schema equivalent of zod `.email()`. */
 const EmailString = Schema.String.pipe(
+  // one @, a dot in the domain, no spaces: "a@b.co" → match, "a@b" / "a b@c.co" → no match
   Schema.filter((value) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value), {
     message: () => 'must be a valid email',
   }),

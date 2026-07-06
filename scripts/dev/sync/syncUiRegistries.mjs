@@ -14,7 +14,7 @@
 
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, stat, unlink, writeFile } from 'node:fs/promises';
-import { basename, dirname, extname, join, relative } from 'node:path';
+import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { repoRootFrom } from '../../lib/repoRoot.mjs';
 import { inferCategory } from '../../lib/uiCategoryTaxonomy.mjs';
@@ -240,6 +240,51 @@ function normalizeMirroredContent(content) {
     .replace(/@\/registry\/new-york\/ui\//g, '@vybekiit/ui/');
 }
 
+/**
+ * Rewrite parent-relative (`../`) imports in a mirrored file to the `@/` alias.
+ * CODE-STYLE bans `../` in templates; `@/` maps to `templates/web/src`. Colocated `./` stays.
+ * e.g. in src/components/cult/x/foo.tsx: `'../ui/bar'` → `'@/components/cult/ui/bar'`.
+ * @param {string} content
+ * @param {string} targetAbsPath absolute path the file is written to
+ * @param {string} srcRoot absolute path of templates/web/src
+ */
+function rewriteParentImportsToAlias(content, targetAbsPath, srcRoot) {
+  const fileDir = dirname(targetAbsPath);
+  // quoted specifier starting with `../` — leave it if it escapes src.
+  return content.replace(/(['"])(\.\.\/[^'"]+)\1/g, (match, quote, spec) => {
+    const relToSrc = relative(srcRoot, resolve(fileDir, spec)).split('\\').join('/');
+    return relToSrc.startsWith('..') ? match : `${quote}@/${relToSrc}${quote}`;
+  });
+}
+
+/**
+ * Drop standalone debug logging (`console.log`/`console.debug`) lines from mirrored code;
+ * keeps `console.error`/`console.warn` (real diagnostics). Whole-line statements only.
+ * @param {string} content
+ */
+function stripDebugConsole(content) {
+  // matches a whole line like `  console.log('x', y);`
+  return content
+    .split('\n')
+    .filter((line) => !/^\s*console\.(log|debug)\(.*\)\s*;?\s*$/.test(line))
+    .join('\n');
+}
+
+/**
+ * The full transform applied to every mirrored file before it is written: registry-alias
+ * normalization + `../`→`@/` rewrite + debug-console strip. Runs on every `sync:ui`, so the
+ * conventions can't drift back in when a block is re-pulled from upstream.
+ * @param {string} content
+ * @param {string} targetAbsPath
+ * @param {string} templateRoot
+ */
+function transformMirroredFile(content, targetAbsPath, templateRoot) {
+  const srcRoot = join(templateRoot, 'src');
+  return stripDebugConsole(
+    rewriteParentImportsToAlias(normalizeMirroredContent(content), targetAbsPath, srcRoot),
+  );
+}
+
 async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
   const files = item.files ?? [];
   const itemName = String(item.name ?? 'component');
@@ -252,7 +297,7 @@ async function writeShadcnRegistryItem(templateRoot, namespace, item, dryRun) {
       continue;
     }
     const target = resolveTargetPath(templateRoot, namespace, file, itemName);
-    const content = normalizeMirroredContent(String(file.content));
+    const content = transformMirroredFile(String(file.content), target, templateRoot);
     if (!dryRun) {
       await mkdir(dirname(target), { recursive: true });
       await writeFile(target, content, 'utf8');
@@ -589,9 +634,10 @@ async function syncGithubTreeSource(templateRoot, sourceId, source, opts) {
           )
         : [];
       for (const file of files) {
-        const content = await fetchGithubRaw(source.repo, source.branch, file.path);
+        const rawContent = await fetchGithubRaw(source.repo, source.branch, file.path);
         const relPath = file.path.split('/').slice(-2).join('/');
         const target = join(templateRoot, 'src/components', source.namespace, relPath);
+        const content = transformMirroredFile(rawContent, target, templateRoot);
         if (!opts.dryRun) {
           await mkdir(dirname(target), { recursive: true });
           await writeFile(target, content, 'utf8');
