@@ -1,6 +1,7 @@
 import { printJson } from '@vybekiit/browserAutomation/cli/output';
 import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
 import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
+import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
 import { gdSetupEnvBlock, verifyGdCredentialsViaApi } from './api/verify';
 import { runGdSetup, standbyLogin } from './verbs/standbyLogin';
 
@@ -33,18 +34,38 @@ export function registerGodaddyDomain(registry: CommandRegistry): void {
         run: async ({ args, flags }) => {
           const params = parseGdSetupArgs(args);
           const result = await runGdSetup(baseVerbContext(flags), params);
-          await verifyGdCredentialsViaApi(result);
+
+          // Persist first — the GoDaddy secret is shown once, so write before verifying to
+          // avoid losing it. writeEnvBlock is the "agent never sees the key" enforcement point.
           const env = gdSetupEnvBlock(result);
-          if (flags.json) {
-            printJson({ ok: true, env, ote: result.ote, reusedExisting: result.reusedExisting });
-          } else {
-            console.log('OK: GoDaddy API credentials verified.');
-            console.log('Write these to .env:');
-            for (const [key, value] of Object.entries(env)) {
-              console.log(`${key}=${value}`);
-            }
+          const written = await writeEnvBlock({ ...env });
+
+          let verified = true;
+          try {
+            await verifyGdCredentialsViaApi(result);
+          } catch {
+            verified = false;
           }
-          return 0;
+
+          if (flags.json) {
+            // Key-guarded: emit key names, never the secret value.
+            printJson({
+              ok: verified,
+              keysWritten: written.keysWritten,
+              ote: result.ote,
+              reusedExisting: result.reusedExisting,
+              verified,
+            });
+          } else {
+            console.log('OK: GoDaddy setup complete.');
+            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            console.log(
+              verified
+                ? '✓ Credentials verified via GoDaddy API.'
+                : '⚠ Credentials written but live verification did not confirm.',
+            );
+          }
+          return verified ? 0 : 1;
         },
       },
     },

@@ -47,9 +47,11 @@ export function scrapeGodaddyApiSecret(html: string): string | null {
 /** Keys already listed on the developer portal (secret is not shown for existing keys). */
 export function scrapeGodaddyKeysFromList(html: string): string[] {
   const keys = new Set<string>();
+  // grab a 20+ char key from an input value: `value="Ab_3...xy"` → "Ab_3...xy"
   for (const match of html.matchAll(/value=["']([A-Za-z0-9_-]{20,})["']/gi)) {
     keys.add(match[1]!);
   }
+  // grab a 20+ char key shown as cell/code text: `<td> Ab_3...xy </td>` → "Ab_3...xy"
   for (const match of html.matchAll(/>\s*([A-Za-z0-9_-]{20,})\s*<\/(?:code|span|td)/gi)) {
     keys.add(match[1]!);
   }

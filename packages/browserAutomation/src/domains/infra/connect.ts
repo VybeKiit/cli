@@ -27,11 +27,7 @@ export async function connectToCfChrome(
     tabUrlPattern: /dash\.cloudflare\.com/i,
   });
   if (waitForAuth) {
-    session.page = await waitForCfAuthenticated(
-      session.page,
-      ctx.log ?? console,
-      session.context,
-    );
+    session.page = await waitForCfAuthenticated(session.page, ctx.log ?? console, session.context);
   }
   return session;
 }

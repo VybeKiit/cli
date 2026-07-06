@@ -10,7 +10,9 @@ Dashboard automation CLI for Lemon Squeezy and Chrome Web Store.
 
 ## What it does
 
-Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls, registrars (nc/gd), google (OAuth consent + Web client). Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
+Unified Playwright + CLI package with registry CLI `vybekiit-automate`. Provider credential onboarding is **CLI-first, browser-fallback** (ADR-0032): each `setup` ensures the provider's CLI via `vybekiit doctor --ensure <tool>`, mints/reads the credential headlessly where possible, verifies it live, and writes it to `.env` (the agent sees only `keysWritten`, never the value).
+
+Domains: `extension` (CWS), `payments/ls`, `registrars` (nc/gd), `google` (OAuth consent + Web client), `infra` (cloudflare/railway/vercel), `dbs` (supabase/neon/upstash), `ai` (openai/anthropic), `misc` (github/resend/sentry). Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
 
 ## In your app
 

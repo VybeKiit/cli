@@ -1,4 +1,4 @@
-export { connectToCfChrome } from './connect';
 export { registerCfDomain } from './cli';
-export { cfEnvBlock, CF_DASHBOARD_URL } from './types';
+export { connectToCfChrome } from './connect';
 export type { CfEnvBlock, CfSetupResult, CfVerbContext } from './types';
+export { CF_DASHBOARD_URL, cfEnvBlock } from './types';

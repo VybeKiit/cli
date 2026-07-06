@@ -1,4 +1,4 @@
-export { connectToSupabaseChrome } from './connect';
 export { registerSupabaseDomain } from './cli';
-export { supabaseEnvBlock, SUPABASE_DASHBOARD_URL } from './types';
+export { connectToSupabaseChrome } from './connect';
 export type { SupabaseEnvBlock, SupabaseSetupResult, SupabaseVerbContext } from './types';
+export { SUPABASE_DASHBOARD_URL, supabaseEnvBlock } from './types';

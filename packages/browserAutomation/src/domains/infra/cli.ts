@@ -1,20 +1,21 @@
 import { printJson } from '@vybekiit/browserAutomation/cli/output';
 import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
 import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
-import { cfEnvBlock, type CfSetupResult } from '@vybekiit/browserAutomation/domains/infra/types';
+import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
+import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+import { type CfSetupResult, cfEnvBlock } from '@vybekiit/browserAutomation/domains/infra/types';
 import { connectToCfChrome } from './connect';
+import { createApiToken } from './dashboard/createApiToken';
 import { waitForCfAuthenticated } from './dashboard/waitForAuthenticated';
+import { verifyCfToken } from './verify';
+import { readAccountIdFromWrangler } from './wrangler';
 
 export async function standbyLogin(
   ctx: ReturnType<typeof baseVerbContext>,
 ): Promise<{ ready: boolean; url?: string }> {
   const session = await connectToCfChrome(ctx, { waitForAuth: false });
   try {
-    const page = await waitForCfAuthenticated(
-      session.page,
-      ctx.log ?? console,
-      session.context,
-    );
+    const page = await waitForCfAuthenticated(session.page, ctx.log ?? console, session.context);
     return { ready: true, url: page.url() };
   } catch {
     return { ready: false };
@@ -23,24 +24,39 @@ export async function standbyLogin(
   }
 }
 
+function shortName(): string {
+  return `vybekiit-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 /**
- * Run Cloudflare API token setup: create scoped token, return .env block.
- *
- * Stub — full implementation needs Cloudflare Console DOM probes.
+ * Run Cloudflare API token setup: CLI-first preflight (ensure wrangler), read the account
+ * id via wrangler, then mint a scoped token through the dashboard (browser fallback —
+ * wrangler cannot create arbitrary scoped tokens). The token never returns to the agent as
+ * text; it is written to `.env` by the caller.
  */
 export async function runCfSetup(
   ctx: ReturnType<typeof baseVerbContext>,
-  _params: { tokenName?: string; scopes?: string },
+  params: { tokenName?: string },
 ): Promise<CfSetupResult> {
+  const log = ctx.log ?? console;
+
+  // CLI-first: ensure wrangler is installed (auto-install if missing) via doctor.
+  const wrangler = ensureCli('wrangler', { log });
+  if (!wrangler.installed) {
+    log.warn('[cf] wrangler is not installed; proceeding with browser-only account detection.');
+  }
+  const accountIdFromCli = wrangler.installed ? readAccountIdFromWrangler() : null;
+
+  const name = params.tokenName ?? shortName();
   const session = await connectToCfChrome(ctx, { waitForAuth: true });
   try {
-    // TODO: navigate to My Profile -> API Tokens
-    // TODO: create token with scoped permissions (Workers, Pages, R2)
-    // TODO: scrape token value (shown once)
-    // TODO: read account ID from URL or page
-    throw new Error(
-      'Cloudflare token setup automation is not yet implemented. Use wrangler login and copy the token manually.',
-    );
+    const minted = await createApiToken(session.page, name, accountIdFromCli ?? undefined);
+    return {
+      token: minted.token,
+      tokenId: name,
+      accountId: minted.accountId || accountIdFromCli || '',
+      name,
+    };
   } finally {
     await session.dispose();
   }
@@ -62,26 +78,40 @@ export function registerCfDomain(registry: CommandRegistry): void {
         },
       },
       setup: {
-        description:
-          'Create Cloudflare API token with scoped permissions (\u2014token-name \u2014scopes)',
+        description: 'Create a Cloudflare API token with full permissions (--token-name)',
         run: async ({ args, flags }) => {
-          const params: Record<string, string> = {};
+          const params: { tokenName?: string } = {};
           for (const arg of args) {
-            if (arg.startsWith('--token-name=')) params.tokenName = arg.slice('--token-name='.length);
-            if (arg.startsWith('--scopes=')) params.scopes = arg.slice('--scopes='.length);
-          }
-          const result = await runCfSetup(baseVerbContext(flags), params);
-          const env = cfEnvBlock(result);
-          if (flags.json) {
-            printJson({ ok: true, env, tokenId: result.tokenId });
-          } else {
-            console.log('OK: Cloudflare setup complete.');
-            console.log('Write these to .env:');
-            for (const [key, value] of Object.entries(env)) {
-              console.log(`${key}=${value}`);
+            if (arg.startsWith('--token-name=')) {
+              params.tokenName = arg.slice('--token-name='.length);
             }
           }
-          return 0;
+          const result = await runCfSetup(baseVerbContext(flags), params);
+
+          // Live self-verification (token value stays in-process).
+          const verified = await verifyCfToken(result.accountId, result.token);
+
+          const env = cfEnvBlock(result);
+          const written = await writeEnvBlock({ ...env });
+          if (flags.json) {
+            // Key-guarded: never emit the token value to the agent transcript.
+            printJson({
+              ok: verified.ok,
+              tokenId: result.tokenId,
+              keysWritten: written.keysWritten,
+              verified: verified.ok,
+              ...(verified.status ? { status: verified.status } : {}),
+            });
+          } else {
+            console.log('OK: Cloudflare setup complete.');
+            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            console.log(
+              verified.ok
+                ? '✓ Token verified active via Cloudflare API.'
+                : '⚠ Token written but live verification did not confirm active status.',
+            );
+          }
+          return verified.ok ? 0 : 1;
         },
       },
     },

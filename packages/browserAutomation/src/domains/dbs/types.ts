@@ -1,8 +1,10 @@
+import { SUPABASE_DASHBOARD_URL as SUPABASE_DASHBOARD_URL_CONST } from '@vybekiit/browserAutomation/core/constants';
 import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
 
 export type SupabaseVerbContext = BaseVerbContext;
 
-export const SUPABASE_DASHBOARD_URL = 'https://supabase.com/dashboard';
+/** Supabase dashboard origin — entry point for browser-fallback project setup. */
+export const SUPABASE_DASHBOARD_URL = SUPABASE_DASHBOARD_URL_CONST;
 
 /** Result of Supabase setup: project URL and API keys. */
 export interface SupabaseSetupResult {
@@ -13,11 +15,11 @@ export interface SupabaseSetupResult {
 }
 
 /** Env block written to .env after setup. Agent never sees key values. */
-export interface SupabaseEnvBlock {
+export type SupabaseEnvBlock = {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
-}
+} & Record<string, string>;
 
 export function supabaseEnvBlock(result: SupabaseSetupResult): SupabaseEnvBlock {
   return {

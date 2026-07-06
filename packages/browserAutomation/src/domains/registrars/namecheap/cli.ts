@@ -1,6 +1,7 @@
 import { printJson } from '@vybekiit/browserAutomation/cli/output';
 import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
 import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
+import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
 import { ncSetupEnvBlock, verifyNcCredentialsViaApi } from './api/verify';
 import { runNcSetup, standbyLogin } from './verbs/standbyLogin';
 
@@ -28,23 +29,37 @@ export function registerNamecheapDomain(registry: CommandRegistry): void {
         run: async ({ args, flags }) => {
           const sandbox = parseSandboxFlag(args);
           const result = await runNcSetup(baseVerbContext(flags), { sandbox });
-          await verifyNcCredentialsViaApi(result);
+
+          // Persist first (key-guarded), then verify — mirrors the CF/GoDaddy setup contract so
+          // the builder never has to copy a secret and the agent never sees the key value.
           const env = ncSetupEnvBlock(result);
+          const written = await writeEnvBlock({ ...env });
+
+          let verified = true;
+          try {
+            await verifyNcCredentialsViaApi(result);
+          } catch {
+            verified = false;
+          }
+
           if (flags.json) {
             printJson({
-              ok: true,
-              env,
+              ok: verified,
+              keysWritten: written.keysWritten,
               sandbox: result.sandbox,
               reusedExisting: result.reusedExisting,
+              verified,
             });
           } else {
-            console.log('OK: Namecheap API credentials verified.');
-            console.log('Write these to .env:');
-            for (const [key, value] of Object.entries(env)) {
-              console.log(`${key}=${value}`);
-            }
+            console.log('OK: Namecheap setup complete.');
+            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            console.log(
+              verified
+                ? '✓ Credentials verified via Namecheap API.'
+                : '⚠ Credentials written but live verification did not confirm.',
+            );
           }
-          return 0;
+          return verified ? 0 : 1;
         },
       },
     },

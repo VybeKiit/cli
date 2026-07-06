@@ -25,6 +25,8 @@ import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/pre
 import { runRenderAgentLayer } from './commands/renderAgentLayer';
 import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
+import { ensureTool, formatEnsureResult } from './doctor/ensureTool';
+import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
 import { runEnvWizard } from './prompts/envWizard';
 import { isInteractive } from './prompts/tty';
@@ -41,6 +43,7 @@ Usage:
   vybekiit local-dev
   vybekiit scaffold backend [directory]
   vybekiit doctor
+  vybekiit doctor --ensure <tool> [--json]
   vybekiit sync-agent-layer [template]
   vybekiit render-agent-layer
   vybekiit check-goals [template]
@@ -75,6 +78,7 @@ Commands:
   local-dev           Open the visual local dev console in your browser
   scaffold backend    Add Express API server to an existing project
   doctor              Set up + check the tools your app needs
+  doctor --ensure     Install/verify a single named CLI on demand (e.g. wrangler, supabase)
   sync-agent-layer    Refresh agent instructions from the latest template mirror
   render-agent-layer  Regenerate marked sections from agent-kit
   check-goals         Validate goal-index ↔ skills (JSON, exit 1 on drift)
@@ -109,7 +113,7 @@ Options:
   -v, --version    Show the CLI version
 `;
 
-/** Read the CLI's own version from its package.json (also used to pin scaffolded deps). */
+/** Read the CLI's own version from its package.json. */
 async function readVersion(): Promise<string> {
   try {
     const raw = await readFile(join(HERE, '..', 'package.json'), 'utf8');
@@ -126,6 +130,29 @@ export {
   resolveTemplatesSource,
 } from './lib/resolveTemplates';
 
+/**
+ * `vybekiit doctor --ensure <tool> [--json]` — on-demand single-tool preflight.
+ *
+ * Reuses the full doctor toolchain (install steps + auth probe) for just one CLI, so
+ * provider automations can precheck/install the tool they need without a parallel layer.
+ * Exit 0 when the tool ends up installed (auth may still be pending); 1 otherwise.
+ */
+function runDoctorEnsure(toolName: string | undefined, json: boolean): number {
+  if (!toolName || toolName.startsWith('--')) {
+    const message = 'Usage: vybekiit doctor --ensure <tool> [--json]';
+    if (json) console.log(JSON.stringify({ ok: false, error: message }));
+    else console.error(message);
+    return 1;
+  }
+  const result = ensureTool(toolName);
+  if (json) {
+    console.log(JSON.stringify({ ok: result.installed, ...result }));
+  } else {
+    console.log(formatEnsureResult(result));
+  }
+  return result.installed ? 0 : 1;
+}
+
 async function main(argv: string[]): Promise<number> {
   const [command, subcommand, ...rest] = argv;
 
@@ -137,6 +164,11 @@ async function main(argv: string[]): Promise<number> {
     console.log(await readVersion());
     return 0;
   }
+  // Access gate (ADR-0033): every command except help/version/doctor needs a VybeKiit
+  // license. `doctor` is exempt so an ungated buyer can still install/sign in to gh.
+  if (command !== 'doctor' && !ensureAccessOrExit()) {
+    return 1;
+  }
   if (command === 'setup') {
     return await runSetup();
   }
@@ -147,6 +179,14 @@ async function main(argv: string[]): Promise<number> {
     return runDrop(subcommand ? [subcommand, ...rest] : rest);
   }
   if (command === 'doctor') {
+    const doctorArgs = subcommand ? [subcommand, ...rest] : rest;
+    const ensureArg = doctorArgs.find((a) => a === '--ensure' || a.startsWith('--ensure='));
+    if (ensureArg) {
+      const inline = ensureArg.includes('=') ? ensureArg.split('=')[1] : undefined;
+      const toolName = inline ?? doctorArgs[doctorArgs.indexOf(ensureArg) + 1];
+      const json = doctorArgs.includes('--json');
+      return runDoctorEnsure(toolName, json);
+    }
     return await runDoctor();
   }
   if (command === 'init') {
@@ -233,7 +273,7 @@ async function main(argv: string[]): Promise<number> {
     return await runEnvWizard();
   }
   if (command === 'scaffold' && subcommand === 'backend') {
-    const result = await runScaffoldBackend(rest, process.cwd(), await readVersion());
+    const result = await runScaffoldBackend(rest, process.cwd());
     console.log(result.message);
     return result.exitCode;
   }

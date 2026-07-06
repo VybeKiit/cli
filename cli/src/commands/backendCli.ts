@@ -32,7 +32,6 @@ async function ensureBackendDir(cwd: string): Promise<boolean> {
 export async function runScaffoldBackend(
   args: string[],
   cwd: string = process.cwd(),
-  packagesVersion: string,
 ): Promise<{ readonly message: string; readonly exitCode: number }> {
   const destName = args[0] ?? 'backend';
   const dest = join(cwd, destName);
@@ -63,7 +62,6 @@ export async function runScaffoldBackend(
       template: 'backend',
       source: resolved.source,
       dest,
-      packagesVersion,
     });
 
     return { message: `Scaffolded ${destName}/ — your API server is ready.`, exitCode: 0 };

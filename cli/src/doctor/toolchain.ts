@@ -150,6 +150,24 @@ const SUPABASE: Tool = {
   auth: { command: 'supabase', args: ['projects', 'list'], loginHint: 'supabase login' },
 };
 
+/**
+ * Neon CLI (`neonctl`) — used when the `neon` data adapter is active, so the agent can
+ * mint a Neon API key / read the connection string without the buyer opening the console.
+ * Installs via npm global on every OS; sign-in lives in neonctl's own store, probed with
+ * `neonctl me` (the one-time login is the browser flow `neonctl auth`).
+ */
+const NEON: Tool = {
+  name: 'neonctl',
+  purpose: 'create and manage your database',
+  versionArgs: ['--version'],
+  install: {
+    darwin: { command: 'npm', args: ['install', '-g', 'neonctl'] },
+    win32: { command: 'npm', args: ['install', '-g', 'neonctl'] },
+    linux: { command: 'npm', args: ['install', '-g', 'neonctl'] },
+  },
+  auth: { command: 'neonctl', args: ['me'], loginHint: 'neonctl auth' },
+};
+
 /** MongoDB Atlas CLI — used only when the `mongodb` data adapter is active. */
 const ATLAS: Tool = {
   name: 'atlas',
@@ -289,6 +307,35 @@ const LAUNCH: Tool = {
  * `*_PROVIDER` key is at its default. Exported as the stable baseline for callers and tests.
  */
 export const TOOLCHAIN: readonly Tool[] = [GH, WRANGLER, SUPABASE];
+
+/**
+ * Every tool declaration by name — the lookup table for on-demand, single-tool ensure
+ * (`vybekiit doctor --ensure <tool>`). This lets a provider automation precheck/install
+ * just the one CLI it needs, reusing the same install steps + auth probe as the full
+ * `doctor` sweep instead of a parallel preflight. Agent runtimes are included so the flag
+ * is a superset of what `doctor` would ever touch.
+ */
+export const ALL_TOOLS: readonly Tool[] = [
+  GH,
+  WRANGLER,
+  VERCEL,
+  RAILWAY,
+  SUPABASE,
+  NEON,
+  ATLAS,
+  AWS,
+  GCLOUD,
+  CLAUDE,
+  CODEX,
+  SKILLS,
+  EAS,
+  LAUNCH,
+];
+
+/** Resolve a tool declaration by its executable name (used by `--ensure <tool>`). */
+export function findToolByName(name: string): Tool | undefined {
+  return ALL_TOOLS.find((tool) => tool.name === name);
+}
 
 /**
  * Extra context {@link selectToolchain} can't read from the `*_PROVIDER` env keys.

@@ -107,7 +107,11 @@ async function readCredentialsFromPage(
   apiUser = apiUser ?? fromEnv.apiUser ?? null;
 
   if (!apiUser) {
-    const profileLink = page.locator('[data-username], .user-name, .profile-name').first();
+    // The Namecheap API user IS the account username, shown in the global-bar account dropdown
+    // (`.gb-dropdown .gb-text-truncate`) rather than beside an "API User" label on this page.
+    const profileLink = page
+      .locator('[data-username], .user-name, .profile-name, .gb-dropdown .gb-text-truncate')
+      .first();
     if ((await profileLink.count()) > 0) {
       const text = (await profileLink.textContent())?.trim().toLowerCase();
       if (text && /^[a-z0-9_-]{3,32}$/.test(text)) apiUser = text;

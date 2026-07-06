@@ -4,8 +4,27 @@
  * vybekiit-automate — unified dashboard automation CLI (registry dispatch).
  */
 
+import {
+  registerAnthropicDomain,
+  registerOpenAiDomain,
+} from '@vybekiit/browserAutomation/domains/ai/cli';
+import { registerSupabaseDomain } from '@vybekiit/browserAutomation/domains/dbs/cli';
+import {
+  registerNeonDomain,
+  registerUpstashDomain,
+} from '@vybekiit/browserAutomation/domains/dbs/neonUpstash';
 import { registerExtensionDomain } from '@vybekiit/browserAutomation/domains/extension/cli';
 import { registerGoogleDomain } from '@vybekiit/browserAutomation/domains/google/cli';
+import { registerCfDomain } from '@vybekiit/browserAutomation/domains/infra/cli';
+import {
+  registerRailwayDomain,
+  registerVercelDomain,
+} from '@vybekiit/browserAutomation/domains/infra/cliAuthProvider';
+import {
+  registerGithubDomain,
+  registerResendDomain,
+  registerSentryDomain,
+} from '@vybekiit/browserAutomation/domains/misc/cli';
 import {
   registerLsDomain,
   registerLsTopLevelAlias,
@@ -18,8 +37,6 @@ import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
 } from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
-import { registerSupabaseDomain } from '@vybekiit/browserAutomation/domains/dbs/cli';
-import { registerCfDomain } from '@vybekiit/browserAutomation/domains/infra/cli';
 import { parseGlobalFlags } from './flags';
 import { printError } from './output';
 import { createRegistry } from './registry';
@@ -35,6 +52,15 @@ registerGdTopLevelAlias(registry);
 registerGoogleDomain(registry);
 registerSupabaseDomain(registry);
 registerCfDomain(registry);
+registerRailwayDomain(registry);
+registerVercelDomain(registry);
+registerNeonDomain(registry);
+registerUpstashDomain(registry);
+registerOpenAiDomain(registry);
+registerAnthropicDomain(registry);
+registerGithubDomain(registry);
+registerResendDomain(registry);
+registerSentryDomain(registry);
 
 async function main(argv: string[]): Promise<number> {
   const { flags, rest } = parseGlobalFlags(argv);
