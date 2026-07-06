@@ -40,8 +40,6 @@
     "verify:docker": "node scripts/dev/checks/verifyNativeDepsDocker.mjs",
     "preflight:docker": "node scripts/preflight-docker-test.mjs",
     "preflight:docker:quick": "node scripts/preflight-docker-test.mjs --quick",
-    "publish:packages": "node scripts/dev/publish/publishPackages.mjs",
-    "publish:packages:dry-run": "node scripts/dev/publish/publishPackages.mjs --dry-run",
     "bump-kit-version": "node scripts/dev/publish/bumpKitVersion.mjs",
     "tag-mirrors": "node scripts/dev/mirror/tagMirrorRepos.mjs",
     "test:scripts": "vitest run --root scripts",

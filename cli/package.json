@@ -21,9 +21,6 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
-    "@vybekiit/core": "workspace:*",
-    "@vybekiit/db": "workspace:*",
-    "@vybekiit/report-mode": "workspace:*",
     "open": "^10.1.0"
   },
   "devDependencies": {
@@ -32,6 +29,9 @@
     "typescript": "^5.7.2",
     "vitest": "^3.2.6",
     "@vybekiit/agent-kit": "workspace:*",
-    "@vybekiit/deploy": "workspace:*"
+    "@vybekiit/core": "workspace:*",
+    "@vybekiit/db": "workspace:*",
+    "@vybekiit/deploy": "workspace:*",
+    "@vybekiit/report-mode": "workspace:*"
   }
 }

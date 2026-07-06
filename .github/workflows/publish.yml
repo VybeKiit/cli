@@ -1,7 +1,9 @@
 name: Publish Package
 
-# Publishes @vybekiit/* + vybekiit CLI via OIDC trusted publishing (no NPM_TOKEN).
-# Workflow filename `publish.yml` must match npm Trusted Publisher config on each package.
+# Publishes ONLY the `vybekiit` CLI via OIDC trusted publishing (no NPM_TOKEN).
+# The CLI is the single public npm artifact (ADR-0033); every packages/* is `private: true`
+# and ships to buyers via the gated monorepo mirror, never to npm.
+# Workflow filename `publish.yml` must match npm Trusted Publisher config on the CLI.
 
 on:
   push:
@@ -82,9 +84,6 @@ jobs:
       - run: pnpm test:scripts
       - run: pnpm build
 
-      - name: Publish @vybekiit/* packages
-        run: pnpm publish:packages
-
-      - name: Publish vybekiit CLI
+      - name: Publish vybekiit CLI (the single public artifact)
         run: pnpm publish --no-git-checks --access public --provenance
         working-directory: cli

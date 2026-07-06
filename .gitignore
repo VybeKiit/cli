@@ -65,3 +65,6 @@ tools/dedup/target/
 
 # local-only dev scripts
 scripts/dev/
+
+# Local runtime data (domain map cache, feedback event log)
+.vybekiit/

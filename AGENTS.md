@@ -16,8 +16,9 @@
 A pnpm + Turborepo monorepo that ships a paid starter kit for non-technical builders. Two kinds
 of code, governed by the **Owned vs Maintained** split (see `CONTEXT.md`):
 
-- `packages/*` — **MAINTAINED**, headless, published to public npm as `@vybekiit/*`. Buyers never
-  edit these; updates reach them as version bumps. No UI, no framework lock — pure TS.
+- `packages/*` — **MAINTAINED**, headless, `private: true` — **never** published to npm (ADR-0033).
+  They ship bundled inside the `vybekiit` CLI (the only public artifact) and are consumed via the
+  workspace in the gated monorepo clone. Buyers never edit these. No UI, no framework lock — pure TS.
 - `templates/*` — **OWNED**, not published, copied into the buyer's own repo by the CLI. Includes
   all UI and the buyer-facing agent layer. Treated as the buyer's code the moment it's scaffolded.
 
@@ -27,7 +28,7 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 ## Stack & tooling
 
 - **Language:** TypeScript, strict. No `any`; narrow in `catch` (`instanceof Error`) before use.
-- **Monorepo:** pnpm workspaces + Turborepo. Packages publish to npm under `@vybekiit/*` (MIT).
+- **Monorepo:** pnpm workspaces + Turborepo. Only the `vybekiit` CLI publishes to npm (MIT, ADR-0033); every `packages/*` is `private: true`.
 - **Web/extension UI:** shadcn/ui. **Mobile UI:** plain StyleSheet primitives + `@vybekiit/tokens`.
 - **Infra the templates target:** Cloudflare (host/edge/cron/storage/email) + Supabase (db/auth).
 - **Payments:** one `@vybekiit/payments` package, one `PaymentProvider` interface, provider
@@ -39,17 +40,17 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 <!-- rules digest — full guide in CODE-STYLE.md; edit there -->
 
 Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
-traceable code). **Two refactors in flight, sequenced: (1) the publish-surface collapse (ADR-0025,
-28→5 published) — do this first; (2) the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer`
+traceable code). **Two refactors in flight, sequenced: (1) the publish-surface collapse — now settled
+as ADR-0033 (0 published packages; the CLI is the only public artifact, superseding ADR-0025's 5-spine);
+(2) the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer`
 replace `Result` / zod / factory-wiring end-to-end, one gate-green slice at a time, **in progress not
 complete**. The load-bearing rules — **full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
 
-- **A new module is not a new published package (ADR-0025).** Earn a public `@vybekiit/*` slot only
-  with real headless logic AND (a buyer-runtime consumer OR ≥2 adapters). Else: template-owned code
-  or a `private: true` workspace package — there is **no `shared/` tier**. Published spine is **5**:
-  `core` (absorbs `http`/`observability`/`security` as subpaths), `payments`, `auth`, `db`,
-  `client-state`. `tokens`/`report-mode`/`analytics` + the thin long tail are template-owned; the 4
-  tooling packages (`browser-automation`, `agent-kit`, `ui-catalog-mcp`, `deploy`) are `private: true`.
+- **Nothing under `packages/` is published (ADR-0033).** Every `packages/*` is `private: true` (no
+  `publishConfig`); the `vybekiit` CLI is the only public npm package and bundles the `@vybekiit/*`
+  it uses (`tsup` `noExternal: [/^@vybekiit\//]`). A new module is either **template-owned code** or a
+  **private workspace package** — there is **no public tier** and **no `shared/` tier** (plumbing
+  folds into `core`). Buyers get the maintained logic via the gated monorepo clone, never `npm i @vybekiit/*`.
 - **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (interface + DTOs + tagged `*Error`) ·
   `config.ts` (`Schema.Struct` + Config `Tag`/`Layer`) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
   `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core` is the exempt library package.
@@ -111,11 +112,12 @@ language (per `templates/*/language.md`) · errors translated · celebrate · **
 (`—`)** in buyer-facing prose (UI titles stay unpunctuated; see Tone in `language.md`). If you
 catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate it.
 
-## Releasing packages
+## Releasing (the CLI only)
 
-- Semver. Public npm publish under `@vybekiit/*`. Breaking changes to a package = major bump and a
-  changelog note; the buyer's `update-kit` skill relies on semver to decide what's safe.
-- Templates are versioned but **not** published — they're distributed by the CLI/scaffolder.
+- Semver. **Only the `vybekiit` CLI publishes to npm** (ADR-0033); every `packages/*` is
+  `private: true` and ships bundled inside the CLI. `publish.yml` publishes just the CLI.
+- Templates + packages are versioned but **not** published — buyers get them via the gated monorepo
+  mirror clone; the buyer's `update-kit` pulls the mirror rather than bumping npm deps.
 - **Kit releases:** unified `vX.Y.Z` tag on monorepo + all mirrors after each merged PR (unless
   `no-release` label). GitHub Release notes on monorepo only. See ADR-0013 and `release.yml` /
   `publish.yml` (OIDC trusted publishing — no `NPM_TOKEN`).
@@ -161,14 +163,12 @@ you can take $1 and auto-invite yourself, the business is real.
   `packages/payments`, `packages/auth`, `packages/db`, `packages/browserAutomation`, `packages/clientState`, `cli`
   (the `vybekiit` scaffolder), and `templates/web` (a real Next.js app, `next build` + `tsc`
   gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
-  the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —
-  it just no longer ships untyped/unbuilt.
-- **Two refactors in progress — the docs (CODE-STYLE / CONTEXT / ADR-0025) describe the target, the
-  code is catching up:**
-  - **Publish-surface collapse (ADR-0025):** all **28** packages still physically exist in
-    `packages/`. The decision to collapse to **5** published (+ template-owned + 4 private) is
-    accepted; the reorg lands as its own `reorg/organize-by-purpose` PR. Until it does, treat the
-    28-package tree as legacy — do not add a new published package.
+  the CLI copies it verbatim, keeping its `@vybekiit/*` `workspace:*` deps (no npm rewrite; ADR-0033).
+- **Two refactors — one settled, one in progress:**
+  - **Publish surface (ADR-0033, done):** every `packages/*` is now `private: true`; the `vybekiit`
+    CLI is the only public npm artifact and bundles what it needs. This supersedes ADR-0025's 5-spine.
+    All **28** packages still physically exist in `packages/` (the by-purpose reorg lands separately),
+    but none publishes — do not add `publishConfig` to any of them.
   - **Effect migration (ADR-0023): partial.** The spine (`core`, `payments`, `auth`, `db`,
     `clientState`) is on Effect + `Schema` + tagged errors; `packages/core/src/result.ts` +
     `effectInterop.ts` still exist as the bridge, and templates, tooling, `cli`, and the buyer agent

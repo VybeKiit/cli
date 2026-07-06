@@ -8,7 +8,7 @@ export default defineConfig({
   format: ['esm'],
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
-  // agent-kit and deploy are private workspace packages (ADR-0025) — never on npm — so
-  // the published CLI must inline their source rather than declare an unresolvable dep.
-  noExternal: ['@vybekiit/agent-kit', '@vybekiit/deploy'],
+  // Every @vybekiit/* package is private (ADR-0033) — never on npm — so the published CLI
+  // (the single public artifact) must inline their source rather than declare unresolvable deps.
+  noExternal: [/^@vybekiit\//],
 });

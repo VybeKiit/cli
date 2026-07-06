@@ -48,25 +48,24 @@ When creating a new script, ask: _"Would CI, the build, or another maintainer ne
 
 Load-bearing, project-specific rules. Each is one line + a real before/after.
 
-### A new module is not a new published package
-Sort every `packages/*` concern into one of **three** buckets (ADR-0025). Earn a **published**
-`@vybekiit/*` slot only with real headless logic **AND** (a buyer-runtime consumer **OR** ≥2 real
-adapters). Otherwise it is template-owned code or a private workspace package. There is **no
-`shared/` tier** — foundational plumbing folds into `core`; cross-template owned code lives in each
-template (a maintainer `check:templates` keeps copies in sync).
+### Nothing under `packages/` is published — the CLI is the only public artifact (ADR-0033)
+Every `packages/*` is `private: true` (no `publishConfig`). The single public npm package is the
+`vybekiit` CLI, which **bundles** the `@vybekiit/*` it uses (`tsup` `noExternal: [/^@vybekiit\//]`).
+Buyers get the maintained logic via the **gated monorepo clone** (the paid wall invites them to the
+private delivery mirror), never via `npm i @vybekiit/*`. So a new module sorts into one of **two**
+buckets: **template-owned code** (`templates/*/src/lib/…`) or a **private workspace package**
+(`packages/*`, `private: true`). There is **no public tier** and **no `shared/` tier** — foundational
+plumbing folds into `core`; cross-template owned code lives in each template (`check:templates` keeps
+copies in sync).
 ```jsonc
-// before  (packages/seo/package.json) — a 269-LOC local-only stub, published to npm
-{ "name": "@vybekiit/seo", "publishConfig": { "access": "public" } }
-// after — folded into the template as owned code; no package, no version to bump
-// templates/web/src/lib/seo.ts
+// before (ADR-0025 era) — a public spine package
+{ "name": "@vybekiit/payments", "publishConfig": { "access": "public" } }
+// after (ADR-0033) — private; ships bundled inside the CLI, or consumed via the workspace
+{ "name": "@vybekiit/payments", "private": true }
 ```
-_Why:_ 28 published packages is 28 version/changelog/publish targets; most were single-`local`
-stubs. Cutting to **5** keeps KISS without moving a module boundary. Buckets: **public npm (5)**
-(`core` — which absorbs `http`/`observability`/`security` as subpaths — `payments`, `auth`, `db`,
-`client-state`) · **workspace domain packages** (promoted from template adapters — `seo`, `cms`,
-`compliance`, `realtime`, `i18n`, `jobs`, `kv`, `search`, `ai`, `email`, `assets`,
-`notifications`, `tenancy`, `tokens`, `analytics`; see ADR-0026) · **private workspace**
-(`browser-automation`, `agent-kit`, `ui-catalog-mcp`, `deploy`).
+_Why:_ publishing the concern packages both leaks a paid product on npm and creates a second
+distribution path that bypasses the gate. One public artifact (the CLI) + a gated mirror is one
+paywall and one thing to version. Do not add `publishConfig` to any `packages/*`.
 
 ### Import aliases — one vocabulary everywhere (ADR-0026)
 Templates use `@/*` → `./src/*`. Packages use `@vybekiit/<pkg>` and `@vybekiit/<pkg>/*` for
@@ -342,8 +341,8 @@ Write new code like these:
 
 The AI-slop / drift fingerprint for THIS repo — each with an offender and how it's caught:
 
-- **Publish a single-`local`-provider stub** as `@vybekiit/*` — fold it into the template · `packages/seo`, `packages/email` (zero consumers) · [taste] (ADR-0025).
-- **Create a new published package for a new module** — earn the slot first; plumbing folds into `core` · [taste].
+- **Add `publishConfig` to any `packages/*`** — every concern package is `private: true`; the CLI is the only public artifact and bundles what it needs · [taste] (ADR-0033).
+- **Point buyers at `npm i @vybekiit/*`** (e.g. re-adding the `workspace:*`→npm scaffold rewrite) — the packages are private; delivery is the gated monorepo clone · [taste] (ADR-0033).
 - `Result`/`ok`/`err`/`fail` or `Promise<Result<…>>` — return `Effect<A, E>` with a tagged error · `packages/core/src/result.ts` (retires with the Effect migration) · [taste] (ADR-0023).
 - Raw `try/catch` across an Effect seam — recover with `Effect.catchTag`/`catchAll` · [taste].
 - `zod` anywhere — validate with Effect `Schema` · pre-Effect manifests (ADR-0023) · [lint: noRestrictedImports].

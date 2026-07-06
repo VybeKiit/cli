@@ -1,6 +1,8 @@
 # ADR-0025: Collapse the published surface to five (no `shared/` tier)
 
-**Status:** Accepted (supersedes ADR-0022 on the publish axis; refines ADR-0012)
+**Status:** Superseded by [ADR-0033](./0033-cli-single-published-artifact-and-access-gate.md) — the
+public 5-spine is retired; every `packages/*` is now `private: true` and the CLI is the only public
+artifact. (Originally: Accepted — superseded ADR-0022 on the publish axis; refined ADR-0012.)
 **Date:** 2026-07-02
 
 ## Context

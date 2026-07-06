@@ -1,6 +1,5 @@
-import { access, cp, readdir, readFile, writeFile } from 'node:fs/promises';
+import { access, cp, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { type DependencyMap, rewriteWorkspaceDeps } from './rewriteDeps';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
 export const TEMPLATES = ['web', 'spa', 'mobile', 'extension', 'backend'] as const;
@@ -37,36 +36,17 @@ export interface ScaffoldOptions {
   readonly source: string;
   /** Destination directory to create the new project in. */
   readonly dest: string;
-  /** npm version to pin `@vybekiit/*` dependencies to in the scaffolded project. */
-  readonly packagesVersion: string;
-}
-
-/** Rewrite a copied `package.json` so it consumes `@vybekiit/*` from npm, not the workspace. */
-async function pinScaffoldedDeps(dest: string, packagesVersion: string): Promise<void> {
-  const pkgPath = join(dest, 'package.json');
-  let raw: string;
-  try {
-    raw = await readFile(pkgPath, 'utf8');
-  } catch {
-    return; // template has no package.json — nothing to pin
-  }
-
-  const pkg: Record<string, unknown> = JSON.parse(raw);
-  for (const field of ['dependencies', 'devDependencies'] as const) {
-    const deps = pkg[field];
-    if (deps && typeof deps === 'object') {
-      pkg[field] = rewriteWorkspaceDeps(deps as DependencyMap, packagesVersion);
-    }
-  }
-  await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 
 /**
- * Copy a template into a fresh destination and pin its `@vybekiit/*` deps to npm.
+ * Copy a template into a fresh destination, preserving its `workspace:*` deps.
  *
- * Refuses to write into a non-empty directory (never clobber a buyer's work) and
- * skips build artifacts. Throws {@link ScaffoldError} for expected problems so the
- * entrypoint translates them into a single plain-language line.
+ * Since ADR-0033 (CLI is the only published artifact) buyers work inside the gated
+ * monorepo clone, where `@vybekiit/*` resolve locally via the workspace — so the
+ * copied `package.json` keeps `workspace:*` untouched (no npm rewrite). Refuses to
+ * write into a non-empty directory (never clobber a buyer's work) and skips build
+ * artifacts. Throws {@link ScaffoldError} for expected problems so the entrypoint
+ * translates them into a single plain-language line.
  */
 export async function scaffold(options: ScaffoldOptions): Promise<{ dest: string }> {
   const sourceDir = join(options.source, options.template);
@@ -92,7 +72,6 @@ export async function scaffold(options: ScaffoldOptions): Promise<{ dest: string
     recursive: true,
     filter: (src) => shouldCopyScaffoldPath(src),
   });
-  await pinScaffoldedDeps(options.dest, options.packagesVersion);
 
   return { dest: options.dest };
 }
