@@ -1,0 +1,153 @@
+{
+  "$schema": "https://vybekiit.com/schemas/mcp-servers.json",
+  "description": "Curated MCP servers for VybeKiit vibe coders. Install what you use, not everything.",
+  "servers": [
+    {
+      "name": "context7",
+      "description": "Version-specific library docs — kills hallucinated APIs",
+      "category": "core",
+      "priority": 1,
+      "command": "npx -y @upstash/context7-mcp@latest",
+      "env": [],
+      "notes": "Most impactful single MCP. Prevents Claude from writing code against outdated APIs."
+    },
+    {
+      "name": "github",
+      "description": "PR review, issue triage, repo search, code context",
+      "category": "core",
+      "priority": 1,
+      "command": "npx -y @modelcontextprotocol/server-github",
+      "env": ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+      "notes": "Start in read-only mode. Scope toolsets to avoid tool bloat."
+    },
+    {
+      "name": "playwright",
+      "description": "Browser automation, E2E verification, accessibility tree",
+      "category": "frontend",
+      "priority": 2,
+      "command": "npx -y @anthropic-ai/mcp-playwright",
+      "env": [],
+      "notes": "Uses accessibility tree (200-400 tokens) instead of screenshots (thousands). Keep sessions tight."
+    },
+    {
+      "name": "supabase",
+      "description": "Database schema, auth, storage, migrations, Edge Functions",
+      "category": "backend",
+      "priority": 2,
+      "command": "npx -y supabase-mcp-server",
+      "env": ["SUPABASE_ACCESS_TOKEN"],
+      "notes": "Full Supabase management. Can run queries, generate migrations, manage infrastructure."
+    },
+    {
+      "name": "figma",
+      "description": "Read designs, generate code from frames, use Code Connect",
+      "category": "design",
+      "priority": 3,
+      "command": "npx -y @anthropic-ai/mcp-figma",
+      "env": ["FIGMA_ACCESS_TOKEN"],
+      "notes": "Claude gets structured design data — components, variables, layout. Can generate code from selected frames."
+    },
+    {
+      "name": "sentry",
+      "description": "Production error triage, stack traces, Seer root-cause analysis",
+      "category": "ops",
+      "priority": 3,
+      "command": "remote:https://mcp.sentry.dev/sse",
+      "env": [],
+      "notes": "OAuth-based remote MCP. Seer (paid) provides automated root-cause analysis."
+    },
+    {
+      "name": "vercel",
+      "description": "Deploy, manage projects, environment variables, domains",
+      "category": "deploy",
+      "priority": 3,
+      "command": "npx -y @vercel/mcp",
+      "env": ["VERCEL_TOKEN"],
+      "notes": "Full Vercel project management from Claude."
+    },
+    {
+      "name": "stripe",
+      "description": "Payments, subscriptions, customer management, webhooks",
+      "category": "payments",
+      "priority": 4,
+      "command": "npx -y @stripe/mcp",
+      "env": ["STRIPE_SECRET_KEY"],
+      "notes": "Use test mode keys during development. Never expose live keys to agent."
+    },
+    {
+      "name": "resend",
+      "description": "Transactional email — send, templates, domains",
+      "category": "comms",
+      "priority": 5,
+      "command": "npx -y resend-mcp",
+      "env": ["RESEND_API_KEY"],
+      "notes": "Simple email sending. Good for auth flows, notifications, receipts."
+    },
+    {
+      "name": "higgsfield",
+      "description": "AI image/video generation — Kling 3, Veo 3, Sora 2, Seedance, Wan",
+      "category": "media",
+      "priority": 4,
+      "command": "npx -y @anthropic-ai/mcp-higgsfield",
+      "env": ["HIGGSFIELD_API_KEY"],
+      "notes": "30+ models through single endpoint. Paid creative asset generation."
+    },
+    {
+      "name": "exa",
+      "description": "AI-native web search — semantic, content, neural",
+      "category": "research",
+      "priority": 4,
+      "command": "npx -y exa-mcp-server",
+      "env": ["EXA_API_KEY"],
+      "notes": "Better than web search for finding code examples, documentation, and technical content."
+    },
+    {
+      "name": "firecrawl",
+      "description": "Web scraping, crawling, structured data extraction",
+      "category": "research",
+      "priority": 5,
+      "command": "npx -y firecrawl-mcp",
+      "env": ["FIRECRAWL_API_KEY"],
+      "notes": "Scrape competitor sites, extract data, crawl documentation."
+    },
+    {
+      "name": "cloudflare",
+      "description": "Workers, KV, R2, D1, AI, Vectorize — full platform",
+      "category": "deploy",
+      "priority": 3,
+      "command": "npx -y @anthropic-ai/mcp-cloudflare",
+      "env": ["CLOUDFLARE_API_TOKEN"],
+      "notes": "Full Cloudflare platform management. Deploy Workers, manage storage, run AI."
+    },
+    {
+      "name": "upstash",
+      "description": "Redis, QStash (queues), Vector DB — serverless data",
+      "category": "backend",
+      "priority": 4,
+      "command": "npx -y @upstash/mcp-server",
+      "env": ["UPSTASH_EMAIL", "UPSTASH_API_KEY"],
+      "notes": "Serverless Redis + message queues + vector search. Pairs well with Next.js/Vercel."
+    },
+    {
+      "name": "tavily",
+      "description": "Deep web research, search with AI extraction",
+      "category": "research",
+      "priority": 5,
+      "command": "npx -y tavily-mcp",
+      "env": ["TAVILY_API_KEY"],
+      "notes": "Best for deep research tasks — competitor analysis, market research, technical investigation."
+    }
+  ],
+  "categories": {
+    "core": "Essential for every project",
+    "frontend": "UI development and testing",
+    "backend": "Database, APIs, infrastructure",
+    "design": "Design-to-code workflows",
+    "ops": "Production monitoring and debugging",
+    "deploy": "Deployment and hosting",
+    "payments": "Payment processing",
+    "comms": "Email, notifications, messaging",
+    "media": "Image/video generation",
+    "research": "Search and data extraction"
+  }
+}
