@@ -62,6 +62,41 @@ _Avoid_: calling it a backend the buyer chooses (it is an invisible fallback, sw
 **Design tokens** — the one shared map of colors, spacing, radius, and type that web (as CSS vars)
 and mobile (as StyleSheet values) both consume, so the two platforms look consistent.
 
+**Page recipe catalog** — a UI-library index of source-backed single-page SaaS outcomes that the
+vibe coder can preview in desktop, tablet, and mobile frames, open on its own full-screen route, copy
+as ready page components, or hand to an agent as a prompt, without automatically scaffolding those
+pages into every template app.
+_Avoid_: page preset (implies shipped code), template page (implies scaffolded route).
+
+**Page recipe manifest** — the source list behind the **Page recipe catalog**: each entry names one
+page outcome, its target route, related recipes, useful existing components, linked feature modules
+or buyer skills, source files, copy/import metadata, and the agent prompt metadata needed to recreate
+it in a buyer app. Runnable recipe components live under `apps/componentLibrary/src/pageRecipes/*`
+and are not scaffolded into `templates/web` unless the vibe coder copies them or asks the agent to
+install them. The maintained source list lives in `scripts/data/page-recipe-manifest.json`;
+generated component-library data lives in `apps/componentLibrary/src/data/pageRecipes.ts`; coverage
+is checked by `scripts/dev/checks/checkPageRecipes.mjs`.
+_Avoid_: hard-coded page sidebar, JSX-only recipe list.
+
+**Recipe integration TODO** — a clear `TODO:` comment inside a runnable Page recipe where real app
+wiring belongs. Recipes use safe default values for local display instead of mock backend records, and
+mark the exact places an agent should connect Supabase, payments, email, Cloudflare, or another
+feature service.
+_Avoid_: fake production data, hidden integration assumptions.
+
+**Recipe install notes** — short catalog notes that explain safe local edits such as changing text,
+color, or shape. Business-owned values point to the owning feature provider or config instead: pricing
+notes tell the vibe coder where the active payment provider owns the price, not to edit a UI literal.
+Install notes are authored in the Page recipe manifest and checked, including provider-owned pointers
+for pricing recipes.
+_Avoid_: "change the price in this card", burying provider-owned setup inside visual copy notes.
+
+**Feature recipe group** — a **Page recipe catalog** grouping tied to either a DB-backed **Feature
+module** or a buyer skill, used to check that every plug-and-play capability has at least one page
+recipe. V1 starts broad: every DB preset and buyer skill gets at least one functional recipe, even
+when the first version is intentionally simple.
+_Avoid_: using feature module for non-DB buyer skills.
+
 ## The contract & skills
 
 **Decide + Guide** — the agent contract: make all technical decisions, guide the few steps only the
