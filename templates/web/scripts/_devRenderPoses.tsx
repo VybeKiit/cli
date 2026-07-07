@@ -2,6 +2,7 @@
  * visual QA. Not shipped — run via tsx, writes /tmp/scene-preview/poses.html. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import process from 'node:process';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -24,7 +25,8 @@ const meta = new Map(CLAUDE_OCTOPUS_EXTENDED_POSES.map((p) => [p.id, p]));
 
 const cards = EXTENDED_POSE_OVERLAY_IDS.map((id) => {
   const info = meta.get(id);
-  const anim = info?.anim ?? 'bounce';
+  const anim = info === undefined ? 'bounce' : info.anim;
+  const label = info === undefined ? id : info.label;
   const svg = renderToStaticMarkup(
     createElement(
       'svg',
@@ -47,7 +49,7 @@ const cards = EXTENDED_POSE_OVERLAY_IDS.map((id) => {
       ),
     ),
   );
-  return `<figure class="card"><div class="stage">${svg}</div><figcaption><b>${info?.label ?? id}</b><br/><code>${id}</code> · <span>${anim}</span></figcaption></figure>`;
+  return `<figure class="card"><div class="stage">${svg}</div><figcaption><b>${label}</b><br/><code>${id}</code> · <span>${anim}</span></figcaption></figure>`;
 }).join('\n');
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -64,4 +66,6 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 </style></head><body><h1>Extended-pose bespoke overlays — visual QA (${EXTENDED_POSE_OVERLAY_IDS.length})</h1><div class="grid">${cards}</div></body></html>`;
 
 writeFileSync('/tmp/scene-preview/poses.html', html, 'utf8');
-console.log(`wrote /tmp/scene-preview/poses.html (${EXTENDED_POSE_OVERLAY_IDS.length} overlays)`);
+process.stdout.write(
+  `wrote /tmp/scene-preview/poses.html (${EXTENDED_POSE_OVERLAY_IDS.length} overlays)\n`,
+);

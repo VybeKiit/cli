@@ -1,9 +1,10 @@
-import { connectToChrome } from '@vybekiit/browserAutomation/core/connect';
+import { connectToChrome } from '@vybekiit/browser-automation/core/connect';
 import {
   rememberProfilePath,
   resolveProfilePath,
-} from '@vybekiit/browserAutomation/core/profileResolve';
-import type { AttachedSession } from '@vybekiit/browserAutomation/core/types';
+} from '@vybekiit/browser-automation/core/profileResolve';
+import type { AttachedSession } from '@vybekiit/browser-automation/core/types';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import { waitForGdAuthenticated } from './dashboard/waitForAuthenticated';
 import { GD_KEYS_URL, type GdVerbContext } from './types';
 
@@ -11,10 +12,19 @@ export type ConnectToGdChromeOptions = {
   waitForAuth?: boolean;
 };
 
-export async function connectToGdChrome(
+/**
+ * Connect To Gd Chrome.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @param options - Operation options.
+ * @returns Promise resolving with an attached browser session.
+ * @example
+ * const result = await connectToGdChrome(ctx, options);
+ */
+export const connectToGdChrome = async (
   ctx: GdVerbContext,
   options: ConnectToGdChromeOptions = {},
-): Promise<AttachedSession> {
+): Promise<AttachedSession> => {
   const waitForAuth = options.waitForAuth !== false;
   const profilePath = await resolveProfilePath('godaddy', ctx.profilePath);
   await rememberProfilePath('godaddy', profilePath);
@@ -26,7 +36,11 @@ export async function connectToGdChrome(
     tabUrlPattern: /godaddy\.com/i,
   });
   if (waitForAuth) {
-    session.page = await waitForGdAuthenticated(session.page, ctx.log ?? console, session.context);
+    session.page = await waitForGdAuthenticated(
+      session.page,
+      resolveVerbLogger(ctx),
+      session.context,
+    );
   }
   return session;
-}
+};

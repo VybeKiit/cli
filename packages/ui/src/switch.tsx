@@ -5,6 +5,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Switch component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Switch component.
+ * @example
+ * <Switch />;
+ */
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>

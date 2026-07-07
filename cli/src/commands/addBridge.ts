@@ -1,10 +1,10 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const SKILL_CONTENT = `# ai-browser-bridge
 
-Drive ChatGPT, Gemini, Claude, DeepSeek, Grok, or Perplexity in a real browser from any agent — one provider or fanned out. Exposes sandboxed local repo tools to ChatGPT over MCP, and serves an outbound MCP \`ask\` tool so agents can call web chats natively.
+Drive ChatGPT, Gemini, Claude, DeepSeek, Grok, or Perplexity in a real browser from any agent, one provider or fanned out. Exposes sandboxed local repo tools to ChatGPT over MCP, and serves an outbound MCP \`ask\` tool so agents can call web chats natively.
 
 ## Prerequisites
 
@@ -103,7 +103,7 @@ bridge ask "your question" --provider chatgpt --json
 - macOS only (hardcoded Chrome path, pbcopy/lsof)
 - Each provider needs a one-time \`bridge login\`
 - File operations are sandboxed to the target repo (no escape)
-- No raw shell — only validated MCP tools
+- No raw shell, only validated MCP tools
 - Browser selectors may break when provider UIs update
 
 ## Fan-out behavior
@@ -123,7 +123,15 @@ const AGENT_SKILL_DIRS = [
 
 const SKILL_FILENAME = 'ai-browser-bridge.md';
 
-export async function runAddBridge(args: string[]): Promise<number> {
+/**
+ * Install ai-browser-bridge and write agent skill wrappers into the current project.
+ *
+ * @param args - CLI arguments after `add bridge`.
+ * @returns Process exit code for the command.
+ * @example
+ * const exitCode = runAddBridge(['--json']);
+ */
+export const runAddBridge = (args: string[]): number => {
   const cwd = process.cwd();
   const json = args.includes('--json');
 
@@ -131,15 +139,15 @@ export async function runAddBridge(args: string[]): Promise<number> {
 
   // 1. Install ai-browser-bridge globally
   try {
-    execSync('pnpm add -g ai-browser-bridge', { stdio: 'pipe' });
+    execFileSync('pnpm', ['add', '-g', 'ai-browser-bridge'], { stdio: 'pipe' });
     results.push('Installed ai-browser-bridge globally');
   } catch {
-    // Already installed or pnpm not available for global — try npm
+    // Already installed or pnpm not available for global, try npm.
     try {
-      execSync('npm install -g ai-browser-bridge', { stdio: 'pipe' });
+      execFileSync('npm', ['install', '-g', 'ai-browser-bridge'], { stdio: 'pipe' });
       results.push('Installed ai-browser-bridge globally (via npm)');
     } catch {
-      results.push('Could not install globally — install manually: pnpm add -g ai-browser-bridge');
+      results.push('Could not install globally. Install manually: pnpm add -g ai-browser-bridge');
     }
   }
 
@@ -169,18 +177,18 @@ export async function runAddBridge(args: string[]): Promise<number> {
 
   // 4. Output
   if (json) {
-    console.log(JSON.stringify({ ok: true, steps: results }, null, 2));
+    process.stdout.write(`${JSON.stringify({ ok: true, steps: results }, null, 2)}\n`);
   } else {
-    console.log('');
-    console.log('  🌉 ai-browser-bridge added');
-    console.log('');
+    process.stdout.write('\n');
+    process.stdout.write('  🌉 ai-browser-bridge added\n');
+    process.stdout.write('\n');
     for (const r of results) {
-      console.log(`  ✓ ${r}`);
+      process.stdout.write(`  ✓ ${r}\n`);
     }
-    console.log('');
-    console.log('  Next: run `bridge login --provider chatgpt` to sign in.');
-    console.log('');
+    process.stdout.write('\n');
+    process.stdout.write('  Next: run `bridge login --provider chatgpt` to sign in.\n');
+    process.stdout.write('\n');
   }
 
   return 0;
-}
+};

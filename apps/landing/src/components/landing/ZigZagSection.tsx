@@ -14,13 +14,40 @@ const MOCK_COMPONENTS = {
   'three-device': ThreeDeviceMock,
 } as const;
 
-function CopyBlock({
+const PROBLEM_HEADING_LINES = {
+  'Boilerplates still leave you holding the bag.': [
+    'Boilerplates still',
+    'leave you holding the bag.',
+  ],
+  'Maintaining multiple platforms drains time.': ['Maintaining multiple', 'platforms drains time.'],
+  'Payments setup kills momentum.': ['Payments setup', 'kills momentum.'],
+} as const satisfies Record<string, readonly string[]>;
+
+const SOLUTION_HEADING_LINES = {
+  'Take payments in your first session.': ['Take payments in your', 'first session.'],
+} as const satisfies Record<string, readonly string[]>;
+
+const resolveHeadingLines = (
+  heading: string,
+  lineBreaks: Readonly<Record<string, readonly string[]>>,
+): readonly string[] => {
+  const lines = lineBreaks[heading];
+  if (lines !== undefined) {
+    return lines;
+  }
+  return [heading];
+};
+
+const CopyBlock = ({
   copy,
   uiOnRight,
 }: {
   copy: (typeof ZIGZAG_ROWS)[number]['copy'];
   uiOnRight: boolean;
-}) {
+}) => {
+  const problemLines = resolveHeadingLines(copy.problemHeading, PROBLEM_HEADING_LINES);
+  const solutionLines = resolveHeadingLines(copy.solutionHeading, SOLUTION_HEADING_LINES);
+
   return (
     <div
       className={cn(
@@ -32,8 +59,12 @@ function CopyBlock({
         <p className="text-[18px] font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
           {copy.problemLabel}
         </p>
-        <h3 className="mt-5 text-[48px] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#f8fafc]">
-          {copy.problemHeading}
+        <h3 className="mt-5 max-w-[620px] text-[48px] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#f8fafc]">
+          {problemLines.map((line) => (
+            <span className="block" key={line}>
+              {line}
+            </span>
+          ))}
         </h3>
         <p className="mt-7 max-w-[600px] text-[24px] leading-[1.35] text-[rgba(226,232,240,0.78)]">
           {copy.problemBody}
@@ -43,8 +74,12 @@ function CopyBlock({
         <p className="text-[18px] font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
           {copy.solutionLabel}
         </p>
-        <h3 className="mt-5 bg-gradient-to-b from-[#57a9ff] to-[#1f7aff] bg-clip-text text-[48px] font-extrabold leading-[1.08] tracking-[-0.045em] text-transparent">
-          {copy.solutionHeading}
+        <h3 className="mt-5 max-w-[640px] bg-gradient-to-b from-[#57a9ff] to-[#1f7aff] bg-clip-text text-[46px] font-extrabold leading-[1.08] tracking-[-0.045em] text-transparent">
+          {solutionLines.map((line) => (
+            <span className="block" key={line}>
+              {line}
+            </span>
+          ))}
         </h3>
         <p className="mt-7 max-w-[600px] text-[24px] leading-[1.35] text-[rgba(226,232,240,0.78)]">
           {copy.solutionBody}
@@ -52,44 +87,52 @@ function CopyBlock({
       </div>
     </div>
   );
-}
+};
 
-/** Three alternating zig-zag problem/solution rows. */
-export function ZigZagSection() {
-  return (
-    <div
-      className="space-y-16 px-[34px] py-[185px] md:space-y-24"
-      style={{
-        background:
-          'radial-gradient(ellipse at 50% 0%, rgba(20, 64, 120, 0.20) 0%, rgba(5, 8, 13, 0.92) 34%, #020407 78%), #020407',
-      }}
-    >
-      {ZIGZAG_ROWS.map((row) => {
-        const Mock = MOCK_COMPONENTS[row.mock];
-        return (
-          <div className="mx-auto max-w-[1848px]" key={row.id}>
-            <div className="overflow-hidden">
-              <div
-                className={cn(
-                  'zigzag-row grid md:grid-cols-[47.5%_52.5%] gap-0',
-                  !row.uiOnRight && 'md:[&>*:first-child]:order-2',
-                )}
+/**
+ * Three alternating zig-zag problem/solution rows.
+ *
+ * @returns The rendered ZigZagSection element.
+ * @example
+ * ```tsx
+ * <ZigZagSection />
+ * ```
+ */
+
+export const ZigZagSection = () => (
+  <div
+    className="space-y-16 px-[34px] py-[185px] md:space-y-40"
+    style={{
+      background:
+        'radial-gradient(ellipse at 50% 0%, rgba(20, 64, 120, 0.20) 0%, rgba(5, 8, 13, 0.92) 34%, #020407 78%), #020407',
+    }}
+  >
+    {ZIGZAG_ROWS.map((row) => {
+      const Mock = MOCK_COMPONENTS[row.mock];
+      return (
+        <div className="mx-auto max-w-[1848px]" key={row.id}>
+          <div className="overflow-hidden">
+            <div
+              className={cn(
+                'zigzag-row grid gap-0 md:grid-cols-[47.5%_52.5%]',
+                `zigzag-row--${row.id}`,
+                !row.uiOnRight && 'md:[&>*:first-child]:order-2',
+              )}
+            >
+              <CopyBlock copy={row.copy} uiOnRight={row.uiOnRight} />
+              <motion.div
+                className="zigzag-visual-side relative z-[2] flex items-center justify-end"
+                initial={false}
+                transition={{ duration: 0.75 }}
+                viewport={{ once: true, amount: 0.2 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
               >
-                <CopyBlock copy={row.copy} uiOnRight={row.uiOnRight} />
-                <motion.div
-                  className="zigzag-visual-side relative z-[2] flex items-center justify-end"
-                  initial={{ opacity: 0, y: 32, scale: 0.98 }}
-                  transition={{ duration: 0.75 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                >
-                  <Mock />
-                </motion.div>
-              </div>
+                <Mock />
+              </motion.div>
             </div>
           </div>
-        );
-      })}
-    </div>
-  );
-}
+        </div>
+      );
+    })}
+  </div>
+);

@@ -7,22 +7,16 @@
 import { WebSocketServer } from 'ws';
 
 const PORT = 3006;
-const STEPS = [
-  'scaffold',
-  'landing',
-  'auth',
-  'dashboard',
-  'database',
-  'payment',
-  'deploy',
-];
+const STEPS = ['scaffold', 'landing', 'auth', 'dashboard', 'database', 'payment', 'deploy'];
 
 const wss = new WebSocketServer({ port: PORT });
 
-let running = false;
+const writeInfo = (message: string): void => {
+  process.stdout.write(`${message}\n`);
+};
 
 wss.on('connection', (ws) => {
-  console.log('[mock-daemon] client connected');
+  writeInfo('[mock-daemon] client connected');
 
   ws.send(
     JSON.stringify({
@@ -32,11 +26,8 @@ wss.on('connection', (ws) => {
     }),
   );
 
-  if (running) return;
-  running = true;
-
   let i = 0;
-  function tick() {
+  const tick = () => {
     if (i >= STEPS.length) {
       ws.send(
         JSON.stringify({
@@ -45,7 +36,7 @@ wss.on('connection', (ws) => {
           status: 'idle',
         }),
       );
-      console.log('[mock-daemon] all steps complete');
+      writeInfo('[mock-daemon] all steps complete');
       return;
     }
 
@@ -58,7 +49,7 @@ wss.on('connection', (ws) => {
         status: 'running',
       }),
     );
-    console.log(`[mock-daemon] step running: ${stepId}`);
+    writeInfo(`[mock-daemon] step running: ${stepId}`);
 
     setTimeout(() => {
       ws.send(
@@ -69,18 +60,17 @@ wss.on('connection', (ws) => {
           status: 'done',
         }),
       );
-      console.log(`[mock-daemon] step done: ${stepId}`);
+      writeInfo(`[mock-daemon] step done: ${stepId}`);
       i += 1;
       setTimeout(tick, 500);
     }, 800);
-  }
+  };
 
   tick();
 
   ws.on('close', () => {
-    console.log('[mock-daemon] client disconnected');
-    running = false;
+    writeInfo('[mock-daemon] client disconnected');
   });
 });
 
-console.log(`[mock-daemon] listening on ws://localhost:${PORT}`);
+writeInfo(`[mock-daemon] listening on ws://localhost:${PORT}`);

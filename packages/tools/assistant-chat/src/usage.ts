@@ -14,10 +14,19 @@ export const AssistantUsage = Schema.Struct({
   used: Schema.optional(Schema.Number),
   limit: Schema.optional(Schema.Number),
   plan: Schema.optional(Schema.String),
-  /** False whenever we could not observe real numbers — the UI shows "unavailable". */
+  /** False whenever we could not observe real numbers; the UI shows "unavailable". */
   available: Schema.Boolean,
 });
+
+/** Static type inferred from {@link AssistantUsage}. */
 export type AssistantUsage = Schema.Schema.Type<typeof AssistantUsage>;
+
+/** Observed usage fields scraped from a live assistant response. */
+export type AssistantUsageObservation = {
+  readonly used?: number;
+  readonly limit?: number;
+  readonly plan?: string;
+};
 
 /** Quota reset cadence by assistant (public knowledge; not a live number). */
 const USAGE_WINDOW: Record<VybeAssistant, '5h' | 'weekly' | undefined> = {
@@ -27,21 +36,30 @@ const USAGE_WINDOW: Record<VybeAssistant, '5h' | 'weekly' | undefined> = {
 };
 
 /**
- * Build the usage contract for an assistant. With no observed data this returns an
- * honestly-empty record (`available: false`); pass `observed` to fill real fields.
+ * Build the usage contract for an assistant.
+ *
+ * @param assistant - Assistant whose quota surface should be described.
+ * @param observed - Optional real usage data observed from CLI output or env.
+ * @returns A usage record that is marked unavailable until real numbers are observed.
+ * @example
+ * const usage = buildAssistantUsage('claude', { used: 2, limit: 10, plan: 'Pro' });
  */
-export function buildAssistantUsage(
+export const buildAssistantUsage = (
   assistant: VybeAssistant,
-  observed?: { used?: number; limit?: number; plan?: string },
-): AssistantUsage {
+  observed?: AssistantUsageObservation,
+): AssistantUsage => {
   const window = USAGE_WINDOW[assistant];
-  const hasNumbers = observed?.used !== undefined && observed?.limit !== undefined;
+  const used = observed?.used;
+  const limit = observed?.limit;
+  const plan = observed?.plan;
+  const hasNumbers = used !== undefined && limit !== undefined;
+
   return {
     assistant,
     ...(window ? { window } : {}),
-    ...(observed?.used === undefined ? {} : { used: observed.used }),
-    ...(observed?.limit === undefined ? {} : { limit: observed.limit }),
-    ...(observed?.plan ? { plan: observed.plan } : {}),
+    ...(used === undefined ? {} : { used }),
+    ...(limit === undefined ? {} : { limit }),
+    ...(plan ? { plan } : {}),
     available: Boolean(hasNumbers),
   };
-}
+};

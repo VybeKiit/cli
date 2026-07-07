@@ -13,6 +13,41 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
+    },
+    "./resolve": {
+      "types": "./dist/resolve.d.ts",
+      "import": "./dist/resolve.js",
+      "require": "./dist/resolve.cjs"
+    },
+    "./deployEffect": {
+      "types": "./dist/deployEffect.d.ts",
+      "import": "./dist/deployEffect.js",
+      "require": "./dist/deployEffect.cjs"
+    },
+    "./cloudflare/*": {
+      "types": "./dist/cloudflare/*.d.ts",
+      "import": "./dist/cloudflare/*.js",
+      "require": "./dist/cloudflare/*.cjs"
+    },
+    "./providers/*": {
+      "types": "./dist/providers/*/index.d.ts",
+      "import": "./dist/providers/*/index.js",
+      "require": "./dist/providers/*/index.cjs"
+    },
+    "./registrar": {
+      "types": "./dist/registrar/index.d.ts",
+      "import": "./dist/registrar/index.js",
+      "require": "./dist/registrar/index.cjs"
+    },
+    "./registrar/*": {
+      "types": "./dist/registrar/*.d.ts",
+      "import": "./dist/registrar/*.js",
+      "require": "./dist/registrar/*.cjs"
     }
   },
   "files": [
@@ -26,11 +61,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-amplify": "^3.1075.0",
-    "@vybekiit/core": "workspace:*"
+    "@vybekiit/core": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

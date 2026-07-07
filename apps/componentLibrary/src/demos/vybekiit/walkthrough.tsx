@@ -1,7 +1,7 @@
 'use client';
 
+import { Button } from '@vybekiit/ui/button';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import {
   useWalkthrough,
   Walkthrough,
@@ -35,8 +35,14 @@ const BOXES = [
   { key: 'results', label: 'Results grid' },
 ] as const;
 
-/** Interactive preview of the shared @vybekiit/walkthrough component — both presets, replayable. */
-export default function WalkthroughDemo() {
+/**
+ * Renders the shared walkthrough component preview.
+ *
+ * @returns The interactive walkthrough demo.
+ * @example
+ * <WalkthroughDemo />
+ */
+const WalkthroughDemo = () => {
   const [variant, setVariant] = useState<WalkthroughVariant>('spotlight');
   const state = useWalkthrough({
     storageKey: 'vybekiit-walkthrough-demo',
@@ -86,4 +92,6 @@ export default function WalkthroughDemo() {
       <Walkthrough state={state} steps={DEMO_STEPS} variant={variant} />
     </div>
   );
-}
+};
+
+export default WalkthroughDemo;

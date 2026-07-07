@@ -3,13 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { cn } from './utils';
 
-type AgentAvatarProps = {
-  src?: string;
-  name: string;
-  status?: 'online' | 'busy' | 'idle' | 'offline';
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-};
+interface AgentAvatarProps {
+  readonly src?: string;
+  readonly name: string;
+  readonly status?: 'online' | 'busy' | 'idle' | 'offline';
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly className?: string;
+}
 
 const STATUS_RING = {
   online: 'ring-emerald-500 shadow-[0_0_6px_#22c55e66]',
@@ -31,14 +31,16 @@ const SIZE_MAP = {
   lg: { ring: 'h-12 w-12', dot: 'h-3 w-3 -right-0.5 -bottom-0.5', text: 'text-sm' },
 };
 
-/** Agent avatar with animated status ring. Extends the base Avatar primitive. */
-export const AgentAvatar = ({
-  src,
-  name,
-  status = 'offline',
-  size = 'md',
-  className,
-}: AgentAvatarProps) => {
+/**
+ * Agent avatar with an animated status ring around the base avatar primitive.
+ *
+ * @param props - Avatar image, display name, status, size, and wrapper classes.
+ * @returns A status-aware avatar element.
+ * @example
+ * <AgentAvatar name="Support Agent" status="online" size="lg" />;
+ */
+export const AgentAvatar = (props: AgentAvatarProps) => {
+  const { src, name, status = 'offline', size = 'md', className = '' } = props;
   const s = SIZE_MAP[size];
   const initials = name
     .split(' ')

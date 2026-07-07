@@ -1,4 +1,4 @@
-import { waitForRedirectAfterSignIn } from '@vybekiit/browserAutomation/core/waitForRedirect';
+import { waitForRedirectAfterSignIn } from '@vybekiit/browser-automation/core/waitForRedirect';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('waitForRedirectAfterSignIn', () => {

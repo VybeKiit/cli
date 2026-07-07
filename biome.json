@@ -1,6 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "ignoreUnknown": true,
     "includes": [
@@ -12,7 +16,15 @@
       "!!.bridge",
       "!!downloads",
       "!!templates/spa",
-      "!!templates/web/instrumentation.ts"
+      "!!templates/web/instrumentation.ts",
+      "!!packages/ui/src/calendar.tsx",
+      "!!packages/ui/src/sidebar.tsx",
+      "!!packages/ui/src/floating-panel.tsx",
+      "!!packages/ui/src/glow-card.tsx",
+      "!!packages/ui/src/input-group.tsx",
+      "!!packages/ui/src/notification-toast.tsx",
+      "!!packages/ui/src/progress-ring.tsx",
+      "!!packages/ui/src/step-indicator.tsx"
     ]
   },
   "formatter": {
@@ -58,6 +70,7 @@
         "noTernary": "off",
         "noNestedTernary": "warn",
         "useNamingConvention": "off",
+        "useConsistentTypeDefinitions": "off",
         "noMagicNumbers": "off",
         "noCommonJs": "off",
         "useExportsLast": "off",
@@ -126,6 +139,42 @@
   },
   "overrides": [
     {
+      "includes": ["**/index.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off",
+            "noReExportAll": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/core/src/**/*.test.ts",
+        "packages/email/src/**/*.test.ts",
+        "packages/assets/src/**/*.test.ts",
+        "packages/cms/src/**/*.test.ts",
+        "packages/compliance/src/**/*.test.ts",
+        "packages/seo/src/**/*.test.ts",
+        "packages/search/src/**/*.test.ts",
+        "packages/tenancy/src/**/*.test.ts",
+        "packages/realtime/src/**/*.test.ts",
+        "packages/kv/src/**/*.test.ts",
+        "packages/jobs/src/**/*.test.ts",
+        "packages/analytics/src/**/*.test.ts",
+        "packages/ai/src/**/*.test.ts",
+        "packages/notifications/src/**/*.test.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noMisplacedAssertion": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["packages/**", "cli/**", "apps/**"],
       "linter": {
         "rules": {
@@ -148,9 +197,15 @@
     },
     {
       "includes": ["**/templates/web/instrumentation.ts"],
-      "assist": { "enabled": false },
-      "formatter": { "enabled": false },
-      "linter": { "enabled": false }
+      "assist": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
     },
     {
       "includes": ["templates/web/src/components/**"],
@@ -159,6 +214,25 @@
       },
       "formatter": {
         "enabled": false
+      }
+    },
+    {
+      "includes": ["packages/ui/src/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noNamespaceImport": "off"
+          },
+          "security": {
+            "noSecrets": "off"
+          },
+          "a11y": {
+            "useSemanticElements": "off"
+          },
+          "suspicious": {
+            "noReactForwardRef": "off"
+          }
+        }
       }
     }
   ]

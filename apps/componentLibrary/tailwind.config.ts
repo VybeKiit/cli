@@ -4,6 +4,7 @@ export default {
   content: [
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
+    '../../packages/ui/src/**/*.{ts,tsx}',
     '../../templates/web/src/components/**/*.{ts,tsx}',
   ],
   theme: {

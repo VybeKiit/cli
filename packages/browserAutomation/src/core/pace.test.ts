@@ -1,4 +1,4 @@
-import { resolvePaceMs } from '@vybekiit/browserAutomation/core/pace';
+import { resolvePaceMs } from '@vybekiit/browser-automation/core/pace';
 import { describe, expect, it } from 'vitest';
 
 describe('resolvePaceMs', () => {

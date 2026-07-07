@@ -32,9 +32,8 @@ const SONNER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function simpleIconSvg(icon, hex = icon.hex) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#${hex}" d="${icon.path}"/></svg>`;
-}
+const simpleIconSvg = (icon, hex = icon.hex) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#${hex}" d="${icon.path}"/></svg>`;
 
 /** slug → official source URL(s), tried in order */
 const SOURCES = {
@@ -124,7 +123,7 @@ const SIMPLE_ICON_FALLBACKS = {
   typescript: () => simpleIconSvg(siTypescript),
 };
 
-async function fetchBuffer(url) {
+const fetchBuffer = async (url) => {
   const response = await fetch(url, {
     headers: { 'User-Agent': 'VybeKiit-landing-brand-mark-fetch/1.0' },
   });
@@ -132,27 +131,41 @@ async function fetchBuffer(url) {
     throw new Error(`${response.status} ${url}`);
   }
   return Buffer.from(await response.arrayBuffer());
-}
+};
 
-async function writeWebp(slug, input) {
+const writeWebp = async (slug, input) => {
   const webp = await sharp(input, { density: 300 })
     .resize(SIZE, SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .webp({ quality: 92, effort: 6, alphaQuality: 100 })
     .toBuffer();
   await writeFile(path.join(outDir, `${slug}.webp`), webp);
-}
+};
 
-async function toWebp(slug, urls) {
+const logInfo = (message) => {
+  process.stdout.write(`${message}\n`);
+};
+
+const logWarn = (message) => {
+  process.stderr.write(`${message}\n`);
+};
+
+const logError = (message) => {
+  process.stderr.write(`${message}\n`);
+};
+
+const errorMessage = (error) => (error instanceof Error ? error.message : String(error));
+
+const toWebp = async (slug, urls) => {
   let lastError;
   for (const url of urls) {
     try {
       const input = await fetchBuffer(url);
       await writeWebp(slug, input);
-      console.log(`✓ ${slug}.webp ← ${url}`);
+      logInfo(`✓ ${slug}.webp ← ${url}`);
       return;
     } catch (error) {
       lastError = error;
-      console.warn(`  ${slug}: failed ${url} — ${error.message}`);
+      logWarn(`  ${slug}: failed ${url} — ${errorMessage(error)}`);
     }
   }
 
@@ -162,28 +175,29 @@ async function toWebp(slug, urls) {
     return;
   }
 
-  throw new Error(`All sources failed for ${slug}: ${lastError?.message}`);
-}
+  const detail = lastError === undefined ? 'no source attempted' : errorMessage(lastError);
+  throw new Error(`All sources failed for ${slug}: ${detail}`);
+};
 
-async function writeInlineSvg(slug, svg, label) {
+const writeInlineSvg = async (slug, svg, label) => {
   await writeWebp(slug, Buffer.from(svg));
-  console.log(`✓ ${slug}.webp ← ${label}`);
-}
+  logInfo(`✓ ${slug}.webp ← ${label}`);
+};
 
-async function writeOpenAiKnot() {
+const writeOpenAiKnot = async () => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="#FFFFFF" d="${OPENAI_KNOT_PATH}"/></svg>`;
   await writeInlineSvg('openai', svg, 'official OpenAI knot (white on transparent)');
-}
+};
 
-async function writeShadcnMark() {
+const writeShadcnMark = async () => {
   await writeInlineSvg('shadcn', SHADCN_SVG, 'shadcn/ui hex mark');
-}
+};
 
-async function writeSonnerMark() {
+const writeSonnerMark = async () => {
   await writeInlineSvg('sonner', SONNER_SVG, 'sonner toast mark');
-}
+};
 
-async function verifyTransparency(slug) {
+const verifyTransparency = async (slug) => {
   const file = path.join(outDir, `${slug}.webp`);
   const { data, info } = await sharp(file)
     .ensureAlpha()
@@ -200,9 +214,9 @@ async function verifyTransparency(slug) {
   const cornerAlpha = corners.map(([x, y]) => sample(x, y));
   const minCornerAlpha = Math.min(...cornerAlpha);
   if (minCornerAlpha > 32) {
-    console.warn(`  ⚠ ${slug}: corners not transparent (min alpha ${minCornerAlpha})`);
+    logWarn(`  ⚠ ${slug}: corners not transparent (min alpha ${minCornerAlpha})`);
   }
-}
+};
 
 await mkdir(outDir, { recursive: true });
 await writeOpenAiKnot();
@@ -211,20 +225,21 @@ await writeSonnerMark();
 
 const failures = [];
 for (const [slug, urls] of Object.entries(SOURCES)) {
-  if (urls.length === 0) continue;
-  try {
-    await toWebp(slug, urls);
-    await verifyTransparency(slug);
-  } catch (error) {
-    failures.push(slug);
-    console.error(`✗ ${slug}: ${error.message}`);
+  if (urls.length > 0) {
+    try {
+      await toWebp(slug, urls);
+      await verifyTransparency(slug);
+    } catch (error) {
+      failures.push(slug);
+      logError(`✗ ${slug}: ${errorMessage(error)}`);
+    }
+    await sleep(250);
   }
-  await sleep(250);
 }
 
 if (failures.length > 0) {
-  console.error(`\nFailed: ${failures.join(', ')}`);
+  logError(`\nFailed: ${failures.join(', ')}`);
   process.exit(1);
 }
 
-console.log('Done.');
+logInfo('Done.');

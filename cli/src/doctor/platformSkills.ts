@@ -9,22 +9,38 @@ import {
 } from '@vybekiit/agent-kit';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 
-export interface PlatformSkillsReport {
+export type PlatformSkillsReport = {
   readonly ok: boolean;
   readonly missing: readonly string[];
   readonly template: string | null;
   readonly lockCount: number;
-}
+};
 
-function readManifest(cwd: string): PlatformSkillsManifest | null {
+/**
+ * Read the platform skills manifest when present.
+ *
+ * @param cwd - Project directory.
+ * @returns Parsed manifest, or null when absent.
+ * @example
+ * const manifest = readManifest(process.cwd());
+ */
+const readManifest = (cwd: string): PlatformSkillsManifest | null => {
   const path = join(cwd, 'platform-skills.manifest.json');
   if (!existsSync(path)) {
     return null;
   }
   return JSON.parse(readFileSync(path, 'utf8')) as PlatformSkillsManifest;
-}
+};
 
-function readSkillsLock(cwd: string): SkillsLockFile | null {
+/**
+ * Read the pinned skills lock when present.
+ *
+ * @param cwd - Project directory.
+ * @returns Parsed skills lock, or null when absent/unreadable.
+ * @example
+ * const lock = readSkillsLock(process.cwd());
+ */
+const readSkillsLock = (cwd: string): SkillsLockFile | null => {
   const path = join(cwd, 'skills-lock.json');
   if (!existsSync(path)) {
     return null;
@@ -34,19 +50,32 @@ function readSkillsLock(cwd: string): SkillsLockFile | null {
   } catch {
     return null;
   }
-}
+};
 
-function skillFileExists(cwd: string, name: string): boolean {
-  return existsSync(join(cwd, '.agents', 'skills', name, 'SKILL.md'));
-}
+/**
+ * Check if one pinned skill exists on disk.
+ *
+ * @param cwd - Project directory.
+ * @param name - Skill name.
+ * @returns True when the skill has a `SKILL.md`.
+ * @example
+ * const exists = skillFileExists(process.cwd(), 'wrangler');
+ */
+const skillFileExists = (cwd: string, name: string): boolean =>
+  existsSync(join(cwd, '.agents', 'skills', name, 'SKILL.md'));
 
 /**
  * Verify pinned platform skills exist under `.agents/skills/<name>/SKILL.md`.
  * When skills-lock.json exists, every locked skill is verified (not just manifest explicit names).
+ *
+ * @param cwd - Project directory to inspect.
+ * @returns Platform skills verification report.
+ * @example
+ * const report = verifyPlatformSkills(process.cwd());
  */
-export function verifyPlatformSkills(cwd: string): PlatformSkillsReport {
+export const verifyPlatformSkills = (cwd: string): PlatformSkillsReport => {
   const manifest = readManifest(cwd);
-  if (!manifest) {
+  if (manifest === null) {
     return { ok: true, missing: [], template: null, lockCount: 0 };
   }
 
@@ -68,18 +97,25 @@ export function verifyPlatformSkills(cwd: string): PlatformSkillsReport {
     template: templateLabelForPlatformSkills(cwd),
     lockCount: lockNames.length,
   };
-}
+};
 
 /** Template label for platform-skills report — only when manifest exists. */
-function templateLabelForPlatformSkills(cwd: string): string | null {
+const templateLabelForPlatformSkills = (cwd: string): string | null => {
   if (!existsSync(join(cwd, 'platform-skills.manifest.json'))) {
     return null;
   }
   return inferProjectSurfaceSync(cwd).template;
-}
+};
 
-/** Plain-language lines for the doctor report. */
-export function formatPlatformSkillsReport(report: PlatformSkillsReport): string[] {
+/**
+ * Format platform skill verification as doctor report lines.
+ *
+ * @param report - Platform skills verification report.
+ * @returns Buyer-readable doctor lines.
+ * @example
+ * const lines = formatPlatformSkillsReport(report);
+ */
+export const formatPlatformSkillsReport = (report: PlatformSkillsReport): string[] => {
   if (report.template === null) {
     return [];
   }
@@ -88,24 +124,24 @@ export function formatPlatformSkillsReport(report: PlatformSkillsReport): string
   if (existsSync(lockPath)) {
     try {
       const lock = JSON.parse(readFileSync(lockPath, 'utf8')) as SkillsLockFile;
-      const count = Object.keys(lock.skills ?? {}).length;
-      lines.push(`✓ platform skills lock — ${count} pinned skill(s) in skills-lock.json.`);
+      const count = Object.keys(lock.skills).length;
+      lines.push(`✓ platform skills lock - ${count} pinned skill(s) in skills-lock.json.`);
     } catch {
-      lines.push('→ platform skills lock — skills-lock.json unreadable.');
+      lines.push('→ platform skills lock - skills-lock.json unreadable.');
     }
   } else {
-    lines.push('→ platform skills lock — skills-lock.json missing (run pin-platform-skills).');
+    lines.push('→ platform skills lock - skills-lock.json missing (run pin-platform-skills).');
   }
   if (report.ok) {
     const scope =
       report.lockCount > 0
         ? `all ${report.lockCount} locked skill(s)`
         : 'all explicit manifest skills';
-    lines.push(`✓ platform skills — ${scope} are present.`);
+    lines.push(`✓ platform skills - ${scope} are present.`);
     return lines;
   }
   lines.push(
-    `→ platform skills — missing: ${report.missing.join(', ')}. Ask your agent to refresh platform skills (update-kit) or run the pin script.`,
+    `→ platform skills - missing: ${report.missing.join(', ')}. Ask your agent to refresh platform skills (update-kit) or run the pin script.`,
   );
   return lines;
-}
+};

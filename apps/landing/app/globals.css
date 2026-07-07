@@ -247,10 +247,10 @@
 }
 
 .landing-page .blue-flare {
-  width: min(720px, 92vw);
-  height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.9), transparent);
-  filter: blur(8px);
+  width: min(760px, 92vw);
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 1), transparent);
+  filter: blur(7px);
   transform-origin: center;
 }
 
@@ -263,11 +263,11 @@
   top: 50%;
   left: 50%;
   width: min(900px, 110vw);
-  height: 200px;
+  height: 250px;
   transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(47, 128, 255, 0.35), transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(47, 128, 255, 0.5), transparent 70%);
   filter: blur(100px);
-  opacity: 0.18;
+  opacity: 0.22;
 }
 
 .landing-page .blue-glow-border {
@@ -339,13 +339,14 @@
 }
 
 .landing-page .hero-section {
-  padding-top: 190px;
+  margin-top: 500px;
+  padding-top: 210px;
   padding-bottom: 230px;
 }
 
 .landing-page .hero-title {
-  max-width: 1180px;
-  font-size: clamp(96px, 8.6vw, 150px);
+  max-width: 1345px;
+  font-size: clamp(108px, 9.75vw, 172px);
   font-weight: 900;
   letter-spacing: -0.055em;
   line-height: 0.92;
@@ -558,15 +559,10 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   justify-content: space-between;
   gap: 80px;
   min-height: 640px;
-  padding: 240px 72px 240px;
+  padding: 240px 0 240px;
   margin-top: 0;
   margin-bottom: 0;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(28, 52, 85, 0.18) 0%,
-    rgba(5, 9, 15, 0.68) 45%,
-    #020406 100%
-  );
+  background: transparent;
 }
 
 .landing-page .auto-scroll-row-showcase {
@@ -723,7 +719,7 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 
 .landing-page .zigzag-copy-side--left {
   clip-path: polygon(14.5% 0, 100% 0, 100% 100%, 0 100%);
-  padding: 66px 68px 64px 72px;
+  padding: 66px 68px 64px 170px;
   border-radius: 0 18px 18px 0;
 }
 
@@ -734,6 +730,105 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   background: linear-gradient(180deg, rgba(5, 8, 13, 0.78), rgba(5, 8, 13, 0.64));
   clip-path: polygon(14.5% 0, 100% 0, 100% 100%, 0 100%);
   margin-left: -120px;
+}
+
+.landing-page .zigzag-visual-side > * {
+  margin-top: -30px;
+}
+
+.landing-page .zigzag-row--payments {
+  grid-template-columns: 54.5% 55.5%;
+}
+
+.landing-page .zigzag-row--payments .zigzag-visual-side {
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-left: 0;
+  padding: 34px 22px 22px 52px;
+  clip-path: polygon(0 0, 100% 0, 84.5% 100%, 0 100%);
+  border-color: rgba(148, 163, 184, 0.32);
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg, rgba(5, 8, 13, 0.72), rgba(5, 8, 13, 0.58));
+}
+
+.landing-page .zigzag-row--payments .zigzag-copy-side--left {
+  margin-left: -164px;
+  padding-left: 250px;
+  clip-path: polygon(19.5% 0, 100% 0, 100% 100%, 0 100%);
+  border-color: rgba(148, 163, 184, 0.32);
+  background: linear-gradient(180deg, rgba(5, 8, 13, 0.94), rgba(5, 8, 13, 0.82));
+}
+
+.landing-page .zigzag-row--payments .zigzag-visual-side > * {
+  margin-top: 0;
+}
+
+.landing-page .payments-mock-panel {
+  min-height: 532px;
+  max-width: 712px;
+  border-radius: 12px;
+}
+
+.landing-page .payments-mock-panel__content {
+  padding-right: 40px;
+  padding-bottom: 40px;
+  padding-left: 40px;
+}
+
+.landing-page .zigzag-row--platforms {
+  grid-template-columns: 49% 58%;
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side {
+  align-self: start;
+  height: 568px;
+  margin-top: 20px;
+  padding-left: 104px;
+  gap: 30px;
+  border-color: rgba(148, 163, 184, 0.28);
+  background: linear-gradient(180deg, rgba(5, 8, 13, 0.94), rgba(5, 8, 13, 0.82));
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side h3 {
+  line-height: 1;
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side h3.mt-5 {
+  margin-top: 16px;
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side p.mt-7 {
+  margin-top: 22px;
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side div > p.mt-7 {
+  max-width: 560px;
+}
+
+.landing-page .zigzag-row--platforms .zigzag-copy-side > div {
+  transform: translateY(20px);
+}
+
+.landing-page .zigzag-row--platforms .zigzag-visual-side {
+  align-self: start;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 952px;
+  height: 568px;
+  margin-left: -135px;
+  margin-top: 20px;
+  padding: 31px 22px 28px 150px;
+  border-color: rgba(148, 163, 184, 0.28);
+  background: linear-gradient(180deg, rgba(5, 8, 13, 0.72), rgba(5, 8, 13, 0.58));
+}
+
+.landing-page .zigzag-row--platforms .zigzag-visual-side > * {
+  margin-top: 0;
+}
+
+.landing-page .three-device-showcase__mockups {
+  transform: scale(0.94);
+  transform-origin: center;
 }
 
 @media (min-width: 768px) {
@@ -760,11 +855,11 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 }
 
 .landing-page .pricing-panel {
-  width: calc(100% - 72px);
-  max-width: 1850px;
-  min-height: 818px;
+  width: calc(100% - 60px);
+  max-width: 1612px;
+  min-height: 720px;
   margin: 0 auto;
-  padding: 72px 76px 38px;
+  padding: 64px 68px 38px;
   border: 2px solid rgba(148, 163, 184, 0.28);
   border-radius: 32px;
   background:
@@ -783,10 +878,17 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
 }
 
 .landing-page .pricing-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.13em;
   font-size: clamp(96px, 10vw, 154px);
   font-weight: 850;
-  letter-spacing: -0.075em;
+  letter-spacing: 0;
   line-height: 0.82;
+}
+
+.landing-page .pricing-price-amount {
+  letter-spacing: -0.045em;
 }
 
 .landing-page .pricing-price number-flow-react {
@@ -909,7 +1011,7 @@ html[dir="rtl"] .landing-page .checkout-cta--proceed .checkout-cta-cart {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
 }
 
 .landing-page .pricing-offer-peek__word {
@@ -1450,16 +1552,57 @@ button.ghostty-terminal__winctl--close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 76px;
+  height: 144px;
   width: 100%;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 700;
   border-radius: 18px;
   color: white;
   background: linear-gradient(135deg, var(--blue-soft), var(--blue-strong));
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+.landing-page .pricing-panel-proof {
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  text-align: center;
+  color: rgba(236, 238, 243, 0.82);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.landing-page .pricing-panel-proof-stars {
+  display: flex;
+  justify-content: center;
+  gap: 11px;
+  margin-bottom: 10px;
+  color: #68a7ff;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.landing-page .pricing-panel-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-page .pricing-panel-logo-row li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 22px;
+  font-weight: 600;
+  white-space: nowrap;
+  filter: grayscale(1);
 }
 
 .landing-page .pricing-button:hover {
@@ -1709,9 +1852,9 @@ button.ghostty-terminal__winctl--close {
 .landing-page .tech-logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: #9aa6b5;
-  opacity: 0.55;
+  opacity: 0.68;
   transition:
     color 0.35s ease,
     opacity 0.35s ease;
@@ -1726,15 +1869,18 @@ button.ghostty-terminal__winctl--close {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 72px;
-  margin: 0;
-  padding: 0 72px 0 0;
+  justify-content: space-between;
+  gap: 44px;
+  width: calc(100% - 220px);
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0;
   list-style: none;
 }
 
 .landing-page .tech-logo-label {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 25px;
+  font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
 }

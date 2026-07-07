@@ -15,13 +15,23 @@ interface ReportHighlightColorMenuProps {
   readonly tutorialActive?: boolean;
 }
 
-/** Hover menu — click a preset or use the color picker to change the inspect highlight ring. */
-export function ReportHighlightColorMenu({
+/**
+ * Hover menu — click a preset or use the color picker to change the inspect highlight ring.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportHighlightColorMenu element.
+ * @example
+ * ```tsx
+ * <ReportHighlightColorMenu />
+ * ```
+ */
+
+export const ReportHighlightColorMenu = ({
   color,
   onChange,
   onReset,
   tutorialActive = false,
-}: ReportHighlightColorMenuProps) {
+}: ReportHighlightColorMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
@@ -118,4 +128,4 @@ export function ReportHighlightColorMenu({
       </ReportFlyoutPortal>
     </div>
   );
-}
+};

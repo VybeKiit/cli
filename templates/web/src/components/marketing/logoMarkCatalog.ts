@@ -1,4 +1,4 @@
-export type TrustLogoAsset = {
+export interface TrustLogoAsset {
   readonly slug: string;
   readonly label: string;
   readonly brandHex: string;
@@ -6,7 +6,7 @@ export type TrustLogoAsset = {
   readonly src: string;
   readonly kind: 'webp' | 'svg';
   readonly invertOnDark?: boolean;
-};
+}
 
 /** Curated trust logos — stack + company marks for logo-trust-grid. */
 export const TRUST_GRID_LOGOS: readonly TrustLogoAsset[] = [

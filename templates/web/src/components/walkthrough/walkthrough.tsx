@@ -15,7 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import './walkthrough.css';
 
-export type WalkthroughVariant = 'spotlight' | 'dialog';
+type WalkthroughVariant = 'spotlight' | 'dialog';
 
 interface WalkthroughProps {
   readonly steps: readonly WalkthroughStep[];
@@ -29,7 +29,7 @@ interface WalkthroughProps {
 const CONFETTI_COLORS = ['#60a5fa', '#3b82f6', '#fbbf24', '#f8fafc', '#34d399'];
 
 /** Full-viewport celebration — bursts from edges and center on completion. */
-async function fireCelebrationConfetti() {
+const fireCelebrationConfetti = async () => {
   try {
     const confetti = (await import('canvas-confetti')).default;
     confetti({
@@ -45,19 +45,24 @@ async function fireCelebrationConfetti() {
   } catch {
     // confetti is celebratory only
   }
-}
+};
 
 /**
  * Reusable first-run walkthrough. One engine (`useWalkthrough`) drives two presets: a spotlight
  * coach-mark (report-mode / assistant-chat) or a centered dialog (UI library). Generalized from
  * report-mode's ReportModeTutorial + the UI library's LibraryTutorial so every surface shares one.
+ *
+ * @param props - Walkthrough steps, state machine, visual variant, and celebration option.
+ * @returns A spotlight or dialog walkthrough while active, otherwise `null`.
+ * @example
+ * <Walkthrough steps={steps} state={walkthrough} variant="spotlight" />
  */
-export function Walkthrough({
+const Walkthrough = ({
   steps,
   state,
   variant = 'spotlight',
   celebrate = false,
-}: WalkthroughProps) {
+}: WalkthroughProps) => {
   const { active, stepIndex, next, back, skip, complete } = state;
   const step = steps[stepIndex];
   const isLast = stepIndex >= steps.length - 1;
@@ -101,7 +106,7 @@ export function Walkthrough({
       totalSteps={steps.length}
     />
   );
-}
+};
 
 interface SubViewProps {
   readonly step: WalkthroughStep;
@@ -114,36 +119,38 @@ interface SubViewProps {
 
 const SPOTLIGHT_PAD = 10;
 
-function findTarget(selector: string): Element | null {
+const findTarget = (selector: string): Element | null => {
   const nodes = document.querySelectorAll(selector);
   if (nodes.length <= 1) {
-    return nodes[0] ?? null;
+    return nodes.item(0);
   }
   let best: Element | null = null;
   let bestArea = 0;
   for (const node of nodes) {
     const rect = node.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) {
-      continue;
-    }
-    const area = rect.width * rect.height;
-    if (area > bestArea) {
-      bestArea = area;
-      best = node;
+    if (rect.width > 0 && rect.height > 0) {
+      const area = rect.width * rect.height;
+      if (area > bestArea) {
+        bestArea = area;
+        best = node;
+      }
     }
   }
-  return best ?? nodes[0] ?? null;
-}
+  if (best !== null) {
+    return best;
+  }
+  return nodes.item(0);
+};
 
 /** Spotlight-hole overlay that tracks the current step's target through resize/scroll. */
-function WalkthroughSpotlight({
+const WalkthroughSpotlight = ({
   step,
   stepIndex,
   totalSteps,
   isLast,
   onNext,
   onSkip,
-}: SubViewProps) {
+}: SubViewProps) => {
   const [spotlight, setSpotlight] = useState<DOMRect | null>(null);
 
   const measure = useCallback(() => {
@@ -152,7 +159,7 @@ function WalkthroughSpotlight({
       return;
     }
     const el = findTarget(step.target);
-    setSpotlight(el?.getBoundingClientRect() ?? null);
+    setSpotlight(el === null ? null : el.getBoundingClientRect());
   }, [step.target]);
 
   useEffect(() => {
@@ -167,18 +174,18 @@ function WalkthroughSpotlight({
       measure();
       frames += 1;
       if (frames < 120) {
-        frame = requestAnimationFrame(tick);
+        frame = globalThis.requestAnimationFrame(tick);
       }
     };
-    frame = requestAnimationFrame(tick);
+    frame = globalThis.requestAnimationFrame(tick);
 
-    window.addEventListener('resize', measure);
-    window.addEventListener('scroll', measure, true);
+    globalThis.addEventListener('resize', measure);
+    globalThis.addEventListener('scroll', measure, true);
     return () => {
       observer?.disconnect();
-      cancelAnimationFrame(frame);
-      window.removeEventListener('resize', measure);
-      window.removeEventListener('scroll', measure, true);
+      globalThis.cancelAnimationFrame(frame);
+      globalThis.removeEventListener('resize', measure);
+      globalThis.removeEventListener('scroll', measure, true);
     };
   }, [measure, step.target]);
 
@@ -221,10 +228,10 @@ function WalkthroughSpotlight({
       </div>
     </div>
   );
-}
+};
 
 /** Centered dialog card with a highlighted target + progress dots. */
-function WalkthroughDialog({
+const WalkthroughDialog = ({
   step,
   stepIndex,
   totalSteps,
@@ -232,11 +239,20 @@ function WalkthroughDialog({
   onNext,
   onSkip,
   onBack,
-}: SubViewProps & { readonly onBack: () => void }) {
+}: SubViewProps & { readonly onBack: () => void }) => {
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        onSkip();
+      }
+    },
+    [onSkip],
+  );
+
   useEffect(() => {
-    document.querySelectorAll('[data-walkthrough-highlight]').forEach((node) => {
+    for (const node of document.querySelectorAll('[data-walkthrough-highlight]')) {
       node.removeAttribute('data-walkthrough-highlight');
-    });
+    }
     if (!step.target) {
       return;
     }
@@ -252,7 +268,7 @@ function WalkthroughDialog({
   return (
     <>
       <div className="vybe-walkthrough-dialog-backdrop" />
-      <Dialog onOpenChange={(open) => (open ? undefined : onSkip())} open={true}>
+      <Dialog onOpenChange={handleOpenChange} open={true}>
         <DialogContent className="z-[70] max-w-md">
           <DialogHeader>
             <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
@@ -291,4 +307,7 @@ function WalkthroughDialog({
       </Dialog>
     </>
   );
-}
+};
+
+export type { WalkthroughVariant };
+export { Walkthrough };

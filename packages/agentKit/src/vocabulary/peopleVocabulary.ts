@@ -4,11 +4,11 @@
  * Rendered into each template's `language.md` via {@link renderPeopleVocabularyTable}.
  */
 
-export interface PeopleVocabularyEntry {
+export type PeopleVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 /** Rows where `say` is empty mean agent-internal or never-say aloud. */
 export const PEOPLE_VOCABULARY: readonly PeopleVocabularyEntry[] = [
@@ -39,12 +39,16 @@ export const PEOPLE_VOCABULARY: readonly PeopleVocabularyEntry[] = [
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link PEOPLE_VOCABULARY} as a markdown table for `language.md`. */
-export function renderPeopleVocabularyTable(): string {
+/**
+ * Render {@link PEOPLE_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render people vocabulary table text.
+ * @example
+ * const result = renderPeopleVocabularyTable();
+ */
+export const renderPeopleVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = PEOPLE_VOCABULARY.map((entry) => {
@@ -52,4 +56,4 @@ export function renderPeopleVocabularyTable(): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};

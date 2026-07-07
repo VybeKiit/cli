@@ -1,3 +1,4 @@
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: Driver mocks intentionally use tiny fake classes.
 import { resolveDataProvider, resolveStorageProvider } from '@vybekiit/db/resolve';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,6 +16,9 @@ vi.mock('@aws-sdk/lib-dynamodb', () => ({
   DynamoDBDocumentClient: { from: () => ({}) },
 }));
 vi.mock('@aws-sdk/client-s3', () => ({ S3Client: class {} }));
+vi.mock('@neondatabase/serverless', () => ({
+  neon: () => vi.fn(),
+}));
 vi.mock('firebase-admin/app', () => ({
   cert: () => ({}),
   getApps: () => [{}],
@@ -31,6 +35,19 @@ const supabaseEnv = {
   SUPABASE_ANON_KEY: 'anon',
 };
 
+const NEON_DATABASE_URL = 'postgresql://host/neondb';
+const RAILWAY_DATABASE_URL = 'postgresql://host/railway';
+
+// "DATABASE_URL is missing" -> match
+const DATABASE_URL_PATTERN = /DATABASE_URL/;
+
+// "MONGODB_URI is missing" -> match
+const MONGODB_URI_PATTERN = /MONGODB_URI/;
+
+// "AWS_REGION is missing" -> match
+const AWS_REGION_PATTERN = /AWS_REGION/;
+
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: Resolver cases stay together to show provider dispatch coverage.
 describe('resolveDataProvider', () => {
   it('falls back to the local adapter when nothing is configured', () => {
     expect(resolveDataProvider({}).name).toBe('local');
@@ -72,7 +89,7 @@ describe('resolveDataProvider', () => {
   it('constructs the neon adapter from DATABASE_URL', () => {
     const provider = resolveDataProvider({
       DATA_PROVIDER: 'neon',
-      DATABASE_URL: 'postgresql://user:pass@host/db',
+      DATABASE_URL: NEON_DATABASE_URL,
     });
     expect(provider.name).toBe('neon');
   });
@@ -80,13 +97,13 @@ describe('resolveDataProvider', () => {
   it('constructs the railway adapter from DATABASE_URL', () => {
     const provider = resolveDataProvider({
       DATA_PROVIDER: 'railway',
-      DATABASE_URL: 'postgresql://user:pass@host/railway',
+      DATABASE_URL: RAILWAY_DATABASE_URL,
     });
     expect(provider.name).toBe('railway');
   });
 
   it('fails loud when the railway adapter is selected without DATABASE_URL', () => {
-    expect(() => resolveDataProvider({ DATA_PROVIDER: 'railway' })).toThrow(/DATABASE_URL/);
+    expect(() => resolveDataProvider({ DATA_PROVIDER: 'railway' })).toThrow(DATABASE_URL_PATTERN);
   });
 
   it('constructs the firebase adapter from project id', () => {
@@ -100,13 +117,13 @@ describe('resolveDataProvider', () => {
 
   it('fails loud when the mongodb adapter is selected without its keys', () => {
     expect(() => resolveDataProvider({ ...supabaseEnv, DATA_PROVIDER: 'mongodb' })).toThrow(
-      /MONGODB_URI/,
+      MONGODB_URI_PATTERN,
     );
   });
 
   it('fails loud when the aws adapter is selected without its region', () => {
     expect(() => resolveDataProvider({ ...supabaseEnv, DATA_PROVIDER: 'aws' })).toThrow(
-      /AWS_REGION/,
+      AWS_REGION_PATTERN,
     );
   });
 });
@@ -127,7 +144,7 @@ describe('resolveStorageProvider', () => {
 
   it('fails loud when the s3 adapter is selected without its region', () => {
     expect(() => resolveStorageProvider({ ...supabaseEnv, STORAGE_PROVIDER: 's3' })).toThrow(
-      /AWS_REGION/,
+      AWS_REGION_PATTERN,
     );
   });
 

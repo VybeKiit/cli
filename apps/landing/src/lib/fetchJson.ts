@@ -1,53 +1,113 @@
-import { fail, ok, type Result } from '@vybekiit/core';
+import { Data, Effect, Either, Schema } from 'effect';
+
+type FetchJsonErrorCode = 'http_error' | 'network_error';
+
+export class FetchJsonError extends Data.TaggedError('FetchJsonError')<{
+  readonly code: FetchJsonErrorCode;
+  readonly message: string;
+}> {}
+
+const ErrorBodySchema = Schema.Struct({
+  error: Schema.optional(Schema.String),
+  message: Schema.optional(Schema.String),
+});
+
+type ErrorBody = Schema.Schema.Type<typeof ErrorBodySchema>;
 
 /**
- * The single place the store's client talks to its own API routes.
+ * Create a typed JSON request error.
  *
- * Mirrors `templates/web/src/lib/fetch-json.ts`: every call returns a {@link Result}
- * (never throws for expected failures) so UI branches on `ok` and translates
- * failures into plain language. Non-2xx responses become `http_error`; a thrown
- * `fetch` (offline, DNS) becomes `network_error`.
+ * @param code - Stable JSON request failure code.
+ * @param message - Human-readable failure message.
+ * @returns A tagged fetch JSON error.
+ * @example
+ * const error = fetchJsonError('http_error', 'Request failed.');
  */
-
-/** Shape we opportunistically read an error message from on a non-2xx body. */
-interface ErrorBody {
-  readonly error?: string;
-  readonly message?: string;
-}
+const fetchJsonError = (code: FetchJsonErrorCode, message: string): FetchJsonError =>
+  new FetchJsonError({ code, message });
 
 /**
- * Pull a human-readable message from a failed response, falling back to the
- * HTTP status line when the body has none (or isn't JSON).
+ * Check whether decoded JSON carries a usable error message.
+ *
+ * @param body - Decoded error response body.
+ * @returns First usable message from the body, or undefined.
+ * @example
+ * const message = messageFromBody({ error: 'Invalid' });
  */
-async function readErrorMessage(response: Response): Promise<string> {
+const messageFromBody = (body: ErrorBody): string | undefined => {
+  if (body.error !== undefined) {
+    return body.error;
+  }
+
+  return body.message;
+};
+
+/**
+ * Pull a human-readable message from a failed response.
+ *
+ * @param response - Failed fetch response.
+ * @returns Message from JSON body or the HTTP status.
+ * @example
+ * const message = await readErrorMessage(response);
+ */
+const readErrorMessage = async (response: Response): Promise<string> => {
   try {
-    const body: ErrorBody = await response.json();
-    return body.error ?? body.message ?? `Request failed (${response.status}).`;
+    const decoded = Schema.decodeUnknownEither(ErrorBodySchema)(await response.json());
+    if (Either.isRight(decoded)) {
+      const message = messageFromBody(decoded.right);
+      if (message !== undefined) {
+        return message;
+      }
+    }
   } catch {
     return `Request failed (${response.status}).`;
   }
-}
+
+  return `Request failed (${response.status}).`;
+};
+
+/**
+ * Convert an unknown fetch failure into a readable network message.
+ *
+ * @param error - Unknown value thrown by fetch.
+ * @returns Message for a network failure.
+ * @example
+ * const message = networkMessage(new Error('offline'));
+ */
+const networkMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : 'Network request failed.';
 
 /**
  * POST a JSON body to a URL and parse the JSON response as `T`.
  *
- * @typeParam T - the expected JSON shape on success.
- * @param body - serialized to JSON; typed `unknown` since callers vary per route.
+ * @typeParam T - Expected JSON shape on success.
+ * @param url - API URL to call.
+ * @param body - Body serialized as JSON.
+ * @returns Effect that succeeds with parsed JSON or fails with a typed request error.
+ * @example
+ * const checkout = postJson<CheckoutResponse>('/api/checkout', { email: 'you@example.com' });
  */
-export async function postJson<T>(url: string, body: unknown): Promise<Result<T>> {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-      return fail('http_error', await readErrorMessage(response));
-    }
-    // Single boundary cast: the network gives us `unknown` JSON; callers own `T`.
-    return ok((await response.json()) as T);
-  } catch (caught) {
-    const message = caught instanceof Error ? caught.message : 'Network request failed.';
-    return fail('network_error', message);
-  }
-}
+const postJson = <T>(url: string, body: unknown): Effect.Effect<T, FetchJsonError> =>
+  Effect.flatMap(
+    Effect.tryPromise({
+      try: () =>
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(body),
+        }),
+      catch: (error) => fetchJsonError('network_error', networkMessage(error)),
+    }),
+    (response) => {
+      if (!response.ok) {
+        return Effect.flatMap(
+          Effect.promise(() => readErrorMessage(response)),
+          (message) => Effect.fail(fetchJsonError('http_error', message)),
+        );
+      }
+
+      return Effect.promise(() => response.json() as Promise<T>);
+    },
+  );
+
+export { postJson };

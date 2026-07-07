@@ -1,5 +1,6 @@
 'use client';
 
+import type { ChangeEvent, KeyboardEvent } from 'react';
 import {
   ReportCancelIcon,
   ReportCopyIcon,
@@ -8,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-type ReportModeNotePanelProps = {
+interface ReportModeNotePanelProps {
   readonly note: string;
   readonly spotLabel: string;
   readonly submitting: boolean;
@@ -17,10 +18,17 @@ type ReportModeNotePanelProps = {
   readonly onSubmit: () => void;
   readonly onCancel: () => void;
   readonly onCopySpot: () => void;
-};
+}
 
-/** One-line builder note after clicking a broken spot. */
-export function ReportModeNotePanel({
+/**
+ * Render the one-line builder note after clicking a broken spot.
+ *
+ * @param props - Note state, callbacks, and selected spot label.
+ * @returns The report-mode note panel.
+ * @example
+ * <ReportModeNotePanel note="" spotLabel="Save" submitting={false} onNoteChange={setNote} onSubmit={submit} onCancel={cancel} onCopySpot={copy} />
+ */
+export const ReportModeNotePanel = ({
   note,
   spotLabel,
   submitting,
@@ -29,7 +37,17 @@ export function ReportModeNotePanel({
   onSubmit,
   onCancel,
   onCopySpot,
-}: ReportModeNotePanelProps) {
+}: ReportModeNotePanelProps) => {
+  const handleNoteChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    onNoteChange(event.target.value);
+  };
+
+  const handleNoteKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === 'Enter') {
+      onSubmit();
+    }
+  };
+
   return (
     <div
       className="report-mode-note-panel rounded-lg border border-white/15 bg-[#0d1117] p-4 shadow-lg"
@@ -68,12 +86,8 @@ export function ReportModeNotePanel({
           autoFocus={true}
           className="border-white/15 bg-white/5 text-white placeholder:text-white/40"
           data-testid="report-mode-note-input"
-          onChange={(event) => onNoteChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              onSubmit();
-            }
-          }}
+          onChange={handleNoteChange}
+          onKeyDown={handleNoteKeyDown}
           placeholder="e.g. typewriter too fast on testimonials"
           value={note}
         />
@@ -103,4 +117,4 @@ export function ReportModeNotePanel({
       </div>
     </div>
   );
-}
+};

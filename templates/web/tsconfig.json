@@ -33,6 +33,13 @@
     "src/components/gluestack",
     "src/components/blocks",
     "src/components/ai-elements",
-    "src/components/kibo"
+    "src/components/kibo",
+    "src/components/blocks-so",
+    "src/components/coss",
+    "src/components/cult",
+    "src/components/evilcharts",
+    "src/components/prompt-kit",
+    "src/components/supabase",
+    "src/components/tailark"
   ]
 }

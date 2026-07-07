@@ -29,26 +29,39 @@ const DESTRUCTIVE_NAME_PATTERN = CWS_DESTRUCTIVE_VERB_PATTERN;
  * @param locator The Playwright locator for the element to click.
  * @param verb The verb name making the call (used in the error message so
  *   debugging tells you which verb misresolved).
+ * @returns A promise that resolves after the guarded click.
  * @throws {DestructiveClickRefusedError} when the accessible name matches
  *   {@link DESTRUCTIVE_NAME_PATTERN}.
+ * @example
+ * await safeClick(page.getByRole('button', { name: 'Save draft' }), 'update-listing');
  */
-export async function safeClick(locator: Locator, verb: string): Promise<void> {
+export const safeClick = async (locator: Locator, verb: string): Promise<void> => {
   const accessibleName = await readAccessibleName(locator);
   if (DESTRUCTIVE_NAME_PATTERN.test(accessibleName)) {
     throw new DestructiveClickRefusedError(accessibleName, verb);
   }
   await locator.click();
-}
+};
 
 /**
  * Read the accessible name of an element. Tries `aria-label`, then the
  * trimmed text content, then an empty string. Empty strings never match the
  * destructive pattern, which is the right default — we'd rather not block a
  * click on an unlabelled element than block every click.
+ *
+ * @param locator - Locator whose accessible name should be inspected.
+ * @returns The best available accessible name, or an empty string.
+ * @example
+ * const name = await readAccessibleName(button);
  */
-async function readAccessibleName(locator: Locator): Promise<string> {
+const readAccessibleName = async (locator: Locator): Promise<string> => {
   const ariaLabel = await locator.getAttribute('aria-label').catch(() => null);
-  if (ariaLabel && ariaLabel.trim().length > 0) return ariaLabel.trim();
+  if (ariaLabel !== null && ariaLabel.trim().length > 0) {
+    return ariaLabel.trim();
+  }
   const text = await locator.textContent().catch(() => null);
-  return text?.trim() ?? '';
-}
+  if (text === null) {
+    return '';
+  }
+  return text.trim();
+};

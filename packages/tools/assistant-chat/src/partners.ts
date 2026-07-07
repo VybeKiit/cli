@@ -1,21 +1,25 @@
 /**
- * Platform partner / referral programs — the infra a VybeKiit buyer deploys ON
+ * Platform partner / referral programs - the infra a VybeKiit buyer deploys ON
  * (Supabase, Vercel, Railway, Stripe, GoDaddy). This is a DIFFERENT slot from the
  * agent-upgrade links in `./affiliate` (Cursor/Claude/Codex): those upgrade the tool
  * the vibe coder chats with; these are the vendor programs the product itself rides on.
  *
  * SSOT for the referral codes/links so the deploy skills and marketing surfaces embed
  * one canonical value. `status: 'pending-application'` means we have not been accepted
- * yet, so there is no live referral link to embed — never fabricate one.
+ * yet, so there is no live referral link to embed - never fabricate one.
  */
 
+/** Partner program ids used by marketing and deploy guidance surfaces. */
 export type PartnerId = 'railway' | 'vercel' | 'supabase' | 'stripe' | 'godaddy';
 
+/** Commercial relationship type for a partner program. */
 export type PartnerKind = 'referral' | 'affiliate' | 'partner';
 
+/** Whether a partner program has a live shareable code yet. */
 export type PartnerStatus = 'active' | 'pending-application';
 
-export interface PartnerProgram {
+/** One commercial partner program that VybeKiit can reference. */
+export type PartnerProgram = {
   readonly id: PartnerId;
   readonly name: string;
   /** referral = share-a-code cash; affiliate = commission; partner = listing/co-marketing. */
@@ -29,11 +33,11 @@ export interface PartnerProgram {
   readonly perk?: string;
   /** Where we apply / manage the program. */
   readonly programUrl?: string;
-}
+};
 
 /**
  * The programs, keyed by id. Only Railway is live today (a personal referral code);
- * the rest are applications we submit — kept here so the moment one is accepted we
+ * the rest are applications we submit - kept here so the moment one is accepted we
  * fill `code` + flip `status` in one place and every surface picks it up.
  */
 export const PARTNER_PROGRAMS: Record<PartnerId, PartnerProgram> = {
@@ -81,27 +85,38 @@ export const PARTNER_PROGRAMS: Record<PartnerId, PartnerProgram> = {
   },
 };
 
+const partnerReferralUrlResolvers: Partial<Record<PartnerId, (code: string) => string>> = {
+  railway: (code: string): string => {
+    const url = new URL('https://railway.com');
+    url.searchParams.set('referralCode', code);
+    return url.toString();
+  },
+};
+
 /**
  * The live referral URL for a partner, or `null` when the program is still pending
  * (no code to embed yet). Railway is the only live one today.
+ *
+ * @param id - Partner program id to resolve.
+ * @returns A live referral URL, or null when the program has no active code.
+ * @example
+ * const url = resolvePartnerReferralUrl('railway');
  */
-export function resolvePartnerReferralUrl(id: PartnerId): string | null {
+export const resolvePartnerReferralUrl = (id: PartnerId): string | null => {
   const program = PARTNER_PROGRAMS[id];
   if (program.status !== 'active' || !program.code) {
     return null;
   }
-  switch (id) {
-    case 'railway': {
-      const url = new URL('https://railway.com');
-      url.searchParams.set('referralCode', program.code);
-      return url.toString();
-    }
-    default:
-      return null;
-  }
-}
+  const resolveUrl = partnerReferralUrlResolvers[id];
+  return resolveUrl === undefined ? null : resolveUrl(program.code);
+};
 
-/** Programs that are live (have a code we can share right now). */
-export function activePartnerPrograms(): readonly PartnerProgram[] {
-  return Object.values(PARTNER_PROGRAMS).filter((p) => p.status === 'active');
-}
+/**
+ * List the partner programs that currently have shareable codes.
+ *
+ * @returns Active partner programs in their display order.
+ * @example
+ * const programs = activePartnerPrograms();
+ */
+export const activePartnerPrograms = (): readonly PartnerProgram[] =>
+  Object.values(PARTNER_PROGRAMS).filter((p) => p.status === 'active');

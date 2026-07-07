@@ -1,14 +1,14 @@
-import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
-import DemographicCard from "../../components/ecommerce/DemographicCard";
-import PageMeta from "../../components/common/PageMeta";
-import { AnimatedGradientText } from "@/components/modern-ui/animated-gradient-text";
-import { useI18n } from "@/lib/i18n";
+import EcommerceMetrics from '../../components/ecommerce/EcommerceMetrics';
+import MonthlySalesChart from '../../components/ecommerce/MonthlySalesChart';
+import StatisticsChart from '../../components/ecommerce/StatisticsChart';
+import MonthlyTarget from '../../components/ecommerce/MonthlyTarget';
+import RecentOrders from '../../components/ecommerce/RecentOrders';
+import DemographicCard from '../../components/ecommerce/DemographicCard';
+import PageMeta from '../../components/common/PageMeta';
+import { AnimatedGradientText } from '@/components/modern-ui/animated-gradient-text';
+import { useI18n } from '@/lib/i18n';
 
-export default function Home() {
+const Home = () => {
   const { t } = useI18n();
   return (
     <>
@@ -46,4 +46,6 @@ export default function Home() {
       </div>
     </>
   );
-}
+};
+
+export default Home;

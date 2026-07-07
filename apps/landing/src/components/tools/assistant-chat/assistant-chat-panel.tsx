@@ -73,7 +73,7 @@ const PANEL_WIDTH = 380;
 const PANEL_HEIGHT = 560;
 const TUTORIAL_STORAGE_KEY = 'vybe-assistant-chat-tutorial';
 
-function toPromptInputStatus(status: ChatStatus): AiChatStatus {
+const toPromptInputStatus = (status: ChatStatus): AiChatStatus => {
   switch (status) {
     case 'starting':
       return 'submitted';
@@ -84,10 +84,10 @@ function toPromptInputStatus(status: ChatStatus): AiChatStatus {
     default:
       return 'ready';
   }
-}
+};
 
 /** Human-readable byte size, e.g. 2048 → "2 KB". */
-function formatBytes(bytes: number): string {
+const formatBytes = (bytes: number): string => {
   if (bytes < 1024) {
     return `${bytes} B`;
   }
@@ -99,11 +99,24 @@ function formatBytes(bytes: number): string {
     unit += 1;
   }
   return `${value.toFixed(value >= 10 || Number.isInteger(value) ? 0 : 1)} ${units[unit]}`;
-}
+};
+
+/**
+ * Read the payload after the first comma in a data URL.
+ *
+ * @param dataUrl - Data URL to inspect.
+ * @returns Base64 payload or an empty string when no payload exists.
+ * @example
+ * const payload = dataUrlPayload('data:text/plain;base64,SGk=');
+ */
+const dataUrlPayload = (dataUrl: string): string => {
+  const payload = dataUrl.split(',')[1];
+  return payload === undefined ? '' : payload;
+};
 
 /** Approximate the decoded byte size of a `data:<mime>;base64,<data>` URL from its base64 length. */
-function dataUrlByteSize(dataUrl: string): number {
-  const base64 = dataUrl.split(',')[1] ?? '';
+const dataUrlByteSize = (dataUrl: string): number => {
+  const base64 = dataUrlPayload(dataUrl);
   let padding = 0;
   if (base64.endsWith('==')) {
     padding = 2;
@@ -111,36 +124,34 @@ function dataUrlByteSize(dataUrl: string): number {
     padding = 1;
   }
   return Math.max(0, Math.floor((base64.length * 3) / 4) - padding);
-}
+};
 
 /** Convert an AI Elements FileUIPart (data URL) into the hook's outgoing attachment shape. */
-function toOutgoingAttachment(
+const toOutgoingAttachment = (
   file: PromptInputMessage['files'][number],
-): OutgoingAttachment | null {
-  const url = file.url ?? '';
-  const dataBase64 = url.startsWith('data:') ? (url.split(',')[1] ?? '') : '';
+): OutgoingAttachment | null => {
+  const url = file.url === undefined ? '' : file.url;
+  const dataBase64 = url.startsWith('data:') ? dataUrlPayload(url) : '';
   if (!dataBase64) {
     return null;
   }
   return {
-    filename: file.filename ?? 'attachment',
-    mediaType: file.mediaType ?? 'application/octet-stream',
+    filename: file.filename === undefined ? 'attachment' : file.filename,
+    mediaType: file.mediaType === undefined ? 'application/octet-stream' : file.mediaType,
     url,
     size: dataUrlByteSize(url),
     dataBase64,
   };
-}
+};
 
 /** Three-dot bubble shown while the assistant is thinking but hasn't streamed a token yet. */
-function TypingDots() {
-  return (
-    <span aria-label="Assistant is typing" className="flex items-center gap-1 py-1" role="status">
-      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
-      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
-      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground" />
-    </span>
-  );
-}
+const TypingDots = () => (
+  <span aria-label="Assistant is typing" className="flex items-center gap-1 py-1" role="status">
+    <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+    <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+    <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground" />
+  </span>
+);
 
 interface AssistantChatPanelProps {
   readonly defaultAssistant: VybeAssistant;
@@ -149,7 +160,13 @@ interface AssistantChatPanelProps {
   readonly onClose: () => void;
 }
 
-function PanelThemeToggle() {
+type AssistantModel = Readonly<{
+  readonly id: string;
+  readonly label?: string | undefined;
+  readonly default?: boolean | undefined;
+}>;
+
+const PanelThemeToggle = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   return (
@@ -163,14 +180,14 @@ function PanelThemeToggle() {
       {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
     </Button>
   );
-}
+};
 
 /** Inline thumbnail (images) or labeled chip (other files) with a human-readable size. */
-function AttachmentPreview({
+const AttachmentPreview = ({
   attachment,
 }: {
   readonly attachment: { filename: string; mediaType: string; url: string; size: number };
-}) {
+}) => {
   const isImage = attachment.mediaType.startsWith('image/');
   return (
     <div className="flex items-center gap-2 rounded-md border border-border bg-muted/40 p-1.5">
@@ -183,7 +200,7 @@ function AttachmentPreview({
         />
       ) : (
         <span className="flex size-10 shrink-0 items-center justify-center rounded bg-background font-mono text-[10px] text-muted-foreground uppercase">
-          {(attachment.filename.split('.').pop() ?? 'file').slice(0, 4)}
+          {attachmentExtension(attachment.filename).slice(0, 4)}
         </span>
       )}
       <span className="min-w-0 flex-1 text-[11px] leading-tight">
@@ -192,14 +209,56 @@ function AttachmentPreview({
       </span>
     </div>
   );
-}
+};
 
-function AssistantChatPanelBody({
+/**
+ * Read a display extension from an attachment filename.
+ *
+ * @param filename - Uploaded filename.
+ * @returns Extension or a generic file label.
+ * @example
+ * const extension = attachmentExtension('report.pdf');
+ */
+const attachmentExtension = (filename: string): string => {
+  const extension = filename.split('.').pop();
+  return extension === undefined || extension.length === 0 ? 'file' : extension;
+};
+
+/**
+ * Pick the default model or first model.
+ *
+ * @param models - Models available for the selected assistant.
+ * @returns Preferred model when any model exists.
+ * @example
+ * const model = preferredModel(models);
+ */
+const preferredModel = (models: readonly AssistantModel[]): AssistantModel | undefined => {
+  const defaultModel = models.find((model) => model.default);
+  return defaultModel === undefined ? models[0] : defaultModel;
+};
+
+/**
+ * Format a model label for picker controls.
+ *
+ * @param model - Optional selected model.
+ * @returns Display label for the model picker.
+ * @example
+ * const label = modelLabel(selectedModel);
+ */
+const modelLabel = (model: AssistantModel | undefined): string => {
+  if (model === undefined) {
+    return 'Model';
+  }
+
+  return model.label === undefined ? model.id : model.label;
+};
+
+const AssistantChatPanelBody = ({
   defaultAssistant,
   bridgeUrl,
   referralCode,
   onClose,
-}: AssistantChatPanelProps) {
+}: AssistantChatPanelProps) => {
   const { assistant, setAssistant } = useAssistantChoice(defaultAssistant);
   const context = usePageContext();
   const { messages, status, error, send } = useAssistantChat({ bridgeUrl, sessionId: SESSION_ID });
@@ -214,26 +273,28 @@ function AssistantChatPanelBody({
 
   const capability = capabilities?.assistants.find((entry) => entry.id === assistant);
   const isCursor = assistant === 'cursor';
-  const modelPickerEnabled = capability?.modelPicker ?? false;
+  const modelPickerEnabled = capability?.modelPicker === true;
   const isBusy = status === 'streaming' || status === 'starting';
 
-  const models = modelsData?.models ?? [];
+  const models: readonly AssistantModel[] =
+    modelsData === undefined || modelsData === null ? [] : modelsData.models;
   const selectedModel = useMemo(() => {
     if (!modelId) {
-      return models.find((model) => model.default) ?? models[0];
+      return preferredModel(models);
     }
-    return models.find((model) => model.id === modelId) ?? models[0];
+    const matched = models.find((model) => model.id === modelId);
+    return matched === undefined ? models[0] : matched;
   }, [modelId, models]);
 
   useEffect(() => {
-    const preferred = models.find((model) => model.default) ?? models[0];
+    const preferred = preferredModel(models);
     setModelId(preferred?.id);
   }, [models]);
 
   const usage = buildAssistantUsage(assistant);
   const upgradeUrl = resolveUpgradeUrl(assistant, referralCode);
 
-  function onSubmit(message: PromptInputMessage, event: FormEvent<HTMLFormElement>) {
+  const onSubmit = (message: PromptInputMessage, event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const text = message.text.trim();
     const attachments = message.files
@@ -255,7 +316,7 @@ function AssistantChatPanelBody({
       },
       attachments,
     );
-  }
+  };
 
   let submitLabel: ReactNode;
   if (isCursor) {
@@ -363,7 +424,7 @@ function AssistantChatPanelBody({
           <ModelSelector>
             <ModelSelectorTrigger asChild={true}>
               <Button disabled={modelsLoading} size="sm" type="button" variant="outline">
-                {selectedModel?.label ?? selectedModel?.id ?? 'Model'}
+                {modelLabel(selectedModel)}
               </Button>
             </ModelSelectorTrigger>
             <ModelSelectorContent title="Pick a model">
@@ -379,7 +440,7 @@ function AssistantChatPanelBody({
                     >
                       <span className="flex items-center gap-2">
                         <BuilderAssistantMark assistant={assistant} className="size-4" />
-                        {model.label ?? model.id}
+                        {modelLabel(model)}
                       </span>
                     </ModelSelectorItem>
                   ))}
@@ -498,13 +559,11 @@ function AssistantChatPanelBody({
       <Walkthrough state={walkthrough} steps={ASSISTANT_TUTORIAL_STEPS} variant="spotlight" />
     </aside>
   );
-}
+};
 
 /** Dev-only draggable sidebar with AI Elements UI and live provider sync. */
-export function AssistantChatPanel(props: AssistantChatPanelProps) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <AssistantChatPanelBody {...props} />
-    </ThemeProvider>
-  );
-}
+export const AssistantChatPanel = (props: AssistantChatPanelProps) => (
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+    <AssistantChatPanelBody {...props} />
+  </ThemeProvider>
+);

@@ -5,6 +5,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Separator component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Separator component.
+ * @example
+ * <Separator />;
+ */
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>

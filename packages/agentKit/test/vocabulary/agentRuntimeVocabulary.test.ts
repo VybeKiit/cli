@@ -1,9 +1,10 @@
 import {
   AGENT_RUNTIME_VOCABULARY,
   renderAgentRuntimeVocabularyTable,
-} from '@vybekiit/agentKit/vocabulary/agentRuntimeVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/agentRuntimeVocabulary';
 import { describe, expect, it } from 'vitest';
 
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('renderAgentRuntimeVocabularyTable', () => {
   const lines = renderAgentRuntimeVocabularyTable().split('\n');
 

@@ -16,13 +16,13 @@ describe('resolveProfilePath', () => {
     vi.unstubAllEnvs();
   });
 
-  async function loadProfileResolve() {
+  const loadProfileResolve = async () => {
     vi.doMock('node:os', async () => {
       const actual = await vi.importActual<typeof import('node:os')>('node:os');
       return { ...actual, homedir: () => tempHome };
     });
     return import('../../src/core/profileResolve');
-  }
+  };
 
   it('uses explicit --profile path', async () => {
     const { resolveProfilePath } = await loadProfileResolve();

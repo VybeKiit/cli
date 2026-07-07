@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@vybekiit/ui/button';
 import {
   Glimpse,
   GlimpseContent,
@@ -7,7 +8,6 @@ import {
   GlimpseTitle,
   GlimpseTrigger,
 } from '@/components/kibo/glimpse';
-import { Button } from '@/components/ui/button';
 
 export default function GlimpsePreview() {
   return (

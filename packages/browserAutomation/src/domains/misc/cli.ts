@@ -1,13 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { printError, printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
 import {
   GITHUB_USER_URL,
   RESEND_DOMAINS_URL,
   SENTRY_API_URL,
-} from '@vybekiit/browserAutomation/core/constants';
-import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+} from '@vybekiit/browser-automation/core/constants';
+import { ensureCli } from '@vybekiit/browser-automation/core/ensureCli';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
 
 /**
  * Miscellaneous providers that don't fit infra/dbs/ai:
@@ -19,14 +19,14 @@ import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
  */
 
 /** Read the GitHub token from the gh CLI store (empty when not signed in). */
-function readGithubTokenFromCli(): string | null {
+const readGithubTokenFromCli = (): string | null => {
   const result = spawnSync('gh', ['auth', 'token'], { encoding: 'utf8' });
   if (result.status !== 0) return null;
-  const token = (result.stdout ?? '').trim();
+  const token = typeof result.stdout === 'string' ? result.stdout.trim() : '';
   return token.length > 0 ? token : null;
-}
+};
 
-async function verifyGithub(token: string): Promise<boolean> {
+const verifyGithub = async (token: string): Promise<boolean> => {
   try {
     const res = await fetch(GITHUB_USER_URL, {
       headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'vybekiit' },
@@ -35,9 +35,17 @@ async function verifyGithub(token: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
-export function registerGithubDomain(registry: CommandRegistry): void {
+/**
+ * Register Github Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerGithubDomain(registry);
+ */
+export const registerGithubDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'misc/github',
     aliases: ['github'],
@@ -49,14 +57,14 @@ export function registerGithubDomain(registry: CommandRegistry): void {
           if (!cli.installed) {
             const message = 'gh CLI could not be installed.';
             if (flags.json) printJson({ ok: false, tool: 'gh', error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
           const token = readGithubTokenFromCli();
           if (!token) {
             const message = 'Not signed in to GitHub. Run `gh auth login`, then re-run.';
             if (flags.json) printJson({ ok: false, loginHint: 'gh auth login', error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
           const verified = await verifyGithub(token);
@@ -64,26 +72,26 @@ export function registerGithubDomain(registry: CommandRegistry): void {
           if (flags.json) {
             printJson({ ok: verified, keysWritten: written.keysWritten, verified });
           } else {
-            console.log('OK: GitHub setup complete.');
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(verified ? '✓ Token verified via GitHub API.' : '⚠ Verification failed.');
+            printLine('OK: GitHub setup complete.');
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(verified ? '✓ Token verified via GitHub API.' : '⚠ Verification failed.');
           }
           return verified ? 0 : 1;
         },
       },
     },
   });
-}
+};
 
-interface PasteProviderSpec {
+type PasteProviderSpec = {
   domain: string;
   aliases: string[];
   label: string;
   envKey: string;
   verify: (apiKey: string) => Promise<boolean>;
-}
+};
 
-async function verifyResend(apiKey: string): Promise<boolean> {
+const verifyResend = async (apiKey: string): Promise<boolean> => {
   try {
     // Resend has no read-only whoami; listing domains is the lightest authorized call.
     const res = await fetch(RESEND_DOMAINS_URL, {
@@ -93,9 +101,9 @@ async function verifyResend(apiKey: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
-async function verifySentry(apiKey: string): Promise<boolean> {
+const verifySentry = async (apiKey: string): Promise<boolean> => {
   try {
     const res = await fetch(SENTRY_API_URL, {
       headers: { Authorization: `Bearer ${apiKey}` },
@@ -104,9 +112,9 @@ async function verifySentry(apiKey: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
-function registerPasteProvider(registry: CommandRegistry, spec: PasteProviderSpec): void {
+const registerPasteProvider = (registry: CommandRegistry, spec: PasteProviderSpec): void => {
   registry.register({
     name: spec.domain,
     aliases: spec.aliases,
@@ -121,7 +129,7 @@ function registerPasteProvider(registry: CommandRegistry, spec: PasteProviderSpe
           if (!apiKey) {
             const message = `${spec.label} has no CLI to mint a key. Create one in the console and pass --api-key=<key>.`;
             if (flags.json) printJson({ ok: false, error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
           const verified = await spec.verify(apiKey);
@@ -129,9 +137,9 @@ function registerPasteProvider(registry: CommandRegistry, spec: PasteProviderSpe
           if (flags.json) {
             printJson({ ok: verified, keysWritten: written.keysWritten, verified });
           } else {
-            console.log(`OK: ${spec.label} setup complete.`);
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(
+            printLine(`OK: ${spec.label} setup complete.`);
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(
               verified
                 ? `✓ Key verified against the ${spec.label} API.`
                 : '⚠ Key written but live verification failed.',
@@ -142,9 +150,17 @@ function registerPasteProvider(registry: CommandRegistry, spec: PasteProviderSpe
       },
     },
   });
-}
+};
 
-export function registerResendDomain(registry: CommandRegistry): void {
+/**
+ * Register Resend Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerResendDomain(registry);
+ */
+export const registerResendDomain = (registry: CommandRegistry): void => {
   registerPasteProvider(registry, {
     domain: 'misc/resend',
     aliases: ['resend'],
@@ -152,9 +168,17 @@ export function registerResendDomain(registry: CommandRegistry): void {
     envKey: 'RESEND_API_KEY',
     verify: verifyResend,
   });
-}
+};
 
-export function registerSentryDomain(registry: CommandRegistry): void {
+/**
+ * Register Sentry Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerSentryDomain(registry);
+ */
+export const registerSentryDomain = (registry: CommandRegistry): void => {
   registerPasteProvider(registry, {
     domain: 'misc/sentry',
     aliases: ['sentry'],
@@ -162,4 +186,4 @@ export function registerSentryDomain(registry: CommandRegistry): void {
     envKey: 'SENTRY_AUTH_TOKEN',
     verify: verifySentry,
   });
-}
+};

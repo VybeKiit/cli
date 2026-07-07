@@ -4,17 +4,22 @@ import type { ExtensionSurface, ExtensionView } from '@/lib/view';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
-export function AppShell({
-  surface,
-  view,
-  onViewChange,
-  children,
-}: {
-  surface: ExtensionSurface;
-  view: ExtensionView;
-  onViewChange: (view: ExtensionView) => void;
-  children: ReactNode;
-}) {
+export interface AppShellProps {
+  readonly surface: ExtensionSurface;
+  readonly view: ExtensionView;
+  readonly onViewChange: (view: ExtensionView) => void;
+  readonly children?: ReactNode;
+}
+
+/**
+ * Shared popup and side-panel layout shell.
+ *
+ * @param props - Surface, active view, navigation callback, and page content.
+ * @returns The extension shell with navigation.
+ * @example
+ * <AppShell surface="popup" view="home" onViewChange={setView} />
+ */
+export const AppShell = ({ surface, view, onViewChange, children = null }: AppShellProps) => {
   const dir = localeToDirection(getActiveLocale());
   const isSidePanel = surface === 'sidepanel';
   const isPopup = surface === 'popup';
@@ -36,4 +41,4 @@ export function AppShell({
       <AppNav active={view} onChange={onViewChange} compact={!isSidePanel} marketing={isPopup} />
     </div>
   );
-}
+};

@@ -2,17 +2,29 @@ import { useTheme } from '@/theme/useTheme';
 import { type ReactNode, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-/** Tabbed sections — simplified RN port of web Tabs. */
-export function Tabs({
-  defaultValue,
-  items,
-}: {
-  defaultValue: string;
-  items: readonly { value: string; label: string; content: ReactNode }[];
-}) {
+interface TabItem {
+  readonly value: string;
+  readonly label: string;
+  readonly content: ReactNode;
+}
+
+export interface TabsProps {
+  readonly defaultValue: string;
+  readonly items: readonly TabItem[];
+}
+
+/**
+ * Tabbed sections for compact mobile content.
+ *
+ * @param props - Initial tab value and tab items to render.
+ * @returns A themed tab list and the active panel content.
+ * @example
+ * <Tabs defaultValue="overview" items={items} />
+ */
+export const Tabs = ({ defaultValue, items }: TabsProps) => {
   const [active, setActive] = useState(defaultValue);
   const { colors, radius, spacing, fontSizes, fontWeights } = useTheme();
-  const current = items.find((item) => item.value === active) ?? items[0];
+  const current = items.find((item) => item.value === active);
 
   return (
     <View style={{ gap: spacing.md }}>
@@ -43,10 +55,10 @@ export function Tabs({
           </Pressable>
         ))}
       </View>
-      <View>{current?.content}</View>
+      <View>{current === undefined ? null : current.content}</View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   list: {

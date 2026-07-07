@@ -17,11 +17,11 @@
  * `title` is the short imperative name; `summary` is the one-line plain-language
  * statement of the promise as it appears to the vibe coder.
  */
-export interface ContractRule {
+export type ContractRule = {
   readonly id: number;
   readonly title: string;
   readonly summary: string;
-}
+};
 
 /**
  * The full buyer-skill contract: a heading and its seven ordered rules.
@@ -29,10 +29,10 @@ export interface ContractRule {
  * This is the single source of truth for the contract's wording. The order is
  * load-bearing — rules are referenced by their 1-based {@link ContractRule.id}.
  */
-export interface Contract {
+export type Contract = {
   readonly heading: string;
   readonly rules: readonly ContractRule[];
-}
+};
 
 /**
  * The canonical seven-rule contract every template agent follows.
@@ -77,6 +77,7 @@ export const CONTRACT: Contract = {
       id: 6,
       title: 'Record decisions',
       summary:
+        // biome-ignore lint/security/noSecrets: Contract prose mentions a helper name, not a credential.
         'After every completing skill, append one entry to checklist.md Decision log via formatChecklistEntry().',
     },
     {
@@ -94,15 +95,16 @@ const CIRCLED_DIGITS = ['①', '②', '③', '④', '⑤', '⑥', '⑦'] as cons
 /**
  * Render {@link CONTRACT} as a markdown section a skill or doc can drop inline.
  *
- * Produces an `##` heading followed by a numbered list (circled digits, matching
- * how the contract is referenced in prose). Pure string-building so the rendered
- * form has one source — callers never reassemble the rules by hand.
+ * @returns The rendered render contract text.
+ * @example
+ * const result = renderContract();
  */
-export function renderContract(): string {
+export const renderContract = (): string => {
   const lines = [`## ${CONTRACT.heading}`, ''];
   for (const rule of CONTRACT.rules) {
-    const glyph = CIRCLED_DIGITS[rule.id - 1] ?? `${rule.id}.`;
+    const possibleGlyph = CIRCLED_DIGITS[rule.id - 1];
+    const glyph = possibleGlyph === undefined ? `${rule.id}.` : possibleGlyph;
     lines.push(`${glyph} **${rule.title}** — ${rule.summary}`);
   }
   return lines.join('\n');
-}
+};

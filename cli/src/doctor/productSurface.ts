@@ -1,10 +1,15 @@
 /**
  * Plain-language hints for the expanded product-surface packages (ADR-0012).
  * Does not import maintained packages — env-only checks the agent can translate.
+ *
+ * @param env - Environment source to inspect for product-surface providers.
+ * @returns Plain-language doctor hints for missing optional product-surface setup.
+ * @example
+ * const hints = formatProductSurfaceHints(process.env);
  */
-export function formatProductSurfaceHints(
+export const formatProductSurfaceHints = (
   env: Record<string, string | undefined>,
-): readonly string[] {
+): readonly string[] => {
   const lines: string[] = [];
 
   if (env.JOBS_PROVIDER === 'cloudflare' && !env.CLOUDFLARE_QUEUE_NAME) {
@@ -35,4 +40,4 @@ export function formatProductSurfaceHints(
     );
   }
   return lines;
-}
+};

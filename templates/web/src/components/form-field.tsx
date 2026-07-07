@@ -20,8 +20,13 @@ export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
  * Label + input + inline error — the single field primitive every form uses, so
  * no screen hand-rolls its own error markup. Sets `aria-invalid`/`aria-describedby`
  * for screen readers when an error is present.
+ *
+ * @param props - Native input props plus visible label and optional inline error.
+ * @returns A labelled input with accessible error wiring when needed.
+ * @example
+ * <FormField id={emailId} label="Email" type="email" />
  */
-export function FormField({ label, id, error = '', className, ...props }: FormFieldProps) {
+export const FormField = ({ label, id, error = '', className = '', ...props }: FormFieldProps) => {
   const errorId = `${id}-error`;
   return (
     <div className="flex flex-col gap-1.5">
@@ -40,4 +45,4 @@ export function FormField({ label, id, error = '', className, ...props }: FormFi
       ) : null}
     </div>
   );
-}
+};

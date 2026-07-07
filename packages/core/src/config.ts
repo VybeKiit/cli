@@ -1,3 +1,4 @@
+// biome-ignore-all lint/style/noExcessiveLinesPerFile: core config is the legacy env bridge until every concern owns its slice.
 import { Schema } from 'effect';
 import { DEFAULT_APP_URL } from './constants';
 
@@ -26,10 +27,12 @@ const UrlString = Schema.String.pipe(
   Schema.filter((value) => URL.canParse(value), { message: () => 'must be a valid URL' }),
 );
 
+// "a@b.co" -> match, "a@b" / "a b@c.co" -> no match
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 /** A string shaped like an email address — the Schema equivalent of zod `.email()`. */
 const EmailString = Schema.String.pipe(
-  // one @, a dot in the domain, no spaces: "a@b.co" → match, "a@b" / "a b@c.co" → no match
-  Schema.filter((value) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value), {
+  Schema.filter((value) => EMAIL_PATTERN.test(value), {
     message: () => 'must be a valid email',
   }),
 );
@@ -47,6 +50,11 @@ export const onOff = Schema.Literal('on', 'off');
  * coerce to `0` and trip the `positive` guard. Mapping `''` to the default (and absent
  * to the `optionalWith` default) means a blank line means "use the safe default"
  * rather than "fail to boot" — important when the consumer is a non-coder.
+ *
+ * @param fallback - Positive integer used when the env value is absent or blank.
+ * @returns A Schema that decodes a positive integer env value.
+ * @example
+ * const rateLimitMax = positiveIntEnv(60);
  */
 export const positiveIntEnv = (fallback: number) =>
   Schema.optionalWith(
@@ -376,16 +384,24 @@ export const godaddyConfigSchema = Schema.Struct({
 /**
  * Enforce an all-or-none group of required keys: pass when none or all are present,
  * else fail with the first missing key named (so the message is actionable + greppable).
+ *
+ * @param value - Partial config object to inspect.
+ * @param keys - Related keys that must be present together.
+ * @returns `true` when the group is valid, otherwise a Schema failure message.
+ * @example
+ * const result = allOrNone(env, ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY']);
  */
-function allOrNone<K extends string>(
+const allOrNone = <K extends string>(
   value: Partial<Record<K, unknown>>,
   keys: readonly K[],
-): true | string {
+): true | string => {
   const present = keys.filter((key) => Boolean(value[key]));
-  if (present.length === 0 || present.length === keys.length) return true;
+  if (present.length === 0 || present.length === keys.length) {
+    return true;
+  }
   const missing = keys.find((key) => !value[key]);
   return `${missing} is required when any related registrar var is set`;
-}
+};
 
 /**
  * Vercel credentials — used by `@vybekiit/deploy` (vercel adapter, ADR-0006).
@@ -666,12 +682,19 @@ export type ResendConfig = Schema.Schema.Type<typeof resendConfigSchema>;
  * Parse + validate one config slice from the environment, failing loud with a single
  * actionable message (ADR-0023). `errors: 'all'` accumulates every missing/invalid key
  * so a misconfigured deploy sees them together; excess env keys are ignored by default.
+ *
+ * @param schema - Effect Schema for the concern's config slice.
+ * @param env - Environment source to decode.
+ * @returns The decoded config slice.
+ * @throws When Schema validation fails.
+ * @example
+ * const config = parseEnv(paymentsConfigSchema, process.env);
  */
-export function parseEnv<A, I>(schema: Schema.Schema<A, I>, env: EnvSource = process.env): A {
+export const parseEnv = <A, I>(schema: Schema.Schema<A, I>, env: EnvSource = process.env): A => {
   try {
     return Schema.decodeUnknownSync(schema, { errors: 'all' })(env);
   } catch (caught) {
     const detail = caught instanceof Error ? caught.message : String(caught);
-    throw new Error(`Invalid VybeKiit configuration:\n${detail}`);
+    throw new Error(`Invalid VybeKiit configuration:\n${detail}`, { cause: caught });
   }
-}
+};

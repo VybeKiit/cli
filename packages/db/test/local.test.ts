@@ -2,14 +2,18 @@ import { createLocalDataProvider } from '@vybekiit/db/providers/local';
 import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-interface Order {
+type Order = {
   readonly id: string;
-  email: string;
-  paid?: boolean;
-}
+  readonly email: string;
+  readonly paid?: boolean;
+};
 
 const run = Effect.runPromise;
 
+// "9f5f9d38-6c1d-4b7d-9a3a-76d5db3f2e8f" -> match
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: Local adapter behavior is easiest to audit in one contract suite.
 describe('createLocalDataProvider', () => {
   it('reports its provider name', () => {
     expect(createLocalDataProvider().name).toBe('local');
@@ -24,7 +28,7 @@ describe('createLocalDataProvider', () => {
   it('insert generates a uuid when the id is empty', async () => {
     const provider = createLocalDataProvider();
     const value = await run(provider.insert<Order>('orders', { id: '', email: 'a@b.c' }));
-    expect(value.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(value.id).toMatch(UUID_PATTERN);
   });
 
   it('get returns a previously inserted record', async () => {

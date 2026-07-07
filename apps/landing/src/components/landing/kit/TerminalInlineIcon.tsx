@@ -7,8 +7,18 @@ interface TerminalInlineIconProps {
   readonly className?: string;
 }
 
-/** Tiny brand mark embedded inside a terminal prompt line. */
-export function TerminalInlineIcon({ slug, className }: TerminalInlineIconProps) {
+/**
+ * Tiny brand mark embedded inside a terminal prompt line.
+ *
+ * @param props - Component props.
+ * @returns The rendered TerminalInlineIcon element.
+ * @example
+ * ```tsx
+ * <TerminalInlineIcon />
+ * ```
+ */
+
+export const TerminalInlineIcon = ({ slug, className }: TerminalInlineIconProps) => {
   if (slug === 'codex') {
     return (
       <CodexMark className={cn('terminal-inline-icon terminal-inline-icon--codex', className)} />
@@ -16,4 +26,4 @@ export function TerminalInlineIcon({ slug, className }: TerminalInlineIconProps)
   }
 
   return <LogoMarkIcon className={cn('terminal-inline-icon', className)} mono={true} slug={slug} />;
-}
+};

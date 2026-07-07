@@ -1,17 +1,18 @@
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+import { printError, printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { ensureCli } from '@vybekiit/browser-automation/core/ensureCli';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
 import { listNeonProjects, readNeonConnectionString } from './neon';
 
 /**
  * Neon — CLI-first `DATABASE_URL`.
  *
- * `setup` ensures `neonctl`, resolves the project (explicit `--project-id`, else the sole
- * project), reads the pooled connection string headlessly, writes `DATABASE_URL` to `.env`,
- * and verifies the CLI can reach the project. No browser path — Neon's CLI owns this fully.
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerNeonDomain(registry);
  */
-export function registerNeonDomain(registry: CommandRegistry): void {
+export const registerNeonDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'dbs/neon',
     aliases: ['neon'],
@@ -23,7 +24,7 @@ export function registerNeonDomain(registry: CommandRegistry): void {
           if (!cli.installed) {
             const message = 'neonctl could not be installed.';
             if (flags.json) printJson({ ok: false, tool: 'neonctl', error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
 
@@ -39,7 +40,7 @@ export function registerNeonDomain(registry: CommandRegistry): void {
             const message =
               'Could not resolve a Neon project. Run `neonctl auth`, then pass --project-id=<id>.';
             if (flags.json) printJson({ ok: false, error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
 
@@ -47,7 +48,7 @@ export function registerNeonDomain(registry: CommandRegistry): void {
           if (!connectionString) {
             const message = `neonctl could not return a connection string for project ${projectId}.`;
             if (flags.json) printJson({ ok: false, error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
 
@@ -55,25 +56,25 @@ export function registerNeonDomain(registry: CommandRegistry): void {
           if (flags.json) {
             printJson({ ok: true, projectId, keysWritten: written.keysWritten });
           } else {
-            console.log('OK: Neon setup complete.');
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine('OK: Neon setup complete.');
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
           }
           return 0;
         },
       },
     },
   });
-}
+};
 
 /**
  * Upstash — REST-first (no first-party CLI to mint a token).
  *
- * Upstash surfaces the REST URL + token only in the console, so `setup` takes them as flags
- * (`--rest-url` `--rest-token`, the browser-fallback inputs the builder copies once), writes
- * them to `.env`, and verifies with a live REST ping. The token value is written to disk and
- * never echoed back to the agent.
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerUpstashDomain(registry);
  */
-export function registerUpstashDomain(registry: CommandRegistry): void {
+export const registerUpstashDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'dbs/upstash',
     aliases: ['upstash'],
@@ -91,7 +92,7 @@ export function registerUpstashDomain(registry: CommandRegistry): void {
             const message =
               'Upstash has no CLI to mint a token. Copy the REST URL + token from the console and pass --rest-url= --rest-token=.';
             if (flags.json) printJson({ ok: false, error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
 
@@ -104,18 +105,18 @@ export function registerUpstashDomain(registry: CommandRegistry): void {
           if (flags.json) {
             printJson({ ok: verified, keysWritten: written.keysWritten, verified });
           } else {
-            console.log('OK: Upstash setup complete.');
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(verified ? '✓ Verified via Upstash REST ping.' : '⚠ Verification failed.');
+            printLine('OK: Upstash setup complete.');
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(verified ? '✓ Verified via Upstash REST ping.' : '⚠ Verification failed.');
           }
           return verified ? 0 : 1;
         },
       },
     },
   });
-}
+};
 
-async function verifyUpstash(restUrl: string, restToken: string): Promise<boolean> {
+const verifyUpstash = async (restUrl: string, restToken: string): Promise<boolean> => {
   try {
     const res = await fetch(`${restUrl.replace(/\/$/, '')}/ping`, {
       headers: { Authorization: `Bearer ${restToken}` },
@@ -124,4 +125,4 @@ async function verifyUpstash(restUrl: string, restToken: string): Promise<boolea
   } catch {
     return false;
   }
-}
+};

@@ -1,9 +1,11 @@
-import { resolveRealtimeProvider } from '@vybekiit/realtime/resolve';
-import { describe, expect, it } from 'vitest';
+import { it } from '@effect/vitest';
+import { resolveRealtimeProvider, resolveRealtimeService } from '@vybekiit/realtime/resolve';
+import { Effect } from 'effect';
+import { describe, expect } from 'vitest';
 
 describe('resolveRealtimeProvider', () => {
-  it('falls back to local for unshipped cloudflare-do provider', () => {
-    const rt = resolveRealtimeProvider({ REALTIME_PROVIDER: 'cloudflare-do' });
+  it('defaults to the local provider', () => {
+    const rt = resolveRealtimeProvider({});
     expect(rt.name).toBe('local');
   });
 
@@ -14,7 +16,27 @@ describe('resolveRealtimeProvider', () => {
     ch.subscribe(() => {
       received = true;
     });
-    await ch.publish({ hello: 'world' });
+    await Effect.runPromise(ch.publish({ hello: 'world' }));
     expect(received).toBe(true);
   });
+});
+
+describe('resolveRealtimeService', () => {
+  it.effect('fails loud for the unshipped Cloudflare Durable Object adapter', () =>
+    Effect.gen(function* () {
+      const error = yield* Effect.flip(
+        resolveRealtimeService({ REALTIME_PROVIDER: 'cloudflare-do' }),
+      );
+      expect(error.code).toBe('REALTIME_PROVIDER_UNSUPPORTED');
+      expect(error.message).toContain('cloudflare-do');
+    }),
+  );
+
+  it.effect('fails loud for the unshipped Supabase adapter', () =>
+    Effect.gen(function* () {
+      const error = yield* Effect.flip(resolveRealtimeService({ REALTIME_PROVIDER: 'supabase' }));
+      expect(error.code).toBe('REALTIME_PROVIDER_UNSUPPORTED');
+      expect(error.message).toContain('supabase');
+    }),
+  );
 });

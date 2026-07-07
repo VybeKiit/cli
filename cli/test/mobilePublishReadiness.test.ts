@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { verifyMobilePublishReadiness } from '../src/doctor/mobilePublishReadiness';
 
-describe('verifyMobilePublishReadiness', () => {
+describe('mobile publish readiness', () => {
   it('passes on macOS when Xcode and Apple signing identity are present', () => {
     const report = verifyMobilePublishReadiness(
       'darwin',

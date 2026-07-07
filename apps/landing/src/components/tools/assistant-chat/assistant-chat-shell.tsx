@@ -12,7 +12,7 @@ import { AssistantChatLauncher } from './assistant-chat-launcher';
  * nothing unless VYBE_ASSISTANT_CHAT is on and an assistant is resolved — the bridge
  * must be running separately (`pnpm --filter @vybekiit/assistant-chat bridge`).
  */
-export function AssistantChatDevShell() {
+export const AssistantChatDevShell = () => {
   if (!shouldShowAssistantChat(process.env)) {
     return null;
   }
@@ -32,4 +32,4 @@ export function AssistantChatDevShell() {
       {...(referralCode ? { referralCode } : {})}
     />
   );
-}
+};

@@ -1,5 +1,5 @@
-/** Pricing plan — message keys resolved via Chrome `_locales` in the UI. */
-export interface Plan {
+/** Pricing plan with message keys resolved via Chrome `_locales` in the UI. */
+export type Plan = Readonly<{
   readonly id: string;
   readonly nameKey: string;
   readonly priceKey: string;
@@ -7,9 +7,17 @@ export interface Plan {
   readonly descriptionKey: string;
   readonly featureKeys: readonly string[];
   readonly featured?: boolean;
-}
+}>;
 
-function planKeys(slug: string) {
+/**
+ * Build catalog keys for a pricing plan slug.
+ *
+ * @param slug - Pricing plan slug from the message catalog.
+ * @returns Message keys used to render a plan.
+ * @example
+ * const pro = planKeys('pro');
+ */
+const planKeys = (slug: string) => {
   const base = `pricing_plan_${slug}`;
   return {
     nameKey: `${base}_name`,
@@ -18,7 +26,7 @@ function planKeys(slug: string) {
     descriptionKey: `${base}_description`,
     featureKeys: [`${base}_feature_0`, `${base}_feature_1`, `${base}_feature_2`] as const,
   };
-}
+};
 
 const free = planKeys('free');
 const pro = planKeys('pro');

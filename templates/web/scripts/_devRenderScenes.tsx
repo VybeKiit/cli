@@ -2,6 +2,7 @@
  * Not shipped — run via tsx, writes /tmp/scene-preview/scenes.html. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import process from 'node:process';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -45,4 +46,6 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 </style></head><body><h1>Claude octopus deluxe scenes — visual QA (${CLAUDE_OCTOPUS_SCENES.length})</h1><div class="grid">${cards}</div></body></html>`;
 
 writeFileSync('/tmp/scene-preview/scenes.html', html, 'utf8');
-console.log(`wrote /tmp/scene-preview/scenes.html (${CLAUDE_OCTOPUS_SCENES.length} scenes)`);
+process.stdout.write(
+  `wrote /tmp/scene-preview/scenes.html (${CLAUDE_OCTOPUS_SCENES.length} scenes)\n`,
+);

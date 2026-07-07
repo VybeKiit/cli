@@ -4,9 +4,9 @@ import {
   LS_FIELD_FALLBACKS,
   type LsFieldFallback,
   locatorFromFallback,
-} from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldFallbacks';
+} from '@vybekiit/browser-automation/domains/payments/ls/dashboard/fieldFallbacks';
 
-import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import type { LsDraftFieldKey } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 import type { Page } from 'playwright';
 import type { ParsedEntry } from '../draft';
 import { deleteProductOnCurrentPage, dismissProductEditorPanels } from './e2eCleanup';

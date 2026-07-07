@@ -10,8 +10,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const command = vi.hoisted(() => {
   const make = (type: string) =>
     class {
+      readonly input: Record<string, unknown>;
       readonly type = type;
-      constructor(public readonly input: Record<string, unknown>) {}
+      constructor(input: Record<string, unknown>) {
+        this.input = input;
+      }
     };
   return {
     SignUpCommand: make('SignUp'),
@@ -42,13 +45,9 @@ beforeEach(() => {
   send = vi.fn();
 });
 
-function provider() {
-  return createCognitoAuthProvider({ config, client: { send } });
-}
+const provider = () => createCognitoAuthProvider({ config, client: { send } });
 
-function issued(index: number): Issued {
-  return send.mock.calls[index]?.[0] as Issued;
-}
+const issued = (index: number): Issued => send.mock.calls[index]?.[0] as Issued;
 
 describe('createCognitoAuthProvider', () => {
   it('reports its provider name', () => {

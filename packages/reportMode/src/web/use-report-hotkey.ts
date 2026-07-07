@@ -2,21 +2,35 @@
 
 import { useEffect } from 'react';
 
-function isReportHotkey(event: KeyboardEvent): boolean {
-  return event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
-}
+/**
+ * Check whether a keyboard event matches the Report Mode toggle hotkey.
+ *
+ * @param event - Keyboard event from the window.
+ * @returns `true` for Option/Alt+Shift+R.
+ * @example
+ * const matched = isReportHotkey(event);
+ */
+const isReportHotkey = (event: KeyboardEvent): boolean =>
+  event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
 
-/** Option+Shift+R toggles pick mode. */
-export function useReportHotkey(toggleActive: () => void) {
+/**
+ * Register the Option/Alt+Shift+R Report Mode toggle hotkey.
+ *
+ * @param toggleActive - Callback that toggles inspect mode.
+ * @returns Nothing.
+ * @example
+ * useReportHotkey(toggleActive);
+ */
+export const useReportHotkey = (toggleActive: () => void): void => {
   useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (!isReportHotkey(event)) {
         return;
       }
       event.preventDefault();
       toggleActive();
-    }
+    };
     globalThis.addEventListener('keydown', onKeyDown);
     return () => globalThis.removeEventListener('keydown', onKeyDown);
   }, [toggleActive]);
-}
+};

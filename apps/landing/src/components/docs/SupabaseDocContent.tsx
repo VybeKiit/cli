@@ -44,79 +44,75 @@ const fadeUp = {
 } as const;
 
 /** The VybeKiit × Supabase partner lockup shown in the doc header. */
-export function SupabaseDocBrand() {
-  return (
-    <Link className="flex items-center gap-2.5" href="/">
-      <VybeLogoIcon className="h-6 w-6" />
-      <span className="font-semibold tracking-tight">VybeKiit</span>
-      <span className="text-muted-foreground text-sm">×</span>
-      <LogoMarkIcon className="h-6 w-6" mono={true} slug="supabase" />
-      <span className="font-semibold tracking-tight">Supabase</span>
-    </Link>
-  );
-}
+export const SupabaseDocBrand = () => (
+  <Link className="flex items-center gap-2.5" href="/">
+    <VybeLogoIcon className="h-6 w-6" />
+    <span className="font-semibold tracking-tight">VybeKiit</span>
+    <span className="text-muted-foreground text-sm">×</span>
+    <LogoMarkIcon className="h-6 w-6" mono={true} slug="supabase" />
+    <span className="font-semibold tracking-tight">Supabase</span>
+  </Link>
+);
 
 /** Animated partner-doc body — official-docs vibe: green accent, staggered reveals, quiet motion. */
-export function SupabaseDocContent() {
-  return (
-    <article className="mx-auto flex max-w-2xl flex-col gap-14 px-6 py-16 md:py-24">
-      <motion.header
-        className="flex flex-col gap-5"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: LANDING_EASE }}
-      >
-        <div className="flex items-center gap-4">
-          <VybeLogoIcon className="h-10 w-10" />
-          <span className="text-2xl text-muted-foreground">×</span>
-          <LogoMarkIcon className="h-10 w-10" slug="supabase" />
-        </div>
-        <p
-          className="font-medium text-sm uppercase tracking-[0.14em]"
-          style={{ color: SUPABASE_GREEN }}
-        >
-          Integration
-        </p>
-        <h1 className="font-bold text-4xl tracking-tight md:text-5xl">VybeKiit + Supabase</h1>
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          How VybeKiit uses Supabase for database, auth, and storage — and how the AI agent sets it
-          up end-to-end so a non-technical builder is live on Supabase in their first session.
-        </p>
-      </motion.header>
-
-      <div className="flex flex-col gap-12">
-        {SECTIONS.map((section, index) => (
-          <motion.section
-            className="flex flex-col gap-3"
-            key={section.heading}
-            transition={{ duration: 0.6, delay: index * 0.05, ease: LANDING_EASE }}
-            {...fadeUp}
-          >
-            <h2 className="flex items-center gap-3 font-semibold text-2xl tracking-tight">
-              <span
-                aria-hidden="true"
-                className="h-5 w-1 rounded-full"
-                style={{ backgroundColor: SUPABASE_GREEN }}
-              />
-              {section.heading}
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">{section.body}</p>
-          </motion.section>
-        ))}
+export const SupabaseDocContent = () => (
+  <article className="mx-auto flex max-w-2xl flex-col gap-14 px-6 py-16 md:py-24">
+    <motion.header
+      className="flex flex-col gap-5"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: LANDING_EASE }}
+    >
+      <div className="flex items-center gap-4">
+        <VybeLogoIcon className="h-10 w-10" />
+        <span className="text-2xl text-muted-foreground">×</span>
+        <LogoMarkIcon className="h-10 w-10" slug="supabase" />
       </div>
-
-      <motion.a
-        className="inline-flex w-fit items-center gap-2 rounded-full border px-5 py-2.5 font-medium text-sm transition-colors hover:bg-foreground/5"
-        href="https://supabase.com"
-        rel="noreferrer"
-        target="_blank"
-        transition={{ duration: 0.6, ease: LANDING_EASE }}
-        {...fadeUp}
+      <p
+        className="font-medium text-sm uppercase tracking-[0.14em]"
+        style={{ color: SUPABASE_GREEN }}
       >
-        <LogoMarkIcon className="h-5 w-5" mono={true} slug="supabase" />
-        Learn more about Supabase
-        <span aria-hidden="true">→</span>
-      </motion.a>
-    </article>
-  );
-}
+        Integration
+      </p>
+      <h1 className="font-bold text-4xl tracking-tight md:text-5xl">VybeKiit + Supabase</h1>
+      <p className="text-lg text-muted-foreground leading-relaxed">
+        How VybeKiit uses Supabase for database, auth, and storage — and how the AI agent sets it up
+        end-to-end so a non-technical builder is live on Supabase in their first session.
+      </p>
+    </motion.header>
+
+    <div className="flex flex-col gap-12">
+      {SECTIONS.map((section, index) => (
+        <motion.section
+          className="flex flex-col gap-3"
+          key={section.heading}
+          transition={{ duration: 0.6, delay: index * 0.05, ease: LANDING_EASE }}
+          {...fadeUp}
+        >
+          <h2 className="flex items-center gap-3 font-semibold text-2xl tracking-tight">
+            <span
+              aria-hidden="true"
+              className="h-5 w-1 rounded-full"
+              style={{ backgroundColor: SUPABASE_GREEN }}
+            />
+            {section.heading}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">{section.body}</p>
+        </motion.section>
+      ))}
+    </div>
+
+    <motion.a
+      className="inline-flex w-fit items-center gap-2 rounded-full border px-5 py-2.5 font-medium text-sm transition-colors hover:bg-foreground/5"
+      href="https://supabase.com"
+      rel="noreferrer"
+      target="_blank"
+      transition={{ duration: 0.6, ease: LANDING_EASE }}
+      {...fadeUp}
+    >
+      <LogoMarkIcon className="h-5 w-5" mono={true} slug="supabase" />
+      Learn more about Supabase
+      <span aria-hidden="true">→</span>
+    </motion.a>
+  </article>
+);

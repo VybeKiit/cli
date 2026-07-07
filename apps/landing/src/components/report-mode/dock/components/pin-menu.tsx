@@ -24,8 +24,18 @@ interface ReportPinMenuProps {
   readonly tutorialActive?: boolean;
 }
 
-/** Pin control — hover to reveal corners, hold 2s on a corner to snap the dock. */
-export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: ReportPinMenuProps) {
+/**
+ * Pin control — hover to reveal corners, hold 2s on a corner to snap the dock.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportPinMenu element.
+ * @example
+ * ```tsx
+ * <ReportPinMenu />
+ * ```
+ */
+
+export const ReportPinMenu = ({ anchor, onSelect, tutorialActive = false }: ReportPinMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
@@ -100,4 +110,4 @@ export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: Repo
       </ReportFlyoutPortal>
     </div>
   );
-}
+};

@@ -6,7 +6,7 @@ export const NC_AUTH_URL_HINT =
   /(login|sign-?in|sign-?up|register|oauth|auth|session\/new|Identity\/Account)/i;
 
 /** Host + path only — avoids false positives from `ReturnUrl=` query params on login pages. */
-function ncHostPath(url: string): string | null {
+const ncHostPath = (url: string): string | null => {
   try {
     const parsed = new URL(url);
     if (!parsed.hostname.includes('namecheap.com')) return null;
@@ -14,9 +14,17 @@ function ncHostPath(url: string): string | null {
   } catch {
     return null;
   }
-}
+};
 
-export function isNcAuthenticatedUrl(url: string): boolean {
+/**
+ * Is Nc Authenticated Url.
+ *
+ * @param url - URL to inspect.
+ * @returns Whether the inspected value matches the expected state.
+ * @example
+ * const result = isNcAuthenticatedUrl('https://example.com');
+ */
+export const isNcAuthenticatedUrl = (url: string): boolean => {
   const hostPath = ncHostPath(url);
   if (!hostPath) return false;
   if (NC_AUTH_URL_HINT.test(hostPath)) return false;
@@ -25,4 +33,4 @@ export function isNcAuthenticatedUrl(url: string): boolean {
     return !/\/myaccount\/(?:login|sign)/i.test(hostPath);
   }
   return NC_AUTHENTICATED_URL.test(hostPath);
-}
+};

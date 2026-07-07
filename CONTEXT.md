@@ -7,7 +7,7 @@
 > and the multi-provider widening below).
 > **Status: v1.0 scaffold built + green + pushed; templates-first production readiness
 > shipped (expanded shadcn kit, dashboard guard, practice checkout, mobile parity,
-> extension WXT scaffold). Money pipeline (#4–#8) and npm publish (#17) remain parked.**
+> extension WXT scaffold). Money pipeline (#4–#8) and CLI publish (#17) remain parked.**
 
 ## Template production readiness scorecard (2026-06-29)
 
@@ -50,24 +50,26 @@ tension — "maintained updates" for "an audience that can't read a diff."
 | | **MAINTAINED** | **OWNED** |
 |---|---|---|
 | What | headless logic | app shell + ALL UI + the agent layer |
-| Lives as | public npm `@vybekiit/*` packages | files copied into the buyer's scaffolded repo |
+| Lives as | private workspace packages in the gated monorepo mirror; bundled into the public CLI when the CLI needs them | files copied into the buyer's scaffolded repo |
 | Buyer edits? | never | freely |
-| Updates | flow as **npm version bumps** (conflict-free) | frozen — never auto-clobbered |
-| Examples | `core` (+`/http`), `payments`, `auth`, `db`, `client-state` (ADR-0025) | `templates/web`, UI components, screens, skills, `tokens`, `report-mode` |
+| Updates | flow by pulling the gated mirror / kit release line | frozen — never auto-clobbered |
+| Examples | `core` (+`/http`), `payments`, `auth`, `db`, `client-state` (private packages, ADR-0033) | `templates/web`, UI components, screens, skills, `tokens`, `report-mode` |
 
-Updates are **version bumps, not git merges** — the only kind of update a non-coder's agent can
-apply safely every time.
+Updates are mirror pulls handled by the agent, not public npm package bumps. The buyer gets the
+maintained logic because checkout grants access to the private delivery mirror, not because the
+logic is free on npm.
 
 ## Repo structure
 
-> **Target shape (ADR-0025 — supersedes ADR-0022's publish axis).** 28 published packages collapse to
-> **5**; the module-per-concern *design* is kept, only what is *published* changes. `core` absorbs the
-> foundation plumbing; the thin long tail folds into templates as OWNED code; tooling goes private.
-> There is **no `shared/` tier**. See `AGENTS.md` → Current state for what has physically moved yet.
+> **Target shape (ADR-0033 — supersedes ADR-0025's five-package spine).** Nothing under `packages/`
+> publishes to npm. The module-per-concern *design* is kept, but every package is private workspace
+> code and the `vybekiit` CLI is the only public npm artifact. `core` absorbs foundation plumbing;
+> the thin long tail folds into templates as OWNED code or stays private tooling. There is **no
+> public package tier** and **no `shared/` tier**.
 
 ```
 vybekiit/                      private monorepo · pnpm + Turborepo
-├─ packages/                  headless TS · 5 published @vybekiit/* + 4 private tooling (ADR-0025)
+├─ packages/                  headless TS · private workspace packages, never npm-published (ADR-0033)
 │  ├─ core/                   MAINTAINED · env+config loader (.env SSOT) + types + utils, AND the
 │  │                          absorbed foundation subpaths — @vybekiit/core/http (client·express·next),
 │  │                          /observability (createLogger), /security (rate limit, origin lock)
@@ -115,11 +117,10 @@ shape applied to every concern. Defaults below are unchanged (Supabase + Cloudfl
 adapters are opt-in escape hatches the builder never picks (the agent routes via one `.env` setting).
 See ADR-0002/0003/0004.
 
-> The `@vybekiit/*` names below name each **concern's interface**, not necessarily a separate npm
-> package. Per [ADR-0025](./docs/adr/0025-publish-surface-collapse-to-five.md) only `core`,
-> `payments`, `auth`, `db`, `client-state` are published; `http`/`observability`/`security` are
-> `@vybekiit/core/*` subpaths; `deploy`/`assets`/`email`/`tokens`/`analytics` etc. are template-owned
-> or private tooling. The interface-per-concern *design* here is unchanged.
+> The `@vybekiit/*` names below name each **concern's interface**, not a public npm package. Per
+> [ADR-0033](./docs/adr/0033-cli-single-published-artifact-and-access-gate.md), only the
+> `vybekiit` CLI publishes; packages stay private workspace code and are consumed through the gated
+> monorepo mirror / bundled CLI. The interface-per-concern *design* here is unchanged.
 
 | Concern | Choice (default ⭐ · adapters) | Dropped / why |
 |---|---|---|
@@ -190,10 +191,10 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 
 ## Distribution, gating & updates
 
-- Packages are **public** (free updates via npm, double as marketing). The wall is the **private
-  template mirrors**: Lemon Squeezy checkout collects the buyer's GitHub username → webhook →
-  **invite to the per-template mirrors** (`web` + `mobile` + `extension`, one bundle) = the single
-  gate. Refund → access removed. The buyer is **never** invited to the maintainer monorepo.
+- Packages are **private workspace code** (ADR-0033). The wall is the **private delivery mirror**:
+  Lemon Squeezy checkout collects the buyer's GitHub username → webhook → **invite to the gated
+  mirror** = the single gate. Refund → access removed. The buyer is **never** invited to the
+  maintainer monorepo.
 - **Templates reach the buyer via private per-template mirror repos, not the npm CLI** (ADR-0005).
   A **delivery mirror** is one `VybeKiit/<repo>` that a monorepo job force-pushes from a mapped
   source path (one-way subtree split). There are **five**: the three template mirrors
@@ -203,8 +204,8 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   local push; GitHub Actions `workflow_dispatch` is the manual fallback (ADR-0005).
   `npx vybekiit <name>` clones the matching template mirror with the buyer's `gh` device-flow login
   (so the proprietary OWNED code never ships inside the public npm package — the gate holds). The
-  scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition to npm version
-  bumps for `@vybekiit/*`.
+  scaffold keeps its `.git`, so `update-kit` pulls the mirror / kit release line instead of bumping
+  public `@vybekiit/*` npm packages.
 - **The landing site is not a mirror.** `apps/landing` is the store; it ships from the monorepo via
   its own deploy (issue #7), not through a delivery mirror — it is never scaffolded into a buyer repo.
 - **The "skills-bag" is not a mirror either.** Official upstream platform skills are *pinned into* the

@@ -1,22 +1,22 @@
 {
   "files": {
     "hero.webp": {
-      "source": "vybekiit-logo.png",
+      "source": "assets/brand/vybekiit-profile.svg",
       "width": 1000,
       "height": 1000,
-      "bytes": 12564
+      "bytes": 5902
     },
     "hero.png": {
-      "source": "vybekiit-logo.png",
+      "source": "assets/brand/vybekiit-profile.svg",
       "width": 1000,
       "height": 1000,
-      "bytes": 162079
+      "bytes": 14284
     },
     "profile.png": {
-      "source": "vybekiit-logo.png",
+      "source": "assets/brand/vybekiit-profile.svg",
       "width": 512,
       "height": 512,
-      "bytes": 54736
+      "bytes": 4734
     }
   }
 }

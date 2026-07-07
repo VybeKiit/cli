@@ -1,11 +1,11 @@
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
 import {
   scrapeCfAccountIdFromUrl,
   scrapeCfTokenFromHtml,
-} from '@vybekiit/browserAutomation/domains/infra/dashboard/scrape';
+} from '@vybekiit/browser-automation/domains/infra/dashboard/scrape';
 import { describe, expect, it } from 'vitest';
 
 describe('cloudflare scrape', () => {

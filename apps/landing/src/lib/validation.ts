@@ -19,12 +19,24 @@ const GITHUB_USERNAME = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
  */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** True when `username` is a syntactically valid GitHub username. */
-export function isValidGithubUsername(username: string): boolean {
-  return GITHUB_USERNAME.test(username);
-}
+/**
+ * True when `username` is a syntactically valid GitHub username.
+ *
+ * @param username - Input value.
+ * @returns The computed result.
+ * @example
+ * const result = isValidGithubUsername(username);
+ */
 
-/** True when `email` looks like a usable email address. */
-export function isValidEmail(email: string): boolean {
-  return EMAIL.test(email);
-}
+export const isValidGithubUsername = (username: string): boolean => GITHUB_USERNAME.test(username);
+
+/**
+ * True when `email` looks like a usable email address.
+ *
+ * @param email - Input value.
+ * @returns The computed result.
+ * @example
+ * const result = isValidEmail(email);
+ */
+
+export const isValidEmail = (email: string): boolean => EMAIL.test(email);

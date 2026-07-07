@@ -3,27 +3,32 @@
 import type { ReactNode } from 'react';
 import { cn } from './utils';
 
-type GlowBadgeProps = {
-  children: ReactNode;
-  color?: string;
-  variant?: 'solid' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  pulse?: boolean;
-  className?: string;
-};
+interface GlowBadgeProps {
+  readonly children?: ReactNode;
+  readonly color?: string;
+  readonly variant?: 'solid' | 'outline' | 'ghost';
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly pulse?: boolean;
+  readonly className?: string;
+}
 
 /**
- * Badge with colored glow effect. Extends the base Badge concept.
- * Great for agent statuses, MCP tags, tech stack indicators, and live counters.
+ * Badge with a colored glow effect for compact status labels.
+ *
+ * @param props - Badge content, color, visual variant, size, pulse state, and classes.
+ * @returns A glow-styled badge element.
+ * @example
+ * <GlowBadge color="#22c55e" pulse>Live</GlowBadge>;
  */
-export const GlowBadge = ({
-  children,
-  color = '#7c3aed',
-  variant = 'solid',
-  size = 'md',
-  pulse = false,
-  className,
-}: GlowBadgeProps) => {
+export const GlowBadge = (props: GlowBadgeProps) => {
+  const {
+    children = null,
+    color = '#7c3aed',
+    variant = 'solid',
+    size = 'md',
+    pulse = false,
+    className = '',
+  } = props;
   const sizeClasses = {
     sm: 'px-1.5 py-0.5 text-[10px]',
     md: 'px-2.5 py-1 text-xs',

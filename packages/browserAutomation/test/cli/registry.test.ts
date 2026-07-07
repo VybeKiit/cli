@@ -1,13 +1,13 @@
-import { createRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { registerExtensionDomain } from '@vybekiit/browserAutomation/domains/extension/cli';
+import { createRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { registerExtensionDomain } from '@vybekiit/browser-automation/domains/extension/cli';
 import {
   registerLsDomain,
   registerLsTopLevelAlias,
-} from '@vybekiit/browserAutomation/domains/payments/ls/cli';
+} from '@vybekiit/browser-automation/domains/payments/ls/cli';
 import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
-} from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/cli';
 import { describe, expect, it } from 'vitest';
 
 describe('CommandRegistry', () => {

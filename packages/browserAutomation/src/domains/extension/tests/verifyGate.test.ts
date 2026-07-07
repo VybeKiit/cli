@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { spawnMock } = vi.hoisted(() => ({
@@ -10,7 +10,7 @@ vi.mock('node:child_process', () => ({
   spawn: spawnMock,
 }));
 
-import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
+import { runVerifyGate } from '@vybekiit/browser-automation/domains/extension/verifyGate';
 
 beforeEach(() => {
   spawnMock.mockReset();
@@ -46,19 +46,17 @@ describe('runVerifyGate', () => {
   });
 });
 
-function createContext(): VerbContext {
-  return {
-    extension: {
-      chromeWebStoreId: 'lidnnjbepijjbbphbdhcchgpckpcbgfm',
-      dir: '/repo/extensions/batchbeam-prompt-queue',
-      key: 'batchbeam-prompt-queue',
-      name: 'BatchBeam Prompt Queue',
-    },
-    log: {
-      error: vi.fn(),
-      log: vi.fn(),
-      warn: vi.fn(),
-    },
-    repoRoot: '/repo',
-  };
-}
+const createContext = (): VerbContext => ({
+  extension: {
+    chromeWebStoreId: 'lidnnjbepijjbbphbdhcchgpckpcbgfm',
+    dir: '/repo/extensions/batchbeam-prompt-queue',
+    key: 'batchbeam-prompt-queue',
+    name: 'BatchBeam Prompt Queue',
+  },
+  log: {
+    error: vi.fn(),
+    log: vi.fn(),
+    warn: vi.fn(),
+  },
+  repoRoot: '/repo',
+});

@@ -3,37 +3,72 @@ import { join } from 'node:path';
 import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { scaffold } from '../lib/scaffold';
 
-function pascalCase(name: string): string {
-  // PascalCase, splitting on "-", "_", "/": "add-user" → "AddUser"
-  return name
-    .split(/[-_/]/)
+// Split "-", "_", "/": "add-user" -> ["add", "user"].
+const PASCAL_SPLIT_PATTERN = /[-_/]/;
+
+// Collapse whitespace: "My  Route" -> "My-Route".
+const WHITESPACE_PATTERN = /\s+/g;
+
+// Drop slug-unsafe chars: "my-route!" -> "my-route".
+const SLUG_UNSAFE_PATTERN = /[^a-z0-9-]/g;
+
+/**
+ * Convert a route/resource name into PascalCase.
+ *
+ * @param name - Route or resource name from CLI input.
+ * @returns PascalCase identifier segment.
+ * @example
+ * pascalCase('add-user');
+ */
+const pascalCase = (name: string): string =>
+  name
+    .split(PASCAL_SPLIT_PATTERN)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join('');
-}
 
-function kebabCase(name: string): string {
-  // kebab slug: spaces → "-", then drop anything not [a-z0-9-]: "My Route!" → "my-route"
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
+/**
+ * Convert a route/resource name into a URL-safe kebab slug.
+ *
+ * @param name - Route or resource name from CLI input.
+ * @returns Lowercase route slug.
+ * @example
+ * kebabCase('My Route!');
+ */
+const kebabCase = (name: string): string =>
+  name.trim().toLowerCase().replace(WHITESPACE_PATTERN, '-').replace(SLUG_UNSAFE_PATTERN, '');
 
-async function ensureBackendDir(cwd: string): Promise<boolean> {
+/**
+ * Check whether a scaffolded backend app exists.
+ *
+ * @param cwd - Project directory to inspect.
+ * @returns True when `backend/src/app.ts` exists.
+ * @example
+ * const exists = await ensureBackendDir(process.cwd());
+ */
+const ensureBackendDir = async (cwd: string): Promise<boolean> => {
   try {
     await access(join(cwd, 'backend', 'src', 'app.ts'));
     return true;
   } catch {
     return false;
   }
-}
+};
 
-export async function runScaffoldBackend(
+/**
+ * Scaffold the backend template into the current project.
+ *
+ * @param args - CLI arguments after `scaffold backend`; first item may be the destination folder.
+ * @param cwd - Project directory where the backend should be created.
+ * @returns Plain message plus the process exit code.
+ * @example
+ * const result = await runScaffoldBackend(['backend'], process.cwd());
+ */
+export const runScaffoldBackend = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly message: string; readonly exitCode: number }> {
-  const destName = args[0] ?? 'backend';
+): Promise<{ readonly message: string; readonly exitCode: number }> => {
+  const [destArg] = args;
+  const destName = destArg === undefined || destArg === '' ? 'backend' : destArg;
   const dest = join(cwd, destName);
 
   try {
@@ -56,31 +91,43 @@ export async function runScaffoldBackend(
         }
       },
     });
-    cleanup = resolved.cleanup;
+    const { cleanup: resolvedCleanup, source } = resolved;
+    cleanup = resolvedCleanup;
 
     await scaffold({
       template: 'backend',
-      source: resolved.source,
+      source,
       dest,
     });
 
-    return { message: `Scaffolded ${destName}/ — your API server is ready.`, exitCode: 0 };
+    return { message: `Scaffolded ${destName}/. Your API server is ready.`, exitCode: 0 };
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'Scaffold failed.',
       exitCode: 1,
     };
   } finally {
-    await cleanup?.();
+    if (cleanup !== undefined) {
+      await cleanup();
+    }
   }
-}
+};
 
-export async function runBackendAddRoute(
+/**
+ * Add a simple GET route and controller to a scaffolded backend.
+ *
+ * @param args - CLI arguments after `backend add-route`; first item is the route name.
+ * @param cwd - Project directory containing the backend.
+ * @returns Plain message plus the process exit code.
+ * @example
+ * const result = await runBackendAddRoute(['users'], process.cwd());
+ */
+export const runBackendAddRoute = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly message: string; readonly exitCode: number }> {
-  const name = args[0];
-  if (!name) {
+): Promise<{ readonly message: string; readonly exitCode: number }> => {
+  const [name] = args;
+  if (name === undefined || name === '') {
     return { message: 'Pass a route name: vybekiit backend add-route users', exitCode: 1 };
   }
 
@@ -89,7 +136,7 @@ export async function runBackendAddRoute(
   }
 
   const slug = kebabCase(name);
-  const Pascal = pascalCase(slug);
+  const pascal = pascalCase(slug);
   const backendRoot = join(cwd, 'backend');
 
   const controllerPath = join(backendRoot, 'src/controllers', `${slug}.controller.ts`);
@@ -100,17 +147,17 @@ export async function runBackendAddRoute(
 
   const controller = `import type { Request, Response } from 'express';
 
-export function get${Pascal}(_req: Request, res: Response): void {
+export const get${pascal} = (_req: Request, res: Response): void => {
   res.json({ ok: true, resource: '${slug}' });
-}
+};
 `;
 
   const route = `import { Router } from 'express';
-import { get${Pascal} } from '../controllers/${slug}.controller.js';
+import { get${pascal} } from '../controllers/${slug}.controller.js';
 
 export const ${slug}Router = Router();
 
-${slug}Router.get('/', get${Pascal});
+${slug}Router.get('/', get${pascal});
 `;
 
   await writeFile(controllerPath, controller, 'utf8');
@@ -139,14 +186,23 @@ ${slug}Router.get('/', get${Pascal});
     message: `Added GET /api/${slug} with controller and route files.`,
     exitCode: 0,
   };
-}
+};
 
-export async function runBackendAddCrud(
+/**
+ * Add CRUD routes and a controller to a scaffolded backend.
+ *
+ * @param args - CLI arguments after `backend add-crud`; first item is the resource name.
+ * @param cwd - Project directory containing the backend.
+ * @returns Plain message plus the process exit code.
+ * @example
+ * const result = await runBackendAddCrud(['posts'], process.cwd());
+ */
+export const runBackendAddCrud = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly message: string; readonly exitCode: number }> {
-  const name = args[0];
-  if (!name) {
+): Promise<{ readonly message: string; readonly exitCode: number }> => {
+  const [name] = args;
+  if (name === undefined || name === '') {
     return { message: 'Pass a resource name: vybekiit backend add-crud posts', exitCode: 1 };
   }
 
@@ -155,7 +211,7 @@ export async function runBackendAddCrud(
   }
 
   const slug = kebabCase(name);
-  const Pascal = pascalCase(slug);
+  const pascal = pascalCase(slug);
   const backendRoot = join(cwd, 'backend');
 
   const controllerPath = join(backendRoot, 'src/controllers', `${slug}.controller.ts`);
@@ -166,64 +222,67 @@ export async function runBackendAddCrud(
 
   const controller = `import type { Request, Response } from 'express';
 
-const store: Record<string, unknown>[] = [];
+type StoreItem = { readonly id: string } & Record<string, unknown>;
 
-export function list${Pascal}(_req: Request, res: Response): void {
+const store: StoreItem[] = [];
+
+export const list${pascal} = (_req: Request, res: Response): void => {
   res.json({ items: store });
-}
+};
 
-export function get${Pascal}(req: Request, res: Response): void {
-  const item = store.find((row) => (row as { id?: string }).id === req.params.id);
+export const get${pascal} = (req: Request, res: Response): void => {
+  const item = store.find((row) => row.id === req.params.id);
   if (!item) {
     res.status(404).json({ error: 'Not found.' });
     return;
   }
   res.json(item);
-}
+};
 
-export function create${Pascal}(req: Request, res: Response): void {
-  const item = { id: crypto.randomUUID(), ...req.body };
+export const create${pascal} = (req: Request, res: Response): void => {
+  const item: StoreItem = { id: crypto.randomUUID(), ...req.body };
   store.push(item);
   res.status(201).json(item);
-}
+};
 
-export function update${Pascal}(req: Request, res: Response): void {
-  const idx = store.findIndex((row) => (row as { id?: string }).id === req.params.id);
+export const update${pascal} = (req: Request, res: Response): void => {
+  const idx = store.findIndex((row) => row.id === req.params.id);
   if (idx === -1) {
     res.status(404).json({ error: 'Not found.' });
     return;
   }
-  store[idx] = { ...store[idx], ...req.body, id: req.params.id };
-  res.json(store[idx]);
-}
+  const updated: StoreItem = { ...store[idx], ...req.body, id: req.params.id };
+  store[idx] = updated;
+  res.json(updated);
+};
 
-export function delete${Pascal}(req: Request, res: Response): void {
-  const idx = store.findIndex((row) => (row as { id?: string }).id === req.params.id);
+export const delete${pascal} = (req: Request, res: Response): void => {
+  const idx = store.findIndex((row) => row.id === req.params.id);
   if (idx === -1) {
     res.status(404).json({ error: 'Not found.' });
     return;
   }
   store.splice(idx, 1);
   res.status(204).send();
-}
+};
 `;
 
   const route = `import { Router } from 'express';
 import {
-  create${Pascal},
-  delete${Pascal},
-  get${Pascal},
-  list${Pascal},
-  update${Pascal},
+  create${pascal},
+  delete${pascal},
+  get${pascal},
+  list${pascal},
+  update${pascal},
 } from '../controllers/${slug}.controller.js';
 
 export const ${slug}Router = Router();
 
-${slug}Router.get('/', list${Pascal});
-${slug}Router.get('/:id', get${Pascal});
-${slug}Router.post('/', create${Pascal});
-${slug}Router.patch('/:id', update${Pascal});
-${slug}Router.delete('/:id', delete${Pascal});
+${slug}Router.get('/', list${pascal});
+${slug}Router.get('/:id', get${pascal});
+${slug}Router.post('/', create${pascal});
+${slug}Router.patch('/:id', update${pascal});
+${slug}Router.delete('/:id', delete${pascal});
 `;
 
   await writeFile(controllerPath, controller, 'utf8');
@@ -252,11 +311,19 @@ ${slug}Router.delete('/:id', delete${Pascal});
     message: `Added CRUD /api/${slug} with in-memory store (swap for @vybekiit/db when ready).`,
     exitCode: 0,
   };
-}
+};
 
-export async function runBackendAddUpload(
+/**
+ * Add an upload route to a scaffolded backend.
+ *
+ * @param cwd - Project directory containing the backend.
+ * @returns Plain message plus the process exit code.
+ * @example
+ * const result = await runBackendAddUpload(process.cwd());
+ */
+export const runBackendAddUpload = async (
   cwd: string = process.cwd(),
-): Promise<{ readonly message: string; readonly exitCode: number }> {
+): Promise<{ readonly message: string; readonly exitCode: number }> => {
   if (!(await ensureBackendDir(cwd))) {
     return { message: 'No backend/ found. Run vybekiit scaffold backend first.', exitCode: 1 };
   }
@@ -295,4 +362,4 @@ uploadRouter.post('/', uploadSingle, uploadFile);
   await writeFile(appPath, appSource, 'utf8');
 
   return { message: 'Added POST /api/upload with multer limits.', exitCode: 0 };
-}
+};

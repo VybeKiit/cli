@@ -1,20 +1,29 @@
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
+import { printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { baseVerbContext } from '@vybekiit/browser-automation/cli/verbContext';
 import {
   type GoogleOAuthParams,
   googleEnvBlock,
-} from '@vybekiit/browserAutomation/domains/google/types';
+} from '@vybekiit/browser-automation/domains/google/types';
 import {
   runGoogleOAuthSetup,
-  standbyLogin,
-} from '@vybekiit/browserAutomation/domains/google/verbs/standbyLogin';
+  standbyGoogleLogin,
+} from '@vybekiit/browser-automation/domains/google/verbs/standbyLogin';
 
-/** Parse `google oauth` args into params. Missing required flags are collected in `missing`. */
-export function parseGoogleOAuthArgs(args: string[]): {
+/**
+ * Parse `google oauth` args into params. Missing required flags are collected in `missing`.
+ *
+ * @param args - Command-specific CLI arguments.
+ * @returns Parsed value for downstream automation.
+ * @example
+ * const result = parseGoogleOAuthArgs(['--json']);
+ */
+export const parseGoogleOAuthArgs = (
+  args: string[],
+): {
   params: Partial<GoogleOAuthParams>;
   missing: string[];
-} {
+} => {
   const params: Partial<GoogleOAuthParams> = {};
   const redirectUris: string[] = [];
   const scopes: string[] = [];
@@ -42,9 +51,17 @@ export function parseGoogleOAuthArgs(args: string[]): {
   if (!params.appUrl) missing.push('app-url');
   if (redirectUris.length === 0) missing.push('redirect');
   return { params, missing };
-}
+};
 
-export function registerGoogleDomain(registry: CommandRegistry): void {
+/**
+ * Register Google Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerGoogleDomain(registry);
+ */
+export const registerGoogleDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'google',
     aliases: [],
@@ -52,10 +69,10 @@ export function registerGoogleDomain(registry: CommandRegistry): void {
       standby: {
         description: 'Wait for Google Cloud Console after builder sign-in',
         run: async ({ flags }) => {
-          const result = await standbyLogin(baseVerbContext(flags));
+          const result = await standbyGoogleLogin(baseVerbContext(flags));
           if (flags.json) printJson({ ok: result.ready, ...result });
-          else if (result.ready) console.log(`OK: Cloud Console ready at ${result.url}`);
-          else console.log('Timed out waiting for Google sign-in.');
+          else if (result.ready) printLine(`OK: Cloud Console ready at ${result.url}`);
+          else printLine('Timed out waiting for Google sign-in.');
           return result.ready ? 0 : 1;
         },
       },
@@ -81,10 +98,10 @@ export function registerGoogleDomain(registry: CommandRegistry): void {
               reusedExisting: result.reusedExisting,
             });
           } else {
-            console.log('OK: Google OAuth client ready.');
-            console.log('Write these to .env:');
+            printLine('OK: Google OAuth client ready.');
+            printLine('Write these to .env:');
             for (const [key, value] of Object.entries(env)) {
-              console.log(`${key}=${value}`);
+              printLine(`${key}=${value}`);
             }
           }
           return 0;
@@ -92,4 +109,4 @@ export function registerGoogleDomain(registry: CommandRegistry): void {
       },
     },
   });
-}
+};

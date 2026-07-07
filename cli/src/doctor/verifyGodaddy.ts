@@ -1,5 +1,6 @@
 import { type GodaddyConfig, godaddyConfigSchema, parseEnv } from '@vybekiit/core';
 import { verifyGodaddyCredentials } from '@vybekiit/deploy';
+import { Effect } from 'effect';
 
 export type GodaddyDoctorReport = {
   readonly checked: boolean;
@@ -7,8 +8,15 @@ export type GodaddyDoctorReport = {
   readonly lines: readonly string[];
 };
 
-/** Probe GoDaddy API when all registrar env vars are configured. */
-export async function verifyGodaddyDoctor(env: NodeJS.ProcessEnv): Promise<GodaddyDoctorReport> {
+/**
+ * Probe GoDaddy API when all registrar env vars are configured.
+ *
+ * @param env - Process environment to inspect.
+ * @returns Doctor report for GoDaddy credentials.
+ * @example
+ * const report = await verifyGodaddyDoctor(process.env);
+ */
+export const verifyGodaddyDoctor = async (env: NodeJS.ProcessEnv): Promise<GodaddyDoctorReport> => {
   const hasAny = ['GODADDY_API_KEY', 'GODADDY_API_SECRET'].some((key) => Boolean(env[key]));
   if (!hasAny) {
     return { checked: false, ok: true, lines: [] };
@@ -22,7 +30,7 @@ export async function verifyGodaddyDoctor(env: NodeJS.ProcessEnv): Promise<Godad
     return {
       checked: true,
       ok: false,
-      lines: [`✗ GoDaddy — ${message.split('\n')[0]}`],
+      lines: [`✗ GoDaddy - ${message.split('\n')[0]}`],
     };
   }
 
@@ -31,18 +39,18 @@ export async function verifyGodaddyDoctor(env: NodeJS.ProcessEnv): Promise<Godad
   }
 
   try {
-    await verifyGodaddyCredentials(config);
+    await Effect.runPromise(verifyGodaddyCredentials(config));
     return {
       checked: true,
       ok: true,
-      lines: ['✓ GoDaddy — API credentials verified.'],
+      lines: ['✓ GoDaddy - API credentials verified.'],
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'GoDaddy probe failed';
     return {
       checked: true,
       ok: false,
-      lines: [`✗ GoDaddy — ${message}`],
+      lines: [`✗ GoDaddy - ${message}`],
     };
   }
-}
+};

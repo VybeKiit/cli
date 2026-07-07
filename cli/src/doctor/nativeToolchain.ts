@@ -55,11 +55,15 @@ const DOCKER: Tool = {
 };
 
 /**
- * Pick native OS tools for the inferred template surface. SPA and extension templates rely
- * on npm deps only (`vite`, `wxt prepare`); mobile adds Watchman everywhere CocoaPods
- * applies on macOS; backend adds Docker.
+ * Pick native OS tools for the inferred template surface.
+ *
+ * @param surface - Inferred project surface from the buyer's template.
+ * @param platform - Current OS family used to select native install steps.
+ * @returns Ordered native tools needed by the project surface.
+ * @example
+ * const tools = selectNativeTools(surface, 'darwin');
  */
-export function selectNativeTools(surface: ProjectSurface, platform: Platform): Tool[] {
+export const selectNativeTools = (surface: ProjectSurface, platform: Platform): Tool[] => {
   const tools: Tool[] = [];
   const add = (tool: Tool): void => {
     if (!tools.some((t) => t.name === tool.name)) {
@@ -79,13 +83,21 @@ export function selectNativeTools(surface: ProjectSurface, platform: Platform): 
   }
 
   return tools;
-}
+};
 
-/** Merge cloud + native tools without duplicate names. */
-export function mergeDoctorTools(
+/**
+ * Merge provider and native doctor tools without duplicate names.
+ *
+ * @param providerTools - Tools selected from active providers.
+ * @param nativeTools - Tools selected from native project requirements.
+ * @returns Ordered tools with first-seen names preserved.
+ * @example
+ * const tools = mergeDoctorTools(providerTools, nativeTools);
+ */
+export const mergeDoctorTools = (
   providerTools: readonly Tool[],
   nativeTools: readonly Tool[],
-): Tool[] {
+): Tool[] => {
   const merged: Tool[] = [];
   const add = (tool: Tool): void => {
     if (!merged.some((t) => t.name === tool.name)) {
@@ -99,4 +111,4 @@ export function mergeDoctorTools(
     add(tool);
   }
   return merged;
-}
+};

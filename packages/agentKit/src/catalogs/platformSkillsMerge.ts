@@ -1,33 +1,38 @@
 import type {
   PlatformSkillsManifest,
   PlatformSkillsSource,
-} from '@vybekiit/agentKit/planners/updatePlatformSkills';
+} from '@vybekiit/agent-kit/planners/updatePlatformSkills';
 import baseManifest from './platform-skills-base.manifest.json' with { type: 'json' };
 
-export { baseManifest as PLATFORM_SKILLS_BASE_MANIFEST };
+export const PLATFORM_SKILLS_BASE_MANIFEST: PlatformSkillsManifest = baseManifest;
 
-export interface PlatformSkillsTemplateManifest extends PlatformSkillsManifest {
+export type PlatformSkillsTemplateManifest = PlatformSkillsManifest & {
   readonly _notes?: Readonly<Record<string, string>>;
-}
+};
 
-function mergeSkillLists(a: readonly string[], b: readonly string[]): string[] {
+const mergeSkillLists = (a: readonly string[], b: readonly string[]): string[] => {
   const merged = new Set<string>([...a, ...b]);
-  if (merged.has('*')) return ['*'];
+  if (merged.has('*')) {
+    return ['*'];
+  }
   return [...merged];
-}
+};
 
-function sourceKey(source: PlatformSkillsSource): string {
-  return source.repo;
-}
+const sourceKey = (source: PlatformSkillsSource): string => source.repo;
 
 /**
  * Merge shared base manifest with per-template overrides.
- * Same repo → union skill names; `"*"` wins for that repo.
+ *
+ * @param templateManifest - template manifest input.
+ * @param base - base input.
+ * @returns The merge platform skills manifests result.
+ * @example
+ * const result = mergePlatformSkillsManifests(templateManifest, base);
  */
-export function mergePlatformSkillsManifests(
+export const mergePlatformSkillsManifests = (
   templateManifest: PlatformSkillsTemplateManifest,
-  base: PlatformSkillsManifest = baseManifest as PlatformSkillsManifest,
-): PlatformSkillsManifest {
+  base: PlatformSkillsManifest = PLATFORM_SKILLS_BASE_MANIFEST,
+): PlatformSkillsManifest => {
   const byRepo = new Map<string, PlatformSkillsSource>();
 
   for (const source of base.sources) {
@@ -48,13 +53,21 @@ export function mergePlatformSkillsManifests(
   }
 
   return { sources: [...byRepo.values()] };
-}
+};
 
-/** Every repo from the base manifest must appear in the merged manifest. */
-export function checkBaseManifestParity(
+/**
+ * Every repo from the base manifest must appear in the merged manifest.
+ *
+ * @param merged - merged input.
+ * @param base - base input.
+ * @returns The check base manifest parity entries.
+ * @example
+ * const result = checkBaseManifestParity(merged, base);
+ */
+export const checkBaseManifestParity = (
   merged: PlatformSkillsManifest,
-  base: PlatformSkillsManifest = baseManifest as PlatformSkillsManifest,
-): string[] {
+  base: PlatformSkillsManifest = PLATFORM_SKILLS_BASE_MANIFEST,
+): string[] => {
   const mergedRepos = new Set(merged.sources.map((s) => s.repo));
   const missing: string[] = [];
   for (const source of base.sources) {
@@ -63,13 +76,21 @@ export function checkBaseManifestParity(
     }
   }
   return missing;
-}
+};
 
-/** Docs-only provider repos must not be in the base manifest. */
-export function findDocsOnlyViolations(
+/**
+ * Docs-only provider repos must not be in the base manifest.
+ *
+ * @param manifest - manifest input.
+ * @param blockedRepoFragments - blocked repo fragments input.
+ * @returns The find docs only violations entries.
+ * @example
+ * const result = findDocsOnlyViolations(manifest, blockedRepoFragments);
+ */
+export const findDocsOnlyViolations = (
   manifest: PlatformSkillsManifest,
   blockedRepoFragments: readonly string[],
-): string[] {
+): string[] => {
   const violations: string[] = [];
   for (const source of manifest.sources) {
     for (const fragment of blockedRepoFragments) {
@@ -79,4 +100,4 @@ export function findDocsOnlyViolations(
     }
   }
   return violations;
-}
+};

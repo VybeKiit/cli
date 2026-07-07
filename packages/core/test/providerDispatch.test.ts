@@ -1,3 +1,4 @@
+// biome-ignore-all lint/security/noSecrets: provider/config test names are public identifiers, not secrets.
 import {
   BACKEND_ANCHOR_KEYS,
   isBackendUnconfigured,

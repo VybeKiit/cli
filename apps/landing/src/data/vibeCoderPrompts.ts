@@ -34,14 +34,15 @@ const BRAND_LABELS: Record<string, string> = {
   expo: 'Expo',
 };
 
-function labelForIcon(slug: string): string {
-  return BRAND_LABELS[slug] ?? slug;
-}
+const labelForIcon = (slug: string): string => {
+  const label = BRAND_LABELS[slug];
+  return label === undefined ? slug : label;
+};
 
-function buildPrompt(
+const buildPrompt = (
   assistant: VibeCoderAssistant,
   segments: readonly VibeCoderPromptSegment[],
-): VibeCoderPromptEntry {
+): VibeCoderPromptEntry => {
   const typeable = segments
     .filter((segment) => segment.kind !== 'icon')
     .map((segment) => segment.text)
@@ -56,7 +57,7 @@ function buildPrompt(
     .join('');
 
   return { assistant, segments, typeable, plain };
-}
+};
 
 /**
  * Goal-named prompts in plain vibe-coder language (see LANGUAGE.md).

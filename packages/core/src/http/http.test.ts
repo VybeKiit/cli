@@ -33,6 +33,7 @@ describe('HTTP outcome builders', () => {
   });
 });
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: cohesive client behavior table.
 describe('createJsonClient', () => {
   it('returns ok on 2xx JSON', async () => {
     const fetch = vi.fn(async () => ({
@@ -43,7 +44,9 @@ describe('createJsonClient', () => {
     const client = createJsonClient({ fetch });
     const result = await client.getJson<{ id: string }>('/api/test');
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.value.id).toBe('1');
+    if (result.ok) {
+      expect(result.value.id).toBe('1');
+    }
   });
 
   it('preserves semantic code on non-2xx', async () => {
@@ -77,13 +80,15 @@ describe('createJsonClient', () => {
   });
 
   it('returns network_error when fetch throws', async () => {
-    const fetch = vi.fn(async () => {
-      throw new Error('offline');
-    }) as unknown as typeof globalThis.fetch;
+    const fetch = vi.fn(() =>
+      Promise.reject(new Error('offline')),
+    ) as unknown as typeof globalThis.fetch;
 
     const result = await createJsonClient({ fetch }).getJson('/api/x');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('network_error');
+    if (!result.ok) {
+      expect(result.error.code).toBe('network_error');
+    }
   });
 
   it('resolves relative URLs at the seam', async () => {

@@ -6,12 +6,21 @@ export type PreviewThemeMessage = {
   readonly primary: string;
 };
 
-/** Push theme + primary into a loaded embed iframe without changing its src. */
-export function postPreviewTheme(
+/**
+ * Post preview theme.
+ *
+ * @param iframe - Preview iframe that receives the theme message.
+ * @param theme - Input passed to this theme parameter.
+ * @param primary - Primary theme color to apply.
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * postPreviewTheme(iframe, theme, '#14b8a6');
+ */
+export const postPreviewTheme = (
   iframe: HTMLIFrameElement | null | undefined,
   theme: PreviewMode,
   primary: string,
-): void {
+): void => {
   if (!iframe?.contentWindow) {
     return;
   }
@@ -21,12 +30,17 @@ export function postPreviewTheme(
     primary,
   };
   iframe.contentWindow.postMessage(message, '*');
-}
+};
 
-export function isPreviewThemeMessage(data: unknown): data is PreviewThemeMessage {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    (data as PreviewThemeMessage).type === 'vk-preview-theme'
-  );
-}
+/**
+ * Is preview theme message.
+ *
+ * @param data - Unknown browser message payload to validate.
+ * @returns The value produced by isPreviewThemeMessage.
+ * @example
+ * const result = isPreviewThemeMessage(message.data);
+ */
+export const isPreviewThemeMessage = (data: unknown): data is PreviewThemeMessage =>
+  typeof data === 'object' &&
+  data !== null &&
+  (data as PreviewThemeMessage).type === 'vk-preview-theme';

@@ -1,15 +1,25 @@
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/hooks/useUser';
+import { signOut } from '@/lib/authClient';
 import { t } from '@/lib/i18n';
 import { requestOpenSidePanel } from '@/lib/sidePanelApi';
 import type { ExtensionView } from '@/lib/view';
-import { signOut } from '@/lib/authClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@vybekiit/client-state';
+import { Effect, Either } from 'effect';
 import { useState } from 'react';
 
-const appUrl = import.meta.env.WXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-const uiLibraryUrl = import.meta.env.WXT_PUBLIC_UI_LIBRARY_URL ?? 'http://localhost:3002';
+const configuredAppUrl = import.meta.env.WXT_PUBLIC_APP_URL;
+const appUrl =
+  configuredAppUrl === undefined || configuredAppUrl.length === 0
+    ? 'http://localhost:3000'
+    : configuredAppUrl;
+
+const configuredUiLibraryUrl = import.meta.env.WXT_PUBLIC_UI_LIBRARY_URL;
+const uiLibraryUrl =
+  configuredUiLibraryUrl === undefined || configuredUiLibraryUrl.length === 0
+    ? 'http://localhost:3002'
+    : configuredUiLibraryUrl;
 
 const FEATURES = [
   'popup_marketing_pill_web',
@@ -18,28 +28,45 @@ const FEATURES = [
   'popup_marketing_pill_ui',
 ] as const;
 
-export function PopupMarketingScreen({
-  onNavigate,
-}: {
-  onNavigate: (view: ExtensionView) => void;
-}) {
+interface PopupMarketingScreenProps {
+  readonly onNavigate: (view: ExtensionView) => void;
+}
+
+/**
+ * Render the marketing-first popup screen.
+ *
+ * @param props - Navigation callback for changing extension views.
+ * @returns The popup marketing screen.
+ * @example
+ * <PopupMarketingScreen onNavigate={setView} />
+ */
+export const PopupMarketingScreen = ({ onNavigate }: PopupMarketingScreenProps) => {
   const { user, loading } = useUser();
   const queryClient = useQueryClient();
   const [sidebarPending, setSidebarPending] = useState(false);
   const [message, setMessage] = useState('');
 
-  async function handleOpenSidebar() {
+  const handleOpenSidebar = async (): Promise<void> => {
     setSidebarPending(true);
     setMessage('');
     const ok = await requestOpenSidePanel();
     setSidebarPending(false);
-    if (!ok) setMessage(t('home_sidebarError'));
-  }
+    if (!ok) {
+      setMessage(t('home_sidebarError'));
+    }
+  };
 
-  async function handleSignOut() {
-    await signOut();
+  const handleSignOut = async (): Promise<void> => {
+    const result = await Effect.runPromise(Effect.either(signOut()));
+    if (Either.isLeft(result)) {
+      return;
+    }
     await queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
-  }
+  };
+
+  const handleLoginClick = (): void => onNavigate('login');
+  const handlePricingClick = (): void => onNavigate('pricing');
+  const userEmail = user === null || user.email === null ? 'you@local.dev' : user.email;
 
   return (
     <div className="vk-popup-marketing relative flex min-h-full flex-col">
@@ -75,9 +102,7 @@ export function PopupMarketingScreen({
         {loading ? (
           <p className="text-[#8b95a7] text-xs">{t('popup_loading')}</p>
         ) : user ? (
-          <p className="text-[#8b95a7] text-xs">
-            {t('popup_signedInAs', user.email ?? 'you@local.dev')}
-          </p>
+          <p className="text-[#8b95a7] text-xs">{t('popup_signedInAs', userEmail)}</p>
         ) : null}
 
         <Button
@@ -103,7 +128,7 @@ export function PopupMarketingScreen({
             className="vk-popup-cta-secondary w-full"
             type="button"
             variant="outline"
-            onClick={() => onNavigate('login')}
+            onClick={handleLoginClick}
           >
             {t('home_goToLogin')}
           </Button>
@@ -135,11 +160,11 @@ export function PopupMarketingScreen({
           className="vk-popup-cta-secondary w-full"
           type="button"
           variant="outline"
-          onClick={() => onNavigate('pricing')}
+          onClick={handlePricingClick}
         >
           {t('home_viewPricing')}
         </Button>
       </div>
     </div>
   );
-}
+};

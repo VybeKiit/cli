@@ -1,42 +1,53 @@
-import type { Result } from '@vybekiit/core';
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: Effect error and service tag classes intentionally live with the email service contract.
+import type { EmailProviderNameType } from '@vybekiit/email/config';
+import { Context, Data, type Effect, Schema } from 'effect';
 
-/**
- * The email backends VybeKiit ships an adapter for. One runs at a time (chosen via
- * `EMAIL_PROVIDER`); the agent swaps by changing that one env value, because senders
- * talk to the {@link EmailProvider} interface rather than a specific vendor.
- * Cloudflare is the v1 default; `ses` and `resend` ship later (ADR-0002).
- */
-export type EmailProviderName = 'cloudflare' | 'ses' | 'resend';
+const NonEmptyString = Schema.String.pipe(Schema.minLength(1));
 
-/**
- * One transactional email, normalized across providers. `html` is the rendered body
- * every adapter requires; `text` is an optional plain-text fallback for clients that
- * won't render HTML. All fields are readonly — params describe a send, they aren't a
- * mutable buffer.
- */
-export interface SendEmailParams {
-  /** Recipient address. */
-  readonly to: string;
-  /** Verified sender address. */
-  readonly from: string;
-  /** Subject line. */
-  readonly subject: string;
-  /** Rendered HTML body. */
-  readonly html: string;
-  /** Optional plain-text fallback body. */
-  readonly text?: string;
-}
+/** One transactional email, normalized before provider delivery. */
+export const SendEmailParams = Schema.Struct({
+  to: NonEmptyString,
+  from: NonEmptyString,
+  subject: NonEmptyString,
+  html: NonEmptyString,
+  text: Schema.optional(Schema.String),
+});
 
-/**
- * The swappable email seam. Each adapter is constructed from its own validated
- * config (credentials/endpoint live in the factory), so `send` is credential-free at
- * the call site and uniform across vendors. Returns a {@link Result} so an expected
- * boundary failure (rejected address, transport error) is branched on, not thrown;
- * `value.id` is the provider's message id for later lookup.
- */
-export interface EmailProvider {
-  /** Which vendor this instance sends through. */
-  readonly name: EmailProviderName;
-  /** Send one email and return the provider's message id. */
-  send(params: SendEmailParams): Promise<Result<{ id: string }>>;
-}
+/** Static type inferred from {@link SendEmailParams}. */
+export type SendEmailParamsType = Schema.Schema.Type<typeof SendEmailParams>;
+
+/** Backward-compatible send parameter type alias during the Schema migration. */
+export type SendEmailParams = SendEmailParamsType;
+
+/** Provider message id returned after a successful send. */
+export const SendEmailResult = Schema.Struct({
+  id: NonEmptyString,
+});
+
+/** Static type inferred from {@link SendEmailResult}. */
+export type SendEmailResultType = Schema.Schema.Type<typeof SendEmailResult>;
+
+/** Expected email failures that callers may recover from. */
+export class EmailError extends Data.TaggedError('EmailError')<{
+  readonly code:
+    | 'EMAIL_CONFIG_INVALID'
+    | 'EMAIL_PROVIDER_UNSUPPORTED'
+    | 'EMAIL_SEND_FAILED'
+    | 'EMAIL_INVALID_RESPONSE';
+  readonly message: string;
+}> {}
+
+/** Effect service contract for transactional email delivery. */
+export type EmailService = {
+  readonly name: EmailProviderNameType;
+  readonly send: (params: SendEmailParamsType) => Effect.Effect<SendEmailResultType, EmailError>;
+};
+
+/** Injectable email service tag used by composition roots and tests. */
+export class Email extends Context.Tag('@vybekiit/email/Email')<Email, EmailService>() {}
+
+/** Backward-compatible alias for the email service shape during the Effect migration. */
+export type EmailProvider = EmailService;
+
+/** Backward-compatible alias for send parameters during the Effect migration. */
+export type SendEmailParamsAlias = SendEmailParamsType;

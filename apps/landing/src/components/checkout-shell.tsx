@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { BRAND, FOOTER_LINKS } from '@/data/site';
 
 /** Minimal shell for checkout and legal pages — keeps shadcn tokens, no cinematic chrome. */
-export function CheckoutShell({
+export const CheckoutShell = ({
   children,
   headerBrand,
   showCheckout = true,
@@ -13,16 +13,21 @@ export function CheckoutShell({
   headerBrand?: ReactNode;
   /** Whether to show the Checkout link — off for partner/doc pages that aren't a buy flow. */
   showCheckout?: boolean;
-}) {
+}) => {
+  const renderedHeaderBrand =
+    headerBrand === undefined ? (
+      <Link className="font-semibold tracking-tight" href="/">
+        {BRAND.name}
+      </Link>
+    ) : (
+      headerBrand
+    );
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
-          {headerBrand ?? (
-            <Link className="font-semibold tracking-tight" href="/">
-              {BRAND.name}
-            </Link>
-          )}
+          {renderedHeaderBrand}
           {showCheckout ? (
             <Link className="text-muted-foreground text-sm hover:text-foreground" href="/checkout">
               Checkout
@@ -45,4 +50,4 @@ export function CheckoutShell({
       </footer>
     </div>
   );
-}
+};

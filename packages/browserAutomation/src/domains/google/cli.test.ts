@@ -1,4 +1,4 @@
-import { parseGoogleOAuthArgs } from '@vybekiit/browserAutomation/domains/google/cli';
+import { parseGoogleOAuthArgs } from '@vybekiit/browser-automation/domains/google/cli';
 import { describe, expect, it } from 'vitest';
 
 describe('parseGoogleOAuthArgs', () => {

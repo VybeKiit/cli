@@ -18,13 +18,13 @@ type ReportHoldOptionProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   readonly compact?: boolean;
 };
 
-function HoldRectProgress({
+const HoldRectProgress = ({
   compact,
   progress,
 }: {
   readonly compact: boolean;
   readonly progress: number;
-}) {
+}) => {
   const spec = compact ? HOLD_RECT_COMPACT : HOLD_RECT_WIDE;
   const viewW = spec.width + spec.pad * 2;
   const viewH = spec.height + spec.pad * 2;
@@ -58,10 +58,20 @@ function HoldRectProgress({
       />
     </svg>
   );
-}
+};
 
-/** Option button — hold 2s for rounded border to complete, then selection applies. */
-export function ReportHoldOption({
+/**
+ * Option button — hold 2s for rounded border to complete, then selection applies.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportHoldOption element.
+ * @example
+ * ```tsx
+ * <ReportHoldOption />
+ * ```
+ */
+
+export const ReportHoldOption = ({
   active = false,
   pending = false,
   progress,
@@ -72,26 +82,24 @@ export function ReportHoldOption({
   children,
   onClick,
   ...props
-}: ReportHoldOptionProps) {
-  return (
-    <button
-      className={cn(
-        'report-mode-hold-option',
-        compact && 'report-mode-hold-option--compact',
-        active && 'report-mode-hold-option--active',
-        pending && 'report-mode-hold-option--pending',
-        className,
-      )}
-      onBlur={onHoldCancel}
-      onClick={onClick}
-      onFocus={onHoldStart}
-      onMouseEnter={onHoldStart}
-      onMouseLeave={onHoldCancel}
-      type="button"
-      {...props}
-    >
-      <HoldRectProgress compact={compact} progress={pending ? progress : 0} />
-      <span className="report-mode-hold-option-content">{children}</span>
-    </button>
-  );
-}
+}: ReportHoldOptionProps) => (
+  <button
+    className={cn(
+      'report-mode-hold-option',
+      compact && 'report-mode-hold-option--compact',
+      active && 'report-mode-hold-option--active',
+      pending && 'report-mode-hold-option--pending',
+      className,
+    )}
+    onBlur={onHoldCancel}
+    onClick={onClick}
+    onFocus={onHoldStart}
+    onMouseEnter={onHoldStart}
+    onMouseLeave={onHoldCancel}
+    type="button"
+    {...props}
+  >
+    <HoldRectProgress compact={compact} progress={pending ? progress : 0} />
+    <span className="report-mode-hold-option-content">{children}</span>
+  </button>
+);

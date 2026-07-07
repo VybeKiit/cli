@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
-import process from 'node:process';
 import { type DataProviderName, type EntityInput, planDataModel } from '@vybekiit/agent-kit';
 
+/** Data providers supported by the data-model planner. */
 const PROVIDERS: readonly DataProviderName[] = [
   'supabase',
   'neon',
@@ -11,17 +11,31 @@ const PROVIDERS: readonly DataProviderName[] = [
   'local',
 ];
 
-function isProvider(value: string): value is DataProviderName {
-  return (PROVIDERS as readonly string[]).includes(value);
-}
+/**
+ * Resolve a data provider name from CLI input.
+ *
+ * @param value - Candidate provider name.
+ * @returns Data provider name when supported, otherwise undefined.
+ * @example
+ * const provider = resolveDataProvider('supabase');
+ */
+const resolveDataProvider = (value: string): DataProviderName | undefined =>
+  PROVIDERS.find((provider) => provider === value);
 
-export async function runPlanDataModel(
+/**
+ * Plan a data model from an entities JSON file.
+ *
+ * @param args - CLI arguments after `plan-data-model`; file path then optional provider.
+ * @returns JSON plan output plus the process exit code.
+ * @example
+ * const result = await runPlanDataModel(['entities.json', 'supabase']);
+ */
+export const runPlanDataModel = async (
   args: string[],
-): Promise<{ readonly json: string; readonly exitCode: number }> {
-  const inputPath = args[0];
-  const providerArg = args[1] ?? 'supabase';
+): Promise<{ readonly json: string; readonly exitCode: number }> => {
+  const [inputPath, providerInput] = args;
 
-  if (!inputPath) {
+  if (inputPath === undefined || inputPath === '') {
     return {
       json: JSON.stringify({
         ok: false,
@@ -31,14 +45,23 @@ export async function runPlanDataModel(
     };
   }
 
-  const provider = isProvider(providerArg) ? providerArg : 'supabase';
+  const providerArg =
+    providerInput === undefined || providerInput === '' ? 'supabase' : providerInput;
+  const provider = resolveDataProvider(providerArg);
+
+  if (provider === undefined) {
+    return {
+      json: JSON.stringify({ ok: false, error: `Unsupported data provider: ${providerArg}` }),
+      exitCode: 1,
+    };
+  }
 
   try {
     const raw = await readFile(inputPath, 'utf8');
     const parsed = JSON.parse(raw) as { entities?: EntityInput[] };
-    const entities = parsed.entities ?? [];
+    const { entities } = parsed;
 
-    if (entities.length === 0) {
+    if (entities === undefined || entities.length === 0) {
       return {
         json: JSON.stringify({ ok: false, error: 'No entities in input file.' }),
         exitCode: 1,
@@ -59,4 +82,4 @@ export async function runPlanDataModel(
       exitCode: 1,
     };
   }
-}
+};

@@ -8,13 +8,13 @@ let selectedKeys = new Set<string>();
 const listeners = new Set<Listener>();
 const keyListeners = new Map<string, Set<Listener>>();
 
-function notifyAll(): void {
+const notifyAll = (): void => {
   for (const listener of listeners) {
     listener();
   }
-}
+};
 
-function notifyKey(previewKey: string): void {
+const notifyKey = (previewKey: string): void => {
   const bucket = keyListeners.get(previewKey);
   if (!bucket) {
     return;
@@ -22,9 +22,9 @@ function notifyKey(previewKey: string): void {
   for (const listener of bucket) {
     listener();
   }
-}
+};
 
-function loadStoredKeys(): Set<string> {
+const loadStoredKeys = (): Set<string> => {
   if (typeof window === 'undefined') {
     return new Set();
   }
@@ -38,9 +38,9 @@ function loadStoredKeys(): Set<string> {
   } catch {
     return new Set();
   }
-}
+};
 
-function persistKeys(keys: Set<string>): void {
+const persistKeys = (keys: Set<string>): void => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -49,25 +49,56 @@ function persistKeys(keys: Set<string>): void {
     return;
   }
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...keys]));
-}
+};
 
-export function hydrateSelectionStore(): void {
+/**
+ * Hydrate selection store.
+ *
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * hydrateSelectionStore();
+ */
+export const hydrateSelectionStore = (): void => {
   selectedKeys = loadStoredKeys();
-}
+};
 
-export function getSelectedKeys(): ReadonlySet<string> {
-  return selectedKeys;
-}
+/**
+ * Get selected keys.
+ *
+ * @returns The value produced by getSelectedKeys.
+ * @example
+ * const result = getSelectedKeys();
+ */
+export const getSelectedKeys = (): ReadonlySet<string> => selectedKeys;
 
-export function getSelectionCount(): number {
-  return selectedKeys.size;
-}
+/**
+ * Get selection count.
+ *
+ * @returns The value produced by getSelectionCount.
+ * @example
+ * const result = getSelectionCount();
+ */
+export const getSelectionCount = (): number => selectedKeys.size;
 
-export function isEntrySelected(previewKey: string): boolean {
-  return selectedKeys.has(previewKey);
-}
+/**
+ * Is entry selected.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @returns The value produced by isEntrySelected.
+ * @example
+ * const result = isEntrySelected(entry.previewKey);
+ */
+export const isEntrySelected = (previewKey: string): boolean => selectedKeys.has(previewKey);
 
-export function toggleEntrySelection(previewKey: string): void {
+/**
+ * Toggle entry selection.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * toggleEntrySelection(entry.previewKey);
+ */
+export const toggleEntrySelection = (previewKey: string): void => {
   const next = new Set(selectedKeys);
   if (next.has(previewKey)) {
     next.delete(previewKey);
@@ -78,9 +109,16 @@ export function toggleEntrySelection(previewKey: string): void {
   persistKeys(selectedKeys);
   notifyKey(previewKey);
   notifyAll();
-}
+};
 
-export function clearSelection(): void {
+/**
+ * Clear selection.
+ *
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * clearSelection();
+ */
+export const clearSelection = (): void => {
   if (selectedKeys.size === 0) {
     return;
   }
@@ -91,29 +129,56 @@ export function clearSelection(): void {
     notifyKey(key);
   }
   notifyAll();
-}
+};
 
-export function subscribeSelection(listener: Listener): () => void {
+/**
+ * Subscribe selection.
+ *
+ * @param listener - Callback invoked when the subscribed state changes.
+ * @returns The value produced by subscribeSelection.
+ * @example
+ * const result = subscribeSelection(listener);
+ */
+export const subscribeSelection = (listener: Listener): (() => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
-}
+};
 
-export function subscribeSelectionKey(previewKey: string, listener: Listener): () => void {
-  const bucket = keyListeners.get(previewKey) ?? new Set();
+/**
+ * Subscribe selection key.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @param listener - Callback invoked when the subscribed state changes.
+ * @returns The value produced by subscribeSelectionKey.
+ * @example
+ * const result = subscribeSelectionKey(entry.previewKey, listener);
+ */
+export const subscribeSelectionKey = (previewKey: string, listener: Listener): (() => void) => {
+  let bucket = keyListeners.get(previewKey);
+  if (bucket === undefined) {
+    bucket = new Set();
+    keyListeners.set(previewKey, bucket);
+  }
   bucket.add(listener);
-  keyListeners.set(previewKey, bucket);
   return () => {
     bucket.delete(listener);
     if (bucket.size === 0) {
       keyListeners.delete(previewKey);
     }
   };
-}
+};
 
-export function resolveSelectedEntries(
+/**
+ * Resolve selected entries for the component library.
+ *
+ * @param byKey - Catalog lookup indexed by preview key.
+ * @returns The value produced by resolveSelectedEntries.
+ * @example
+ * const result = resolveSelectedEntries(catalog.byKey);
+ */
+export const resolveSelectedEntries = (
   byKey: Readonly<Record<string, CatalogEntry>>,
-): CatalogEntry[] {
-  return [...selectedKeys]
+): CatalogEntry[] =>
+  [...selectedKeys]
     .map((key) => byKey[key])
     .filter((entry): entry is CatalogEntry => Boolean(entry));
-}

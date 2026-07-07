@@ -30,8 +30,17 @@ const PLANS = [
   },
 ] as const;
 
-/** Pricing plan showcase slide — demo tiers with confetti on mock CTA. */
-export function PricingPlanSlide() {
+/**
+ * Pricing plan showcase slide — demo tiers with confetti on mock CTA.
+ *
+ * @returns The rendered PricingPlanSlide element.
+ * @example
+ * ```tsx
+ * <PricingPlanSlide />
+ * ```
+ */
+
+export const PricingPlanSlide = () => {
   const handleConfetti = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const originX = (rect.left + rect.width / 2) / window.innerWidth;
@@ -107,4 +116,4 @@ export function PricingPlanSlide() {
       </div>
     </div>
   );
-}
+};

@@ -21,7 +21,7 @@ export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
  * no screen hand-rolls its own error markup. Sets `aria-invalid`/`aria-describedby`
  * for screen readers when an error is present.
  */
-export function FormField({ label, id, error = '', className, ...props }: FormFieldProps) {
+export const FormField = ({ label, id, error = '', className, ...props }: FormFieldProps) => {
   const errorId = `${id}-error`;
   return (
     <div className="flex flex-col gap-1.5">
@@ -40,4 +40,4 @@ export function FormField({ label, id, error = '', className, ...props }: FormFi
       ) : null}
     </div>
   );
-}
+};

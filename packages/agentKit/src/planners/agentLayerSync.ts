@@ -34,41 +34,57 @@ export const AGENT_LAYER_PATHS: readonly string[] = [
 /** Buyer-owned extension skills — never overwritten by sync-agent-layer. */
 export const AGENT_LAYER_EXTENSION_PREFIX = '.vybekiit/extensions/';
 
-/** True when a path under the project root is buyer-owned extension content. */
-export function isAgentLayerExtensionPath(relativePath: string): boolean {
+/**
+ * True when a path under the project root is buyer-owned extension content.
+ *
+ * @param relativePath - relative path input.
+ * @returns Whether is agent layer extension path succeeds.
+ * @example
+ * const result = isAgentLayerExtensionPath(relativePath);
+ */
+export const isAgentLayerExtensionPath = (relativePath: string): boolean => {
   const normalized = relativePath.replace(/\\/g, '/');
   return (
     normalized === '.vybekiit/extensions' || normalized.startsWith(AGENT_LAYER_EXTENSION_PREFIX)
   );
-}
+};
 
 /** Result of planning an agent-layer sync from mirror → buyer project. */
-export interface AgentLayerSyncPlan {
+export type AgentLayerSyncPlan = {
   /** Allowlisted paths that exist in the mirror and would be copied. */
   readonly pathsToSync: readonly string[];
   /** True when there is nothing to sync (mirror matches or empty). */
   readonly upToDate: boolean;
-}
+};
 
 /**
  * Given which allowlisted paths exist in the mirror snapshot, plan what would
- * be copied into the buyer's project. Pure — filesystem reads happen in the CLI.
  *
- * @param mirrorPaths - allowlisted paths that exist under the cloned mirror root
+ * @param mirrorPaths - mirror paths input.
+ * @returns The plan agent layer sync result.
+ * @example
+ * const result = planAgentLayerSync(mirrorPaths);
  */
-export function planAgentLayerSync(mirrorPaths: readonly string[]): AgentLayerSyncPlan {
+export const planAgentLayerSync = (mirrorPaths: readonly string[]): AgentLayerSyncPlan => {
   const pathsToSync = AGENT_LAYER_PATHS.filter((path) => mirrorPaths.includes(path));
   return {
     pathsToSync,
     upToDate: pathsToSync.length === 0,
   };
-}
+};
 
-/** Plain-language summary for the agent to relay (never jargon). */
-export function formatAgentLayerSyncSummary(plan: AgentLayerSyncPlan): string {
+/**
+ * Plain-language summary for the agent to relay (never jargon).
+ *
+ * @param plan - plan input.
+ * @returns The rendered format agent layer sync summary text.
+ * @example
+ * const result = formatAgentLayerSyncSummary(plan);
+ */
+export const formatAgentLayerSyncSummary = (plan: AgentLayerSyncPlan): string => {
   if (plan.upToDate) {
     return 'Your assistant instructions are already up to date.';
   }
   const count = plan.pathsToSync.length;
   return `Refreshing ${count} instruction file${count === 1 ? '' : 's'} for your assistant.`;
-}
+};

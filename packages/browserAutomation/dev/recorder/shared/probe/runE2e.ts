@@ -1,5 +1,5 @@
-import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
-import { LS_PRODUCT_FIELD_HINTS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/hints';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
+import { LS_PRODUCT_FIELD_HINTS } from '@vybekiit/browser-automation/domains/payments/ls/selectors/hints';
 import type { Page } from 'playwright';
 import { classifyCrawlPages, missingFieldKeys } from './classify';
 import { cleanupAllE2eByPrefix, cleanupE2eArtifacts } from './e2eCleanup';

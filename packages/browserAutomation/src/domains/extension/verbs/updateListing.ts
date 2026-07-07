@@ -1,13 +1,15 @@
+// biome-ignore-all lint/suspicious/noUnnecessaryConditions: ListingFieldDiff.field is a runtime selector path split by tab prefix.
+
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToCwsChrome } from '@vybekiit/browser-automation/domains/extension/connect';
 import {
   diffListing,
   formatListingDiff,
   type ListingFieldDiff,
-} from '@vybekiit/browserAutomation/domains/extension/diff';
-import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
+} from '@vybekiit/browser-automation/domains/extension/diff';
+import { MissingItemIdError } from '@vybekiit/browser-automation/domains/extension/errors';
 import {
   applyCertifications,
   applyDataUseDisclosure,
@@ -19,26 +21,46 @@ import {
   setRadioByLabel,
   setRemoteCodeRadio,
   setSwitchByKey,
-} from '@vybekiit/browserAutomation/domains/extension/listingSourceFields';
-import { fieldLocator } from '@vybekiit/browserAutomation/domains/extension/locator';
-import { safeClick } from '@vybekiit/browserAutomation/domains/extension/safeClick';
+} from '@vybekiit/browser-automation/domains/extension/listingSourceWriters';
+import { fieldLocator } from '@vybekiit/browser-automation/domains/extension/locator';
+import { safeClick } from '@vybekiit/browser-automation/domains/extension/safeClick';
 import {
   type CwsListing,
   CwsListingSchema,
-} from '@vybekiit/browserAutomation/domains/extension/schema';
-import { cwsListingPath } from '@vybekiit/browserAutomation/domains/extension/store';
-import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+} from '@vybekiit/browser-automation/domains/extension/schema';
+import { cwsListingPath } from '@vybekiit/browser-automation/domains/extension/store';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
 import {
   discoverDeveloperGroupId,
   distributionUrl,
   listingUrl,
   packageUrl,
   privacyUrl,
-} from '@vybekiit/browserAutomation/domains/extension/urls';
-import { runVerifyGate } from '@vybekiit/browserAutomation/domains/extension/verifyGate';
+} from '@vybekiit/browser-automation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browser-automation/domains/extension/verifyGate';
 import { Schema } from 'effect';
 import type { Page } from 'playwright';
 import { readListingState } from './readListingState';
+
+/**
+ * Inputs for applying a precomputed CWS listing diff.
+ */
+type ApplyTabChangesParams = {
+  readonly changes: readonly ListingFieldDiff[];
+  readonly groupId: string;
+  readonly itemId: string;
+  readonly page: Page;
+  readonly saveDrafts: boolean;
+};
+
+/**
+ * Tab routing definition used by the CWS listing writer.
+ */
+type TabChangeWriter = {
+  readonly apply: (page: Page, change: ListingFieldDiff) => Promise<void>;
+  readonly prefix: string;
+  readonly url: string;
+};
 
 /**
  * Apply a precomputed `ListingFieldDiff[]` to the dev console, navigating
@@ -53,19 +75,20 @@ import { readListingState } from './readListingState';
  * Callers driving a dry-run should attach their own `dialog` handler to
  * accept the dev console's "discard unsaved changes?" prompt before
  * calling this — registering it here would leak listeners across calls.
+ *
+ * @param params - Page, target extension ids, diff entries, and save behavior.
+ * @returns A promise that resolves once all requested tab changes have been applied.
+ * @example
+ * await applyTabChanges({ page, groupId, itemId, changes, saveDrafts: false });
  */
-export async function applyTabChanges(
-  page: Page,
-  groupId: string,
-  itemId: string,
-  changes: readonly ListingFieldDiff[],
-  options: { saveDrafts: boolean },
-): Promise<void> {
-  const tabs: Array<{
-    apply: (page: Page, change: ListingFieldDiff) => Promise<void>;
-    prefix: string;
-    url: string;
-  }> = [
+export const applyTabChanges = async ({
+  changes,
+  groupId,
+  itemId,
+  page,
+  saveDrafts,
+}: ApplyTabChangesParams): Promise<void> => {
+  const tabs: TabChangeWriter[] = [
     { apply: applyListingFieldChange, prefix: 'listing.', url: listingUrl(groupId, itemId) },
     { apply: applyPrivacyFieldChange, prefix: 'privacy.', url: privacyUrl(groupId, itemId) },
     {
@@ -78,16 +101,19 @@ export async function applyTabChanges(
 
   for (const tab of tabs) {
     const tabChanges = changes.filter((change) => change.field.startsWith(tab.prefix));
-    if (tabChanges.length === 0) continue;
-    await page.goto(tab.url);
-    for (const change of tabChanges) {
-      await tab.apply(page, change);
-    }
-    if (options.saveDrafts) {
-      await safeClick(fieldLocator(page, 'actions.saveDraftButton'), 'updateListing');
+    if (tabChanges.length > 0) {
+      // biome-ignore lint/performance/noAwaitInLoops: CWS tabs must be applied sequentially.
+      await page.goto(tab.url);
+      for (const change of tabChanges) {
+        // biome-ignore lint/performance/noAwaitInLoops: CWS fields must be applied sequentially.
+        await tab.apply(page, change);
+      }
+      if (saveDrafts) {
+        await safeClick(fieldLocator(page, 'actions.saveDraftButton'), 'updateListing');
+      }
     }
   }
-}
+};
 
 /**
  * Push `cws-listing.ts` to the dev console.
@@ -107,12 +133,17 @@ export async function applyTabChanges(
  * The verb does NOT submit for review or publish — those are separate
  * verbs (ADR-0012). A draft sitting on the dev console after this verb
  * succeeds is the expected post-condition.
+ *
+ * @param ctx - Extension automation context with repo paths, auth state, and logging.
+ * @returns The list of field diffs applied to the Chrome Web Store draft.
+ * @example
+ * const { applied } = await updateListing(ctx);
  */
-export async function updateListing(ctx: VerbContext): Promise<{ applied: ListingFieldDiff[] }> {
+export const updateListing = async (ctx: VerbContext): Promise<{ applied: ListingFieldDiff[] }> => {
   if (!ctx.extension.chromeWebStoreId) {
     throw new MissingItemIdError(ctx.extension.key, 'updateListing');
   }
-  const log = ctx.log ?? console;
+  const log = resolveVerbLogger(ctx);
 
   const local = await loadLocalListing(ctx);
 
@@ -131,22 +162,35 @@ export async function updateListing(ctx: VerbContext): Promise<{ applied: Listin
   const session = await connectToCwsChrome(ctx);
   try {
     const groupId = await discoverDeveloperGroupId(session.page);
-    await applyTabChanges(session.page, groupId, ctx.extension.chromeWebStoreId, proposed, {
+    await applyTabChanges({
+      changes: proposed,
+      groupId,
+      itemId: ctx.extension.chromeWebStoreId,
+      page: session.page,
       saveDrafts: true,
     });
     return { applied: proposed };
   } finally {
     await session.dispose();
   }
-}
+};
 
 /**
  * Map one diff entry to a Playwright write against the distribution tab.
  * `payments` and `visibility` are radio groups; `regions` is a long
  * Record<region, boolean> we apply by toggling each `<li>` whose
  * checkbox state disagrees with the desired map.
+ *
+ * @param page - Chrome Web Store distribution page.
+ * @param change - Field diff routed to the distribution tab.
+ * @returns A promise that resolves after the field writer completes.
+ * @example
+ * await applyDistributionFieldChange(page, change);
  */
-async function applyDistributionFieldChange(page: Page, change: ListingFieldDiff): Promise<void> {
+const applyDistributionFieldChange = async (
+  page: Page,
+  change: ListingFieldDiff,
+): Promise<void> => {
   switch (change.field) {
     case 'distribution.payments':
       await setRadioByLabel(page, String(change.after));
@@ -157,11 +201,12 @@ async function applyDistributionFieldChange(page: Page, change: ListingFieldDiff
     case 'distribution.visibility':
       await setRadioByLabel(page, String(change.after));
       return;
+    default:
+      throw new Error(
+        `Distribution field "${change.field}" has no writer branch; add one in updateListing.ts.`,
+      );
   }
-  throw new Error(
-    `Distribution field "${change.field}" has no writer branch; add one in updateListing.ts.`,
-  );
-}
+};
 
 /**
  * Map one diff entry to a Playwright write against the listing tab. The
@@ -176,8 +221,14 @@ async function applyDistributionFieldChange(page: Page, change: ListingFieldDiff
  *    name equals the desired value.
  *  - Asset fields → fail-closed via `isFileUploadField`.
  *  - Anything else → `fill()` the underlying textbox.
+ *
+ * @param page - Chrome Web Store listing page.
+ * @param change - Field diff routed to the listing tab.
+ * @returns A promise that resolves after the field writer completes.
+ * @example
+ * await applyListingFieldChange(page, change);
  */
-async function applyListingFieldChange(page: Page, change: ListingFieldDiff): Promise<void> {
+const applyListingFieldChange = async (page: Page, change: ListingFieldDiff): Promise<void> => {
   if (change.field === 'listing.matureContent') {
     await setSwitchByKey(page, 'listing.matureContent', Boolean(change.after));
     return;
@@ -193,8 +244,9 @@ async function applyListingFieldChange(page: Page, change: ListingFieldDiff): Pr
     );
   }
 
-  await fieldLocator(page, change.field).fill(String(change.after ?? ''));
-}
+  const fieldValue = change.after === undefined ? '' : String(change.after);
+  await fieldLocator(page, change.field).fill(fieldValue);
+};
 
 /**
  * Map one diff entry to a Playwright write against the package tab.
@@ -203,8 +255,14 @@ async function applyListingFieldChange(page: Page, change: ListingFieldDiff): Pr
  * action — the dev console offers no opt-out affordance — so the writer
  * accepts only `false → true` and otherwise no-ops with a warning, which
  * preserves the no-deletion contract.
+ *
+ * @param page - Chrome Web Store package page.
+ * @param change - Field diff routed to the package tab.
+ * @returns A promise that resolves after the field writer completes.
+ * @example
+ * await applyPackageFieldChange(page, change);
  */
-async function applyPackageFieldChange(page: Page, change: ListingFieldDiff): Promise<void> {
+const applyPackageFieldChange = async (page: Page, change: ListingFieldDiff): Promise<void> => {
   if (change.field !== 'package.verifiedUploadsOptIn') {
     throw new Error(
       `Package field "${change.field}" has no writer branch; add one in updateListing.ts.`,
@@ -217,7 +275,7 @@ async function applyPackageFieldChange(page: Page, change: ListingFieldDiff): Pr
   }
   const optIn = page.getByRole('button', { name: 'Opt in to verified CRX uploads' }).first();
   await safeClick(optIn, 'updateListing');
-}
+};
 
 /**
  * Map one diff entry to a Playwright write against the privacy tab. Handles
@@ -225,8 +283,14 @@ async function applyPackageFieldChange(page: Page, change: ListingFieldDiff): Pr
  * `dataUseDisclosure`) inline rather than dispatching to per-subkey
  * selectors — both shapes are enumerated against the live DOM, mirroring
  * the read side.
+ *
+ * @param page - Chrome Web Store privacy page.
+ * @param change - Field diff routed to the privacy tab.
+ * @returns A promise that resolves after the field writer completes.
+ * @example
+ * await applyPrivacyFieldChange(page, change);
  */
-async function applyPrivacyFieldChange(page: Page, change: ListingFieldDiff): Promise<void> {
+const applyPrivacyFieldChange = async (page: Page, change: ListingFieldDiff): Promise<void> => {
   switch (change.field) {
     case 'privacy.certifications':
       await applyCertifications(page, change.before, change.after);
@@ -237,12 +301,16 @@ async function applyPrivacyFieldChange(page: Page, change: ListingFieldDiff): Pr
     case 'privacy.permissionsJustification':
       await applyPermissionsJustification(page, change.before, change.after);
       return;
-    case 'privacy.remoteCodeJustification':
-      await fillTextareaByLabelPrefix(page, 'Justification', String(change.after ?? ''));
+    case 'privacy.remoteCodeJustification': {
+      const justification = change.after === undefined ? '' : String(change.after);
+      await fillTextareaByLabelPrefix(page, 'Justification', justification);
       return;
+    }
     case 'privacy.usesRemoteCode':
       await setRemoteCodeRadio(page, Boolean(change.after));
       return;
+    default:
+      break;
   }
 
   if (typeof change.after === 'string') {
@@ -258,14 +326,19 @@ async function applyPrivacyFieldChange(page: Page, change: ListingFieldDiff): Pr
   throw new Error(
     `Privacy field "${change.field}" has an unexpected value type (${typeof change.after}); add a writer branch in updateListing.ts.`,
   );
-}
+};
 
 /**
  * Dynamically import the per-extension `cws-listing.ts` and validate it.
  * Importing keeps the file as a typed module rather than a stringly-typed
  * JSON blob.
+ *
+ * @param ctx - Extension automation context containing the repo root.
+ * @returns The validated local listing module export.
+ * @example
+ * const listing = await loadLocalListing(ctx);
  */
-async function loadLocalListing(ctx: VerbContext): Promise<CwsListing> {
+const loadLocalListing = async (ctx: VerbContext): Promise<CwsListing> => {
   const filePath = cwsListingPath(ctx.repoRoot);
   if (!existsSync(filePath)) {
     throw new Error(
@@ -273,6 +346,11 @@ async function loadLocalListing(ctx: VerbContext): Promise<CwsListing> {
     );
   }
   const moduleUrl = pathToFileURL(filePath).href;
-  const imported: { default?: unknown } = await import(moduleUrl);
-  return Schema.decodeUnknownSync(CwsListingSchema)(imported.default);
-}
+  const imported: { listing?: unknown } = await import(moduleUrl);
+  if (imported.listing === undefined) {
+    throw new Error(
+      `Invalid cws-listing.ts at ${filePath}. Export a named \`listing\` constant or re-run \`vybekiit-automate extension import --json\`.`,
+    );
+  }
+  return Schema.decodeUnknownSync(CwsListingSchema)(imported.listing);
+};

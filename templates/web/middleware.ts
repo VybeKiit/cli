@@ -7,19 +7,29 @@ import { evaluateApiSecurity } from '@/lib/apiSecurity';
 const intlMiddleware = createIntlMiddleware(routing);
 
 /**
- * Edge middleware — API security for `/api/*`, next-intl locale routing for pages.
+ * Edge middleware for API security and locale routing.
+ *
+ * @param request - Incoming Next.js edge request.
+ * @returns A blocked API response or the locale middleware response.
+ * @example
+ * const response = middleware(request);
  */
-export function middleware(request: NextRequest) {
+export const middleware = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/api')) {
     const blocked = evaluateApiSecurity(request);
-    return blocked ?? NextResponse.next();
+    if (blocked !== null) {
+      return blocked;
+    }
+
+    return NextResponse.next();
   }
 
   return intlMiddleware(request);
-}
+};
 
+/** Routes covered by the Next.js middleware. */
 export const config = {
   matcher: ['/api/:path*', '/((?!api|_next|_vercel|.*\\..*).*)'],
 };

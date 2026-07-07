@@ -3,15 +3,29 @@ const RTL_LANGUAGES = new Set(['ar', 'he', 'fa', 'ur']);
 
 /**
  * Derive page writing direction from the active i18n locale.
- * Combined with logical-property utilities (see `tailwind.config.ts`) the whole
- * layout mirrors with zero per-component work.
+ *
+ * @param locale - Active route locale, such as `en` or `he-IL`.
+ * @returns The HTML direction for the locale.
+ * @example
+ * const direction = localeToDirection('he-IL');
  */
-export function localeToDirection(locale: string): 'ltr' | 'rtl' {
-  const base = locale.split('-')[0]?.toLowerCase() ?? 'en';
+const localeToDirection = (locale: string): 'ltr' | 'rtl' => {
+  const [language] = locale.split('-');
+  const base = language === undefined || language === '' ? 'en' : language.toLowerCase();
   return RTL_LANGUAGES.has(base) ? 'rtl' : 'ltr';
-}
+};
 
-/** Base language tag for `<html lang>` from a locale string. */
-export function localeToLang(locale: string): string {
-  return locale.split('-')[0]?.toLowerCase() ?? 'en';
-}
+/**
+ * Derive the base language tag for `<html lang>`.
+ *
+ * @param locale - Active route locale, such as `en-US`.
+ * @returns The base language subtag.
+ * @example
+ * const lang = localeToLang('en-US');
+ */
+const localeToLang = (locale: string): string => {
+  const [language] = locale.split('-');
+  return language === undefined || language === '' ? 'en' : language.toLowerCase();
+};
+
+export { localeToDirection, localeToLang };

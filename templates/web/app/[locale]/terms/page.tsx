@@ -3,15 +3,20 @@ import { TERMS_SECTIONS } from '@/data/legal';
 import { COMPANY_NAME, CONTACT_EMAIL, LEGAL_EFFECTIVE_DATE, PRODUCT_NAME } from '@/data/product';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-type TermsPageProps = {
+interface TermsPageProps {
   params: Promise<{ locale: string }>;
-};
+}
 
 /**
  * Terms of Service — plain-language skeleton with sensible defaults. The onboarding
  * skill replaces company/contact details; a human should review before launch.
+ *
+ * @param props - Locale route params from Next.js.
+ * @returns The localized terms page.
+ * @example
+ * <TermsPage params={params} />
  */
-export default async function TermsPage({ params }: TermsPageProps) {
+const TermsPage = async ({ params }: TermsPageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
@@ -40,4 +45,6 @@ export default async function TermsPage({ params }: TermsPageProps) {
       </article>
     </MarketingShell>
   );
-}
+};
+
+export default TermsPage;

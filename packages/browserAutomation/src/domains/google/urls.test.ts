@@ -6,7 +6,7 @@ import {
   consentUrl,
   createClientUrl,
   dataAccessUrl,
-} from '@vybekiit/browserAutomation/domains/google/urls';
+} from '@vybekiit/browser-automation/domains/google/urls';
 import { describe, expect, it } from 'vitest';
 
 describe('google console urls', () => {

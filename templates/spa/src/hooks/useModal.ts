@@ -1,6 +1,14 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 
-export const useModal = (initialState: boolean = false) => {
+/**
+ * Manage simple open/close/toggle modal state.
+ *
+ * @param initialState - Initial open state for the modal.
+ * @returns Modal state and stable state-change callbacks.
+ * @example
+ * const { isOpen, openModal, closeModal } = useModal();
+ */
+export const useModal = (initialState = false) => {
   const [isOpen, setIsOpen] = useState(initialState);
 
   const openModal = useCallback(() => setIsOpen(true), []);

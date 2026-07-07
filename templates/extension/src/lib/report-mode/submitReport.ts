@@ -7,7 +7,15 @@ import {
 
 const assistant = resolveVybeAssistant(import.meta.env as Record<string, string | undefined>);
 
-export async function submitExtensionReport(payload: ReportPayload): Promise<void> {
+/**
+ * Submit an extension report through assistant deep link or clipboard fallback.
+ *
+ * @param payload - Report details collected from the extension report overlay.
+ * @returns A promise that resolves after the handoff is prepared.
+ * @example
+ * await submitExtensionReport({ route: 'extension-popup', selector: 'button', builderNote: 'Wrong copy' });
+ */
+export const submitExtensionReport = async (payload: ReportPayload): Promise<void> => {
   const prompt = formatReportPrompt({ ...payload, platform: 'extension' });
 
   if (assistant) {
@@ -22,6 +30,6 @@ export async function submitExtensionReport(payload: ReportPayload): Promise<voi
   }
 
   await navigator.clipboard.writeText(prompt);
-}
+};
 
 export { assistant as extensionVybeAssistant };

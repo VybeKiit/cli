@@ -8,27 +8,36 @@ import { LANDING_EASE, LANDING_HERO, LANDING_NAV } from '@/data/landing';
 import { BRAND } from '@/data/site';
 import { cn } from '@/lib/utils';
 
-/** Fixed header with nav anchors and checkout CTA. */
-export function Header() {
+/**
+ * Fixed header with nav anchors and checkout CTA.
+ *
+ * @returns The rendered Header element.
+ * @example
+ * ```tsx
+ * <Header />
+ * ```
+ */
+
+export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <motion.header
       animate={{ opacity: 1, y: 0 }}
       className="relative z-50"
-      initial={{ opacity: 0, y: -16 }}
+      initial={false}
       transition={{ duration: 0.7, ease: LANDING_EASE }}
     >
-      <div className="mx-auto flex h-[96px] max-w-[1520px] items-center justify-between px-6 md:px-12">
+      <div className="mx-auto flex h-[96px] w-full max-w-none translate-y-[14px] items-center justify-between px-[72px]">
         <Link className="flex items-center gap-3 text-white" href="/">
-          <VybeLogoIcon className="h-8 w-8" />
-          <span className="font-extrabold text-[22px] tracking-tight">{BRAND.name}</span>
+          <VybeLogoIcon className="h-10 w-10" />
+          <span className="font-extrabold text-[34px] tracking-tight">{BRAND.name}</span>
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-12 lg:flex">
           {LANDING_NAV.map((link) => (
             <a
-              className="font-semibold text-[var(--text-soft)] text-[15px] transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
+              className="font-semibold text-[20px] text-[var(--text-soft)] transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
               href={link.href}
               key={link.label}
             >
@@ -39,7 +48,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <Link
-            className="landing-cta-pill hidden px-6 py-3 font-semibold text-sm sm:inline-flex"
+            className="landing-cta-pill hidden min-h-[68px] min-w-[196px] px-9 py-4 font-semibold text-[20px] sm:inline-flex"
             href="/checkout"
           >
             {LANDING_HERO.ctaLabel}
@@ -91,4 +100,4 @@ export function Header() {
       </div>
     </motion.header>
   );
-}
+};

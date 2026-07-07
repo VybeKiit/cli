@@ -7,22 +7,30 @@ import { startCheckout } from '@/lib/billingClient';
 import { t } from '@/lib/i18n';
 import { PLANS } from '@/lib/plans';
 import { cn } from '@/lib/utils';
+import { Either } from 'effect';
 import { useState } from 'react';
 
-export function PricingScreen() {
+/**
+ * Render extension pricing cards and checkout actions.
+ *
+ * @returns The pricing screen for the extension.
+ * @example
+ * <PricingScreen />
+ */
+export const PricingScreen = () => {
   const [pendingId, setPendingId] = useState('');
   const { error, run: checkout } = useAsync(startCheckout);
 
-  async function handleSelect(planId: string) {
+  const handleSelect = async (planId: string): Promise<void> => {
     setPendingId(planId);
     const result = await checkout(planId);
-    if (!result.ok) {
+    if (Either.isLeft(result)) {
       setPendingId('');
       return;
     }
-    window.open(result.value.url, '_blank', 'noopener,noreferrer');
+    window.open(result.right.url, '_blank', 'noopener,noreferrer');
     setPendingId('');
-  }
+  };
 
   return (
     <section className="flex flex-col gap-6">
@@ -72,4 +80,4 @@ export function PricingScreen() {
       </div>
     </section>
   );
-}
+};

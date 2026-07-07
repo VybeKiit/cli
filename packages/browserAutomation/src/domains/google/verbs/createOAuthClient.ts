@@ -2,36 +2,35 @@ import {
   pacedDispatchClick,
   pacedFill,
   resolvePaceMs,
-} from '@vybekiit/browserAutomation/core/pace';
-import { waitForGoogleAuthenticated } from '@vybekiit/browserAutomation/domains/google/dashboard/waitForAuthenticated';
+} from '@vybekiit/browser-automation/core/pace';
+import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { waitForGoogleAuthenticated } from '@vybekiit/browser-automation/domains/google/dashboard/waitForAuthenticated';
 import {
   parseClientId,
   parseClientSecret,
-} from '@vybekiit/browserAutomation/domains/google/scrape';
+} from '@vybekiit/browser-automation/domains/google/scrape';
 import type {
   GoogleOAuthParams,
   GoogleOAuthResult,
-} from '@vybekiit/browserAutomation/domains/google/types';
-import { clientsUrl, createClientUrl } from '@vybekiit/browserAutomation/domains/google/urls';
+} from '@vybekiit/browser-automation/domains/google/types';
+import { clientsUrl, createClientUrl } from '@vybekiit/browser-automation/domains/google/urls';
 import type { BrowserContext, Locator, Page } from 'playwright';
 
 /** Consistent OAuth client display name so reruns can find and reuse it. */
-function clientName(appName: string): string {
-  return `${appName} Web`;
-}
+const clientName = (appName: string): string => `${appName} Web`;
 
-async function firstPresent(locators: Locator[]): Promise<Locator | null> {
+const firstPresent = async (locators: Locator[]): Promise<Locator | null> => {
   for (const locator of locators) {
     if ((await locator.count()) > 0) return locator.first();
   }
   return null;
-}
+};
 
 /** Poll the page HTML for a `GOCSPX-` secret (+ client id) up to a bounded window. */
-async function pollForSecret(
+const pollForSecret = async (
   page: Page,
   attempts = 20,
-): Promise<{ clientId: string | null; clientSecret: string } | null> {
+): Promise<{ clientId: string | null; clientSecret: string } | null> => {
   for (let i = 0; i < attempts; i++) {
     await page.waitForTimeout(1000);
     const html = await page
@@ -42,7 +41,7 @@ async function pollForSecret(
     if (clientSecret) return { clientId: parseClientId(html), clientSecret };
   }
   return null;
-}
+};
 
 /**
  * Add the two authorized redirect URIs.
@@ -51,11 +50,11 @@ async function pollForSecret(
  * URIs" — both rendering `input[formcontrolname="uri"]`. We scope strictly to the redirect
  * container so origins (which reject paths) never receive a callback URL.
  */
-async function fillRedirectUris(
+const fillRedirectUris = async (
   page: Page,
   redirectUris: readonly string[],
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
   const redirectSection = page
     .locator('.cfc-form-stack-container', { hasText: /redirect uris/i })
     .filter({ hasNot: page.locator('text=/javascript origins/i') })
@@ -78,7 +77,7 @@ async function fillRedirectUris(
       `[google] only ${count} redirect field(s) available for ${redirectUris.length} URI(s) — add the rest manually if needed`,
     );
   }
-}
+};
 
 /**
  * Add a fresh secret to an existing same-named client and read it back.
@@ -88,12 +87,12 @@ async function fillRedirectUris(
  * detail page ("Information and summary" panel → "Add secret"). Returns null if no matching
  * client exists so the caller can fall through to creating one.
  */
-async function addSecretToExistingClient(
+const addSecretToExistingClient = async (
   page: Page,
   params: GoogleOAuthParams,
   context: BrowserContext,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<GoogleOAuthResult | null> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<GoogleOAuthResult | null> => {
   await page.goto(clientsUrl(params.projectId), { waitUntil: 'domcontentloaded', timeout: 60_000 });
   page = await waitForGoogleAuthenticated(page, log, context);
   await page.waitForTimeout(resolvePaceMs());
@@ -136,29 +135,39 @@ async function addSecretToExistingClient(
 
   const creds = await pollForSecret(page);
   if (!creds) return null;
+  const resolvedClientId = creds.clientId === null ? clientId : creds.clientId;
+  if (resolvedClientId === null) {
+    throw new Error(
+      'Google showed a new OAuth secret but no client ID. Open the client details, copy the Client ID, and paste it into .env.',
+    );
+  }
+
   return {
-    clientId: creds.clientId ?? clientId ?? '',
+    clientId: resolvedClientId,
     clientSecret: creds.clientSecret,
     projectId: params.projectId,
     reusedExisting: true,
   };
-}
+};
 
 /**
- * Create a Web OAuth client (or add a secret to a same-named existing one) and read back the
- * credentials. Secrets are shown once and unreadable afterwards, so "reuse" adds a new secret.
+ * Create a Web OAuth client (or add a secret to a same-named existing one) and read back the credentials. Secrets are shown once and unreadable afterwards, so "reuse" adds a new secret.
  *
- * Every click uses `pacedDispatchClick` because the Console overlay intercepts real pointer
- * gestures; text inputs use fill. The create-success dialog auto-dismisses on the slow console,
- * so we always open the client's detail page and add a secret to obtain a readable value.
+ * @param page - Playwright page to inspect or mutate.
+ * @param params - Validated automation parameters for the operation.
+ * @param context - Browser context used for authenticated waits.
+ * @param log - Input value for log.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await createOAuthClient(page, params, context, log);
  */
-export async function createOAuthClient(
+export const createOAuthClient = async (
   page: Page,
   params: GoogleOAuthParams,
   context?: BrowserContext,
-  log: Pick<Console, 'log' | 'warn'> = console,
-): Promise<GoogleOAuthResult> {
-  const ctx = context ?? page.context();
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+): Promise<GoogleOAuthResult> => {
+  const ctx = context === undefined ? page.context() : context;
 
   if (params.resetSecret) {
     const reused = await addSecretToExistingClient(page, params, ctx, log);
@@ -208,7 +217,7 @@ export async function createOAuthClient(
 
   // Fallback: try to read whatever the create dialog left on the page.
   const creds = await pollForSecret(page, 5);
-  if (!creds?.clientId) {
+  if (creds === null || creds.clientId === null) {
     throw new Error(
       'OAuth client was created but a readable secret could not be captured. Open the client in the Console, add a secret, and paste the Client ID + secret into .env.',
     );
@@ -219,4 +228,4 @@ export async function createOAuthClient(
     projectId: params.projectId,
     reusedExisting: false,
   };
-}
+};

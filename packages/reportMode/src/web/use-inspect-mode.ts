@@ -2,12 +2,41 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-interface UseInspectModeOptions {
+/** Options for initializing inspect mode. */
+type UseInspectModeOptions = {
   readonly autoActivate?: boolean;
-}
+};
 
-/** Pick mode — hover highlight, click to select an element for reporting. */
-export function useInspectMode({ autoActivate = false }: UseInspectModeOptions = {}) {
+/**
+ * Resolve the element that should currently receive the inspect highlight.
+ *
+ * @param selected - Element selected by the user.
+ * @param hovered - Element currently under the cursor.
+ * @returns The selected element, hovered element, or `null`.
+ * @example
+ * const target = resolveHighlightTarget(selected, hovered);
+ */
+const resolveHighlightTarget = (
+  selected: Element | null,
+  hovered: Element | null,
+): Element | null => {
+  if (selected !== null) {
+    return selected;
+  }
+
+  return hovered;
+};
+
+/**
+ * Manage Report Mode pick mode state and document event listeners.
+ *
+ * @param options - Optional initial activation behavior.
+ * @returns Inspect mode state, selected element, highlight rect, and actions.
+ * @example
+ * const inspect = useInspectMode({ autoActivate: true });
+ */
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: hook owns one DOM listener lifecycle and related state.
+export const useInspectMode = ({ autoActivate = false }: UseInspectModeOptions = {}) => {
   const [active, setActive] = useState(autoActivate);
   const [hovered, setHovered] = useState<Element | null>(null);
   const [selected, setSelected] = useState<Element | null>(null);
@@ -33,6 +62,11 @@ export function useInspectMode({ autoActivate = false }: UseInspectModeOptions =
 
   const activate = useCallback(() => {
     setActive(true);
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelected(null);
+    setNote('');
   }, []);
 
   const onMouseMove = useCallback(
@@ -77,9 +111,9 @@ export function useInspectMode({ autoActivate = false }: UseInspectModeOptions =
     };
   }, [active, onClick, onMouseMove]);
 
-  const highlightTarget = selected ?? hovered;
+  const highlightTarget = resolveHighlightTarget(selected, hovered);
   const highlightRect =
-    highlightTarget && typeof highlightTarget.getBoundingClientRect === 'function'
+    highlightTarget !== null && typeof highlightTarget.getBoundingClientRect === 'function'
       ? highlightTarget.getBoundingClientRect()
       : null;
 
@@ -93,9 +127,6 @@ export function useInspectMode({ autoActivate = false }: UseInspectModeOptions =
     activate,
     deactivate,
     toggleActive,
-    clearSelection: () => {
-      setSelected(null);
-      setNote('');
-    },
+    clearSelection,
   };
-}
+};

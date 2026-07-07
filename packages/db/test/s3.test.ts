@@ -1,3 +1,5 @@
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: SDK command mocks intentionally use small fake classes.
+// biome-ignore-all lint/complexity/noExcessiveLinesPerFunction: S3 provider contract cases stay grouped for auditability.
 import { createS3StorageProvider } from '@vybekiit/db/providers/s3';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,7 +14,11 @@ const { send, command } = vi.hoisted(() => {
   const make = (name: string) =>
     class {
       readonly name = name;
-      constructor(public readonly input: Record<string, unknown>) {}
+      readonly input: Record<string, unknown>;
+
+      constructor(input: Record<string, unknown>) {
+        this.input = input;
+      }
     };
   return {
     send: vi.fn(),
@@ -30,10 +36,14 @@ vi.mock('@aws-sdk/client-s3', () => ({
   ...command,
 }));
 
-/** The single command issued to `send`, with its tag and payload typed for assertions. */
-function sentCommand(): { name: string; input: Record<string, unknown> } {
-  return send.mock.calls[0]?.[0];
-}
+/**
+ * Return the single SDK command issued to the mocked S3 client.
+ *
+ * @returns Captured command tag and payload for assertions.
+ * @example
+ * expect(sentCommand().name).toBe('PutObject');
+ */
+const sentCommand = (): { name: string; input: Record<string, unknown> } => send.mock.calls[0]?.[0];
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
 const run = Effect.runPromise;

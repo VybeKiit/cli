@@ -28,7 +28,12 @@ export type ClientMessage =
 
 export type DaemonMessage =
   | { type: 'agent.output'; sessionId: string; chunk: string }
-  | { type: 'agent.step'; sessionId: string; step: WorkflowStep }
+  | {
+      type: 'agent.step';
+      sessionId: string;
+      stepId: string;
+      status: WorkflowStep['status'];
+    }
   | { type: 'agent.status'; sessionId: string; status: 'running' | 'idle' | 'error' }
   | { type: 'agent.list'; agents: AgentStatus[] }
   | { type: 'session.history'; sessions: Session[] }

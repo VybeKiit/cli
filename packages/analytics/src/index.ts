@@ -1,7 +1,3 @@
-export { resolveAnalyticsProvider } from './resolve';
-export type {
-  AnalyticsProvider,
-  AnalyticsProviderName,
-  ScriptConfig,
-  TrackEvent,
-} from './types';
+export * from './config';
+export * from './resolve';
+export * from './types';

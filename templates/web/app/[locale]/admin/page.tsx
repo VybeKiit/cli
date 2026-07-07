@@ -1,11 +1,18 @@
 import { AdminStatsCard } from '@/components/admin/admin-stats-card';
 import { AdminRevenueChart } from '@/components/admin/admin-revenue-chart';
 
-export default function AdminOverviewPage() {
+/**
+ * Render the admin overview dashboard.
+ *
+ * @returns Mock admin stats, revenue, and activity sections.
+ * @example
+ * <AdminOverviewPage />
+ */
+const AdminOverviewPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Overview</h2>
+        <h2 className="font-bold text-2xl tracking-tight">Overview</h2>
         <p className="text-muted-foreground">Your SaaS at a glance.</p>
       </div>
 
@@ -51,18 +58,20 @@ export default function AdminOverviewPage() {
               time: '3 hours ago',
             },
             { action: 'New team created', detail: 'Acme Corp (5 members)', time: '5 hours ago' },
-            { action: 'Support ticket', detail: '#1234 — Billing question', time: '1 day ago' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between py-2">
+            { action: 'Support ticket', detail: '#1234 - Billing question', time: '1 day ago' },
+          ].map((item) => (
+            <div key={item.action} className="flex items-center justify-between py-2">
               <div>
                 <span className="font-medium">{item.action}</span>
                 <span className="ml-2 text-muted-foreground">{item.detail}</span>
               </div>
-              <span className="text-xs text-muted-foreground">{item.time}</span>
+              <span className="text-muted-foreground text-xs">{item.time}</span>
             </div>
           ))}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default AdminOverviewPage;

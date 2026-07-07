@@ -2,62 +2,121 @@ import { PRESET_HELPERS, REALTIME_TABLES, renderRealtimeGrants } from './helpers
 import type {
   PostgresProviderName,
   PresetColumn,
+  PresetColumnType,
   PresetEntity,
   PresetManifest,
   PresetRlsMode,
   RenderedPreset,
 } from './types';
 
-function sqlType(column: PresetColumn): string {
-  switch (column.type) {
-    case 'uuid':
-      return 'uuid';
-    case 'boolean':
-      return 'boolean';
-    case 'timestamptz':
-      return 'timestamptz';
-    case 'jsonb':
-      return 'jsonb';
-    case 'numeric':
-      return 'numeric';
-    case 'vector':
-      return 'vector(1536)';
-    default:
-      return 'text';
-  }
-}
+const SQL_TYPE_BY_PRESET_TYPE = {
+  text: 'text',
+  uuid: 'uuid',
+  boolean: 'boolean',
+  timestamptz: 'timestamptz',
+  jsonb: 'jsonb',
+  numeric: 'numeric',
+  // pgvector column for embeddings, e.g. `embedding vector(1536)`.
+  // biome-ignore lint/security/noSecrets: pgvector dimension literal is not a secret.
+  vector: 'vector(1536)',
+} satisfies Readonly<Record<PresetColumnType, string>>;
 
-function renderColumnDef(column: PresetColumn): string {
+/**
+ * Resolve the SQL column type for a preset column.
+ *
+ * @param column - Preset column definition.
+ * @returns Postgres SQL type for the column.
+ * @example
+ * const type = sqlType({ name: 'id', type: 'uuid' });
+ */
+const sqlType = (column: PresetColumn): string => SQL_TYPE_BY_PRESET_TYPE[column.type];
+
+/**
+ * Render a non-primary-key column definition.
+ *
+ * @param column - Preset column definition.
+ * @returns SQL fragment for the column.
+ * @example
+ * const sql = renderColumnDef({ name: 'email', type: 'text', required: true });
+ */
+const renderColumnDef = (column: PresetColumn): string => {
   if (column.generated) {
     const storedType = column.name === 'search_vector' ? 'tsvector' : 'text';
     return `  ${column.name} ${storedType} generated always as (${column.generated}) stored`;
   }
   const parts = [`  ${column.name} ${sqlType(column)}`];
-  if (column.required && !column.default) parts.push('not null');
-  if (column.default) parts.push(`default ${column.default}`);
-  if (column.unique) parts.push('unique');
+  if (column.required && !column.default) {
+    parts.push('not null');
+  }
+  if (column.default) {
+    parts.push(`default ${column.default}`);
+  }
+  if (column.unique) {
+    parts.push('unique');
+  }
   return parts.join(' ');
-}
+};
 
-function renderCreateTable(entity: PresetEntity): string {
-  const pk = entity.primaryKey ?? 'id';
+/**
+ * Resolve an entity primary key.
+ *
+ * @param entity - Preset entity definition.
+ * @returns Explicit primary key, or the kit default `id`.
+ * @example
+ * const primaryKey = resolvePrimaryKey(entity);
+ */
+const resolvePrimaryKey = (entity: PresetEntity): string => {
+  if (entity.primaryKey !== undefined) {
+    return entity.primaryKey;
+  }
+  return 'id';
+};
+
+/**
+ * Render a primary-key column definition.
+ *
+ * @param pk - Primary key column name.
+ * @param pkColumn - Matching column definition, if present.
+ * @returns SQL column definition for the primary key.
+ * @example
+ * const sql = renderPrimaryKeyColumn('id', column);
+ */
+const renderPrimaryKeyColumn = (pk: string, pkColumn: PresetColumn | undefined): string => {
+  if (pkColumn === undefined) {
+    return `  ${pk} text primary key`;
+  }
+  if (pkColumn.type === 'uuid' && pkColumn.default?.includes('gen_random_uuid')) {
+    return `  ${pk} uuid primary key default gen_random_uuid()`;
+  }
+  const required = pkColumn.required ? ' not null' : '';
+  const defaultSql = pkColumn.default ? ` default ${pkColumn.default}` : '';
+  return `  ${pk} ${sqlType(pkColumn)} primary key${required}${defaultSql}`;
+};
+
+/**
+ * Render a create-table statement for one preset entity.
+ *
+ * @param entity - Preset entity definition.
+ * @returns SQL create-table statement.
+ * @example
+ * const sql = renderCreateTable(entity);
+ */
+const renderCreateTable = (entity: PresetEntity): string => {
+  const pk = resolvePrimaryKey(entity);
   const pkColumn = entity.columns.find((col) => col.name === pk);
   const nonPkColumns = entity.columns.filter((col) => col.name !== pk || col.generated);
 
   const columnLines: string[] = [];
   if (pkColumn && !pkColumn.generated) {
-    const pkDef =
-      pkColumn.type === 'uuid' && pkColumn.default?.includes('gen_random_uuid')
-        ? `  ${pk} uuid primary key default gen_random_uuid()`
-        : `  ${pk} ${sqlType(pkColumn)} primary key${pkColumn.required ? ' not null' : ''}${pkColumn.default ? ` default ${pkColumn.default}` : ''}`;
-    columnLines.push(pkDef);
-  } else if (!pkColumn) {
-    columnLines.push(`  ${pk} text primary key`);
+    columnLines.push(renderPrimaryKeyColumn(pk, pkColumn));
+  } else if (pkColumn === undefined) {
+    columnLines.push(renderPrimaryKeyColumn(pk, undefined));
   }
 
   for (const column of nonPkColumns) {
-    if (column.name === pk && !column.generated) continue;
-    columnLines.push(renderColumnDef(column));
+    if (column.name !== pk || column.generated) {
+      columnLines.push(renderColumnDef(column));
+    }
   }
 
   const fkLines: string[] = [];
@@ -71,20 +130,43 @@ function renderCreateTable(entity: PresetEntity): string {
 
   const allLines = [...columnLines, ...fkLines];
   return `create table if not exists public.${entity.name} (\n${allLines.join(',\n')}\n);`;
-}
+};
 
-function renderIndex(manifest: PresetManifest, index: PresetManifest['indexes'][number]): string {
+/**
+ * Render one preset index.
+ *
+ * @param manifest - Parent preset manifest.
+ * @param index - Index definition from the manifest.
+ * @returns SQL create-index statement.
+ * @example
+ * const sql = renderIndex(manifest, manifest.indexes[0]);
+ */
+const renderIndex = (
+  _manifest: PresetManifest,
+  index: PresetManifest['indexes'][number],
+): string => {
   const cols = index.columns.join(', ');
   const idxName = `${index.table}_${index.columns.join('_')}_idx`;
   const unique = index.unique ? 'unique ' : '';
   const method = index.method ? ` using ${index.method}` : '';
   const where = index.where ? ` where ${index.where}` : '';
   return `-- ${index.reason}\ncreate ${unique}index if not exists ${idxName} on public.${index.table}${method} (${cols})${where};`;
-}
+};
 
-function renderRls(manifest: PresetManifest, entityName: string): string {
+/**
+ * Render row-level security policies for one entity.
+ *
+ * @param manifest - Parent preset manifest.
+ * @param entityName - Entity/table name to protect.
+ * @returns SQL RLS block, or an empty string for `none`.
+ * @example
+ * const sql = renderRls(manifest, 'orders');
+ */
+const renderRls = (manifest: PresetManifest, entityName: string): string => {
   const mode: PresetRlsMode = manifest.rls;
-  if (mode === 'none') return '';
+  if (mode === 'none') {
+    return '';
+  }
 
   const lines: string[] = [`alter table public.${entityName} enable row level security;`];
 
@@ -178,25 +260,37 @@ create policy "${entityName}_delete_own"
   }
 
   return lines.join('\n');
-}
+};
 
-/** Render Postgres SQL migration for a preset manifest. */
-export function renderPostgresPreset(
+/**
+ * Render a Postgres SQL migration for a preset manifest.
+ *
+ * @param manifest - Preset manifest to render.
+ * @param provider - Postgres provider target.
+ * @returns SQL migration text.
+ * @example
+ * const sql = renderPostgresPreset(manifest, 'supabase');
+ */
+export const renderPostgresPreset = (
   manifest: PresetManifest,
   provider: PostgresProviderName,
-): string {
+): string => {
+  const description = manifest.description === undefined ? '' : manifest.description;
   const parts: string[] = [
     `-- VybeKiit preset: ${manifest.id} v${manifest.version} (${provider})`,
-    `-- ${manifest.description ?? ''}`.trim(),
+    `-- ${description}`.trim(),
   ];
 
   if (manifest.extensions?.includes('vector')) {
     parts.push('create extension if not exists vector;');
   }
 
-  for (const helper of manifest.helpers ?? []) {
+  const helpers = manifest.helpers === undefined ? [] : manifest.helpers;
+  for (const helper of helpers) {
     const sql = PRESET_HELPERS[helper];
-    if (sql) parts.push(sql);
+    if (sql !== undefined) {
+      parts.push(sql);
+    }
   }
 
   for (const entity of manifest.entities) {
@@ -209,7 +303,9 @@ export function renderPostgresPreset(
 
   for (const entity of manifest.entities) {
     const rls = renderRls(manifest, entity.name);
-    if (rls) parts.push(rls);
+    if (rls) {
+      parts.push(rls);
+    }
   }
 
   if (manifest.id === 'realtime_publications') {
@@ -217,14 +313,22 @@ export function renderPostgresPreset(
   }
 
   return `${parts.filter(Boolean).join('\n\n')}\n`;
-}
+};
 
-/** Render a preset for the requested provider. */
-export function renderPreset(
+/**
+ * Render a preset for the requested provider.
+ *
+ * @param manifest - Preset manifest to render.
+ * @param provider - Target data provider.
+ * @returns Rendered SQL for Postgres providers or notes for planned NoSQL providers.
+ * @example
+ * const rendered = renderPreset(manifest, 'supabase');
+ */
+export const renderPreset = (
   manifest: PresetManifest,
   provider: PostgresProviderName | 'mongodb' | 'firebase' | 'aws',
-): RenderedPreset {
-  const status = manifest.providers?.[provider];
+): RenderedPreset => {
+  const status = manifest.providers === undefined ? undefined : manifest.providers[provider];
   if (provider === 'mongodb' || provider === 'firebase' || provider === 'aws') {
     return {
       presetId: manifest.id,
@@ -244,15 +348,25 @@ export function renderPreset(
     provider,
     sql: renderPostgresPreset(manifest, provider),
   };
-}
+};
 
-function renderNosqlPreset(
+/**
+ * Render NoSQL implementation notes for a preset.
+ *
+ * @param manifest - Preset manifest to describe.
+ * @param provider - NoSQL provider target.
+ * @returns Markdown notes for the provider-specific implementation plan.
+ * @example
+ * const notes = renderNosqlPreset(manifest, 'mongodb');
+ */
+const renderNosqlPreset = (
   manifest: PresetManifest,
   provider: 'mongodb' | 'firebase' | 'aws',
-): string {
+): string => {
+  const description = manifest.description === undefined ? '' : manifest.description;
   const lines: string[] = [
     `# VybeKiit preset: ${manifest.id} (${provider}) — v1.1 planned`,
-    `# ${manifest.description ?? ''}`,
+    `# ${description}`,
   ];
   for (const entity of manifest.entities) {
     lines.push(`\n## Collection/table: ${entity.name}`);
@@ -274,4 +388,4 @@ function renderNosqlPreset(
     lines.push('\n// Firestore composite indexes in firebase.json');
   }
   return lines.join('\n');
-}
+};

@@ -1,5 +1,5 @@
-import { GOAL_ENTRIES } from '@vybekiit/agentKit/catalogs/goalCatalog';
-import { checkGoalDrift, planGoalRouting } from '@vybekiit/agentKit/planners/planGoalRouting';
+import { GOAL_ENTRIES } from '@vybekiit/agent-kit/catalogs/goalCatalog';
+import { checkGoalDrift, planGoalRouting } from '@vybekiit/agent-kit/planners/planGoalRouting';
 import { describe, expect, it } from 'vitest';
 
 describe('planGoalRouting', () => {

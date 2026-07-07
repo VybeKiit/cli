@@ -4,5 +4,5 @@
     "noEmit": true,
     "baseUrl": "../.."
   },
-  "include": ["src", "test", "tsup.config.ts"]
+  "include": ["src", "test", "tsup.config.ts", "vitest.config.ts"]
 }

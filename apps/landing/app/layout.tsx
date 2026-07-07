@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  * sets `<html dir>` so RTL locales (Hebrew/Arabic) mirror automatically — see
  * `src/lib/direction.ts`. Copy stays English; the structure is RTL-safe.
  */
-export default async function RootLayout({ children }: { children: ReactNode }) {
+const RootLayout = async ({ children }: { children: ReactNode }) => {
   const { lang, dir } = resolveDirection((await headers()).get('accept-language'));
   return (
     <html lang={lang} dir={dir}>
@@ -29,4 +29,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

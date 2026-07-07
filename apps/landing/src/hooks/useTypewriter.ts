@@ -11,15 +11,24 @@ export interface UseTypewriterOptions {
   readonly humanPace?: boolean;
 }
 
-function nextCharDelay(msPerChar: number, humanPace: boolean): number {
+const nextCharDelay = (msPerChar: number, humanPace: boolean): number => {
   if (!humanPace) {
     return msPerChar;
   }
   return msPerChar + Math.floor(Math.random() * 34) - 10;
-}
+};
 
-/** Types text at reading pace when `start` is true; skips `.` and `,`. */
-export function useTypewriter(text: string, options: UseTypewriterOptions = {}) {
+/**
+ * Types text at reading pace when `start` is true; skips `.` and `,`.
+ *
+ * @param text - Input value.
+ * @param options - Input value.
+ * @returns The hook result.
+ * @example
+ * const value = useTypewriter(text, options);
+ */
+
+export const useTypewriter = (text: string, options: UseTypewriterOptions = {}) => {
   const { start = false, msPerChar = 48, humanPace = false } = options;
   const reduced = useReducedMotion();
   const target = useMemo(() => sanitizeTypewriterText(text), [text]);
@@ -52,4 +61,4 @@ export function useTypewriter(text: string, options: UseTypewriterOptions = {}) 
   const isComplete = charIndex >= target.length;
 
   return { displayText, isComplete };
-}
+};

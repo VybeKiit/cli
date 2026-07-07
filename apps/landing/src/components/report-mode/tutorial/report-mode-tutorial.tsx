@@ -16,18 +16,27 @@ interface ReportModeTutorialProps {
   readonly onComplete: () => void;
 }
 
-function targetSelector(stepId: ReportTutorialStepId): string {
-  return `[data-report-tutorial="${stepId}"]`;
-}
+const targetSelector = (stepId: ReportTutorialStepId): string =>
+  `[data-report-tutorial="${stepId}"]`;
 
-/** First-visit spotlight walkthrough for the Report Mode dock — a thin @vybekiit/walkthrough consumer. */
-export function ReportModeTutorial({
+/**
+ * First-visit spotlight walkthrough for the Report Mode dock — a thin @vybekiit/walkthrough consumer.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportModeTutorial element.
+ * @example
+ * ```tsx
+ * <ReportModeTutorial />
+ * ```
+ */
+
+export const ReportModeTutorial = ({
   active,
   stepIndex,
   onNext,
   onSkip,
   onComplete,
-}: ReportModeTutorialProps) {
+}: ReportModeTutorialProps) => {
   const steps = useMemo<readonly WalkthroughStep[]>(
     () =>
       REPORT_TUTORIAL_STEPS.map((step) => ({
@@ -55,6 +64,6 @@ export function ReportModeTutorial({
       variant="spotlight"
     />
   );
-}
+};
 
 export { REPORT_TUTORIAL_STEPS };

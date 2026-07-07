@@ -8,8 +8,15 @@ import { readNodeEnv } from '@/lib/nodeEnv';
  * origin, so every API call must be absolute. We read `EXPO_PUBLIC_APP_URL` (the
  * `EXPO_PUBLIC_` prefix is what Expo inlines into the JS bundle) and fall back to
  * the kit's shared `DEFAULT_APP_URL` for local dev. Centralized here so a backend
- * URL change is a one-line edit, not a scatter of raw strings (project standard).
+ * URL change is a one-line edit, not a scatter of raw strings.
  *
- * TODO(vybekiit): set EXPO_PUBLIC_APP_URL in `.env` to your deployed backend's address — skill: connect-account
+ * @example
+ * fetch(`${APP_URL}/api/auth/me`);
  */
-export const APP_URL: string = readNodeEnv().EXPO_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
+const configuredAppUrl = readNodeEnv().EXPO_PUBLIC_APP_URL;
+
+/** Absolute app origin used by native fetch helpers. */
+export const APP_URL: string =
+  configuredAppUrl === undefined || configuredAppUrl.length === 0
+    ? DEFAULT_APP_URL
+    : configuredAppUrl;

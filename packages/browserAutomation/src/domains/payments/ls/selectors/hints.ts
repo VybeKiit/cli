@@ -1,21 +1,25 @@
+// biome-ignore-all lint/security/noSecrets: Field keys and regex hints are public selectors, not secrets.
+// biome-ignore-all lint/style/noExcessiveLinesPerFile: Keeping the selector inventory together makes coverage audits traceable.
+
 import { LS_DRAFT_FIELDS } from './fields';
 
 /** Declarative matchers for LS passive probe classification. */
 export type LsFieldHint = {
-  fieldKey: string;
-  pathPattern?: RegExp;
-  tags?: readonly string[];
-  roles?: readonly string[];
-  inputType?: string;
-  fileInputIndex?: number;
-  textPattern?: RegExp;
-  labelPattern?: RegExp;
-  placeholderPattern?: RegExp;
-  nearestHeadingPattern?: RegExp;
-  allowEmptyText?: boolean;
-  priority: number;
+  readonly allowEmptyText?: boolean;
+  readonly fieldKey: string;
+  readonly fileInputIndex?: number;
+  readonly inputType?: string;
+  readonly labelPattern?: RegExp;
+  readonly nearestHeadingPattern?: RegExp;
+  readonly pathPattern?: RegExp;
+  readonly placeholderPattern?: RegExp;
+  readonly priority: number;
+  readonly roles?: readonly string[];
+  readonly tags?: readonly string[];
+  readonly textPattern?: RegExp;
 };
 
+// `/products/123` -> match.
 const PRODUCT_PATH = /\/products\/\d+/i;
 
 export const LS_PRODUCT_FIELD_HINTS: readonly LsFieldHint[] = [
@@ -323,13 +327,20 @@ export const LS_FIELD_HINTS: readonly LsFieldHint[] = [
   ...LS_LEGACY_API_FIELD_HINTS,
 ];
 
-/** Every draft field should have a probe hint (dashboard keys only). */
-export function assertHintsCoverDraftFields(): void {
+/**
+ * Verify every product draft field has a passive probe hint.
+ *
+ * @returns Nothing when all product fields are covered.
+ * @example
+ * assertHintsCoverDraftFields();
+ */
+export const assertHintsCoverDraftFields = (): void => {
   const hinted = new Set(LS_PRODUCT_FIELD_HINTS.map((h) => h.fieldKey));
   for (const key of LS_DRAFT_FIELDS) {
-    if (key.startsWith('dashboard.')) continue;
-    if (!hinted.has(key)) throw new Error(`Missing probe hint for ${key}`);
+    if (!(key.startsWith('dashboard.') || hinted.has(key))) {
+      throw new Error(`Missing probe hint for ${key}`);
+    }
   }
-}
+};
 
 assertHintsCoverDraftFields();

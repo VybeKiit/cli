@@ -9,14 +9,14 @@ import {
   type CatalogGridLayoutId,
   type CatalogGridPreset,
 } from '@library/lib/catalogGridLayout';
+import { Button } from '@vybekiit/ui/button';
+import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@vybekiit/ui/dialog';
 import { LayoutGrid } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-function LayoutPreviewIcon({
+const LayoutPreviewIcon = ({
   cols,
   rows,
   active,
@@ -24,7 +24,7 @@ function LayoutPreviewIcon({
   cols: number;
   rows: number;
   active?: boolean;
-}) {
+}) => {
   const cappedCols = Math.min(cols, 5);
   const cells = cappedCols * Math.min(rows, 4);
 
@@ -47,9 +47,9 @@ function LayoutPreviewIcon({
       ))}
     </div>
   );
-}
+};
 
-function LayoutOption({
+const LayoutOption = ({
   preset,
   active,
   onSelect,
@@ -65,28 +65,26 @@ function LayoutOption({
       };
   active: boolean;
   onSelect: () => void;
-}) {
-  return (
-    <button
-      className={cn(
-        'flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors',
-        active
-          ? 'border-primary bg-primary/5'
-          : 'border-transparent hover:border-border hover:bg-muted/40',
-      )}
-      onClick={onSelect}
-      type="button"
-    >
-      <LayoutPreviewIcon active={active} cols={preset.previewCols} rows={preset.previewRows} />
-      <div className="min-w-0 flex-1">
-        <p className="font-medium text-sm">{preset.label}</p>
-        <p className="text-muted-foreground text-xs leading-snug">{preset.description}</p>
-      </div>
-    </button>
-  );
-}
+}) => (
+  <button
+    className={cn(
+      'flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors',
+      active
+        ? 'border-primary bg-primary/5'
+        : 'border-transparent hover:border-border hover:bg-muted/40',
+    )}
+    onClick={onSelect}
+    type="button"
+  >
+    <LayoutPreviewIcon active={active} cols={preset.previewCols} rows={preset.previewRows} />
+    <div className="min-w-0 flex-1">
+      <p className="font-medium text-sm">{preset.label}</p>
+      <p className="text-muted-foreground text-xs leading-snug">{preset.description}</p>
+    </div>
+  </button>
+);
 
-function LayoutOptionsList({ onPresetPick }: { onPresetPick?: () => void }) {
+const LayoutOptionsList = ({ onPresetPick }: { onPresetPick?: () => void }) => {
   const { layoutId, customCols, setLayout } = useCatalogGridLayout();
 
   const pickPreset = (id: CatalogGridLayoutId) => {
@@ -139,9 +137,16 @@ function LayoutOptionsList({ onPresetPick }: { onPresetPick?: () => void }) {
       </label>
     </div>
   );
-}
+};
 
-export function CatalogGridLayoutPicker() {
+/**
+ * Render the catalog grid layout picker component.
+ *
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogGridLayoutPicker />;
+ */
+export const CatalogGridLayoutPicker = () => {
   const { layoutLabel: activeLabel } = useCatalogGridLayout();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -283,4 +288,4 @@ export function CatalogGridLayoutPicker() {
       </Dialog>
     </>
   );
-}
+};

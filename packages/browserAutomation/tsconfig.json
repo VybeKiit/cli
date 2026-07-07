@@ -6,8 +6,8 @@
     "types": ["node"],
     "baseUrl": "../..",
     "paths": {
-      "@vybekiit/browserAutomation": ["packages/browserAutomation/src/index.ts"],
-      "@vybekiit/browserAutomation/*": ["packages/browserAutomation/src/*"],
+      "@vybekiit/browser-automation": ["packages/browserAutomation/src/index.ts"],
+      "@vybekiit/browser-automation/*": ["packages/browserAutomation/src/*"],
       "@vybekiit/deploy": ["../deploy/src/registrar/index.ts"],
       "@vybekiit/core": ["../core/src/index.ts"]
     }

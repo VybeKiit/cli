@@ -1,3 +1,4 @@
-export { createLocalCompliance } from './providers/local';
-export { createComplianceFromEnv, resolveComplianceProvider } from './resolve';
-export type { ComplianceProvider, ComplianceProviderName, CookieConsentConfig } from './types';
+export * from './config';
+export * from './providers/local';
+export * from './resolve';
+export * from './types';

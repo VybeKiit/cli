@@ -10,12 +10,22 @@ interface VibeCoderPromptDisplayProps {
   readonly className?: string;
 }
 
-/** Renders a partially typed vibe-coder prompt with inline brand/cmd chips. */
-export function VibeCoderPromptDisplay({
+/**
+ * Renders a partially typed vibe-coder prompt with inline brand/cmd chips.
+ *
+ * @param props - Component props.
+ * @returns The rendered VibeCoderPromptDisplay element.
+ * @example
+ * ```tsx
+ * <VibeCoderPromptDisplay />
+ * ```
+ */
+
+export const VibeCoderPromptDisplay = ({
   segments,
   typedChars,
   className,
-}: VibeCoderPromptDisplayProps) {
+}: VibeCoderPromptDisplayProps) => {
   let typeableOffset = 0;
   const nodes: ReactNode[] = [];
 
@@ -30,33 +40,30 @@ export function VibeCoderPromptDisplay({
           />,
         );
       }
-      continue;
-    }
-
-    const chunk = segment.text;
-    const start = typeableOffset;
-    typeableOffset += chunk.length;
-
-    if (typedChars <= start) {
-      continue;
-    }
-
-    const visible = chunk.slice(0, typedChars - start);
-
-    if (segment.kind === 'cmd') {
-      nodes.push(
-        <span className="ghostty-vibe-tui__cmd" key={`cmd-${index}`}>
-          {visible}
-        </span>,
-      );
     } else {
-      nodes.push(
-        <span className="ghostty-vibe-tui__prompt-chunk" key={`text-${index}`}>
-          {visible}
-        </span>,
-      );
+      const chunk = segment.text;
+      const start = typeableOffset;
+      typeableOffset += chunk.length;
+
+      if (typedChars > start) {
+        const visible = chunk.slice(0, typedChars - start);
+
+        if (segment.kind === 'cmd') {
+          nodes.push(
+            <span className="ghostty-vibe-tui__cmd" key={`cmd-${index}`}>
+              {visible}
+            </span>,
+          );
+        } else {
+          nodes.push(
+            <span className="ghostty-vibe-tui__prompt-chunk" key={`text-${index}`}>
+              {visible}
+            </span>,
+          );
+        }
+      }
     }
   }
 
   return <span className={cn('ghostty-vibe-tui__prompt-text', className)}>{nodes}</span>;
-}
+};

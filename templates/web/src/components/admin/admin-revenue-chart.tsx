@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useId } from 'react';
 
 // Mock MRR data — replace with @vybekiit/payments real queries
 const MOCK_MRR_DATA = [
@@ -21,21 +22,40 @@ const MOCK_MRR_DATA = [
   { month: 'Jul', mrr: 8500 },
 ];
 
-export function AdminRevenueChart() {
+const formatCurrencyTick = (value: string | number) => `$${value}`;
+
+const formatMrrTooltip = (value: unknown): [string, string] => {
+  const amount = Array.isArray(value) ? value[0] : value;
+  const numericAmount =
+    typeof amount === 'number' || typeof amount === 'string' ? Number(amount) : 0;
+
+  return [`$${numericAmount.toLocaleString()}`, 'MRR'];
+};
+
+/**
+ * Render the admin monthly recurring revenue chart.
+ *
+ * @returns A card containing the starter MRR area chart.
+ * @example
+ * <AdminRevenueChart />
+ */
+export const AdminRevenueChart = () => {
+  const gradientId = `mrr-gradient-${useId().replaceAll(':', '')}`;
+
   return (
     <div className="rounded-xl border bg-card p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="font-semibold">Monthly Recurring Revenue</h3>
-          <p className="text-sm text-muted-foreground">Revenue growth over the last 7 months</p>
+          <p className="text-muted-foreground text-sm">Revenue growth over the last 7 months</p>
         </div>
-        <span className="text-2xl font-bold">$8,500</span>
+        <span className="font-bold text-2xl">$8,500</span>
       </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={MOCK_MRR_DATA} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
             <defs>
-              <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
                 <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
               </linearGradient>
@@ -49,7 +69,7 @@ export function AdminRevenueChart() {
             <YAxis
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={formatCurrencyTick}
             />
             <Tooltip
               contentStyle={{
@@ -57,18 +77,18 @@ export function AdminRevenueChart() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
               }}
-              formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
+              formatter={formatMrrTooltip}
             />
             <Area
               type="monotone"
               dataKey="mrr"
               stroke="hsl(var(--primary))"
               strokeWidth={2}
-              fill="url(#mrrGradient)"
+              fill={`url(#${gradientId})`}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
   );
-}
+};

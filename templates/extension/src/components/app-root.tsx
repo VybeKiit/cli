@@ -7,7 +7,19 @@ import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import type { ExtensionSurface, ExtensionView } from '@/lib/view';
 import { useState } from 'react';
 
-export function AppRoot({ surface }: { surface: ExtensionSurface }) {
+interface AppRootProps {
+  readonly surface: ExtensionSurface;
+}
+
+/**
+ * Root extension router shared by popup and side panel entrypoints.
+ *
+ * @param props - Extension surface being rendered.
+ * @returns The active extension screen wrapped in the shared shell.
+ * @example
+ * <AppRoot surface="popup" />
+ */
+export const AppRoot = ({ surface }: AppRootProps) => {
   const [view, setView] = useState<ExtensionView>('home');
   const isPopup = surface === 'popup';
 
@@ -22,4 +34,4 @@ export function AppRoot({ surface }: { surface: ExtensionSurface }) {
       </AppShell>
     </>
   );
-}
+};

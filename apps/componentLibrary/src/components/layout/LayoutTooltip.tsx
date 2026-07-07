@@ -1,7 +1,7 @@
 'use client';
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import type { ReactNode } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface LayoutTooltipProps {
   readonly label: string;
@@ -11,34 +11,47 @@ interface LayoutTooltipProps {
   readonly disabled?: boolean;
 }
 
-export function LayoutTooltipProvider({ children }: { children: ReactNode }) {
-  return (
-    <TooltipProvider delayDuration={250} skipDelayDuration={0}>
-      {children}
-    </TooltipProvider>
-  );
-}
+/**
+ * Render the layout tooltip provider component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <LayoutTooltipProvider><App /></LayoutTooltipProvider>;
+ */
+export const LayoutTooltipProvider = ({ children = <></> }: { readonly children?: ReactNode }) => (
+  <TooltipProvider delayDuration={250} skipDelayDuration={0}>
+    {children}
+  </TooltipProvider>
+);
 
-export function LayoutTooltip({
+/**
+ * Render the layout tooltip component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <LayoutTooltip {...props} />;
+ */
+export const LayoutTooltip = ({
   label,
   children,
   side = 'top',
   className,
   disabled = false,
-}: LayoutTooltipProps) {
+}: LayoutTooltipProps) => {
   if (disabled) {
     return children;
   }
+  const tooltipClassName =
+    className === undefined ? 'z-[var(--vk-z-tooltip,40)] max-w-[16rem] text-center' : className;
 
   return (
     <Tooltip>
       <TooltipTrigger asChild={true}>{children}</TooltipTrigger>
-      <TooltipContent
-        className={className ?? 'z-[var(--vk-z-tooltip,40)] max-w-[16rem] text-center'}
-        side={side}
-      >
+      <TooltipContent className={tooltipClassName} side={side}>
         {label}
       </TooltipContent>
     </Tooltip>
   );
-}
+};

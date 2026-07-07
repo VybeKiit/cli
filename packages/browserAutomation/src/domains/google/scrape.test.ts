@@ -4,7 +4,7 @@ import {
   parseClientId,
   parseClientSecret,
   validateGoogleCredentials,
-} from '@vybekiit/browserAutomation/domains/google/scrape';
+} from '@vybekiit/browser-automation/domains/google/scrape';
 import { describe, expect, it } from 'vitest';
 
 const CLIENT_ID = '123456789012-a1b2c3d4e5f6g7h8.apps.googleusercontent.com';

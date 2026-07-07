@@ -3,15 +3,20 @@ import { PRIVACY_SECTIONS } from '@/data/legal';
 import { COMPANY_NAME, CONTACT_EMAIL, LEGAL_EFFECTIVE_DATE, PRODUCT_NAME } from '@/data/product';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-type PrivacyPageProps = {
+interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
-};
+}
 
 /**
  * Privacy Policy — plain-language skeleton with sensible defaults. The onboarding
  * skill replaces company/contact details; a human should review before launch.
+ *
+ * @param props - Locale route params from Next.js.
+ * @returns The localized privacy policy page.
+ * @example
+ * <PrivacyPage params={params} />
  */
-export default async function PrivacyPage({ params }: PrivacyPageProps) {
+const PrivacyPage = async ({ params }: PrivacyPageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
@@ -40,4 +45,6 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
       </article>
     </MarketingShell>
   );
-}
+};
+
+export default PrivacyPage;

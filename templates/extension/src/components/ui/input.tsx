@@ -1,6 +1,14 @@
 import { type InputHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Render the shared text input.
+ *
+ * @param props - Native input props.
+ * @returns A themed input element.
+ * @example
+ * <Input value={email} onChange={handleChange} />
+ */
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, type, ...props }, ref) => (
     <input

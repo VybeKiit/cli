@@ -1,18 +1,32 @@
 import { useTheme } from '@/theme/useTheme';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-/** Compact action menu — mirrors web DropdownMenu for account actions. */
-export function DropdownMenu({
+interface DropdownItem {
+  readonly label: string;
+  readonly onPress: () => void;
+}
+
+export interface DropdownMenuProps {
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly triggerLabel?: string;
+  readonly items?: readonly DropdownItem[];
+}
+
+/**
+ * Compact action menu for account actions.
+ *
+ * @param props - Menu state, trigger label, and action items.
+ * @returns A themed modal menu.
+ * @example
+ * <DropdownMenu open={open} onOpenChange={setOpen} triggerLabel="Menu" items={items} />
+ */
+export const DropdownMenu = ({
   open,
   onOpenChange,
-  triggerLabel,
-  items,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  triggerLabel: string;
-  items: readonly { label: string; onPress: () => void }[];
-}) {
+  triggerLabel = '',
+  items = [],
+}: DropdownMenuProps) => {
   const { colors, radius, spacing, fontSizes } = useTheme();
   return (
     <>
@@ -56,7 +70,7 @@ export function DropdownMenu({
       </Modal>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   overlay: {

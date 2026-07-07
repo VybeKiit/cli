@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -6,8 +7,12 @@ const mocks = vi.hoisted(() => ({
   track: vi.fn(),
 }));
 
-vi.mock('../../vybekiit/analytics/index.js', () => ({
-  resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
+vi.mock('@vybekiit/analytics', () => ({
+  resolveAnalyticsProvider: vi.fn(() =>
+    Effect.succeed({
+      track: (event: unknown) => Effect.sync(() => mocks.track(event)),
+    }),
+  ),
 }));
 
 vi.mock('@vybekiit/core/observability', () => ({

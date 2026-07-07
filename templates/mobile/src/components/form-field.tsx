@@ -4,7 +4,7 @@ import { useTheme } from '@/theme/useTheme';
 import { StyleSheet, Text, View } from 'react-native';
 
 /**
- * Props for {@link FormField}. Extends the {@link Input} (native `TextInput`) props
+ * Props for {@link FormField}. Extends the {@link Input} native `TextInput` props
  * so callers pass `value`, `onChangeText`, `keyboardType`, `autoComplete`, etc.
  * straight through.
  */
@@ -16,13 +16,14 @@ export interface FormFieldProps extends Omit<InputProps, 'invalid' | 'accessibil
 }
 
 /**
- * Label + input + inline error — the single field primitive every form uses, so no
- * screen hand-rolls its own error markup. The RN parallel of the web `FormField`:
- * with no DOM `aria-*`, it wires accessibility via `accessibilityLabel` (the label
- * text) and announces the error through `accessibilityLiveRegion`, and paints the
- * input's destructive border via `invalid` when an error is present.
+ * Label, input, and inline error field primitive.
+ *
+ * @param props - Input props plus label and optional error message.
+ * @returns A themed form field.
+ * @example
+ * <FormField label="Email" value={email} onChangeText={setEmail} />
  */
-export function FormField({ label, error = '', ...props }: FormFieldProps) {
+export const FormField = ({ label, error = '', ...props }: FormFieldProps) => {
   const { colors, spacing, fontSizes } = useTheme();
   const hasError = error.length > 0;
   return (
@@ -39,7 +40,7 @@ export function FormField({ label, error = '', ...props }: FormFieldProps) {
       ) : null}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   field: {

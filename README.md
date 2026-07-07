@@ -1,77 +1,90 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/brand/vybekiit-profile.svg" width="160" height="160" alt="VybeKiit logo">
 </p>
 
 # VybeKiit
 
 [![CI](https://github.com/VybeKiit/vybekiit/actions/workflows/ci.yml/badge.svg)](https://github.com/VybeKiit/vybekiit/actions/workflows/ci.yml)
 
-> **Status: blueprint + v1.0 scaffold.** This is the maintainer monorepo for VybeKiit — the paid,
-> agent-driven starter kit. If you're a buyer, you never read this; your agent does.
+VybeKiit is a paid starter kit for vibe coders: people who know what they want to build, use an
+AI coding agent, and do not want to understand the code before they can ship.
 
-A paid, GitHub-distributed monorepo starter kit that lets a non-technical builder ship a real,
-money-making product by *describing* it to an AI agent — without having to *understand* the
-plumbing. The product isn't the boilerplate (that's commodity); it's the **agent layer** that
-carries a vibe coder from "I bought this" to "my app is live and taking payments."
+You describe the product. Your agent follows the kit instructions, sets up the app, fixes what is
+broken, and walks you through the few steps only you can do.
 
-Read **[CONTEXT.md](./CONTEXT.md)** for the full blueprint and **[AGENTS.md](./AGENTS.md)** for
-how agents work in this repo.
+> **Status:** active v1.0 kit work. The web app scaffold, agent instructions, and maintainer code
+> are in place; the live customer purchase and access flow is still being finished.
 
-## Layout
+## Start Here
 
-```
-packages/   MAINTAINED · published to npm as @vybekiit/* · headless logic (no UI)
-  core/             env + Zod-validated config (the single source of truth) + Result type
-  payments/         one PaymentProvider interface · Lemon Squeezy + Stripe + PayPal adapters
-  auth/             headless Supabase auth
-  db/               typed Supabase data client
-  browser-automation/  Unified dashboard Playwright CLI (CWS + Lemon Squeezy)
-templates/  OWNED · NOT published · copied into a buyer's repo by the CLI
-  web/              Next.js + shadcn (RTL-ready) + the buyer-facing agent layer
-  spa/              Vite admin SPA + agent layer
-  mobile/           Expo + shared tokens — full web parity
-  extension/        WXT browser extension scaffold + agent layer
-  backend/          Express MVC API for mobile/extension/spa clients
-apps/landing/       marketing site — dogfoods templates/web · Cloudflare Pages
-cli/                `npx vybekiit` — scaffolds a template into the buyer's own repo
-```
-
-The maintained packages and the owned templates are governed by the **Owned vs Maintained** split
-(see `CONTEXT.md`) — the backbone that makes "lifetime updates for people who can't read a diff"
-actually work: updates ship as npm version bumps, never git merges.
-
-## Develop
+After you have VybeKiit access, create your app:
 
 ```bash
-pnpm install            # install the workspace (runs preflight checks automatically)
-pnpm build              # build all packages (turbo)
-pnpm test               # run tests
-pnpm typecheck          # strict tsc across the workspace
-pnpm lint               # biome check
+npx vybekiit new web my-app
 ```
 
-### Prerequisites
+Then open `my-app` in [Claude Code](https://code.claude.com/docs/en/overview),
+[Codex](https://developers.openai.com/codex/quickstart), or [Cursor](https://cursor.com/docs) and say:
 
-| Tool | Version | Required | Why |
-|------|---------|----------|-----|
-| Node.js | ≥ 20 | ✅ | runtime + build |
-| pnpm | ≥ 10 | ✅ | workspace package manager (pinned via `corepack`) |
-| git | ≥ 2.30 | ✅ | hooks + monorepo |
-| Rust | edition 2021+ | ✅ | builds `tools/dedup` (the dedup gate binary) |
-| corepack | any | optional | enables pnpm from `packageManager` field |
-| GitHub CLI (`gh`) | any | optional | mirror sync + PR creation |
-| Docker | any | optional | `pnpm verify:docker` native-deps check |
+> **Set up my app.**
 
-Run `pnpm preflight` to check all prerequisites with install instructions for your OS.
+Your agent reads the instructions that shipped with your app and takes it from there, one step at a
+time.
 
-See `.nvmrc` / `package.json` engines.
+## What You Can Ask For
 
-## Build order
+You do not need to learn how the code works first. Start with plain requests:
 
-v1.0 cuts a thin vertical slice — **web + the money pipeline first** (Lemon Squeezy checkout →
-GitHub invite). See `CONTEXT.md` → *Build order*.
+- **"Set up my app."** First-time setup.
+- **"Add payments."** Start taking money.
+- **"Add sign-in and save data."** Add accounts and saved information.
+- **"Something is broken."** Run a checkup and fix the problem.
+- **"Put my app online."** Publish the latest version.
 
-## Licensing
+VybeKiit is built so the agent can decide the technical steps and explain only what you need to do.
 
-Dual-licensed by component — public packages MIT, the owned product proprietary. See
-[LICENSE.md](./LICENSE.md).
+## What The Kit Handles
+
+- A real web app starting point.
+- Instructions for AI coding agents.
+- Checkout, sign-in, saved data, and launch paths.
+- A local checkup flow so the agent can verify the app before moving on.
+- Shared code the kit can keep improving over time.
+
+You should expect to describe your product, review the result, and approve account or browser steps
+when needed. You should not have to understand the code before your app can move forward.
+
+## Requirements
+
+You need [Node.js](https://nodejs.org/en) 20 or newer. The command uses
+[`npx`](https://docs.npmjs.com/cli/v11/commands/npx) to run the VybeKiit CLI.
+
+To get your purchased app files, VybeKiit uses the [GitHub CLI](https://cli.github.com/). If it is
+not ready yet, the kit tells you what to install or sign in to.
+
+## For Agents And Maintainers
+
+This repository also contains the instructions and code used to build the kit itself. If you are an
+agent or maintainer working inside this repo, read these first:
+
+- [AGENTS.md](./AGENTS.md): agent rules, validation commands, and where work belongs.
+- [CONTEXT.md](./CONTEXT.md): product blueprint and decisions.
+- [CODE-STYLE.md](./CODE-STYLE.md): code style and current migration rules.
+- [LANGUAGE.md](./LANGUAGE.md): terms, customer language, and words to avoid.
+
+Useful maintainer commands:
+
+```bash
+pnpm install
+pnpm build
+pnpm test
+pnpm typecheck
+pnpm lint
+```
+
+Maintainer tooling uses [pnpm](https://pnpm.io/) and [Turborepo](https://turborepo.com/docs).
+
+## License
+
+Dual-licensed by component: public pieces are MIT, and the owned VybeKiit product is proprietary.
+See [LICENSE.md](./LICENSE.md).

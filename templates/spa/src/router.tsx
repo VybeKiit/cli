@@ -1,9 +1,4 @@
-import {
-  Outlet,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router';
+import { Outlet, createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
 import AppLayout from './layout/AppLayout';

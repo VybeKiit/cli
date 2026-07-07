@@ -6,12 +6,19 @@ import { useAsync } from '@/hooks/useAsync';
 import { displayError, useTranslations } from '@/hooks/useTranslations';
 import { signInWithPassword } from '@/lib/authClient';
 import { useTheme } from '@/theme/useTheme';
+import { Either } from 'effect';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text } from 'react-native';
 
-/** Sign-in screen — RN parallel of the web login page. */
-export default function LoginScreen() {
+/**
+ * Render the mobile sign-in screen.
+ *
+ * @returns React Native sign-in screen.
+ * @example
+ * <LoginScreen />
+ */
+const LoginScreen = () => {
   const router = useRouter();
   const { colors, fontSizes } = useTheme();
   const { t } = useTranslations();
@@ -19,11 +26,14 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const { loading: pending, error, run: signIn } = useAsync(signInWithPassword);
 
-  async function handleSubmit() {
+  const handleSubmit = async () => {
     const result = await signIn(email, password);
-    if (!result.ok) return;
+    if (Either.isLeft(result)) {
+      return;
+    }
+
     router.replace('/dashboard');
-  }
+  };
 
   return (
     <AuthShell
@@ -70,4 +80,6 @@ export default function LoginScreen() {
       />
     </AuthShell>
   );
-}
+};
+
+export default LoginScreen;

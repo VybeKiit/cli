@@ -3,17 +3,15 @@ import { mergeDoctorTools, selectNativeTools } from '../src/doctor/nativeToolcha
 import { selectToolchain } from '../src/doctor/toolchain';
 import type { ProjectSurface } from '../src/lib/inferProjectSurface';
 
-function surface(
+const surface = (
   template: ProjectSurface['template'],
   overrides: Partial<ProjectSurface> = {},
-): ProjectSurface {
-  return {
-    template,
-    mobile: template === 'mobile',
-    extension: template === 'extension',
-    ...overrides,
-  };
-}
+): ProjectSurface => ({
+  template,
+  mobile: template === 'mobile',
+  extension: template === 'extension',
+  ...overrides,
+});
 
 describe('selectNativeTools', () => {
   it('adds Docker for backend templates', () => {

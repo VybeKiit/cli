@@ -12,16 +12,29 @@ import type { SecurityPolicy } from './types';
  *
  * Comparison is case-insensitive on the origin only (scheme + host + port); we never
  * compare paths here.
+ *
+ * @param originHeader - Raw Origin header, or `null` when absent.
+ * @param appOrigin - Canonical application origin.
+ * @param policy - Resolved origin-lock policy.
+ * @returns Whether the request should pass the origin lock.
+ * @example
+ * const allowed = isOriginAllowed('https://app.test', 'https://app.test', policy);
  */
-export function isOriginAllowed(
+export const isOriginAllowed = (
   originHeader: string | null,
   appOrigin: string,
   policy: SecurityPolicy['originLock'],
-): boolean {
-  if (!policy.enabled) return true;
-  if (originHeader === null) return true;
+): boolean => {
+  if (!policy.enabled) {
+    return true;
+  }
+  if (originHeader === null) {
+    return true;
+  }
 
   const origin = originHeader.trim().toLowerCase();
-  if (origin === appOrigin.trim().toLowerCase()) return true;
+  if (origin === appOrigin.trim().toLowerCase()) {
+    return true;
+  }
   return policy.allowedOrigins.includes(origin);
-}
+};

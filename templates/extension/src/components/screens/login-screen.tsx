@@ -8,9 +8,22 @@ import { t } from '@/lib/i18n';
 import type { ExtensionView } from '@/lib/view';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@vybekiit/client-state';
+import { Either } from 'effect';
 import { type FormEvent, useId, useState } from 'react';
 
-export function LoginScreen({ onNavigate }: { onNavigate: (view: ExtensionView) => void }) {
+interface LoginScreenProps {
+  readonly onNavigate: (view: ExtensionView) => void;
+}
+
+/**
+ * Render the extension sign-in screen.
+ *
+ * @param props - Navigation callback for changing extension views.
+ * @returns The sign-in form.
+ * @example
+ * <LoginScreen onNavigate={setView} />
+ */
+export const LoginScreen = ({ onNavigate }: LoginScreenProps) => {
   const emailId = useId();
   const passwordId = useId();
   const [email, setEmail] = useState('');
@@ -18,19 +31,23 @@ export function LoginScreen({ onNavigate }: { onNavigate: (view: ExtensionView) 
   const { loading: pending, error, run: signIn } = useAsync(signInWithPassword);
   const queryClient = useQueryClient();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const result = await signIn(email, password);
-    if (!result.ok) return;
+    if (Either.isLeft(result)) {
+      return;
+    }
     await queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
     onNavigate('home');
-  }
+  };
+
+  const handleBrandClick = (): void => onNavigate('home');
 
   return (
     <AuthShell
       titleKey="auth_login_title"
       descriptionKey="auth_login_description"
-      onBrandClick={() => onNavigate('home')}
+      onBrandClick={handleBrandClick}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {error ? (
@@ -62,4 +79,4 @@ export function LoginScreen({ onNavigate }: { onNavigate: (view: ExtensionView) 
       </form>
     </AuthShell>
   );
-}
+};

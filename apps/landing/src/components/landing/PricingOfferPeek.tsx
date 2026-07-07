@@ -17,10 +17,17 @@ const LABEL_HEAD = LABEL.slice(0, -1);
 const LABEL_TAIL = LABEL.slice(-1);
 
 /**
- * "LIMITED TIME OFFER" label. Once the price finishes dropping, a Claude Code octopus
- * peeks from behind the last "R" and types a farewell chat bubble.
+ * "LIMITED TIME OFFER" label. Once the price finishes dropping, a Claude Code octopus peeks from behind the last "R" and types a farewell chat bubble.
+ *
+ * @param props - Component props.
+ * @returns The rendered PricingOfferPeek element.
+ * @example
+ * ```tsx
+ * <PricingOfferPeek />
+ * ```
  */
-export function PricingOfferPeek({ dropped = false }: { readonly dropped?: boolean }) {
+
+export const PricingOfferPeek = ({ dropped = false }: { readonly dropped?: boolean }) => {
   const [peeking, setPeeking] = useState(false);
   const [typedChars, setTypedChars] = useState(0);
 
@@ -49,7 +56,7 @@ export function PricingOfferPeek({ dropped = false }: { readonly dropped?: boole
 
   return (
     <p className="landing-label pricing-offer-peek">
-      <ClockIcon className="h-4 w-4" />
+      <ClockIcon className="h-7 w-7 text-white" />
       <span className="pricing-offer-peek__word">
         {LABEL_HEAD}
         <span className="pricing-offer-peek__anchor">
@@ -77,4 +84,4 @@ export function PricingOfferPeek({ dropped = false }: { readonly dropped?: boole
       ) : null}
     </p>
   );
-}
+};

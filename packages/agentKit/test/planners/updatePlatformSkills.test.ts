@@ -2,15 +2,14 @@ import {
   expectedSkillNamesFromManifest,
   planPlatformSkillsUpdate,
   shouldRunPlatformSkillsUpdate,
-} from '@vybekiit/agentKit/planners/updatePlatformSkills';
+} from '@vybekiit/agent-kit/planners/updatePlatformSkills';
+import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
 
 describe('planPlatformSkillsUpdate', () => {
   it('reports up to date when manifest has no sources', () => {
-    const result = planPlatformSkillsUpdate({ sources: [] }, null);
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.upToDate).toBe(true);
+    const result = Effect.runSync(planPlatformSkillsUpdate({ sources: [] }, null));
+    expect(result.upToDate).toBe(true);
   });
 
   it('flags missing skills for explicit manifest entries', () => {
@@ -23,11 +22,9 @@ describe('planPlatformSkillsUpdate', () => {
         a: { source: 'x', sourceType: 'github', skillPath: 'a/SKILL.md', computedHash: 'h' },
       },
     };
-    const result = planPlatformSkillsUpdate(manifest, lock);
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.upToDate).toBe(false);
-    expect(result.value.missing).toEqual(['b']);
+    const result = Effect.runSync(planPlatformSkillsUpdate(manifest, lock));
+    expect(result.upToDate).toBe(false);
+    expect(result.missing).toEqual(['b']);
   });
 
   it('wildcard manifest treats non-empty lock as manageable', () => {
@@ -38,13 +35,12 @@ describe('planPlatformSkillsUpdate', () => {
         foo: { source: 'expo/skills', sourceType: 'github', skillPath: 'x', computedHash: 'h' },
       },
     };
-    const result = planPlatformSkillsUpdate(manifest, lock);
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.value.hasLock).toBe(true);
+    const result = Effect.runSync(planPlatformSkillsUpdate(manifest, lock));
+    expect(result.hasLock).toBe(true);
   });
 });
 
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('expectedSkillNamesFromManifest', () => {
   it('expands explicit skill names and skips wildcard', () => {
     expect(
@@ -58,6 +54,7 @@ describe('expectedSkillNamesFromManifest', () => {
   });
 });
 
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('shouldRunPlatformSkillsUpdate', () => {
   it('suggests update when lock exists and plan is up to date', () => {
     expect(

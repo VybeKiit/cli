@@ -1,4 +1,3 @@
-import { FaqSection } from '@/components/landing/FaqSection';
 import { FeatureStrip } from '@/components/landing/FeatureStrip';
 import { Footer } from '@/components/landing/Footer';
 import { Header } from '@/components/landing/Header';
@@ -9,19 +8,18 @@ import { ShowcaseCarousel } from '@/components/landing/ShowcaseCarousel';
 import { ZigZagSection } from '@/components/landing/ZigZagSection';
 
 /** VybeKiit cinematic store homepage — dark premium landing at `/`. */
-export default function HomePage() {
-  return (
-    <LandingShell>
-      <Header />
-      <main>
-        <Hero />
-        <FeatureStrip />
-        <ShowcaseCarousel />
-        <ZigZagSection />
-        <FaqSection />
-        <PricingCTA />
-      </main>
-      <Footer />
-    </LandingShell>
-  );
-}
+const HomePage = () => (
+  <LandingShell>
+    <Header />
+    <main>
+      <Hero />
+      <FeatureStrip />
+      <ShowcaseCarousel />
+      <ZigZagSection />
+      <PricingCTA />
+    </main>
+    <Footer />
+  </LandingShell>
+);
+
+export default HomePage;

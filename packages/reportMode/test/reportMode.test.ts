@@ -1,29 +1,30 @@
-import {
-  buildAssistantDeepLink,
-  inferVybeAssistant,
-  resolveVybeAssistant,
-} from '@vybekiit/reportMode/deeplink';
-import { formatReportPrompt } from '@vybekiit/reportMode/formatPrompt';
-import {
-  loadReportHandoffTarget,
-  saveReportHandoffTarget,
-} from '@vybekiit/reportMode/handoffTarget';
+// biome-ignore-all lint/style/noExcessiveLinesPerFile: package regression matrix is intentionally grouped.
+
+import { describe, expect, it } from 'vitest';
+import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
+import { formatReportPrompt } from '../src/formatPrompt';
+import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoffTarget';
 import {
   DEFAULT_INSPECT_HIGHLIGHT_COLOR,
   hexToRgba,
   INSPECT_HIGHLIGHT_PRESETS,
   loadInspectHighlightColor,
   saveInspectHighlightColor,
-} from '@vybekiit/reportMode/inspectHighlightColor';
+} from '../src/inspectHighlightColor';
 import {
   computeFlyoutPlacement,
   type FlyoutRect,
   getDockInsetStyle,
   loadDockCornerOnly,
   snapDockToNearestCorner,
-} from '@vybekiit/reportMode/position';
-import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '@vybekiit/reportMode/types';
-import { describe, expect, it } from 'vitest';
+} from '../src/position';
+import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
+
+// cursor://anysphere.cursor-deeplink/prompt?text=hello -> match
+const cursorDeepLinkPattern = /^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?/;
+
+const noopStorageWrite = (): void => undefined;
+const emptyStorageKey = (): string | null => null;
 
 describe('formatReportPrompt', () => {
   it('includes the VybeKiit Report prefix and builder note', () => {
@@ -64,7 +65,7 @@ describe('formatReportPrompt', () => {
 describe('buildAssistantDeepLink', () => {
   it('builds cursor deeplink with encoded text', () => {
     const url = buildAssistantDeepLink('cursor', '/proj', 'hello world');
-    expect(url).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?/);
+    expect(url).toMatch(cursorDeepLinkPattern);
     expect(new URL(url).searchParams.get('text')).toBe('hello world');
   });
 
@@ -133,11 +134,27 @@ describe('ConsoleErrorBuffer', () => {
 
 describe('snapDockToNearestCorner', () => {
   it('snaps near bottom-right corner', () => {
-    expect(snapDockToNearestCorner(950, 650, 1000, 700, 80)).toEqual({ anchor: 'bottom-right' });
+    expect(
+      snapDockToNearestCorner({
+        x: 950,
+        y: 650,
+        viewportWidth: 1000,
+        viewportHeight: 700,
+        thresholdPx: 80,
+      }),
+    ).toEqual({ anchor: 'bottom-right' });
   });
 
   it('keeps custom position when far from corners', () => {
-    expect(snapDockToNearestCorner(400, 300, 1000, 700, 80)).toEqual({
+    expect(
+      snapDockToNearestCorner({
+        x: 400,
+        y: 300,
+        viewportWidth: 1000,
+        viewportHeight: 700,
+        thresholdPx: 80,
+      }),
+    ).toEqual({
       anchor: 'custom',
       customX: 400,
       customY: 300,
@@ -145,6 +162,7 @@ describe('snapDockToNearestCorner', () => {
   });
 });
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: grouped geometry cases document one pure function.
 describe('computeFlyoutPlacement', () => {
   const viewport = { width: 1000, height: 800 };
   const flyout = { width: 160, height: 120 };
@@ -229,7 +247,7 @@ describe('getDockInsetStyle', () => {
   });
 });
 
-describe('loadInspectHighlightColor', () => {
+describe('inspect color storage', () => {
   it('defaults to amber', () => {
     expect(loadInspectHighlightColor(null)).toBe(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
   });
@@ -237,13 +255,19 @@ describe('loadInspectHighlightColor', () => {
   it('persists valid hex colors', () => {
     const entries = new Map<string, string>();
     const storage = {
-      getItem: (key: string) => entries.get(key) ?? null,
+      getItem: (key: string) => {
+        const value = entries.get(key);
+        if (value !== undefined) {
+          return value;
+        }
+        return null;
+      },
       setItem: (key: string, value: string) => {
         entries.set(key, value);
       },
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     saveInspectHighlightColor(storage, '#3B82F6');
@@ -253,10 +277,10 @@ describe('loadInspectHighlightColor', () => {
   it('ignores invalid stored values', () => {
     const storage = {
       getItem: () => 'not-a-color',
-      setItem: () => {},
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      setItem: noopStorageWrite,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     expect(loadInspectHighlightColor(storage)).toBe(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
@@ -285,13 +309,19 @@ describe('loadReportHandoffTarget', () => {
   it('persists valid targets', () => {
     const entries = new Map<string, string>();
     const storage = {
-      getItem: (key: string) => entries.get(key) ?? null,
+      getItem: (key: string) => {
+        const value = entries.get(key);
+        if (value !== undefined) {
+          return value;
+        }
+        return null;
+      },
       setItem: (key: string, value: string) => {
         entries.set(key, value);
       },
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     saveReportHandoffTarget(storage, 'new-chat');
@@ -301,10 +331,10 @@ describe('loadReportHandoffTarget', () => {
   it('ignores invalid stored values', () => {
     const storage = {
       getItem: () => 'invalid',
-      setItem: () => {},
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      setItem: noopStorageWrite,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     expect(loadReportHandoffTarget(storage)).toBe('current-chat');
@@ -315,10 +345,10 @@ describe('loadDockCornerOnly', () => {
   it('returns corner anchor from storage', () => {
     const storage = {
       getItem: () => JSON.stringify({ anchor: 'top-right' }),
-      setItem: () => {},
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      setItem: noopStorageWrite,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     expect(loadDockCornerOnly(storage)).toBe('top-right');
@@ -327,10 +357,10 @@ describe('loadDockCornerOnly', () => {
   it('ignores custom anchor and falls back to default corner', () => {
     const storage = {
       getItem: () => JSON.stringify({ anchor: 'custom', customX: 100, customY: 200 }),
-      setItem: () => {},
-      removeItem: () => {},
-      clear: () => {},
-      key: () => null,
+      setItem: noopStorageWrite,
+      removeItem: noopStorageWrite,
+      clear: noopStorageWrite,
+      key: emptyStorageKey,
       length: 0,
     } as Storage;
     expect(loadDockCornerOnly(storage)).toBe('bottom-right');

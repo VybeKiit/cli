@@ -18,6 +18,14 @@ type CodeSnippetsProps = {
   active: boolean;
 };
 
+/**
+ * Render the code snippets component.
+ *
+ * @param active - Whether the animated snippet strip should render.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <CodeSnippets active={true} />;
+ */
 export const CodeSnippets = ({ active }: CodeSnippetsProps) => {
   const [index, setIndex] = useState(0);
 

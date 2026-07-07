@@ -7,12 +7,17 @@ import { Moon, RotateCcw, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
-function isSelected(primary: string, hex: string): boolean {
-  return primary.toLowerCase() === hex.toLowerCase();
-}
+const isSelected = (primary: string, hex: string): boolean =>
+  primary.toLowerCase() === hex.toLowerCase();
 
-/** Preset swatches + custom color input + reset — writes the shared global primary. */
-export function PrimaryPicker() {
+/**
+ * Render preset swatches, custom color input, and reset action.
+ *
+ * @returns A React element that writes the shared global preview primary color.
+ * @example
+ * const element = <PrimaryPicker />;
+ */
+export const PrimaryPicker = () => {
   const { primary, setPrimary, resetPrimary } = usePreviewTheme();
 
   return (
@@ -63,51 +68,62 @@ export function PrimaryPicker() {
       )}
     </div>
   );
-}
+};
 
 const PREVIEW_MODE_TIPS: Record<PreviewMode, string> = {
   light: 'Preview this component on a light background.',
   dark: 'Preview this component on a dark background.',
 };
 
-/** Segmented light/dark control for a single preview (independent of the chrome theme). */
-export function PreviewModeToggle({
+/**
+ * Render the per-preview light/dark segmented control.
+ *
+ * @param props - Current preview mode and change handler.
+ * @returns A React element for switching one preview independently of the chrome theme.
+ * @example
+ * const element = <PreviewModeToggle mode="light" onChange={setMode} />;
+ */
+export const PreviewModeToggle = ({
   mode,
   onChange,
 }: {
-  mode: PreviewMode;
-  onChange: (mode: PreviewMode) => void;
-}) {
-  return (
-    <div className="inline-flex rounded-md border border-border p-0.5">
-      {(['light', 'dark'] as const).map((option) => (
-        <LayoutTooltip key={option} label={PREVIEW_MODE_TIPS[option]}>
-          <button
-            className={`flex items-center gap-1 rounded px-2 py-1 text-xs ${
-              mode === option
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-            onClick={() => onChange(option)}
-            type="button"
-          >
-            {option === 'light' ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-            <span className="capitalize">{option}</span>
-          </button>
-        </LayoutTooltip>
-      ))}
-    </div>
-  );
-}
+  readonly mode: PreviewMode;
+  readonly onChange: (mode: PreviewMode) => void;
+}) => (
+  <div className="inline-flex rounded-md border border-border p-0.5">
+    {(['light', 'dark'] as const).map((option) => (
+      <LayoutTooltip key={option} label={PREVIEW_MODE_TIPS[option]}>
+        <button
+          className={`flex items-center gap-1 rounded px-2 py-1 text-xs ${
+            mode === option
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+          onClick={() => onChange(option)}
+          type="button"
+        >
+          {option === 'light' ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+          <span className="capitalize">{option}</span>
+        </button>
+      </LayoutTooltip>
+    ))}
+  </div>
+);
 
-/** Global controls for the catalog chrome: light/dark (next-themes) + the shared primary. */
-export function GlobalThemeControls() {
+/**
+ * Render global catalog chrome theme controls.
+ *
+ * @returns A React element for toggling chrome theme and global primary color.
+ * @example
+ * const element = <GlobalThemeControls />;
+ */
+export const GlobalThemeControls = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) {
-    // next-themes has no server value — reserve height to avoid a layout jump on hydrate.
+    // next-themes has no server value, so reserve height to avoid a hydration jump.
     return <div aria-hidden="true" className="h-8" />;
   }
 
@@ -127,4 +143,4 @@ export function GlobalThemeControls() {
       <PrimaryPicker />
     </div>
   );
-}
+};

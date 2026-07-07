@@ -9,7 +9,14 @@ import {
 } from '@vybekiit/report-mode';
 import { useCallback, useEffect, useState } from 'react';
 
-function browserStorage(): Storage | null {
+/**
+ * Resolve browser localStorage for dock persistence.
+ *
+ * @returns Storage when available in the current runtime.
+ * @example
+ * const storage = browserStorage();
+ */
+const browserStorage = (): Storage | null => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -18,10 +25,16 @@ function browserStorage(): Storage | null {
   } catch {
     return null;
   }
-}
+};
 
-/** Persisted dock placement (corner preset or custom drag position). */
-export function useReportDockPosition() {
+/**
+ * Persist the report-mode dock position.
+ *
+ * @returns Dock position plus setters for custom and corner placement.
+ * @example
+ * const { position, savePosition } = useReportDockPosition();
+ */
+export const useReportDockPosition = () => {
   const [position, setPosition] = useState<ReportDockPosition>(DEFAULT_DOCK_POSITION);
 
   useEffect(() => {
@@ -41,4 +54,4 @@ export function useReportDockPosition() {
   );
 
   return { position, savePosition, setCorner };
-}
+};

@@ -1,7 +1,7 @@
 import {
   PEOPLE_VOCABULARY,
   renderPeopleVocabularyTable,
-} from '@vybekiit/agentKit/vocabulary/peopleVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/peopleVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderPeopleVocabularyTable', () => {

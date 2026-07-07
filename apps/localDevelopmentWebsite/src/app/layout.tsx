@@ -16,19 +16,19 @@ export const viewport: Viewport = {
   themeColor: '#7c3aed',
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
-          <Toaster position="bottom-right" richColors={true} />
-        </ThemeProvider>
-      </body>
-    </html>
-  );
-}
+}>) => (
+  <html lang="en" suppressHydrationWarning={true}>
+    <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        {children}
+        <Toaster position="bottom-right" richColors={true} />
+      </ThemeProvider>
+    </body>
+  </html>
+);
+
+export default RootLayout;

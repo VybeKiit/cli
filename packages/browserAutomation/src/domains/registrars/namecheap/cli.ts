@@ -1,15 +1,22 @@
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
-import { ncSetupEnvBlock, verifyNcCredentialsViaApi } from './api/verify';
+import { printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { baseVerbContext } from '@vybekiit/browser-automation/cli/verbContext';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
+import { verifyNcCredentialsViaApi } from './api/verify';
+import { ncSetupEnvBlock } from './types';
 import { runNcSetup, standbyLogin } from './verbs/standbyLogin';
 
-function parseSandboxFlag(args: string[]): boolean {
-  return args.includes('--sandbox');
-}
+const parseSandboxFlag = (args: string[]): boolean => args.includes('--sandbox');
 
-export function registerNamecheapDomain(registry: CommandRegistry): void {
+/**
+ * Register Namecheap Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerNamecheapDomain(registry);
+ */
+export const registerNamecheapDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'registrars/namecheap',
     aliases: [],
@@ -18,9 +25,13 @@ export function registerNamecheapDomain(registry: CommandRegistry): void {
         description: 'Wait for Namecheap dashboard after builder sign-in',
         run: async ({ flags }) => {
           const result = await standbyLogin(baseVerbContext(flags));
-          if (flags.json) printJson({ ok: result.ready, ...result });
-          else if (result.ready) console.log(`OK: Namecheap ready at ${result.url}`);
-          else console.log('Timed out waiting for Namecheap sign-in.');
+          if (flags.json) {
+            printJson({ ok: result.ready, ...result });
+          } else if (result.ready) {
+            printLine(`OK: Namecheap ready at ${result.url}`);
+          } else {
+            printLine('Timed out waiting for Namecheap sign-in.');
+          }
           return result.ready ? 0 : 1;
         },
       },
@@ -51,9 +62,9 @@ export function registerNamecheapDomain(registry: CommandRegistry): void {
               verified,
             });
           } else {
-            console.log('OK: Namecheap setup complete.');
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(
+            printLine('OK: Namecheap setup complete.');
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(
               verified
                 ? '✓ Credentials verified via Namecheap API.'
                 : '⚠ Credentials written but live verification did not confirm.',
@@ -64,14 +75,24 @@ export function registerNamecheapDomain(registry: CommandRegistry): void {
       },
     },
   });
-}
+};
 
-export function registerNcTopLevelAlias(registry: CommandRegistry): void {
+/**
+ * Register Nc Top Level Alias.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerNcTopLevelAlias(registry);
+ */
+export const registerNcTopLevelAlias = (registry: CommandRegistry): void => {
   const domain = registry.resolveDomain('registrars/namecheap');
-  if (!domain) return;
+  if (!domain) {
+    return;
+  }
   registry.register({
     name: 'nc',
     aliases: [],
     commands: domain.commands,
   });
-}
+};

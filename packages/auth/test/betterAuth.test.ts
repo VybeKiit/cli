@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type FakeApi = Record<keyof BetterAuthInstance['api'], ReturnType<typeof vi.fn>>;
 
-function fakeInstance(): { instance: BetterAuthInstance; api: FakeApi } {
+const fakeInstance = (): { instance: BetterAuthInstance; api: FakeApi } => {
   const api: FakeApi = {
     signUpEmail: vi.fn(),
     signInEmail: vi.fn(),
@@ -16,7 +16,7 @@ function fakeInstance(): { instance: BetterAuthInstance; api: FakeApi } {
     getSession: vi.fn(),
   };
   return { instance: { api } as unknown as BetterAuthInstance, api };
-}
+};
 
 const config = { BETTER_AUTH_SECRET: 'secret', BETTER_AUTH_URL: 'http://localhost:3000' };
 const user = { id: 'u1', email: 'a@b.com' };
@@ -27,9 +27,7 @@ beforeEach(() => {
   fake = fakeInstance();
 });
 
-function provider() {
-  return createBetterAuthProvider({ config, instance: fake.instance });
-}
+const provider = () => createBetterAuthProvider({ config, instance: fake.instance });
 
 describe('createBetterAuthProvider', () => {
   it('reports its provider name and capabilities', () => {

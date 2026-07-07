@@ -7,7 +7,14 @@ import {
 } from '@vybekiit/report-mode';
 import { useCallback, useEffect, useState } from 'react';
 
-function browserStorage(): Storage | null {
+/**
+ * Resolve browser localStorage for highlight color persistence.
+ *
+ * @returns Storage when available in the current runtime.
+ * @example
+ * const storage = browserStorage();
+ */
+const browserStorage = (): Storage | null => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -16,10 +23,16 @@ function browserStorage(): Storage | null {
   } catch {
     return null;
   }
-}
+};
 
-/** Persisted inspect highlight ring color for pick mode. */
-export function useReportInspectHighlightColor() {
+/**
+ * Persist the inspect highlight ring color.
+ *
+ * @returns Highlight color plus set/reset actions.
+ * @example
+ * const { color, setColor } = useReportInspectHighlightColor();
+ */
+export const useReportInspectHighlightColor = () => {
   const [color, setColorState] = useState(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
 
   useEffect(() => {
@@ -36,4 +49,4 @@ export function useReportInspectHighlightColor() {
   }, [setColor]);
 
   return { color, setColor, resetColor };
-}
+};

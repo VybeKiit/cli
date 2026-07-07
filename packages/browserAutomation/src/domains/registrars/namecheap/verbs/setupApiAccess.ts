@@ -1,27 +1,28 @@
-import { waitForNcAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/namecheap/dashboard/waitForAuthenticated';
+import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { waitForNcAuthenticated } from '@vybekiit/browser-automation/domains/registrars/namecheap/dashboard/waitForAuthenticated';
 import {
   htmlContainsWhitelistedIp,
   scrapeNamecheapApiKey,
   scrapeNamecheapApiUser,
-} from '@vybekiit/browserAutomation/domains/registrars/namecheap/scrape';
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/scrape';
 import {
   NC_API_ACCESS_URL,
   type NcSetupParams,
   type NcSetupResult,
-} from '@vybekiit/browserAutomation/domains/registrars/namecheap/types';
-import { fetchPublicIpv4 } from '@vybekiit/browserAutomation/domains/registrars/shared/publicIp';
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/types';
+import { fetchPublicIpv4 } from '@vybekiit/browser-automation/domains/registrars/shared/publicIp';
 import type { BrowserContext, Page } from 'playwright';
 
-function envCredentials(): { apiKey?: string; apiUser?: string } {
+const envCredentials = (): { apiKey?: string; apiUser?: string } => {
   const apiKey = process.env.NAMECHEAP_API_KEY?.trim();
   const apiUser = process.env.NAMECHEAP_API_USER?.trim().toLowerCase();
   return {
     ...(apiKey ? { apiKey } : {}),
     ...(apiUser ? { apiUser } : {}),
   };
-}
+};
 
-async function isApiAccessEnabled(page: Page): Promise<boolean> {
+const isApiAccessEnabled = async (page: Page): Promise<boolean> => {
   const toggle = page.getByRole('checkbox', { name: /api access/i }).first();
   if ((await toggle.count()) > 0) {
     return toggle.isChecked().catch(() => false);
@@ -32,9 +33,9 @@ async function isApiAccessEnabled(page: Page): Promise<boolean> {
   }
   const html = await page.content();
   return Boolean(scrapeNamecheapApiKey(html));
-}
+};
 
-async function enableApiAccessToggle(page: Page): Promise<void> {
+const enableApiAccessToggle = async (page: Page): Promise<void> => {
   if (await isApiAccessEnabled(page)) return;
 
   const toggle = page.getByRole('checkbox', { name: /api access/i }).first();
@@ -53,9 +54,9 @@ async function enableApiAccessToggle(page: Page): Promise<void> {
   if ((await enableBtn.count()) > 0) {
     await enableBtn.click();
   }
-}
+};
 
-async function whitelistIp(page: Page, ip: string): Promise<void> {
+const whitelistIp = async (page: Page, ip: string): Promise<void> => {
   const html = await page.content();
   if (htmlContainsWhitelistedIp(html, ip)) return;
 
@@ -82,12 +83,12 @@ async function whitelistIp(page: Page, ip: string): Promise<void> {
       .click();
     await page.waitForTimeout(1500);
   }
-}
+};
 
-async function readCredentialsFromPage(
+const readCredentialsFromPage = async (
   page: Page,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<{ apiKey: string; apiUser: string } | null> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<{ apiKey: string; apiUser: string } | null> => {
   const html = await page.content();
   let apiKey = scrapeNamecheapApiKey(html);
   let apiUser = scrapeNamecheapApiUser(html);
@@ -103,8 +104,12 @@ async function readCredentialsFromPage(
   }
 
   const fromEnv = envCredentials();
-  apiKey = apiKey ?? fromEnv.apiKey ?? null;
-  apiUser = apiUser ?? fromEnv.apiUser ?? null;
+  if (apiKey === null && fromEnv.apiKey !== undefined) {
+    apiKey = fromEnv.apiKey;
+  }
+  if (apiUser === null && fromEnv.apiUser !== undefined) {
+    apiUser = fromEnv.apiUser;
+  }
 
   if (!apiUser) {
     // The Namecheap API user IS the account username, shown in the global-bar account dropdown
@@ -128,23 +133,38 @@ async function readCredentialsFromPage(
     await regenerate.click();
     await page.waitForTimeout(2000);
     const refreshed = await page.content();
-    apiKey = scrapeNamecheapApiKey(refreshed) ?? apiKey;
-    apiUser = apiUser ?? scrapeNamecheapApiUser(refreshed);
+    const refreshedApiKey = scrapeNamecheapApiKey(refreshed);
+    if (refreshedApiKey !== null) {
+      apiKey = refreshedApiKey;
+    }
+    if (apiUser === null) {
+      apiUser = scrapeNamecheapApiUser(refreshed);
+    }
   }
 
   if (!(apiKey && apiUser)) return null;
   return { apiKey, apiUser };
-}
+};
 
-/** Enable API access, whitelist the current public IP, and read API credentials. */
-export async function setupApiAccess(
+/**
+ * Enable API access, whitelist the current public IP, and read API credentials.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @param params - Validated automation parameters for the operation.
+ * @param context - Browser context used for authenticated waits.
+ * @param log - Input value for log.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await setupApiAccess(page, params, context, log);
+ */
+export const setupApiAccess = async (
   page: Page,
   params: NcSetupParams = {},
   context?: BrowserContext,
-  log: Pick<Console, 'log' | 'warn'> = console,
-): Promise<NcSetupResult> {
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+): Promise<NcSetupResult> => {
   await page.goto(NC_API_ACCESS_URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  page = await waitForNcAuthenticated(page, log, context ?? page.context());
+  page = await waitForNcAuthenticated(page, log, context === undefined ? page.context() : context);
 
   const alreadyEnabled = await isApiAccessEnabled(page);
   if (alreadyEnabled) {
@@ -170,4 +190,4 @@ export async function setupApiAccess(
     reusedExisting: alreadyEnabled,
     sandbox: params.sandbox === true,
   };
-}
+};

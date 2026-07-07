@@ -1,19 +1,19 @@
 export type SetupDomain = 'payments' | 'auth' | 'database' | 'deploy' | 'email';
 
-export interface SetupStep {
+export type SetupStep = {
   readonly order: number;
   readonly builderMessage: string;
   readonly skill?: string;
   readonly envKeys?: readonly string[];
   readonly verify?: string;
   readonly agentNote?: string;
-}
+};
 
-export interface SetupPlan {
+export type SetupPlan = {
   readonly domain: SetupDomain;
   readonly steps: readonly SetupStep[];
   readonly summary: string;
-}
+};
 
 const SETUP_PLANS: Readonly<Record<SetupDomain, SetupPlan>> = {
   payments: {
@@ -123,7 +123,10 @@ const SETUP_PLANS: Readonly<Record<SetupDomain, SetupPlan>> = {
 
 /**
  * Ordered setup checklist for a domain — complements buyer skills with env + verify hints.
+ *
+ * @param domain - domain input.
+ * @returns The plan setup result.
+ * @example
+ * const result = planSetup(domain);
  */
-export function planSetup(domain: SetupDomain): SetupPlan {
-  return SETUP_PLANS[domain];
-}
+export const planSetup = (domain: SetupDomain): SetupPlan => SETUP_PLANS[domain];

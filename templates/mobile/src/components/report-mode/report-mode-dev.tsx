@@ -14,8 +14,16 @@ import {
 } from 'react-native';
 import { useTheme } from '@/theme/useTheme';
 
-/** Dev-only Report Mode — R FAB with Pin corners (no drag); tap-to-report. */
-export function ReportModeDev() {
+declare const __DEV__: boolean;
+
+/**
+ * Dev-only report-mode overlay for tap-to-report feedback.
+ *
+ * @returns The report-mode floating action button and modal in development builds.
+ * @example
+ * <ReportModeDev />
+ */
+export const ReportModeDev = () => {
   const pathname = usePathname();
   const { colors } = useTheme();
   const { corner, setCorner } = useReportDockMobile();
@@ -31,15 +39,15 @@ export function ReportModeDev() {
 
   const fabInset = getDockInsetStyle(corner, 24);
 
-  function handleScreenTap(event: GestureResponderEvent) {
+  const handleScreenTap = (event: GestureResponderEvent): void => {
     if (!active || tapPoint) {
       return;
     }
     const { locationX, locationY } = event.nativeEvent;
     setTapPoint({ x: Math.round(locationX), y: Math.round(locationY) });
-  }
+  };
 
-  async function handleSubmit() {
+  const handleSubmit = async (): Promise<void> => {
     if (!(tapPoint && note.trim())) {
       return;
     }
@@ -57,7 +65,7 @@ export function ReportModeDev() {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -165,7 +173,7 @@ export function ReportModeDev() {
       </Modal>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   fabCluster: {

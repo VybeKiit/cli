@@ -4,11 +4,11 @@
  * Rendered into each template's `language.md` via {@link renderVybekiitLayerVocabularyTable}.
  */
 
-export interface VybekiitLayerVocabularyEntry {
+export type VybekiitLayerVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 export const VYBEKIIT_LAYER_VOCABULARY: readonly VybekiitLayerVocabularyEntry[] = [
   {
@@ -68,12 +68,16 @@ export const VYBEKIIT_LAYER_VOCABULARY: readonly VybekiitLayerVocabularyEntry[] 
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link VYBEKIIT_LAYER_VOCABULARY} as a markdown table for `language.md`. */
-export function renderVybekiitLayerVocabularyTable(): string {
+/**
+ * Render {@link VYBEKIIT_LAYER_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render vybekiit layer vocabulary table text.
+ * @example
+ * const result = renderVybekiitLayerVocabularyTable();
+ */
+export const renderVybekiitLayerVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = VYBEKIIT_LAYER_VOCABULARY.map((entry) => {
@@ -81,4 +85,4 @@ export function renderVybekiitLayerVocabularyTable(): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};

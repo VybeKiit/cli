@@ -26,6 +26,15 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 
 const KIRO_SESSIONS_DIR = join(homedir(), '.kiro', 'sessions', 'cli');
 
+const valueOr = (value, defaultValue) => {
+  if (value === undefined || value === null) {
+    return defaultValue;
+  }
+  return value;
+};
+
+const textField = (data, key, defaultValue) => String(valueOr(data[key], defaultValue));
+
 // ─── Server Setup ────────────────────────────────────────────────────────────
 
 const server = new Server({ name: 'vybekiit', version: '0.2.0' }, { capabilities: { tools: {} } });
@@ -37,7 +46,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'list_sessions',
       description:
-        'List all coding sessions from the development console. Returns session IDs, titles, timestamps, and working directories.',
+        'List all coding sessions from the development Console UI. Returns session IDs, titles, timestamps, and working directories.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -59,7 +68,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'create_session',
-      description: 'Create a new coding session in the VybeKiit development console.',
+      description: 'Create a new coding session in the VybeKiit development Console UI.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -114,7 +123,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'render_component',
       description:
-        'Request the VybeKiit UI to render a dynamic component. The component will appear in the development console.',
+        'Request the VybeKiit UI to render a dynamic component. The component will appear in the development Console UI.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -143,8 +152,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'list_ui_components',
-      description:
-        'List all available UI components that can be dynamically rendered in the VybeKiit console.',
+      description: 'List all available UI components that can render in the VybeKiit Console UI.',
       inputSchema: { type: 'object', properties: {} },
     },
   ],
@@ -157,7 +165,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   switch (name) {
     case 'list_sessions': {
-      const limit = args?.limit ?? 20;
+      const limit = Number(valueOr(args?.limit, 20));
       const cwdFilter = args?.cwd;
 
       try {
@@ -169,21 +177,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           try {
             const raw = await readFile(join(KIRO_SESSIONS_DIR, file), 'utf-8');
             const data = JSON.parse(raw);
-            if (cwdFilter && data.cwd !== cwdFilter) continue;
-            sessions.push({
-              session_id: data.session_id,
-              title: data.title?.slice(0, 80) ?? '(untitled)',
-              cwd: data.cwd,
-              created_at: data.created_at,
-              updated_at: data.updated_at,
-              agent: 'kiro',
-            });
+            const cwdMatches = !cwdFilter || data.cwd === cwdFilter;
+            if (cwdMatches) {
+              sessions.push({
+                session_id: data.session_id,
+                title: textField(data, 'title', '(untitled)').slice(0, 80),
+                cwd: data.cwd,
+                created_at: data.created_at,
+                updated_at: data.updated_at,
+                agent: 'kiro',
+              });
+            }
           } catch {
             /* skip malformed */
           }
         }
 
-        sessions.sort((a, b) => (b.updated_at ?? '').localeCompare(a.updated_at ?? ''));
+        sessions.sort((a, b) =>
+          textField(b, 'updated_at', '').localeCompare(textField(a, 'updated_at', '')),
+        );
         const result = sessions.slice(0, limit);
 
         return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
@@ -226,9 +238,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case 'create_session': {
-      const title = args?.title ?? 'New Session';
-      const agent = args?.agent ?? 'kiro';
-      const cwd = args?.cwd ?? process.cwd();
+      const title = String(valueOr(args?.title, 'New Session'));
+      const agent = String(valueOr(args?.agent, 'kiro'));
+      const cwd = String(valueOr(args?.cwd, process.cwd()));
+
+      const launchCommandByAgent = {
+        kiro: `kiro-cli chat "${title}"`,
+        'claude-code': `claude "${title}"`,
+      };
 
       // We generate a session reference — the actual Kiro session is created via CLI launch
       const sessionRef = {
@@ -239,11 +256,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         created_at: new Date().toISOString(),
         status: 'ready',
         launch_command:
-          agent === 'kiro'
-            ? `kiro-cli chat "${title}"`
-            : agent === 'claude-code'
-              ? `claude "${title}"`
-              : `${agent} "${title}"`,
+          launchCommandByAgent[agent] === undefined
+            ? `${agent} "${title}"`
+            : launchCommandByAgent[agent],
       };
 
       return { content: [{ type: 'text', text: JSON.stringify(sessionRef, null, 2) }] };
@@ -264,7 +279,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     case 'send_notification': {
       const notification = {
         message: args?.message,
-        variant: args?.variant ?? 'info',
+        variant: valueOr(args?.variant, 'info'),
         timestamp: new Date().toISOString(),
       };
       return {
@@ -276,7 +291,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const render = {
         component: args?.component,
         props: args?.props,
-        target: args?.target ?? 'main',
+        target: valueOr(args?.target, 'main'),
       };
       return {
         content: [{ type: 'text', text: `Component render requested: ${JSON.stringify(render)}` }],

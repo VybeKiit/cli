@@ -1,10 +1,10 @@
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { printError, printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
 import {
   ANTHROPIC_MODELS_URL,
   OPENAI_MODELS_URL,
-} from '@vybekiit/browserAutomation/core/constants';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+} from '@vybekiit/browser-automation/core/constants';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
 
 /**
  * AI model providers (OpenAI, Anthropic) — no first-party CLI can mint an API key, so this is
@@ -14,15 +14,15 @@ import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
  * never echoed back to the agent transcript.
  */
 
-interface AiProviderSpec {
+type AiProviderSpec = {
   domain: string;
   aliases: string[];
   label: string;
   envKey: string;
   verify: (apiKey: string) => Promise<boolean>;
-}
+};
 
-async function verifyOpenAi(apiKey: string): Promise<boolean> {
+const verifyOpenAi = async (apiKey: string): Promise<boolean> => {
   try {
     const res = await fetch(OPENAI_MODELS_URL, {
       headers: { Authorization: `Bearer ${apiKey}` },
@@ -31,9 +31,9 @@ async function verifyOpenAi(apiKey: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
-async function verifyAnthropic(apiKey: string): Promise<boolean> {
+const verifyAnthropic = async (apiKey: string): Promise<boolean> => {
   try {
     const res = await fetch(ANTHROPIC_MODELS_URL, {
       headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
@@ -42,9 +42,9 @@ async function verifyAnthropic(apiKey: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
-function registerAiProvider(registry: CommandRegistry, spec: AiProviderSpec): void {
+const registerAiProvider = (registry: CommandRegistry, spec: AiProviderSpec): void => {
   registry.register({
     name: spec.domain,
     aliases: spec.aliases,
@@ -59,7 +59,7 @@ function registerAiProvider(registry: CommandRegistry, spec: AiProviderSpec): vo
           if (!apiKey) {
             const message = `${spec.label} has no CLI to mint a key. Create one in the console and pass --api-key=<key>.`;
             if (flags.json) printJson({ ok: false, error: message });
-            else console.error(message);
+            else printError(message, false);
             return 1;
           }
 
@@ -68,9 +68,9 @@ function registerAiProvider(registry: CommandRegistry, spec: AiProviderSpec): vo
           if (flags.json) {
             printJson({ ok: verified, keysWritten: written.keysWritten, verified });
           } else {
-            console.log(`OK: ${spec.label} setup complete.`);
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(
+            printLine(`OK: ${spec.label} setup complete.`);
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(
               verified
                 ? `✓ Key verified against the ${spec.label} API.`
                 : '⚠ Key written but live verification failed.',
@@ -81,9 +81,17 @@ function registerAiProvider(registry: CommandRegistry, spec: AiProviderSpec): vo
       },
     },
   });
-}
+};
 
-export function registerOpenAiDomain(registry: CommandRegistry): void {
+/**
+ * Register Open Ai Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerOpenAiDomain(registry);
+ */
+export const registerOpenAiDomain = (registry: CommandRegistry): void => {
   registerAiProvider(registry, {
     domain: 'ai/openai',
     aliases: ['openai'],
@@ -91,9 +99,17 @@ export function registerOpenAiDomain(registry: CommandRegistry): void {
     envKey: 'OPENAI_API_KEY',
     verify: verifyOpenAi,
   });
-}
+};
 
-export function registerAnthropicDomain(registry: CommandRegistry): void {
+/**
+ * Register Anthropic Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerAnthropicDomain(registry);
+ */
+export const registerAnthropicDomain = (registry: CommandRegistry): void => {
   registerAiProvider(registry, {
     domain: 'ai/anthropic',
     aliases: ['anthropic'],
@@ -101,4 +117,4 @@ export function registerAnthropicDomain(registry: CommandRegistry): void {
     envKey: 'ANTHROPIC_API_KEY',
     verify: verifyAnthropic,
   });
-}
+};

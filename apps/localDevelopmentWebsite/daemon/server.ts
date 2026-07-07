@@ -6,6 +6,9 @@ const PORT = 3006;
 const sessions = new Map<string, AgentProcess>();
 
 const wss = new WebSocketServer({ port: PORT });
+const writeInfo = (message: string): void => {
+  process.stdout.write(`${message}\n`);
+};
 
 const send = (ws: import('ws').WebSocket, msg: DaemonMessage) => {
   if (ws.readyState === ws.OPEN) {
@@ -92,7 +95,7 @@ const route = (ws: import('ws').WebSocket, msg: ClientMessage) => {
 };
 
 wss.on('connection', (ws) => {
-  console.log('[daemon] client connected');
+  writeInfo('[daemon] client connected');
 
   ws.on('message', (data) => {
     try {
@@ -104,8 +107,8 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    console.log('[daemon] client disconnected');
+    writeInfo('[daemon] client disconnected');
   });
 });
 
-console.log(`[daemon] VybeKiit daemon listening on ws://localhost:${PORT}`);
+writeInfo(`[daemon] VybeKiit daemon listening on ws://localhost:${PORT}`);

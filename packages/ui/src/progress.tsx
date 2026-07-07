@@ -5,6 +5,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Progress component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Progress component.
+ * @example
+ * <Progress />;
+ */
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>

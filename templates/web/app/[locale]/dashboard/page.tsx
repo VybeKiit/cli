@@ -4,15 +4,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@vybekiit/ui/tabs';
 import { DASHBOARD_STATS, GETTING_STARTED_STEP_KEYS } from '@/data/dashboard';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-type DashboardPageProps = {
+interface DashboardPageProps {
   params: Promise<{ locale: string }>;
-};
+}
 
 /**
  * Signed-in dashboard — stats, getting-started list, and tabbed sections.
  * Route protection and signed-in chrome live in `app/[locale]/dashboard/layout.tsx`.
+ *
+ * @param props - Locale route params from Next.js.
+ * @returns The localized signed-in dashboard page.
+ * @example
+ * <DashboardPage params={params} />
  */
-export default async function DashboardPage({ params }: DashboardPageProps) {
+const DashboardPage = async ({ params }: DashboardPageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
@@ -60,4 +65,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       </Tabs>
     </main>
   );
-}
+};
+
+export default DashboardPage;

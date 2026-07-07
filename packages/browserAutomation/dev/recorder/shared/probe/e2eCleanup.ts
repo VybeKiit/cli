@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import {
   LS_FIELD_FALLBACKS,
   locatorFromFallback,
-} from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/fieldFallbacks';
+} from '@vybekiit/browser-automation/domains/payments/ls/dashboard/fieldFallbacks';
 import type { Page } from 'playwright';
 import { LS_E2E_PREFIX, type LsE2eArtifacts, matchesE2ePrefix } from './e2eNames';
 

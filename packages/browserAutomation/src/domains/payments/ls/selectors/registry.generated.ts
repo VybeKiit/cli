@@ -1,10 +1,12 @@
+// biome-ignore-all lint/security/noSecrets: Generated selector strings are public dashboard selectors, not secrets.
+
 /**
  * LS recorded selectors — DOM-seeded from maintainer inspect + probe runs.
  *
  * Last regenerated: 2026-06-29
  */
 
-import type { SelectorEntry } from '@vybekiit/browserAutomation/domains/extension/selectors';
+import type { SelectorEntry } from '@vybekiit/browser-automation/domains/extension/selectors';
 
 export const LS_RECORDED_SELECTORS: Record<string, SelectorEntry[]> = {
   'product.createButton': [

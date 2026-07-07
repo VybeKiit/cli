@@ -1,40 +1,39 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseAuthConfig } from '@vybekiit/auth/config';
-import { type AuthProviderResult, toEffectAuthProvider } from '@vybekiit/auth/effectBridge';
-import { type AuthSession, toSessionResult } from '@vybekiit/auth/session';
-import type { AuthProvider } from '@vybekiit/auth/types';
-import { type AuthUser, normalizeAuthUser } from '@vybekiit/auth/user';
-import { fail, ok, type Result } from '@vybekiit/core';
+import { type AuthSession, authError, failAuth, toAuthSession } from '@vybekiit/auth/session';
+import type { AuthError, AuthProvider } from '@vybekiit/auth/types';
+import { normalizeAuthUser } from '@vybekiit/auth/user';
+import { Effect } from 'effect';
 
 /** The GoTrue user shape this adapter reads (id + optional email). */
-interface SupabaseUserLike {
+type SupabaseUserLike = {
   readonly id: string;
   readonly email?: string | null;
-}
+};
 
 /** The GoTrue session shape this adapter reads (just the bearer token). */
-interface SupabaseSessionLike {
+type SupabaseSessionLike = {
   readonly access_token: string;
-}
+};
 
 /** A GoTrue error — only its message is surfaced. */
-interface SupabaseAuthError {
+type SupabaseAuthError = {
   readonly message: string;
-}
+};
 
 /** A GoTrue call that establishes (or reads) a user/session. */
-interface AuthResponse {
+type AuthResponse = {
   readonly data: {
     readonly user: SupabaseUserLike | null;
     readonly session?: SupabaseSessionLike | null;
   };
   readonly error: SupabaseAuthError | null;
-}
+};
 
 /** A GoTrue call that only reports success/failure (OTP send, reset email). */
-interface SendResponse {
+type SendResponse = {
   readonly error: SupabaseAuthError | null;
-}
+};
 
 /** The `verifyOtp` shapes this adapter issues (email/sms code, or a recovery/magic-link hash). */
 type VerifyOtpParams =
@@ -48,28 +47,33 @@ type VerifyOtpParams =
  * inject a fake `{ auth: {...} }` and run with NO network; the real client is adapted at
  * {@link buildSupabaseAuthClient} via the sanctioned vendor-seam cast.
  */
-export interface SupabaseAuthClientLike {
+export type SupabaseAuthClientLike = {
   readonly auth: {
-    signUp(credentials: { email: string; password: string }): Promise<AuthResponse>;
-    signInWithPassword(credentials: { email: string; password: string }): Promise<AuthResponse>;
-    signInWithOtp(credentials: { email: string } | { phone: string }): Promise<SendResponse>;
-    verifyOtp(params: VerifyOtpParams): Promise<AuthResponse>;
-    resetPasswordForEmail(email: string): Promise<SendResponse>;
-    updateUser(attributes: { password: string }): Promise<AuthResponse>;
-    getUser(jwt?: string): Promise<AuthResponse>;
+    readonly signUp: (credentials: { email: string; password: string }) => Promise<AuthResponse>;
+    readonly signInWithPassword: (credentials: {
+      email: string;
+      password: string;
+    }) => Promise<AuthResponse>;
+    readonly signInWithOtp: (
+      credentials: { email: string } | { phone: string },
+    ) => Promise<SendResponse>;
+    readonly verifyOtp: (params: VerifyOtpParams) => Promise<AuthResponse>;
+    readonly resetPasswordForEmail: (email: string) => Promise<SendResponse>;
+    readonly updateUser: (attributes: { password: string }) => Promise<AuthResponse>;
+    readonly getUser: (jwt?: string) => Promise<AuthResponse>;
   };
-}
+};
 
 /**
  * Settings for {@link createSupabaseAuthProvider}: the validated Supabase project URL +
  * anon key, plus an optional injected client (default: a real GoTrue client). Injecting
  * the client is the test seam that keeps construction offline.
  */
-export interface SupabaseAuthProviderOptions {
+export type SupabaseAuthProviderOptions = {
   readonly config: SupabaseAuthConfig;
   /** Test seam — a fake `{ auth }` whose methods are mocked; omit to build the real one. */
   readonly client?: SupabaseAuthClientLike;
-}
+};
 
 /** Supabase Auth covers the full sign-in surface (email code, magic link, password reset, SMS). */
 const SUPABASE_CAPABILITIES = {
@@ -87,107 +91,191 @@ const SUPABASE_CAPABILITIES = {
  * Method → GoTrue mapping: password sign-up/in → `signUp`/`signInWithPassword`; email &
  * magic-link & SMS codes → `signInWithOtp` + `verifyOtp`; password reset → recovery
  * `verifyOtp` then `updateUser`; `getUser` → `getUser(jwt)`. Every GoTrue error is
- * narrated as a {@link Result} `fail(...)` rather than thrown across the boundary.
+ * narrated as tagged {@link AuthError} failures rather than thrown across the boundary.
+ *
+ * @param options - Validated config plus an optional injected GoTrue client.
+ * @returns The Supabase AuthProvider.
+ * @example
+ * const provider = createSupabaseAuthProvider({ config });
  */
-export function createSupabaseAuthProvider(options: SupabaseAuthProviderOptions): AuthProvider {
-  const { auth } = options.client ?? buildSupabaseAuthClient(options.config);
+export const createSupabaseAuthProvider = (options: SupabaseAuthProviderOptions): AuthProvider => {
+  const client =
+    options.client === undefined ? buildSupabaseAuthClient(options.config) : options.client;
+  const { auth } = client;
 
-  const impl: AuthProviderResult = {
+  return {
     name: 'supabase',
     capabilities: SUPABASE_CAPABILITIES,
 
-    async signUpWithPassword(email: string, password: string) {
-      const { data, error } = await auth.signUp({ email, password });
-      if (error) return fail('signup_failed', error.message);
-      return sessionFrom(
-        data,
-        email,
-        'Sign up succeeded but returned no session (confirm your email).',
-      );
-    },
+    signUpWithPassword: (email, password) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('signup_failed', () =>
+          auth.signUp({ email, password }),
+        );
+        if (error !== null) {
+          return yield* failAuth('signup_failed', error.message);
+        }
+        return yield* sessionFrom(
+          data,
+          email,
+          'Sign up succeeded but returned no session (confirm your email).',
+        );
+      }),
 
-    async signInWithPassword(email: string, password: string) {
-      const { data, error } = await auth.signInWithPassword({ email, password });
-      if (error) return fail('signin_failed', error.message);
-      return sessionFrom(data, email, 'Sign in returned no session.');
-    },
+    signInWithPassword: (email, password) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('signin_failed', () =>
+          auth.signInWithPassword({ email, password }),
+        );
+        if (error !== null) {
+          return yield* failAuth('signin_failed', error.message);
+        }
+        return yield* sessionFrom(data, email, 'Sign in returned no session.');
+      }),
 
-    async sendEmailCode(email: string): Promise<Result<true>> {
-      const { error } = await auth.signInWithOtp({ email });
-      if (error) return fail('otp_send_failed', error.message);
-      return ok(true);
-    },
+    sendEmailCode: (email) =>
+      Effect.gen(function* () {
+        const { error } = yield* trySupabase('otp_send_failed', () =>
+          auth.signInWithOtp({ email }),
+        );
+        if (error !== null) {
+          return yield* failAuth('otp_send_failed', error.message);
+        }
+        return true as const;
+      }),
 
-    async verifyEmailCode(email: string, code: string) {
-      const { data, error } = await auth.verifyOtp({ email, token: code, type: 'email' });
-      if (error) return fail('otp_verify_failed', error.message);
-      return sessionFrom(data, email, 'Code verified but returned no session.');
-    },
+    verifyEmailCode: (email, code) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('otp_verify_failed', () =>
+          auth.verifyOtp({ email, token: code, type: 'email' }),
+        );
+        if (error !== null) {
+          return yield* failAuth('otp_verify_failed', error.message);
+        }
+        return yield* sessionFrom(data, email, 'Code verified but returned no session.');
+      }),
 
-    async requestPasswordReset(email: string): Promise<Result<true>> {
-      const { error } = await auth.resetPasswordForEmail(email);
-      if (error) return fail('reset_request_failed', error.message);
-      return ok(true);
-    },
+    requestPasswordReset: (email) =>
+      Effect.gen(function* () {
+        const { error } = yield* trySupabase('reset_request_failed', () =>
+          auth.resetPasswordForEmail(email),
+        );
+        if (error !== null) {
+          return yield* failAuth('reset_request_failed', error.message);
+        }
+        return true as const;
+      }),
 
-    async resetPassword(token: string, newPassword: string) {
-      const recovery = await auth.verifyOtp({ token_hash: token, type: 'recovery' });
-      if (recovery.error) return fail('reset_failed', recovery.error.message);
-      const { data, error } = await auth.updateUser({ password: newPassword });
-      if (error) return fail('reset_failed', error.message);
-      return sessionFrom(data, '', 'Password reset succeeded but returned no session.');
-    },
+    resetPassword: (token, newPassword) =>
+      Effect.gen(function* () {
+        const recovery = yield* trySupabase('reset_failed', () =>
+          auth.verifyOtp({ token_hash: token, type: 'recovery' }),
+        );
+        if (recovery.error !== null) {
+          return yield* failAuth('reset_failed', recovery.error.message);
+        }
+        const { data, error } = yield* trySupabase('reset_failed', () =>
+          auth.updateUser({ password: newPassword }),
+        );
+        if (error !== null) {
+          return yield* failAuth('reset_failed', error.message);
+        }
+        return yield* sessionFrom(data, '', 'Password reset succeeded but returned no session.');
+      }),
 
-    async sendMagicLink(email: string): Promise<Result<true>> {
-      const { error } = await auth.signInWithOtp({ email });
-      if (error) return fail('magic_link_failed', error.message);
-      return ok(true);
-    },
+    sendMagicLink: (email) =>
+      Effect.gen(function* () {
+        const { error } = yield* trySupabase('magic_link_failed', () =>
+          auth.signInWithOtp({ email }),
+        );
+        if (error !== null) {
+          return yield* failAuth('magic_link_failed', error.message);
+        }
+        return true as const;
+      }),
 
-    async verifyMagicLink(token: string) {
-      const { data, error } = await auth.verifyOtp({ token_hash: token, type: 'magiclink' });
-      if (error) return fail('magic_link_failed', error.message);
-      return sessionFrom(data, '', 'Magic link verified but returned no session.');
-    },
+    verifyMagicLink: (token) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('magic_link_failed', () =>
+          auth.verifyOtp({ token_hash: token, type: 'magiclink' }),
+        );
+        if (error !== null) {
+          return yield* failAuth('magic_link_failed', error.message);
+        }
+        return yield* sessionFrom(data, '', 'Magic link verified but returned no session.');
+      }),
 
-    async sendSmsCode(phone: string): Promise<Result<true>> {
-      const { error } = await auth.signInWithOtp({ phone });
-      if (error) return fail('sms_send_failed', error.message);
-      return ok(true);
-    },
+    sendSmsCode: (phone) =>
+      Effect.gen(function* () {
+        const { error } = yield* trySupabase('sms_send_failed', () =>
+          auth.signInWithOtp({ phone }),
+        );
+        if (error !== null) {
+          return yield* failAuth('sms_send_failed', error.message);
+        }
+        return true as const;
+      }),
 
-    async verifySmsCode(phone: string, code: string) {
-      const { data, error } = await auth.verifyOtp({ phone, token: code, type: 'sms' });
-      if (error) return fail('sms_verify_failed', error.message);
-      return sessionFrom(data, '', 'SMS verified but returned no session.');
-    },
+    verifySmsCode: (phone, code) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('sms_verify_failed', () =>
+          auth.verifyOtp({ phone, token: code, type: 'sms' }),
+        );
+        if (error !== null) {
+          return yield* failAuth('sms_verify_failed', error.message);
+        }
+        return yield* sessionFrom(data, '', 'SMS verified but returned no session.');
+      }),
 
-    async getUser(sessionToken: string): Promise<Result<AuthUser>> {
-      const { data, error } = await auth.getUser(sessionToken);
-      if (error) return fail('get_user_failed', error.message);
-      const user = normalizeAuthUser(data.user);
-      return user ? ok(user) : fail('no_user', 'No user for the given session token.');
-    },
+    getUser: (sessionToken) =>
+      Effect.gen(function* () {
+        const { data, error } = yield* trySupabase('get_user_failed', () =>
+          auth.getUser(sessionToken),
+        );
+        if (error !== null) {
+          return yield* failAuth('get_user_failed', error.message);
+        }
+        const user = normalizeAuthUser(data.user);
+        if (user === null) {
+          return yield* failAuth('no_user', 'No user for the given session token.');
+        }
+        return user;
+      }),
   };
-  return toEffectAuthProvider(impl);
-}
+};
 
-/** Map a GoTrue `{ user, session }` payload into a {@link Result} session. */
-function sessionFrom(
+/** Map a GoTrue `{ user, session }` payload into an Effect session. */
+const sessionFrom = (
   data: { readonly user: SupabaseUserLike | null; readonly session?: SupabaseSessionLike | null },
   fallbackEmail: string,
   noUserMessage: string,
-): Result<AuthSession> {
-  return toSessionResult(
-    data.user ? { id: data.user.id, email: data.user.email ?? fallbackEmail } : null,
-    data.session?.access_token,
-    noUserMessage,
-  );
-}
+): Effect.Effect<AuthSession, AuthError> => {
+  const user =
+    data.user === null
+      ? null
+      : {
+          id: data.user.id,
+          email:
+            data.user.email === undefined || data.user.email === null
+              ? fallbackEmail
+              : data.user.email,
+        };
+  const token =
+    data.session === undefined || data.session === null ? undefined : data.session.access_token;
+  return toAuthSession(user, token, noUserMessage);
+};
 
 /** Construct the real GoTrue client (stateless server-side; no session persistence). */
-function buildSupabaseAuthClient(config: SupabaseAuthConfig): SupabaseAuthClientLike {
-  return createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
+const buildSupabaseAuthClient = (config: SupabaseAuthConfig): SupabaseAuthClientLike =>
+  createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   }) as unknown as SupabaseAuthClientLike;
-}
+
+const trySupabase = <A>(code: string, run: () => Promise<A>): Effect.Effect<A, AuthError> =>
+  Effect.tryPromise({
+    try: run,
+    catch: (caught) => authError(code, errorMessage(caught)),
+  });
+
+const errorMessage = (caught: unknown): string =>
+  caught instanceof Error ? caught.message : String(caught);

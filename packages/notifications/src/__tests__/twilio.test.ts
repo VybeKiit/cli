@@ -1,4 +1,5 @@
 import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications/providers/twilio';
+import { Effect } from 'effect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const config = {
@@ -12,28 +13,39 @@ describe('Twilio SMS helpers', () => {
     vi.unstubAllGlobals();
   });
 
-  it('sendTwilioSmsOtp succeeds without FROM when no verify service (practice)', async () => {
-    const result = await sendTwilioSmsOtp('+15551234567', {
-      ...config,
-      TWILIO_FROM_NUMBER: '',
-    });
-    expect(result.ok && result.value).toBe(true);
+  it('sends a practice code without a sender', async () => {
+    const result = await Effect.runPromise(
+      sendTwilioSmsOtp('+15551234567', {
+        ...config,
+        TWILIO_FROM_NUMBER: '',
+      }),
+    );
+
+    expect(result).toBe(true);
   });
 
   it('verifyTwilioSmsOtp accepts practice code 000000', async () => {
-    const result = await verifyTwilioSmsOtp('+15551234567', '000000', {
-      ...config,
-      TWILIO_FROM_NUMBER: '',
-    });
-    expect(result.ok && result.value).toBe(true);
+    const result = await Effect.runPromise(
+      verifyTwilioSmsOtp('+15551234567', '000000', {
+        ...config,
+        TWILIO_FROM_NUMBER: '',
+      }),
+    );
+
+    expect(result).toBe(true);
   });
 
   it('verifyTwilioSmsOtp rejects wrong code', async () => {
-    const result = await verifyTwilioSmsOtp('+15551234567', '123456', {
-      ...config,
-      TWILIO_FROM_NUMBER: '',
-    });
-    expect(result.ok).toBe(false);
+    const error = await Effect.runPromise(
+      Effect.flip(
+        verifyTwilioSmsOtp('+15551234567', '123456', {
+          ...config,
+          TWILIO_FROM_NUMBER: '',
+        }),
+      ),
+    );
+
+    expect(error.code).toBe('NOTIFICATIONS_VERIFY_FAILED');
   });
 
   it('uses Verify API when service sid is set', async () => {
@@ -42,12 +54,15 @@ describe('Twilio SMS helpers', () => {
       .mockResolvedValue({ ok: true, json: async () => ({ status: 'approved' }) });
     vi.stubGlobal('fetch', fetchMock);
     const withVerify = { ...config, TWILIO_VERIFY_SERVICE_SID: 'VATEST' };
-    await sendTwilioSmsOtp('+15551234567', withVerify);
+    await Effect.runPromise(sendTwilioSmsOtp('+15551234567', withVerify));
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/Verifications'),
       expect.any(Object),
     );
-    const verify = await verifyTwilioSmsOtp('+15551234567', '123456', withVerify);
-    expect(verify.ok && verify.value).toBe(true);
+    const verify = await Effect.runPromise(
+      verifyTwilioSmsOtp('+15551234567', '123456', withVerify),
+    );
+
+    expect(verify).toBe(true);
   });
 });

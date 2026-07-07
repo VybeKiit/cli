@@ -1,11 +1,21 @@
 import type { CatalogCategory, CatalogEntry } from '@library/data/catalog';
 import { CATALOG_CATEGORIES } from '@library/data/catalog.meta';
 
-export function groupCatalogEntries(
+/**
+ * Group catalog entries.
+ *
+ * @param entries - Catalog entries to render or describe.
+ * @param categoryFilter - Selected category slug, or all for the complete catalog.
+ * @param categories - Ordered category metadata used to group entries.
+ * @returns The value produced by groupCatalogEntries.
+ * @example
+ * const result = groupCatalogEntries(entries, 'all', categories);
+ */
+export const groupCatalogEntries = (
   entries: CatalogEntry[],
   categoryFilter: string,
   categories: readonly CatalogCategory[] = CATALOG_CATEGORIES,
-): Array<{ slug: string; entries: CatalogEntry[] }> {
+): Array<{ slug: string; entries: CatalogEntry[] }> => {
   if (categoryFilter !== 'all') {
     return [{ slug: categoryFilter, entries }];
   }
@@ -14,12 +24,21 @@ export function groupCatalogEntries(
   const buckets = new Map<string, CatalogEntry[]>();
 
   for (const entry of entries) {
-    const list = buckets.get(entry.category) ?? [];
+    let list = buckets.get(entry.category);
+    if (list === undefined) {
+      list = [];
+      buckets.set(entry.category, list);
+    }
     list.push(entry);
-    buckets.set(entry.category, list);
   }
 
   return order
     .filter((slug) => buckets.has(slug))
-    .map((slug) => ({ slug, entries: buckets.get(slug) ?? [] }));
-}
+    .map((slug) => {
+      const bucket = buckets.get(slug);
+      if (bucket === undefined) {
+        throw new Error(`Catalog category ${slug} was marked non-empty without a bucket.`);
+      }
+      return { slug, entries: bucket };
+    });
+};

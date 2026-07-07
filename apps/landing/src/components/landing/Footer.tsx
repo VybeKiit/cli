@@ -19,8 +19,17 @@ const FOOTER_TECH_LOGOS: readonly TechLogo[] = [
   { slug: 'vercel', label: 'Vercel' },
 ];
 
-/** Landing footer — tech logos band, logo, copyright, legal links. */
-export function Footer() {
+/**
+ * Landing footer — tech logos band, logo, copyright, legal links.
+ *
+ * @returns The rendered Footer element.
+ * @example
+ * ```tsx
+ * <Footer />
+ * ```
+ */
+
+export const Footer = () => {
   return (
     <footer
       className="relative overflow-hidden border-t-0 pt-[256px] pb-[238px]"
@@ -88,4 +97,4 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+};

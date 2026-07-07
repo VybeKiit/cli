@@ -13,12 +13,23 @@ const Drawer = ({
 );
 Drawer.displayName = 'Drawer';
 
+/** Drawer Trigger primitive re-export from the underlying UI library. */
 const DrawerTrigger = DrawerPrimitive.Trigger;
 
+/** Drawer Portal primitive re-export from the underlying UI library. */
 const DrawerPortal = DrawerPrimitive.Portal;
 
+/** Drawer Close primitive re-export from the underlying UI library. */
 const DrawerClose = DrawerPrimitive.Close;
 
+/**
+ * Render the Drawer Overlay component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Drawer Overlay component.
+ * @example
+ * <DrawerOverlay />;
+ */
 const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
@@ -31,6 +42,14 @@ const DrawerOverlay = React.forwardRef<
 ));
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
+/**
+ * Render the Drawer Content component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Drawer Content component.
+ * @example
+ * <DrawerContent />;
+ */
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
@@ -62,6 +81,14 @@ const DrawerFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
 );
 DrawerFooter.displayName = 'DrawerFooter';
 
+/**
+ * Render the Drawer Title component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Drawer Title component.
+ * @example
+ * <DrawerTitle />;
+ */
 const DrawerTitle = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
@@ -74,6 +101,14 @@ const DrawerTitle = React.forwardRef<
 ));
 DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
 
+/**
+ * Render the Drawer Description component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Drawer Description component.
+ * @example
+ * <DrawerDescription />;
+ */
 const DrawerDescription = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>

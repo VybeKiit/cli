@@ -1,12 +1,11 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   CLAUDE_FALLBACK_MODELS,
   CODEX_FALLBACK_MODELS,
   parseAnthropicModels,
   parseCodexConfigModel,
   parseOpenAiModels,
-} from '../src/node/models/index';
+} from '@vybekiit/assistant-chat/node';
+import { describe, expect, it } from 'vitest';
 
 describe('parseAnthropicModels', () => {
   it('maps live API payload to model options', () => {
@@ -51,6 +50,7 @@ model = "o4-mini"
   });
 
   it('returns undefined when model is missing', () => {
-    expect(parseCodexConfigModel('[profile]\nname = "dev"')).toBeUndefined();
+    const toml = ['[profile]', 'name = "dev"'].join('\n');
+    expect(parseCodexConfigModel(toml)).toBeUndefined();
   });
 });

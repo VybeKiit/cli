@@ -1,4 +1,4 @@
-import { planAgentRuntimeCompliance } from '@vybekiit/agentKit/planners/planAgentRuntimeCompliance';
+import { planAgentRuntimeCompliance } from '@vybekiit/agent-kit/planners/planAgentRuntimeCompliance';
 import { describe, expect, it } from 'vitest';
 
 const LIVE_DOCS = {

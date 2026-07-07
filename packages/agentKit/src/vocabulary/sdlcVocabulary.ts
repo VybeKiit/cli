@@ -5,11 +5,11 @@
  * via {@link renderSdlcVocabularyTable} (DRY with {@link tool-vocabulary.ts}).
  */
 
-export interface SdlcVocabularyEntry {
+export type SdlcVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 /** Rows where `say` is empty mean agent-internal — never speak the jargon aloud. */
 export const SDLC_VOCABULARY: readonly SdlcVocabularyEntry[] = [
@@ -70,12 +70,16 @@ export const SDLC_VOCABULARY: readonly SdlcVocabularyEntry[] = [
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link SDLC_VOCABULARY} as a markdown table for `language.md`. */
-export function renderSdlcVocabularyTable(): string {
+/**
+ * Render {@link SDLC_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render sdlc vocabulary table text.
+ * @example
+ * const result = renderSdlcVocabularyTable();
+ */
+export const renderSdlcVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = SDLC_VOCABULARY.map((entry) => {
@@ -83,4 +87,4 @@ export function renderSdlcVocabularyTable(): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};

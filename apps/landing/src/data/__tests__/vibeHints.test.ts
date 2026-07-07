@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BUILDER_TOOL_MARKS, PRODUCT_STACK_MARKS } from '@/data/landing';
 import { VIBE_HINTS } from '@/data/vibeHints';
 
-function allBrandMarkSlugs(): string[] {
+const allBrandMarkSlugs = (): string[] => {
   const slugs = new Set<string>();
   for (const mark of BUILDER_TOOL_MARKS) {
     slugs.add(mark.slug);
@@ -11,7 +11,7 @@ function allBrandMarkSlugs(): string[] {
     slugs.add(mark.slug);
   }
   return [...slugs].sort();
-}
+};
 
 describe('VIBE_HINTS', () => {
   it('defines a non-empty hint for every builder-tool and product-stack slug', () => {

@@ -198,6 +198,16 @@ const AgentPicker = ({ onSwitch }: { onSwitch: () => void }) => {
   );
 };
 
+/**
+ * Render the chat input component.
+ *
+ * @param conversationId - Active conversation receiving the outgoing message.
+ * @param disabled - Whether the input is locked.
+ * @param onAgentSwitch - Callback fired after the active agent changes.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <ChatInput conversationId="local-1" onAgentSwitch={refreshSessions} />;
+ */
 export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: ChatInputProps) => {
   const [text, setText] = useState('');
   const [isVoiceActive, setIsVoiceActive] = useState(false);

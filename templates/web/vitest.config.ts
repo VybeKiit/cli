@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
+import { createViteWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
 /**
  * Vitest config for the web template's component and hook tests.
@@ -13,7 +14,7 @@ import { defineConfig } from 'vitest/config';
  *   `expect` with jest-dom matchers.
  */
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [createViteWorkspaceAliasPlugin(), react(), tsconfigPaths()],
   test: {
     environment: 'jsdom',
     globals: true,

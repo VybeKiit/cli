@@ -25,12 +25,25 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import '../../../styles/report-mode-note.css';
 
-function isReportHotkey(event: KeyboardEvent): boolean {
-  return event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
-}
+/**
+ * Check whether a keyboard event matches the report-mode hotkey.
+ *
+ * @param event - Keyboard event to inspect.
+ * @returns True when the event should toggle report mode.
+ * @example
+ * const active = isReportHotkey(event);
+ */
+const isReportHotkey = (event: KeyboardEvent): boolean =>
+  event.altKey && event.shiftKey && event.key.toLowerCase() === 'r';
 
-/** Dev-only Report Mode — full dock (drag + Pin) for extension popup. */
-export function ReportModeDev() {
+/**
+ * Render the dev-only extension report-mode dock.
+ *
+ * @returns The report-mode dock, highlight overlay, and note panel in development builds.
+ * @example
+ * <ReportModeDev />
+ */
+export const ReportModeDev = () => {
   const errorBuffer = useConsoleErrorBuffer();
   const { position, savePosition, setCorner } = useReportDockPosition();
   const {
@@ -71,13 +84,13 @@ export function ReportModeDev() {
   }, []);
 
   useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (!isReportHotkey(event)) {
         return;
       }
       event.preventDefault();
       toggleActive();
-    }
+    };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [toggleActive]);
@@ -129,21 +142,21 @@ export function ReportModeDev() {
     if (!dragging) {
       return;
     }
-    function onPointerMove(event: PointerEvent) {
+    const onPointerMove = (event: PointerEvent): void => {
       const x = event.clientX - dragOffset.current.x;
       const y = event.clientY - dragOffset.current.y;
       savePosition({ anchor: 'custom', customX: Math.max(0, x), customY: Math.max(0, y) });
-    }
-    function onPointerUp(event: PointerEvent) {
+    };
+    const onPointerUp = (event: PointerEvent): void => {
       setDragging(false);
-      const snapped = snapDockToNearestCorner(
-        event.clientX - dragOffset.current.x,
-        event.clientY - dragOffset.current.y,
-        window.innerWidth,
-        window.innerHeight,
-      );
+      const snapped = snapDockToNearestCorner({
+        x: event.clientX - dragOffset.current.x,
+        y: event.clientY - dragOffset.current.y,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+      });
       savePosition(snapped);
-    }
+    };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     return () => {
@@ -152,16 +165,16 @@ export function ReportModeDev() {
     };
   }, [dragging, savePosition]);
 
-  function onDragHandlePointerDown(event: React.PointerEvent<HTMLButtonElement>) {
+  const onDragHandlePointerDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
     event.preventDefault();
     const rect = dockRef.current?.getBoundingClientRect();
-    const left = rect?.left ?? event.clientX;
-    const top = rect?.top ?? event.clientY;
+    const left = rect === undefined ? event.clientX : rect.left;
+    const top = rect === undefined ? event.clientY : rect.top;
     dragOffset.current = { x: event.clientX - left, y: event.clientY - top };
     setDragging(true);
-  }
+  };
 
-  async function handleCopySpot() {
+  const handleCopySpot = async (): Promise<void> => {
     if (!spotLabel.trim()) {
       return;
     }
@@ -171,9 +184,9 @@ export function ReportModeDev() {
     } finally {
       setCopyingSpot(false);
     }
-  }
+  };
 
-  async function handleSubmit() {
+  const handleSubmit = async (): Promise<void> => {
     if (!(selected && note.trim())) {
       return;
     }
@@ -194,14 +207,14 @@ export function ReportModeDev() {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   if (!import.meta.env.DEV) {
     return null;
   }
 
-  const highlightTarget = selected ?? hovered;
-  const highlightRect = highlightTarget?.getBoundingClientRect() ?? null;
+  const highlightTarget = selected === null ? hovered : selected;
+  const highlightRect = highlightTarget === null ? null : highlightTarget.getBoundingClientRect();
   const dockStyle = getDockPlacementStyle(position) as CSSProperties;
 
   return (
@@ -382,4 +395,4 @@ export function ReportModeDev() {
       </div>
     </>
   );
-}
+};

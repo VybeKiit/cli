@@ -57,7 +57,7 @@
 }
 
 .builder-assistant-mark--cursor {
-  color: #f4f4f5;
+  color: rgb(244 244 245);
 }
 
 .builder-assistant-mark--codex {
@@ -2267,7 +2267,7 @@
 
   /* All extended-pose overlay parts (any `claude-octopus__x-*` class). */
   [class*="claude-octopus__x-"] {
-    animation: none !important;
+    animation: none;
   }
 
   /* Acting kit — held-prop arms, scanning gaze, streak fire, and the four acting bodies. */
@@ -2290,6 +2290,6 @@
   }
 
   .claude-octopus__x-bar {
-    transform: none !important;
+    transform: none;
   }
 }

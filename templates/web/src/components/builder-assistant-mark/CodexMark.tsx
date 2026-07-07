@@ -10,8 +10,14 @@ interface CodexMarkProps {
   readonly className?: string;
 }
 
-/** Codex CLI logo — lavender-to-blue cloud with >_ prompt cutout. */
-export function CodexMark({ className }: CodexMarkProps) {
+/**
+ * Codex CLI logo with gradient cloud and prompt cutout.
+ *
+ * @returns Inline SVG mark for Codex.
+ * @example
+ * <CodexMark className="size-6" />;
+ */
+export const CodexMark = ({ className }: CodexMarkProps) => {
   const uid = useId().replaceAll(':', '');
   const gradientId = `codex-grad-${uid}`;
   const maskId = `codex-mask-${uid}`;
@@ -47,4 +53,4 @@ export function CodexMark({ className }: CodexMarkProps) {
       <rect fill={`url(#${gradientId})`} height="24" mask={`url(#${maskId})`} width="24" />
     </svg>
   );
-}
+};

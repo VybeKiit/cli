@@ -26,12 +26,12 @@ export type DataProviderName =
  * Adapters generate/accept this id in whatever native form the backend uses (a
  * Postgres uuid, a Mongo `_id` mapped to `id`, a Dynamo partition key) so call
  * sites address records uniformly. Concrete record types extend this with their
- * own typed fields, e.g. `interface Order extends DbRecord { email: string }`.
+ * own typed fields, e.g. `type Order = DbRecord & { readonly email: string }`.
  */
-export interface DbRecord {
+export type DbRecord = {
   /** Stable primary key, vendor-neutral at the call site. */
   readonly id: string;
-}
+};
 
 /**
  * A simple equality filter for {@link DataProvider.query}: every listed field must
@@ -75,62 +75,65 @@ export class DbError extends Data.TaggedError('DbError')<{
  * tagged {@link DbError} for expected boundary failures (not found, constraint
  * violation, network blip); composition roots run it at the edge.
  */
-export interface DataProvider {
+export type DataProvider = {
   /** Which backend this instance talks to. */
   readonly name: DataProviderName;
   /** Which optional operations this adapter implements. */
   readonly capabilities: DataProviderCapabilities;
   /** Insert a record and return it as stored (with its final `id`). */
-  insert<T extends DbRecord>(collection: string, record: T): Effect.Effect<T, DbError>;
+  readonly insert: <T extends DbRecord>(collection: string, record: T) => Effect.Effect<T, DbError>;
   /** Fetch one record by id; succeeds with `null` when no row matches. */
-  get<T extends DbRecord>(collection: string, id: string): Effect.Effect<T | null, DbError>;
+  readonly get: <T extends DbRecord>(
+    collection: string,
+    id: string,
+  ) => Effect.Effect<T | null, DbError>;
   /** Fetch every record matching an equality {@link QueryFilter}. */
-  query<T extends DbRecord>(
+  readonly query: <T extends DbRecord>(
     collection: string,
     filter: QueryFilter<T>,
-  ): Effect.Effect<T[], DbError>;
+  ) => Effect.Effect<T[], DbError>;
   /** Patch fields of one record by id and return the updated record. */
-  update<T extends DbRecord>(
+  readonly update: <T extends DbRecord>(
     collection: string,
     id: string,
     patch: Partial<Omit<T, 'id'>>,
-  ): Effect.Effect<T, DbError>;
+  ) => Effect.Effect<T, DbError>;
   /** Delete one record by id. */
-  remove(collection: string, id: string): Effect.Effect<true, DbError>;
+  readonly remove: (collection: string, id: string) => Effect.Effect<true, DbError>;
   /** Insert or update on a non-id conflict key (when {@link DataProviderCapabilities.upsert}). */
-  upsert?<T extends DbRecord>(
+  readonly upsert?: <T extends DbRecord>(
     collection: string,
     record: T,
     conflictKey: keyof T & string,
-  ): Effect.Effect<T, DbError>;
+  ) => Effect.Effect<T, DbError>;
   /** Insert once; return existing row when dedupe key collides. */
-  idempotentInsert?<T extends DbRecord>(
+  readonly idempotentInsert?: <T extends DbRecord>(
     collection: string,
     record: T,
     dedupeKey: keyof T & string,
-  ): Effect.Effect<T, DbError>;
+  ) => Effect.Effect<T, DbError>;
   /** Approximate nearest-neighbor search on vector-enabled preset tables. */
-  vectorSearch?<T extends DbRecord>(
+  readonly vectorSearch?: <T extends DbRecord>(
     collection: string,
     embedding: readonly number[],
     limit: number,
-  ): Effect.Effect<T[], DbError>;
+  ) => Effect.Effect<T[], DbError>;
   /** Full-text search on preset tables with tsvector columns. */
-  fullTextSearch?<T extends DbRecord>(
+  readonly fullTextSearch?: <T extends DbRecord>(
     collection: string,
     query: string,
     limit: number,
-  ): Effect.Effect<T[], DbError>;
+  ) => Effect.Effect<T[], DbError>;
   /** Insert many rows in one round trip. */
-  bulkInsert?<T extends DbRecord>(
+  readonly bulkInsert?: <T extends DbRecord>(
     collection: string,
     records: readonly T[],
-  ): Effect.Effect<T[], DbError>;
+  ) => Effect.Effect<T[], DbError>;
   /** Run fn in a transaction when the adapter supports it. */
-  withTransaction?<R>(
+  readonly withTransaction?: <R>(
     fn: (tx: DataProvider) => Effect.Effect<R, DbError>,
-  ): Effect.Effect<R, DbError>;
-}
+  ) => Effect.Effect<R, DbError>;
+};
 
 /**
  * The object-storage backends VybeKiit ships an adapter for, chosen via
@@ -146,18 +149,18 @@ export type StorageProviderName = 'supabase' | 'r2' | 's3';
  * stay credential-free, and every method returns an {@link Effect.Effect} failing
  * with a tagged {@link DbError}.
  */
-export interface StorageProvider {
+export type StorageProvider = {
   /** Which storage backend this instance talks to. */
   readonly name: StorageProviderName;
   /** Upload bytes to `bucket/key`; optional `contentType` sets the MIME type. */
-  upload(
+  readonly upload: (
     bucket: string,
     key: string,
     data: Uint8Array,
     contentType?: string,
-  ): Effect.Effect<{ key: string }, DbError>;
+  ) => Effect.Effect<{ key: string }, DbError>;
   /** Resolve a readable URL for an existing object. */
-  getUrl(bucket: string, key: string): Effect.Effect<{ url: string }, DbError>;
+  readonly getUrl: (bucket: string, key: string) => Effect.Effect<{ url: string }, DbError>;
   /** Delete an object at `bucket/key`. */
-  remove(bucket: string, key: string): Effect.Effect<true, DbError>;
-}
+  readonly remove: (bucket: string, key: string) => Effect.Effect<true, DbError>;
+};

@@ -1,14 +1,18 @@
-import { ok, type Result } from '@vybekiit/core';
-import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
+import type {
+  NotificationsProvider,
+  SendNotificationParamsType,
+} from '@vybekiit/notifications/types';
+import { Effect } from 'effect';
 
-export function createLocalNotifications(): NotificationsProvider {
-  return {
-    name: 'local',
-    async send(_params: SendNotificationParams): Promise<Result<{ id: string }>> {
-      return ok({ id: 'local-notification' });
-    },
-    async verifyDelivery() {
-      return ok(true);
-    },
-  };
-}
+/**
+ * Build a local notifications adapter for tests and offline template flows.
+ *
+ * @returns A notifications provider that acknowledges delivery without external IO.
+ * @example
+ * const notifications = createLocalNotifications();
+ */
+export const createLocalNotifications = (): NotificationsProvider => ({
+  name: 'local',
+  send: (_params: SendNotificationParamsType) => Effect.succeed({ id: 'local-notification' }),
+  verifyDelivery: () => Effect.succeed(true),
+});

@@ -4,7 +4,7 @@ import { defineConfig } from 'tsup';
 // dual ESM/CJS + d.ts shape of the published library packages, so it uses its
 // own config rather than the shared `tsup.base`.
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/bin.ts'],
   format: ['esm'],
   clean: true,
   banner: { js: '#!/usr/bin/env node' },

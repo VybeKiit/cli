@@ -2,55 +2,68 @@ import {
   createCheckout as createLemonSqueezyHostedCheckout,
   lemonSqueezySetup,
 } from '@lemonsqueezy/lemonsqueezy.js';
-import { fail, type LemonSqueezyConfig, ok, type Result } from '@vybekiit/core';
-import type { CheckoutParams, CheckoutResult } from '@vybekiit/payments/types';
+import type { LemonSqueezyConfig } from '@vybekiit/payments/config';
+import { caughtMessage, failPayment, paymentError } from '@vybekiit/payments/paymentEffect';
+import type { CheckoutParams, CheckoutResult, PaymentError } from '@vybekiit/payments/types';
+import { Effect } from 'effect';
 
 /**
  * Create a hosted Lemon Squeezy checkout and return its URL.
  *
- * `githubUsername` is sent as checkout `custom` data so the order webhook reads it
- * back and the gate invites that exact account — this links a payment to the right
- * GitHub user with no account system of our own. Returns a {@link Result}: a bad
- * key / unknown variant / network blip is an expected boundary failure the caller
- * surfaces, not a thrown crash.
+ * @param config - Validated Lemon Squeezy credentials and test-mode flag.
+ * @param params - Normalized checkout creation parameters.
+ * @returns An Effect containing the hosted checkout URL.
+ * @example
+ * const checkout = await Effect.runPromise(createLemonSqueezyCheckout(config, params));
  */
-export async function createLemonSqueezyCheckout(
+export const createLemonSqueezyCheckout = (
   config: LemonSqueezyConfig,
   params: CheckoutParams,
-): Promise<Result<CheckoutResult>> {
-  lemonSqueezySetup({ apiKey: config.LEMONSQUEEZY_API_KEY });
+): Effect.Effect<CheckoutResult, PaymentError> =>
+  Effect.gen(function* () {
+    lemonSqueezySetup({ apiKey: config.LEMONSQUEEZY_API_KEY });
 
-  const variantId = Number(params.productId);
-  const testMode = config.LEMONSQUEEZY_TEST_MODE ?? false;
+    const variantId = Number(params.productId);
+    const testMode = config.LEMONSQUEEZY_TEST_MODE;
 
-  let url: string | undefined;
-  try {
-    const response = await createLemonSqueezyHostedCheckout(
-      config.LEMONSQUEEZY_STORE_ID,
-      params.productId,
-      {
-        testMode,
-        productOptions: {
-          enabledVariants: [variantId],
-          ...(params.successUrl ? { redirectUrl: params.successUrl } : {}),
-        },
-        checkoutData: {
-          ...(params.email ? { email: params.email } : {}),
-          ...(params.githubUsername ? { custom: { github_username: params.githubUsername } } : {}),
-        },
-      },
-    );
+    const response = yield* Effect.tryPromise({
+      try: () =>
+        createLemonSqueezyHostedCheckout(config.LEMONSQUEEZY_STORE_ID, params.productId, {
+          testMode,
+          productOptions: {
+            enabledVariants: [variantId],
+            ...(params.successUrl ? { redirectUrl: params.successUrl } : {}),
+          },
+          checkoutData: {
+            ...(params.email ? { email: params.email } : {}),
+            ...(params.githubUsername
+              ? { custom: { github_username: params.githubUsername } }
+              : {}),
+          },
+        }),
+      catch: (caught) =>
+        paymentError(
+          'network_error',
+          `Lemon Squeezy could not create a checkout: ${caughtMessage(caught, 'unknown network error')}`,
+        ),
+    });
+
     if (response.error) {
-      return fail('api_error', response.error.message);
+      return yield* failPayment('api_error', response.error.message);
     }
-    url = response.data?.data.attributes.url;
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : 'unknown network error';
-    return fail('network_error', `Could not reach Lemon Squeezy: ${detail}`);
-  }
 
-  if (!url) {
-    return fail('invalid_response', 'Lemon Squeezy did not return a checkout URL.');
-  }
-  return ok({ url });
-}
+    const responseData = response.data;
+    if (responseData === undefined) {
+      return yield* failPayment('invalid_response', 'Lemon Squeezy did not return a checkout URL.');
+    }
+
+    const {
+      data: {
+        attributes: { url },
+      },
+    } = responseData;
+    if (url.length === 0) {
+      return yield* failPayment('invalid_response', 'Lemon Squeezy did not return a checkout URL.');
+    }
+    return { url };
+  });

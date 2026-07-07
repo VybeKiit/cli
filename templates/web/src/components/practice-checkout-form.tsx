@@ -9,10 +9,21 @@ import { useToast } from '@/hooks/useToast';
 import { Link, useRouter } from '@/i18n/navigation';
 import { PLANS } from '@/lib/plans';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-/** Practice checkout form — `productId` comes from the URL query string on the server page. */
-export function PracticeCheckoutForm({ productId }: { productId?: string }) {
+interface PracticeCheckoutFormProps {
+  readonly productId: string | undefined;
+}
+
+/**
+ * Render the local practice checkout form.
+ *
+ * @param props - Product id read from the URL query string on the server page.
+ * @returns A practice checkout confirmation screen.
+ * @example
+ * <PracticeCheckoutForm productId="plan_pro" />
+ */
+export const PracticeCheckoutForm = ({ productId }: PracticeCheckoutFormProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations();
@@ -24,12 +35,12 @@ export function PracticeCheckoutForm({ productId }: { productId?: string }) {
     setMounted(true);
   }, []);
 
-  const trimmedProductId = productId?.trim() ?? '';
+  const trimmedProductId = productId === undefined ? '' : productId.trim();
   const plan = trimmedProductId ? PLANS.find((entry) => entry.id === trimmedProductId) : undefined;
   const missingProduct = trimmedProductId.length === 0;
   const unknownProduct = trimmedProductId.length > 0 && !plan;
 
-  async function handleComplete() {
+  const handleComplete = useCallback(async () => {
     if (!plan) {
       return;
     }
@@ -43,12 +54,12 @@ export function PracticeCheckoutForm({ productId }: { productId?: string }) {
     setPending(false);
     if (!response.ok) {
       const body = (await response.json()) as { error?: string };
-      setError(body.error ?? t('common.error.checkoutFailed'));
+      setError(body.error === undefined ? t('common.error.checkoutFailed') : body.error);
       return;
     }
     toast(t('pricing.checkout.successToast'));
     router.push('/pricing?checkout=success');
-  }
+  }, [plan, router, t, toast]);
 
   return (
     <MarketingShell>
@@ -104,4 +115,4 @@ export function PracticeCheckoutForm({ productId }: { productId?: string }) {
       </section>
     </MarketingShell>
   );
-}
+};

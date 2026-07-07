@@ -23,14 +23,24 @@ export interface TypewriterSequenceProps {
   ) => ReactNode;
 }
 
-/** Scroll-triggered sequential typewriter for multiple lines in one block. */
-export function TypewriterSequence({
+/**
+ * Scroll-triggered sequential typewriter for multiple lines in one block.
+ *
+ * @param props - Component props.
+ * @returns The rendered TypewriterSequence element.
+ * @example
+ * ```tsx
+ * <TypewriterSequence />
+ * ```
+ */
+
+export const TypewriterSequence = ({
   lines,
   className,
   msPerChar = 48,
   renderBetween,
   renderLineWrap,
-}: TypewriterSequenceProps) {
+}: TypewriterSequenceProps) => {
   const { ref, inView } = useInViewOnce();
   const texts = lines.map((line) => line.text);
   const { displayLines, activeIndex, isComplete } = useTypewriterSequence(texts, {
@@ -41,7 +51,7 @@ export function TypewriterSequence({
   return (
     <div className={className} ref={ref as never}>
       {lines.map((line, index) => {
-        const Tag = (line.as ?? 'p') as ElementType;
+        const Tag = (line.as === undefined ? 'p' : line.as) as ElementType;
         const visible = index <= activeIndex || isComplete;
         const showCursor = visible && index === activeIndex && !isComplete;
         const lineComplete =
@@ -62,4 +72,4 @@ export function TypewriterSequence({
       })}
     </div>
   );
-}
+};

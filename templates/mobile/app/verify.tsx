@@ -6,8 +6,9 @@ import { useAsync } from '@/hooks/useAsync';
 import { useToast } from '@/hooks/useToast';
 import { displayError, useTranslations } from '@/hooks/useTranslations';
 import { sendEmailCode, verifyEmailCode } from '@/lib/authClient';
+import type { MobileClientError } from '@/lib/clientEffect';
 import type { AuthUser } from '@vybekiit/auth';
-import type { Result } from '@vybekiit/core';
+import { type Effect, Either } from 'effect';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
@@ -15,13 +16,22 @@ type AuthAction =
   | { kind: 'verify'; email: string; code: string }
   | { kind: 'resend'; email: string };
 
-function runAuthAction(action: AuthAction): Promise<Result<AuthUser | true>> {
-  if (action.kind === 'verify') return verifyEmailCode(action.email, action.code);
-  return sendEmailCode(action.email);
-}
+const runAuthAction = (action: AuthAction): Effect.Effect<AuthUser | true, MobileClientError> => {
+  if (action.kind === 'verify') {
+    return verifyEmailCode(action.email, action.code);
+  }
 
-/** Email verification screen — RN parallel of the web verify page. */
-export default function VerifyScreen() {
+  return sendEmailCode(action.email);
+};
+
+/**
+ * Render the mobile email verification screen.
+ *
+ * @returns React Native email verification screen.
+ * @example
+ * <VerifyScreen />
+ */
+const VerifyScreen = () => {
   const router = useRouter();
   const { t } = useTranslations();
   const [email, setEmail] = useState('');
@@ -30,21 +40,27 @@ export default function VerifyScreen() {
   const { toast } = useToast();
   const { loading: pending, error, run: submit } = useAsync(runAuthAction);
 
-  async function handleVerify() {
+  const handleVerify = async () => {
     setMessage('');
     const result = await submit({ kind: 'verify', email, code });
-    if (!result.ok) return;
-    router.replace('/dashboard');
-  }
+    if (Either.isLeft(result)) {
+      return;
+    }
 
-  async function handleResend() {
+    router.replace('/dashboard');
+  };
+
+  const handleResend = async () => {
     setMessage('');
     const result = await submit({ kind: 'resend', email });
-    if (!result.ok) return;
+    if (Either.isLeft(result)) {
+      return;
+    }
+
     const sent = t('auth.verify.codeSent');
     setMessage(sent);
     toast(sent);
-  }
+  };
 
   return (
     <AuthShell titleKey="auth.verify.title" descriptionKey="auth.verify.description">
@@ -83,4 +99,6 @@ export default function VerifyScreen() {
       <Button title={t('auth.verify.resend')} variant="ghost" onPress={handleResend} />
     </AuthShell>
   );
-}
+};
+
+export default VerifyScreen;

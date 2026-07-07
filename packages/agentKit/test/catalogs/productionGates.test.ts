@@ -2,7 +2,7 @@ import {
   formatChecklistEntry,
   planProductionChecklist,
   renderProductionGates,
-} from '@vybekiit/agentKit/catalogs/productionGates';
+} from '@vybekiit/agent-kit/catalogs/productionGates';
 import { describe, expect, it } from 'vitest';
 
 describe('production-gates', () => {

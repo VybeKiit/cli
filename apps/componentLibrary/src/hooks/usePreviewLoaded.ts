@@ -3,8 +3,15 @@
 import { isPreviewLoaded, subscribePreviewCache } from '@library/lib/previewCache';
 import { useEffect, useState } from 'react';
 
-/** Reactive hook — true once an embed iframe for this previewKey has loaded once. */
-export function usePreviewLoaded(previewKey: string): boolean {
+/**
+ * Read preview loaded state for the component library.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @returns The state or callback exposed by usePreviewLoaded.
+ * @example
+ * const value = usePreviewLoaded(entry.previewKey);
+ */
+export const usePreviewLoaded = (previewKey: string): boolean => {
   const [loaded, setLoaded] = useState(() => isPreviewLoaded(previewKey));
 
   useEffect(() => {
@@ -15,4 +22,4 @@ export function usePreviewLoaded(previewKey: string): boolean {
   }, [previewKey]);
 
   return loaded;
-}
+};

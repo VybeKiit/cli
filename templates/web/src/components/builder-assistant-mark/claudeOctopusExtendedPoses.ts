@@ -414,14 +414,29 @@ const extendedById = new Map<string, ClaudeOctopusExtendedPose>(
   ]),
 );
 
-export function claudeOctopusExtendedPose(id: string): ClaudeOctopusExtendedPose | undefined {
-  return extendedById.get(id);
-}
+/**
+ * Resolve an extended pose definition by id.
+ *
+ * @param id - Extended pose id.
+ * @returns Pose definition, or undefined when the id is unknown.
+ * @example
+ * claudeOctopusExtendedPose('deploying');
+ */
+export const claudeOctopusExtendedPose = (id: string): ClaudeOctopusExtendedPose | undefined =>
+  extendedById.get(id);
 
-export function claudeOctopusExtendedAnimClass(id: string): string | undefined {
+/**
+ * Resolve the CSS animation class for an extended pose.
+ *
+ * @param id - Extended pose id.
+ * @returns Animation class, or undefined when the id is unknown.
+ * @example
+ * claudeOctopusExtendedAnimClass('deploying');
+ */
+export const claudeOctopusExtendedAnimClass = (id: string): string | undefined => {
   const pose = extendedById.get(id);
   return pose ? `claude-octopus--anim-${pose.anim}` : undefined;
-}
+};
 
 const GLOW_CLASS: Record<NonNullable<ClaudeOctopusExtendedPose['glow']>, string> = {
   active: 'builder-assistant-mark--active',
@@ -435,7 +450,15 @@ const GLOW_CLASS: Record<NonNullable<ClaudeOctopusExtendedPose['glow']>, string>
   sleep: 'builder-assistant-mark--sleep',
 };
 
-export function claudeOctopusExtendedGlowClass(id: string): string | undefined {
+/**
+ * Resolve the glow CSS class for an extended pose.
+ *
+ * @param id - Extended pose id.
+ * @returns Glow class, or undefined when the pose has no glow.
+ * @example
+ * claudeOctopusExtendedGlowClass('celebrating');
+ */
+export const claudeOctopusExtendedGlowClass = (id: string): string | undefined => {
   const pose = extendedById.get(id);
   return pose?.glow ? GLOW_CLASS[pose.glow] : undefined;
-}
+};

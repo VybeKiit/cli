@@ -5,13 +5,15 @@
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { repoRootFrom } from '../../lib/repoRoot.mjs';
 
 const ROOT = repoRootFrom(import.meta.url);
 
-const HERO_URL = 'https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp';
+const HERO_URL =
+  'https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/brand/vybekiit-profile.svg';
 
 const HERO = `<p align="center">
-  <img src="${HERO_URL}" width="1000" height="1000" alt="VybeKiit">
+  <img src="${HERO_URL}" width="160" height="160" alt="VybeKiit logo">
 </p>
 
 `;

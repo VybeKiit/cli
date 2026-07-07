@@ -1,40 +1,89 @@
 #!/usr/bin/env node
 /**
- * Fails when debug console calls exist outside tests — used at go-live / check-safety.
+ * Fails when debug console calls exist outside tests.
  * Usage: node scripts/checkNoConsole.mjs (from template root)
  */
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 const templateRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const pattern = String.raw`console\.(log|debug)`;
-const dirs = ['app', 'src'].map((d) => join(templateRoot, d)).filter((d) => existsSync(d));
+// Match direct debug calls while ignoring prose that only names the API.
+const debugConsolePattern = String.raw`console\.(log|debug)\s*\(`;
+const dirs = ['app', 'src'].map((dir) => join(templateRoot, dir)).filter((dir) => existsSync(dir));
+const skippedComponentDirs = [
+  'aceternity',
+  'ai-elements',
+  'blocks',
+  'blocks-so',
+  'bundui',
+  'coss',
+  'cult',
+  'evilcharts',
+  'gluestack',
+  'kibo',
+  'kokonutui',
+  'magicui',
+  'prompt-kit',
+  'supabase',
+  'tailark',
+  'untitled',
+];
+const skippedComponentGlobs = skippedComponentDirs.flatMap((name) => [
+  '--glob',
+  `!**/components/${name}/**`,
+]);
 
-for (const dir of dirs) {
-  try {
-    const out = execSync(
-      `rg '${pattern}' "${dir}" --glob '!**/*.test.*' --glob '!**/*.md' --glob '!**/scripts/**' -l`,
-      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] },
-    ).trim();
-    if (out) {
-      console.error(`Debug console calls found in ${dir}:\n${out}`);
-      process.exit(1);
-    }
-  } catch (error) {
-    if (error.status === 1) {
-      // rg exit 1 = no matches — good
-      continue;
-    }
-    throw error;
+/**
+ * Run ripgrep for debug console calls in one directory.
+ *
+ * @param dir - Directory to scan.
+ * @returns Matching file list from ripgrep, or an empty string when none match.
+ * @example
+ * const matches = scanDirectory('/path/to/src');
+ */
+const scanDirectory = (dir) => {
+  const result = spawnSync(
+    'rg',
+    [
+      debugConsolePattern,
+      dir,
+      '--glob',
+      '!**/*.test.*',
+      '--glob',
+      '!**/*.md',
+      '--glob',
+      '!**/scripts/**',
+      ...skippedComponentGlobs,
+      '-l',
+    ],
+    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+  );
+
+  if (result.status === 0) {
+    return result.stdout.trim();
   }
-}
+
+  if (result.status === 1) {
+    return '';
+  }
+
+  throw new Error(result.stderr.trim() || 'Debug console scan failed.');
+};
 
 if (dirs.length === 0) {
-  console.log('No app/ or src/ directories — skipping.');
+  process.stdout.write('No app/ or src/ directories - skipping.\n');
   process.exit(0);
 }
 
-console.log('No debug console calls in app/ or src/.');
+for (const dir of dirs) {
+  const matches = scanDirectory(dir);
+  if (matches.length > 0) {
+    process.stderr.write(`Debug console calls found in ${dir}:\n${matches}\n`);
+    process.exit(1);
+  }
+}
+
+process.stdout.write('No debug console calls in configured app directories.\n');

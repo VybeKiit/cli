@@ -13,6 +13,14 @@ const PRICE_ROLL_FORMAT = {
   maximumFractionDigits: 0,
 } as const;
 
+const countdownPhase = (
+  shouldStart: boolean,
+  atStartValue: boolean,
+): 'idle' | 'holding' | 'dropping' => {
+  if (!shouldStart) return 'idle';
+  return atStartValue ? 'holding' : 'dropping';
+};
+
 export interface CountdownPriceProps {
   readonly fromDisplay: string;
   readonly toDisplay: string;
@@ -23,22 +31,37 @@ export interface CountdownPriceProps {
   readonly onDoneChange?: (done: boolean) => void;
 }
 
-/** Rolling price countdown when the element enters view (once per page load). */
-export function CountdownPrice({
+/**
+ * Rolling price countdown when the element enters view (once per page load).
+ *
+ * @param props - Component props.
+ * @returns The rendered CountdownPrice element.
+ * @example
+ * ```tsx
+ * <CountdownPrice />
+ * ```
+ */
+
+export const CountdownPrice = ({
   fromDisplay,
   toDisplay,
   className,
   start: startProp = false,
   onComplete,
   onDoneChange,
-}: CountdownPriceProps) {
+}: CountdownPriceProps) => {
   const { ref, inView } = useInViewOnce(0.35);
   const fromParsed = parseDisplayNumber(fromDisplay);
   const toParsed = parseDisplayNumber(toDisplay);
 
-  const fromValue = fromParsed?.value ?? 0;
-  const toValue = toParsed?.value ?? 0;
-  const prefix = fromParsed?.prefix ?? toParsed?.prefix ?? '$';
+  const fromValue = fromParsed === null ? 0 : fromParsed.value;
+  const toValue = toParsed === null ? 0 : toParsed.value;
+  let prefix = '$';
+  if (fromParsed !== null) {
+    prefix = fromParsed.prefix;
+  } else if (toParsed !== null) {
+    prefix = toParsed.prefix;
+  }
 
   const shouldStart = startProp && inView && fromParsed !== null && toParsed !== null;
   const { value, done } = useCountdownNumber(fromValue, toValue, shouldStart);
@@ -65,7 +88,7 @@ export function CountdownPrice({
   return (
     <span
       className={cn('tabular-nums', className)}
-      data-phase={shouldStart ? (value === fromValue ? 'holding' : 'dropping') : 'idle'}
+      data-phase={countdownPhase(shouldStart, value === fromValue)}
       data-testid="pricing-countdown"
       ref={ref as never}
     >
@@ -83,4 +106,4 @@ export function CountdownPrice({
       />
     </span>
   );
-}
+};

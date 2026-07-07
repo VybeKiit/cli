@@ -1,0 +1,651 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "onboarding",
+      "label": "Onboarding",
+      "description": "First-run setup and kit update pages.",
+      "order": 10,
+      "presetIds": [],
+      "goalIds": ["onboarding", "update-kit"],
+      "recipes": [
+        {
+          "id": "onboarding",
+          "slug": "onboarding",
+          "title": "Onboarding page",
+          "summary": "A first-run checklist for setup progress, updates, and next actions.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/onboardingPage.tsx",
+          "exportName": "OnboardingPage",
+          "targetRoute": "/onboarding",
+          "suggestedComponents": ["vybekiit/walkthrough"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Save progress",
+              "note": "Connect checklist progress to the buyer's saved setup state.",
+              "todo": "Connect checklist progress to the user's saved setup state.",
+              "owner": "client-state"
+            },
+            {
+              "kind": "service",
+              "label": "Update workflow",
+              "note": "Connect update prompts to the kit update workflow.",
+              "todo": "Connect update prompts to the kit update workflow.",
+              "owner": "update-kit"
+            }
+          ],
+          "acceptanceChecks": ["The page shows the current setup step and a next action."]
+        }
+      ]
+    },
+    {
+      "id": "idea-planning",
+      "label": "Idea Planning",
+      "description": "Idea planning, data design, and save-data starting point.",
+      "order": 20,
+      "presetIds": [],
+      "goalIds": ["plan-my-idea", "design-my-data", "save-data"],
+      "recipes": [
+        {
+          "id": "idea-planner",
+          "slug": "idea-planner",
+          "title": "Idea planner page",
+          "summary": "A planning surface for app notes and first data entities.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/ideaPlannerPage.tsx",
+          "exportName": "IdeaPlannerPage",
+          "targetRoute": "/plan",
+          "suggestedComponents": ["untitled/modals/modal", "bundui/card-default"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Save notes",
+              "note": "Save idea notes to the configured app data store.",
+              "todo": "Save idea notes to the configured app data store.",
+              "owner": "db"
+            },
+            {
+              "kind": "service",
+              "label": "Schema plan",
+              "note": "Turn approved entities into the active database schema plan.",
+              "todo": "Turn approved entities into the active database schema plan.",
+              "owner": "db"
+            }
+          ],
+          "acceptanceChecks": ["The page captures the idea and shows the first entity list."]
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Auth",
+      "description": "Account access pages for sign in, sign up, codes, and recovery.",
+      "order": 30,
+      "presetIds": ["auth-bridge"],
+      "goalIds": [
+        "sign-in",
+        "reset-password",
+        "sign-in-with-email-link",
+        "sign-in-with-phone",
+        "setup-sms",
+        "sign-in-with-google"
+      ],
+      "recipes": [
+        {
+          "id": "auth",
+          "slug": "auth",
+          "title": "Auth page",
+          "summary": "A full account access page covering password, OTP, phone, and social entry.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/authPage.tsx",
+          "exportName": "AuthPage",
+          "targetRoute": "/login",
+          "suggestedComponents": ["supabase/sign-in-forms-01"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Connect auth",
+              "note": "Connect the form to the active Supabase auth provider.",
+              "todo": "Connect this form to the active Supabase auth provider.",
+              "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Enable code methods",
+              "note": "Connect phone and email-code buttons to the configured auth methods.",
+              "todo": "Connect phone and email-code buttons to the configured auth methods.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": ["The page renders account access choices before auth is configured."]
+        }
+      ]
+    },
+    {
+      "id": "payments",
+      "label": "Payments",
+      "description": "Pricing and checkout handoff pages.",
+      "order": 40,
+      "presetIds": ["orders", "webhook_events"],
+      "goalIds": ["setup-payments"],
+      "providerPointers": [
+        {
+          "provider": "payments",
+          "note": "Change live prices in the active payment provider dashboard and provider config."
+        }
+      ],
+      "recipes": [
+        {
+          "id": "pricing",
+          "slug": "pricing",
+          "title": "Pricing page",
+          "summary": "A pricing page that points live prices to the active payment provider.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/pricingPage.tsx",
+          "exportName": "PricingPage",
+          "targetRoute": "/pricing",
+          "suggestedComponents": ["bundui/pricing-sections-01", "shadcnblocks/pricing"],
+          "installNotes": [
+            {
+              "kind": "provider",
+              "label": "Plan source",
+              "note": "Read plans from the active payment provider configuration.",
+              "todo": "Read plans from the active payment provider configuration.",
+              "owner": "payments"
+            },
+            {
+              "kind": "provider",
+              "label": "Checkout route",
+              "note": "Send checkout clicks to the configured payments checkout route.",
+              "todo": "Send checkout clicks to the configured payments checkout route.",
+              "owner": "payments"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page never claims UI card text is the source of truth for prices."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "launch",
+      "label": "Launch",
+      "description": "Go-live, domain, backup, and scheduled job status pages.",
+      "order": 50,
+      "presetIds": ["job_runs"],
+      "goalIds": ["go-live", "buy-domain", "back-up-my-code"],
+      "recipes": [
+        {
+          "id": "launch-checklist",
+          "slug": "launch-checklist",
+          "title": "Launch checklist page",
+          "summary": "A launch readiness page for deployment, domain, backup, and job status.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/launchChecklistPage.tsx",
+          "exportName": "LaunchChecklistPage",
+          "targetRoute": "/launch",
+          "suggestedComponents": ["vybekiit/walkthrough"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Hosting status",
+              "note": "Connect deployment status to the configured hosting provider.",
+              "todo": "Connect deployment status to the configured hosting provider.",
+              "owner": "deploy"
+            },
+            {
+              "kind": "service",
+              "label": "Job status",
+              "note": "Connect scheduled job status to the jobs feature.",
+              "todo": "Connect scheduled job status to the jobs feature.",
+              "owner": "jobs"
+            }
+          ],
+          "acceptanceChecks": ["The page exposes launch status without needing provider secrets."]
+        }
+      ]
+    },
+    {
+      "id": "files",
+      "label": "Files",
+      "description": "File uploads and metadata pages.",
+      "order": 60,
+      "presetIds": ["file_metadata"],
+      "goalIds": ["add-files"],
+      "recipes": [
+        {
+          "id": "file-manager",
+          "slug": "file-manager",
+          "title": "File manager page",
+          "summary": "An upload and file metadata page for app attachments.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/fileManagerPage.tsx",
+          "exportName": "FileManagerPage",
+          "targetRoute": "/files",
+          "suggestedComponents": ["bundui/input", "bundui/card-default"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Upload provider",
+              "note": "Connect file selection to the configured upload provider.",
+              "todo": "Connect file selection to the configured upload provider.",
+              "owner": "assets"
+            },
+            {
+              "kind": "service",
+              "label": "File metadata",
+              "note": "Save uploaded file metadata through the file metadata preset.",
+              "todo": "Save uploaded file metadata through the file metadata preset.",
+              "owner": "db"
+            }
+          ],
+          "acceptanceChecks": ["The page shows an upload slot and metadata handoff."]
+        }
+      ]
+    },
+    {
+      "id": "communication",
+      "label": "Communication",
+      "description": "Email and notification settings pages.",
+      "order": 70,
+      "presetIds": ["notifications_log"],
+      "goalIds": ["setup-email", "add-notifications"],
+      "recipes": [
+        {
+          "id": "email-notifications",
+          "slug": "email-notifications",
+          "title": "Email notifications page",
+          "summary": "A page for test emails and notification preferences.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/emailNotificationsPage.tsx",
+          "exportName": "EmailNotificationsPage",
+          "targetRoute": "/settings/notifications",
+          "suggestedComponents": ["bundui/alert-default", "bundui/switch"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Email provider",
+              "note": "Send test emails through the configured email provider.",
+              "todo": "Send test emails through the configured email provider.",
+              "owner": "email"
+            },
+            {
+              "kind": "service",
+              "label": "Preferences",
+              "note": "Save notification preferences through the notifications feature.",
+              "todo": "Save notification preferences through the notifications feature.",
+              "owner": "notifications"
+            }
+          ],
+          "acceptanceChecks": ["The page separates email sending from notification preferences."]
+        }
+      ]
+    },
+    {
+      "id": "teams",
+      "label": "Teams",
+      "description": "Organization and team invite pages.",
+      "order": 80,
+      "presetIds": ["organizations"],
+      "goalIds": ["add-teams"],
+      "recipes": [
+        {
+          "id": "teams",
+          "slug": "teams",
+          "title": "Teams page",
+          "summary": "A workspace member and invitation page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/teamsPage.tsx",
+          "exportName": "TeamsPage",
+          "targetRoute": "/settings/team",
+          "suggestedComponents": ["bundui/app-sidebar", "untitled/table/table"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Memberships",
+              "note": "Load organizations and memberships from the active teams data model.",
+              "todo": "Load organizations and memberships from the active teams data model.",
+              "owner": "tenancy"
+            },
+            {
+              "kind": "service",
+              "label": "Invites",
+              "note": "Send invite requests through the configured team invitation action.",
+              "todo": "Send invite requests through the configured team invitation action.",
+              "owner": "tenancy"
+            }
+          ],
+          "acceptanceChecks": ["The page offers member roles and invite entry before team wiring."]
+        }
+      ]
+    },
+    {
+      "id": "analytics",
+      "label": "Analytics",
+      "description": "Usage analytics and error tracking pages.",
+      "order": 90,
+      "presetIds": [],
+      "goalIds": ["add-analytics", "track-errors"],
+      "recipes": [
+        {
+          "id": "analytics",
+          "slug": "analytics",
+          "title": "Analytics page",
+          "summary": "A product health page for usage totals and error status.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/analyticsPage.tsx",
+          "exportName": "AnalyticsPage",
+          "targetRoute": "/analytics",
+          "suggestedComponents": ["evilcharts/chart", "bundui/chart"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Usage totals",
+              "note": "Connect usage totals to the configured analytics provider.",
+              "todo": "Connect usage totals to the configured analytics provider.",
+              "owner": "analytics"
+            },
+            {
+              "kind": "service",
+              "label": "Error alerts",
+              "note": "Connect error alerts to the configured tracking provider.",
+              "todo": "Connect error alerts to the configured tracking provider.",
+              "owner": "observability"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows product health without inventing production metrics."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "label": "AI",
+      "description": "AI assistant, conversations, and embeddings pages.",
+      "order": 100,
+      "presetIds": ["ai_conversations", "embeddings"],
+      "goalIds": ["add-ai"],
+      "recipes": [
+        {
+          "id": "ai-assistant",
+          "slug": "ai-assistant",
+          "title": "AI assistant page",
+          "summary": "A chat workspace for AI conversations and knowledge retrieval.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/aiAssistantPage.tsx",
+          "exportName": "AiAssistantPage",
+          "targetRoute": "/assistant",
+          "suggestedComponents": ["ai-elements/agent", "prompt-kit/ai-prompt"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Conversation service",
+              "note": "Connect messages to the configured AI provider and conversation table.",
+              "todo": "Connect messages to the configured AI provider and conversation table.",
+              "owner": "ai"
+            },
+            {
+              "kind": "service",
+              "label": "Knowledge retrieval",
+              "note": "Connect retrieval to the embeddings preset when knowledge search is enabled.",
+              "todo": "Connect retrieval to the embeddings preset when knowledge search is enabled.",
+              "owner": "search"
+            }
+          ],
+          "acceptanceChecks": ["The page renders a chat surface without calling an AI provider."]
+        }
+      ]
+    },
+    {
+      "id": "search",
+      "label": "Search",
+      "description": "Search results and indexed content pages.",
+      "order": 110,
+      "presetIds": ["search_documents"],
+      "goalIds": ["add-search"],
+      "recipes": [
+        {
+          "id": "search",
+          "slug": "search",
+          "title": "Search page",
+          "summary": "A search page for indexed app records.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/searchPage.tsx",
+          "exportName": "SearchPage",
+          "targetRoute": "/search",
+          "suggestedComponents": ["kokonutui/action-search-bar", "kibo/glimpse"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Search provider",
+              "note": "Connect the search input to the configured search provider.",
+              "todo": "Connect the search input to the configured search provider.",
+              "owner": "search"
+            },
+            {
+              "kind": "service",
+              "label": "Search results",
+              "note": "Replace default result labels with records from the search index.",
+              "todo": "Replace default result labels with records from the search index.",
+              "owner": "search"
+            }
+          ],
+          "acceptanceChecks": ["The page shows a search box and safe default result labels."]
+        }
+      ]
+    },
+    {
+      "id": "realtime",
+      "label": "Realtime",
+      "description": "Live update and realtime publication pages.",
+      "order": 120,
+      "presetIds": ["realtime_publications"],
+      "goalIds": ["add-realtime"],
+      "recipes": [
+        {
+          "id": "realtime",
+          "slug": "realtime",
+          "title": "Realtime page",
+          "summary": "A live activity page for database updates.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/realtimePage.tsx",
+          "exportName": "RealtimePage",
+          "targetRoute": "/activity",
+          "suggestedComponents": ["bundui/badge-indicator", "bundui/card-default"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Publication",
+              "note": "Subscribe to the configured realtime publication.",
+              "todo": "Subscribe to the configured realtime publication.",
+              "owner": "realtime"
+            },
+            {
+              "kind": "service",
+              "label": "Live events",
+              "note": "Replace default activity labels with live events from the database.",
+              "todo": "Replace default activity labels with live events from the database.",
+              "owner": "realtime"
+            }
+          ],
+          "acceptanceChecks": ["The page makes live status visible without requiring a socket."]
+        }
+      ]
+    },
+    {
+      "id": "blog",
+      "label": "Blog",
+      "description": "Publishing, article index, and changelog pages.",
+      "order": 130,
+      "presetIds": [],
+      "goalIds": ["add-blog"],
+      "recipes": [
+        {
+          "id": "blog",
+          "slug": "blog",
+          "title": "Blog page",
+          "summary": "An article index page for posts, changelogs, and product stories.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/blogPage.tsx",
+          "exportName": "BlogPage",
+          "targetRoute": "/blog",
+          "suggestedComponents": ["tailark/blog-section", "bundui/card-default"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Content source",
+              "note": "Load published posts from the configured CMS or markdown content source.",
+              "todo": "Load published posts from the configured CMS or markdown content source.",
+              "owner": "cms"
+            },
+            {
+              "kind": "service",
+              "label": "Article routes",
+              "note": "Connect article cards to real blog routes.",
+              "todo": "Connect article cards to real blog routes.",
+              "owner": "cms"
+            }
+          ],
+          "acceptanceChecks": ["The page shows article cards before content wiring."]
+        }
+      ]
+    },
+    {
+      "id": "safety",
+      "label": "Safety",
+      "description": "Doctor, hardening, security checklist, and audit pages.",
+      "order": 140,
+      "presetIds": ["audit_log"],
+      "goalIds": ["doctor", "harden", "check-safety"],
+      "recipes": [
+        {
+          "id": "safety",
+          "slug": "safety",
+          "title": "Safety page",
+          "summary": "A doctor and launch safety checklist page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/safetyPage.tsx",
+          "exportName": "SafetyPage",
+          "targetRoute": "/safety",
+          "suggestedComponents": ["bundui/alert-warning", "bundui/data-table-01"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Safety scanner",
+              "note": "Connect checks to the configured safety scanner and audit log.",
+              "todo": "Connect checks to the configured safety scanner and audit log.",
+              "owner": "compliance"
+            },
+            {
+              "kind": "service",
+              "label": "Error tracking",
+              "note": "Connect incident rows to the configured error tracking provider.",
+              "todo": "Connect incident rows to the configured error tracking provider.",
+              "owner": "observability"
+            }
+          ],
+          "acceptanceChecks": ["The page tells the vibe coder the one thing to fix next."]
+        }
+      ]
+    },
+    {
+      "id": "brand-assets",
+      "label": "Brand Assets",
+      "description": "Logo, image, color, and shape setup pages.",
+      "order": 150,
+      "presetIds": [],
+      "goalIds": ["add-images"],
+      "recipes": [
+        {
+          "id": "brand-assets",
+          "slug": "brand-assets",
+          "title": "Brand assets page",
+          "summary": "A visual setup page for logos, images, colors, and shape.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/brandAssetsPage.tsx",
+          "exportName": "BrandAssetsPage",
+          "targetRoute": "/brand",
+          "suggestedComponents": ["bundui/avatar-default", "magicui/marquee"],
+          "installNotes": [
+            {
+              "kind": "visual",
+              "label": "Logo slots",
+              "note": "Replace default logo and image slots with uploaded brand assets.",
+              "todo": "Replace default logo and image slots with uploaded brand assets.",
+              "owner": "assets"
+            },
+            {
+              "kind": "visual",
+              "label": "Style tokens",
+              "note": "Save color and shape choices through the design token source.",
+              "todo": "Save color and shape choices through the design token source.",
+              "owner": "tokens"
+            }
+          ],
+          "acceptanceChecks": ["The page only suggests visual edits for image, color, and shape."]
+        }
+      ]
+    },
+    {
+      "id": "language",
+      "label": "Language",
+      "description": "Locale and translation management pages.",
+      "order": 160,
+      "presetIds": [],
+      "goalIds": ["add-language"],
+      "recipes": [
+        {
+          "id": "language",
+          "slug": "language",
+          "title": "Language page",
+          "summary": "A translation setup page for locales and visible strings.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/languagePage.tsx",
+          "exportName": "LanguagePage",
+          "targetRoute": "/settings/language",
+          "suggestedComponents": ["bundui/tabs", "bundui/select-01"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Locale routing",
+              "note": "Connect locale choices to the configured i18n routing source.",
+              "todo": "Connect locale choices to the configured i18n routing source.",
+              "owner": "i18n"
+            },
+            {
+              "kind": "visual",
+              "label": "Message files",
+              "note": "Replace default strings with translated message files.",
+              "todo": "Replace default strings with translated message files.",
+              "owner": "i18n"
+            }
+          ],
+          "acceptanceChecks": ["The page makes language choices visible before translation wiring."]
+        }
+      ]
+    },
+    {
+      "id": "feature-flags",
+      "label": "Feature Flags",
+      "description": "Feature flag and release control pages.",
+      "order": 170,
+      "presetIds": ["feature_flags"],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "feature-flags",
+          "slug": "feature-flags",
+          "title": "Feature flags page",
+          "summary": "A release control page for turning app features on and off.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/featureFlagsPage.tsx",
+          "exportName": "FeatureFlagsPage",
+          "targetRoute": "/admin/feature-flags",
+          "suggestedComponents": ["bundui/switch", "bundui/data-table-02"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Flag source",
+              "note": "Load flags from the configured feature flag source.",
+              "todo": "Load flags from the configured feature flag source.",
+              "owner": "core"
+            },
+            {
+              "kind": "service",
+              "label": "Save flags",
+              "note": "Save flag changes through the feature flags preset.",
+              "todo": "Save flag changes through the feature flags preset.",
+              "owner": "core"
+            }
+          ],
+          "acceptanceChecks": ["The page shows release switches without hiding the owning config."]
+        }
+      ]
+    }
+  ]
+}

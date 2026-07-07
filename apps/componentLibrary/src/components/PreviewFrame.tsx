@@ -44,13 +44,16 @@ const UNAVAILABLE_COPY: Record<UnavailableReason, string> = {
   nodemo: 'Live preview is coming soon. The source above is ready to copy into your app.',
 };
 
-function reasonOf(entry: CatalogEntry): UnavailableReason {
-  return entry.unavailableReason ?? (entry.requiresEnv ? 'env' : 'nodemo');
-}
+const reasonOf = (entry: CatalogEntry): UnavailableReason => {
+  if (entry.unavailableReason !== undefined) {
+    return entry.unavailableReason;
+  }
+  return entry.requiresEnv ? 'env' : 'nodemo';
+};
 
 const PREVIEW_BASE_HEIGHT = 520;
 
-function PreviewIframe({
+const PreviewIframe = ({
   entry,
   mode,
   primary,
@@ -64,13 +67,14 @@ function PreviewIframe({
   viewportWidth: string;
   sizeScale: number;
   viewport: ViewportPreset;
-}) {
+}) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const src = buildPreviewSrc(entry.namespace, entry.name);
   const wasLoaded = usePreviewLoaded(entry.previewKey);
   const [showSpinner, setShowSpinner] = useState(!wasLoaded);
   const scaledHeight = PREVIEW_BASE_HEIGHT * sizeScale;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset the spinner when the previewed entry changes
   useEffect(() => {
     setShowSpinner(!wasLoaded);
   }, [wasLoaded, entry.previewKey]);
@@ -120,9 +124,17 @@ function PreviewIframe({
       </PreviewDeviceFrame>
     </div>
   );
-}
+};
 
-export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
+/**
+ * Render the component detail component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <ComponentDetail {...props} />;
+ */
+export const ComponentDetail = ({ entry }: { entry: CatalogEntry }) => {
   const { resolvedTheme } = useTheme();
   const { primary } = usePreviewTheme();
   const { gridClassName } = useCatalogGridLayout();
@@ -139,11 +151,13 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
     setSize(loadPreviewSize());
   }, []);
 
-  const mode: PreviewMode = modeOverride ?? (resolvedTheme === 'dark' ? 'dark' : 'light');
+  const mode: PreviewMode =
+    modeOverride === null ? (resolvedTheme === 'dark' ? 'dark' : 'light') : modeOverride;
   const viewportWidth = resolveViewportWidth(viewport, customWidth);
   const sizeScale = SIZE_SCALES[size];
 
-  const relatedInCategory = (CATALOG_BY_CATEGORY[entry.category] ?? [])
+  const categoryEntries = CATALOG_BY_CATEGORY[entry.category];
+  const relatedInCategory = (categoryEntries === undefined ? [] : categoryEntries)
     .filter((item) => item.previewKey !== entry.previewKey)
     .sort((a, b) => Number(b.previewable) - Number(a.previewable))
     .slice(0, 8);
@@ -236,4 +250,4 @@ export function ComponentDetail({ entry }: { entry: CatalogEntry }) {
       <SelectionTray />
     </div>
   );
-}
+};

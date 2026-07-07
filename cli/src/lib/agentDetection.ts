@@ -7,15 +7,17 @@
  * 3. default to claude-code
  */
 
-type AgentId = 'claude-code' | 'cursor' | 'gemini' | 'codex';
+/** Agent runtime ids supported by the local development sidecar. */
+export type AgentId = 'claude-code' | 'cursor' | 'gemini' | 'codex';
 
-interface DetectedAgent {
+/** Agent metadata shown by the local development sidecar. */
+export type DetectedAgent = {
   readonly id: AgentId;
   readonly name: string;
   readonly icon: string;
   readonly command: string;
   readonly mcpSupported: boolean;
-}
+};
 
 const AGENTS: Record<AgentId, DetectedAgent> = {
   'claude-code': {
@@ -48,8 +50,14 @@ const AGENTS: Record<AgentId, DetectedAgent> = {
   },
 };
 
-/** Detect the active agent from environment signals. */
-function detectAgent(): DetectedAgent {
+/**
+ * Detect the active agent from environment signals.
+ *
+ * @returns Detected agent metadata, defaulting to Claude Code when no signal is present.
+ * @example
+ * const agent = detectAgent();
+ */
+export const detectAgent = (): DetectedAgent => {
   const {
     CLAUDE_CODE,
     ANTHROPIC_CLI,
@@ -76,7 +84,7 @@ function detectAgent(): DetectedAgent {
     return AGENTS.codex;
   }
 
-  const term = TERM_PROGRAM?.toLowerCase() ?? '';
+  const term = TERM_PROGRAM === undefined ? '' : TERM_PROGRAM.toLowerCase();
   if (term.includes('claude')) {
     return AGENTS['claude-code'];
   }
@@ -84,21 +92,29 @@ function detectAgent(): DetectedAgent {
     return AGENTS.cursor;
   }
 
-  const shell = SHELL?.toLowerCase() ?? '';
+  const shell = SHELL === undefined ? '' : SHELL.toLowerCase();
   if (shell.includes('claude')) {
     return AGENTS['claude-code'];
   }
 
   return AGENTS['claude-code'];
-}
+};
 
-function getAgentById(id: AgentId): DetectedAgent {
-  return AGENTS[id];
-}
+/**
+ * Return metadata for a known agent id.
+ *
+ * @param id - Agent id to look up.
+ * @returns Metadata for the known agent id.
+ * @example
+ * const codex = getAgentById('codex');
+ */
+export const getAgentById = (id: AgentId): DetectedAgent => AGENTS[id];
 
-function listAgents(): DetectedAgent[] {
-  return Object.values(AGENTS);
-}
-
-export type { AgentId, DetectedAgent };
-export { detectAgent, getAgentById, listAgents };
+/**
+ * List all known agent metadata entries.
+ *
+ * @returns Known agent metadata in registry order.
+ * @example
+ * const agents = listAgents();
+ */
+export const listAgents = (): DetectedAgent[] => Object.values(AGENTS);

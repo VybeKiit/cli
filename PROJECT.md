@@ -32,9 +32,9 @@ assumes the agent is the developer.
 ## The approach
 
 - **Owned vs Maintained** — the architectural backbone (see CONTEXT.md). MAINTAINED headless logic
-  ships as public npm `@vybekiit/*` packages, so updates flow as conflict-free version bumps; OWNED
-  code (app shell, all UI, the buyer agent layer) is copied into the buyer's repo and never
-  auto-clobbered.
+  lives in private workspace packages and ships through the gated monorepo mirror / bundled CLI, not
+  public npm packages; OWNED code (app shell, all UI, the buyer agent layer) is copied into the
+  buyer's repo and never auto-clobbered.
 - **One interface per concern, swappable adapters, one default** — the proven `@vybekiit/payments`
   shape applied to every concern. The vibe coder never picks an adapter; the agent routes via one
   `.env` setting.
@@ -47,20 +47,20 @@ assumes the agent is the developer.
 - **Built, green, pushed:** `core`, `payments`, `auth`, `db`, `clientState`, the `vybekiit` CLI,
   and a real Next.js `templates/web` — all in the CI gate.
 - **Two large refactors in flight, deliberately sequenced:**
-  1. **Publish-surface collapse (ADR-0025, supersedes ADR-0022):** 28 published packages → **5**
-     (`core`, `payments`, `auth`, `db`, `clientState`). `core` absorbs `http`/`observability`/
-     `security`; the thin long tail folds into templates as owned code; tooling goes private. There
-     is **no `shared/` tier**.
+  1. **Publish-surface collapse (ADR-0033, supersedes ADR-0025's five-package spine):** **0**
+     packages publish to npm. The `vybekiit` CLI is the only public npm artifact and bundles the
+     maintained packages it needs; buyers receive maintained logic through the gated monorepo mirror.
+     There is **no public package tier** and **no `shared/` tier**.
   2. **Effect adoption (ADR-0023):** `Result`/zod/factory-wiring → Effect + `Schema` + `Layer`,
      end-to-end, one gate-green slice at a time. **In progress, not complete** — the spine packages
-     are converted; templates, tooling, and the buyer agent layer are not. **Collapse first, then
-     finish Effect** on the smaller surface (don't migrate a package that's about to move).
+     are partly converted; templates, tooling, `cli`, and the buyer agent layer are not. Convert
+     touched slices one gate-green pass at a time.
 - The **money pipeline** (Lemon-Squeezy → GitHub invite) is still the load-bearing unproven slice —
   de-risk it before polishing templates.
 
 ## Direction
 
-- **v1.0** — web only + the money pipeline; packages `core`/`payments`/`auth`/`db`; the dogfooded
+- **v1.0** — web only + the money pipeline; private packages `core`/`payments`/`auth`/`db`; the dogfooded
   landing page. Goal: a stranger pays → gets invited → scaffolds a web app → wires payments →
   deploys live in session #1 (the keystone).
 - **v1.1** — `update-kit`, `add-signin`, `save-data`, `buy-domain`, `setup-email`.
@@ -69,6 +69,7 @@ assumes the agent is the developer.
 
 ## Principles
 
-KISS · YAGNI · ruthless DRY · SSOT. Reuse and extend before creating; promote to shared code only on
-a real second consumer. **A new module is not a new published package.** Junior-readable, boring,
-traceable code. Buyer-facing prose stays jargon-free (Decide + Guide) with **no em dashes**.
+KISS · YAGNI · ruthless DRY · SSOT. Reuse and extend before creating; promote to maintained
+workspace code only when the buyer should not edit it. **A new module is not a new published
+package.** Junior-readable, boring, traceable code. Buyer-facing prose stays jargon-free
+(Decide + Guide) with **no em dashes**.

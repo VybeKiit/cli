@@ -5,8 +5,14 @@ import { readNodeCwd, readNodeEnv } from '@/lib/nodeEnv';
 import { resolveVybeAssistant, shouldShowReportMode } from '@vybekiit/report-mode';
 import { Toaster } from 'sonner';
 
-/** Server wrapper — reads assistant + project root for dev-only Report Mode. */
-export function ReportModeDevShell() {
+/**
+ * Render the dev-only Report Mode shell.
+ *
+ * @returns Report Mode tooling when enabled, otherwise `null`.
+ * @example
+ * <ReportModeDevShell />
+ */
+const ReportModeDevShell = () => {
   const env = readNodeEnv();
   if (!shouldShowReportMode(env)) {
     return null;
@@ -21,4 +27,6 @@ export function ReportModeDevShell() {
       <ReportModeDev assistant={assistant} projectRoot={projectRoot} />
     </TooltipProvider>
   );
-}
+};
+
+export { ReportModeDevShell };

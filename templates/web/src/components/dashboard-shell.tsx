@@ -14,20 +14,36 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { signOut } from '@/lib/authClient';
 import type { AuthUser } from '@vybekiit/auth';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useCallback, useState } from 'react';
 
-/** Signed-in chrome: brand, avatar menu with sign-out, then page content + footer. */
-export function DashboardShell({ user, children }: { user: AuthUser; children: ReactNode }) {
+interface DashboardShellProps {
+  readonly user: AuthUser;
+  readonly children?: ReactNode;
+}
+
+/**
+ * Render signed-in chrome with brand navigation, avatar menu, content, and footer.
+ *
+ * @param props - Signed-in user plus page content.
+ * @returns The authenticated app shell.
+ * @example
+ * <DashboardShell user={user}><DashboardPage /></DashboardShell>
+ */
+export const DashboardShell = ({ user, children = null }: DashboardShellProps) => {
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const t = useTranslations();
-  const initials = (user.email ?? t('common.fallback.user')).slice(0, 2).toUpperCase();
+  const userEmail =
+    user.email === null || user.email === '' ? t('common.fallback.user') : user.email;
+  const displayEmail =
+    user.email === null || user.email === '' ? t('common.fallback.signedIn') : user.email;
+  const initials = userEmail.slice(0, 2).toUpperCase();
 
-  async function handleSignOut() {
+  const handleSignOut = useCallback(async () => {
     setPending(true);
     await signOut();
     router.push('/login');
-  }
+  }, [router]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -42,9 +58,7 @@ export function DashboardShell({ user, children }: { user: AuthUser; children: R
                 <Avatar className="size-8">
                   <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                 </Avatar>
-                <span className="hidden text-sm sm:inline">
-                  {user.email ?? t('common.fallback.signedIn')}
-                </span>
+                <span className="hidden text-sm sm:inline">{displayEmail}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -60,4 +74,4 @@ export function DashboardShell({ user, children }: { user: AuthUser; children: R
       <SiteFooter />
     </div>
   );
-}
+};

@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { type ChangeEvent, useCallback, useState } from 'react';
 
 interface User {
-  id: string;
-  email: string;
-  name: string;
-  plan: 'free' | 'pro' | 'enterprise';
-  status: 'active' | 'banned' | 'pending';
-  createdAt: string;
-  lastLogin: string;
+  readonly id: string;
+  readonly email: string;
+  readonly name: string;
+  readonly plan: 'free' | 'pro' | 'enterprise';
+  readonly status: 'active' | 'banned' | 'pending';
+  readonly createdAt: string;
+  readonly lastLogin: string;
 }
 
 // Mock data — replace with @vybekiit/db queries
@@ -61,26 +61,41 @@ const MOCK_USERS: User[] = [
   },
 ];
 
-const PLAN_BADGE: Record<string, string> = {
+const PLAN_BADGE: Record<User['plan'], string> = {
   free: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   pro: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
   enterprise: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
 };
 
-const STATUS_BADGE: Record<string, string> = {
+const STATUS_BADGE: Record<User['status'], string> = {
   active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
   banned: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
 };
 
-export function AdminUserTable() {
+/**
+ * Render the starter admin user table with local filters.
+ *
+ * @returns A searchable user table seeded with mock rows.
+ * @example
+ * <AdminUserTable />
+ */
+export const AdminUserTable = () => {
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState<string>('all');
 
-  const filtered = MOCK_USERS.filter((u) => {
+  const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  }, []);
+
+  const handlePlanFilterChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+    setPlanFilter(event.target.value);
+  }, []);
+
+  const filtered = MOCK_USERS.filter((user) => {
     const matchesSearch =
-      u.email.includes(search) || u.name.toLowerCase().includes(search.toLowerCase());
-    const matchesPlan = planFilter === 'all' || u.plan === planFilter;
+      user.email.includes(search) || user.name.toLowerCase().includes(search.toLowerCase());
+    const matchesPlan = planFilter === 'all' || user.plan === planFilter;
     return matchesSearch && matchesPlan;
   });
 
@@ -92,12 +107,12 @@ export function AdminUserTable() {
           type="text"
           placeholder="Search users..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
           className="rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
         <select
           value={planFilter}
-          onChange={(e) => setPlanFilter(e.target.value)}
+          onChange={handlePlanFilterChange}
           className="rounded-lg border bg-background px-3 py-2 text-sm"
         >
           <option value="all">All Plans</option>
@@ -126,25 +141,27 @@ export function AdminUserTable() {
                 <td className="px-4 py-3">
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-muted-foreground text-xs">{user.email}</p>
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${PLAN_BADGE[user.plan]}`}
+                    className={`inline-flex rounded-full px-2.5 py-0.5 font-medium text-xs ${PLAN_BADGE[user.plan]}`}
                   >
                     {user.plan}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE[user.status]}`}
+                    className={`inline-flex rounded-full px-2.5 py-0.5 font-medium text-xs ${STATUS_BADGE[user.status]}`}
                   >
                     {user.status}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{user.createdAt}</td>
-                <td className="px-4 py-3 text-muted-foreground">{user.lastLogin || '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {user.lastLogin === '' ? '—' : user.lastLogin}
+                </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <button
@@ -168,9 +185,9 @@ export function AdminUserTable() {
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="py-8 text-center text-sm text-muted-foreground">No users found</div>
+          <div className="py-8 text-center text-muted-foreground text-sm">No users found</div>
         )}
       </div>
     </div>
   );
-}
+};

@@ -13,6 +13,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.js",
+      "require": "./dist/providers/index.cjs"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
@@ -30,14 +35,15 @@
   },
   "dependencies": {
     "@vybekiit/core": "workspace:*",
-    "effect": "3.21.4",
+    "effect": "catalog:",
     "svgo": "^3.3.2",
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "@effect/vitest": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "private": true
 }

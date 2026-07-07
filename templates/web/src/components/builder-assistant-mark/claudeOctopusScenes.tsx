@@ -39,7 +39,7 @@ export interface ClaudeOctopusSceneDef {
   readonly label: string;
   readonly description: string;
   readonly focus: SceneFocus;
-  render(): ReactNode;
+  render: () => ReactNode;
 }
 
 export const SCENE_WORLD = { width: 320, height: 220 } as const;
@@ -51,7 +51,7 @@ const PORTRAIT_FOCUS: SceneFocus = { x: 96, y: 26, w: 148, h: 168 };
 // Shared desk layout
 // ————————————————————————————————————————————————————————————————
 
-function DeskScene({
+const DeskScene = ({
   backdropId,
   from,
   to,
@@ -71,201 +71,178 @@ function DeskScene({
   readonly heroClass?: string;
   readonly mug?: boolean;
   readonly children?: ReactNode;
-}) {
-  return (
-    <>
-      <SceneBackdrop from={from} id={backdropId} to={to} />
-      <OfficeChair className="claude-scene__chair" scale={0.9} x={165} y={150} />
-      <OctopusBody className={heroClass} expression={expression} size={72} x={128} y={70} />
-      <Desk width={320} x={0} y={158} />
-      <MacBook
-        className="claude-scene__mac"
-        scale={1.15}
-        screen={screen}
-        screenGlow={screenGlow}
-        x={92}
-        y={158}
-      />
-      {mug ? <CoffeeMug className="claude-scene__mug" scale={0.9} x={258} y={156} /> : null}
-      {children}
-    </>
-  );
-}
+}) => (
+  <>
+    <SceneBackdrop from={from} id={backdropId} to={to} />
+    <OfficeChair className="claude-scene__chair" scale={0.9} x={165} y={150} />
+    <OctopusBody className={heroClass} expression={expression} size={72} x={128} y={70} />
+    <Desk width={320} x={0} y={158} />
+    <MacBook
+      className="claude-scene__mac"
+      scale={1.15}
+      screen={screen}
+      screenGlow={screenGlow}
+      x={92}
+      y={158}
+    />
+    {mug ? <CoffeeMug className="claude-scene__mug" scale={0.9} x={258} y={156} /> : null}
+    {children}
+  </>
+);
 
 // ————————————————————————————————————————————————————————————————
 // MacBook screen variants (authored in the 48×32 screen space)
 // ————————————————————————————————————————————————————————————————
 
-function ScreenChrome({ bg = '#0F0F0F' }: { readonly bg?: string }) {
-  return (
-    <>
-      <rect fill={bg} height="32" rx="1.4" width="48" x="0" y="0" />
-      <rect fill="#2A2A2A" height="4" width="48" x="0" y="0" />
-      <circle cx="3" cy="2" fill="#FF5F57" r="0.8" />
-      <circle cx="6" cy="2" fill="#FEBC2E" r="0.8" />
-      <circle cx="9" cy="2" fill="#28C840" r="0.8" />
-    </>
-  );
-}
+const ScreenChrome = ({ bg = '#0F0F0F' }: { readonly bg?: string }) => (
+  <>
+    <rect fill={bg} height="32" rx="1.4" width="48" x="0" y="0" />
+    <rect fill="#2A2A2A" height="4" width="48" x="0" y="0" />
+    <circle cx="3" cy="2" fill="#FF5F57" r="0.8" />
+    <circle cx="6" cy="2" fill="#FEBC2E" r="0.8" />
+    <circle cx="9" cy="2" fill="#28C840" r="0.8" />
+  </>
+);
 
-function TerminalScreen() {
-  return (
-    <g className="claude-scene__terminal">
-      <ScreenChrome />
-      <rect fill="#569CD6" height="1.6" rx="0.5" width="10" x="4" y="8" />
-      <rect fill="#CE9178" height="1.6" rx="0.5" width="26" x="16" y="8" />
-      <rect fill="#6A9955" height="1.6" rx="0.5" width="20" x="4" y="12" />
-      <rect fill="#D4D4D4" height="1.6" rx="0.5" width="30" x="4" y="16" />
-      <rect fill="#D4D4D4" height="1.6" rx="0.5" width="16" x="4" y="20" />
-      <rect className="claude-scene__caret" fill="#D97757" height="1.8" width="1.4" x="22" y="20" />
-    </g>
-  );
-}
+const TerminalScreen = () => (
+  <g className="claude-scene__terminal">
+    <ScreenChrome />
+    <rect fill="#569CD6" height="1.6" rx="0.5" width="10" x="4" y="8" />
+    <rect fill="#CE9178" height="1.6" rx="0.5" width="26" x="16" y="8" />
+    <rect fill="#6A9955" height="1.6" rx="0.5" width="20" x="4" y="12" />
+    <rect fill="#D4D4D4" height="1.6" rx="0.5" width="30" x="4" y="16" />
+    <rect fill="#D4D4D4" height="1.6" rx="0.5" width="16" x="4" y="20" />
+    <rect className="claude-scene__caret" fill="#D97757" height="1.8" width="1.4" x="22" y="20" />
+  </g>
+);
 
-function DiffScreen() {
-  return (
-    <g>
-      <ScreenChrome />
-      <rect fill="#3B2A1E" height="2.4" width="48" x="0" y="7" />
-      <rect fill="#F87171" height="1.4" rx="0.4" width="4" x="2" y="7.5" />
-      <rect fill="#FCA5A5" height="1.4" rx="0.4" width="26" x="8" y="7.5" />
-      <rect fill="#1E3A2A" height="2.4" width="48" x="0" y="11" />
-      <rect fill="#4ADE80" height="1.4" rx="0.4" width="4" x="2" y="11.5" />
-      <rect fill="#86EFAC" height="1.4" rx="0.4" width="30" x="8" y="11.5" />
-      <rect fill="#1E3A2A" height="2.4" width="48" x="0" y="15" />
-      <rect fill="#4ADE80" height="1.4" rx="0.4" width="4" x="2" y="15.5" />
-      <rect fill="#86EFAC" height="1.4" rx="0.4" width="22" x="8" y="15.5" />
-      <rect fill="#D4D4D4" height="1.4" rx="0.4" width="18" x="8" y="20" />
-    </g>
-  );
-}
+const DiffScreen = () => (
+  <g>
+    <ScreenChrome />
+    <rect fill="#3B2A1E" height="2.4" width="48" x="0" y="7" />
+    <rect fill="#F87171" height="1.4" rx="0.4" width="4" x="2" y="7.5" />
+    <rect fill="#FCA5A5" height="1.4" rx="0.4" width="26" x="8" y="7.5" />
+    <rect fill="#1E3A2A" height="2.4" width="48" x="0" y="11" />
+    <rect fill="#4ADE80" height="1.4" rx="0.4" width="4" x="2" y="11.5" />
+    <rect fill="#86EFAC" height="1.4" rx="0.4" width="30" x="8" y="11.5" />
+    <rect fill="#1E3A2A" height="2.4" width="48" x="0" y="15" />
+    <rect fill="#4ADE80" height="1.4" rx="0.4" width="4" x="2" y="15.5" />
+    <rect fill="#86EFAC" height="1.4" rx="0.4" width="22" x="8" y="15.5" />
+    <rect fill="#D4D4D4" height="1.4" rx="0.4" width="18" x="8" y="20" />
+  </g>
+);
 
-function PromptScreen() {
-  return (
-    <g>
-      <ScreenChrome bg="#151519" />
-      <rect
-        fill="#26262E"
-        height="10"
-        rx="1.6"
-        stroke="#3F3F46"
-        strokeWidth="0.4"
-        width="42"
-        x="3"
-        y="9"
-      />
-      <text fill="#D97757" fontSize="2.2" x="5" y="12.4">
-        ›
-      </text>
-      <rect fill="#A1A1AA" height="1.5" rx="0.5" width="24" x="8" y="11" />
-      <rect className="claude-scene__caret" fill="#D97757" height="2" width="1.3" x="33" y="10.6" />
-      <text className="claude-scene__prompt-spark" fill="#FBBF24" fontSize="3" x="40" y="7">
-        ✦
-      </text>
-    </g>
-  );
-}
+const PromptScreen = () => (
+  <g>
+    <ScreenChrome bg="#151519" />
+    <rect
+      fill="#26262E"
+      height="10"
+      rx="1.6"
+      stroke="#3F3F46"
+      strokeWidth="0.4"
+      width="42"
+      x="3"
+      y="9"
+    />
+    <text fill="#D97757" fontSize="2.2" x="5" y="12.4">
+      ›
+    </text>
+    <rect fill="#A1A1AA" height="1.5" rx="0.5" width="24" x="8" y="11" />
+    <rect className="claude-scene__caret" fill="#D97757" height="2" width="1.3" x="33" y="10.6" />
+    <text className="claude-scene__prompt-spark" fill="#FBBF24" fontSize="3" x="40" y="7">
+      ✦
+    </text>
+  </g>
+);
 
-function ErrorScreen() {
-  return (
-    <g>
-      <rect fill="#2A1113" height="32" rx="1.4" width="48" x="0" y="0" />
-      <path
-        className="claude-scene__err-mark"
-        d="M24 6 L31 20 H17 Z"
-        fill="none"
-        stroke="#F87171"
-        strokeLinejoin="round"
-        strokeWidth="1.4"
-      />
-      <rect fill="#F87171" height="4" rx="0.6" width="1.4" x="23.3" y="11" />
-      <circle cx="24" cy="17.5" fill="#F87171" r="0.9" />
-      <rect fill="#7F1D1D" height="1.4" rx="0.4" width="20" x="14" y="24" />
-    </g>
-  );
-}
+const ErrorScreen = () => (
+  <g>
+    <rect fill="#2A1113" height="32" rx="1.4" width="48" x="0" y="0" />
+    <path
+      className="claude-scene__err-mark"
+      d="M24 6 L31 20 H17 Z"
+      fill="none"
+      stroke="#F87171"
+      strokeLinejoin="round"
+      strokeWidth="1.4"
+    />
+    <rect fill="#F87171" height="4" rx="0.6" width="1.4" x="23.3" y="11" />
+    <circle cx="24" cy="17.5" fill="#F87171" r="0.9" />
+    <rect fill="#7F1D1D" height="1.4" rx="0.4" width="20" x="14" y="24" />
+  </g>
+);
 
-function BugScreen() {
-  return (
-    <g>
-      <ScreenChrome />
-      <rect fill="#D4D4D4" height="1.5" rx="0.4" width="20" x="4" y="8" />
-      <rect fill="#D4D4D4" height="1.5" rx="0.4" width="28" x="4" y="12" />
-      <path d="M4 18 q3 1.4 6 0 t6 0 t6 0" fill="none" stroke="#F87171" strokeWidth="0.6" />
-      <rect fill="#D4D4D4" height="1.5" rx="0.4" width="14" x="4" y="21" />
-      <g transform="translate(36 20)">
-        <g className="claude-scene__screen-bug">
-          <ellipse cx="0" cy="0" fill="#DC2626" rx="2.4" ry="3" />
-          <line stroke="#7F1D1D" strokeWidth="0.4" x1="-2.4" x2="2.4" y1="0" y2="0" />
-          <line
-            stroke="#DC2626"
-            strokeLinecap="round"
-            strokeWidth="0.5"
-            x1="-2.4"
-            x2="-4"
-            y1="-1.6"
-            y2="-2.6"
-          />
-          <line
-            stroke="#DC2626"
-            strokeLinecap="round"
-            strokeWidth="0.5"
-            x1="2.4"
-            x2="4"
-            y1="-1.6"
-            y2="-2.6"
-          />
-        </g>
+const BugScreen = () => (
+  <g>
+    <ScreenChrome />
+    <rect fill="#D4D4D4" height="1.5" rx="0.4" width="20" x="4" y="8" />
+    <rect fill="#D4D4D4" height="1.5" rx="0.4" width="28" x="4" y="12" />
+    <path d="M4 18 q3 1.4 6 0 t6 0 t6 0" fill="none" stroke="#F87171" strokeWidth="0.6" />
+    <rect fill="#D4D4D4" height="1.5" rx="0.4" width="14" x="4" y="21" />
+    <g transform="translate(36 20)">
+      <g className="claude-scene__screen-bug">
+        <ellipse cx="0" cy="0" fill="#DC2626" rx="2.4" ry="3" />
+        <line stroke="#7F1D1D" strokeWidth="0.4" x1="-2.4" x2="2.4" y1="0" y2="0" />
+        <line
+          stroke="#DC2626"
+          strokeLinecap="round"
+          strokeWidth="0.5"
+          x1="-2.4"
+          x2="-4"
+          y1="-1.6"
+          y2="-2.6"
+        />
+        <line
+          stroke="#DC2626"
+          strokeLinecap="round"
+          strokeWidth="0.5"
+          x1="2.4"
+          x2="4"
+          y1="-1.6"
+          y2="-2.6"
+        />
       </g>
     </g>
-  );
-}
+  </g>
+);
 
 // ————————————————————————————————————————————————————————————————
 // Portrait props
 // ————————————————————————————————————————————————————————————————
 
-function ThoughtBubble({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <g className="claude-scene__thought">
-        <circle cx="-14" cy="16" fill="#fff" r="2" stroke="#D4D4D8" strokeWidth="0.8" />
-        <circle cx="-9" cy="10" fill="#fff" r="3" stroke="#D4D4D8" strokeWidth="0.8" />
-        <ellipse cx="4" cy="0" fill="#fff" rx="18" ry="12" stroke="#D4D4D8" strokeWidth="1" />
-        <g stroke={SCENE_INK_SOFT} strokeLinecap="round" strokeWidth="1.4" fill="none">
-          <circle cx="4" cy="0" r="4.4" />
-          <path d="M4 -8 v2 M4 6 v2 M-4 0 h2 M10 0 h2" />
-        </g>
+const ThoughtBubble = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <g className="claude-scene__thought">
+      <circle cx="-14" cy="16" fill="#fff" r="2" stroke="#D4D4D8" strokeWidth="0.8" />
+      <circle cx="-9" cy="10" fill="#fff" r="3" stroke="#D4D4D8" strokeWidth="0.8" />
+      <ellipse cx="4" cy="0" fill="#fff" rx="18" ry="12" stroke="#D4D4D8" strokeWidth="1" />
+      <g stroke={SCENE_INK_SOFT} strokeLinecap="round" strokeWidth="1.4" fill="none">
+        <circle cx="4" cy="0" r="4.4" />
+        <path d="M4 -8 v2 M4 6 v2 M-4 0 h2 M10 0 h2" />
       </g>
     </g>
-  );
-}
+  </g>
+);
 
-function Lightbulb({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <g
-        className="claude-scene__bulb-rays"
-        stroke="#FBBF24"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-      >
-        <line x1="0" x2="0" y1="-16" y2="-11" />
-        <line x1="-11" x2="-7.5" y1="-11" y2="-7.5" />
-        <line x1="11" x2="7.5" y1="-11" y2="-7.5" />
-        <line x1="-15" x2="-10" y1="0" y2="0" />
-        <line x1="15" x2="10" y1="0" y2="0" />
-      </g>
-      <g className="claude-scene__bulb">
-        <circle cx="0" cy="0" fill="#FDE68A" r="7" stroke="#F59E0B" strokeWidth="1" />
-        <path d="M-2 6 h4 l-0.6 3 h-2.8 Z" fill="#9CA3AF" />
-        <rect fill="#6B7280" height="1.4" width="4.6" x="-2.3" y="9" />
-      </g>
+const Lightbulb = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <g className="claude-scene__bulb-rays" stroke="#FBBF24" strokeLinecap="round" strokeWidth="1.4">
+      <line x1="0" x2="0" y1="-16" y2="-11" />
+      <line x1="-11" x2="-7.5" y1="-11" y2="-7.5" />
+      <line x1="11" x2="7.5" y1="-11" y2="-7.5" />
+      <line x1="-15" x2="-10" y1="0" y2="0" />
+      <line x1="15" x2="10" y1="0" y2="0" />
     </g>
-  );
-}
+    <g className="claude-scene__bulb">
+      <circle cx="0" cy="0" fill="#FDE68A" r="7" stroke="#F59E0B" strokeWidth="1" />
+      <path d="M-2 6 h4 l-0.6 3 h-2.8 Z" fill="#9CA3AF" />
+      <rect fill="#6B7280" height="1.4" width="4.6" x="-2.3" y="9" />
+    </g>
+  </g>
+);
 
-function MoneyFloat({
+const MoneyFloat = ({
   x,
   y,
   delay,
@@ -273,46 +250,42 @@ function MoneyFloat({
   readonly x: number;
   readonly y: number;
   readonly delay: string;
-}) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <g className="claude-scene__money" style={{ animationDelay: delay }}>
-        <rect
-          fill="#4ADE80"
-          height="9"
-          rx="1"
-          stroke="#16A34A"
-          strokeWidth="0.6"
-          width="15"
-          x="-7.5"
-          y="-4.5"
-        />
-        <circle cx="0" cy="0" fill="none" r="2.4" stroke="#16A34A" strokeWidth="0.8" />
-        <text fill="#16A34A" fontSize="4" fontWeight="700" textAnchor="middle" x="0" y="1.6">
-          $
-        </text>
-      </g>
-    </g>
-  );
-}
-
-function Zzz({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g fill={SCENE_INK_SOFT} fontWeight="700" transform={`translate(${x} ${y})`}>
-      <text className="claude-scene__zzz claude-scene__zzz--1" fontSize="8" x="0" y="0">
-        z
-      </text>
-      <text className="claude-scene__zzz claude-scene__zzz--2" fontSize="6" x="7" y="-7">
-        z
-      </text>
-      <text className="claude-scene__zzz claude-scene__zzz--3" fontSize="4.4" x="12" y="-13">
-        z
+}) => (
+  <g transform={`translate(${x} ${y})`}>
+    <g className="claude-scene__money" style={{ animationDelay: delay }}>
+      <rect
+        fill="#4ADE80"
+        height="9"
+        rx="1"
+        stroke="#16A34A"
+        strokeWidth="0.6"
+        width="15"
+        x="-7.5"
+        y="-4.5"
+      />
+      <circle cx="0" cy="0" fill="none" r="2.4" stroke="#16A34A" strokeWidth="0.8" />
+      <text fill="#16A34A" fontSize="4" fontWeight="700" textAnchor="middle" x="0" y="1.6">
+        $
       </text>
     </g>
-  );
-}
+  </g>
+);
 
-function Heart({
+const Zzz = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g fill={SCENE_INK_SOFT} fontWeight="700" transform={`translate(${x} ${y})`}>
+    <text className="claude-scene__zzz claude-scene__zzz--1" fontSize="8" x="0" y="0">
+      z
+    </text>
+    <text className="claude-scene__zzz claude-scene__zzz--2" fontSize="6" x="7" y="-7">
+      z
+    </text>
+    <text className="claude-scene__zzz claude-scene__zzz--3" fontSize="4.4" x="12" y="-13">
+      z
+    </text>
+  </g>
+);
+
+const Heart = ({
   x,
   y,
   scale,
@@ -322,200 +295,180 @@ function Heart({
   readonly y: number;
   readonly scale: number;
   readonly cls: string;
-}) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <path
-        className={`claude-scene__heart ${cls}`}
-        d="M0 3 C-4 -1 -2 -5 0 -1.6 C2 -5 4 -1 0 3Z"
-        fill="#F43F5E"
-      />
-    </g>
-  );
-}
-
-function MusicNote({
-  x,
-  y,
-  cls,
-}: {
-  readonly x: number;
-  readonly y: number;
-  readonly cls: string;
-}) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <g className={`claude-scene__note ${cls}`} fill={SCENE_INK}>
-        <rect height="8" rx="0.4" width="1.3" x="2.6" y="-8" />
-        <ellipse cx="1" cy="0.4" rx="2.4" ry="1.8" transform="rotate(-20 1 0.4)" />
-        <path d="M3.9 -8 q3 0.6 3 3 q-1.4 -1.8 -3 -1.2Z" />
-      </g>
-    </g>
-  );
-}
-
-function SweatDrop({
-  x,
-  y,
-  cls,
-}: {
-  readonly x: number;
-  readonly y: number;
-  readonly cls: string;
-}) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <path
-        className={`claude-scene__sweat ${cls}`}
-        d="M0 -3 C2 0 2.4 3 0 3 C-2.4 3 -2 0 0 -3Z"
-        fill="#7DD3FC"
-      />
-    </g>
-  );
-}
-
-function Shades({ cx, cy }: { readonly cx: number; readonly cy: number }) {
-  return (
-    <g fill={SCENE_INK} transform={`translate(${cx} ${cy})`}>
-      <rect height="10" rx="2.4" width="17" x="-24" y="-5" />
-      <rect height="10" rx="2.4" width="17" x="7" y="-5" />
-      <path d="M-7 -3 q7 -3 14 0" fill="none" stroke={SCENE_INK} strokeWidth="2.4" />
-    </g>
-  );
-}
-
-function Headphones({ cx, cy }: { readonly cx: number; readonly cy: number }) {
-  return (
-    <g transform={`translate(${cx} ${cy})`}>
-      <path
-        d="M-30 4 Q0 -30 30 4"
-        fill="none"
-        stroke="#3F3F46"
-        strokeLinecap="round"
-        strokeWidth="4"
-      />
-      <rect fill="#3F3F46" height="16" rx="3" width="9" x="-33" y="2" />
-      <rect fill="#3F3F46" height="16" rx="3" width="9" x="24" y="2" />
-    </g>
-  );
-}
-
-function RainCloud({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <ellipse cx="0" cy="0" fill="#94A3B8" rx="20" ry="10" />
-      <ellipse cx="-12" cy="2" fill="#94A3B8" rx="10" ry="7" />
-      <ellipse cx="12" cy="2" fill="#94A3B8" rx="10" ry="7" />
-      <line
-        className="claude-scene__rain claude-scene__rain--1"
-        stroke="#60A5FA"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-        x1="-10"
-        x2="-10"
-        y1="10"
-        y2="16"
-      />
-      <line
-        className="claude-scene__rain claude-scene__rain--2"
-        stroke="#60A5FA"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-        x1="0"
-        x2="0"
-        y1="10"
-        y2="16"
-      />
-      <line
-        className="claude-scene__rain claude-scene__rain--3"
-        stroke="#60A5FA"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-        x1="10"
-        x2="10"
-        y1="10"
-        y2="16"
-      />
-    </g>
-  );
-}
-
-function AlertTriangle({
-  x,
-  y,
-  cls,
-}: {
-  readonly x: number;
-  readonly y: number;
-  readonly cls: string;
-}) {
-  return (
-    <g className={`claude-scene__alert ${cls}`} transform={`translate(${x} ${y})`}>
-      <path
-        d="M0 -9 L10 9 H-10 Z"
-        fill="#EF4444"
-        stroke="#B91C1C"
-        strokeLinejoin="round"
-        strokeWidth="1"
-      />
-      <rect fill="#fff" height="6" rx="0.7" width="1.8" x="-0.9" y="-3" />
-      <circle cx="0" cy="6" fill="#fff" r="1.1" />
-    </g>
-  );
-}
-
-function GitGraph({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <path d="M0 22 V6 Q0 0 8 0 H16" fill="none" stroke="#8B5CF6" strokeWidth="2.4" />
-      <path d="M32 22 V6 Q32 0 24 0 H16" fill="none" stroke="#22C55E" strokeWidth="2.4" />
-      <line stroke="#94A3B8" strokeWidth="2.4" x1="16" x2="16" y1="0" y2="-14" />
-      <circle cx="0" cy="22" fill="#8B5CF6" r="3.4" />
-      <circle cx="32" cy="22" fill="#22C55E" r="3.4" />
-      <circle className="claude-scene__merge-node" cx="16" cy="-14" fill="#F59E0B" r="4" />
-    </g>
-  );
-}
-
-function WrenchFlame({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <path
-        className="claude-scene__wrench"
-        d="M-8 8 L2 -2 A4 4 0 0 0 8 -8 L4 -4 L1 -7 L5 -11 A4 4 0 0 0 -1 -5 L-11 5 Z"
-        fill="#9CA3AF"
-        stroke="#6B7280"
-        strokeWidth="0.6"
-      />
-      <path
-        className="claude-scene__flame claude-scene__flame--1"
-        d="M6 -12 q4 -6 0 -12 q-1 4 -4 5 q3 3 4 7Z"
-        fill="#F97316"
-      />
-      <path
-        className="claude-scene__flame claude-scene__flame--2"
-        d="M6 -12 q2 -4 0 -8 q-0.6 2.5 -2.4 3.4 q2 1.6 2.4 4.6Z"
-        fill="#FBBF24"
-      />
-    </g>
-  );
-}
-
-function Star({ cx, cy, r }: { readonly cx: number; readonly cy: number; readonly r: number }) {
-  return (
+}) => (
+  <g transform={`translate(${x} ${y}) scale(${scale})`}>
     <path
-      className="claude-scene__star"
-      d={`M${cx} ${cy - r} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r} ${cy} L${cx + r * 0.3} ${cy + r * 0.3} L${cx} ${cy + r} L${cx - r * 0.3} ${cy + r * 0.3} L${cx - r} ${cy} L${cx - r * 0.3} ${cy - r * 0.3} Z`}
+      className={`claude-scene__heart ${cls}`}
+      d="M0 3 C-4 -1 -2 -5 0 -1.6 C2 -5 4 -1 0 3Z"
+      fill="#F43F5E"
+    />
+  </g>
+);
+
+const MusicNote = ({
+  x,
+  y,
+  cls,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly cls: string;
+}) => (
+  <g transform={`translate(${x} ${y})`}>
+    <g className={`claude-scene__note ${cls}`} fill={SCENE_INK}>
+      <rect height="8" rx="0.4" width="1.3" x="2.6" y="-8" />
+      <ellipse cx="1" cy="0.4" rx="2.4" ry="1.8" transform="rotate(-20 1 0.4)" />
+      <path d="M3.9 -8 q3 0.6 3 3 q-1.4 -1.8 -3 -1.2Z" />
+    </g>
+  </g>
+);
+
+const SweatDrop = ({
+  x,
+  y,
+  cls,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly cls: string;
+}) => (
+  <g transform={`translate(${x} ${y})`}>
+    <path
+      className={`claude-scene__sweat ${cls}`}
+      d="M0 -3 C2 0 2.4 3 0 3 C-2.4 3 -2 0 0 -3Z"
+      fill="#7DD3FC"
+    />
+  </g>
+);
+
+const _Shades = ({ cx, cy }: { readonly cx: number; readonly cy: number }) => (
+  <g fill={SCENE_INK} transform={`translate(${cx} ${cy})`}>
+    <rect height="10" rx="2.4" width="17" x="-24" y="-5" />
+    <rect height="10" rx="2.4" width="17" x="7" y="-5" />
+    <path d="M-7 -3 q7 -3 14 0" fill="none" stroke={SCENE_INK} strokeWidth="2.4" />
+  </g>
+);
+
+const Headphones = ({ cx, cy }: { readonly cx: number; readonly cy: number }) => (
+  <g transform={`translate(${cx} ${cy})`}>
+    <path
+      d="M-30 4 Q0 -30 30 4"
+      fill="none"
+      stroke="#3F3F46"
+      strokeLinecap="round"
+      strokeWidth="4"
+    />
+    <rect fill="#3F3F46" height="16" rx="3" width="9" x="-33" y="2" />
+    <rect fill="#3F3F46" height="16" rx="3" width="9" x="24" y="2" />
+  </g>
+);
+
+const RainCloud = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <ellipse cx="0" cy="0" fill="#94A3B8" rx="20" ry="10" />
+    <ellipse cx="-12" cy="2" fill="#94A3B8" rx="10" ry="7" />
+    <ellipse cx="12" cy="2" fill="#94A3B8" rx="10" ry="7" />
+    <line
+      className="claude-scene__rain claude-scene__rain--1"
+      stroke="#60A5FA"
+      strokeLinecap="round"
+      strokeWidth="1.4"
+      x1="-10"
+      x2="-10"
+      y1="10"
+      y2="16"
+    />
+    <line
+      className="claude-scene__rain claude-scene__rain--2"
+      stroke="#60A5FA"
+      strokeLinecap="round"
+      strokeWidth="1.4"
+      x1="0"
+      x2="0"
+      y1="10"
+      y2="16"
+    />
+    <line
+      className="claude-scene__rain claude-scene__rain--3"
+      stroke="#60A5FA"
+      strokeLinecap="round"
+      strokeWidth="1.4"
+      x1="10"
+      x2="10"
+      y1="10"
+      y2="16"
+    />
+  </g>
+);
+
+const AlertTriangle = ({
+  x,
+  y,
+  cls,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly cls: string;
+}) => (
+  <g className={`claude-scene__alert ${cls}`} transform={`translate(${x} ${y})`}>
+    <path
+      d="M0 -9 L10 9 H-10 Z"
+      fill="#EF4444"
+      stroke="#B91C1C"
+      strokeLinejoin="round"
+      strokeWidth="1"
+    />
+    <rect fill="#fff" height="6" rx="0.7" width="1.8" x="-0.9" y="-3" />
+    <circle cx="0" cy="6" fill="#fff" r="1.1" />
+  </g>
+);
+
+const GitGraph = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <path d="M0 22 V6 Q0 0 8 0 H16" fill="none" stroke="#8B5CF6" strokeWidth="2.4" />
+    <path d="M32 22 V6 Q32 0 24 0 H16" fill="none" stroke="#22C55E" strokeWidth="2.4" />
+    <line stroke="#94A3B8" strokeWidth="2.4" x1="16" x2="16" y1="0" y2="-14" />
+    <circle cx="0" cy="22" fill="#8B5CF6" r="3.4" />
+    <circle cx="32" cy="22" fill="#22C55E" r="3.4" />
+    <circle className="claude-scene__merge-node" cx="16" cy="-14" fill="#F59E0B" r="4" />
+  </g>
+);
+
+const WrenchFlame = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <path
+      className="claude-scene__wrench"
+      d="M-8 8 L2 -2 A4 4 0 0 0 8 -8 L4 -4 L1 -7 L5 -11 A4 4 0 0 0 -1 -5 L-11 5 Z"
+      fill="#9CA3AF"
+      stroke="#6B7280"
+      strokeWidth="0.6"
+    />
+    <path
+      className="claude-scene__flame claude-scene__flame--1"
+      d="M6 -12 q4 -6 0 -12 q-1 4 -4 5 q3 3 4 7Z"
+      fill="#F97316"
+    />
+    <path
+      className="claude-scene__flame claude-scene__flame--2"
+      d="M6 -12 q2 -4 0 -8 q-0.6 2.5 -2.4 3.4 q2 1.6 2.4 4.6Z"
       fill="#FBBF24"
     />
-  );
-}
+  </g>
+);
+
+const Star = ({ cx, cy, r }: { readonly cx: number; readonly cy: number; readonly r: number }) => (
+  <path
+    className="claude-scene__star"
+    d={`M${cx} ${cy - r} L${cx + r * 0.3} ${cy - r * 0.3} L${cx + r} ${cy} L${cx + r * 0.3} ${cy + r * 0.3} L${cx} ${cy + r} L${cx - r * 0.3} ${cy + r * 0.3} L${cx - r} ${cy} L${cx - r * 0.3} ${cy - r * 0.3} Z`}
+    fill="#FBBF24"
+  />
+);
 
 // ————————————————————————————————————————————————————————————————
 // Scene-specific set pieces (deploying, shipped)
 // ————————————————————————————————————————————————————————————————
 
-function Popper({
+const Popper = ({
   x,
   y,
   mirror,
@@ -523,71 +476,63 @@ function Popper({
   readonly x: number;
   readonly y: number;
   readonly mirror: boolean;
-}) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${mirror ? -1 : 1} 1)`}>
-      <path d="M0 0 L18 -6 L14 6 Z" fill="#D97757" />
-      <path
-        className="claude-scene__popper-streamer"
-        d="M18 -6 q10 -6 18 -2"
-        fill="none"
-        stroke="#34D399"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        className="claude-scene__popper-streamer"
-        d="M18 -2 q12 0 20 6"
-        fill="none"
-        stroke="#60A5FA"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-      <path
-        className="claude-scene__popper-streamer"
-        d="M18 2 q10 6 16 12"
-        fill="none"
-        stroke="#FBBF24"
-        strokeLinecap="round"
-        strokeWidth="2"
-      />
-    </g>
-  );
-}
+}) => (
+  <g transform={`translate(${x} ${y}) scale(${mirror ? -1 : 1} 1)`}>
+    <path d="M0 0 L18 -6 L14 6 Z" fill="#D97757" />
+    <path
+      className="claude-scene__popper-streamer"
+      d="M18 -6 q10 -6 18 -2"
+      fill="none"
+      stroke="#34D399"
+      strokeLinecap="round"
+      strokeWidth="2"
+    />
+    <path
+      className="claude-scene__popper-streamer"
+      d="M18 -2 q12 0 20 6"
+      fill="none"
+      stroke="#60A5FA"
+      strokeLinecap="round"
+      strokeWidth="2"
+    />
+    <path
+      className="claude-scene__popper-streamer"
+      d="M18 2 q10 6 16 12"
+      fill="none"
+      stroke="#FBBF24"
+      strokeLinecap="round"
+      strokeWidth="2"
+    />
+  </g>
+);
 
-function Rocket({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <path d="M0 0 q10 -28 20 0 L20 60 L0 60 Z" fill="#E5E7EB" />
-      <path d="M0 0 q10 -28 20 0 L20 14 L0 14 Z" fill="#D97757" />
-      <circle cx="10" cy="26" fill="#93C5FD" r="5" stroke="#1E3A8A" strokeWidth="1.5" />
-      <path d="M0 46 L-8 62 L0 58 Z" fill="#B91C1C" />
-      <path d="M20 46 L28 62 L20 58 Z" fill="#B91C1C" />
-    </g>
-  );
-}
+const Rocket = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <path d="M0 0 q10 -28 20 0 L20 60 L0 60 Z" fill="#E5E7EB" />
+    <path d="M0 0 q10 -28 20 0 L20 14 L0 14 Z" fill="#D97757" />
+    <circle cx="10" cy="26" fill="#93C5FD" r="5" stroke="#1E3A8A" strokeWidth="1.5" />
+    <path d="M0 46 L-8 62 L0 58 Z" fill="#B91C1C" />
+    <path d="M20 46 L28 62 L20 58 Z" fill="#B91C1C" />
+  </g>
+);
 
-function SmokeCloud({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g className="claude-scene__smoke" transform={`translate(${x} ${y})`}>
-      <circle cx="0" cy="0" fill="#E2E8F0" r="9" />
-      <circle cx="10" cy="2" fill="#EDF2F7" r="7" />
-      <circle cx="-9" cy="3" fill="#EDF2F7" r="6" />
-    </g>
-  );
-}
+const SmokeCloud = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g className="claude-scene__smoke" transform={`translate(${x} ${y})`}>
+    <circle cx="0" cy="0" fill="#E2E8F0" r="9" />
+    <circle cx="10" cy="2" fill="#EDF2F7" r="7" />
+    <circle cx="-9" cy="3" fill="#EDF2F7" r="6" />
+  </g>
+);
 
-function DiscoBall({ x, y }: { readonly x: number; readonly y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <line stroke="#94A3B8" strokeWidth="1" x1="0" x2="0" y1="-18" y2="-6" />
-      <g className="claude-scene__disco">
-        <circle cx="0" cy="0" fill="#A5B4FC" r="6" />
-        <path d="M-6 0 H6 M0 -6 V6 M-4 -4 L4 4 M4 -4 L-4 4" stroke="#6366F1" strokeWidth="0.5" />
-      </g>
+const DiscoBall = ({ x, y }: { readonly x: number; readonly y: number }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <line stroke="#94A3B8" strokeWidth="1" x1="0" x2="0" y1="-18" y2="-6" />
+    <g className="claude-scene__disco">
+      <circle cx="0" cy="0" fill="#A5B4FC" r="6" />
+      <path d="M-6 0 H6 M0 -6 V6 M-4 -4 L4 4 M4 -4 L-4 4" stroke="#6366F1" strokeWidth="0.5" />
     </g>
-  );
-}
+  </g>
+);
 
 // ————————————————————————————————————————————————————————————————
 // Registry
@@ -1110,10 +1055,30 @@ export const CLAUDE_OCTOPUS_SCENES = SCENES;
 
 export const CLAUDE_OCTOPUS_SCENE_IDS: readonly string[] = SCENES.map((scene) => scene.id);
 
-export function claudeOctopusScene(id: string): ClaudeOctopusSceneDef | undefined {
-  return SCENE_BY_ID.get(id);
-}
+/**
+ * Resolve a scene definition by id.
+ *
+ * @param id - Scene id.
+ * @returns Scene definition, or undefined when the id is unknown.
+ * @example
+ * claudeOctopusScene('working-at-mac');
+ */
+export const claudeOctopusScene = (id: string): ClaudeOctopusSceneDef | undefined =>
+  SCENE_BY_ID.get(id);
 
-export function sceneFocusOrFull(id: string): SceneFocus {
-  return SCENE_BY_ID.get(id)?.focus ?? FULL_FOCUS;
-}
+/**
+ * Resolve the scene focus rectangle, falling back to the full canvas intentionally.
+ *
+ * @param id - Scene id.
+ * @returns Focus rectangle for the scene, or the full canvas when no scene exists.
+ * @example
+ * sceneFocusOrFull('working-at-mac');
+ */
+export const sceneFocusOrFull = (id: string): SceneFocus => {
+  const scene = SCENE_BY_ID.get(id);
+  if (scene === undefined) {
+    return FULL_FOCUS;
+  }
+
+  return scene.focus;
+};

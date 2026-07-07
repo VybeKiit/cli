@@ -8,22 +8,33 @@ interface MarqueeLoopOptions {
   readonly enabled?: boolean;
 }
 
-function parseDurationSeconds(duration: string): number {
+const parseDurationSeconds = (duration: string): number => {
   const match = duration.match(/^([\d.]+)(s|ms)$/);
   if (!match) {
     return 55;
   }
   const value = Number(match[1]);
   return match[2] === 'ms' ? value / 1000 : value;
-}
+};
 
-/** Smooth infinite marquee — velocity lerps on hover so direction/speed changes never jump. */
-export function useMarqueeLoop(
+/**
+ * Smooth infinite marquee — velocity lerps on hover so direction/speed changes never jump.
+ *
+ * @param trackRef - Input value.
+ * @param copyRef - Input value.
+ * @param regionRef - Input value.
+ * @param props - Component props.
+ * @returns The hook result.
+ * @example
+ * const value = useMarqueeLoop(trackRef, copyRef, regionRef, props);
+ */
+
+export const useMarqueeLoop = (
   trackRef: RefObject<HTMLElement | null>,
   copyRef: RefObject<HTMLElement | null>,
   regionRef: RefObject<HTMLElement | null>,
   { durationSeconds, hoverMultiplier = 2.75, enabled = true }: MarqueeLoopOptions,
-) {
+) => {
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
   const targetVelocityRef = useRef(0);
@@ -113,6 +124,6 @@ export function useMarqueeLoop(
       track.style.transform = '';
     };
   }, [copyRef, durationSeconds, enabled, hoverMultiplier, regionRef, trackRef]);
-}
+};
 
 export { parseDurationSeconds };

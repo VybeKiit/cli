@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildVerbContext, discoverStore } from '@vybekiit/browserAutomation/cli/discover';
+import { buildVerbContext, discoverStore } from '@vybekiit/browser-automation/cli/discover';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 let repoRoot: string;

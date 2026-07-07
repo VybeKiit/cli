@@ -13,26 +13,30 @@ vi.mock('firebase-admin/firestore', () => ({
   getFirestore: () => ({
     collection: (name: string) => ({
       doc: (id: string) => ({
-        set: async (data: Record<string, unknown>) => {
+        set: (data: Record<string, unknown>) => {
           docStore.set(`${name}:${id}`, data);
+          return Promise.resolve();
         },
-        get: async () => ({
-          exists: docStore.has(`${name}:${id}`),
-          data: () => docStore.get(`${name}:${id}`),
-        }),
-        update: async (patch: Record<string, unknown>) => {
+        get: () =>
+          Promise.resolve({
+            exists: docStore.has(`${name}:${id}`),
+            data: () => docStore.get(`${name}:${id}`),
+          }),
+        update: (patch: Record<string, unknown>) => {
           const key = `${name}:${id}`;
           docStore.set(key, { ...docStore.get(key), ...patch });
+          return Promise.resolve();
         },
-        delete: async () => {
+        delete: () => {
           docStore.delete(`${name}:${id}`);
+          return Promise.resolve();
         },
       }),
       where: () => ({
-        get: async () => ({ docs: [] }),
+        get: () => Promise.resolve({ docs: [] }),
       }),
     }),
-    listCollections: async () => [],
+    listCollections: () => Promise.resolve([]),
   }),
 }));
 

@@ -1,4 +1,4 @@
-import { fetchPublicIpv4 } from '@vybekiit/browserAutomation/domains/registrars/shared/publicIp';
+import { fetchPublicIpv4 } from '@vybekiit/browser-automation/domains/registrars/shared/publicIp';
 import { describe, expect, it } from 'vitest';
 
 describe('fetchPublicIpv4', () => {

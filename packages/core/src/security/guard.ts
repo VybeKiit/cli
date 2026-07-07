@@ -17,11 +17,27 @@ export class SecurityGuard {
   private readonly limiters = new Map<RouteTier, RateLimiter>();
   private readonly now: Clock;
 
+  /**
+   * Create a guard with one policy and shared limiter state.
+   *
+   * @param policy - Normalized policy to enforce.
+   * @param now - Clock used by rate-limit windows.
+   * @example
+   * const guard = new SecurityGuard(resolveSecurityPolicy());
+   */
   constructor(policy: SecurityPolicy = resolveSecurityPolicy(), now: Clock = Date.now) {
     this.policy = policy;
     this.now = now;
   }
 
+  /**
+   * Resolve or create the limiter for a route tier.
+   *
+   * @param tier - Classified route tier.
+   * @returns A limiter when rate limiting is enabled, otherwise `null`.
+   * @example
+   * const limiter = this.limiterFor('auth-strict');
+   */
   private limiterFor(tier: RouteTier): RateLimiter | null {
     if (!this.policy.rateLimit.enabled) {
       return null;
@@ -38,9 +54,17 @@ export class SecurityGuard {
     return limiter;
   }
 
-  /** Run the configured checks against one request and return an allow/block verdict. */
+  /**
+   * Run the configured checks against one request.
+   *
+   * @param request - Framework-neutral inbound request shape.
+   * @returns An allow/block verdict with a stable reason when blocked.
+   * @example
+   * const verdict = guard.evaluate(request);
+   */
   evaluate(request: SecurityRequest): SecurityVerdict {
-    const tier = classifyRoute(request.path ?? '/api/unknown');
+    const requestPath = request.path === undefined ? '/api/unknown' : request.path;
+    const tier = classifyRoute(requestPath);
     const originLockEnabled = this.policy.originLock.enabled && !isOriginLockExempt(tier);
 
     if (

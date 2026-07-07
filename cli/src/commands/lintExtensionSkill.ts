@@ -1,13 +1,25 @@
 import { readFile } from 'node:fs/promises';
-import process from 'node:process';
 import { type ExtensionSkillLintKind, lintExtensionSkill } from '@vybekiit/agent-kit';
 
-export interface LintExtensionSkillResult {
+/** JSON result returned by the extension skill linter command. */
+export type LintExtensionSkillResult = {
   readonly json: string;
   readonly exitCode: number;
-}
+};
 
-function inferKind(path: string, explicit?: string): ExtensionSkillLintKind | null {
+/**
+ * Resolve the extension skill kind from an explicit flag or path convention.
+ *
+ * @param path - Skill file path passed to the command.
+ * @param explicit - Optional `--kind` flag value.
+ * @returns Lint kind, or null when the kind cannot be inferred.
+ * @example
+ * const kind = resolveExtensionSkillKind('extensions/skills/payments.md');
+ */
+const resolveExtensionSkillKind = (
+  path: string,
+  explicit?: string,
+): ExtensionSkillLintKind | null => {
   if (
     explicit === 'buyer-goal' ||
     explicit === 'platform-wrapper' ||
@@ -15,23 +27,36 @@ function inferKind(path: string, explicit?: string): ExtensionSkillLintKind | nu
   ) {
     return explicit;
   }
-  const normalized = path.replace(/\\/g, '/');
-  if (normalized.includes('/extensions/skills/')) return 'buyer-goal';
-  if (normalized.includes('/extensions/platform-skills/')) return 'platform-wrapper';
-  if (normalized.endsWith('SKILL.md')) return 'agent-skills-global';
-  if (normalized.includes('-vybekiit.md')) return 'platform-wrapper';
+  const normalized = path.split('\\').join('/');
+  if (normalized.includes('/extensions/skills/')) {
+    return 'buyer-goal';
+  }
+  if (normalized.includes('/extensions/platform-skills/')) {
+    return 'platform-wrapper';
+  }
+  if (normalized.endsWith('SKILL.md')) {
+    return 'agent-skills-global';
+  }
+  if (normalized.includes('-vybekiit.md')) {
+    return 'platform-wrapper';
+  }
   return null;
-}
+};
 
 /**
  * Lint an extension skill file before persisting.
- * Usage: vybekiit lint-extension-skill <path> [--kind buyer-goal|platform-wrapper|agent-skills-global]
+ *
+ * @param args - CLI arguments after `lint-extension-skill`.
+ * @returns JSON lint report plus the process exit code.
+ * @example
+ * const result = await runLintExtensionSkill(['skill.md', '--kind=buyer-goal']);
  */
-export async function runLintExtensionSkill(args: string[]): Promise<LintExtensionSkillResult> {
+export const runLintExtensionSkill = async (args: string[]): Promise<LintExtensionSkillResult> => {
   const path = args.find((a) => !a.startsWith('--'));
-  const kindFlag = args.find((a) => a.startsWith('--kind='))?.slice('--kind='.length);
+  const kindArg = args.find((a) => a.startsWith('--kind='));
+  const kindFlag = kindArg === undefined ? undefined : kindArg.slice('--kind='.length);
 
-  if (!path) {
+  if (path === undefined || path === '') {
     return {
       json: JSON.stringify({
         ok: false,
@@ -41,13 +66,13 @@ export async function runLintExtensionSkill(args: string[]): Promise<LintExtensi
     };
   }
 
-  const kind = inferKind(path, kindFlag);
-  if (!kind) {
+  const kind = resolveExtensionSkillKind(path, kindFlag);
+  if (kind === null) {
     return {
       json: JSON.stringify({
         ok: false,
         error:
-          'Could not infer skill kind — pass --kind=buyer-goal|platform-wrapper|agent-skills-global',
+          'Could not infer skill kind. Pass --kind=buyer-goal|platform-wrapper|agent-skills-global',
       }),
       exitCode: 1,
     };
@@ -68,4 +93,4 @@ export async function runLintExtensionSkill(args: string[]): Promise<LintExtensi
     json: JSON.stringify({ ok: report.ok, kind, path, issues: report.issues }, null, 2),
     exitCode: report.ok ? 0 : 1,
   };
-}
+};

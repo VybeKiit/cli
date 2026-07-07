@@ -5,16 +5,29 @@ import { NextResponse } from 'next/server';
 
 const guard = new SecurityGuard(resolveSecurityPolicy());
 
-function clientIdFromRequest(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    return forwarded.split(',')[0]?.trim() ?? 'unknown';
-  }
-  return request.headers.get('x-real-ip') ?? 'unknown';
-}
+const UNKNOWN_CLIENT_ID = 'unknown';
 
-/** Run {@link SecurityGuard} for `/api/*` requests; returns a block response or `null`. */
-export function evaluateApiSecurity(request: NextRequest): NextResponse | null {
+const clientIdFromRequest = (request: NextRequest): string => {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded !== null) {
+    const [firstForwarded] = forwarded.split(',');
+    if (firstForwarded !== undefined && firstForwarded.trim() !== '') {
+      return firstForwarded.trim();
+    }
+  }
+  const realIp = request.headers.get('x-real-ip');
+  return realIp === null || realIp === '' ? UNKNOWN_CLIENT_ID : realIp;
+};
+
+/**
+ * Run {@link SecurityGuard} for `/api/*` requests.
+ *
+ * @param request - Incoming Next.js request.
+ * @returns A blocking response, or `null` when the request may continue.
+ * @example
+ * const blocked = evaluateApiSecurity(request);
+ */
+const evaluateApiSecurity = (request: NextRequest): NextResponse | null => {
   if (!request.nextUrl.pathname.startsWith('/api')) {
     return null;
   }
@@ -38,4 +51,6 @@ export function evaluateApiSecurity(request: NextRequest): NextResponse | null {
   const response =
     verdict.reason === 'origin' ? forbidden(verdict.message) : tooManyRequests(verdict.message);
   return NextResponse.json(response.body, { status: response.status, headers });
-}
+};
+
+export { evaluateApiSecurity };

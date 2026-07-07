@@ -4,8 +4,15 @@ import { createElement } from 'react';
 
 import type { ClaudeOctopusPose } from '@/components/builder-assistant-mark/claudeOctopusPoses';
 
-/** Isolated VybeKiit demo loader — pose cards share one module instead of ~190 demo files. */
-export async function loadVybeKiitDemo(name: string): Promise<Record<string, unknown>> {
+/**
+ * Load vybe kiit demo from browser storage or catalog data.
+ *
+ * @param name - Catalog component name.
+ * @returns The loaded value produced by loadVybeKiitDemo.
+ * @example
+ * const result = await loadVybeKiitDemo('button');
+ */
+export const loadVybeKiitDemo = async (name: string): Promise<Record<string, unknown>> => {
   if (name.startsWith('claude-octopus-scene-')) {
     const scene = name.slice('claude-octopus-scene-'.length);
     const { MascotSceneDemo } = await import('@library/demos/vybekiit/_mascotSceneDemo');
@@ -31,4 +38,4 @@ export async function loadVybeKiitDemo(name: string): Promise<Record<string, unk
   }
 
   return import(`@library/demos/vybekiit/${name}`);
-}
+};

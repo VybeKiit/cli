@@ -27,12 +27,22 @@ interface ReportHandoffMenuProps {
   readonly tutorialActive?: boolean;
 }
 
-/** Hover menu — hold 2s on an option to lock chat handoff target. */
-export function ReportHandoffMenu({
+/**
+ * Hover menu — hold 2s on an option to lock chat handoff target.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportHandoffMenu element.
+ * @example
+ * ```tsx
+ * <ReportHandoffMenu />
+ * ```
+ */
+
+export const ReportHandoffMenu = ({
   value,
   onChange,
   tutorialActive = false,
-}: ReportHandoffMenuProps) {
+}: ReportHandoffMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
@@ -123,4 +133,4 @@ export function ReportHandoffMenu({
       </ReportFlyoutPortal>
     </div>
   );
-}
+};

@@ -4,13 +4,13 @@ import {
   isPlatformSkillsAuditBlocking,
   normalizeSkillsRepoKey,
   PLATFORM_SKILLS_AUDIT_PROVIDERS,
-} from '@vybekiit/agentKit/catalogs/platformSkillsAudit';
+} from '@vybekiit/agent-kit/catalogs/platformSkillsAudit';
 import {
   checkBaseManifestParity,
   findDocsOnlyViolations,
   mergePlatformSkillsManifests,
   PLATFORM_SKILLS_BASE_MANIFEST,
-} from '@vybekiit/agentKit/catalogs/platformSkillsMerge';
+} from '@vybekiit/agent-kit/catalogs/platformSkillsMerge';
 import { describe, expect, it } from 'vitest';
 
 describe('mergePlatformSkillsManifests', () => {
@@ -65,7 +65,9 @@ describe('evaluatePlatformSkillsAudit', () => {
     const npmPublishDates: Record<string, Date> = {};
     for (const p of PLATFORM_SKILLS_AUDIT_PROVIDERS) {
       repoCommitDates[normalizeSkillsRepoKey(p.skillsRepo)] = recent;
-      if (p.npmPackage) npmPublishDates[p.npmPackage] = recent;
+      if (p.npmPackage) {
+        npmPublishDates[p.npmPackage] = recent;
+      }
     }
     const results = evaluatePlatformSkillsAudit({ now, repoCommitDates, npmPublishDates });
     expect(isPlatformSkillsAuditBlocking(results)).toBe(false);

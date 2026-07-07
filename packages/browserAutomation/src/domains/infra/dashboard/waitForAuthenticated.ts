@@ -1,18 +1,21 @@
+import type { VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import { scrapeCfAccountIdFromUrl } from './scrape';
 
 /**
  * Wait until the Cloudflare dashboard is reachable after manual sign-in.
  *
- * Signed-in state is confirmed primarily by the 32-hex account id appearing in the URL
- * (the dashboard redirects to `/<accountId>/...` once authenticated); a couple of visible
- * dashboard anchors are used as secondary/fallback signals so a URL scheme change alone
- * doesn't wedge the flow.
+ * @param page - Playwright page to inspect or mutate.
+ * @param log - Input value for log.
+ * @param _context - Input value for _context.
+ * @returns Promise resolving with the authenticated page.
+ * @example
+ * const result = await waitForCfAuthenticated(page, log, _context);
  */
-export async function waitForCfAuthenticated(
+export const waitForCfAuthenticated = async (
   page: import('playwright').Page,
-  log: Pick<Console, 'log' | 'warn' | 'error'>,
+  log: Pick<VerbLogger, 'log' | 'warn' | 'error'>,
   _context: import('playwright').BrowserContext,
-): Promise<import('playwright').Page> {
+): Promise<import('playwright').Page> => {
   const deadline = Date.now() + 120_000;
 
   while (Date.now() < deadline) {
@@ -36,4 +39,4 @@ export async function waitForCfAuthenticated(
 
   log.warn('[cf] timed out waiting for Cloudflare authentication.');
   return page;
-}
+};

@@ -1,4 +1,4 @@
-import { planAgentLayerCompliance } from '@vybekiit/agentKit/planners/planAgentLayerCompliance';
+import { planAgentLayerCompliance } from '@vybekiit/agent-kit/planners/planAgentLayerCompliance';
 import { describe, expect, it } from 'vitest';
 
 const minimalWebFiles = {

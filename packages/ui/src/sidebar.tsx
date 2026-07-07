@@ -32,15 +32,31 @@ type SidebarContextProps = {
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 
-function useSidebar() {
+/**
+ * Read the sidebar context created by {@link SidebarProvider}.
+ *
+ * @returns The current sidebar state and control callbacks.
+ * @throws When called outside of a sidebar provider.
+ * @example
+ * const { toggleSidebar } = useSidebar();
+ */
+const useSidebar = (): SidebarContextProps => {
   const context = React.useContext(SidebarContext);
   if (!context) {
     throw new Error('useSidebar must be used within a SidebarProvider.');
   }
 
   return context;
-}
+};
 
+/**
+ * Render the Sidebar Provider component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Provider component.
+ * @example
+ * <SidebarProvider />;
+ */
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
@@ -67,7 +83,7 @@ const SidebarProvider = React.forwardRef<
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen);
-    const open = openProp ?? _open;
+    const open = openProp === undefined ? _open : openProp;
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === 'function' ? value(open) : value;
@@ -146,6 +162,14 @@ const SidebarProvider = React.forwardRef<
 );
 SidebarProvider.displayName = 'SidebarProvider';
 
+/**
+ * Render the Sidebar component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar component.
+ * @example
+ * <Sidebar />;
+ */
 const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
@@ -171,7 +195,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            'flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground',
+            'flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground',
             className,
           )}
           ref={ref}
@@ -188,7 +212,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
@@ -218,24 +242,24 @@ const Sidebar = React.forwardRef<
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            'relative w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear',
+            'relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
               ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]'
-              : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
+              : 'group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
           )}
         />
         <div
           className={cn(
-            'fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex',
+            'fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex',
             side === 'left'
               ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
               : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
             // Adjust the padding for floating and inset variants.
             variant === 'floating' || variant === 'inset'
               ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]'
-              : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
+              : 'group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l',
             className,
           )}
           {...props}
@@ -253,6 +277,14 @@ const Sidebar = React.forwardRef<
 );
 Sidebar.displayName = 'Sidebar';
 
+/**
+ * Render the Sidebar Trigger component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Trigger component.
+ * @example
+ * <SidebarTrigger />;
+ */
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
@@ -279,6 +311,14 @@ const SidebarTrigger = React.forwardRef<
 });
 SidebarTrigger.displayName = 'SidebarTrigger';
 
+/**
+ * Render the Sidebar Rail component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Rail component.
+ * @example
+ * <SidebarRail />;
+ */
 const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(
   ({ className, ...props }, ref) => {
     const { toggleSidebar } = useSidebar();
@@ -307,6 +347,14 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'bu
 );
 SidebarRail.displayName = 'SidebarRail';
 
+/**
+ * Render the Sidebar Inset component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Inset component.
+ * @example
+ * <SidebarInset />;
+ */
 const SidebarInset = React.forwardRef<HTMLDivElement, React.ComponentProps<'main'>>(
   ({ className, ...props }, ref) => (
     <main
@@ -322,6 +370,14 @@ const SidebarInset = React.forwardRef<HTMLDivElement, React.ComponentProps<'main
 );
 SidebarInset.displayName = 'SidebarInset';
 
+/**
+ * Render the Sidebar Input component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Input component.
+ * @example
+ * <SidebarInput />;
+ */
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
   React.ComponentProps<typeof Input>
@@ -338,6 +394,14 @@ const SidebarInput = React.forwardRef<
 ));
 SidebarInput.displayName = 'SidebarInput';
 
+/**
+ * Render the Sidebar Header component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Header component.
+ * @example
+ * <SidebarHeader />;
+ */
 const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -350,6 +414,14 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<'div
 );
 SidebarHeader.displayName = 'SidebarHeader';
 
+/**
+ * Render the Sidebar Footer component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Footer component.
+ * @example
+ * <SidebarFooter />;
+ */
 const SidebarFooter = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -362,6 +434,14 @@ const SidebarFooter = React.forwardRef<HTMLDivElement, React.ComponentProps<'div
 );
 SidebarFooter.displayName = 'SidebarFooter';
 
+/**
+ * Render the Sidebar Separator component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Separator component.
+ * @example
+ * <SidebarSeparator />;
+ */
 const SidebarSeparator = React.forwardRef<
   React.ElementRef<typeof Separator>,
   React.ComponentProps<typeof Separator>
@@ -375,6 +455,14 @@ const SidebarSeparator = React.forwardRef<
 ));
 SidebarSeparator.displayName = 'SidebarSeparator';
 
+/**
+ * Render the Sidebar Content component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Content component.
+ * @example
+ * <SidebarContent />;
+ */
 const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -390,6 +478,14 @@ const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'di
 );
 SidebarContent.displayName = 'SidebarContent';
 
+/**
+ * Render the Sidebar Group component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Group component.
+ * @example
+ * <SidebarGroup />;
+ */
 const SidebarGroup = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -402,6 +498,14 @@ const SidebarGroup = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'
 );
 SidebarGroup.displayName = 'SidebarGroup';
 
+/**
+ * Render the Sidebar Group Label component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Group Label component.
+ * @example
+ * <SidebarGroupLabel />;
+ */
 const SidebarGroupLabel = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & { asChild?: boolean }
@@ -423,6 +527,14 @@ const SidebarGroupLabel = React.forwardRef<
 });
 SidebarGroupLabel.displayName = 'SidebarGroupLabel';
 
+/**
+ * Render the Sidebar Group Action component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Group Action component.
+ * @example
+ * <SidebarGroupAction />;
+ */
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<'button'> & { asChild?: boolean }
@@ -446,6 +558,14 @@ const SidebarGroupAction = React.forwardRef<
 });
 SidebarGroupAction.displayName = 'SidebarGroupAction';
 
+/**
+ * Render the Sidebar Group Content component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Group Content component.
+ * @example
+ * <SidebarGroupContent />;
+ */
 const SidebarGroupContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -458,6 +578,14 @@ const SidebarGroupContent = React.forwardRef<HTMLDivElement, React.ComponentProp
 );
 SidebarGroupContent.displayName = 'SidebarGroupContent';
 
+/**
+ * Render the Sidebar Menu component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu component.
+ * @example
+ * <SidebarMenu />;
+ */
 const SidebarMenu = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
   ({ className, ...props }, ref) => (
     <ul
@@ -470,6 +598,14 @@ const SidebarMenu = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'
 );
 SidebarMenu.displayName = 'SidebarMenu';
 
+/**
+ * Render the Sidebar Menu Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Item component.
+ * @example
+ * <SidebarMenuItem />;
+ */
 const SidebarMenuItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(
   ({ className, ...props }, ref) => (
     <li
@@ -504,6 +640,14 @@ const sidebarMenuButtonVariants = cva(
   },
 );
 
+/**
+ * Render the Sidebar Menu Button component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Button component.
+ * @example
+ * <SidebarMenuButton />;
+ */
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<'button'> & {
@@ -563,6 +707,14 @@ const SidebarMenuButton = React.forwardRef<
 );
 SidebarMenuButton.displayName = 'SidebarMenuButton';
 
+/**
+ * Render the Sidebar Menu Action component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Action component.
+ * @example
+ * <SidebarMenuAction />;
+ */
 const SidebarMenuAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<'button'> & {
@@ -594,6 +746,14 @@ const SidebarMenuAction = React.forwardRef<
 });
 SidebarMenuAction.displayName = 'SidebarMenuAction';
 
+/**
+ * Render the Sidebar Menu Badge component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Badge component.
+ * @example
+ * <SidebarMenuBadge />;
+ */
 const SidebarMenuBadge = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
   ({ className, ...props }, ref) => (
     <div
@@ -614,6 +774,14 @@ const SidebarMenuBadge = React.forwardRef<HTMLDivElement, React.ComponentProps<'
 );
 SidebarMenuBadge.displayName = 'SidebarMenuBadge';
 
+/**
+ * Render the Sidebar Menu Skeleton component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Skeleton component.
+ * @example
+ * <SidebarMenuSkeleton />;
+ */
 const SidebarMenuSkeleton = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
@@ -645,6 +813,14 @@ const SidebarMenuSkeleton = React.forwardRef<
 });
 SidebarMenuSkeleton.displayName = 'SidebarMenuSkeleton';
 
+/**
+ * Render the Sidebar Menu Sub component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Sub component.
+ * @example
+ * <SidebarMenuSub />;
+ */
 const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
   ({ className, ...props }, ref) => (
     <ul
@@ -661,11 +837,27 @@ const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'
 );
 SidebarMenuSub.displayName = 'SidebarMenuSub';
 
+/**
+ * Render the Sidebar Menu Sub Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Sub Item component.
+ * @example
+ * <SidebarMenuSubItem />;
+ */
 const SidebarMenuSubItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(
   ({ ...props }, ref) => <li ref={ref} {...props} />,
 );
 SidebarMenuSubItem.displayName = 'SidebarMenuSubItem';
 
+/**
+ * Render the Sidebar Menu Sub Button component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Sidebar Menu Sub Button component.
+ * @example
+ * <SidebarMenuSubButton />;
+ */
 const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentProps<'a'> & {

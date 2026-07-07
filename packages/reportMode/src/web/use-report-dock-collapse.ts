@@ -1,36 +1,37 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { resolveBrowserStorage } from './browserStorage';
 
-/** Small delay before expanding on hover — avoids flicker when the cursor just grazes the chip. */
+/** Small delay before expanding on hover. */
 const HOVER_OPEN_DELAY_MS = 90;
-/** Longer delay before collapsing — keeps the dock open across small cursor gaps to sub-menus. */
+/** Longer delay before collapsing across small cursor gaps to sub-menus. */
 const HOVER_CLOSE_DELAY_MS = 260;
 
 const REPORT_DOCK_EXPANDED_KEY = 'vybekiit-report-dock-expanded';
 /** @deprecated Use REPORT_DOCK_EXPANDED_KEY */
 const REPORT_DOCK_EXPANDED_LOCK_KEY = 'vybekiit-report-dock-expanded-lock';
 
-function browserStorage(): Storage | null {
-  if (typeof globalThis.localStorage === 'undefined') {
-    return null;
-  }
+/**
+ * Read whether the dock is pinned open from browser storage.
+ *
+ * @returns `true` when the persisted setting pins the dock open.
+ * @example
+ * const pinned = readPinnedExpanded();
+ */
+const readPinnedExpanded = (): boolean => {
   try {
-    return globalThis.localStorage;
-  } catch {
-    return null;
-  }
-}
+    const storage = resolveBrowserStorage();
+    if (storage === null) {
+      return false;
+    }
 
-function readPinnedExpanded(): boolean {
-  try {
-    const storage = browserStorage();
-    const next = storage?.getItem(REPORT_DOCK_EXPANDED_KEY);
+    const next = storage.getItem(REPORT_DOCK_EXPANDED_KEY);
     if (next === 'true' || next === 'false') {
       return next === 'true';
     }
-    // Migrate legacy “lock open forever” flag.
-    if (storage?.getItem(REPORT_DOCK_EXPANDED_LOCK_KEY) === 'true') {
+
+    if (storage.getItem(REPORT_DOCK_EXPANDED_LOCK_KEY) === 'true') {
       storage.setItem(REPORT_DOCK_EXPANDED_KEY, 'true');
       storage.removeItem(REPORT_DOCK_EXPANDED_LOCK_KEY);
       return true;
@@ -39,10 +40,16 @@ function readPinnedExpanded(): boolean {
   } catch {
     return false;
   }
-}
+};
 
-/** Collapsed chip by default; hover or pin expands; VybeKiit chip toggles pin. */
-export function useReportDockCollapse() {
+/**
+ * Manage collapsed, hovered, and pinned Report dock expansion state.
+ *
+ * @returns Dock expansion state and event handlers for hover/pin interactions.
+ * @example
+ * const dock = useReportDockCollapse();
+ */
+export const useReportDockCollapse = () => {
   const [pinnedExpanded, setPinnedExpanded] = useState(false);
   const [dockHovered, setDockHovered] = useState(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -52,13 +59,12 @@ export function useReportDockCollapse() {
   }, []);
 
   const clearHoverTimer = useCallback(() => {
-    if (hoverTimer.current) {
+    if (hoverTimer.current !== null) {
       clearTimeout(hoverTimer.current);
       hoverTimer.current = null;
     }
   }, []);
 
-  // Debounced hover so a grazing cursor or the gap to a sub-menu doesn't flicker the dock.
   const onDockEnter = useCallback(() => {
     clearHoverTimer();
     hoverTimer.current = setTimeout(() => setDockHovered(true), HOVER_OPEN_DELAY_MS);
@@ -79,7 +85,10 @@ export function useReportDockCollapse() {
         setDockHovered(false);
       }
       try {
-        browserStorage()?.setItem(REPORT_DOCK_EXPANDED_KEY, String(next));
+        const storage = resolveBrowserStorage();
+        if (storage !== null) {
+          storage.setItem(REPORT_DOCK_EXPANDED_KEY, String(next));
+        }
       } catch {
         // ignore
       }
@@ -97,4 +106,4 @@ export function useReportDockCollapse() {
     onDockEnter,
     onDockLeave,
   };
-}
+};

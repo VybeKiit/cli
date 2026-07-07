@@ -150,14 +150,12 @@ const EYE_SETS: Record<EyeKind, readonly RigRect[]> = {
 };
 
 /** A tiny pixel heart (two bumps + body + point) as prop accents. */
-function heart(x: number, y: number, cls: string): readonly RigAccent[] {
-  return [
-    { rect: [x, y, 2, 2], fill: HEART, cls },
-    { rect: [x + 3, y, 2, 2], fill: HEART, cls },
-    { rect: [x, y + 2, 5, 2], fill: HEART, cls },
-    { rect: [x + 1, y + 4, 3, 1], fill: HEART, cls },
-  ];
-}
+const heart = (x: number, y: number, cls: string): readonly RigAccent[] => [
+  { rect: [x, y, 2, 2], fill: HEART, cls },
+  { rect: [x + 3, y, 2, 2], fill: HEART, cls },
+  { rect: [x, y + 2, 5, 2], fill: HEART, cls },
+  { rect: [x + 1, y + 4, 3, 1], fill: HEART, cls },
+];
 
 // --- Motion archetypes -------------------------------------------------------
 /**
@@ -168,21 +166,20 @@ function heart(x: number, y: number, cls: string): readonly RigAccent[] {
 type MotionKind = 'static' | 'hop' | 'bob' | 'float' | 'pulse' | 'rock' | 'sway' | 'jitter';
 
 /** Shift each eye rect — keeps the eyes on the face as the torso deforms. */
-function nudgeEyes(eyes: readonly RigRect[], dx: number, dy: number): readonly RigRect[] {
-  return eyes.map((r): RigRect => [r[0] + dx, r[1] + dy, r[2], r[3]]);
-}
+const nudgeEyes = (eyes: readonly RigRect[], dx: number, dy: number): readonly RigRect[] =>
+  eyes.map((r): RigRect => [r[0] + dx, r[1] + dy, r[2], r[3]]);
 
 /** One frame as [tx, ty, body, eyes]; frame ids are assigned by `build`. */
 type FrameSpec = readonly [number, number, readonly RigRect[], readonly RigRect[]];
-function build(
+const build = (
   specs: readonly FrameSpec[],
   loopMs?: number,
-): { frames: readonly RigFrame[]; loopMs?: number } {
+): { frames: readonly RigFrame[]; loopMs?: number } => {
   const frames = specs.map(
     (s, i): RigFrame => ({ id: `k${i}`, tx: s[0], ty: s[1], body: s[2], eyes: s[3] }),
   );
   return loopMs === undefined ? { frames } : { frames, loopMs };
-}
+};
 
 // Body deformations in local space (each frame is translated down by its ty).
 const LEGS_SPLAY: readonly RigRect[] = [
@@ -248,10 +245,10 @@ const BODY_TAP_B: readonly RigRect[] = [TORSO, ...LEGS, [0, 32, 22, 24], [107, 3
 /** Drifting — arms eased slightly outward for a weightless float. */
 const BODY_DRIFT: readonly RigRect[] = [TORSO, ...LEGS, [0, 33, 22, 23], [107, 33, 22, 23]];
 
-function motionFrames(
+const motionFrames = (
   kind: MotionKind,
   eyes: readonly RigRect[],
-): { frames: readonly RigFrame[]; loopMs?: number } {
+): { frames: readonly RigFrame[]; loopMs?: number } => {
   switch (kind) {
     // Excited leap — squash, launch with arms sweeping up, peak, land, settle.
     case 'hop':
@@ -343,7 +340,7 @@ function motionFrames(
         2600,
       );
   }
-}
+};
 
 // --- Prop library ------------------------------------------------------------
 /** A prop cell: [x, y, w, h] (uses the spec tone) or [x, y, w, h, fill]. */
@@ -992,27 +989,49 @@ const PM_CLASS: Record<PMKind, string> = {
   pop: 'octo-rig__accent--pop',
 };
 
-function withDelay(base: string | undefined, suffix: string): string | undefined {
-  return base ? `${base} octo-rig__accent${suffix}` : undefined;
-}
+const withDelay = (base: string | undefined, suffix: string): string | undefined =>
+  base ? `${base} octo-rig__accent${suffix}` : undefined;
 
-function assemble(
+const assemble = (
   cells: readonly Cell[],
   place: Place,
   cls: string | undefined,
   tone: string,
-): RigAccent[] {
+): RigAccent[] => {
   const { ox, oy, s } = place;
   return cells.map((c) => {
     const rect: RigRect = [ox + c[0] * s, oy + c[1] * s, c[2] * s, c[3] * s];
-    const fill = c[4] ?? tone;
+    const fill = c[4] === undefined ? tone : c[4];
     return cls ? { rect, fill, cls } : { rect, fill };
   });
-}
+};
 
-function placeProp(prop: string, pm: PMKind | undefined, tone: string, many: boolean): RigAccent[] {
-  const key = PROP_ALIAS[prop] ?? prop;
-  const cells: readonly Cell[] = PROP_CELLS[key] ?? PROP_CELLS.sparkle ?? [];
+const propKey = (prop: string): string => {
+  const alias = PROP_ALIAS[prop];
+  if (alias !== undefined) {
+    return alias;
+  }
+
+  return prop;
+};
+
+const propCells = (key: string): readonly Cell[] => {
+  const cells = PROP_CELLS[key];
+  if (cells === undefined) {
+    throw new Error(`Unknown rig prop: ${key}`);
+  }
+
+  return cells;
+};
+
+const placeProp = (
+  prop: string,
+  pm: PMKind | undefined,
+  tone: string,
+  many: boolean,
+): RigAccent[] => {
+  const key = propKey(prop);
+  const cells = propCells(key);
   const base = pm ? PM_CLASS[pm] : undefined;
   if (OVER_PROPS.has(key)) {
     return assemble(cells, { ox: 0, oy: BODY_REST_TY, s: 1 }, base, tone);
@@ -1025,7 +1044,7 @@ function placeProp(prop: string, pm: PMKind | undefined, tone: string, many: boo
     ];
   }
   return assemble(cells, SINGLE_PLACE, base, tone);
-}
+};
 
 // --- Pose specs --------------------------------------------------------------
 interface Spec {
@@ -1237,15 +1256,15 @@ const SPECS: Record<string, Spec> = {
   agentswarm: { m: 'jitter', e: 'open', p: 'octo', pm: 'spin', t: 'brand' },
 };
 
-function toneOf(prop: string | undefined, t: ToneKey | undefined): string {
+const toneOf = (prop: string | undefined, t: ToneKey | undefined): string => {
   if (t) {
     return TONE[t];
   }
-  const key = prop ? (PROP_ALIAS[prop] ?? prop) : undefined;
+  const key = prop ? propKey(prop) : undefined;
   return key && PROP_TONE[key] ? TONE[PROP_TONE[key]] : GOLD;
-}
+};
 
-function buildFromSpec(spec: Spec): RigPose {
+const buildFromSpec = (spec: Spec): RigPose => {
   const eyes = EYE_SETS[spec.e];
   const motion = motionFrames(spec.m, eyes);
   const accents = spec.p
@@ -1256,7 +1275,7 @@ function buildFromSpec(spec: Spec): RigPose {
     ...(motion.loopMs === undefined ? {} : { loopMs: motion.loopMs }),
     ...(accents.length > 0 ? { accents } : {}),
   };
-}
+};
 
 // --- Flagship hand-authored poses (kept exactly, zero regression) ------------
 /**
@@ -1454,34 +1473,28 @@ const DANCE_NOTES: readonly RigAccent[] = [
 ];
 
 // --- Debugging — full metamorphosis bug hunt with ambient particles -----------
-function lensDown(x: number, y: number): readonly RigAccent[] {
-  return [
-    { rect: [x + 4, y + 4, 14, 14], fill: CREAM },
-    { rect: [x + 3, y, 16, 4], fill: INK },
-    { rect: [x + 3, y + 18, 16, 4], fill: INK },
-    { rect: [x, y + 3, 4, 16], fill: INK },
-    { rect: [x + 18, y + 3, 4, 16], fill: INK },
-    { rect: [x + 18, y - 4, 4, 6], fill: INK },
-    { rect: [x + 20, y - 9, 5, 6], fill: INK },
-  ];
-}
-function bug(x: number, y: number): readonly RigAccent[] {
-  return [
-    { rect: [x + 2, y, 9, 3], fill: INK },
-    { rect: [x, y + 3, 13, 4], fill: INK },
-    { rect: [x + 5, y, 1, 7], fill: CREAM },
-    { rect: [x + 16, y + 1, 2, 1], fill: INK },
-    { rect: [x + 16, y + 4, 1, 1], fill: CORAL },
-  ];
-}
-function splat(x: number, y: number): readonly RigAccent[] {
-  return [
-    { rect: [x, y, 16, 3], fill: INK },
-    { rect: [x + 3, y - 2, 3, 2], fill: INK },
-    { rect: [x + 9, y - 2, 3, 2], fill: INK },
-    { rect: [x + 6, y - 1, 4, 1], fill: CORAL },
-  ];
-}
+const lensDown = (x: number, y: number): readonly RigAccent[] => [
+  { rect: [x + 4, y + 4, 14, 14], fill: CREAM },
+  { rect: [x + 3, y, 16, 4], fill: INK },
+  { rect: [x + 3, y + 18, 16, 4], fill: INK },
+  { rect: [x, y + 3, 4, 16], fill: INK },
+  { rect: [x + 18, y + 3, 4, 16], fill: INK },
+  { rect: [x + 18, y - 4, 4, 6], fill: INK },
+  { rect: [x + 20, y - 9, 5, 6], fill: INK },
+];
+const bug = (x: number, y: number): readonly RigAccent[] => [
+  { rect: [x + 2, y, 9, 3], fill: INK },
+  { rect: [x, y + 3, 13, 4], fill: INK },
+  { rect: [x + 5, y, 1, 7], fill: CREAM },
+  { rect: [x + 16, y + 1, 2, 1], fill: INK },
+  { rect: [x + 16, y + 4, 1, 1], fill: CORAL },
+];
+const splat = (x: number, y: number): readonly RigAccent[] => [
+  { rect: [x, y, 16, 3], fill: INK },
+  { rect: [x + 3, y - 2, 3, 2], fill: INK },
+  { rect: [x + 9, y - 2, 3, 2], fill: INK },
+  { rect: [x + 6, y - 1, 4, 1], fill: CORAL },
+];
 const DEBUG_CHECK: readonly RigAccent[] = [
   { rect: [94, 34, 4, 4], fill: GREEN },
   { rect: [98, 38, 4, 4], fill: GREEN },
@@ -1744,15 +1757,13 @@ const ROCKET: readonly RigAccent[] = [
   { rect: [44, 94, 6, 10], fill: CORAL },
   { rect: [78, 94, 6, 10], fill: CORAL },
 ];
-function flame(len: number): readonly RigAccent[] {
-  return [
-    { rect: [52, 96, 24, 8], fill: GOLD },
-    { rect: [56, 104, 16, 7], fill: CORAL },
-    ...(len >= 1 ? [{ rect: [58, 111, 12, 10] as RigRect, fill: GOLD }] : []),
-    ...(len >= 2 ? [{ rect: [59, 121, 10, 14] as RigRect, fill: CORAL }] : []),
-    ...(len >= 3 ? [{ rect: [60, 135, 8, 16] as RigRect, fill: GOLD }] : []),
-  ];
-}
+const flame = (len: number): readonly RigAccent[] => [
+  { rect: [52, 96, 24, 8], fill: GOLD },
+  { rect: [56, 104, 16, 7], fill: CORAL },
+  ...(len >= 1 ? [{ rect: [58, 111, 12, 10] as RigRect, fill: GOLD }] : []),
+  ...(len >= 2 ? [{ rect: [59, 121, 10, 14] as RigRect, fill: CORAL }] : []),
+  ...(len >= 3 ? [{ rect: [60, 135, 8, 16] as RigRect, fill: GOLD }] : []),
+];
 /** The Claude octopus body — recognizable silhouette with torso+legs+hands+eyes sitting on rocket */
 const DEPLOY_FRAMES: readonly RigFrame[] = [
   {
@@ -1865,28 +1876,26 @@ const BULB_DIM: readonly RigAccent[] = [
   { rect: [60, 26, 10, 3], fill: INK },
   { rect: [62, 29, 6, 2], fill: INK },
 ];
-function bulbLit(rays: boolean): readonly RigAccent[] {
-  return [
-    { rect: [58, 12, 14, 12], fill: GOLD },
-    { rect: [60, 10, 10, 2], fill: GOLD },
-    { rect: [56, 14, 2, 8], fill: GOLD },
-    { rect: [72, 14, 2, 8], fill: GOLD },
-    { rect: [62, 14, 6, 6], fill: WHITE },
-    { rect: [60, 24, 10, 3], fill: INK },
-    { rect: [62, 27, 6, 2], fill: INK },
-    ...(rays
-      ? (
-          [
-            [63, 0, 3, 7],
-            [46, 4, 5, 3],
-            [43, 15, 6, 3],
-            [79, 4, 5, 3],
-            [81, 15, 6, 3],
-          ] as const
-        ).map((r): RigAccent => ({ rect: r as RigRect, fill: GOLD }))
-      : []),
-  ];
-}
+const bulbLit = (rays: boolean): readonly RigAccent[] => [
+  { rect: [58, 12, 14, 12], fill: GOLD },
+  { rect: [60, 10, 10, 2], fill: GOLD },
+  { rect: [56, 14, 2, 8], fill: GOLD },
+  { rect: [72, 14, 2, 8], fill: GOLD },
+  { rect: [62, 14, 6, 6], fill: WHITE },
+  { rect: [60, 24, 10, 3], fill: INK },
+  { rect: [62, 27, 6, 2], fill: INK },
+  ...(rays
+    ? (
+        [
+          [63, 0, 3, 7],
+          [46, 4, 5, 3],
+          [43, 15, 6, 3],
+          [79, 4, 5, 3],
+          [81, 15, 6, 3],
+        ] as const
+      ).map((r): RigAccent => ({ rect: r as RigRect, fill: GOLD }))
+    : []),
+];
 const EUREKA_FRAMES: readonly RigFrame[] = [
   {
     id: 'think',
@@ -2084,7 +2093,7 @@ const WALK_DUST: readonly RigAccent[] = [
 ];
 
 // --- Weights — powerlifting: setup→deadlift→clean→press→flex (5 frames) -------
-function barbell(y: number): readonly RigAccent[] {
+const barbell = (y: number): readonly RigAccent[] => {
   return [
     { rect: [6, y, 116, 8], fill: INK }, // bar — thick & wide
     { rect: [0, y - 6, 16, 20], fill: INK }, // left plate outer
@@ -2092,7 +2101,7 @@ function barbell(y: number): readonly RigAccent[] {
     { rect: [112, y - 6, 16, 20], fill: INK }, // right plate outer
     { rect: [100, y - 4, 12, 16], fill: CORAL }, // right plate inner
   ];
-}
+};
 const WEIGHTS_FRAMES: readonly RigFrame[] = [
   // Setup: crouching low, hands gripping bar at floor level
   {
@@ -2222,15 +2231,19 @@ const FLAG_CLOTH: readonly RigRect[][] = [
     [106, 10, 8, 12],
   ],
 ];
-function flag(phase: number): readonly RigAccent[] {
-  const cloth = FLAG_CLOTH[phase] ?? FLAG_CLOTH[0] ?? [];
+const flag = (phase: number): readonly RigAccent[] => {
+  const cloth = FLAG_CLOTH[phase];
+  if (cloth === undefined) {
+    throw new Error(`Unknown flag phase: ${phase}`);
+  }
+
   return [
     { rect: [78, 24, 4, 44], fill: INK },
     { rect: [76, 22, 8, 4], fill: GOLD },
     ...cloth.map((r): RigAccent => ({ rect: r as RigRect, fill: CORAL })),
     { rect: [82, 14, 20, 4], fill: WHITE },
   ];
-}
+};
 const FLAG_FRAMES: readonly RigFrame[] = [
   {
     id: 'f-plant',
@@ -2391,7 +2404,7 @@ const ALIVE_PARTICLES: readonly RigAccent[] = [
 ];
 
 // --- Working — typing at keyboard with body bob (5 frames) --------------------
-function keyboard(): readonly RigAccent[] {
+const keyboard = (): readonly RigAccent[] => {
   return [
     { rect: [24, 84, 80, 8], fill: INK }, // keyboard base
     { rect: [28, 82, 8, 4], fill: CREAM }, // key row 1
@@ -2403,7 +2416,7 @@ function keyboard(): readonly RigAccent[] {
     { rect: [18, 72, 92, 10], fill: DIM }, // screen
     { rect: [20, 74, 88, 6], fill: SKY }, // screen glow
   ];
-}
+};
 const WORKING_FRAMES: readonly RigFrame[] = [
   {
     id: 'wk-type1',
@@ -2895,7 +2908,12 @@ const GENERATED: Record<string, RigPose> = Object.fromEntries(
 /** Registry — flagship hand poses win over generated ones on id collision. */
 export const RIG_POSES: Readonly<Record<string, RigPose>> = { ...GENERATED, ...HAND_POSES };
 
-/** Resolve a pose to its rig entry, or `undefined` when not yet migrated. */
-export function getRigPose(pose: string): RigPose | undefined {
-  return RIG_POSES[pose];
-}
+/**
+ * Resolve a pose to its integer-grid rig entry.
+ *
+ * @param pose - Pose id to resolve.
+ * @returns Rig pose, or undefined when the pose has not migrated to the rig.
+ * @example
+ * getRigPose('celebrating');
+ */
+export const getRigPose = (pose: string): RigPose | undefined => RIG_POSES[pose];

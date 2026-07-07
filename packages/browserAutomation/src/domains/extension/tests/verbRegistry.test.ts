@@ -3,7 +3,7 @@ import {
   CWS_AUTOMATION_READ_VERBS,
   CWS_AUTOMATION_VERBS,
   CWS_DESTRUCTIVE_VERB_PATTERN,
-} from '@vybekiit/browserAutomation/domains/extension/verbRegistry';
+} from '@vybekiit/browser-automation/domains/extension/verbRegistry';
 import { describe, expect, it } from 'vitest';
 
 describe('CWS automation verb registry', () => {

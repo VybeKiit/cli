@@ -1,6 +1,6 @@
 {
   "root": false,
-  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
@@ -24,7 +24,14 @@
       "!!**/src/components/ui/input-group.tsx",
       "!!**/src/components/cult",
       "!!**/src/components/tailark",
-      "!!**/src/components/blocks-so"
+      "!!**/src/components/blocks-so",
+      "!!**/src/components/coss",
+      "!!**/src/components/evilcharts",
+      "!!**/src/components/prompt-kit",
+      "!!**/src/components/supabase",
+      "!!**/src/registry",
+      "!!**/public/catalog.json",
+      "!!**/public/logos"
     ]
   },
   "formatter": {
@@ -123,5 +130,94 @@
       "test": "all",
       "project": "all"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/index.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off",
+            "noReExportAll": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["app/**/*.tsx", "e2e/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["scripts/safety-*.mjs"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "useTopLevelRegex": "off"
+          },
+          "security": {
+            "noSecrets": "off"
+          },
+          "style": {
+            "noExcessiveLinesPerFile": "off",
+            "useExportsLast": "off"
+          },
+          "suspicious": {
+            "noUnnecessaryConditions": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/components/builder-assistant-mark/**/*"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off"
+          },
+          "correctness": {
+            "useUniqueElementIds": "off"
+          },
+          "performance": {
+            "noBarrelFile": "off"
+          },
+          "security": {
+            "noSecrets": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off",
+            "noExcessiveLinesPerFile": "off",
+            "useExportsLast": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/components/report-mode/**/*"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noNoninteractiveElementInteractions": "off",
+            "noStaticElementInteractions": "off"
+          },
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off"
+          },
+          "performance": {
+            "noJsxPropsBind": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off",
+            "noExcessiveLinesPerFile": "off",
+            "useExportsLast": "off"
+          }
+        }
+      }
+    }
+  ]
 }

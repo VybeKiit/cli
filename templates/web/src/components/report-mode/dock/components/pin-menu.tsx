@@ -18,14 +18,21 @@ import {
 } from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
 
-type ReportPinMenuProps = {
+interface ReportPinMenuProps {
   readonly anchor: ReportDockAnchor;
   readonly onSelect: (corner: Exclude<ReportDockAnchor, 'custom'>) => void;
   readonly tutorialActive?: boolean;
-};
+}
 
-/** Pin control — hover to reveal corners, hold 2s on a corner to snap the dock. */
-export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: ReportPinMenuProps) {
+/**
+ * Render the pin-position menu for snapping the dock to a corner.
+ *
+ * @param props - Current anchor, selection callback, and tutorial state.
+ * @returns Corner picker trigger and flyout.
+ * @example
+ * <ReportPinMenu anchor="bottom-right" onSelect={setCorner} />
+ */
+const ReportPinMenu = ({ anchor, onSelect, tutorialActive = false }: ReportPinMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
@@ -100,4 +107,6 @@ export function ReportPinMenu({ anchor, onSelect, tutorialActive = false }: Repo
       </ReportFlyoutPortal>
     </div>
   );
-}
+};
+
+export { ReportPinMenu };

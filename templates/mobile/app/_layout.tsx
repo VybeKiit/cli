@@ -19,10 +19,13 @@ const SCREEN_TITLES = {
 } as const;
 
 /**
- * Root layout — initializes i18n from the device locale, applies RTL when needed,
- * and sets translated stack titles.
+ * Render the Expo Router root layout.
+ *
+ * @returns Root provider and stack layout for the mobile app.
+ * @example
+ * <RootLayout />
  */
-export default function RootLayout() {
+const RootLayout = () => {
   const { colors, scheme } = useTheme();
   const [, setLocaleReady] = useState(false);
 
@@ -54,4 +57,6 @@ export default function RootLayout() {
       </ClientStateProvider>
     </SafeAreaProvider>
   );
-}
+};
+
+export default RootLayout;

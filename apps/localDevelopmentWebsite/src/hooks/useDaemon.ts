@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useChatStore, useWorkflowStore } from '@/stores';
+import { useWorkflowStore } from '@/stores';
 
 type DaemonStatus = 'connecting' | 'connected' | 'disconnected';
 
@@ -30,7 +30,7 @@ const STEP_KEYWORDS: Record<string, string> = {
   'go live': 'deploy',
 };
 
-function detectStepFromOutput(chunk: string): string | null {
+const detectStepFromOutput = (chunk: string): string | null => {
   const lower = chunk.toLowerCase();
   for (const [keyword, stepId] of Object.entries(STEP_KEYWORDS)) {
     if (lower.includes(keyword)) {
@@ -38,7 +38,7 @@ function detectStepFromOutput(chunk: string): string | null {
     }
   }
   return null;
-}
+};
 
 type DaemonMessage =
   | { type: 'agent.output'; sessionId: string; chunk: string }
@@ -50,11 +50,17 @@ type DaemonMessage =
  * WebSocket client to the local daemon. Wires real agent output to the chat
  * store and workflow store so steps advance from actual agent activity.
  */
+/**
+ * Read daemon state.
+ *
+ * @returns The state and actions exposed by useDaemon.
+ * @example
+ * const value = useDaemon();
+ */
 export const useDaemon = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<DaemonStatus>('disconnected');
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const addMessage = useChatStore((s) => s.addMessage);
   const markStepRunning = useWorkflowStore((s) => s.markStepRunning);
   const markStepDone = useWorkflowStore((s) => s.markStepDone);
   const setRunning = useWorkflowStore((s) => s.setRunning);
@@ -110,7 +116,7 @@ export const useDaemon = () => {
           break;
         }
         case 'error': {
-          console.error('[daemon]', msg.message);
+          setStatus('disconnected');
           break;
         }
       }
@@ -139,13 +145,10 @@ export const useDaemon = () => {
     };
   }, [connect]);
 
-  const spawn = useCallback(
-    (agent: string) => {
-      lastStepRef.current = null;
-      wsRef.current?.send(JSON.stringify({ type: 'agent.spawn', agent }));
-    },
-    [],
-  );
+  const spawn = useCallback((agent: string) => {
+    lastStepRef.current = null;
+    wsRef.current?.send(JSON.stringify({ type: 'agent.spawn', agent }));
+  }, []);
 
   const sendMessage = useCallback(
     (content: string) => {

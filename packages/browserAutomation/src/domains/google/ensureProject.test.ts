@@ -9,20 +9,21 @@ vi.mock('node:child_process', () => ({
   spawn: spawnMock,
 }));
 
-import { ensureProject } from '@vybekiit/browserAutomation/domains/google/ensureProject';
+import { ensureProject } from '@vybekiit/browser-automation/domains/google/ensureProject';
 
 const silentLog = { log: vi.fn(), warn: vi.fn() };
 
 /** Queue of exit codes, one per spawn call in order (describe, then create). */
-function mockExitCodes(codes: number[]): void {
+const mockExitCodes = (codes: number[]): void => {
   let call = 0;
   spawnMock.mockImplementation(() => {
-    const code = codes[call++] ?? 0;
+    const next = codes[call++];
+    const code = next === undefined ? 0 : next;
     const child = new EventEmitter();
     queueMicrotask(() => child.emit('close', code));
     return child;
   });
-}
+};
 
 beforeEach(() => {
   spawnMock.mockReset();

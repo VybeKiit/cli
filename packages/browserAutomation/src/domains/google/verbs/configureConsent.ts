@@ -2,41 +2,46 @@ import {
   pacedDispatchClick,
   pacedFill,
   resolvePaceMs,
-} from '@vybekiit/browserAutomation/core/pace';
-import { waitForGoogleAuthenticated } from '@vybekiit/browserAutomation/domains/google/dashboard/waitForAuthenticated';
+} from '@vybekiit/browser-automation/core/pace';
+import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { waitForGoogleAuthenticated } from '@vybekiit/browser-automation/domains/google/dashboard/waitForAuthenticated';
 import {
   DEFAULT_OAUTH_SCOPES,
   type GoogleOAuthParams,
-} from '@vybekiit/browserAutomation/domains/google/types';
+} from '@vybekiit/browser-automation/domains/google/types';
 import {
   audienceUrl,
   consentCreateUrl,
   consentUrl,
   dataAccessUrl,
-} from '@vybekiit/browserAutomation/domains/google/urls';
+} from '@vybekiit/browser-automation/domains/google/urls';
 import type { BrowserContext, Locator, Page } from 'playwright';
 
 /** Resolve the consent-screen home/privacy/terms links, defaulting privacy/terms off the app URL. */
-function resolveAppDomain(params: GoogleOAuthParams): {
+const resolveAppDomain = (
+  params: GoogleOAuthParams,
+): {
   homepage: string;
   privacy: string;
   terms: string;
-} {
+} => {
   const base = params.appUrl.replace(/\/$/, '');
+  const privacy = params.privacyUrl === undefined ? `${base}/privacy` : params.privacyUrl;
+  const terms = params.termsUrl === undefined ? `${base}/terms` : params.termsUrl;
   return {
     homepage: params.appUrl,
-    privacy: params.privacyUrl ?? `${base}/privacy`,
-    terms: params.termsUrl ?? `${base}/terms`,
+    privacy,
+    terms,
   };
-}
+};
 
 /** First locator with a match, or null if none are present (blind-DOM fallback chain). */
-async function firstPresent(locators: Locator[]): Promise<Locator | null> {
+const firstPresent = async (locators: Locator[]): Promise<Locator | null> => {
   for (const locator of locators) {
     if ((await locator.count()) > 0) return locator.first();
   }
   return null;
-}
+};
 
 /**
  * True when the "Google Auth Platform" is already configured for this project.
@@ -47,7 +52,7 @@ async function firstPresent(locators: Locator[]): Promise<Locator | null> {
  * concluding the project is unconfigured — otherwise a slow render is misread as first-run and
  * the wizard is wrongly re-entered.
  */
-async function isConsentAlreadyConfigured(page: Page): Promise<boolean> {
+const isConsentAlreadyConfigured = async (page: Page): Promise<boolean> => {
   const signal = page
     .locator('input[formcontrolname="displayName"]')
     .or(page.getByText(/publishing status/i));
@@ -57,20 +62,20 @@ async function isConsentAlreadyConfigured(page: Page): Promise<boolean> {
   } catch {
     return false;
   }
-}
+};
 
 /** Pick a value from a `cfc-select` combobox by its visible option text. */
-async function selectOption(page: Page, control: Locator, optionText: string): Promise<boolean> {
+const selectOption = async (page: Page, control: Locator, optionText: string): Promise<boolean> => {
   if ((await control.count()) === 0) return false;
   await pacedDispatchClick(control.first());
   const option = page.getByRole('option', { name: optionText, exact: true });
   if ((await option.count()) === 0) return false;
   await pacedDispatchClick(option.first());
   return true;
-}
+};
 
 /** Advance the create wizard one step (Next/Create), returning false when no control remains. */
-async function advanceWizard(page: Page): Promise<boolean> {
+const advanceWizard = async (page: Page): Promise<boolean> => {
   const advance = await firstPresent([
     page.getByRole('button', { name: /^next$/i }),
     page.getByRole('button', { name: /^create$/i }),
@@ -79,28 +84,28 @@ async function advanceWizard(page: Page): Promise<boolean> {
   await pacedDispatchClick(advance);
   await page.waitForTimeout(resolvePaceMs());
   return true;
-}
+};
 
 /**
- * Configure the OAuth consent screen on the redesigned Google Auth Platform, end to end, so a
- * builder gets a working "Sign in with Google" in one shot. Idempotent on the branding basics:
- * if the app already exists it skips the first-run wizard and only (re)applies logo/domain. It
- * always then registers scopes, sets the app-domain links, uploads the logo, and — when
- * `params.publish` — moves the app from Testing to Production.
+ * Configure the OAuth consent screen on the redesigned Google Auth Platform, end to end, so a builder gets a working "Sign in with Google" in one shot. Idempotent on the branding basics: if the app already exists it skips the first-run wizard and only (re)applies logo/domain. It always then registers scopes, sets the app-domain links, uploads the logo, and — when `params.publish` — moves the app from Testing to Production.
  *
- * The Console floats an overlay that eats real pointer clicks, so every click goes through
- * `pacedDispatchClick` (a dispatched DOM event) while text/file inputs use fill/setInputFiles.
- * The default scopes (`openid email profile`) are non-sensitive, so Production needs no review;
- * the one thing that can trigger Google review is brand verification of an uploaded logo.
+ * @param page - Playwright page to inspect or mutate.
+ * @param params - Validated automation parameters for the operation.
+ * @param context - Browser context used for authenticated waits.
+ * @param log - Input value for log.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await configureConsent(page, params, context, log);
  */
-export async function configureConsent(
+export const configureConsent = async (
   page: Page,
   params: GoogleOAuthParams,
   context?: BrowserContext,
-  log: Pick<Console, 'log' | 'warn'> = console,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+): Promise<void> => {
   await page.goto(consentUrl(params.projectId), { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  page = await waitForGoogleAuthenticated(page, log, context ?? page.context());
+  const browserContext = context === undefined ? page.context() : context;
+  page = await waitForGoogleAuthenticated(page, log, browserContext);
 
   if (await isConsentAlreadyConfigured(page)) {
     log.log('[google] consent screen already configured — updating branding/scopes');
@@ -112,14 +117,14 @@ export async function configureConsent(
   if (params.logoPath) await uploadLogoForProject(page, params, log);
   await registerScopes(page, params, log);
   if (params.publish) await publishApp(page, params, log);
-}
+};
 
 /** Drive the first-run consent wizard: App Information → Audience → Contact → Finish. */
-async function runFirstRunWizard(
+const runFirstRunWizard = async (
   page: Page,
   params: GoogleOAuthParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
   await page.goto(consentCreateUrl(params.projectId), {
     waitUntil: 'domcontentloaded',
     timeout: 60_000,
@@ -165,18 +170,18 @@ async function runFirstRunWizard(
   if (create) await pacedDispatchClick(create);
   await page.waitForTimeout(resolvePaceMs());
   log.log('[google] consent screen configured');
-}
+};
 
 /**
  * Fill the "App domain" links (home page, privacy policy, terms of service) on the branding page.
  * Google shows these to users on the consent screen and requires the home page's host to be an
  * authorized domain — filling the home page URL registers that domain automatically.
  */
-async function setAppDomain(
+const setAppDomain = async (
   page: Page,
   params: GoogleOAuthParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
   const { homepage, privacy, terms } = resolveAppDomain(params);
   await page.goto(consentUrl(params.projectId), { waitUntil: 'domcontentloaded', timeout: 60_000 });
 
@@ -205,7 +210,7 @@ async function setAppDomain(
   const save = await firstPresent([page.getByRole('button', { name: /^save$/i })]);
   if (save) await pacedDispatchClick(save);
   log.log('[google] app-domain links set (home/privacy/terms)');
-}
+};
 
 /**
  * Register the OAuth scopes on the Data Access page so they appear on the consent screen.
@@ -215,12 +220,12 @@ async function setAppDomain(
  * identifiers comma-separated, add them to the table, and save. A missing control is warned, not
  * fatal — sign-in still works on Google's implicit defaults.
  */
-async function registerScopes(
+const registerScopes = async (
   page: Page,
   params: GoogleOAuthParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
-  const scopes = params.scopes ?? DEFAULT_OAUTH_SCOPES;
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
+  const scopes = params.scopes === undefined ? DEFAULT_OAUTH_SCOPES : params.scopes;
   await page.goto(dataAccessUrl(params.projectId), {
     waitUntil: 'domcontentloaded',
     timeout: 60_000,
@@ -264,18 +269,18 @@ async function registerScopes(
   if (save) await pacedDispatchClick(save);
   await page.waitForTimeout(resolvePaceMs());
   log.log(`[google] registered scopes: ${scopes.join(' ')}`);
-}
+};
 
 /**
  * Publish the app to Production (Audience page → "Publish app" → confirm). For non-sensitive
  * scopes this is instant with no review queue; any Google user can then sign in rather than only
  * test users. A no-op (with a log) if the app is already in production.
  */
-async function publishApp(
+const publishApp = async (
   page: Page,
   params: GoogleOAuthParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
   await page.goto(audienceUrl(params.projectId), {
     waitUntil: 'domcontentloaded',
     timeout: 60_000,
@@ -310,14 +315,14 @@ async function publishApp(
   if (confirm) await pacedDispatchClick(confirm);
   await page.waitForTimeout(resolvePaceMs());
   log.log('[google] app published to production');
-}
+};
 
 /** Navigate to this project's branding page and upload the logo (project-scoped URL). */
-async function uploadLogoForProject(
+const uploadLogoForProject = async (
   page: Page,
   params: GoogleOAuthParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<void> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<void> => {
   if (!params.logoPath) return;
   await page.goto(consentUrl(params.projectId), { waitUntil: 'domcontentloaded', timeout: 60_000 });
   await page.waitForTimeout(resolvePaceMs());
@@ -331,4 +336,4 @@ async function uploadLogoForProject(
   const save = await firstPresent([page.getByRole('button', { name: /^save$/i })]);
   if (save) await pacedDispatchClick(save);
   log.log('[google] consent-screen logo uploaded');
-}
+};

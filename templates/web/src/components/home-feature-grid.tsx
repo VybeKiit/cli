@@ -18,8 +18,12 @@ const FEATURE_ICONS: Record<HomeFeatureIcon, ComponentType<{ className?: string 
 
 /**
  * Landing feature grid with builder-voice intro tooltips (mount + hover).
+ *
+ * @returns Localized feature cards for the marketing home page.
+ * @example
+ * <HomeFeatureGrid />
  */
-export function HomeFeatureGrid() {
+const HomeFeatureGrid = () => {
   const t = useTranslations();
 
   return (
@@ -49,7 +53,7 @@ export function HomeFeatureGrid() {
                 </div>
                 <CardTitle className="text-base">{t(feature.titleKey)}</CardTitle>
                 {feature.techLabelKey ? (
-                  <p className="font-medium text-primary/80 text-xs tracking-wide uppercase">
+                  <p className="font-medium text-primary/80 text-xs uppercase tracking-wide">
                     {t(feature.techLabelKey)}
                   </p>
                 ) : null}
@@ -61,4 +65,6 @@ export function HomeFeatureGrid() {
       </section>
     </TooltipProvider>
   );
-}
+};
+
+export { HomeFeatureGrid };

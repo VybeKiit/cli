@@ -1,28 +1,31 @@
-import { useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
-import Label from "../form/Label";
-import Input from "../form/input/InputField";
-import Checkbox from "../form/input/Checkbox";
-import Button from "../tailadmin-ui/button/Button";
-import { useAsync } from "../../hooks/useAsync";
-import { signInWithPassword } from "../../lib/authClient";
+import { Either } from 'effect';
+import { useNavigate } from '@tanstack/react-router';
+import { useState, type FormEvent } from 'react';
+import { Link } from '@tanstack/react-router';
+import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '../../icons';
+import Label from '../form/Label';
+import Input from '../form/input/InputField';
+import Checkbox from '../form/input/Checkbox';
+import Button from '../tailadmin-ui/button/Button';
+import { useAsync } from '../../hooks/useAsync';
+import { signInWithPassword } from '../../lib/authClient';
 
-export default function SignInForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const SignInForm = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const { loading: pending, error, run: signIn } = useAsync(signInWithPassword);
   const navigate = useNavigate();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const result = await signIn(email, password);
-    if (!result.ok) return;
-    navigate({ to: "/" });
-  }
+    if (Either.isLeft(result)) {
+      return;
+    }
+    navigate({ to: '/' });
+  };
 
   return (
     <div className="flex flex-col flex-1">
@@ -96,7 +99,7 @@ export default function SignInForm() {
             </div>
             <div className="relative py-3 sm:py-5">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-800" />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
@@ -113,7 +116,7 @@ export default function SignInForm() {
                 ) : null}
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{" "}
+                    Email <span className="text-error-500">*</span>{' '}
                   </Label>
                   <Input
                     placeholder="info@gmail.com"
@@ -123,11 +126,11 @@ export default function SignInForm() {
                 </div>
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>{" "}
+                    Password <span className="text-error-500">*</span>{' '}
                   </Label>
                   <div className="relative">
                     <Input
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
@@ -160,7 +163,7 @@ export default function SignInForm() {
                 </div>
                 <div>
                   <Button className="w-full" size="sm" type="submit" disabled={pending}>
-                    {pending ? "Signing in…" : "Sign in"}
+                    {pending ? 'Signing in…' : 'Sign in'}
                   </Button>
                 </div>
               </div>
@@ -168,7 +171,7 @@ export default function SignInForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account? {""}
+                Don&apos;t have an account? {''}
                 <Link
                   to="/signup"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
@@ -182,4 +185,6 @@ export default function SignInForm() {
       </div>
     </div>
   );
-}
+};
+
+export default SignInForm;

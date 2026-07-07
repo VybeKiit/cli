@@ -1,6 +1,7 @@
+// biome-ignore-all lint/suspicious/noUnnecessaryConditions: Biome misreads the SelectorEntry discriminated union.
+import type { SelectorEntry } from '@vybekiit/browser-automation/core/selectors';
 import type { Locator, Page } from 'playwright';
-
-import { resolveSelectorEntry, type SelectorEntry } from './selectors';
+import { resolveSelectorEntry } from './selectors';
 
 /**
  * Build a Playwright `Locator` for a named field by looking up its entry in
@@ -13,17 +14,28 @@ import { resolveSelectorEntry, type SelectorEntry } from './selectors';
  *
  * @throws {SelectorMissingError} if the field has no fresh selector entry
  *   (delegated through `resolveSelectorEntry`).
+ * @param page - Playwright page containing the CWS form.
+ * @param fieldKey - Selector inventory field key.
+ * @returns Locator for the requested field.
+ * @example
+ * const locator = fieldLocator(page, 'actions.publishButton');
  */
-export function fieldLocator(page: Page, fieldKey: string): Locator {
+export const fieldLocator = (page: Page, fieldKey: string): Locator => {
   const entry = resolveSelectorEntry(fieldKey);
   return locatorFor(page, entry);
-}
+};
 
 /**
  * Apply one selector entry to a page. `fieldLocator` is the only caller —
  * kept as a separate function so the `kind`-switch lives next to the type.
+ *
+ * @param page - Playwright page containing the CWS form.
+ * @param entry - Fresh selector entry.
+ * @returns Locator built from the selector entry.
+ * @example
+ * const locator = locatorFor(page, entry);
  */
-function locatorFor(page: Page, entry: SelectorEntry): Locator {
+const locatorFor = (page: Page, entry: SelectorEntry): Locator => {
   switch (entry.kind) {
     case 'css':
       return page.locator(entry.selector);
@@ -33,5 +45,9 @@ function locatorFor(page: Page, entry: SelectorEntry): Locator {
       return page.getByPlaceholder(entry.text);
     case 'role':
       return page.getByRole(entry.role as Parameters<Page['getByRole']>[0], { name: entry.name });
+    default: {
+      const exhaustive: never = entry;
+      return exhaustive;
+    }
   }
-}
+};

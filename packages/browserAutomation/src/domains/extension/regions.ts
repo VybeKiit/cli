@@ -159,10 +159,19 @@ export const CWS_ALL_REGIONS = {
   Zimbabwe: true,
 } satisfies CwsListing['distribution']['regions'];
 
-/** Checks whether a listing region map is the canonical all-regions selection. */
-export function isCwsAllRegions(regions: CwsListing['distribution']['regions']): boolean {
+/**
+ * Check whether a listing region map is the canonical all-regions selection.
+ *
+ * @param regions - CWS listing region map to compare.
+ * @returns True when every canonical region is enabled and no extra region exists.
+ * @example
+ * const allRegions = isCwsAllRegions(CWS_ALL_REGIONS);
+ */
+export const isCwsAllRegions = (regions: CwsListing['distribution']['regions']): boolean => {
   const entries = Object.entries(CWS_ALL_REGIONS);
-  if (Object.keys(regions).length !== entries.length) return false;
+  if (Object.keys(regions).length !== entries.length) {
+    return false;
+  }
 
   return entries.every(([region, isEnabled]) => regions[region] === isEnabled);
-}
+};

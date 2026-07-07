@@ -9,13 +9,22 @@ import {
 } from '@vybekiit/report-mode';
 import { toast } from 'sonner';
 
-/** Copy prompt and optionally open assistant deeplink (new chat only). */
-export async function submitReportHandoff(options: {
+interface SubmitReportHandoffOptions {
   readonly payload: ReportPayload;
   readonly assistant: VybeAssistant | null;
   readonly projectRoot: string;
   readonly target: ReportHandoffTarget;
-}): Promise<void> {
+}
+
+/**
+ * Copy a report prompt and optionally open an assistant deep link.
+ *
+ * @param options - Report payload, assistant selection, project root, and target chat mode.
+ * @returns A promise that resolves after copy/deeplink handling finishes.
+ * @example
+ * await submitReportHandoff({ payload, assistant, projectRoot, target: 'new-chat' });
+ */
+const submitReportHandoff = async (options: SubmitReportHandoffOptions): Promise<void> => {
   const prompt = formatReportPrompt(options.payload);
   const openNewChat = options.target === 'new-chat' && options.assistant !== null;
 
@@ -38,4 +47,6 @@ export async function submitReportHandoff(options: {
   }
 
   toast.success('Copied — paste into your assistant.');
-}
+};
+
+export { submitReportHandoff };

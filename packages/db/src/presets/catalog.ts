@@ -46,18 +46,64 @@ export const PRESET_TABLE_NAMES: ReadonlySet<string> = new Set(
   ALL_PRESETS.flatMap((preset) => preset.entities.map((entity) => entity.name)),
 );
 
-/** Lookup a preset by id; returns undefined when unknown. */
-export function getPreset(presetId: string): PresetManifest | undefined {
-  return PRESET_CATALOG[presetId];
-}
+/**
+ * Lookup a preset by id.
+ *
+ * @param presetId - Preset id from the catalog or user input.
+ * @returns The matching manifest, or `undefined` when the id is unknown.
+ * @example
+ * const preset = getPreset('orders');
+ */
+export const getPreset = (presetId: string): PresetManifest | undefined => PRESET_CATALOG[presetId];
 
-/** Presets triggered by a buyer goal skill name. */
-export function presetsForSkill(skillName: string): readonly PresetManifest[] {
-  return ALL_PRESETS.filter((preset) => preset.skills.includes(skillName));
-}
+/**
+ * Resolve presets triggered by a buyer goal skill name.
+ *
+ * @param skillName - Buyer-facing skill name.
+ * @returns Matching preset manifests in catalog order.
+ * @example
+ * const presets = presetsForSkill('take-payments');
+ */
+export const presetsForSkill = (skillName: string): readonly PresetManifest[] =>
+  ALL_PRESETS.filter((preset) => preset.skills.includes(skillName));
 
-/** Presets expected when payment env is configured. */
-export function expectedPresetsFromEnv(env: NodeJS.ProcessEnv): readonly PresetManifest[] {
+/**
+ * Alias for {@link presetsForSkill} kept for CLI readability.
+ *
+ * @param skillName - Buyer-facing skill name.
+ * @returns Matching preset manifests in catalog order.
+ * @example
+ * const presets = listPresetsForSkill('take-payments');
+ */
+export const listPresetsForSkill = (skillName: string): readonly PresetManifest[] =>
+  presetsForSkill(skillName);
+
+/**
+ * Resolve a required built-in preset or fail as a programmer error.
+ *
+ * @param presetId - Known preset id hardcoded by the kit.
+ * @returns The matching preset manifest.
+ * @throws When the static catalog is missing the expected preset id.
+ * @example
+ * const orders = requireCatalogPreset('orders');
+ */
+const requireCatalogPreset = (presetId: string): PresetManifest => {
+  const preset = PRESET_CATALOG[presetId];
+  if (preset === undefined) {
+    throw new Error(`Preset catalog is missing required preset "${presetId}".`);
+  }
+  return preset;
+};
+
+/**
+ * Resolve presets expected from configured env features.
+ *
+ * @param env - Process environment used by maintainer verification.
+ * @returns Presets that should be present for the configured feature set.
+ * @example
+ * const expected = expectedPresetsFromEnv(process.env);
+ */
+export const expectedPresetsFromEnv = (env: NodeJS.ProcessEnv): readonly PresetManifest[] => {
   const expected = new Set<PresetManifest>();
   const hasPayments =
     Boolean(env.LEMONSQUEEZY_API_KEY) ||
@@ -65,13 +111,11 @@ export function expectedPresetsFromEnv(env: NodeJS.ProcessEnv): readonly PresetM
     Boolean(env.PAYPAL_CLIENT_ID);
   if (hasPayments) {
     for (const id of ['orders', 'webhook_events'] as const) {
-      const preset = PRESET_CATALOG[id];
-      if (preset) expected.add(preset);
+      expected.add(requireCatalogPreset(id));
     }
   }
   if (env.TENANCY_PROVIDER === 'better-auth' || env.DATA_PROVIDER) {
-    const org = PRESET_CATALOG.organizations;
-    if (org) expected.add(org);
+    expected.add(requireCatalogPreset('organizations'));
   }
   return [...expected];
-}
+};

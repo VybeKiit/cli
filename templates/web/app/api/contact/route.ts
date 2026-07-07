@@ -13,10 +13,14 @@ const contactSchema = Schema.Struct({
 const decodeContact = Schema.decodeUnknownEither(contactSchema);
 
 /**
- * Public contact form — lenient rate-limit tier (`public-form`), not auth-strict.
- * The agent wires email delivery via `setup-email`; until then this accepts and logs.
+ * Handle public contact form submissions.
+ *
+ * @param request - Incoming contact form request.
+ * @returns JSON response that accepts valid contact form payloads.
+ * @example
+ * const response = await POST(request);
  */
-export async function POST(request: Request): Promise<NextResponse> {
+export const POST = async (request: Request): Promise<NextResponse> => {
   let body: unknown;
   try {
     body = await request.json();
@@ -34,4 +38,4 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // TODO(vybekiit): forward to email provider — skill: setup-email
   return NextResponse.json({ ok: true });
-}
+};

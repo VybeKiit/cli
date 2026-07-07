@@ -21,18 +21,21 @@ const HANDOFF_OPTION_TOOLTIPS: Record<ReportHandoffTarget, string> = {
   'new-chat': REPORT_DOCK_TOOLTIPS.handoffNewChat,
 };
 
-type ReportHandoffMenuProps = {
+interface ReportHandoffMenuProps {
   readonly value: ReportHandoffTarget;
   readonly onChange: (target: ReportHandoffTarget) => void;
   readonly tutorialActive?: boolean;
-};
+}
 
-/** Hover menu — hold 2s on an option to lock chat handoff target. */
-export function ReportHandoffMenu({
-  value,
-  onChange,
-  tutorialActive = false,
-}: ReportHandoffMenuProps) {
+/**
+ * Render the chat handoff target menu.
+ *
+ * @param props - Current handoff value, change callback, and tutorial state.
+ * @returns Handoff trigger and hold-to-select flyout.
+ * @example
+ * <ReportHandoffMenu value="current-chat" onChange={setHandoff} />
+ */
+const ReportHandoffMenu = ({ value, onChange, tutorialActive = false }: ReportHandoffMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
@@ -123,4 +126,6 @@ export function ReportHandoffMenu({
       </ReportFlyoutPortal>
     </div>
   );
-}
+};
+
+export { ReportHandoffMenu };

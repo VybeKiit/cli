@@ -10,22 +10,32 @@ const NAV_ITEMS = [
   { href: '/admin/billing', label: 'Billing', icon: '💳' },
   { href: '/admin/teams', label: 'Teams', icon: '🏢' },
 ] as const;
+// strips locale prefixes like "/en" and "/en-US" before admin nav matching
+const LOCALE_PREFIX_PATTERN = /^\/[a-z]{2}(-[A-Z]{2})?/;
 
 interface AdminShellProps {
-  children: ReactNode;
+  readonly children?: ReactNode;
 }
 
-export function AdminShell({ children }: AdminShellProps) {
+/**
+ * Render the admin sidebar and content shell.
+ *
+ * @param props - Admin page content.
+ * @returns A two-column admin layout with active navigation.
+ * @example
+ * <AdminShell><AdminDashboard /></AdminShell>
+ */
+export const AdminShell = ({ children = null }: AdminShellProps) => {
   const pathname = usePathname();
   // Strip locale prefix for path matching
-  const path = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '');
+  const path = pathname.replace(LOCALE_PREFIX_PATTERN, '');
 
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <aside className="flex w-64 flex-col border-r bg-card">
         <div className="flex h-14 items-center border-b px-4">
-          <h1 className="text-lg font-semibold">Admin Panel</h1>
+          <h1 className="font-semibold text-lg">Admin Panel</h1>
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {NAV_ITEMS.map((item) => {
@@ -50,7 +60,7 @@ export function AdminShell({ children }: AdminShellProps) {
         <div className="border-t p-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
           >
             ← Back to Dashboard
           </Link>
@@ -63,4 +73,4 @@ export function AdminShell({ children }: AdminShellProps) {
       </main>
     </div>
   );
-}
+};

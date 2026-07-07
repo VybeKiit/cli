@@ -2,7 +2,15 @@ import type { Page } from 'playwright';
 
 import { isGdAuthenticatedUrl } from './authUrl';
 
-export async function isGdAuthGateDom(page: Page): Promise<boolean> {
+/**
+ * Is Gd Auth Gate Dom.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @returns Whether the inspected value matches the expected state.
+ * @example
+ * const result = await isGdAuthGateDom(page);
+ */
+export const isGdAuthGateDom = async (page: Page): Promise<boolean> => {
   const url = page.url();
   if (/sso\.godaddy\.com/i.test(url)) return true;
 
@@ -12,9 +20,17 @@ export async function isGdAuthGateDom(page: Page): Promise<boolean> {
     return true;
   }
   return (await signIn.count()) > 0 && (await signIn.isVisible().catch(() => false));
-}
+};
 
-export async function isGdAuthenticatedDom(page: Page): Promise<boolean> {
+/**
+ * Is Gd Authenticated Dom.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @returns Whether the inspected value matches the expected state.
+ * @example
+ * const result = await isGdAuthenticatedDom(page);
+ */
+export const isGdAuthenticatedDom = async (page: Page): Promise<boolean> => {
   if (!page.url().includes('godaddy.com')) return false;
   if (await isGdAuthGateDom(page)) return false;
 
@@ -27,4 +43,4 @@ export async function isGdAuthenticatedDom(page: Page): Promise<boolean> {
   }
 
   return false;
-}
+};

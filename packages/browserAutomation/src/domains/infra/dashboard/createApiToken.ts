@@ -1,4 +1,4 @@
-import { CLOUDFLARE_DASHBOARD_URL } from '@vybekiit/browserAutomation/core/constants';
+import { CLOUDFLARE_DASHBOARD_URL } from '@vybekiit/browser-automation/core/constants';
 import type { Page } from 'playwright';
 import { scrapeCfAccountIdFromUrl, scrapeCfTokenFromHtml } from './scrape';
 
@@ -16,7 +16,7 @@ const DASH_ORIGIN = CLOUDFLARE_DASHBOARD_URL;
  * Kept as a string-body `page.evaluate` (not a typed import) because it touches the live
  * Cloudflare DOM (`role="checkbox"` Kumo controls) which has no types on our side.
  */
-async function selectAllPermissions(page: Page): Promise<number> {
+const selectAllPermissions = async (page: Page): Promise<number> => {
   return page.evaluate(async () => {
     const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
     const isChecked = (el: Element): boolean => el.getAttribute('aria-checked') === 'true';
@@ -26,33 +26,45 @@ async function selectAllPermissions(page: Page): Promise<number> {
 
     let selected = 0;
     for (const box of boxes) {
-      if (isChecked(box)) continue;
-      box.scrollIntoView({ block: 'center', inline: 'center' });
-      (box as HTMLElement).click();
-      await sleep(20);
-      if (isChecked(box)) selected++;
+      if (!isChecked(box)) {
+        box.scrollIntoView({ block: 'center', inline: 'center' });
+        (box as HTMLElement).click();
+        await sleep(20);
+        if (isChecked(box)) selected++;
+      }
     }
     return selected;
   });
-}
+};
 
-export interface CreateCfTokenResult {
+export type CreateCfTokenResult = {
   token: string;
   accountId: string;
   name: string;
-}
+};
 
 /**
- * Mint a full-access Cloudflare API token via the dashboard (browser fallback — wrangler can't
- * create arbitrary scoped tokens). Navigates straight to the custom-token editor, fills the
- * name, grants every permission group, then reviews + creates and scrapes the one-time value.
+ * Mint a full-access Cloudflare API token via the dashboard (browser fallback — wrangler can't create arbitrary scoped tokens). Navigates straight to the custom-token editor, fills the name, grants every permission group, then reviews + creates and scrapes the one-time value.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @param name - Input value for name.
+ * @param accountId - Cloudflare account id used for verification.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await createApiToken(page, name, 'example-account');
  */
-export async function createApiToken(
+export const createApiToken = async (
   page: Page,
   name: string,
   accountId?: string,
-): Promise<CreateCfTokenResult> {
-  const resolvedAccountId = accountId ?? scrapeCfAccountIdFromUrl(page.url()) ?? undefined;
+): Promise<CreateCfTokenResult> => {
+  let resolvedAccountId = accountId;
+  if (resolvedAccountId === undefined) {
+    const accountIdFromUrl = scrapeCfAccountIdFromUrl(page.url());
+    if (accountIdFromUrl !== null) {
+      resolvedAccountId = accountIdFromUrl;
+    }
+  }
 
   // The custom-token editor is a dedicated route; visiting it directly avoids the tokens-list
   // "Create Token" control (which is a link, not a button) and lands in the editor.
@@ -108,6 +120,17 @@ export async function createApiToken(
       'Cloudflare token was created but could not be read from the success dialog (copy it manually).',
     );
   }
-  const finalAccountId = resolvedAccountId ?? scrapeCfAccountIdFromUrl(html) ?? '';
+  let finalAccountId = resolvedAccountId;
+  if (finalAccountId === undefined) {
+    const accountIdFromHtml = scrapeCfAccountIdFromUrl(html);
+    if (accountIdFromHtml !== null) {
+      finalAccountId = accountIdFromHtml;
+    }
+  }
+  if (finalAccountId === undefined) {
+    throw new Error(
+      'Cloudflare token was created but the account id could not be read from the dashboard.',
+    );
+  }
   return { token, accountId: finalAccountId, name };
-}
+};

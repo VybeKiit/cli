@@ -1,4 +1,4 @@
-import { CONTRACT, renderContract } from '@vybekiit/agentKit/contract/contract';
+import { CONTRACT, renderContract } from '@vybekiit/agent-kit/contract/contract';
 import { describe, expect, it } from 'vitest';
 
 describe('renderContract', () => {

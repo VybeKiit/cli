@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
+import { printError, printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { ensureCli } from '@vybekiit/browser-automation/core/ensureCli';
 
 /**
  * Register a CLI-native provider (Railway, Vercel, …) whose credentials live in the tool's
@@ -10,7 +10,7 @@ import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
  * probe, and reports readiness. This is the CLI-first path taken to its logical end: when the
  * CLI fully owns auth, browser automation is not just a fallback — it's unnecessary.
  */
-export interface CliAuthProviderSpec {
+export type CliAuthProviderSpec = {
   /** Registry domain name, e.g. `infra/railway`. */
   domain: string;
   /** Short aliases, e.g. `['railway']`. */
@@ -23,16 +23,24 @@ export interface CliAuthProviderSpec {
   loginHint: string;
   /** Human label for messages. */
   label: string;
-}
+};
 
-function isSignedIn(tool: string, args: readonly string[]): boolean {
-  return spawnSync(tool, [...args], { stdio: 'ignore' }).status === 0;
-}
+const isSignedIn = (tool: string, args: readonly string[]): boolean =>
+  spawnSync(tool, [...args], { stdio: 'ignore' }).status === 0;
 
-export function registerCliAuthProvider(
+/**
+ * Register Cli Auth Provider.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @param spec - Input value for spec.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerCliAuthProvider(registry, spec);
+ */
+export const registerCliAuthProvider = (
   registry: CommandRegistry,
   spec: CliAuthProviderSpec,
-): void {
+): void => {
   registry.register({
     name: spec.domain,
     aliases: spec.aliases,
@@ -44,7 +52,7 @@ export function registerCliAuthProvider(
           if (!cli.installed) {
             const message = `${spec.label} CLI could not be installed. ${cli.missingRequirement ? `Install ${cli.missingRequirement} first.` : ''}`;
             if (flags.json) printJson({ ok: false, tool: spec.tool, error: message.trim() });
-            else console.error(message.trim());
+            else printError(message.trim(), false);
             return 1;
           }
           const signedIn = isSignedIn(spec.tool, spec.whoamiArgs);
@@ -57,9 +65,9 @@ export function registerCliAuthProvider(
               ...(signedIn ? {} : { loginHint: spec.loginHint }),
             });
           } else if (signedIn) {
-            console.log(`OK: ${spec.label} CLI ready and signed in.`);
+            printLine(`OK: ${spec.label} CLI ready and signed in.`);
           } else {
-            console.log(
+            printLine(
               `→ ${spec.label} CLI installed. One-time sign-in: run \`${spec.loginHint}\`.`,
             );
           }
@@ -68,10 +76,17 @@ export function registerCliAuthProvider(
       },
     },
   });
-}
+};
 
-/** Register Railway + Vercel — both CLI-native hosting providers. */
-export function registerRailwayDomain(registry: CommandRegistry): void {
+/**
+ * Register Railway + Vercel — both CLI-native hosting providers.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerRailwayDomain(registry);
+ */
+export const registerRailwayDomain = (registry: CommandRegistry): void => {
   registerCliAuthProvider(registry, {
     domain: 'infra/railway',
     aliases: ['railway'],
@@ -80,9 +95,17 @@ export function registerRailwayDomain(registry: CommandRegistry): void {
     loginHint: 'railway login',
     label: 'Railway',
   });
-}
+};
 
-export function registerVercelDomain(registry: CommandRegistry): void {
+/**
+ * Register Vercel Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerVercelDomain(registry);
+ */
+export const registerVercelDomain = (registry: CommandRegistry): void => {
   registerCliAuthProvider(registry, {
     domain: 'infra/vercel',
     aliases: ['vercel'],
@@ -91,4 +114,4 @@ export function registerVercelDomain(registry: CommandRegistry): void {
     loginHint: 'vercel login',
     label: 'Vercel',
   });
-}
+};

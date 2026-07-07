@@ -10,7 +10,7 @@ const user = { id: 'u1', email: 'a@b.com' };
 const session = { access_token: 'tok' };
 
 /** A fake GoTrue `auth` client whose methods are mocked — no network, no real client. */
-function fakeClient() {
+const fakeClient = () => {
   const auth = {
     signUp: vi.fn(),
     signInWithPassword: vi.fn(),
@@ -21,7 +21,7 @@ function fakeClient() {
     getUser: vi.fn(),
   };
   return { client: { auth } as unknown as SupabaseAuthClientLike, auth };
-}
+};
 
 let fake: ReturnType<typeof fakeClient>;
 
@@ -29,9 +29,7 @@ beforeEach(() => {
   fake = fakeClient();
 });
 
-function provider() {
-  return createSupabaseAuthProvider({ config, client: fake.client });
-}
+const provider = () => createSupabaseAuthProvider({ config, client: fake.client });
 
 describe('createSupabaseAuthProvider', () => {
   it('reports its provider name and full capabilities', () => {

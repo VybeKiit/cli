@@ -34,60 +34,97 @@ const LOCALE = 'hl=en';
  * The dashboard / item list. Used as a navigation anchor, as the starting
  * point for `createNewItem`, and as the discovery surface for the
  * developer-group ID.
+ *
+ * @returns Chrome Web Store dashboard URL pinned to English.
+ * @example
+ * const url = dashboardUrl();
  */
-export function dashboardUrl(): string {
-  return `${ROOT}/?${LOCALE}`;
-}
+export const dashboardUrl = (): string => `${ROOT}/?${LOCALE}`;
 
 /**
  * Distribution tab — visibility (public / unlisted / private), regions,
  * pricing.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @returns Distribution edit URL.
+ * @example
+ * const url = distributionUrl(groupId, itemId);
  */
-export function distributionUrl(groupId: string, itemId: string): string {
-  return editUrl(groupId, itemId, 'distribution');
-}
+export const distributionUrl = (groupId: string, itemId: string): string =>
+  editUrl(groupId, itemId, 'distribution');
 
 /**
  * Store-listing edit tab — description, support URL, homepage URL,
  * official URL, category, language, mature-content switch, global promo
  * video, plus the "Save draft" / "Submit for review" page actions.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @returns Store-listing edit URL.
+ * @example
+ * const url = listingUrl(groupId, itemId);
  */
-export function listingUrl(groupId: string, itemId: string): string {
-  return editUrl(groupId, itemId, 'listing');
-}
+export const listingUrl = (groupId: string, itemId: string): string =>
+  editUrl(groupId, itemId, 'listing');
 
 /**
  * Package tab — zip upload + the publish control. The same operations are
  * available via the official Publish API; this URL is the UI fallback.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @returns Package edit URL.
+ * @example
+ * const url = packageUrl(groupId, itemId);
  */
-export function packageUrl(groupId: string, itemId: string): string {
-  return editUrl(groupId, itemId, 'package');
-}
+export const packageUrl = (groupId: string, itemId: string): string =>
+  editUrl(groupId, itemId, 'package');
 
 /**
  * Privacy practices tab — single purpose, per-permission justifications,
  * data-collection disclosures.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @returns Privacy practices edit URL.
+ * @example
+ * const url = privacyUrl(groupId, itemId);
  */
-export function privacyUrl(groupId: string, itemId: string): string {
-  return editUrl(groupId, itemId, 'privacy');
-}
+export const privacyUrl = (groupId: string, itemId: string): string =>
+  editUrl(groupId, itemId, 'privacy');
 
 /**
  * Status tab — current review-status badge, violations panel, version
  * history table. Read-only verbs that surface "what's going on with this
  * item right now" go here.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @returns Status URL.
+ * @example
+ * const url = statusUrl(groupId, itemId);
  */
-export function statusUrl(groupId: string, itemId: string): string {
-  return editUrl(groupId, itemId, 'status');
-}
+export const statusUrl = (groupId: string, itemId: string): string =>
+  editUrl(groupId, itemId, 'status');
 
-function editUrl(groupId: string, itemId: string, tab: string): string {
-  return `${ROOT}/${groupId}/${itemId}/edit/${tab}?${LOCALE}`;
-}
+/**
+ * Build a group-scoped edit URL for one CWS tab.
+ *
+ * @param groupId - Developer group UUID.
+ * @param itemId - Chrome Web Store item id.
+ * @param tab - Dev-console tab slug.
+ * @returns Group-scoped edit URL pinned to English.
+ * @example
+ * const url = editUrl(groupId, itemId, 'listing');
+ */
+const editUrl = (groupId: string, itemId: string, tab: string): string =>
+  `${ROOT}/${groupId}/${itemId}/edit/${tab}?${LOCALE}`;
 
 /**
  * Group-ID UUIDs are 8-4-4-4-12 lowercase hex.
  */
+// group URL: "/devconsole/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/x" -> group id
 const GROUP_ID_PATTERN =
   /\/devconsole\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[/?]|$)/;
 
@@ -107,17 +144,25 @@ const GROUP_ID_PATTERN =
  * path, the CDP-attached Chrome is most likely not signed into a Chrome
  * Web Store developer account at all. Surface that case as a clear error
  * rather than silently returning an empty string.
+ *
+ * @param page - Playwright page signed into the CWS developer console.
+ * @returns The developer group UUID for the signed-in account.
+ * @example
+ * const groupId = await discoverDeveloperGroupId(page);
  */
-export async function discoverDeveloperGroupId(page: Page): Promise<string> {
+export const discoverDeveloperGroupId = async (page: Page): Promise<string> => {
   await page.goto(dashboardUrl(), { timeout: 30_000, waitUntil: 'load' });
 
   for (let attempt = 0; attempt < 20; attempt++) {
     const match = page.url().match(GROUP_ID_PATTERN);
-    if (match) return match[1] as string;
+    if (match !== null && match[1] !== undefined) {
+      return match[1];
+    }
+    // biome-ignore lint/performance/noAwaitInLoops: redirect polling must observe URL changes sequentially.
     await page.waitForTimeout(250);
   }
 
   throw new Error(
     `Could not extract developer group ID from ${page.url()}. Confirm the CDP-attached Chrome is signed into a Chrome Web Store developer account.`,
   );
-}
+};

@@ -4,51 +4,42 @@ test.describe('agent switch', () => {
   test('switching agent reloads the sidebar sessions', async ({ page }) => {
     await page.goto('/');
 
-    // Wait for the sidebar to show that Kiro sessions loaded (initial agent)
-    const sidebar = page.locator('aside').first();
+    const sidebar = page.getByTestId('chat-sidebar');
     await expect(sidebar).toBeVisible();
 
-    // The active agent buttons should be visible
-    const claudeButton = sidebar.locator('button:has-text("Claude")');
-    const kiroButton = sidebar.locator('button:has-text("Kiro")');
+    const claudeButton = sidebar.getByTestId('agent-button-claude-code');
+    const kiroButton = sidebar.getByTestId('agent-button-kiro');
 
     await expect(kiroButton).toBeVisible();
     await expect(claudeButton).toBeVisible();
 
-    // Wait for Kiro sessions label to be present
-    const sessionsGroup = sidebar.locator('text=Sessions');
-    await expect(sessionsGroup.first()).toBeVisible();
+    await expect(sidebar.getByText('Kiro sessions')).toBeVisible();
 
-    // Click Claude agent
     await claudeButton.click();
 
-    // Sidebar should show loading briefly, then Claude sessions heading
-    // We verify by checking the "New Claude session" button label
-    const newSessionBtn = sidebar.locator('button:has-text("New Claude session")');
-    await expect(newSessionBtn).toBeVisible({ timeout: 5_000 });
+    const newSessionBtn = sidebar.getByTestId('new-agent-session');
+    await expect(sidebar.getByText('Claude Code sessions')).toBeVisible({ timeout: 5000 });
+    await expect(newSessionBtn).toBeVisible({ timeout: 5000 });
+    await expect(newSessionBtn).toContainText('New Claude Code session');
 
-    // Switch back to Kiro
     await kiroButton.click();
-    const newKiroBtn = sidebar.locator('button:has-text("New Kiro session")');
-    await expect(newKiroBtn).toBeVisible({ timeout: 5_000 });
+    await expect(sidebar.getByText('Kiro sessions')).toBeVisible({ timeout: 5000 });
+    await expect(newSessionBtn).toContainText('New Kiro session');
   });
 
   test('active agent button has highlighted style', async ({ page }) => {
     await page.goto('/');
 
-    const sidebar = page.locator('aside').first();
-    const kiroButton = sidebar.locator('button:has-text("Kiro")');
-    const claudeButton = sidebar.locator('button:has-text("Claude")');
+    const sidebar = page.getByTestId('chat-sidebar');
+    const kiroButton = sidebar.getByTestId('agent-button-kiro');
+    const claudeButton = sidebar.getByTestId('agent-button-claude-code');
 
-    // Kiro should be active by default (bg-zinc-800 means bg="#27272a" or similar)
-    await expect(kiroButton).toHaveCSS('background-color', /rgba?(39, 39, 42|rgb\(39, 39, 42\))/i);
-
-    // Claude should be inactive initially
-    await expect(claudeButton).not.toHaveCSS('background-color', /rgba?(39, 39, 42|rgb\(39, 39, 42\))/i);
+    await expect(kiroButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(claudeButton).toHaveAttribute('aria-pressed', 'false');
 
     await claudeButton.click();
 
-    // Claude should now be active
-    await expect(claudeButton).toHaveCSS('background-color', /rgba?(39, 39, 42|rgb\(39, 39, 42\))/i);
+    await expect(claudeButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(kiroButton).toHaveAttribute('aria-pressed', 'false');
   });
 });

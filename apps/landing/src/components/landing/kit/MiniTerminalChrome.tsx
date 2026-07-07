@@ -27,14 +27,24 @@ const CLOSE_ICON = (
   </svg>
 );
 
-/** Compact terminal chrome that can render as macOS (Ghostty) or Windows Terminal. */
-export function MiniTerminalChrome({
+/**
+ * Compact terminal chrome that can render as macOS (Ghostty) or Windows Terminal.
+ *
+ * @param props - Component props.
+ * @returns The rendered MiniTerminalChrome element.
+ * @example
+ * ```tsx
+ * <MiniTerminalChrome />
+ * ```
+ */
+
+export const MiniTerminalChrome = ({
   children,
   className,
   title = 'ghostty — zsh',
   variant = 'macos',
   onCloseClick,
-}: MiniTerminalChromeProps) {
+}: MiniTerminalChromeProps) => {
   const CloseControl = onCloseClick ? 'button' : 'span';
   const closeProps = onCloseClick
     ? { type: 'button' as const, onClick: onCloseClick, 'aria-label': 'Close terminal' }
@@ -145,4 +155,4 @@ export function MiniTerminalChrome({
       <div className="ghostty-terminal__body">{children}</div>
     </div>
   );
-}
+};

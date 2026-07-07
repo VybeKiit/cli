@@ -3,7 +3,7 @@ import {
   renderForbiddenWebUiLibsList,
   renderWebUiSourcesTable,
   WEB_UI_SOURCES,
-} from '@vybekiit/agentKit/catalogs/uiSources';
+} from '@vybekiit/agent-kit/catalogs/uiSources';
 import { describe, expect, it } from 'vitest';
 
 describe('ui-sources', () => {

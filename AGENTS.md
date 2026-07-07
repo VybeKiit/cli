@@ -31,9 +31,9 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 - **Monorepo:** pnpm workspaces + Turborepo. Only the `vybekiit` CLI publishes to npm (MIT, ADR-0033); every `packages/*` is `private: true`.
 - **Web/extension UI:** shadcn/ui. **Mobile UI:** plain StyleSheet primitives + `@vybekiit/tokens`.
 - **Infra the templates target:** Cloudflare (host/edge/cron/storage/email) + Supabase (db/auth).
-- **Payments:** one `@vybekiit/payments` package, one `PaymentProvider` interface, provider
-  adapters under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the
-  v1 default (Merchant of Record); the agent swaps providers via the `PAYMENTS_PROVIDER` env.
+- **Payments:** one `@vybekiit/payments` package, one payment service contract, provider adapters
+  under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the v1 default
+  (Merchant of Record); the agent swaps providers via the `PAYMENTS_PROVIDER` env.
 
 ## Conventions
 
@@ -51,20 +51,23 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   it uses (`tsup` `noExternal: [/^@vybekiit\//]`). A new module is either **template-owned code** or a
   **private workspace package** — there is **no public tier** and **no `shared/` tier** (plumbing
   folds into `core`). Buyers get the maintained logic via the gated monorepo clone, never `npm i @vybekiit/*`.
-- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (interface + DTOs + tagged `*Error`) ·
-  `config.ts` (`Schema.Struct` + Config `Tag`/`Layer`) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
-  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core` is the exempt library package.
+- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (`Schema.Struct` DTOs +
+  `Schema.Schema.Type<>` aliases + tagged `*Error` + service type) · `config.ts` (`Schema.Struct` +
+  Config `Tag`/`Layer` when needed) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
+  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` pure wildcard barrel. `core`
+  is the exempt library package.
 - **Provider dispatch (ADR-0018, now Effect):** wire each provider as a `Live` `Layer`; the
-  `resolveEnvProvider` selector picks the adapter from `*_PROVIDER`. Never `new` a provider at a call
-  site, never hand-roll `switch`/`===` on `*_PROVIDER`. Before editing any adapter or `resolve.ts`,
-  read `.agents/skills/extend-provider-dispatch/SKILL.md`. Ref: `packages/payments/src/resolve.ts`.
+  concern selector picks the adapter from `*_PROVIDER`. Schema config owns defaults; a missing runtime
+  adapter/map returns a typed error before construction. Never `new` a provider at a call site, never
+  hand-roll `switch`/`===` on `*_PROVIDER`, and never use `adapters[key] ?? adapters.default`. Before
+  editing any adapter or `resolve.ts`, read `.agents/skills/extend-provider-dispatch/SKILL.md`.
 - **One source of truth for config:** per-concern **`Schema.Struct`** in each package's `config.ts`
   (`core` keeps only the `parseEnv` engine); parse only your slice via `parseEnv`, fail loud. **No zod.**
   Root `.env.example` is the SSOT for keys. No scattered URLs/secrets — centralize endpoints in `core`;
   never commit secrets.
 - **Errors (ADR-0023):** return `Effect<A, E>` with a `Data.TaggedError` (`code` + `message`) for
-  expected failures; `throw` only for programmer/config errors; recover with `Effect.catchTag`. No
-  `Result`, no raw `try/catch` across an Effect seam. No bare `console.*` in published packages —
+  expected failures; recover with `Effect.catchTag`. No `Result`, no raw `try/catch` across an Effect
+  seam; wrap IO with `Effect.try` / `Effect.tryPromise`. No bare `console.*` in maintained packages —
   return an `Effect` (log via `Effect.log*`) or use `createLogger`.
 - **DI (ADR-0023):** providers + config are `Context.Tag` services wired by `Layer`; composition roots
   `Effect.provide` them and run at the edge (`runPromiseExit` on servers, one `ManagedRuntime` on clients).
@@ -81,14 +84,24 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   (self-imports too). `./` colocated OK; `../` banned. Order: external → `@vybekiit` → `@/` → `./`.
   Domain adapters live in `packages/{seo,email,…}` — not `templates/*/src/vybekiit/`. Full rule in
   CODE-STYLE.
-- **Types:** `interface` for contracts, `type` for unions + `Schema.Schema.Type<>`; fields `readonly`;
-  `unknown` over `any`; no casts except a vendor-type seam. Named exports only; no `export default` in
-  package source (except a Worker handler / `tsup.config.ts`).
-- **Docs (changed):** a **one-line** TSDoc on each export — no multi-line "why" essays inline; put
-  durable rationale in an ADR / `CONTEXT.md`. Keep files ~200–400 lines; match the nearest sibling;
-  reuse helpers before writing new ones.
+- **Types:** Schema-first DTO/config/wire payloads; `type` for unions + `Schema.Schema.Type<>`;
+  interfaces mainly for component props; fields `readonly`; `unknown` over `any`; no casts except a
+  vendor-type seam. Named exports only; no `export default` in package source (except a Worker
+  handler / `tsup.config.ts`).
+- **Exports:** package `index.ts` files are pure wildcard barrels (`export * from './types'`) for
+  cleaner imports. No implementation code, constants, side effects, or wiring in `index.ts`.
+- **Functions + docs:** authored functions are const-arrow only (`function*` allowed inside
+  `Effect.gen`). Every exported function has TSDoc summary, `@param`, `@returns`, and `@example`;
+  durable rationale goes in an ADR / `CONTEXT.md`.
+- **Component props:** component prop contracts remain interfaces; optional props get safe defaults
+  at the boundary (`children` defaults to `null` or an empty render by case).
 - **Tests:** colocate `*.test.ts` next to source (not a per-package `test/` dir). Effectful code uses
   `@effect/vitest` (`it.effect` + `Exit`/`Either`). Vitest `3.2.6`, TDD red→green→refactor.
+- **Dependencies:** shared external versions live in the pnpm workspace catalog as exact stable pins;
+  workspace manifests use `catalog:`. Named catalogs only for real framework lanes.
+- **AI-slop Never list:** no one-row predicate helpers like `isRecord`/`isObject`/`isDefined`/
+  `isName`/`isKey`, no `noop`/`assertNever`, no generic `result`/`data`/`temp` names when a domain
+  noun exists, and no hidden runtime fallbacks.
 - **Maintainer scripts** are `.mjs` + JSDoc types, `execFile`+`promisify`, secrets scrubbed from logs.
 
 ## TDD & quality gate (this is load-bearing — it's also the product promise)
@@ -173,10 +186,9 @@ you can take $1 and auto-invite yourself, the business is real.
     `clientState`) is on Effect + `Schema` + tagged errors; `packages/core/src/result.ts` +
     `effectInterop.ts` still exist as the bridge, and templates, tooling, `cli`, and the buyer agent
     layer are **not yet** converted. Slices 5–8 remain. Convert-as-you-touch; `deslop` enforces per-diff.
-- **Payload, NOT yet workspace members** (see `pnpm-workspace.yaml`): `templates/{mobile,extension}`
-  (v2/v3 placeholders, nothing to build) and `apps/landing`, which today is a stub (webhook + the
-  GitHub-invite **gate** only). `apps/landing` joins the workspace alongside its real UI in issue #3,
-  so we don't gate an empty shell.
+- **Workspace members** (see `pnpm-workspace.yaml`): `templates/{web,mobile,extension,backend,spa}`
+  and `apps/{landing,componentLibrary,localDevelopmentWebsite}` are in the workspace gate. Some are
+  still payload-first or scaffold surfaces, but they are no longer excluded from workspace resolution.
 - **The gate lives in `apps/landing`, not in the buyer template.** A buyer's app fulfills its own
   orders (`templates/web/src/lib/fulfillment.ts` → records the order); inviting to our private repo
   is *our* business logic.

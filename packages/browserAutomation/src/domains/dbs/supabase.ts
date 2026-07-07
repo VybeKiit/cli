@@ -8,36 +8,48 @@ import type { SupabaseSetupResult } from './types';
  * when the CLI can't resolve the project.
  */
 
-interface SupabaseProject {
+type SupabaseProject = {
   ref: string;
   name: string;
-}
+};
 
-interface SupabaseApiKey {
+type SupabaseApiKey = {
   name: string;
   api_key: string;
-}
+};
 
-function runSupabaseJson<T>(args: readonly string[]): T | null {
+const runSupabaseJson = <T>(args: readonly string[]): T | null => {
   const result = spawnSync('supabase', [...args, '--output', 'json'], { encoding: 'utf8' });
   if (result.status !== 0) return null;
   try {
-    return JSON.parse(result.stdout ?? '') as T;
+    const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+    return JSON.parse(stdout) as T;
   } catch {
     return null;
   }
-}
-
-/** List the signed-in user's Supabase projects (empty when not signed in). */
-export function listSupabaseProjects(): SupabaseProject[] {
-  return runSupabaseJson<SupabaseProject[]>(['projects', 'list']) ?? [];
-}
+};
 
 /**
- * Resolve a project's URL + anon/service_role keys via the CLI. Returns null when the CLI
- * can't provide them (missing project, not signed in) so the caller can fall back to browser.
+ * List the signed-in user's Supabase projects (empty when not signed in).
+ *
+ * @returns Resolved list of provider resources.
+ * @example
+ * const result = listSupabaseProjects();
  */
-export function readSupabaseKeysViaCli(projectRef: string): SupabaseSetupResult | null {
+export const listSupabaseProjects = (): SupabaseProject[] => {
+  const projects = runSupabaseJson<SupabaseProject[]>(['projects', 'list']);
+  return projects === null ? [] : projects;
+};
+
+/**
+ * Resolve a project's URL + anon/service_role keys via the CLI. Returns null when the CLI can't provide them (missing project, not signed in) so the caller can fall back to browser.
+ *
+ * @param projectRef - Supabase project reference.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = readSupabaseKeysViaCli('project-ref');
+ */
+export const readSupabaseKeysViaCli = (projectRef: string): SupabaseSetupResult | null => {
   const keys = runSupabaseJson<SupabaseApiKey[]>([
     'projects',
     'api-keys',
@@ -56,4 +68,4 @@ export function readSupabaseKeysViaCli(projectRef: string): SupabaseSetupResult 
     anonKey: anon,
     serviceRoleKey: serviceRole,
   };
-}
+};

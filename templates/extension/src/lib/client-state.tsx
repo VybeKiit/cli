@@ -10,7 +10,15 @@ const resolved = resolveClientState('extension');
 
 const queryPersister = resolved.persistEnabled ? createWebQueryPersister() : null;
 
-export function ClientStateProvider({ children }: { children: ReactNode }) {
+/**
+ * Provide the extension React Query client and persisted cache.
+ *
+ * @param props - Provider props containing the app tree.
+ * @returns A React Query provider for extension screens.
+ * @example
+ * <ClientStateProvider>{children}</ClientStateProvider>
+ */
+export const ClientStateProvider = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => resolved.queryClient);
 
   if (queryPersister) {
@@ -25,4 +33,4 @@ export function ClientStateProvider({ children }: { children: ReactNode }) {
   }
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-}
+};

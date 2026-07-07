@@ -1,5 +1,6 @@
-import { fail, type Result } from '@vybekiit/core';
-import type { DataProviderCapabilities, DbRecord } from '@vybekiit/db/types';
+import { failDb } from '@vybekiit/db/providerEffect';
+import type { DataProviderCapabilities, DbError, DbRecord } from '@vybekiit/db/types';
+import type { Effect } from 'effect';
 
 export const POSTGRES_CAPABILITIES: DataProviderCapabilities = {
   upsert: true,
@@ -21,11 +22,23 @@ export const LOCAL_CAPABILITIES: DataProviderCapabilities = {
 
 export const MINIMAL_CAPABILITIES: DataProviderCapabilities = {};
 
-/** Build column map from a record object. */
-export function recordToColumns(record: DbRecord): Record<string, unknown> {
-  return { ...record };
-}
+/**
+ * Build a mutable column map from a record object.
+ *
+ * @param record - Vendor-neutral DB record.
+ * @returns A shallow copy suitable for SQL insert/update helpers.
+ * @example
+ * const columns = recordToColumns({ id: '1', email: 'a@b.co' });
+ */
+export const recordToColumns = (record: DbRecord): Record<string, unknown> => ({ ...record });
 
-export function unsupportedCapability<T>(capability: string): Result<T> {
-  return fail('unsupported', `This data adapter does not support ${capability}.`);
-}
+/**
+ * Build an Effect failure for an unsupported optional capability.
+ *
+ * @param capability - Optional capability name.
+ * @returns A failed Effect with the shared unsupported code.
+ * @example
+ * const effect = unsupportedCapability('bulkInsert');
+ */
+export const unsupportedCapability = <T>(capability: string): Effect.Effect<T, DbError> =>
+  failDb('unsupported', `This data adapter does not support ${capability}.`);

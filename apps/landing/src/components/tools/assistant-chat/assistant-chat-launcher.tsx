@@ -1,12 +1,10 @@
 'use client';
 
 import type { VybeAssistant } from '@vybekiit/report-mode';
-import {
-  assistantLabel,
-  BuilderAssistantMark,
-} from '@vybekiit-template-web/components/builder-assistant-mark';
+import { assistantLabel } from '@vybekiit-template-web/components/builder-assistant-mark';
 import { useState } from 'react';
 
+import { VybeLogoIcon } from '@/components/ui/CustomIcons';
 import { cn } from '@/lib/utils';
 
 import { AssistantChatPanel } from './assistant-chat-panel';
@@ -18,11 +16,11 @@ interface AssistantChatLauncherProps {
 }
 
 /** Floating toggle that opens the dev chat sidebar. Client-only, dev-only mount. */
-export function AssistantChatLauncher({
+export const AssistantChatLauncher = ({
   assistant,
   bridgeUrl,
   referralCode,
-}: AssistantChatLauncherProps) {
+}: AssistantChatLauncherProps) => {
   const [open, setOpen] = useState(false);
 
   if (open) {
@@ -45,8 +43,8 @@ export function AssistantChatLauncher({
       onClick={() => setOpen(true)}
       type="button"
     >
-      <BuilderAssistantMark active={true} assistant={assistant} className="size-5" />
+      <VybeLogoIcon className="size-5" />
       Ask {assistantLabel(assistant)}
     </button>
   );
-}
+};

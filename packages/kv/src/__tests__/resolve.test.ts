@@ -1,5 +1,7 @@
-import { resolveKvProvider } from '@vybekiit/kv/resolve';
-import { describe, expect, it } from 'vitest';
+import { it } from '@effect/vitest';
+import { resolveKvProvider, resolveKvService } from '@vybekiit/kv/resolve';
+import { Effect } from 'effect';
+import { describe, expect } from 'vitest';
 
 describe('resolveKvProvider', () => {
   it('falls back to local when cloudflare is unconfigured', () => {
@@ -7,14 +9,19 @@ describe('resolveKvProvider', () => {
     expect(kv.name).toBe('local');
   });
 
-  it('falls back to local for unshipped upstash provider', () => {
-    const kv = resolveKvProvider({ KV_PROVIDER: 'upstash' });
-    expect(kv.name).toBe('local');
-  });
-
   it('stores and reads local values', async () => {
     const kv = resolveKvProvider({ KV_PROVIDER: 'local' });
-    await kv.set('key', 'value');
-    expect(await kv.get('key')).toBe('value');
+    await Effect.runPromise(kv.set('key', 'value'));
+    expect(await Effect.runPromise(kv.get('key'))).toBe('value');
   });
+});
+
+describe('resolveKvService', () => {
+  it.effect('fails loud for the unshipped upstash adapter', () =>
+    Effect.gen(function* () {
+      const error = yield* Effect.flip(resolveKvService({ KV_PROVIDER: 'upstash' }));
+      expect(error.code).toBe('KV_PROVIDER_UNSUPPORTED');
+      expect(error.message).toContain('upstash');
+    }),
+  );
 });

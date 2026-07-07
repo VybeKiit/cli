@@ -11,6 +11,14 @@ const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariant
   variant: 'default',
 });
 
+/**
+ * Render the Toggle Group component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Toggle Group component.
+ * @example
+ * <ToggleGroup />;
+ */
 const ToggleGroup = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root> &
@@ -27,20 +35,30 @@ const ToggleGroup = React.forwardRef<
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
+/**
+ * Render the Toggle Group Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Toggle Group Item component.
+ * @example
+ * <ToggleGroupItem />;
+ */
 const ToggleGroupItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
     VariantProps<typeof toggleVariants>
 >(({ className, children, variant, size, ...props }, ref) => {
   const context = React.useContext(ToggleGroupContext);
+  const resolvedVariant = context.variant === undefined ? variant : context.variant;
+  const resolvedSize = context.size === undefined ? size : context.size;
 
   return (
     <ToggleGroupPrimitive.Item
       ref={ref}
       className={cn(
         toggleVariants({
-          variant: context.variant || variant,
-          size: context.size || size,
+          variant: resolvedVariant,
+          size: resolvedSize,
         }),
         className,
       )}

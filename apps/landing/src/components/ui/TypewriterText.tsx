@@ -16,16 +16,26 @@ export interface TypewriterTextProps {
 
 const spinTiming = { duration: 1100, easing: 'cubic-bezier(0.33, 1, 0.68, 1)' } as const;
 
-/** Scroll-triggered typewriter for a single line of copy. */
-export function TypewriterText({
+/**
+ * Scroll-triggered typewriter for a single line of copy.
+ *
+ * @param props - Component props.
+ * @returns The rendered TypewriterText element.
+ * @example
+ * ```tsx
+ * <TypewriterText />
+ * ```
+ */
+
+export const TypewriterText = ({
   text,
   as: Tag = 'p',
   className,
   msPerChar = 48,
   start: startProp,
-}: TypewriterTextProps) {
+}: TypewriterTextProps) => {
   const { ref, inView } = useInViewOnce();
-  const start = startProp ?? inView;
+  const start = startProp === undefined ? inView : startProp;
 
   const { displayText, isComplete } = useTypewriter(text, { start, msPerChar });
 
@@ -37,6 +47,6 @@ export function TypewriterText({
       {displayText}
     </Tag>
   );
-}
+};
 
 export { spinTiming };

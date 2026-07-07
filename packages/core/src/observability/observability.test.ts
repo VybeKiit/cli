@@ -14,6 +14,9 @@ vi.mock('@sentry/node', () => ({
   captureMessage: vi.fn(),
 }));
 
+// "SENTRY_DSN is required" -> match
+const SENTRY_DSN_PATTERN = /SENTRY_DSN/;
+
 describe('createLocalObservabilityProvider', () => {
   it('does not throw when capturing', () => {
     const provider = createLocalObservabilityProvider();
@@ -30,7 +33,7 @@ describe('resolveObservabilityProvider', () => {
 
   it('throws when sentry is selected without DSN', () => {
     expect(() => resolveObservabilityProvider({ OBSERVABILITY_PROVIDER: 'sentry' })).toThrow(
-      /SENTRY_DSN/,
+      SENTRY_DSN_PATTERN,
     );
   });
 

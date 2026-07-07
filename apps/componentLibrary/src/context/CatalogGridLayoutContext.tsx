@@ -27,7 +27,19 @@ interface CatalogGridLayoutContextValue {
 
 const CatalogGridLayoutContext = createContext<CatalogGridLayoutContextValue | null>(null);
 
-export function CatalogGridLayoutProvider({ children }: { children: ReactNode }) {
+/**
+ * Render the catalog grid layout provider component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogGridLayoutProvider><App /></CatalogGridLayoutProvider>;
+ */
+export const CatalogGridLayoutProvider = ({
+  children = <></>,
+}: {
+  readonly children?: ReactNode;
+}) => {
   const [layoutId, setLayoutId] = useState<CatalogGridLayoutId>('2x2');
   const [customCols, setCustomCols] = useState(3);
   const [hydrated, setHydrated] = useState(false);
@@ -42,13 +54,13 @@ export function CatalogGridLayoutProvider({ children }: { children: ReactNode })
   const setLayout = useCallback(
     (nextId: CatalogGridLayoutId, nextCols?: number) => {
       setLayoutId(nextId);
-      const cols = nextCols ?? customCols;
+      const cols = nextCols === undefined ? customCols : nextCols;
       if (nextCols !== undefined) {
         setCustomCols(nextCols);
       }
       saveStoredGridLayout({
         layoutId: nextId,
-        customCols: nextId === 'custom' ? cols : (nextCols ?? customCols),
+        customCols: nextId === 'custom' ? cols : cols,
       });
     },
     [customCols],
@@ -70,12 +82,19 @@ export function CatalogGridLayoutProvider({ children }: { children: ReactNode })
   return (
     <CatalogGridLayoutContext.Provider value={value}>{children}</CatalogGridLayoutContext.Provider>
   );
-}
+};
 
-export function useCatalogGridLayout() {
+/**
+ * Read catalog grid layout state for the component library.
+ *
+ * @returns The state or callback exposed by useCatalogGridLayout.
+ * @example
+ * const value = useCatalogGridLayout();
+ */
+export const useCatalogGridLayout = () => {
   const ctx = useContext(CatalogGridLayoutContext);
   if (!ctx) {
     throw new Error('useCatalogGridLayout must be used within CatalogGridLayoutProvider');
   }
   return ctx;
-}
+};

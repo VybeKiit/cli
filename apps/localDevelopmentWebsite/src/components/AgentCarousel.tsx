@@ -3,6 +3,13 @@
 import Image from 'next/image';
 import { useAgentStore } from '@/stores';
 
+/**
+ * Render the agent carousel component.
+ *
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <AgentCarousel />;
+ */
 export const AgentCarousel = () => {
   const agentsMap = useAgentStore((s) => s.agents);
   const agents = Object.values(agentsMap);

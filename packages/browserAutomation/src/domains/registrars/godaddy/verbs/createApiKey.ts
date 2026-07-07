@@ -1,25 +1,26 @@
-import { waitForGdAuthenticated } from '@vybekiit/browserAutomation/domains/registrars/godaddy/dashboard/waitForAuthenticated';
+import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { waitForGdAuthenticated } from '@vybekiit/browser-automation/domains/registrars/godaddy/dashboard/waitForAuthenticated';
 import {
   scrapeGodaddyKeyPair,
   scrapeGodaddyKeysFromList,
-} from '@vybekiit/browserAutomation/domains/registrars/godaddy/scrape';
+} from '@vybekiit/browser-automation/domains/registrars/godaddy/scrape';
 import {
   GD_KEYS_URL,
   type GdSetupParams,
   type GdSetupResult,
-} from '@vybekiit/browserAutomation/domains/registrars/godaddy/types';
+} from '@vybekiit/browser-automation/domains/registrars/godaddy/types';
 import type { BrowserContext, Locator, Page } from 'playwright';
 
-function envCredentials(): { apiKey?: string; apiSecret?: string } {
+const envCredentials = (): { apiKey?: string; apiSecret?: string } => {
   const apiKey = process.env.GODADDY_API_KEY?.trim();
   const apiSecret = process.env.GODADDY_API_SECRET?.trim();
   return {
     ...(apiKey ? { apiKey } : {}),
     ...(apiSecret ? { apiSecret } : {}),
   };
-}
+};
 
-async function clickFirstVisible(page: Page, locators: Locator[]): Promise<boolean> {
+const clickFirstVisible = async (page: Page, locators: Locator[]): Promise<boolean> => {
   for (const locator of locators) {
     // `.first()` — some controls (e.g. GoDaddy's header + empty-state "Create New API Key")
     // render more than one match; without it Playwright throws a strict-mode violation.
@@ -29,17 +30,17 @@ async function clickFirstVisible(page: Page, locators: Locator[]): Promise<boole
     }
   }
   return false;
-}
+};
 
-async function readExistingKeys(page: Page): Promise<string[]> {
+const readExistingKeys = async (page: Page): Promise<string[]> => {
   const html = await page.content();
   return scrapeGodaddyKeysFromList(html);
-}
+};
 
-async function tryRecreateSecret(
+const tryRecreateSecret = async (
   page: Page,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<string | null> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<string | null> => {
   const actions = page.getByRole('button', { name: /actions|more|menu|⋯|\.\.\./i }).first();
   if ((await actions.count()) > 0) {
     await actions.click({ timeout: 5000 }).catch(() => undefined);
@@ -56,8 +57,8 @@ async function tryRecreateSecret(
   await page.waitForTimeout(1500);
 
   const pair = await readKeyPairFromPage(activeModal(page));
-  return pair?.apiSecret ?? null;
-}
+  return pair === null ? null : pair.apiSecret;
+};
 
 /**
  * Resolve the active create-key modal. GoDaddy renders one modal instance per "Create New
@@ -65,11 +66,9 @@ async function tryRecreateSecret(
  * stacked, identical dialogs. The last one in DOM order paints on top, so its controls are the
  * clickable ones — the earlier modal's buttons are intercepted by the top backdrop.
  */
-function activeModal(page: Page): Locator {
-  return page.getByRole('dialog').last();
-}
+const activeModal = (page: Page): Locator => page.getByRole('dialog').last();
 
-async function openCreateKeyDialog(page: Page): Promise<Locator> {
+const openCreateKeyDialog = async (page: Page): Promise<Locator> => {
   const clicked = await clickFirstVisible(page, [
     page.getByRole('button', { name: /create new api key/i }),
     page.getByRole('link', { name: /create new api key/i }),
@@ -84,9 +83,9 @@ async function openCreateKeyDialog(page: Page): Promise<Locator> {
   const modal = activeModal(page);
   await modal.waitFor({ state: 'visible', timeout: 10_000 });
   return modal;
-}
+};
 
-async function fillKeyName(modal: Locator, keyName: string): Promise<void> {
+const fillKeyName = async (modal: Locator, keyName: string): Promise<void> => {
   const nameInput = modal
     .locator(
       'input[name*="name" i], input[id*="name" i], input[placeholder*="name" i], input[type="text"]',
@@ -95,9 +94,9 @@ async function fillKeyName(modal: Locator, keyName: string): Promise<void> {
   if ((await nameInput.count()) > 0) {
     await nameInput.fill(keyName);
   }
-}
+};
 
-async function chooseOteEnvironment(modal: Locator): Promise<void> {
+const chooseOteEnvironment = async (modal: Locator): Promise<void> => {
   const select = modal.locator('select').first();
   if ((await select.count()) > 0) {
     const options = await select.locator('option').allTextContents();
@@ -123,33 +122,39 @@ async function chooseOteEnvironment(modal: Locator): Promise<void> {
   if ((await oteRadio.count()) > 0) {
     await oteRadio.check({ force: true });
   }
-}
+};
 
-async function advanceWizard(modal: Locator): Promise<void> {
+const advanceWizard = async (modal: Locator): Promise<void> => {
   const next = modal
     .getByRole('button', { name: /^next$/i })
     .or(modal.getByRole('button', { name: /create|generate|save|confirm/i }))
     .first();
   await next.click({ timeout: 10_000 });
   await modal.page().waitForTimeout(1500);
-}
+};
 
-async function readKeyPairFromPage(
+const readKeyPairFromPage = async (
   scope: Locator,
-): Promise<{ apiKey: string; apiSecret: string } | null> {
+): Promise<{ apiKey: string; apiSecret: string } | null> => {
   // GoDaddy renders the key + secret in two ordered `keyCodeBlock` divs (not inputs); the
   // class carries a CSS-module hash so match the stable substring. Fall back to inputs for
   // older layouts.
   const fromDom = await scope
     .evaluate((root) => {
       const blocks = Array.from(root.querySelectorAll('[class*="keyCodeBlock" i]'))
-        .map((el) => (el.textContent ?? '').trim())
+        .map((el) => {
+          const text = el.textContent;
+          return text === null ? '' : text.trim();
+        })
         .filter((v) => v.length >= 15);
       if (blocks.length >= 2) return { apiKey: blocks[0]!, apiSecret: blocks[1]! };
 
       const inputs = Array.from(root.querySelectorAll('input, textarea'));
       const values = inputs
-        .map((el) => (el as HTMLInputElement).value?.trim() ?? '')
+        .map((el) => {
+          const value = (el as HTMLInputElement).value;
+          return value === undefined ? '' : value.trim();
+        })
         .filter((v) => v.length >= 20);
       if (values.length >= 2) return { apiKey: values[0]!, apiSecret: values[1]! };
       if (values.length === 1) return { apiKey: values[0]!, apiSecret: '' };
@@ -164,9 +169,11 @@ async function readKeyPairFromPage(
 
   const fromText = await scope
     .evaluate((root) => {
-      const body = (root as HTMLElement).innerText ?? root.textContent ?? '';
-      const keyMatch = body.match(/(?:API\s*)?Key[:\s]+([A-Za-z0-9_-]{20,})/i);
-      const secretMatch = body.match(/(?:API\s*)?Secret[:\s]+([A-Za-z0-9_-]{20,})/i);
+      const innerText = (root as HTMLElement).innerText;
+      const body = innerText === undefined ? root.textContent : innerText;
+      const text = body === null ? '' : body;
+      const keyMatch = text.match(/(?:API\s*)?Key[:\s]+([A-Za-z0-9_-]{20,})/i);
+      const secretMatch = text.match(/(?:API\s*)?Secret[:\s]+([A-Za-z0-9_-]{20,})/i);
       if (keyMatch?.[1] && secretMatch?.[1]) {
         return { apiKey: keyMatch[1], apiSecret: secretMatch[1] };
       }
@@ -174,25 +181,28 @@ async function readKeyPairFromPage(
     })
     .catch(() => null);
   return fromText;
-}
+};
 
-async function tryReuseExistingKey(
+const tryReuseExistingKey = async (
   page: Page,
   params: GdSetupParams,
-  log: Pick<Console, 'log' | 'warn'>,
-): Promise<GdSetupResult | null> {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<GdSetupResult | null> => {
   const existingKeys = await readExistingKeys(page);
   const fromEnv = envCredentials();
+  let apiKey: string | undefined;
 
-  const apiKey =
-    (fromEnv.apiKey && existingKeys.includes(fromEnv.apiKey) ? fromEnv.apiKey : undefined) ??
-    existingKeys[0];
+  if (fromEnv.apiKey !== undefined && existingKeys.includes(fromEnv.apiKey)) {
+    apiKey = fromEnv.apiKey;
+  } else {
+    apiKey = existingKeys[0];
+  }
 
   if (!apiKey) return null;
 
   log.log('[gd] existing API key found — reusing');
 
-  let apiSecret = fromEnv.apiSecret ?? '';
+  let apiSecret = fromEnv.apiSecret === undefined ? '' : fromEnv.apiSecret;
   if (fromEnv.apiKey === apiKey && fromEnv.apiSecret) {
     log.log('[gd] using GODADDY_API_SECRET from environment');
   } else {
@@ -212,17 +222,27 @@ async function tryReuseExistingKey(
     ote: params.ote !== false,
     reusedExisting: true,
   };
-}
+};
 
-/** Create or reuse a GoDaddy API key and read credentials. */
-export async function createApiKeyInPortal(
+/**
+ * Create or reuse a GoDaddy API key and read credentials.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @param params - Validated automation parameters for the operation.
+ * @param context - Browser context used for authenticated waits.
+ * @param log - Input value for log.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await createApiKeyInPortal(page, params, context, log);
+ */
+export const createApiKeyInPortal = async (
   page: Page,
   params: GdSetupParams = {},
   context?: BrowserContext,
-  log: Pick<Console, 'log' | 'warn'> = console,
-): Promise<GdSetupResult> {
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+): Promise<GdSetupResult> => {
   await page.goto(GD_KEYS_URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  page = await waitForGdAuthenticated(page, log, context ?? page.context());
+  page = await waitForGdAuthenticated(page, log, context === undefined ? page.context() : context);
 
   const reused = await tryReuseExistingKey(page, params, log);
   if (reused) return reused;
@@ -230,7 +250,7 @@ export async function createApiKeyInPortal(
   log.log('[gd] no existing key — creating new API key');
   const modal = await openCreateKeyDialog(page);
 
-  const keyName = params.keyName ?? `vybekiit-${Date.now()}`;
+  const keyName = params.keyName === undefined ? `vybekiit-${Date.now()}` : params.keyName;
   await fillKeyName(modal, keyName);
 
   if (params.ote !== false) {
@@ -256,4 +276,4 @@ export async function createApiKeyInPortal(
     ote: params.ote !== false,
     reusedExisting: false,
   };
-}
+};

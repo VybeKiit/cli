@@ -1,36 +1,90 @@
-import { type ExpoPushConfig, fail, ok, type Result } from '@vybekiit/core';
 import { decodeExpoPushSendResponse } from '@vybekiit/core/http';
-import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
+import type { ExpoPushConfigType } from '@vybekiit/notifications/config';
+import { resolveNotificationSubject } from '@vybekiit/notifications/notificationSubject';
+import {
+  NotificationsError,
+  type NotificationsProvider,
+  type SendNotificationParamsType,
+} from '@vybekiit/notifications/types';
+import { Effect } from 'effect';
 
-export function createExpoNotifications(config: ExpoPushConfig): NotificationsProvider {
-  return {
-    name: 'expo',
-    async send(params: SendNotificationParams): Promise<Result<{ id: string }>> {
-      if (params.channel !== 'push') {
-        return fail('invalid_channel', 'Expo adapter only supports push channel');
-      }
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (config.EXPO_ACCESS_TOKEN) {
-        headers.Authorization = `Bearer ${config.EXPO_ACCESS_TOKEN}`;
-      }
-      const res = await fetch('https://exp.host/--/api/v2/push/send', {
+const notificationsErrorMessage = (caught: unknown): string =>
+  caught instanceof Error ? caught.message : String(caught);
+
+const expoHeaders = (config: ExpoPushConfigType): Record<string, string> => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (config.EXPO_ACCESS_TOKEN !== undefined) {
+    headers.Authorization = `Bearer ${config.EXPO_ACCESS_TOKEN}`;
+  }
+
+  return headers;
+};
+
+const sendExpoPushRequest = (
+  config: ExpoPushConfigType,
+  params: SendNotificationParamsType,
+): Effect.Effect<unknown, NotificationsError> =>
+  Effect.tryPromise({
+    try: async () => {
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
-        headers,
+        headers: expoHeaders(config),
         body: JSON.stringify({
           to: params.to,
-          title: params.subject ?? 'Notification',
+          title: resolveNotificationSubject(params.subject),
           body: params.body,
           data: params.data,
         }),
       });
-      if (!res.ok) {
-        return fail('push_failed', `Expo push returned ${res.status}`);
+
+      if (!response.ok) {
+        throw new Error(`Expo push returned ${response.status}.`);
       }
-      const json = decodeExpoPushSendResponse(await res.json());
-      return ok({ id: json?.data?.id ?? 'expo-push' });
+
+      return response.json();
     },
-    async verifyDelivery() {
-      return ok(true);
-    },
-  };
-}
+    catch: (caught) =>
+      new NotificationsError({
+        code: 'NOTIFICATIONS_SEND_FAILED',
+        message: notificationsErrorMessage(caught),
+      }),
+  });
+
+/**
+ * Build a notifications adapter that sends push messages through Expo.
+ *
+ * @param config - Validated Expo push configuration.
+ * @returns A notifications provider for the `push` channel.
+ * @example
+ * const notifications = createExpoNotifications({ EXPO_ACCESS_TOKEN: 'token' });
+ */
+export const createExpoNotifications = (config: ExpoPushConfigType): NotificationsProvider => ({
+  name: 'expo',
+  send: (params: SendNotificationParamsType) => {
+    if (params.channel !== 'push') {
+      return Effect.fail(
+        new NotificationsError({
+          code: 'NOTIFICATIONS_INVALID_CHANNEL',
+          message: 'Expo adapter only supports push channel.',
+        }),
+      );
+    }
+
+    return sendExpoPushRequest(config, params).pipe(
+      Effect.flatMap((response) => {
+        const json = decodeExpoPushSendResponse(response);
+        if (json === null || json.data === undefined || json.data.id === undefined) {
+          return Effect.fail(
+            new NotificationsError({
+              code: 'NOTIFICATIONS_SEND_FAILED',
+              message: 'Expo push response did not include a ticket id.',
+            }),
+          );
+        }
+
+        return Effect.succeed({ id: json.data.id });
+      }),
+    );
+  },
+  verifyDelivery: () => Effect.succeed(true),
+});

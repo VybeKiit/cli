@@ -3,13 +3,19 @@ import { useEffect, useMemo, useState } from 'react';
 
 type Scheme = 'light' | 'dark';
 
-function readScheme(): Scheme {
+const readScheme = (): Scheme => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
+};
 
-/** Apply `@vybekiit/tokens` CSS variables from the OS color scheme. */
-export function useTheme(): { scheme: Scheme } {
+/**
+ * Apply `@vybekiit/tokens` CSS variables from the OS color scheme.
+ *
+ * @returns The active color scheme.
+ * @example
+ * const { scheme } = useTheme();
+ */
+export const useTheme = (): { scheme: Scheme } => {
   const [scheme, setScheme] = useState<Scheme>(readScheme);
 
   useEffect(() => {
@@ -29,4 +35,4 @@ export function useTheme(): { scheme: Scheme } {
   }, [vars]);
 
   return { scheme };
-}
+};

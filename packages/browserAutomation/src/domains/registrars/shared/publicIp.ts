@@ -1,5 +1,11 @@
-/** Fetches the machine's public IPv4 for Namecheap API whitelist. */
-export async function fetchPublicIpv4(): Promise<string> {
+/**
+ * Fetches the machine's public IPv4 for Namecheap API whitelist.
+ *
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await fetchPublicIpv4();
+ */
+export const fetchPublicIpv4 = async (): Promise<string> => {
   const response = await fetch('https://api.ipify.org?format=json');
   if (!response.ok) {
     throw new Error(`Could not detect public IP (HTTP ${response.status})`);
@@ -10,4 +16,4 @@ export async function fetchPublicIpv4(): Promise<string> {
     throw new Error('Could not parse public IPv4 from ipify response');
   }
   return ip;
-}
+};

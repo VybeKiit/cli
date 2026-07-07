@@ -1,15 +1,21 @@
-import type { LsDraftFieldKey } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
-import type { Page } from 'playwright';
+// biome-ignore-all lint/security/noSecrets: Dusk/CSS selectors are public dashboard selectors, not secrets.
+
+import type { LsDraftFieldKey } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
+import type { Locator, Page } from 'playwright';
 
 export type LsFieldFallback = {
   /** Scope clicks/lookups under a section heading when set. */
-  sectionHeading?: string;
-  role?: { role: Parameters<Page['getByRole']>[0]; name: RegExp | string; exact?: boolean };
-  text?: { text: RegExp | string; exact?: boolean };
-  label?: RegExp | string;
-  placeholder?: RegExp | string;
-  css?: string;
-  fileInputIndex?: number;
+  readonly sectionHeading?: string;
+  readonly role?: {
+    readonly exact?: boolean;
+    readonly name: RegExp | string;
+    readonly role: Parameters<Page['getByRole']>[0];
+  };
+  readonly text?: { readonly exact?: boolean; readonly text: RegExp | string };
+  readonly label?: RegExp | string;
+  readonly placeholder?: RegExp | string;
+  readonly css?: string;
+  readonly fileInputIndex?: number;
 };
 
 /** Runtime text/role hints when registry entry is missing or not visible. */
@@ -70,31 +76,61 @@ export const LS_FIELD_FALLBACKS: Partial<Record<LsDraftFieldKey, LsFieldFallback
   'product.emailReceipt.buttonLinkInput': { css: '#button_link' },
 };
 
-export function scopeForFallback(page: Page, fallback: LsFieldFallback) {
-  if (!fallback.sectionHeading) return page;
+/**
+ * Resolve the page or section scope for a fallback locator.
+ *
+ * @param page - Playwright page to inspect.
+ * @param fallback - Fallback selector definition.
+ * @returns Page or scoped locator used to build the final locator.
+ * @example
+ * const scope = scopeForFallback(page, fallback);
+ */
+export const scopeForFallback = (page: Page, fallback: LsFieldFallback): Page | Locator => {
+  if (fallback.sectionHeading === undefined || fallback.sectionHeading.length === 0) {
+    return page;
+  }
+
   const heading = page
     .getByRole('heading', { name: new RegExp(fallback.sectionHeading, 'i') })
     .first();
   return heading.locator('xpath=ancestor::*[self::section or self::div][1]').first();
-}
+};
 
-export function locatorFromFallback(page: Page, fallback: LsFieldFallback) {
+/**
+ * Build a Playwright locator from a Lemon Squeezy field fallback definition.
+ *
+ * @param page - Playwright page to inspect.
+ * @param fallback - Fallback selector definition.
+ * @returns Locator for the requested fallback target.
+ * @example
+ * const locator = locatorFromFallback(page, fallback);
+ */
+export const locatorFromFallback = (page: Page, fallback: LsFieldFallback): Locator => {
   const root = scopeForFallback(page, fallback);
 
   if (fallback.fileInputIndex !== undefined) {
     return root.locator('input[type="file"]').nth(fallback.fileInputIndex);
   }
-  if (fallback.css) return root.locator(fallback.css).first();
-  if (fallback.role) {
-    const roleOpts: { name: string | RegExp; exact?: boolean } = { name: fallback.role.name };
-    if (fallback.role.exact !== undefined) roleOpts.exact = fallback.role.exact;
+  if (fallback.css !== undefined && fallback.css.length > 0) {
+    return root.locator(fallback.css).first();
+  }
+  if (fallback.role !== undefined) {
+    const roleOpts: { exact?: boolean; name: string | RegExp } = { name: fallback.role.name };
+    if (fallback.role.exact !== undefined) {
+      roleOpts.exact = fallback.role.exact;
+    }
     return root.getByRole(fallback.role.role, roleOpts);
   }
-  if (fallback.text) {
-    return root.getByText(fallback.text.text, { exact: fallback.text.exact ?? false });
+  if (fallback.text !== undefined) {
+    const exact = fallback.text.exact === undefined ? false : fallback.text.exact;
+    return root.getByText(fallback.text.text, { exact });
   }
-  if (fallback.label) return root.getByLabel(fallback.label);
-  if (fallback.placeholder) return root.getByPlaceholder(fallback.placeholder);
+  if (fallback.label !== undefined) {
+    return root.getByLabel(fallback.label);
+  }
+  if (fallback.placeholder !== undefined) {
+    return root.getByPlaceholder(fallback.placeholder);
+  }
 
   throw new Error('Empty field fallback definition');
-}
+};

@@ -1,7 +1,7 @@
 import {
   renderVybekiitLayerVocabularyTable,
   VYBEKIIT_LAYER_VOCABULARY,
-} from '@vybekiit/agentKit/vocabulary/vybekiitLayerVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/vybekiitLayerVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderVybekiitLayerVocabularyTable', () => {

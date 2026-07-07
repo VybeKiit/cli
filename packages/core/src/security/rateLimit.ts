@@ -13,11 +13,11 @@
  */
 
 /** One client's counter within the current window. */
-interface WindowState {
+type WindowState = {
   count: number;
   /** Epoch ms when the current window ends and the count resets. */
   resetAt: number;
-}
+};
 
 /** Outcome of a single {@link RateLimiter.check}. `allowed: false` carries the wait. */
 export type RateLimitResult =
@@ -37,6 +37,15 @@ export class RateLimiter {
   private readonly windowMs: number;
   private readonly now: Clock;
 
+  /**
+   * Create a fixed-window limiter.
+   *
+   * @param max - Maximum hits allowed in one window.
+   * @param windowSeconds - Window length in seconds.
+   * @param now - Clock used to read the current epoch time.
+   * @example
+   * const limiter = new RateLimiter(10, 60);
+   */
   constructor(max: number, windowSeconds: number, now: Clock = Date.now) {
     this.max = max;
     this.windowMs = windowSeconds * 1000;
@@ -49,6 +58,11 @@ export class RateLimiter {
    * Lazily expires the window on read (no background timer): when the stored window has
    * elapsed, it starts a fresh one. Sweeps stale entries opportunistically so the Map
    * doesn't grow unbounded under churn of distinct keys.
+   *
+   * @param key - Caller bucket key, usually IP plus route tier.
+   * @returns Whether the hit is allowed, with remaining count or retry delay.
+   * @example
+   * const verdict = limiter.check('1.2.3.4:auth-strict');
    */
   check(key: string): RateLimitResult {
     const now = this.now();
@@ -68,10 +82,19 @@ export class RateLimiter {
     return { allowed: true, remaining: this.max - existing.count };
   }
 
-  /** Drop windows that have already reset, keeping memory bounded under key churn. */
+  /**
+   * Drop windows that have already reset.
+   *
+   * @param now - Current epoch time in milliseconds.
+   * @returns Nothing; stale windows are removed from the internal Map.
+   * @example
+   * this.sweep(Date.now());
+   */
   private sweep(now: number): void {
     for (const [key, state] of this.windows) {
-      if (now >= state.resetAt) this.windows.delete(key);
+      if (now >= state.resetAt) {
+        this.windows.delete(key);
+      }
     }
   }
 }

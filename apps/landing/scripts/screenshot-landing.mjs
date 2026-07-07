@@ -12,15 +12,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const outDir = join(root, '.compare-tmp');
 
-const width = Number(process.argv[2] ?? 1280);
-const baseUrl = process.argv[3] ?? 'http://localhost:3333';
+const rawWidth = process.argv[2];
+const rawBaseUrl = process.argv[3];
+const width = Number(rawWidth === undefined ? 1280 : rawWidth);
+const baseUrl = rawBaseUrl === undefined ? 'http://localhost:3333' : rawBaseUrl;
 const viewport = { width, height: 900 };
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function main() {
+const main = async () => {
   await mkdir(outDir, { recursive: true });
 
   const browser = await chromium.launch({ headless: true });
@@ -34,12 +34,12 @@ async function main() {
   await page.screenshot({ path: join(outDir, `current-full-${width}.png`), fullPage: true });
 
   // Helper to capture a vertical slice
-  async function captureSlice(name, top, height) {
+  const captureSlice = async (name, top, height) => {
     await page.screenshot({
       path: join(outDir, `current-sec-${name}-${width}.png`),
       clip: { x: 0, y: top, width, height },
     });
-  }
+  };
 
   // Scroll-trigger sections so mockups animate in before cropping
   const sectionTops = [
@@ -60,10 +60,10 @@ async function main() {
   }
 
   await browser.close();
-  console.log(`Screenshots saved to ${outDir} at ${width}px width`);
-}
+  process.stdout.write(`Screenshots saved to ${outDir} at ${width}px width\n`);
+};
 
 main().catch((err) => {
-  console.error(err);
+  process.stderr.write(`${err instanceof Error ? err.stack : String(err)}\n`);
   process.exit(1);
 });

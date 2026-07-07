@@ -28,6 +28,14 @@ const toggleVariants = cva(
   },
 );
 
+/**
+ * Render the Toggle component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Toggle component.
+ * @example
+ * <Toggle />;
+ */
 const Toggle = React.forwardRef<
   React.ElementRef<typeof TogglePrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> & VariantProps<typeof toggleVariants>

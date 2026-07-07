@@ -11,12 +11,16 @@ import {
   planBuyerSkillStubOutputs,
   renderBuyerSkillDescription,
   renderBuyerSkillStub,
-} from '@vybekiit/agentKit/render/buyerSkillStubs';
+} from '@vybekiit/agent-kit/render/buyerSkillStubs';
 import { describe, expect, it } from 'vitest';
 
 const REPO_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const GO_LIVE = readFileSync(join(REPO_ROOT, 'templates/web/.vybekiit/skills/go-live.md'), 'utf8');
 
+// "---\nname: go-live\n" -> true
+const GO_LIVE_FRONTMATTER_PATTERN = /^---\nname: go-live\n/;
+
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('buyerSkillStemFromPath', () => {
   it('parses buyer skill paths', () => {
     expect(buyerSkillStemFromPath('.vybekiit/skills/go-live.md')).toBe('go-live');
@@ -26,7 +30,7 @@ describe('buyerSkillStemFromPath', () => {
 describe('renderBuyerSkillStub', () => {
   it('includes frontmatter, marker, and full buyer body', () => {
     const stub = renderBuyerSkillStub('go-live', GO_LIVE, 'web');
-    expect(stub).toMatch(/^---\nname: go-live\n/);
+    expect(stub).toMatch(GO_LIVE_FRONTMATTER_PATTERN);
     expect(stub).toContain('vybekiit:generated:buyer-skill-stub');
     expect(stub).toContain('# Skill: go-live');
     expect(stub).toContain('**Goal:**');

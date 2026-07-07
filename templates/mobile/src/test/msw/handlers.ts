@@ -18,8 +18,15 @@ export const wirePointHandlers = [
   ),
 ];
 
-export function signInFailureHandler(message = 'Wrong password.') {
-  return http.post(`${base}/api/auth/signin`, async () =>
+/**
+ * Override the sign-in route with a controlled failure.
+ *
+ * @param message - Error message returned by the mocked route.
+ * @returns MSW handler for the sign-in failure path.
+ * @example
+ * mswServer.use(signInFailureHandler('Wrong password.'));
+ */
+export const signInFailureHandler = (message = 'Wrong password.') =>
+  http.post(`${base}/api/auth/signin`, async () =>
     HttpResponse.json({ code: 'unauthorized', error: message }, { status: 401 }),
   );
-}

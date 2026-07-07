@@ -19,6 +19,14 @@ const alertVariants = cva(
   },
 );
 
+/**
+ * Render the Alert component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Alert component.
+ * @example
+ * <Alert />;
+ */
 const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
@@ -27,6 +35,14 @@ const Alert = React.forwardRef<
 ));
 Alert.displayName = 'Alert';
 
+/**
+ * Render the Alert Title component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Alert Title component.
+ * @example
+ * <AlertTitle />;
+ */
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h5
@@ -38,6 +54,14 @@ const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<H
 );
 AlertTitle.displayName = 'AlertTitle';
 
+/**
+ * Render the Alert Description component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Alert Description component.
+ * @example
+ * <AlertDescription />;
+ */
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>

@@ -3,54 +3,59 @@ import { CLAUDE_CODE_BRAND_HEX, CLAUDE_CODE_SAD_FACE } from './builderAssistantM
 import { claudeOctopusExtendedPose } from './claudeOctopusExtendedPoses';
 import { extendedPoseOverlay } from './extendedPoseOverlays';
 
-function SadFace() {
-  return (
-    <g className="claude-octopus__sad-face">
-      <path
-        className="claude-octopus__brow claude-octopus__brow--left"
-        d={CLAUDE_CODE_SAD_FACE.leftBrow}
-        fill="none"
-        stroke="#6B3D2E"
-        strokeLinecap="round"
-        strokeWidth="0.55"
-      />
-      <path
-        className="claude-octopus__brow claude-octopus__brow--right"
-        d={CLAUDE_CODE_SAD_FACE.rightBrow}
-        fill="none"
-        stroke="#6B3D2E"
-        strokeLinecap="round"
-        strokeWidth="0.55"
-      />
-      <path
-        className="claude-octopus__mouth"
-        d={CLAUDE_CODE_SAD_FACE.mouth}
-        fill="none"
-        stroke="#6B3D2E"
-        strokeLinecap="round"
-        strokeWidth="0.6"
-      />
-      <ellipse
-        className="claude-octopus__tear claude-octopus__tear--left"
-        cx={CLAUDE_CODE_SAD_FACE.leftTear.cx}
-        cy={CLAUDE_CODE_SAD_FACE.leftTear.cy}
-        fill="#7EC8E3"
-        rx={CLAUDE_CODE_SAD_FACE.leftTear.rx}
-        ry={CLAUDE_CODE_SAD_FACE.leftTear.ry}
-      />
-      <ellipse
-        className="claude-octopus__tear claude-octopus__tear--right"
-        cx={CLAUDE_CODE_SAD_FACE.rightTear.cx}
-        cy={CLAUDE_CODE_SAD_FACE.rightTear.cy}
-        fill="#7EC8E3"
-        rx={CLAUDE_CODE_SAD_FACE.rightTear.rx}
-        ry={CLAUDE_CODE_SAD_FACE.rightTear.ry}
-      />
-    </g>
-  );
-}
+const SadFace = () => (
+  <g className="claude-octopus__sad-face">
+    <path
+      className="claude-octopus__brow claude-octopus__brow--left"
+      d={CLAUDE_CODE_SAD_FACE.leftBrow}
+      fill="none"
+      stroke="#6B3D2E"
+      strokeLinecap="round"
+      strokeWidth="0.55"
+    />
+    <path
+      className="claude-octopus__brow claude-octopus__brow--right"
+      d={CLAUDE_CODE_SAD_FACE.rightBrow}
+      fill="none"
+      stroke="#6B3D2E"
+      strokeLinecap="round"
+      strokeWidth="0.55"
+    />
+    <path
+      className="claude-octopus__mouth"
+      d={CLAUDE_CODE_SAD_FACE.mouth}
+      fill="none"
+      stroke="#6B3D2E"
+      strokeLinecap="round"
+      strokeWidth="0.6"
+    />
+    <ellipse
+      className="claude-octopus__tear claude-octopus__tear--left"
+      cx={CLAUDE_CODE_SAD_FACE.leftTear.cx}
+      cy={CLAUDE_CODE_SAD_FACE.leftTear.cy}
+      fill="#7EC8E3"
+      rx={CLAUDE_CODE_SAD_FACE.leftTear.rx}
+      ry={CLAUDE_CODE_SAD_FACE.leftTear.ry}
+    />
+    <ellipse
+      className="claude-octopus__tear claude-octopus__tear--right"
+      cx={CLAUDE_CODE_SAD_FACE.rightTear.cx}
+      cy={CLAUDE_CODE_SAD_FACE.rightTear.cy}
+      fill="#7EC8E3"
+      rx={CLAUDE_CODE_SAD_FACE.rightTear.rx}
+      ry={CLAUDE_CODE_SAD_FACE.rightTear.ry}
+    />
+  </g>
+);
 
-export function ClaudeOctopusOverlays({ pose }: { readonly pose: ClaudeOctopusPose }) {
+/**
+ * Render the legacy path-body overlay for poses that need extra face or prop detail.
+ *
+ * @returns SVG overlay nodes for the current pose.
+ * @example
+ * <ClaudeOctopusOverlays pose="sad" />;
+ */
+export const ClaudeOctopusOverlays = ({ pose }: { readonly pose: ClaudeOctopusPose }) => {
   switch (pose) {
     case 'sad':
       return <SadFace />;
@@ -1107,4 +1112,4 @@ export function ClaudeOctopusOverlays({ pose }: { readonly pose: ClaudeOctopusPo
       );
     }
   }
-}
+};

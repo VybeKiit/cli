@@ -5,29 +5,99 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAsync } from '@/hooks/useAsync';
 import { displayError, useTranslations } from '@/hooks/useTranslations';
 import { startCheckout } from '@/lib/billingClient';
-import { PLANS } from '@/lib/plans';
+import { PLANS, type Plan } from '@/lib/plans';
 import { useTheme } from '@/theme/useTheme';
-import * as Linking from 'expo-linking';
-import { useState } from 'react';
+import { Either } from 'effect';
+import { openURL } from 'expo-linking';
+import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/** Pricing screen — RN parallel of the web pricing page. */
-export default function PricingScreen() {
+interface PricingPlanCardProps {
+  readonly plan: Plan;
+  readonly pendingId: string;
+  readonly onSelect: (planId: string) => Promise<void>;
+}
+
+/**
+ * Render one selectable mobile pricing plan card.
+ *
+ * @param props - Plan data, pending checkout id, and select handler.
+ * @returns A themed pricing card with checkout action.
+ * @example
+ * <PricingPlanCard plan={plan} pendingId="" onSelect={selectPlan} />
+ */
+const PricingPlanCard = ({ plan, pendingId, onSelect }: PricingPlanCardProps) => {
+  const { colors, spacing, fontSizes, fontWeights } = useTheme();
+  const { t } = useTranslations();
+  const selectPlan = useCallback(() => {
+    void onSelect(plan.id);
+  }, [onSelect, plan.id]);
+
+  return (
+    <Card style={plan.featured ? { borderColor: colors.primary } : undefined}>
+      <CardHeader>
+        <CardTitle>{t(plan.nameKey)}</CardTitle>
+        <CardDescription>{t(plan.descriptionKey)}</CardDescription>
+        <View style={[styles.priceRow, { marginTop: spacing.xs }]}>
+          <Text
+            style={{
+              color: colors.foreground,
+              fontSize: fontSizes.xxxl,
+              fontWeight: fontWeights.bold,
+            }}
+          >
+            {t(plan.priceKey)}
+          </Text>
+          <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
+            {t(plan.periodKey)}
+          </Text>
+        </View>
+      </CardHeader>
+      <CardContent style={{ gap: spacing.md }}>
+        <View style={{ gap: spacing.sm }}>
+          {plan.featureKeys.map((featureKey) => (
+            <Text key={featureKey} style={{ color: colors.foreground, fontSize: fontSizes.sm }}>
+              {t(featureKey)}
+            </Text>
+          ))}
+        </View>
+        <Button
+          title={pendingId === plan.id ? t('pricing.starting') : t('pricing.choosePlan')}
+          variant={plan.featured ? 'default' : 'outline'}
+          loading={pendingId === plan.id}
+          onPress={selectPlan}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+/**
+ * Render the mobile pricing screen.
+ *
+ * @returns React Native pricing screen.
+ * @example
+ * <PricingScreen />
+ */
+const PricingScreen = () => {
   const { colors, spacing, fontSizes, fontWeights } = useTheme();
   const { t } = useTranslations();
   const [pendingId, setPendingId] = useState('');
   const { error, run: checkout } = useAsync(startCheckout);
 
-  async function handleSelect(planId: string) {
-    setPendingId(planId);
-    const result = await checkout(planId);
-    if (!result.ok) {
+  const handleSelect = useCallback(
+    async (planId: string): Promise<void> => {
+      setPendingId(planId);
+      const result = await checkout(planId);
+      if (Either.isLeft(result)) {
+        setPendingId('');
+        return;
+      }
+      await openURL(result.right.url);
       setPendingId('');
-      return;
-    }
-    await Linking.openURL(result.value.url);
-    setPendingId('');
-  }
+    },
+    [checkout],
+  );
 
   return (
     <ScrollView
@@ -58,49 +128,17 @@ export default function PricingScreen() {
 
       <View style={{ gap: spacing.md }}>
         {PLANS.map((plan) => (
-          <Card key={plan.id} style={plan.featured ? { borderColor: colors.primary } : undefined}>
-            <CardHeader>
-              <CardTitle>{t(plan.nameKey)}</CardTitle>
-              <CardDescription>{t(plan.descriptionKey)}</CardDescription>
-              <View style={[styles.priceRow, { marginTop: spacing.xs }]}>
-                <Text
-                  style={{
-                    color: colors.foreground,
-                    fontSize: fontSizes.xxxl,
-                    fontWeight: fontWeights.bold,
-                  }}
-                >
-                  {t(plan.priceKey)}
-                </Text>
-                <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
-                  {t(plan.periodKey)}
-                </Text>
-              </View>
-            </CardHeader>
-            <CardContent style={{ gap: spacing.md }}>
-              <View style={{ gap: spacing.sm }}>
-                {plan.featureKeys.map((featureKey) => (
-                  <Text
-                    key={featureKey}
-                    style={{ color: colors.foreground, fontSize: fontSizes.sm }}
-                  >
-                    {t(featureKey)}
-                  </Text>
-                ))}
-              </View>
-              <Button
-                title={pendingId === plan.id ? t('pricing.starting') : t('pricing.choosePlan')}
-                variant={plan.featured ? 'default' : 'outline'}
-                loading={pendingId === plan.id}
-                onPress={() => handleSelect(plan.id)}
-              />
-            </CardContent>
-          </Card>
+          <PricingPlanCard
+            key={plan.id}
+            plan={plan}
+            pendingId={pendingId}
+            onSelect={handleSelect}
+          />
         ))}
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   content: {
@@ -112,3 +150,5 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 });
+
+export default PricingScreen;

@@ -11,13 +11,23 @@ interface ReportControlHintProps {
   readonly className?: string;
 }
 
-/** Buyer-voice control hint — shadcn Tooltip, suppressed when flyout/hold/tutorial is active. */
-export function ReportControlHint({
+/**
+ * Buyer-voice control hint — shadcn Tooltip, suppressed when flyout/hold/tutorial is active.
+ *
+ * @param props - Component props.
+ * @returns The rendered ReportControlHint element.
+ * @example
+ * ```tsx
+ * <ReportControlHint />
+ * ```
+ */
+
+export const ReportControlHint = ({
   text,
   children,
   disabled = false,
   className,
-}: ReportControlHintProps) {
+}: ReportControlHintProps) => {
   if (disabled) {
     return <>{children}</>;
   }
@@ -37,4 +47,4 @@ export function ReportControlHint({
       </TooltipContent>
     </Tooltip>
   );
-}
+};

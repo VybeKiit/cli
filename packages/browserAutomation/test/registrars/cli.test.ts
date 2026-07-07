@@ -1,12 +1,12 @@
-import { createRegistry } from '@vybekiit/browserAutomation/cli/registry';
+import { createRegistry } from '@vybekiit/browser-automation/cli/registry';
 import {
   registerGdTopLevelAlias,
   registerGodaddyDomain,
-} from '@vybekiit/browserAutomation/domains/registrars/godaddy/cli';
+} from '@vybekiit/browser-automation/domains/registrars/godaddy/cli';
 import {
   registerNamecheapDomain,
   registerNcTopLevelAlias,
-} from '@vybekiit/browserAutomation/domains/registrars/namecheap/cli';
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/cli';
 import { describe, expect, it } from 'vitest';
 
 describe('registrar CLI registry', () => {

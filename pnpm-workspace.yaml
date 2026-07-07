@@ -1,11 +1,11 @@
 # VybeKiit monorepo workspaces.
 #
 # Workspace members = code we develop, build, and gate here:
-#   - packages/*    → MAINTAINED, published to npm as @vybekiit/* (headless logic)
-#   - cli           → the `vybekiit` scaffolder
+#   - packages/*    → MAINTAINED, private headless logic; never published to npm
+#   - cli           → the `vybekiit` scaffolder; the only public npm artifact
 #   - templates/web → OWNED scaffold payload, but a real Next app we now build +
-#     typecheck in CI so the reference app can't rot. On scaffold the CLI rewrites
-#     its `@vybekiit/*` `workspace:*` deps → npm versions (see cli/src/rewrite-deps).
+#     typecheck in CI so the reference app can't rot. The CLI preserves workspace
+#     deps; buyers receive the gated monorepo mirror, not public @vybekiit/* packages.
 #   - templates/mobile → OWNED scaffold payload, a real Expo app we typecheck + test in CI.
 #     It has no monorepo `build` task (Expo builds run remotely via EAS/launch).
 #   - templates/extension → real WXT app; build + typecheck in CI (issue #20 scaffold)
@@ -31,3 +31,19 @@ packages:
   - "apps/landing"
   - "apps/componentLibrary"
   - "apps/localDevelopmentWebsite"
+
+# Shared external dependency SSOT. Workspace manifests use `catalog:` for these rather than
+# repeating ranges. Exact latest stable is the default; peer/framework exceptions are documented.
+catalog:
+  "@biomejs/biome": 2.5.2
+  "@clack/prompts": 1.7.0
+  "@effect/vitest": 0.29.0
+  "@types/node": 22.20.0
+  agnix: 0.37.5
+  effect: 3.21.4
+  husky: 9.1.7
+  open: 11.0.0
+  tsup: 8.5.1
+  turbo: 2.10.3
+  typescript: 5.7.2 # TS 6 upgrade gets its own gate-green pass.
+  vitest: 3.2.6 # @effect/vitest@0.29.0 peers vitest ^3.2.0.

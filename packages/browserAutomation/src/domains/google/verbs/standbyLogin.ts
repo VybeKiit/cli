@@ -1,25 +1,33 @@
-import { connectToGoogleChrome } from '@vybekiit/browserAutomation/domains/google/connect';
-import { waitForGoogleAuthenticated } from '@vybekiit/browserAutomation/domains/google/dashboard/waitForAuthenticated';
-import { ensureProject } from '@vybekiit/browserAutomation/domains/google/ensureProject';
-import { validateGoogleCredentials } from '@vybekiit/browserAutomation/domains/google/scrape';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToGoogleChrome } from '@vybekiit/browser-automation/domains/google/connect';
+import { waitForGoogleAuthenticated } from '@vybekiit/browser-automation/domains/google/dashboard/waitForAuthenticated';
+import { ensureProject } from '@vybekiit/browser-automation/domains/google/ensureProject';
+import { validateGoogleCredentials } from '@vybekiit/browser-automation/domains/google/scrape';
 import type {
   GoogleOAuthParams,
   GoogleOAuthResult,
   GoogleVerbContext,
-} from '@vybekiit/browserAutomation/domains/google/types';
+} from '@vybekiit/browser-automation/domains/google/types';
 import { configureConsent } from './configureConsent';
 import { createOAuthClient } from './createOAuthClient';
 
-/** Wait until the builder reaches the Cloud Console after manual Google sign-in. */
-export async function standbyLogin(
+/**
+ * Wait until the builder reaches the Cloud Console after manual Google sign-in.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await standbyGoogleLogin(ctx);
+ */
+export const standbyGoogleLogin = async (
   ctx: GoogleVerbContext = {},
-): Promise<{ ready: boolean; url?: string }> {
+): Promise<{ ready: boolean; url?: string }> => {
   const session = await connectToGoogleChrome(ctx, { waitForAuth: false });
   try {
     try {
       session.page = await waitForGoogleAuthenticated(
         session.page,
-        ctx.log ?? console,
+        resolveVerbLogger(ctx),
         session.context,
       );
       return { ready: true, url: session.page.url() };
@@ -29,17 +37,22 @@ export async function standbyLogin(
   } finally {
     await session.dispose();
   }
-}
+};
 
 /**
- * One-shot Google OAuth setup: ensure the GCP project (gcloud), then drive the Console once
- * to configure the consent screen and create/reset the Web OAuth client, returning credentials.
+ * One-shot Google OAuth setup: ensure the GCP project (gcloud), then drive the Console once to configure the consent screen and create/reset the Web OAuth client, returning credentials.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @param params - Validated automation parameters for the operation.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await runGoogleOAuthSetup(ctx, params);
  */
-export async function runGoogleOAuthSetup(
+export const runGoogleOAuthSetup = async (
   ctx: GoogleVerbContext,
   params: GoogleOAuthParams,
-): Promise<GoogleOAuthResult> {
-  const log = ctx.log ?? console;
+): Promise<GoogleOAuthResult> => {
+  const log = resolveVerbLogger(ctx);
   await ensureProject(params.projectId, log);
 
   const session = await connectToGoogleChrome(ctx, { waitForAuth: true });
@@ -55,4 +68,4 @@ export async function runGoogleOAuthSetup(
   } finally {
     await session.dispose();
   }
-}
+};

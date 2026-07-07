@@ -14,14 +14,24 @@ interface CheckoutCTAProps {
   readonly icon?: 'cart' | 'lock';
 }
 
-/** Checkout link with cart fly animation on click (RTL-aware). */
-export function CheckoutCTA({
+/**
+ * Checkout link with cart fly animation on click (RTL-aware).
+ *
+ * @param props - Component props.
+ * @returns The rendered CheckoutCTA element.
+ * @example
+ * ```tsx
+ * <CheckoutCTA />
+ * ```
+ */
+
+export const CheckoutCTA = ({
   href = '/checkout',
   children,
   className,
   size = 'hero',
   icon = 'cart',
-}: CheckoutCTAProps) {
+}: CheckoutCTAProps) => {
   const [proceeding, setProceeding] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -49,4 +59,4 @@ export function CheckoutCTA({
       )}
     </Link>
   );
-}
+};

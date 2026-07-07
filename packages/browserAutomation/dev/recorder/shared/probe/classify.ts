@@ -1,8 +1,8 @@
-import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 import {
   LS_FIELD_HINTS,
   type LsFieldHint,
-} from '@vybekiit/browserAutomation/domains/payments/ls/selectors/hints';
+} from '@vybekiit/browser-automation/domains/payments/ls/selectors/hints';
 import type { ParsedEntry } from '../draft';
 import type { ClassifiedMatch, DomCandidate, PageSnapshot } from './types';
 

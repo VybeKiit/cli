@@ -1,16 +1,21 @@
 import { useTheme } from '@/theme/useTheme';
 import { Text, View, type ViewStyle } from 'react-native';
 
-/** Circular initials avatar — mirrors web Avatar + AvatarFallback. */
-export function Avatar({
-  label,
-  size = 32,
-  style,
-}: {
-  label: string;
-  size?: number;
-  style?: ViewStyle;
-}) {
+interface AvatarProps {
+  readonly label?: string;
+  readonly size?: number;
+  readonly style?: ViewStyle;
+}
+
+/**
+ * Circular initials avatar for account affordances.
+ *
+ * @param props - Label, size, and optional style for the avatar.
+ * @returns A themed circular initials avatar.
+ * @example
+ * <Avatar label="you@local.dev" />
+ */
+export const Avatar = ({ label = '', size = 32, style }: AvatarProps) => {
   const { colors, fontSizes, fontWeights } = useTheme();
   const initials = label.slice(0, 2).toUpperCase();
   return (
@@ -34,4 +39,4 @@ export function Avatar({
       </Text>
     </View>
   );
-}
+};

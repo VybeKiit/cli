@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { RateLimiter } from './rateLimit';
 
 /** A controllable clock so window expiry is deterministic, not wall-clock dependent. */
-function fakeClock(start = 0) {
+const fakeClock = (start = 0) => {
   let now = start;
   return {
     now: () => now,
@@ -10,7 +10,7 @@ function fakeClock(start = 0) {
       now += ms;
     },
   };
-}
+};
 
 describe('RateLimiter', () => {
   it('allows up to max within a window, then blocks', () => {
@@ -23,7 +23,9 @@ describe('RateLimiter', () => {
 
     const blocked = limiter.check('ip');
     expect(blocked.allowed).toBe(false);
-    if (!blocked.allowed) expect(blocked.retryAfterSeconds).toBe(60);
+    if (!blocked.allowed) {
+      expect(blocked.retryAfterSeconds).toBe(60);
+    }
   });
 
   it('counts each key independently', () => {
@@ -50,7 +52,11 @@ describe('RateLimiter', () => {
     const limiter = new RateLimiter(2, 60, fakeClock().now);
     const first = limiter.check('ip');
     const second = limiter.check('ip');
-    if (first.allowed) expect(first.remaining).toBe(1);
-    if (second.allowed) expect(second.remaining).toBe(0);
+    if (first.allowed) {
+      expect(first.remaining).toBe(1);
+    }
+    if (second.allowed) {
+      expect(second.remaining).toBe(0);
+    }
   });
 });

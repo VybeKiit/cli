@@ -1,7 +1,7 @@
 const loadedKeys = new Set<string>();
 const listeners = new Map<string, Set<() => void>>();
 
-function notifyKey(previewKey: string): void {
+const notifyKey = (previewKey: string): void => {
   const keyListeners = listeners.get(previewKey);
   if (!keyListeners) {
     return;
@@ -9,29 +9,54 @@ function notifyKey(previewKey: string): void {
   for (const listener of keyListeners) {
     listener();
   }
-}
+};
 
-/** Mark a preview iframe as compiled and ready — skips spinner on revisit. */
-export function markPreviewLoaded(previewKey: string): void {
+/**
+ * Mark preview loaded.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * markPreviewLoaded(entry.previewKey);
+ */
+export const markPreviewLoaded = (previewKey: string): void => {
   if (loadedKeys.has(previewKey)) {
     return;
   }
   loadedKeys.add(previewKey);
   notifyKey(previewKey);
-}
+};
 
-export function isPreviewLoaded(previewKey: string): boolean {
-  return loadedKeys.has(previewKey);
-}
+/**
+ * Is preview loaded.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @returns The value produced by isPreviewLoaded.
+ * @example
+ * const result = isPreviewLoaded(entry.previewKey);
+ */
+export const isPreviewLoaded = (previewKey: string): boolean => loadedKeys.has(previewKey);
 
-export function subscribePreviewCache(previewKey: string, listener: () => void): () => void {
-  const bucket = listeners.get(previewKey) ?? new Set();
+/**
+ * Subscribe preview cache.
+ *
+ * @param previewKey - Stable catalog preview key to read or update.
+ * @param listener - Callback invoked when the subscribed state changes.
+ * @returns The value produced by subscribePreviewCache.
+ * @example
+ * const result = subscribePreviewCache(entry.previewKey, listener);
+ */
+export const subscribePreviewCache = (previewKey: string, listener: () => void): (() => void) => {
+  let bucket = listeners.get(previewKey);
+  if (bucket === undefined) {
+    bucket = new Set();
+    listeners.set(previewKey, bucket);
+  }
   bucket.add(listener);
-  listeners.set(previewKey, bucket);
   return () => {
     bucket.delete(listener);
     if (bucket.size === 0) {
       listeners.delete(previewKey);
     }
   };
-}
+};

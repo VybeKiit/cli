@@ -54,7 +54,15 @@ const SIZE_TIPS: Record<PreviewSize, string> = {
 
 const SIZE_OPTIONS: PreviewSize[] = ['s', 'm', 'l', 'xl', 'xxl'];
 
-export function PreviewControlsBar({
+/**
+ * Render the preview controls bar component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <PreviewControlsBar {...props} />;
+ */
+export const PreviewControlsBar = ({
   mode,
   onModeChange,
   compact = false,
@@ -76,7 +84,7 @@ export function PreviewControlsBar({
   onViewportChange?: (preset: ViewportPreset) => void;
   onCustomWidthChange?: (width: number) => void;
   onSizeChange?: (size: PreviewSize) => void;
-}) {
+}) => {
   const showViewport = viewport !== undefined && onViewportChange !== undefined;
   const showSize = size !== undefined && onSizeChange !== undefined;
 
@@ -157,6 +165,6 @@ export function PreviewControlsBar({
       ) : null}
     </div>
   );
-}
+};
 
 export { SIZE_SCALES };

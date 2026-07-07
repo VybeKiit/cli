@@ -1,4 +1,4 @@
-import { isRtlLocale, resolveLocaleOrDefault } from '@vybekiit/i18n/localeRules';
+import { isRtlLocale, resolveLocaleOrDefault } from '@vybekiit/i18n';
 import { describe, expect, it } from 'vitest';
 
 describe('locale-rules', () => {

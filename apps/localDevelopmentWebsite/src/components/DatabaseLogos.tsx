@@ -46,6 +46,14 @@ type DatabaseLogosProps = {
   active: boolean;
 };
 
+/**
+ * Render the database logos component.
+ *
+ * @param active - Whether database logos should appear highlighted.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <DatabaseLogos active={true} />;
+ */
 export const DatabaseLogos = ({ active }: DatabaseLogosProps) => (
   <div className="flex flex-wrap gap-2 mt-2">
     {DB_LOGOS.map((db) => (

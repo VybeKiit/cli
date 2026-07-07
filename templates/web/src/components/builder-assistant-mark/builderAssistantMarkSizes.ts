@@ -19,6 +19,13 @@ export const BUILDER_ASSISTANT_MARK_SIZE_LABELS: Record<BuilderAssistantMarkSize
   xxl: 'XXL · 72px',
 };
 
-export function builderAssistantMarkSizeClass(size: BuilderAssistantMarkSize = 's'): string {
-  return `builder-assistant-mark--size-${size}`;
-}
+/**
+ * Resolve the CSS class for a named assistant mark size.
+ *
+ * @param size - Size token from the assistant mark scale.
+ * @returns CSS modifier class for the requested size.
+ * @example
+ * builderAssistantMarkSizeClass('xl');
+ */
+export const builderAssistantMarkSizeClass = (size: BuilderAssistantMarkSize = 's'): string =>
+  `builder-assistant-mark--size-${size}`;

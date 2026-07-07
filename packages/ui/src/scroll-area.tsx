@@ -5,6 +5,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Scroll Area component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Scroll Area component.
+ * @example
+ * <ScrollArea />;
+ */
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
@@ -23,6 +31,14 @@ const ScrollArea = React.forwardRef<
 ));
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
+/**
+ * Render the Scroll Bar component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Scroll Bar component.
+ * @example
+ * <ScrollBar />;
+ */
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>

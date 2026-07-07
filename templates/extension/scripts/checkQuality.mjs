@@ -11,4 +11,5 @@ const result = spawnSync('pnpm', ['verify'], {
   shell: process.platform === 'win32',
 });
 
-process.exit(result.status ?? 1);
+const status = result.status === null ? 1 : result.status;
+process.exit(status);

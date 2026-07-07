@@ -3,15 +3,20 @@ import { MarketingHero } from '@/components/marketing-hero';
 import { HomeFeatureGrid } from '@/components/home-feature-grid';
 import { setRequestLocale } from 'next-intl/server';
 
-type HomePageProps = {
+interface HomePageProps {
   params: Promise<{ locale: string }>;
-};
+}
 
 /**
  * Landing page — normalized hero block + feature grid + CTA. The agent reshapes
  * copy and blocks to the builder's idea; spacing mirrors in RTL.
+ *
+ * @param props - Locale route params from Next.js.
+ * @returns The localized marketing home page.
+ * @example
+ * <HomePage params={params} />
  */
-export default async function HomePage({ params }: HomePageProps) {
+const HomePage = async ({ params }: HomePageProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -21,4 +26,6 @@ export default async function HomePage({ params }: HomePageProps) {
       <HomeFeatureGrid />
     </MarketingShell>
   );
-}
+};
+
+export default HomePage;

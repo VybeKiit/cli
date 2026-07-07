@@ -12,7 +12,8 @@ import sharp from 'sharp';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const landingRoot = path.join(__dirname, '..');
-const downloadsDir = path.join(process.env.HOME ?? '', 'Downloads');
+const homeDir = process.env.HOME;
+const downloadsDir = path.join(homeDir === undefined ? '' : homeDir, 'Downloads');
 const outDir = path.join(landingRoot, 'public/brand-marks-3d');
 const manifestPath = path.join(landingRoot, 'src/data/brandMarks3d.ts');
 const flatMarksDir = path.join(landingRoot, 'public/brand-marks');
@@ -161,13 +162,13 @@ const ORBIT_POSITIONS = [
   { x: 0.5, y: 0.76, scale: 0.16, floatPhase: 0.2 },
 ];
 
-async function load3dSourceBuffer(source) {
+const load3dSourceBuffer = async (source) => {
   const primary = path.join(downloadsDir, source.file);
   let pipeline = sharp(primary);
   if (source.crop) {
     const meta = await sharp(primary).metadata();
-    const w = meta.width ?? 1;
-    const h = meta.height ?? 1;
+    const w = meta.width === undefined ? 1 : meta.width;
+    const h = meta.height === undefined ? 1 : meta.height;
     const { left, top, width, height } = source.crop;
     pipeline = pipeline.extract({
       left: Math.round(left * w),
@@ -177,31 +178,32 @@ async function load3dSourceBuffer(source) {
     });
   }
   return pipeline.toBuffer();
-}
+};
 
-function erodeAlpha(pixels, width, height, channels = 4) {
+const erodeAlpha = (pixels, width, height, channels = 4) => {
   const copy = Buffer.from(pixels);
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
       const i = (y * width + x) * channels;
-      if (pixels[i + 3] === 0) continue;
-      let neighborTransparent = false;
-      for (const [dx, dy] of [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ]) {
-        const ni = ((y + dy) * width + (x + dx)) * channels;
-        if (pixels[ni + 3] < 128) neighborTransparent = true;
+      if (pixels[i + 3] !== 0) {
+        let neighborTransparent = false;
+        for (const [dx, dy] of [
+          [-1, 0],
+          [1, 0],
+          [0, -1],
+          [0, 1],
+        ]) {
+          const ni = ((y + dy) * width + (x + dx)) * channels;
+          if (pixels[ni + 3] < 128) neighborTransparent = true;
+        }
+        if (neighborTransparent) copy[i + 3] = Math.min(copy[i + 3], 200);
       }
-      if (neighborTransparent) copy[i + 3] = Math.min(copy[i + 3], 200);
     }
   }
   return copy;
-}
+};
 
-async function removeWhiteBackground(input) {
+const removeWhiteBackground = async (input) => {
   const { data, info } = await sharp(input)
     .ensureAlpha()
     .raw()
@@ -223,10 +225,7 @@ async function removeWhiteBackground(input) {
 
       if (y >= shadowStartY && lightness > 180 && saturation < 40) {
         pixels[i + 3] = 0;
-        continue;
-      }
-
-      if (lightness > 240 && saturation < 25) {
+      } else if (lightness > 240 && saturation < 25) {
         pixels[i + 3] = 0;
       } else if (lightness > 220 && saturation < 18) {
         pixels[i + 3] = Math.min(pixels[i + 3], 64);
@@ -247,26 +246,26 @@ async function removeWhiteBackground(input) {
   }
 
   return pipeline.png().toBuffer();
-}
+};
 
-async function write3dWebp(slug, input) {
+const write3dWebp = async (slug, input) => {
   const cutout = await removeWhiteBackground(input);
   const webp = await sharp(cutout)
     .resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .webp({ quality: 90, effort: 6, alphaQuality: 100 })
     .toBuffer();
   await writeFile(path.join(outDir, `${slug}.webp`), webp);
-}
+};
 
-async function removeStale3d(slug) {
+const removeStale3d = async (slug) => {
   try {
     await unlink(path.join(outDir, `${slug}.webp`));
   } catch {
     // already absent
   }
-}
+};
 
-function generateManifest(entries) {
+const generateManifest = (entries) => {
   const lines = entries.map((e) => {
     const fields = [
       `slug: '${e.slug}'`,
@@ -304,9 +303,23 @@ ${lines.join('\n')}
 /** @deprecated Use HERO_STACK_MARKS */
 export const BRAND_MARKS_3D = HERO_STACK_MARKS;
 `;
-}
+};
 
-async function main() {
+const logInfo = (message) => {
+  process.stdout.write(`${message}\n`);
+};
+
+const logWarn = (message) => {
+  process.stderr.write(`${message}\n`);
+};
+
+const logError = (message) => {
+  process.stderr.write(`${message}\n`);
+};
+
+const errorMessage = (error) => (error instanceof Error ? error.message : String(error));
+
+const main = async () => {
   await mkdir(outDir, { recursive: true });
 
   const manifestEntries = [];
@@ -319,31 +332,32 @@ async function main() {
     const pos = ORBIT_POSITIONS[index % ORBIT_POSITIONS.length];
 
     if (source.tier === 'reuse2d') {
-      const src = FLAT_MARK_SRC[slug] ?? `/brand-marks/${slug}.webp`;
+      const flatSrc = FLAT_MARK_SRC[slug];
+      const src = flatSrc === undefined ? `/brand-marks/${slug}.webp` : flatSrc;
       await removeStale3d(slug);
       manifestEntries.push({ slug, src, tier: '2d', ...pos });
       reused2d.push(slug);
-      console.log(`↪ ${slug} → ${src} (reuse2d)`);
-      continue;
-    }
-
-    try {
-      const input = await load3dSourceBuffer(source);
-      await write3dWebp(slug, input);
-      manifestEntries.push({
-        slug,
-        src: `/brand-marks-3d/${slug}.webp`,
-        tier: '3d',
-        ...pos,
-      });
-      processed3d.push(slug);
-      console.log(`✓ ${slug}.webp`);
-    } catch (error) {
-      errors.push(slug);
-      const fallbackSrc = FLAT_MARK_SRC[slug] ?? `/brand-marks/${slug}.webp`;
-      await removeStale3d(slug);
-      manifestEntries.push({ slug, src: fallbackSrc, tier: '2d', ...pos });
-      console.warn(`✗ ${slug} 3d failed (${error.message}) → ${fallbackSrc}`);
+      logInfo(`↪ ${slug} → ${src} (reuse2d)`);
+    } else {
+      try {
+        const input = await load3dSourceBuffer(source);
+        await write3dWebp(slug, input);
+        manifestEntries.push({
+          slug,
+          src: `/brand-marks-3d/${slug}.webp`,
+          tier: '3d',
+          ...pos,
+        });
+        processed3d.push(slug);
+        logInfo(`✓ ${slug}.webp`);
+      } catch (error) {
+        errors.push(slug);
+        const flatSrc = FLAT_MARK_SRC[slug];
+        const fallbackSrc = flatSrc === undefined ? `/brand-marks/${slug}.webp` : flatSrc;
+        await removeStale3d(slug);
+        manifestEntries.push({ slug, src: fallbackSrc, tier: '2d', ...pos });
+        logWarn(`✗ ${slug} 3d failed (${errorMessage(error)}) → ${fallbackSrc}`);
+      }
     }
   }
 
@@ -352,14 +366,14 @@ async function main() {
   const downloadFiles = await readdir(downloadsDir).catch(() => []);
   const chatgptCount = downloadFiles.filter((f) => f.startsWith('ChatGPT Image Jun 30')).length;
 
-  console.log(
+  logInfo(
     `\n3D processed: ${processed3d.length} | 2D reused: ${reused2d.length} | errors: ${errors.length}`,
   );
-  console.log(`Manifest: ${manifestPath}`);
-  console.log(`(${chatgptCount} ChatGPT sources in Downloads)`);
-}
+  logInfo(`Manifest: ${manifestPath}`);
+  logInfo(`(${chatgptCount} ChatGPT sources in Downloads)`);
+};
 
 main().catch((error) => {
-  console.error(error);
+  logError(error instanceof Error ? error.stack : String(error));
   process.exit(1);
 });

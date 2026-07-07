@@ -2,8 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import type { SelectorEntry } from '@vybekiit/browserAutomation/domains/extension/selectors';
-import { LS_DRAFT_FIELDS } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+import type { SelectorEntry } from '@vybekiit/browser-automation/domains/extension/selectors';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 import { type ParsedEntry, renderGenerated } from '../draft';
 import type { ClassifiedMatch, ProbeReport } from './types';
 

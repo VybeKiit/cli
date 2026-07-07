@@ -2,11 +2,11 @@
 
 import { cn } from './utils';
 
-type PulseBeamProps = {
-  color?: 'green' | 'orange' | 'red' | 'blue' | 'purple';
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-};
+interface PulseBeamProps {
+  readonly color?: 'green' | 'orange' | 'red' | 'blue' | 'purple';
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly className?: string;
+}
 
 const COLOR_MAP = {
   green: { dot: 'bg-emerald-500', ring: 'bg-emerald-500/30', shadow: '0 0 8px #22c55e88' },
@@ -19,16 +19,21 @@ const COLOR_MAP = {
 const SIZE_MAP = { sm: 'h-2 w-2', md: 'h-3 w-3', lg: 'h-4 w-4' };
 
 /**
- * Animated pulsing dot with expanding ring beacon.
- * Use for live status, connection indicators, or step progress.
+ * Animated pulsing dot with an expanding ring beacon.
+ *
+ * @param props - Beacon color, size, and wrapper classes.
+ * @returns A pulsing status indicator element.
+ * @example
+ * <PulseBeam color="green" size="sm" />;
  */
-export const PulseBeam = ({ color = 'green', size = 'md', className }: PulseBeamProps) => {
+export const PulseBeam = (props: PulseBeamProps) => {
+  const { color = 'green', size = 'md', className = '' } = props;
   const c = COLOR_MAP[color];
   return (
     <span className={cn('relative inline-flex', className)}>
       <span
         className={cn(
-          'animate-ping absolute inline-flex rounded-full opacity-75',
+          'absolute inline-flex animate-ping rounded-full opacity-75',
           c.ring,
           SIZE_MAP[size],
         )}

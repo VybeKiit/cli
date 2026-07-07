@@ -5,21 +5,22 @@ import { useCallback } from 'react';
 
 const REPORT_TUTORIAL_DONE_KEY = 'vybekiit-report-tutorial-done';
 
-/** Number of Report Mode tutorial steps — mirrors REPORT_TUTORIAL_STEPS in the owned UI. */
+/** Number of Report Mode tutorial steps mirrored from the owned UI. */
 const REPORT_TUTORIAL_TOTAL_STEPS = 4;
 
 /**
- * First-visit walkthrough state for the Report Mode dock. Thin binding over the shared
- * @vybekiit/walkthrough engine at the report-mode storage key; keeps its historical
- * `next(totalSteps)` signature so the owned dock UI needs no change.
+ * Manage first-visit walkthrough state for the Report Mode dock.
+ *
+ * @returns Walkthrough state and navigation actions for the Report Mode tutorial.
+ * @example
+ * const tutorial = useReportTutorial();
  */
-export function useReportTutorial() {
+export const useReportTutorial = () => {
   const walkthrough = useWalkthrough({
     storageKey: REPORT_TUTORIAL_DONE_KEY,
     totalSteps: REPORT_TUTORIAL_TOTAL_STEPS,
   });
 
-  // Historical signature accepted a step count per call; the engine already knows it, so ignore it.
   const next = useCallback((_totalSteps?: number) => walkthrough.next(), [walkthrough]);
 
   return {
@@ -31,4 +32,4 @@ export function useReportTutorial() {
     complete: walkthrough.complete,
     replay: walkthrough.replay,
   };
-}
+};

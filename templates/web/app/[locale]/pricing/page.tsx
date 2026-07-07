@@ -8,47 +8,98 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybe
 import { useAsync } from '@/hooks/useAsync';
 import { useToast } from '@/hooks/useToast';
 import { startCheckout } from '@/lib/billingClient';
-import { PLANS } from '@/lib/plans';
+import { PLANS, type Plan } from '@/lib/plans';
 import { cn } from '@/lib/utils';
+import { Either } from 'effect';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /** Show a catalog key or pass through a server error message. */
-function displayError(t: ReturnType<typeof useTranslations>, error: string): string {
+const displayError = (t: ReturnType<typeof useTranslations>, error: string): string => {
   try {
     return t(error as 'pricing.errors.pickPlanFirst');
   } catch {
     return error;
   }
+};
+
+interface PricingPlanCardProps {
+  readonly plan: Plan;
+  readonly pending: boolean;
+  readonly onSelect: (planId: string) => void;
+  readonly t: ReturnType<typeof useTranslations>;
 }
+
+const PricingPlanCard = ({ plan, pending, onSelect, t }: PricingPlanCardProps) => {
+  const handleClick = useCallback(() => {
+    onSelect(plan.id);
+  }, [onSelect, plan.id]);
+
+  return (
+    <Card className={cn(plan.featured && 'border-primary')}>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>{t(plan.nameKey)}</CardTitle>
+          {plan.featured ? <Badge>{t('pricing.popularBadge')}</Badge> : null}
+        </div>
+        <CardDescription>{t(plan.descriptionKey)}</CardDescription>
+        <p className="pt-2">
+          <span className="font-bold text-3xl">{t(plan.priceKey)}</span>
+          <span className="text-muted-foreground text-sm">{t(plan.periodKey)}</span>
+        </p>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-2 text-sm">
+          {plan.featureKeys.map((featureKey) => (
+            <li key={featureKey}>{t(featureKey)}</li>
+          ))}
+        </ul>
+        <Button
+          disabled={pending}
+          onClick={handleClick}
+          variant={plan.featured ? 'default' : 'outline'}
+        >
+          {pending ? t('pricing.starting') : t('pricing.choosePlan')}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 /**
  * Pricing page — three starter tiers wired to checkout. Practice mode runs a local
  * checkout simulation when no provider keys are set; real hosted checkout replaces
  * it once the `setup-payments` skill wires keys.
+ *
+ * @returns The localized pricing page.
+ * @example
+ * <PricingPage />
  */
-export default function PricingPage() {
+const PricingPage = () => {
   const [pendingId, setPendingId] = useState('');
   const { error, run: checkout } = useAsync(startCheckout);
   const { toast } = useToast();
   const t = useTranslations();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(globalThis.location.search);
     if (params.get('checkout') === 'success') {
       toast(t('pricing.successToast'));
     }
   }, [toast, t]);
 
-  async function handleSelect(planId: string) {
-    setPendingId(planId);
-    const result = await checkout(planId);
-    if (!result.ok) {
-      setPendingId('');
-      return;
-    }
-    window.location.href = result.value.url;
-  }
+  const handleSelect = useCallback(
+    async (planId: string) => {
+      setPendingId(planId);
+      const result = await checkout(planId);
+      if (Either.isLeft(result)) {
+        setPendingId('');
+        return;
+      }
+      globalThis.location.href = result.right.url;
+    },
+    [checkout],
+  );
 
   return (
     <MarketingShell>
@@ -65,36 +116,18 @@ export default function PricingPage() {
         ) : null}
         <div className="grid gap-6 sm:grid-cols-3">
           {PLANS.map((plan) => (
-            <Card key={plan.id} className={cn(plan.featured && 'border-primary')}>
-              <CardHeader>
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle>{t(plan.nameKey)}</CardTitle>
-                  {plan.featured ? <Badge>{t('pricing.popularBadge')}</Badge> : null}
-                </div>
-                <CardDescription>{t(plan.descriptionKey)}</CardDescription>
-                <p className="pt-2">
-                  <span className="font-bold text-3xl">{t(plan.priceKey)}</span>
-                  <span className="text-muted-foreground text-sm">{t(plan.periodKey)}</span>
-                </p>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <ul className="flex flex-col gap-2 text-sm">
-                  {plan.featureKeys.map((featureKey) => (
-                    <li key={featureKey}>{t(featureKey)}</li>
-                  ))}
-                </ul>
-                <Button
-                  variant={plan.featured ? 'default' : 'outline'}
-                  disabled={pendingId === plan.id}
-                  onClick={() => handleSelect(plan.id)}
-                >
-                  {pendingId === plan.id ? t('pricing.starting') : t('pricing.choosePlan')}
-                </Button>
-              </CardContent>
-            </Card>
+            <PricingPlanCard
+              key={plan.id}
+              onSelect={handleSelect}
+              pending={pendingId === plan.id}
+              plan={plan}
+              t={t}
+            />
           ))}
         </div>
       </section>
     </MarketingShell>
   );
-}
+};
+
+export default PricingPage;

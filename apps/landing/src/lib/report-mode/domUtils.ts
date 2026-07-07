@@ -1,20 +1,36 @@
 const MIN_LABEL_LENGTH = 2;
 const MAX_LABEL_LENGTH = 80;
 const REPORT_MODE_UI_SELECTOR = '[data-report-mode-ui]';
+// collapse any whitespace run to one space: "a   b" -> "a b"
+const WHITESPACE_RUN = /\s+/g;
+// heading tag only: "H1" matches, "DIV" does not.
+const HEADING_TAG = /^H[1-6]$/i;
 
-/** Collapse whitespace for label comparison. */
-export function normalizeLabelText(text: string): string {
-  // collapse any whitespace run to one space: "a   b" → "a b"
-  return text.replace(/\s+/g, ' ').trim();
-}
+/**
+ * Collapse whitespace for label comparison.
+ *
+ * @param text - Raw label text.
+ * @returns Trimmed label with whitespace collapsed.
+ * @example
+ * const label = normalizeLabelText('Save   now');
+ */
+const normalizeLabelText = (text: string): string => text.replace(WHITESPACE_RUN, ' ').trim();
 
-/** Build a stable CSS selector path for an element (dev-only Report Mode). */
-export function getCssPath(element: Element): string {
+/**
+ * Build a stable CSS selector path for an element.
+ *
+ * @param element - Element to identify.
+ * @returns Best-effort CSS path for dev-only Report Mode.
+ * @example
+ * const path = getCssPath(button);
+ */
+const getCssPath = (element: Element): string => {
   const segments: string[] = [];
   let current: Element | null = element;
 
   while (current && current.tagName.toLowerCase() !== 'html') {
-    let segment = current.tagName.toLowerCase();
+    const currentTagName = current.tagName;
+    let segment = currentTagName.toLowerCase();
     if (current.id) {
       segment += `#${CSS.escape(current.id)}`;
       segments.unshift(segment);
@@ -23,7 +39,7 @@ export function getCssPath(element: Element): string {
     const parent: Element | null = current.parentElement;
     if (parent) {
       const sameTag = Array.from(parent.children).filter(
-        (child): child is Element => child instanceof Element && child.tagName === current?.tagName,
+        (child): child is Element => child instanceof Element && child.tagName === currentTagName,
       );
       if (sameTag.length > 1) {
         const index = sameTag.indexOf(current) + 1;
@@ -35,61 +51,112 @@ export function getCssPath(element: Element): string {
   }
 
   return segments.join(' > ');
-}
+};
 
-/** Best-effort accessible name for a DOM element. */
-export function getAccessibleName(element: Element): string | undefined {
+/**
+ * Read a best-effort accessible name for a DOM element.
+ *
+ * @param element - Element to inspect.
+ * @returns Accessible name when one is present.
+ * @example
+ * const name = getAccessibleName(button);
+ */
+const getAccessibleName = (element: Element): string | undefined => {
   const labelledBy = element.getAttribute('aria-labelledby');
   if (labelledBy) {
     const label = document.getElementById(labelledBy);
-    if (label?.textContent?.trim()) {
-      return label.textContent.trim();
+    const text = label?.textContent?.trim();
+    if (text !== undefined && text.length > 0) {
+      return text;
     }
   }
   const ariaLabel = element.getAttribute('aria-label')?.trim();
-  if (ariaLabel) {
+  if (ariaLabel !== undefined && ariaLabel.length > 0) {
     return ariaLabel;
   }
   const text = element.textContent?.trim();
-  return text && text.length > 0 ? text.slice(0, 120) : undefined;
-}
+  if (text !== undefined && text.length > 0) {
+    return text.slice(0, 120);
+  }
+  return undefined;
+};
 
-/** Visible inner text, trimmed and capped. */
-export function getVisibleText(element: Element): string | undefined {
-  // collapse any whitespace run to one space: "a   b" → "a b"
-  const text = element.textContent?.replace(/\s+/g, ' ').trim();
-  if (!text) {
+/**
+ * Read visible text from an element.
+ *
+ * @param element - Element to inspect.
+ * @returns Trimmed and capped visible text when present.
+ * @example
+ * const text = getVisibleText(button);
+ */
+const getVisibleText = (element: Element): string | undefined => {
+  const text = element.textContent?.replace(WHITESPACE_RUN, ' ').trim();
+  if (text === undefined || text.length === 0) {
     return;
   }
   return text.slice(0, 200);
-}
+};
 
-function isReportModeUi(element: Element): boolean {
-  return element.closest(REPORT_MODE_UI_SELECTOR) !== null;
-}
+/**
+ * Check whether an element belongs to Report Mode UI.
+ *
+ * @param element - Element to inspect.
+ * @returns True when the element is inside Report Mode UI.
+ * @example
+ * const isUi = isReportModeUi(element);
+ */
+const isReportModeUi = (element: Element): boolean =>
+  element.closest(REPORT_MODE_UI_SELECTOR) !== null;
 
-function clipLabel(text: string): string | undefined {
+/**
+ * Normalize and cap a candidate label.
+ *
+ * @param text - Raw label text.
+ * @returns Clipped label when it is long enough.
+ * @example
+ * const label = clipLabel('Checkout button');
+ */
+const clipLabel = (text: string): string | undefined => {
   const normalized = normalizeLabelText(text);
   if (normalized.length < MIN_LABEL_LENGTH) {
     return;
   }
   return normalized.length <= MAX_LABEL_LENGTH ? normalized : normalized.slice(0, MAX_LABEL_LENGTH);
-}
+};
 
-function addCandidate(candidates: Set<string>, text: string | null | undefined): void {
-  const clipped = text ? clipLabel(text) : undefined;
-  if (clipped) {
+/**
+ * Add a normalized label candidate to the set.
+ *
+ * @param candidates - Candidate set to mutate.
+ * @param text - Optional raw label text.
+ * @returns Nothing.
+ * @example
+ * addCandidate(candidates, element.textContent);
+ */
+const addCandidate = (candidates: Set<string>, text: string | null | undefined): void => {
+  const clipped = text === null || text === undefined ? undefined : clipLabel(text);
+  if (clipped !== undefined) {
     candidates.add(clipped);
   }
-}
+};
 
-function collectDeepTextCandidates(element: Element, candidates: Set<string>): void {
+/**
+ * Collect text-node candidates from an element subtree.
+ *
+ * @param element - Element whose subtree should be scanned.
+ * @param candidates - Candidate set to mutate.
+ * @returns Nothing.
+ * @example
+ * collectDeepTextCandidates(button, candidates);
+ */
+const collectDeepTextCandidates = (element: Element, candidates: Set<string>): void => {
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
   const texts: string[] = [];
 
   while (walker.nextNode()) {
-    const clipped = clipLabel(walker.currentNode.textContent ?? '');
-    if (clipped) {
+    const textContent = walker.currentNode.textContent;
+    const clipped = textContent === null ? undefined : clipLabel(textContent);
+    if (clipped !== undefined) {
       texts.push(clipped);
     }
   }
@@ -98,13 +165,22 @@ function collectDeepTextCandidates(element: Element, candidates: Set<string>): v
   for (const text of texts) {
     candidates.add(text);
   }
-}
+};
 
-function collectDirectCandidates(element: Element, candidates: Set<string>): void {
+/**
+ * Collect direct label candidates from one element.
+ *
+ * @param element - Element to inspect.
+ * @param candidates - Candidate set to mutate.
+ * @returns Nothing.
+ * @example
+ * collectDirectCandidates(button, candidates);
+ */
+const collectDirectCandidates = (element: Element, candidates: Set<string>): void => {
   addCandidate(candidates, element.getAttribute('aria-label'));
 
   const labelledBy = element.getAttribute('aria-labelledby');
-  if (labelledBy) {
+  if (labelledBy !== null) {
     addCandidate(candidates, document.getElementById(labelledBy)?.textContent);
   }
 
@@ -114,18 +190,31 @@ function collectDirectCandidates(element: Element, candidates: Set<string>): voi
     addCandidate(candidates, element.alt);
   }
 
-  // heading element? matches tag "H1".."H6", not "DIV"
-  if (/^H[1-6]$/i.test(element.tagName)) {
+  if (HEADING_TAG.test(element.tagName)) {
     addCandidate(candidates, element.textContent);
   }
-}
+};
 
-function sortCandidates(candidates: Set<string>): string[] {
-  return [...candidates].sort((left, right) => left.length - right.length);
-}
+/**
+ * Sort candidates shortest first.
+ *
+ * @param candidates - Candidate set to sort.
+ * @returns Sorted candidate labels.
+ * @example
+ * const labels = sortCandidates(candidates);
+ */
+const sortCandidates = (candidates: Set<string>): string[] =>
+  [...candidates].sort((left, right) => left.length - right.length);
 
-/** Closest-first tiers: clicked subtree, then each ancestor (no distant heading leaks). */
-function collectCandidatesInTiers(element: Element): string[][] {
+/**
+ * Collect closest-first label candidate tiers.
+ *
+ * @param element - Clicked element.
+ * @returns Candidate tiers from subtree to ancestors.
+ * @example
+ * const tiers = collectCandidatesInTiers(button);
+ */
+const collectCandidatesInTiers = (element: Element): string[][] => {
   const tiers: string[][] = [];
 
   const subtree = new Set<string>();
@@ -143,12 +232,19 @@ function collectCandidatesInTiers(element: Element): string[][] {
   }
 
   return tiers;
-}
+};
 
-/** Count page elements whose normalized text exactly matches (ignoring report-mode UI). */
-export function countElementsWithExactLabel(text: string): number {
+/**
+ * Count page elements whose normalized text exactly matches.
+ *
+ * @param text - Label text to match.
+ * @returns Count of matching non-Report-Mode elements.
+ * @example
+ * const count = countElementsWithExactLabel('Buy now');
+ */
+const countElementsWithExactLabel = (text: string): number => {
   const normalized = normalizeLabelText(text);
-  if (!normalized) {
+  if (normalized.length === 0) {
     return 0;
   }
 
@@ -157,22 +253,28 @@ export function countElementsWithExactLabel(text: string): number {
 
   while (walker.nextNode()) {
     const element = walker.currentNode as Element;
-    if (isReportModeUi(element)) {
-      continue;
-    }
-    if (normalizeLabelText(element.textContent ?? '') === normalized) {
+    const elementText = element.textContent;
+    if (
+      !isReportModeUi(element) &&
+      elementText !== null &&
+      normalizeLabelText(elementText) === normalized
+    ) {
       count += 1;
     }
   }
 
   return count;
-}
+};
 
 /**
- * Shortest readable label that uniquely identifies the clicked spot on the page.
- * Prefers labels from the clicked element's subtree before walking up the parent chain.
+ * Find the shortest readable label that uniquely identifies a clicked spot.
+ *
+ * @param element - Clicked element.
+ * @returns Short unique label, accessible fallback, visible text fallback, or tag name.
+ * @example
+ * const label = getShortestUniqueLabel(button);
  */
-export function getShortestUniqueLabel(element: Element): string {
+const getShortestUniqueLabel = (element: Element): string => {
   const tiers = collectCandidatesInTiers(element);
 
   for (const candidates of tiers) {
@@ -185,26 +287,35 @@ export function getShortestUniqueLabel(element: Element): string {
 
   for (const candidates of tiers) {
     const shortest = candidates[0];
-    if (shortest) {
+    if (shortest !== undefined) {
       return shortest;
     }
   }
 
   const accessible = getAccessibleName(element);
-  if (accessible) {
+  if (accessible !== undefined) {
     const clipped = clipLabel(accessible);
-    if (clipped) {
+    if (clipped !== undefined) {
       return clipped;
     }
   }
 
   const visible = getVisibleText(element);
-  if (visible) {
+  if (visible !== undefined) {
     const clipped = clipLabel(visible);
-    if (clipped) {
+    if (clipped !== undefined) {
       return clipped;
     }
   }
 
   return element.tagName.toLowerCase();
-}
+};
+
+export {
+  countElementsWithExactLabel,
+  getAccessibleName,
+  getCssPath,
+  getShortestUniqueLabel,
+  getVisibleText,
+  normalizeLabelText,
+};

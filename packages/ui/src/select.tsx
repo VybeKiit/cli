@@ -6,12 +6,23 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/** Select primitive re-export from the underlying UI library. */
 const Select = SelectPrimitive.Root;
 
+/** Select Group primitive re-export from the underlying UI library. */
 const SelectGroup = SelectPrimitive.Group;
 
+/** Select Value primitive re-export from the underlying UI library. */
 const SelectValue = SelectPrimitive.Value;
 
+/**
+ * Render the Select Trigger component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Trigger component.
+ * @example
+ * <SelectTrigger />;
+ */
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
@@ -19,7 +30,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+      'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
       className,
     )}
     {...props}
@@ -32,6 +43,14 @@ const SelectTrigger = React.forwardRef<
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
+/**
+ * Render the Select Scroll Up Button component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Scroll Up Button component.
+ * @example
+ * <SelectScrollUpButton />;
+ */
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
@@ -46,6 +65,14 @@ const SelectScrollUpButton = React.forwardRef<
 ));
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
+/**
+ * Render the Select Scroll Down Button component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Scroll Down Button component.
+ * @example
+ * <SelectScrollDownButton />;
+ */
 const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
@@ -60,6 +87,14 @@ const SelectScrollDownButton = React.forwardRef<
 ));
 SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
 
+/**
+ * Render the Select Content component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Content component.
+ * @example
+ * <SelectContent />;
+ */
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
@@ -68,9 +103,9 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] origin-[--radix-select-content-transform-origin] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=closed]:animate-out data-[state=open]:animate-in',
         position === 'popper' &&
-          'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+          'data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
         className,
       )}
       position={position}
@@ -92,18 +127,34 @@ const SelectContent = React.forwardRef<
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
+/**
+ * Render the Select Label component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Label component.
+ * @example
+ * <SelectLabel />;
+ */
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn('px-2 py-1.5 text-sm font-semibold', className)}
+    className={cn('px-2 py-1.5 font-semibold text-sm', className)}
     {...props}
   />
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
+/**
+ * Render the Select Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Item component.
+ * @example
+ * <SelectItem />;
+ */
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
@@ -111,7 +162,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pr-8 pl-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     {...props}
@@ -126,6 +177,14 @@ const SelectItem = React.forwardRef<
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
+/**
+ * Render the Select Separator component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Select Separator component.
+ * @example
+ * <SelectSeparator />;
+ */
 const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>

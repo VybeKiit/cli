@@ -5,11 +5,20 @@
     "app/page.tsx",
     "app/components/**/*.ts",
     "app/components/**/*.tsx",
+    "app/pages/**/*.ts",
+    "app/pages/**/*.tsx",
+    "app/embed/pages/**/*.ts",
+    "app/embed/pages/**/*.tsx",
     "src/components/**/*.ts",
     "src/components/**/*.tsx",
     "src/data/**/*.ts",
+    "src/data/**/*.tsx",
+    "src/pageRecipes/**/*.ts",
+    "src/pageRecipes/**/*.tsx",
+    "src/lib/agentPrompt.ts",
     "src/lib/resolvePreviewExport.ts",
+    "src/lib/theme.ts",
     "next-env.d.ts"
   ],
-  "exclude": ["node_modules", "app/embed/**", "src/lib/loadPreview.client.ts", "src/demos/**"]
+  "exclude": ["node_modules", "src/lib/loadPreview.client.ts", "src/demos/**"]
 }

@@ -30,12 +30,14 @@
   },
   "dependencies": {
     "@vybekiit/core": "workspace:*",
-    "effect": "3.21.4"
+    "@vybekiit/db": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "@effect/vitest": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "private": true
 }

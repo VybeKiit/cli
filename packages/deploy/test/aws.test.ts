@@ -1,16 +1,25 @@
 import { type AmplifyRunner, createAwsHosting } from '@vybekiit/deploy/providers/aws';
+import { Effect } from 'effect';
 import { describe, expect, it, type Mock, vi } from 'vitest';
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
 const hosting = { AWS_AMPLIFY_APP_ID: 'app123', AWS_AMPLIFY_BRANCH: 'main' };
 const options = { projectName: 'my-app', buildDir: './dist' };
 
-/** A fake Amplify runner capturing the command input the adapter issued. */
-function fakeRunner(impl: AmplifyRunner['send']): { runner: AmplifyRunner; send: Mock } {
+/**
+ * Build a fake Amplify runner and expose its `send` spy.
+ *
+ * @param impl - Mock implementation for the runner's send method.
+ * @returns Runner plus the spy used for assertions.
+ * @example
+ * const { runner } = fakeRunner(async () => ({}));
+ */
+const fakeRunner = (impl: AmplifyRunner['send']): { runner: AmplifyRunner; send: Mock } => {
   const send = vi.fn(impl);
   return { runner: { send }, send };
-}
+};
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: AWS hosting contract cases stay grouped for auditability.
 describe('createAwsHosting', () => {
   it('reports its provider name', () => {
     const { runner } = fakeRunner(async () => ({}));
@@ -20,9 +29,11 @@ describe('createAwsHosting', () => {
   it('deploy starts a RELEASE job for the app/branch and returns the amplify url', async () => {
     const { runner, send } = fakeRunner(async () => ({}));
 
-    const result = await createAwsHosting(config, hosting, runner).deploy(options);
+    const result = await Effect.runPromise(
+      createAwsHosting(config, hosting, runner).deploy(options),
+    );
 
-    expect(result.ok && result.value.url).toBe('https://main.app123.amplifyapp.com');
+    expect(result.url).toBe('https://main.app123.amplifyapp.com');
     expect(send).toHaveBeenCalledTimes(1);
     const command = send.mock.calls[0]?.[0] as { input: Record<string, unknown> };
     expect(command.input).toEqual({ appId: 'app123', branchName: 'main', jobType: 'RELEASE' });
@@ -31,22 +42,22 @@ describe('createAwsHosting', () => {
   it('deploy fails when no Amplify app id is configured', async () => {
     const { runner, send } = fakeRunner(async () => ({}));
 
-    const result = await createAwsHosting(config, { AWS_AMPLIFY_BRANCH: 'main' }, runner).deploy(
-      options,
+    const error = await Effect.runPromise(
+      Effect.flip(createAwsHosting(config, { AWS_AMPLIFY_BRANCH: 'main' }, runner).deploy(options)),
     );
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('no_amplify_app');
+    expect(error.code).toBe('no_amplify_app');
     expect(send).not.toHaveBeenCalled();
   });
 
   it('maps a runner throw into a deploy_failed result', async () => {
     const { runner } = fakeRunner(() => Promise.reject(new Error('throttled')));
 
-    const result = await createAwsHosting(config, hosting, runner).deploy(options);
+    const error = await Effect.runPromise(
+      Effect.flip(createAwsHosting(config, hosting, runner).deploy(options)),
+    );
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('deploy_failed');
+    expect(error.code).toBe('deploy_failed');
   });
 
   it('status reports live + url when the latest job succeeded', async () => {
@@ -54,9 +65,11 @@ describe('createAwsHosting', () => {
       job: { summary: { status: 'SUCCEED' } },
     }));
 
-    const result = await createAwsHosting(config, hosting, runner).status('my-app');
+    const result = await Effect.runPromise(
+      createAwsHosting(config, hosting, runner).status('my-app'),
+    );
 
-    expect(result.ok && result.value).toEqual({
+    expect(result).toEqual({
       live: true,
       url: 'https://main.app123.amplifyapp.com',
     });
@@ -67,8 +80,10 @@ describe('createAwsHosting', () => {
       job: { summary: { status: 'RUNNING' } },
     }));
 
-    const result = await createAwsHosting(config, hosting, runner).status('my-app');
+    const result = await Effect.runPromise(
+      createAwsHosting(config, hosting, runner).status('my-app'),
+    );
 
-    expect(result.ok && result.value).toEqual({ live: false, url: null });
+    expect(result).toEqual({ live: false, url: null });
   });
 });

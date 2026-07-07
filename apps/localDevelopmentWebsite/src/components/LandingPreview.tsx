@@ -11,6 +11,15 @@ type LandingPreviewProps = {
   compact?: boolean;
 };
 
+/**
+ * Render the landing preview component.
+ *
+ * @param title - Product title displayed in the generated preview.
+ * @param compact - Whether to render the smaller embedded preview.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <LandingPreview title="Acme" compact={true} />;
+ */
 export const LandingPreview = ({ title = 'Your SaaS', compact = false }: LandingPreviewProps) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -20,6 +29,8 @@ export const LandingPreview = ({ title = 'Your SaaS', compact = false }: Landing
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   }, [title]);
+
+  const maxHeightClass = compact ? 'max-h-[160px]' : 'max-h-[280px]';
 
   return (
     <motion.div
@@ -53,10 +64,11 @@ export const LandingPreview = ({ title = 'Your SaaS', compact = false }: Landing
         </Button>
       </div>
 
-      <div
+      <button
+        type="button"
         className={cn(
-          'cursor-pointer transition-all',
-          expanded ? 'max-h-[600px]' : compact ? 'max-h-[160px]' : 'max-h-[280px]',
+          'block w-full cursor-pointer text-left transition-all',
+          expanded ? 'max-h-[600px]' : maxHeightClass,
         )}
         onClick={() => setExpanded(!expanded)}
       >
@@ -72,7 +84,7 @@ export const LandingPreview = ({ title = 'Your SaaS', compact = false }: Landing
             <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-950 to-transparent pointer-events-none" />
           )}
         </div>
-      </div>
+      </button>
 
       {!expanded && (
         <p className="px-4 pb-3 text-xs text-zinc-500 text-center">

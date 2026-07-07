@@ -1,15 +1,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { fail, ok, type Result } from '@vybekiit/core';
-import type { OrderEvent } from '@vybekiit/payments/types';
-import { Either, Schema } from 'effect';
+import { failPayment, paymentError } from '@vybekiit/payments/paymentEffect';
+import type { OrderEvent, PaymentError } from '@vybekiit/payments/types';
+import { Effect, Either, Schema } from 'effect';
 
-/**
- * Raw Lemon Squeezy webhook envelope (only the fields VybeKiit reads).
- *
- * `meta.custom_data` carries the checkout custom fields set at checkout time —
- * specifically the buyer's GitHub username, which the gate uses to send the repo
- * invite. `Schema.Struct` strips unknown keys on decode, so extra LS fields are tolerated.
- */
 const webhookSchema = Schema.Struct({
   meta: Schema.Struct({
     event_name: Schema.String.pipe(Schema.minLength(1)),
@@ -27,61 +20,99 @@ const webhookSchema = Schema.Struct({
 const decodeWebhook = Schema.decodeUnknownEither(webhookSchema);
 
 /**
- * Verify a Lemon Squeezy webhook signature (HMAC-SHA256 of the raw body).
+ * Resolve an optional string field to a nullable internal value.
  *
- * Uses a constant-time compare so a forged signature can't be brute-forced by
- * timing. The raw, unparsed body must be passed — re-serializing JSON would change
- * bytes and break the digest.
- *
- * @param rawBody - the exact request body bytes/string as received
- * @param signature - the `X-Signature` header value (hex)
- * @param secret - `LEMONSQUEEZY_WEBHOOK_SECRET`
+ * @param value - Optional string decoded from a provider payload.
+ * @returns The non-empty string, or `null` when the provider omitted it.
+ * @example
+ * const email = optionalStringToNull(data.attributes.user_email);
  */
-export function verifyLemonSqueezySignature(
-  rawBody: string,
-  signature: string,
-  secret: string,
-): boolean {
-  const digest = createHmac('sha256', secret).update(rawBody).digest('hex');
-  if (signature.length !== digest.length) return false;
-  return timingSafeEqual(Buffer.from(digest, 'hex'), Buffer.from(signature, 'hex'));
-}
+const optionalStringToNull = (value: string | undefined): string | null => {
+  if (value !== undefined && value.length > 0) {
+    return value;
+  }
+
+  return null;
+};
 
 /**
- * Verify, parse, and normalize a Lemon Squeezy webhook in one step.
+ * Read the GitHub username stored in Lemon Squeezy custom data.
  *
- * Returns a {@link Result} rather than throwing because an invalid signature or
- * malformed body is an *expected* boundary failure the caller (the webhook route)
- * must translate into a 4xx — not a crash.
+ * @param customData - Optional checkout custom data decoded from the webhook.
+ * @returns The GitHub username, or `null` when not present.
+ * @example
+ * const username = readLemonSqueezyGithubUsername(meta.custom_data);
  */
-export function parseLemonSqueezyWebhook(
+const readLemonSqueezyGithubUsername = (
+  customData: Readonly<Record<string, string>> | undefined,
+): string | null => {
+  if (customData === undefined) {
+    return null;
+  }
+
+  return optionalStringToNull(customData.github_username);
+};
+
+/**
+ * Verify a Lemon Squeezy webhook signature.
+ *
+ * @param rawBody - Exact request body string as received.
+ * @param signature - `X-Signature` header value in hex form.
+ * @param secret - Lemon Squeezy webhook secret.
+ * @returns `true` when the signature matches the raw body.
+ * @example
+ * const verified = verifyLemonSqueezySignature(rawBody, signature, secret);
+ */
+export const verifyLemonSqueezySignature = (
   rawBody: string,
   signature: string,
   secret: string,
-): Result<OrderEvent> {
-  if (!verifyLemonSqueezySignature(rawBody, signature, secret)) {
-    return fail('invalid_signature', 'Webhook signature did not match.');
+): boolean => {
+  const digest = createHmac('sha256', secret).update(rawBody).digest('hex');
+  if (signature.length !== digest.length) {
+    return false;
   }
 
-  let json: unknown;
-  try {
-    json = JSON.parse(rawBody);
-  } catch {
-    return fail('invalid_body', 'Webhook body was not valid JSON.');
-  }
+  return timingSafeEqual(Buffer.from(digest, 'hex'), Buffer.from(signature, 'hex'));
+};
 
-  const parsed = decodeWebhook(json);
-  if (Either.isLeft(parsed)) {
-    return fail('invalid_shape', 'Webhook payload was missing expected fields.');
-  }
+/**
+ * Verify, parse, and normalize a Lemon Squeezy webhook.
+ *
+ * @param rawBody - Exact request body string as received.
+ * @param signature - Lemon Squeezy signature header.
+ * @param secret - Lemon Squeezy webhook secret.
+ * @returns An Effect containing the normalized order event.
+ * @example
+ * const event = await Effect.runPromise(parseLemonSqueezyWebhook(rawBody, signature, secret));
+ */
+export const parseLemonSqueezyWebhook = (
+  rawBody: string,
+  signature: string,
+  secret: string,
+): Effect.Effect<OrderEvent, PaymentError> =>
+  Effect.gen(function* () {
+    if (!verifyLemonSqueezySignature(rawBody, signature, secret)) {
+      return yield* failPayment('invalid_signature', 'Webhook signature did not match.');
+    }
 
-  const { meta, data } = parsed.right;
-  return ok({
-    provider: 'lemon-squeezy',
-    eventName: meta.event_name,
-    orderId: data.id,
-    customerEmail: data.attributes.user_email ?? null,
-    githubUsername: meta.custom_data?.github_username ?? null,
-    isRefund: meta.event_name === 'order_refunded' || data.attributes.refunded === true,
+    const json = yield* Effect.try({
+      try: () => JSON.parse(rawBody) as unknown,
+      catch: () => paymentError('invalid_body', 'Webhook body was not valid JSON.'),
+    });
+
+    const parsed = decodeWebhook(json);
+    if (Either.isLeft(parsed)) {
+      return yield* failPayment('invalid_shape', 'Webhook payload was missing expected fields.');
+    }
+
+    const { meta, data } = parsed.right;
+    return {
+      provider: 'lemon-squeezy',
+      eventName: meta.event_name,
+      orderId: data.id,
+      customerEmail: optionalStringToNull(data.attributes.user_email),
+      githubUsername: readLemonSqueezyGithubUsername(meta.custom_data),
+      isRefund: meta.event_name === 'order_refunded' || data.attributes.refunded === true,
+    };
   });
-}

@@ -1,7 +1,7 @@
 import {
   renderToolVocabularyTable,
   TOOL_VOCABULARY,
-} from '@vybekiit/agentKit/vocabulary/toolVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/toolVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderToolVocabularyTable', () => {

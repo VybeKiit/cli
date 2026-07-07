@@ -5,12 +5,21 @@ import type { CatalogEntry } from '@library/data/catalog';
 import { fetchCategoryShard, fetchFullCatalog } from '@library/lib/catalogFetch';
 import { useEffect, useState } from 'react';
 
-/** Load the smallest catalog slice needed for the active filters. */
-export function useCatalogPool(
+/**
+ * Read catalog pool state for the component library.
+ *
+ * @param category - Catalog category slug to load or persist.
+ * @param query - Search text entered by the user.
+ * @param ready - Input passed to this ready parameter.
+ * @returns The state or callback exposed by useCatalogPool.
+ * @example
+ * const value = useCatalogPool('buttons', 'button', ready);
+ */
+export const useCatalogPool = (
   category: string,
   query: string,
   ready: boolean,
-): { readonly pool: CatalogEntry[]; readonly poolReady: boolean } {
+): { readonly pool: CatalogEntry[]; readonly poolReady: boolean } => {
   const registerEntries = useRegisterCatalogEntries();
   const [pool, setPool] = useState<CatalogEntry[]>([]);
   const [poolReady, setPoolReady] = useState(false);
@@ -52,4 +61,4 @@ export function useCatalogPool(
   }, [category, query, ready, registerEntries]);
 
   return { pool, poolReady };
-}
+};

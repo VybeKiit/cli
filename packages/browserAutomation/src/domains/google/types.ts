@@ -1,4 +1,4 @@
-import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 
 export type GoogleVerbContext = BaseVerbContext;
 
@@ -6,7 +6,7 @@ export type GoogleVerbContext = BaseVerbContext;
 export const GOOGLE_CONSOLE_URL = 'https://console.cloud.google.com';
 
 /** Inputs for the one-shot OAuth setup (consent screen + Web client). */
-export interface GoogleOAuthParams {
+export type GoogleOAuthParams = {
   /** GCP project ID the OAuth client is created under. */
   projectId: string;
   /** Consent-screen application name shown to end users. */
@@ -29,7 +29,7 @@ export interface GoogleOAuthParams {
   publish?: boolean;
   /** Add a fresh secret to a same-named existing client instead of failing (secrets are view-once). */
   resetSecret?: boolean;
-}
+};
 
 /**
  * Default non-sensitive identity scopes — sign-in only, no Google verification review required.
@@ -43,24 +43,29 @@ export const DEFAULT_OAUTH_SCOPES: readonly string[] = [
 ];
 
 /** Credentials read back after the Web OAuth client is created or its secret reset. */
-export interface GoogleOAuthResult {
+export type GoogleOAuthResult = {
   clientId: string;
   clientSecret: string;
   projectId: string;
   /** True when an existing client was reused (secret reset) rather than created fresh. */
   reusedExisting: boolean;
-}
+};
 
 /** `.env` block Better Auth reads for the Google social provider. */
-export interface GoogleEnvBlock {
+export type GoogleEnvBlock = {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
-}
+};
 
-/** Map a setup result to the `.env` keys the buyer pastes in. */
-export function googleEnvBlock(result: GoogleOAuthResult): GoogleEnvBlock {
-  return {
-    GOOGLE_CLIENT_ID: result.clientId,
-    GOOGLE_CLIENT_SECRET: result.clientSecret,
-  };
-}
+/**
+ * Map a setup result to the `.env` keys the buyer pastes in.
+ *
+ * @param result - Operation result to convert.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = googleEnvBlock(result);
+ */
+export const googleEnvBlock = (result: GoogleOAuthResult): GoogleEnvBlock => ({
+  GOOGLE_CLIENT_ID: result.clientId,
+  GOOGLE_CLIENT_SECRET: result.clientSecret,
+});

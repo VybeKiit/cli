@@ -8,26 +8,32 @@ import {
 } from '@/components/report-mode/shared/report-mode-copy';
 import { Walkthrough } from '@/components/walkthrough';
 
-type ReportModeTutorialProps = {
+interface ReportModeTutorialProps {
   readonly active: boolean;
   readonly stepIndex: number;
   readonly onNext: () => void;
   readonly onSkip: () => void;
   readonly onComplete: () => void;
-};
-
-function targetSelector(stepId: ReportTutorialStepId): string {
-  return `[data-report-tutorial="${stepId}"]`;
 }
 
-/** First-visit spotlight walkthrough for the Report Mode dock — a thin @vybekiit/walkthrough consumer. */
-export function ReportModeTutorial({
+const targetSelector = (stepId: ReportTutorialStepId): string =>
+  `[data-report-tutorial="${stepId}"]`;
+
+/**
+ * Render the first-visit spotlight walkthrough for the Report Mode dock.
+ *
+ * @param props - Current tutorial state and navigation callbacks.
+ * @returns A walkthrough instance pointed at report-mode controls.
+ * @example
+ * <ReportModeTutorial active={true} stepIndex={0} onNext={next} onSkip={skip} onComplete={complete} />
+ */
+export const ReportModeTutorial = ({
   active,
   stepIndex,
   onNext,
   onSkip,
   onComplete,
-}: ReportModeTutorialProps) {
+}: ReportModeTutorialProps) => {
   const steps = useMemo<readonly WalkthroughStep[]>(
     () =>
       REPORT_TUTORIAL_STEPS.map((step) => ({
@@ -55,6 +61,4 @@ export function ReportModeTutorial({
       variant="spotlight"
     />
   );
-}
-
-export { REPORT_TUTORIAL_STEPS };
+};

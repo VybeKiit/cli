@@ -1,8 +1,8 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PROFILE_PATHS } from '@vybekiit/browserAutomation/core/types';
-import { LS_DASHBOARD_URL } from '@vybekiit/browserAutomation/domains/payments/ls/types';
+import { PROFILE_PATHS } from '@vybekiit/browser-automation/core/types';
+import { LS_DASHBOARD_URL } from '@vybekiit/browser-automation/domains/payments/ls/types';
 import { ensureChromeWithCdp, profileDirFor } from './shared/chrome';
 import { applyDraft, ensureDraftTemplate, type ParsedEntry, renderGenerated } from './shared/draft';
 import { LS_DRAFT_FIELDS } from './shared/fields';

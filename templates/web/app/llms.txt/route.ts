@@ -1,8 +1,14 @@
 import { getCms } from '@/lib/providers';
 import { getSeo } from '@/lib/seo';
 
-/** llms.txt for AI crawlers and answer engines — skill: add-blog, go-live */
-export async function GET() {
+/**
+ * Generate llms.txt for AI crawlers and answer engines.
+ *
+ * @returns Text response containing public pages and CMS pages.
+ * @example
+ * const response = await GET();
+ */
+export const GET = async () => {
   const cms = getCms();
   const cmsPages = await cms.listPages();
   const seo = getSeo();
@@ -26,4 +32,4 @@ export async function GET() {
   return new Response(body, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
-}
+};

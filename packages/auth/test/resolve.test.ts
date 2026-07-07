@@ -1,6 +1,7 @@
 import type { BetterAuthInstance } from '@vybekiit/auth/providers/betterAuth';
 import type { SupabaseAuthClientLike } from '@vybekiit/auth/providers/supabase';
-import { resolveAuthProvider } from '@vybekiit/auth/resolve';
+import { type ResolveAuthInjections, resolveAuthProvider } from '@vybekiit/auth/resolve';
+import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
 // Stub the Cognito client so resolving the cognito adapter never opens a real
@@ -32,25 +33,44 @@ const cognitoEnv = {
   AWS_REGION: 'us-east-1',
 };
 
+// matches a missing Supabase URL in parseEnv output: "SUPABASE_URL"
+const SUPABASE_URL_PATTERN = /SUPABASE_URL/;
+// matches a missing better-auth secret in parseEnv output: "BETTER_AUTH_SECRET"
+const BETTER_AUTH_SECRET_PATTERN = /BETTER_AUTH_SECRET/;
+// matches a missing Cognito pool id in parseEnv output: "COGNITO_USER_POOL_ID"
+const COGNITO_USER_POOL_ID_PATTERN = /COGNITO_USER_POOL_ID/;
+
+const resolveProvider = (
+  env: Record<string, string | undefined>,
+  injections: ResolveAuthInjections = {},
+) => Effect.runSync(resolveAuthProvider(env, injections));
+
+const resolveProviderError = (
+  env: Record<string, string | undefined>,
+  injections: ResolveAuthInjections = {},
+) => Effect.runSync(Effect.flip(resolveAuthProvider(env, injections)));
+
 describe('resolveAuthProvider', () => {
   it('falls back to the local adapter when nothing is configured', () => {
-    expect(resolveAuthProvider({}).name).toBe('local');
+    expect(resolveProvider({}).name).toBe('local');
   });
 
   it('resolves the local adapter for an explicit AUTH_PROVIDER=local', () => {
-    expect(resolveAuthProvider({ AUTH_PROVIDER: 'local' }).name).toBe('local');
+    expect(resolveProvider({ AUTH_PROVIDER: 'local' }).name).toBe('local');
   });
 
   it('pairs local auth with an explicit DATA_PROVIDER=local (no secret required)', () => {
-    expect(resolveAuthProvider({ DATA_PROVIDER: 'local' }).name).toBe('local');
+    expect(resolveProvider({ DATA_PROVIDER: 'local' }).name).toBe('local');
   });
 
   it('defaults to Supabase Auth for the default Supabase stack', () => {
-    expect(resolveAuthProvider(supabaseEnv, { supabaseAuthClient }).name).toBe('supabase');
+    expect(resolveProvider(supabaseEnv, { supabaseAuthClient }).name).toBe('supabase');
   });
+});
 
+describe('resolveAuthProvider configured providers', () => {
   it('uses Supabase Auth for an explicit AUTH_PROVIDER=supabase', () => {
-    const provider = resolveAuthProvider(
+    const provider = resolveProvider(
       { ...supabaseEnv, AUTH_PROVIDER: 'supabase' },
       { supabaseAuthClient },
     );
@@ -58,15 +78,15 @@ describe('resolveAuthProvider', () => {
   });
 
   it('uses better-auth for a non-Supabase Postgres (DATA_PROVIDER=neon)', () => {
-    expect(resolveAuthProvider(betterAuthEnv, { betterAuthInstance }).name).toBe('better-auth');
+    expect(resolveProvider(betterAuthEnv, { betterAuthInstance }).name).toBe('better-auth');
   });
 
   it('uses better-auth for DATA_PROVIDER=mongodb', () => {
-    expect(resolveAuthProvider(mongoEnv, { betterAuthInstance }).name).toBe('better-auth');
+    expect(resolveProvider(mongoEnv, { betterAuthInstance }).name).toBe('better-auth');
   });
 
   it('honors an explicit AUTH_PROVIDER=better-auth', () => {
-    const provider = resolveAuthProvider(
+    const provider = resolveProvider(
       { AUTH_PROVIDER: 'better-auth', BETTER_AUTH_SECRET: 'secret', DATABASE_URL: 'postgres://x' },
       { betterAuthInstance },
     );
@@ -74,30 +94,34 @@ describe('resolveAuthProvider', () => {
   });
 
   it('auto-routes DATA_PROVIDER=aws to cognito', () => {
-    expect(resolveAuthProvider({ ...cognitoEnv, DATA_PROVIDER: 'aws' }).name).toBe('cognito');
+    expect(resolveProvider({ ...cognitoEnv, DATA_PROVIDER: 'aws' }).name).toBe('cognito');
   });
 
   it('uses cognito when AUTH_PROVIDER=cognito regardless of data', () => {
-    expect(resolveAuthProvider({ ...cognitoEnv, AUTH_PROVIDER: 'cognito' }).name).toBe('cognito');
+    expect(resolveProvider({ ...cognitoEnv, AUTH_PROVIDER: 'cognito' }).name).toBe('cognito');
   });
+});
 
+describe('resolveAuthProvider config failures', () => {
   it('fails loud when Supabase Auth is selected without its keys', () => {
-    expect(() => resolveAuthProvider({ AUTH_PROVIDER: 'supabase' })).toThrow(/SUPABASE_URL/);
+    expect(resolveProviderError({ AUTH_PROVIDER: 'supabase' }).message).toMatch(
+      SUPABASE_URL_PATTERN,
+    );
   });
 
   it('fails loud when better-auth is selected without its secret', () => {
-    expect(() =>
-      resolveAuthProvider({ DATA_PROVIDER: 'neon', DATABASE_URL: 'postgres://x' }),
-    ).toThrow(/BETTER_AUTH_SECRET/);
+    expect(
+      resolveProviderError({ DATA_PROVIDER: 'neon', DATABASE_URL: 'postgres://x' }).message,
+    ).toMatch(BETTER_AUTH_SECRET_PATTERN);
   });
 
   it('fails loud when cognito is selected without its pool id', () => {
-    expect(() =>
-      resolveAuthProvider({
+    expect(
+      resolveProviderError({
         AUTH_PROVIDER: 'cognito',
         AWS_REGION: 'us-east-1',
         COGNITO_CLIENT_ID: 'c',
-      }),
-    ).toThrow(/COGNITO_USER_POOL_ID/);
+      }).message,
+    ).toMatch(COGNITO_USER_POOL_ID_PATTERN);
   });
 });

@@ -12,10 +12,10 @@ export const metadata = {
  * Describes the real integration (default DB/auth/storage + agent provisioning), so the
  * partner application's required "integration docs" link resolves to accurate content.
  */
-export default function SupabaseDocPage() {
-  return (
-    <CheckoutShell headerBrand={<SupabaseDocBrand />} showCheckout={false}>
-      <SupabaseDocContent />
-    </CheckoutShell>
-  );
-}
+const SupabaseDocPage = () => (
+  <CheckoutShell headerBrand={<SupabaseDocBrand />} showCheckout={false}>
+    <SupabaseDocContent />
+  </CheckoutShell>
+);
+
+export default SupabaseDocPage;

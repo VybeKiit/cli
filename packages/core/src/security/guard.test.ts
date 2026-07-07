@@ -5,7 +5,7 @@ import type { SecurityPolicy, SecurityRequest } from './types';
 
 const APP_ORIGIN = 'https://myapp.com';
 
-function policy(overrides: Partial<SecurityPolicy> = {}): SecurityPolicy {
+const policy = (overrides: Partial<SecurityPolicy> = {}): SecurityPolicy => {
   const tierMax = {
     'auth-strict': 2,
     'public-form': 30,
@@ -24,18 +24,16 @@ function policy(overrides: Partial<SecurityPolicy> = {}): SecurityPolicy {
     originLock: { enabled: true, allowedOrigins: [] },
     ...overrides,
   };
-}
+};
 
-function request(overrides: Partial<SecurityRequest> = {}): SecurityRequest {
-  return {
-    method: 'POST',
-    originHeader: APP_ORIGIN,
-    appOrigin: APP_ORIGIN,
-    clientId: '1.2.3.4',
-    path: '/api/checkout',
-    ...overrides,
-  };
-}
+const request = (overrides: Partial<SecurityRequest> = {}): SecurityRequest => ({
+  method: 'POST',
+  originHeader: APP_ORIGIN,
+  appOrigin: APP_ORIGIN,
+  clientId: '1.2.3.4',
+  path: '/api/checkout',
+  ...overrides,
+});
 
 describe('isOriginAllowed', () => {
   const lock = policy().originLock;
@@ -62,6 +60,7 @@ describe('isOriginAllowed', () => {
   });
 });
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: grouped guard scenarios share setup.
 describe('SecurityGuard.evaluate', () => {
   it('allows a same-origin POST under the limit', () => {
     const guard = new SecurityGuard(policy());
@@ -72,7 +71,9 @@ describe('SecurityGuard.evaluate', () => {
     const guard = new SecurityGuard(policy());
     const verdict = guard.evaluate(request({ originHeader: 'https://evil.com' }));
     expect(verdict.allowed).toBe(false);
-    if (!verdict.allowed) expect(verdict.reason).toBe('origin');
+    if (!verdict.allowed) {
+      expect(verdict.reason).toBe('origin');
+    }
   });
 
   it('does not origin-check safe reads', () => {

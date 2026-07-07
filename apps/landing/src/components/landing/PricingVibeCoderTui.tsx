@@ -24,7 +24,7 @@ interface ActivePromptLineProps {
 }
 
 /** Types one prompt, then signals the parent to advance the queue. */
-function ActivePromptLine({ entry, onFinished, onTypingChange }: ActivePromptLineProps) {
+const ActivePromptLine = ({ entry, onFinished, onTypingChange }: ActivePromptLineProps) => {
   const reduced = useReducedMotion();
   const { displayText, isComplete } = useTypewriter(entry.typeable, {
     start: true,
@@ -65,15 +65,28 @@ function ActivePromptLine({ entry, onFinished, onTypingChange }: ActivePromptLin
       )}
     </p>
   );
-}
+};
 
-/** Cycles vibe-coder prompts across Cursor, Claude Code, and Codex inside the checkout terminal. */
-export function PricingVibeCoderTui() {
+/**
+ * Cycles vibe-coder prompts across Cursor, Claude Code, and Codex inside the checkout terminal.
+ *
+ * @returns The rendered PricingVibeCoderTui element.
+ * @example
+ * ```tsx
+ * <PricingVibeCoderTui />
+ * ```
+ */
+
+export const PricingVibeCoderTui = () => {
   const reduced = useReducedMotion();
   const [promptIndex, setPromptIndex] = useState(0);
   const [claudeWorking, setClaudeWorking] = useState(false);
-  const current =
-    VIBE_CODER_PROMPTS[promptIndex % VIBE_CODER_PROMPTS.length] ?? VIBE_CODER_PROMPTS[0]!;
+  const firstPrompt = VIBE_CODER_PROMPTS[0];
+  if (firstPrompt === undefined) {
+    throw new Error('VIBE_CODER_PROMPTS must contain at least one prompt.');
+  }
+  const currentCandidate = VIBE_CODER_PROMPTS[promptIndex % VIBE_CODER_PROMPTS.length];
+  const current = currentCandidate === undefined ? firstPrompt : currentCandidate;
   const claudeIsActive = current.assistant === 'claude';
 
   const advancePrompt = useCallback(() => {
@@ -133,4 +146,4 @@ export function PricingVibeCoderTui() {
       />
     </div>
   );
-}
+};

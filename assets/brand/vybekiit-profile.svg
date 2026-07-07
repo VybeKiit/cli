@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VybeKiit">
+  <rect width="512" height="512" fill="#050507"/>
+  <rect x="130" y="130" width="110" height="110" rx="28" fill="#ffffff"/>
+  <path d="M272 130H326L382 186V212A28 28 0 0 1 354 240H300A28 28 0 0 1 272 212V130Z" fill="#ffffff"/>
+  <rect x="130" y="272" width="110" height="110" rx="28" fill="#ffffff"/>
+  <rect x="272" y="272" width="110" height="110" rx="28" fill="#ffffff"/>
+</svg>

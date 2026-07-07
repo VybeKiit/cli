@@ -1,30 +1,41 @@
 import { resolve } from 'node:path';
 import { resolveTemplatesSource } from '../lib/resolveTemplates';
-import { isTemplateName, ScaffoldError, scaffold, type TemplateName } from '../lib/scaffold';
+import { isTemplateName, ScaffoldError, scaffold } from '../lib/scaffold';
 import { promptTemplateSelect } from '../prompts/templateSelect';
 import { isInteractive } from '../prompts/tty';
 
-export async function runNew(args: string[]): Promise<number> {
+/**
+ * Scaffold a new project from one VybeKiit template.
+ *
+ * @param args - CLI arguments after `new`; template then optional destination directory.
+ * @returns Process exit code for the command.
+ * @example
+ * const exitCode = await runNew(['web', 'my-app']);
+ */
+export const runNew = async (args: string[]): Promise<number> => {
   let [template, dir] = args;
 
-  if (!template && isInteractive()) {
+  if ((template === undefined || template === '') && isInteractive()) {
     const picked = await promptTemplateSelect();
-    if (!picked) return 1;
+    if (picked === null) {
+      return 1;
+    }
     template = picked;
   }
 
-  if (!(template && isTemplateName(template))) {
+  if (template === undefined || template === '' || !isTemplateName(template)) {
     return 1;
   }
 
-  const dest = resolve(process.cwd(), dir ?? template);
+  const destName = dir === undefined || dir === '' ? template : dir;
+  const dest = resolve(process.cwd(), destName);
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveTemplatesSource(template as TemplateName);
-    cleanup = resolved.cleanup;
+    const { cleanup: resolvedCleanup, source } = await resolveTemplatesSource(template);
+    cleanup = resolvedCleanup;
     await scaffold({
-      template: template as TemplateName,
-      source: resolved.source,
+      template,
+      source,
       dest,
     });
   } catch (error) {
@@ -33,7 +44,9 @@ export async function runNew(args: string[]): Promise<number> {
     }
     throw error;
   } finally {
-    await cleanup?.();
+    if (cleanup !== undefined) {
+      await cleanup();
+    }
   }
   return 0;
-}
+};

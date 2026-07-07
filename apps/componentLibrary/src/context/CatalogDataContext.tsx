@@ -44,9 +44,9 @@ interface CatalogDataContextValue {
 
 const CatalogDataContext = createContext<CatalogDataContextValue | null>(null);
 
-function buildDerived(
+const buildDerived = (
   byKey: Readonly<Record<string, CatalogEntry>>,
-): Pick<CatalogData, 'entries' | 'components' | 'examples'> {
+): Pick<CatalogData, 'entries' | 'components' | 'examples'> => {
   const entries = Object.values(byKey);
   const components: CatalogEntry[] = [];
   const examples: CatalogEntry[] = [];
@@ -58,9 +58,17 @@ function buildDerived(
     }
   }
   return { entries, components, examples };
-}
+};
 
-export function CatalogDataProvider({ children }: { readonly children: ReactNode }) {
+/**
+ * Render the catalog data provider component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogDataProvider><App /></CatalogDataProvider>;
+ */
+export const CatalogDataProvider = ({ children }: { readonly children: ReactNode }) => {
   const [byKey, setByKey] = useState<Record<string, CatalogEntry>>({});
   const [categories, setCategories] = useState<CatalogCategory[]>(CATALOG_CATEGORIES);
   const [namespaces, setNamespaces] = useState<readonly string[]>(CATALOG_NAMESPACES);
@@ -144,28 +152,49 @@ export function CatalogDataProvider({ children }: { readonly children: ReactNode
   );
 
   return <CatalogDataContext.Provider value={value}>{children}</CatalogDataContext.Provider>;
-}
+};
 
-export function useCatalogData(): CatalogData {
+/**
+ * Read catalog data state for the component library.
+ *
+ * @returns The state or callback exposed by useCatalogData.
+ * @example
+ * const value = useCatalogData();
+ */
+export const useCatalogData = (): CatalogData => {
   const ctx = useContext(CatalogDataContext);
   if (!ctx) {
     throw new Error('useCatalogData must be used within CatalogDataProvider');
   }
   return ctx.catalog;
-}
+};
 
-export function useCatalogReady(): { readonly ready: boolean; readonly error: string | null } {
+/**
+ * Read catalog ready state for the component library.
+ *
+ * @returns The state or callback exposed by useCatalogReady.
+ * @example
+ * const value = useCatalogReady();
+ */
+export const useCatalogReady = (): { readonly ready: boolean; readonly error: string | null } => {
   const ctx = useContext(CatalogDataContext);
   if (!ctx) {
     throw new Error('useCatalogReady must be used within CatalogDataProvider');
   }
   return { ready: ctx.ready, error: ctx.error };
-}
+};
 
-export function useRegisterCatalogEntries(): (entries: readonly CatalogEntry[]) => void {
+/**
+ * Read register catalog entries state for the component library.
+ *
+ * @returns The state or callback exposed by useRegisterCatalogEntries.
+ * @example
+ * const value = useRegisterCatalogEntries();
+ */
+export const useRegisterCatalogEntries = (): ((entries: readonly CatalogEntry[]) => void) => {
   const ctx = useContext(CatalogDataContext);
   if (!ctx) {
     throw new Error('useRegisterCatalogEntries must be used within CatalogDataProvider');
   }
   return ctx.registerEntries;
-}
+};

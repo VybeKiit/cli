@@ -20,15 +20,22 @@ const indexCache: { payload?: CatalogIndexPayload; promise?: Promise<CatalogInde
 const fullCache: { payload?: CatalogFullPayload; promise?: Promise<CatalogFullPayload> } = {};
 const shardCache = new Map<string, Promise<CatalogShardPayload>>();
 
-async function readJson<T>(url: string): Promise<T> {
+const readJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url, { cache: 'force-cache' });
   if (!response.ok) {
     throw new Error(`${url} ${response.status}`);
   }
   return response.json() as Promise<T>;
-}
+};
 
-export function fetchCatalogIndex(): Promise<CatalogIndexPayload> {
+/**
+ * Fetch catalog index data for the component library.
+ *
+ * @returns The loaded value produced by fetchCatalogIndex.
+ * @example
+ * const result = await fetchCatalogIndex();
+ */
+export const fetchCatalogIndex = (): Promise<CatalogIndexPayload> => {
   if (indexCache.payload) {
     return Promise.resolve(indexCache.payload);
   }
@@ -39,9 +46,16 @@ export function fetchCatalogIndex(): Promise<CatalogIndexPayload> {
     });
   }
   return indexCache.promise;
-}
+};
 
-export function fetchFullCatalog(): Promise<CatalogFullPayload> {
+/**
+ * Fetch full catalog data for the component library.
+ *
+ * @returns The loaded value produced by fetchFullCatalog.
+ * @example
+ * const result = await fetchFullCatalog();
+ */
+export const fetchFullCatalog = (): Promise<CatalogFullPayload> => {
   if (fullCache.payload) {
     return Promise.resolve(fullCache.payload);
   }
@@ -52,9 +66,17 @@ export function fetchFullCatalog(): Promise<CatalogFullPayload> {
     });
   }
   return fullCache.promise;
-}
+};
 
-export function fetchCategoryShard(category: string): Promise<CatalogShardPayload> {
+/**
+ * Fetch category shard data for the component library.
+ *
+ * @param category - Catalog category slug to load or persist.
+ * @returns The loaded value produced by fetchCategoryShard.
+ * @example
+ * const result = await fetchCategoryShard('buttons');
+ */
+export const fetchCategoryShard = (category: string): Promise<CatalogShardPayload> => {
   const cached = shardCache.get(category);
   if (cached) {
     return cached;
@@ -68,22 +90,37 @@ export function fetchCategoryShard(category: string): Promise<CatalogShardPayloa
 
   shardCache.set(category, promise);
   return promise;
-}
+};
 
-/** Warm a category shard in the background — e.g. sidebar hover. */
-export function prefetchCategoryShard(category: string): void {
+/**
+ * Prefetch category shard.
+ *
+ * @param category - Catalog category slug to load or persist.
+ * @returns Nothing; the helper updates browser state or notifies subscribers.
+ * @example
+ * prefetchCategoryShard('buttons');
+ */
+export const prefetchCategoryShard = (category: string): void => {
   if (category === 'all') {
     return;
   }
   void fetchCategoryShard(category);
-}
+};
 
-export function registerCatalogEntries(
+/**
+ * Register catalog entries.
+ *
+ * @param entries - Catalog entries to render or describe.
+ * @returns The value produced by registerCatalogEntries.
+ * @example
+ * const result = registerCatalogEntries(entries);
+ */
+export const registerCatalogEntries = (
   entries: readonly CatalogEntry[],
-): Record<string, CatalogEntry> {
+): Record<string, CatalogEntry> => {
   const patch: Record<string, CatalogEntry> = {};
   for (const entry of entries) {
     patch[entry.previewKey] = entry;
   }
   return patch;
-}
+};

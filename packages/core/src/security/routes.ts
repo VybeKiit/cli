@@ -13,22 +13,35 @@ export type RouteTier =
   | 'public-read'
   | 'default';
 
-/** Normalize to a comparable path (lowercase, no trailing slash). */
-function normalizePath(path: string): string {
-  const base = path.split('?')[0]?.toLowerCase() ?? '/';
+/**
+ * Normalize a path to lowercase without a query string or trailing slash.
+ *
+ * @param path - Raw request path.
+ * @returns Comparable route path.
+ * @example
+ * const path = normalizePath('/API/Auth/Signin?x=1');
+ */
+const normalizePath = (path: string): string => {
+  const [head] = path.split('?');
+  const base = head === undefined ? '/' : head.toLowerCase();
   if (base.length > 1 && base.endsWith('/')) {
     return base.slice(0, -1);
   }
   return base;
-}
+};
 
 /**
  * Classify an API path into a security tier.
  *
  * Order matters: more specific prefixes win. Webhook is checked before auth because
  * `/api/webhook` must not inherit auth-strict limits or origin lock.
+ *
+ * @param path - API path to classify.
+ * @returns The security tier for the path.
+ * @example
+ * const tier = classifyRoute('/api/auth/signin');
  */
-export function classifyRoute(path: string): RouteTier {
+export const classifyRoute = (path: string): RouteTier => {
   const p = normalizePath(path);
 
   if (p === '/api/webhook' || p.startsWith('/api/webhook/')) {
@@ -65,9 +78,14 @@ export function classifyRoute(path: string): RouteTier {
   }
 
   return 'default';
-}
+};
 
-/** True when the origin lock must not apply (external trusted-by-signature callers). */
-export function isOriginLockExempt(tier: RouteTier): boolean {
-  return tier === 'webhook';
-}
+/**
+ * Check whether a route tier bypasses origin lock.
+ *
+ * @param tier - Classified route tier.
+ * @returns Whether the route is trusted by signature instead of browser origin.
+ * @example
+ * isOriginLockExempt('webhook') === true;
+ */
+export const isOriginLockExempt = (tier: RouteTier): boolean => tier === 'webhook';

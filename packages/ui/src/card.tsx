@@ -2,6 +2,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Card component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card component.
+ * @example
+ * <Card />;
+ */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -13,6 +21,14 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
 );
 Card.displayName = 'Card';
 
+/**
+ * Render the Card Header component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card Header component.
+ * @example
+ * <CardHeader />;
+ */
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
@@ -20,6 +36,14 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardHeader.displayName = 'CardHeader';
 
+/**
+ * Render the Card Title component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card Title component.
+ * @example
+ * <CardTitle />;
+ */
 const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
@@ -31,13 +55,29 @@ const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
 );
 CardTitle.displayName = 'CardTitle';
 
+/**
+ * Render the Card Description component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card Description component.
+ * @example
+ * <CardDescription />;
+ */
 const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+    <div ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
   ),
 );
 CardDescription.displayName = 'CardDescription';
 
+/**
+ * Render the Card Content component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card Content component.
+ * @example
+ * <CardContent />;
+ */
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
@@ -45,6 +85,14 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 );
 CardContent.displayName = 'CardContent';
 
+/**
+ * Render the Card Footer component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Card Footer component.
+ * @example
+ * <CardFooter />;
+ */
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />

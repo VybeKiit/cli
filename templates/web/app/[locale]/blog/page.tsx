@@ -6,20 +6,33 @@ import { Link } from '@/i18n/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-type BlogIndexProps = {
+interface BlogIndexProps {
   params: Promise<{ locale: string }>;
-};
+}
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata({
+/**
+ * Build the metadata for the localized blog index page.
+ *
+ * @returns The metadata consumed by Next.js for the blog index route.
+ * @example
+ * const metadata = generateMetadata();
+ */
+const generateMetadata = (): Metadata =>
+  buildPageMetadata({
     title: 'Blog',
     description: 'Updates and articles',
     path: '/blog',
   });
-}
 
-/** Blog index — hub for hub-spoke internal links (GEO). */
-export default async function BlogIndexPage({ params }: BlogIndexProps) {
+/**
+ * Render the blog index hub for hub-spoke internal links.
+ *
+ * @param props - Locale route params from Next.js.
+ * @returns The localized blog index page.
+ * @example
+ * <BlogIndexPage params={params} />
+ */
+const BlogIndexPage = async ({ params }: BlogIndexProps) => {
   const { locale } = await params;
   setRequestLocale(locale);
   const cms = getCms();
@@ -28,7 +41,7 @@ export default async function BlogIndexPage({ params }: BlogIndexProps) {
   return (
     <MarketingShell>
       <section className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="text-3xl font-semibold tracking-tight">Blog</h1>
+        <h1 className="font-semibold text-3xl tracking-tight">Blog</h1>
         <p className="mt-2 text-muted-foreground">News and updates from the team.</p>
         <ul className="mt-8 space-y-4">
           {pages.map((page) => (
@@ -49,4 +62,7 @@ export default async function BlogIndexPage({ params }: BlogIndexProps) {
       </section>
     </MarketingShell>
   );
-}
+};
+
+export { generateMetadata };
+export default BlogIndexPage;

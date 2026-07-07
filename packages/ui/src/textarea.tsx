@@ -2,6 +2,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Textarea component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Textarea component.
+ * @example
+ * <Textarea />;
+ */
 const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
   ({ className, ...props }, ref) => (
     <textarea

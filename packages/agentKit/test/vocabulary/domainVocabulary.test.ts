@@ -3,7 +3,7 @@ import {
   PAYMENTS_VOCABULARY,
   renderPaymentsVocabularyTable,
   renderServiceNameBanList,
-} from '@vybekiit/agentKit/vocabulary/domainVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/domainVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('PAYMENTS_VOCABULARY', () => {

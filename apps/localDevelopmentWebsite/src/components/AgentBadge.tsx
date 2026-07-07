@@ -10,6 +10,15 @@ type AgentBadgeProps = {
   pulse?: boolean;
 };
 
+/**
+ * Render the agent badge component.
+ *
+ * @param agent - Agent metadata displayed in the badge.
+ * @param pulse - Whether to animate the badge as active.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <AgentBadge agent={agent} pulse={true} />;
+ */
 export const AgentBadge = ({ agent, pulse = false }: AgentBadgeProps) => (
   <Badge
     variant="outline"

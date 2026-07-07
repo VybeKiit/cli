@@ -1,7 +1,7 @@
 import {
   planFeatureReadiness,
   resolveTemplateTopology,
-} from '@vybekiit/agentKit/planners/planFeatureReadiness';
+} from '@vybekiit/agent-kit/planners/planFeatureReadiness';
 import { describe, expect, it } from 'vitest';
 
 describe('planFeatureReadiness', () => {

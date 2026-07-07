@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PROFILE_PATHS } from '@vybekiit/browserAutomation/core/types';
+import { PROFILE_PATHS } from '@vybekiit/browser-automation/core/types';
 import { ensureChromeWithCdp, profileDirFor } from './shared/chrome';
 import { applyDraft, ensureDraftTemplate, type ParsedEntry, renderGenerated } from './shared/draft';
 import { CWS_DRAFT_FIELDS } from './shared/fields';

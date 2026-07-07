@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Spinner } from './spinner';
 import { cn } from './utils';
 
@@ -39,42 +40,44 @@ const CircleIcon = ({ className }: { className?: string }) => (
 const StatusDot = ({ status, size }: { status: StepStatus; size: 'sm' | 'md' }) => {
   const dotSize = size === 'sm' ? 'h-5 w-5' : 'h-6 w-6';
   const iconSize = size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5';
+  const dots = {
+    done: (
+      <div
+        className={cn('flex items-center justify-center rounded-full bg-emerald-500/20', dotSize)}
+      >
+        <CheckIcon className={cn('text-emerald-400', iconSize)} />
+      </div>
+    ),
+    running: (
+      <div
+        className={cn('flex items-center justify-center rounded-full bg-purple-500/20', dotSize)}
+      >
+        <Spinner className={cn('text-purple-400', iconSize)} />
+      </div>
+    ),
+    error: (
+      <div className={cn('flex items-center justify-center rounded-full bg-red-500/20', dotSize)}>
+        <CircleIcon className={cn('text-red-400', iconSize)} />
+      </div>
+    ),
+    pending: (
+      <div className={cn('flex items-center justify-center rounded-full bg-zinc-800', dotSize)}>
+        <CircleIcon className={cn('text-zinc-600', iconSize)} />
+      </div>
+    ),
+  } satisfies Record<StepStatus, ReactNode>;
 
-  switch (status) {
-    case 'done':
-      return (
-        <div
-          className={cn('flex items-center justify-center rounded-full bg-emerald-500/20', dotSize)}
-        >
-          <CheckIcon className={cn('text-emerald-400', iconSize)} />
-        </div>
-      );
-    case 'running':
-      return (
-        <div
-          className={cn('flex items-center justify-center rounded-full bg-purple-500/20', dotSize)}
-        >
-          <Spinner className={cn('text-purple-400', iconSize)} />
-        </div>
-      );
-    case 'error':
-      return (
-        <div className={cn('flex items-center justify-center rounded-full bg-red-500/20', dotSize)}>
-          <CircleIcon className={cn('text-red-400', iconSize)} />
-        </div>
-      );
-    default:
-      return (
-        <div className={cn('flex items-center justify-center rounded-full bg-zinc-800', dotSize)}>
-          <CircleIcon className={cn('text-zinc-600', iconSize)} />
-        </div>
-      );
-  }
+  return dots[status];
 };
 
 /**
  * Animated step progress indicator. Vertical or horizontal.
  * Perfect for onboarding flows, build pipelines, and task sequences.
+ *
+ * @param props - Step list, orientation, size, and optional class names.
+ * @returns The rendered step progress indicator.
+ * @example
+ * <StepIndicator steps={[{ id: 'install', label: 'Install', status: 'done' }]} />;
  */
 export const StepIndicator = ({
   steps,

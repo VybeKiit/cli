@@ -96,5 +96,5 @@ export const SUPPORT: {
   /** Discord invite URL — set before launch. */
   discordUrl: '',
   /** Kit bug email — from root EMAIL_FROM when set. */
-  kitEmail: process.env.EMAIL_FROM ?? 'support@vybekiit.com',
+  kitEmail: process.env.EMAIL_FROM === undefined ? 'support@vybekiit.com' : process.env.EMAIL_FROM,
 };

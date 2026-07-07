@@ -29,7 +29,15 @@ interface SelectionActionsValue {
 
 const SelectionActionsContext = createContext<SelectionActionsValue | null>(null);
 
-export function SelectionProvider({ children }: { readonly children: ReactNode }) {
+/**
+ * Render the selection provider component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <SelectionProvider><App /></SelectionProvider>;
+ */
+export const SelectionProvider = ({ children }: { readonly children: ReactNode }) => {
   useEffect(() => {
     hydrateSelectionStore();
   }, []);
@@ -47,58 +55,84 @@ export function SelectionProvider({ children }: { readonly children: ReactNode }
   return (
     <SelectionActionsContext.Provider value={actions}>{children}</SelectionActionsContext.Provider>
   );
-}
+};
 
-function useSelectionActions(): SelectionActionsValue {
+const useSelectionActions = (): SelectionActionsValue => {
   const ctx = useContext(SelectionActionsContext);
   if (!ctx) {
     throw new Error('useSelectionActions must be used within SelectionProvider');
   }
   return ctx;
-}
+};
 
-/** Per-card subscription — only re-renders when this key toggles. */
-export function useIsSelected(previewKey: string): boolean {
-  return useSyncExternalStore(
+/**
+ * Subscribe one catalog card to its selected state.
+ *
+ * @param previewKey - Stable catalog preview key to observe.
+ * @returns Whether the entry is currently selected.
+ * @example
+ * const selected = useIsSelected(entry.previewKey);
+ */
+export const useIsSelected = (previewKey: string): boolean =>
+  useSyncExternalStore(
     (listener) => subscribeSelectionKey(previewKey, listener),
     () => isEntrySelected(previewKey),
     () => false,
   );
-}
 
-export function useSelectionToggle(): (previewKey: string) => void {
-  return useSelectionActions().toggle;
-}
+/**
+ * Read the selection toggle callback from context.
+ *
+ * @returns A callback that toggles a catalog entry by preview key.
+ * @example
+ * const toggle = useSelectionToggle();
+ */
+export const useSelectionToggle = (): ((previewKey: string) => void) =>
+  useSelectionActions().toggle;
 
-/** Tray-only hook — re-renders on any selection change. */
-export function useSelectionTrayState(): {
+/**
+ * Subscribe the tray to selected entries and count.
+ *
+ * @returns Selection count, selected catalog entries, and a clear callback.
+ * @example
+ * const tray = useSelectionTrayState();
+ */
+export const useSelectionTrayState = (): {
   readonly count: number;
   readonly selectedEntries: CatalogEntry[];
   readonly clear: () => void;
-} {
+} => {
   const catalog = useCatalogData();
   const { clear } = useSelectionActions();
   const count = useSyncExternalStore(subscribeSelection, getSelectionCount, () => 0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: recompute when the selection count changes (store read)
   const selectedEntries = useMemo(
     () => resolveSelectedEntries(catalog.byKey),
     [catalog.byKey, count],
   );
 
   return { count, selectedEntries, clear };
-}
+};
 
-/** @deprecated Prefer `useIsSelected` + `useSelectionToggle` on cards. */
-export function useSelection() {
+/**
+ * Reads the legacy selection context shape.
+ *
+ * @returns Selected keys, selected entries, and selection actions.
+ * @example
+ * const selection = useSelection();
+ * @deprecated Prefer `useIsSelected` + `useSelectionToggle` on cards.
+ */
+export const useSelection = () => {
   const { toggle, clear } = useSelectionActions();
   const tray = useSelectionTrayState();
 
   return {
     selectedKeys: new Set(tray.selectedEntries.map((entry) => entry.previewKey)),
     selectedEntries: tray.selectedEntries,
-    isSelected,
+    isSelected: isEntrySelected,
     toggle,
     clear,
     count: tray.count,
   };
-}
+};

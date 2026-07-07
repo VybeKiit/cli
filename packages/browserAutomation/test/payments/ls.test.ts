@@ -3,10 +3,10 @@ import {
   scrapeProductIdFromUrl,
   scrapeStoreIdFromHtml,
   scrapeVariantIdFromHtml,
-} from '@vybekiit/browserAutomation/domains/payments/ls/scrape';
-import { resolveLsSelectorEntry } from '@vybekiit/browserAutomation/domains/payments/ls/selectors/registry';
-import { LS_DASHBOARD_URL } from '@vybekiit/browserAutomation/domains/payments/ls/types';
-import { LS_AUTOMATION_VERBS } from '@vybekiit/browserAutomation/domains/payments/ls/verbRegistry';
+} from '@vybekiit/browser-automation/domains/payments/ls/scrape';
+import { resolveLsSelectorEntry } from '@vybekiit/browser-automation/domains/payments/ls/selectors/registry';
+import { LS_DASHBOARD_URL } from '@vybekiit/browser-automation/domains/payments/ls/types';
+import { LS_AUTOMATION_VERBS } from '@vybekiit/browser-automation/domains/payments/ls/verbRegistry';
 import { describe, expect, it } from 'vitest';
 
 describe('LS verbRegistry', () => {

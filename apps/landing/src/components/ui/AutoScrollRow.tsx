@@ -29,11 +29,12 @@ interface AutoScrollRowProps {
   readonly rowClassName?: string;
 }
 
-function cloneForLoop(children: ReactNode) {
+const cloneForLoop = (children: ReactNode) => {
   if (isValidElement(children)) {
+    const keySource = children.key === null ? 'row' : children.key;
     return cloneElement(children as ReactElement<{ 'aria-hidden'?: boolean }>, {
       'aria-hidden': true,
-      key: `${children.key ?? 'row'}-clone`,
+      key: `${keySource}-clone`,
     });
   }
 
@@ -41,14 +42,35 @@ function cloneForLoop(children: ReactNode) {
     if (!isValidElement(child)) {
       return child;
     }
+    const keySource = child.key === null ? index : child.key;
     return cloneElement(child as ReactElement, {
-      key: `${child.key ?? index}-clone`,
+      key: `${keySource}-clone`,
     });
   });
-}
+};
 
-/** Horizontal row that scrolls on its own and loops seamlessly (edge fade included). */
-export function AutoScrollRow({
+const resolveHoverBehavior = (
+  hoverBehavior: HoverBehavior | undefined,
+  pauseOnHover: boolean,
+): HoverBehavior => {
+  if (hoverBehavior !== undefined) {
+    return hoverBehavior;
+  }
+  return pauseOnHover ? 'pause' : 'none';
+};
+
+/**
+ * Horizontal row that scrolls on its own and loops seamlessly (edge fade included).
+ *
+ * @param props - Component props.
+ * @returns The rendered AutoScrollRow element.
+ * @example
+ * ```tsx
+ * <AutoScrollRow />
+ * ```
+ */
+
+export const AutoScrollRow = ({
   children,
   ariaLabel,
   durationDesktop = '80s',
@@ -58,13 +80,13 @@ export function AutoScrollRow({
   className,
   trackClassName,
   rowClassName,
-}: AutoScrollRowProps) {
+}: AutoScrollRowProps) => {
   const reduced = useReducedMotion();
   const regionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
 
-  const resolvedHover = hoverBehavior ?? (pauseOnHover ? 'pause' : 'none');
+  const resolvedHover = resolveHoverBehavior(hoverBehavior, pauseOnHover);
   const useJsMarquee = resolvedHover === 'accelerate-reverse' && !reduced;
   const [durationSeconds, setDurationSeconds] = useState(() =>
     parseDurationSeconds(durationMobile),
@@ -114,4 +136,4 @@ export function AutoScrollRow({
       </div>
     </div>
   );
-}
+};

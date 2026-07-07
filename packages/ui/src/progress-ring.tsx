@@ -2,26 +2,34 @@
 
 import { cn } from './utils';
 
-type ProgressRingProps = {
-  value: number;
-  max?: number;
-  size?: number;
-  strokeWidth?: number;
-  color?: string;
-  label?: string;
-  className?: string;
-};
+interface ProgressRingProps {
+  readonly value: number;
+  readonly max?: number;
+  readonly size?: number;
+  readonly strokeWidth?: number;
+  readonly color?: string;
+  readonly label?: string;
+  readonly className?: string;
+}
 
-/** Circular progress ring with animated fill. */
-export const ProgressRing = ({
-  value,
-  max = 100,
-  size = 64,
-  strokeWidth = 4,
-  color = '#7c3aed',
-  label,
-  className,
-}: ProgressRingProps) => {
+/**
+ * Circular progress ring with animated fill.
+ *
+ * @param props - Progress value, max, dimensions, stroke, color, label, and classes.
+ * @returns An SVG-backed circular progress indicator.
+ * @example
+ * <ProgressRing value={75} label="75%" />;
+ */
+export const ProgressRing = (props: ProgressRingProps) => {
+  const {
+    value,
+    max = 100,
+    size = 64,
+    strokeWidth = 4,
+    color = '#7c3aed',
+    label,
+    className = '',
+  } = props;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const percent = Math.min(value / max, 1);

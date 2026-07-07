@@ -1,25 +1,34 @@
-import { printJson } from '@vybekiit/browserAutomation/cli/output';
-import type { CommandRegistry } from '@vybekiit/browserAutomation/cli/registry';
-import { baseVerbContext } from '@vybekiit/browserAutomation/cli/verbContext';
-import { ensureCli } from '@vybekiit/browserAutomation/core/ensureCli';
-import { writeEnvBlock } from '@vybekiit/browserAutomation/core/writeEnvBlock';
+import { printJson, printLine } from '@vybekiit/browser-automation/cli/output';
+import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
+import { baseVerbContext } from '@vybekiit/browser-automation/cli/verbContext';
+import { ensureCli } from '@vybekiit/browser-automation/core/ensureCli';
+import { resolveVerbLogger, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { writeEnvBlock } from '@vybekiit/browser-automation/core/writeEnvBlock';
 import {
   type SupabaseSetupResult,
   supabaseEnvBlock,
-} from '@vybekiit/browserAutomation/domains/dbs/types';
+} from '@vybekiit/browser-automation/domains/dbs/types';
 import { connectToSupabaseChrome } from './connect';
 import { waitForSupabaseAuthenticated } from './dashboard/waitForAuthenticated';
 import { listSupabaseProjects, readSupabaseKeysViaCli } from './supabase';
 import { verifySupabaseKeys } from './verify';
 
-export async function standbyLogin(
+/**
+ * Standby Login.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await standbyLogin(ctx);
+ */
+export const standbyLogin = async (
   ctx: ReturnType<typeof baseVerbContext>,
-): Promise<{ ready: boolean; url?: string }> {
+): Promise<{ ready: boolean; url?: string }> => {
   const session = await connectToSupabaseChrome(ctx, { waitForAuth: false });
   try {
     const page = await waitForSupabaseAuthenticated(
       session.page,
-      ctx.log ?? console,
+      resolveVerbLogger(ctx),
       session.context,
     );
     return { ready: true, url: page.url() };
@@ -28,22 +37,21 @@ export async function standbyLogin(
   } finally {
     await session.dispose();
   }
-}
+};
 
 /**
  * Resolve Supabase project URL + keys, CLI-first.
  *
- * 1. Ensure the `supabase` CLI (auto-install via doctor).
- * 2. Resolve the project ref (explicit `--project-ref`, else the sole project the CLI lists).
- * 3. Read anon + service_role keys headlessly via the CLI — no browser needed.
- *
- * Returns null only when the CLI can't surface the keys; the caller then falls back to the
- * browser flow. Project *creation* (new-project wizard) remains a browser/MCP concern.
+ * @param projectRef - Supabase project reference.
+ * @param log - Input value for log.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = resolveSupabaseViaCli('project-ref', log);
  */
-export function resolveSupabaseViaCli(
+export const resolveSupabaseViaCli = (
   projectRef: string | undefined,
-  log: Pick<Console, 'log' | 'warn'>,
-): SupabaseSetupResult | null {
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): SupabaseSetupResult | null => {
   const cli = ensureCli('supabase', { log });
   if (!cli.installed) {
     log.warn('[supabase] CLI not available; falling back to browser.');
@@ -62,17 +70,22 @@ export function resolveSupabaseViaCli(
   if (!ref) return null;
 
   return readSupabaseKeysViaCli(ref);
-}
+};
 
 /**
- * Run Supabase setup: CLI-first key retrieval, browser fallback for project creation /
- * console-only keys. Returns credentials; the caller writes them to `.env`.
+ * Run Supabase setup: CLI-first key retrieval, browser fallback for project creation / console-only keys. Returns credentials; the caller writes them to `.env`.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @param params - Validated automation parameters for the operation.
+ * @returns Promise resolving with the automation result.
+ * @example
+ * const result = await runSupabaseSetup(ctx, params);
  */
-export async function runSupabaseSetup(
+export const runSupabaseSetup = async (
   ctx: ReturnType<typeof baseVerbContext>,
   params: { orgSlug?: string; projectName?: string; region?: string; projectRef?: string },
-): Promise<SupabaseSetupResult> {
-  const log = ctx.log ?? console;
+): Promise<SupabaseSetupResult> => {
+  const log = resolveVerbLogger(ctx);
 
   const viaCli = resolveSupabaseViaCli(params.projectRef, log);
   if (viaCli) {
@@ -89,9 +102,17 @@ export async function runSupabaseSetup(
   } finally {
     await session.dispose();
   }
-}
+};
 
-export function registerSupabaseDomain(registry: CommandRegistry): void {
+/**
+ * Register Supabase Domain.
+ *
+ * @param registry - Command registry receiving domain commands.
+ * @returns Nothing; registers commands on the provided registry.
+ * @example
+ * registerSupabaseDomain(registry);
+ */
+export const registerSupabaseDomain = (registry: CommandRegistry): void => {
   registry.register({
     name: 'dbs/supabase',
     aliases: ['db'],
@@ -101,8 +122,8 @@ export function registerSupabaseDomain(registry: CommandRegistry): void {
         run: async ({ flags }) => {
           const result = await standbyLogin(baseVerbContext(flags));
           if (flags.json) printJson({ ok: result.ready, ...result });
-          else if (result.ready) console.log(`OK: dashboard ready at ${result.url}`);
-          else console.log('Timed out waiting for Supabase sign-in.');
+          else if (result.ready) printLine(`OK: dashboard ready at ${result.url}`);
+          else printLine('Timed out waiting for Supabase sign-in.');
           return result.ready ? 0 : 1;
         },
       },
@@ -133,9 +154,9 @@ export function registerSupabaseDomain(registry: CommandRegistry): void {
               verified: verified.ok,
             });
           } else {
-            console.log('OK: Supabase setup complete.');
-            console.log(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
-            console.log(
+            printLine('OK: Supabase setup complete.');
+            printLine(`Wrote ${written.keysWritten.join(', ')} to ${written.path}`);
+            printLine(
               verified.ok
                 ? '✓ Keys verified against the Supabase REST endpoint.'
                 : '⚠ Keys written but live verification did not confirm access.',
@@ -146,4 +167,4 @@ export function registerSupabaseDomain(registry: CommandRegistry): void {
       },
     },
   });
-}
+};

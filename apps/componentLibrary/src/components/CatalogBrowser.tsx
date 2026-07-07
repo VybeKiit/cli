@@ -21,11 +21,11 @@ import { CATALOG_PAGE_SIZE, loadInfiniteScrollEnabled } from '@library/lib/catal
 import { matchesCatalogQuery } from '@library/lib/catalogSearch';
 import { categoryLabelFromSlug } from '@library/lib/categoryLabels';
 import { groupCatalogEntries } from '@library/lib/groupCatalogEntries';
+import { Button } from '@vybekiit/ui/button';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
 import { CircleHelp } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 type TabKind = 'all' | 'components' | 'examples';
 
@@ -35,32 +35,39 @@ const TAB_TIPS: Record<TabKind, string> = {
   examples: 'Full-page or composite demos — great for inspiration before you copy a prompt.',
 };
 
-function CatalogGridSkeleton({ count = 8 }: { readonly count?: number }) {
-  return (
-    <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 [&>*]:min-w-0">
-      {Array.from({ length: count }, (_, index) => (
-        <div
-          className="animate-pulse rounded-xl border border-border bg-card p-4"
-          key={`catalog-skeleton-${index}`}
-        >
-          <div className="mb-4 h-40 rounded-lg bg-muted" />
-          <div className="mb-2 h-8 rounded bg-muted" />
-          <div className="h-4 w-2/3 rounded bg-muted" />
-        </div>
-      ))}
-    </div>
-  );
-}
+const CatalogGridSkeleton = ({ count = 8 }: { readonly count?: number }) => (
+  <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 [&>*]:min-w-0">
+    {Array.from({ length: count }, (_, index) => (
+      <div
+        className="animate-pulse rounded-xl border border-border bg-card p-4"
+        key={`catalog-skeleton-${index}`}
+      >
+        <div className="mb-4 h-40 rounded-lg bg-muted" />
+        <div className="mb-2 h-8 rounded bg-muted" />
+        <div className="h-4 w-2/3 rounded bg-muted" />
+      </div>
+    ))}
+  </div>
+);
 
-export function CatalogBrowser() {
+/**
+ * Render the catalog browser component.
+ *
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogBrowser />;
+ */
+export const CatalogBrowser = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const catalog = useCatalogData();
   const { ready, error } = useCatalogReady();
   const { gridClassName } = useCatalogGridLayout();
   const initialTab = searchParams.get('tab') === 'examples' ? 'examples' : 'all';
-  const initialCategory = searchParams.get('category') ?? 'all';
-  const initialLibrary = searchParams.get('library') ?? 'all';
+  const categoryParam = searchParams.get('category');
+  const libraryParam = searchParams.get('library');
+  const initialCategory = categoryParam === null ? 'all' : categoryParam;
+  const initialLibrary = libraryParam === null ? 'all' : libraryParam;
 
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
@@ -81,6 +88,7 @@ export function CatalogBrowser() {
     setScrollHydrated(true);
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset pagination whenever a filter changes
   useEffect(() => {
     setPage(1);
     setVisibleCount(CATALOG_PAGE_SIZE);
@@ -89,9 +97,9 @@ export function CatalogBrowser() {
   const syncUrl = useCallback(
     (next: { category?: string; library?: string; tab?: TabKind }) => {
       const params = new URLSearchParams();
-      const cat = next.category ?? category;
-      const lib = next.library ?? library;
-      const kind = next.tab ?? tab;
+      const cat = next.category === undefined ? category : next.category;
+      const lib = next.library === undefined ? library : next.library;
+      const kind = next.tab === undefined ? tab : next.tab;
       if (cat !== 'all') {
         params.set('category', cat);
       }
@@ -313,18 +321,22 @@ export function CatalogBrowser() {
           </div>
 
           <p className="mb-4 text-muted-foreground text-sm">
-            {catalogReady ? (
-              <>
-                Showing {visibleEntries.length} of {orderedFiltered.length}
-                {!infiniteScroll && orderedFiltered.length > CATALOG_PAGE_SIZE
-                  ? ` · page ${page} of ${pageCount}`
-                  : null}
-              </>
-            ) : error ? (
-              <>Catalog failed to load: {error}</>
-            ) : (
-              <>Loading catalog…</>
-            )}
+            {(() => {
+              if (catalogReady) {
+                return (
+                  <>
+                    Showing {visibleEntries.length} of {orderedFiltered.length}
+                    {!infiniteScroll && orderedFiltered.length > CATALOG_PAGE_SIZE
+                      ? ` · page ${page} of ${pageCount}`
+                      : null}
+                  </>
+                );
+              }
+              if (error) {
+                return <>Catalog failed to load: {error}</>;
+              }
+              return <>Loading catalog…</>;
+            })()}
           </p>
 
           <div className="flex flex-col gap-10" ref={gridTopRef}>
@@ -369,4 +381,4 @@ export function CatalogBrowser() {
       </SidebarInset>
     </SidebarProvider>
   );
-}
+};

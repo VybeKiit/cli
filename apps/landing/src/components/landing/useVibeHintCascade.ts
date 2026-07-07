@@ -17,8 +17,16 @@ interface UseVibeHintCascadeResult {
   readonly cancelCascade: () => void;
 }
 
-/** One-time domino auto-tooltip sequence for hero builder-tool marks (desktop only). */
-export function useVibeHintCascade(count: number): UseVibeHintCascadeResult {
+/**
+ * One-time domino auto-tooltip sequence for hero builder-tool marks (desktop only).
+ *
+ * @param count - Input value.
+ * @returns The hook result.
+ * @example
+ * const value = useVibeHintCascade(count);
+ */
+
+export const useVibeHintCascade = (count: number): UseVibeHintCascadeResult => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const timersRef = useRef<number[]>([]);
@@ -99,4 +107,4 @@ export function useVibeHintCascade(count: number): UseVibeHintCascadeResult {
     isRunning,
     cancelCascade,
   };
-}
+};

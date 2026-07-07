@@ -1,33 +1,57 @@
 'use client';
 
-import { type ReactNode, useCallback, useRef, useState } from 'react';
+import { X } from 'lucide-react';
+import {
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import { cn } from './utils';
 
-type FloatingPanelProps = {
-  children: ReactNode;
-  title?: string;
-  defaultPosition?: { x: number; y: number };
-  onClose?: () => void;
-  className?: string;
+interface FloatingPanelProps {
+  readonly children?: ReactNode;
+  readonly title?: string;
+  readonly defaultPosition?: { readonly x: number; readonly y: number };
+  readonly onClose?: () => void;
+  readonly className?: string;
+}
+
+/**
+ * Resolve the visible panel title.
+ *
+ * @param title - Optional caller-provided title.
+ * @returns The caller title, or the default panel title.
+ * @example
+ * resolvePanelTitle(undefined) === 'Panel';
+ */
+const resolvePanelTitle = (title: string | undefined): string => {
+  if (title === undefined) {
+    return 'Panel';
+  }
+  return title;
 };
 
-/** Floating overlay panel that can be positioned and dragged. */
-export const FloatingPanel = ({
-  children,
-  title,
-  defaultPosition = { x: 20, y: 20 },
-  onClose,
-  className,
-}: FloatingPanelProps) => {
+/**
+ * Floating overlay panel that can be positioned and dragged.
+ *
+ * @param props - Panel content, optional title, initial position, close handler, and classes.
+ * @returns A draggable fixed-position panel.
+ * @example
+ * <FloatingPanel title="Inspector">Details</FloatingPanel>;
+ */
+export const FloatingPanel = (props: FloatingPanelProps) => {
+  const { children = null, title, defaultPosition = { x: 20, y: 20 }, onClose, className = '' } = props;
   const [pos, setPos] = useState(defaultPosition);
   const [dragging, setDragging] = useState(false);
   const offsetRef = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e: ReactMouseEvent<HTMLDivElement>) => {
       setDragging(true);
       offsetRef.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
-      const handleMove = (ev: MouseEvent) => {
+      const handleMove = (ev: globalThis.MouseEvent) => {
         setPos({ x: ev.clientX - offsetRef.current.x, y: ev.clientY - offsetRef.current.y });
       };
       const handleUp = () => {
@@ -54,21 +78,14 @@ export const FloatingPanel = ({
         className="flex cursor-grab items-center justify-between border-b border-zinc-800 px-3 py-2"
         onMouseDown={handleMouseDown}
       >
-        <span className="text-xs font-medium text-zinc-300">{title ?? 'Panel'}</span>
+        <span className="text-xs font-medium text-zinc-300">{resolvePanelTitle(title)}</span>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
             className="rounded p-0.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
           >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M4 4l8 8M12 4l-8 8"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         )}
       </div>

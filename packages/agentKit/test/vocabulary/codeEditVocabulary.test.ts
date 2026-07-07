@@ -1,7 +1,7 @@
 import {
   CODE_EDIT_VOCABULARY,
   renderCodeEditVocabularyTable,
-} from '@vybekiit/agentKit/vocabulary/codeEditVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/codeEditVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderCodeEditVocabularyTable', () => {

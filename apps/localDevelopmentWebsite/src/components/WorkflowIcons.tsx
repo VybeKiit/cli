@@ -5,6 +5,14 @@ import type { SVGProps } from 'react';
 
 type IconProps = SVGProps<SVGSVGElement>;
 
+/**
+ * Render the database icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <DatabaseIcon {...props} />;
+ */
 export const DatabaseIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -13,6 +21,7 @@ export const DatabaseIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -21,8 +30,16 @@ export const DatabaseIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the google icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <GoogleIcon {...props} />;
+ */
 export const GoogleIcon = (props: IconProps) => (
-  <svg viewBox="0 0 24 24" fill="none" {...props}>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       fill="#4285F4"
@@ -42,6 +59,14 @@ export const GoogleIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the website icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <WebsiteIcon {...props} />;
+ */
 export const WebsiteIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -50,6 +75,7 @@ export const WebsiteIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <circle cx="12" cy="12" r="10" />
@@ -58,6 +84,14 @@ export const WebsiteIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the extension icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <ExtensionIcon {...props} />;
+ */
 export const ExtensionIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -66,6 +100,7 @@ export const ExtensionIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -75,6 +110,14 @@ export const ExtensionIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the app icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <AppIcon {...props} />;
+ */
 export const AppIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -83,6 +126,7 @@ export const AppIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -92,6 +136,14 @@ export const AppIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the payment icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <PaymentIcon {...props} />;
+ */
 export const PaymentIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -100,6 +152,7 @@ export const PaymentIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
@@ -107,6 +160,14 @@ export const PaymentIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the deploy icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <DeployIcon {...props} />;
+ */
 export const DeployIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -115,6 +176,7 @@ export const DeployIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <path d="M22 2L11 13" />
@@ -122,6 +184,14 @@ export const DeployIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the scaffold icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <ScaffoldIcon {...props} />;
+ */
 export const ScaffoldIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -130,6 +200,7 @@ export const ScaffoldIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -138,6 +209,14 @@ export const ScaffoldIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the auth icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <AuthIcon {...props} />;
+ */
 export const AuthIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -146,6 +225,7 @@ export const AuthIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -153,6 +233,14 @@ export const AuthIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the dashboard icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <DashboardIcon {...props} />;
+ */
 export const DashboardIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -161,6 +249,7 @@ export const DashboardIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -169,6 +258,14 @@ export const DashboardIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the landing icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <LandingIcon {...props} />;
+ */
 export const LandingIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -177,6 +274,7 @@ export const LandingIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <rect x="2" y="3" width="20" height="18" rx="2" />
@@ -186,6 +284,14 @@ export const LandingIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the terms icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <TermsIcon {...props} />;
+ */
 export const TermsIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -194,6 +300,7 @@ export const TermsIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -203,6 +310,14 @@ export const TermsIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the privacy icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <PrivacyIcon {...props} />;
+ */
 export const PrivacyIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -211,12 +326,21 @@ export const PrivacyIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
 
+/**
+ * Render the billing icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <BillingIcon {...props} />;
+ */
 export const BillingIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -225,6 +349,7 @@ export const BillingIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <line x1="12" y1="1" x2="12" y2="23" />
@@ -232,6 +357,14 @@ export const BillingIcon = (props: IconProps) => (
   </svg>
 );
 
+/**
+ * Render the settings icon component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <SettingsIcon {...props} />;
+ */
 export const SettingsIcon = (props: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -240,6 +373,7 @@ export const SettingsIcon = (props: IconProps) => (
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
     {...props}
   >
     <circle cx="12" cy="12" r="3" />

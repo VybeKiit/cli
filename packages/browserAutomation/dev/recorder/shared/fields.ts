@@ -1,7 +1,7 @@
 export {
   LS_DRAFT_FIELDS,
   type LsDraftFieldKey,
-} from '@vybekiit/browserAutomation/domains/payments/ls/selectors/fields';
+} from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 
 /** CWS maintainer draft fields (unchanged). */
 export const CWS_DRAFT_FIELDS = [

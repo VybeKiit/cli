@@ -1,8 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import process from 'node:process';
 
-const port = process.env.PLAYWRIGHT_PORT ?? '8081';
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
+const port = process.env.PLAYWRIGHT_PORT === undefined ? '8081' : process.env.PLAYWRIGHT_PORT;
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL === undefined
+    ? `http://localhost:${port}`
+    : process.env.PLAYWRIGHT_BASE_URL;
+const headless = process.env.PLAYWRIGHT_HEADLESS !== 'false';
 
 export default defineConfig({
   testDir: './e2e',
@@ -10,7 +14,7 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL,
-    headless: process.env.PLAYWRIGHT_HEADLESS !== 'false',
+    headless,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

@@ -1,43 +1,70 @@
+import { parseEnv } from '@vybekiit/core';
+import { TwilioConfigSchema, type TwilioConfigType } from '@vybekiit/notifications/config';
 import {
-  fail,
-  ok,
-  parseEnv,
-  type Result,
-  type TwilioConfig,
-  twilioConfigSchema,
-} from '@vybekiit/core';
-import type { NotificationsProvider, SendNotificationParams } from '@vybekiit/notifications/types';
+  NotificationsError,
+  type NotificationsProvider,
+  type SendNotificationParamsType,
+} from '@vybekiit/notifications/types';
+import { Effect } from 'effect';
 import { sendTwilioSmsOtp, sendTwilioWhatsApp } from './twilio';
 
-export function createTwilioNotifications(config: TwilioConfig): NotificationsProvider {
-  return {
-    name: 'twilio',
-    async send(params: SendNotificationParams): Promise<Result<{ id: string }>> {
-      if (params.channel === 'sms') {
-        const result = await sendTwilioSmsOtp(params.to, config);
-        if (!result.ok) return fail(result.error.code, result.error.message);
-        return ok({ id: 'twilio-sms' });
-      }
-      if (params.channel === 'push') {
-        return fail('invalid_channel', 'Twilio adapter does not support push — use Expo.');
-      }
-      const waConfig = config as TwilioConfig & { TWILIO_WHATSAPP_FROM?: string };
-      if (params.data?.channel === 'whatsapp' && waConfig.TWILIO_WHATSAPP_FROM) {
-        const result = await sendTwilioWhatsApp(params.to, params.body, waConfig);
-        if (!result.ok) return fail(result.error.code, result.error.message);
-        return ok({ id: result.value.sid });
-      }
-      return fail('invalid_channel', 'Unsupported notification channel for Twilio.');
-    },
-    async verifyDelivery(): Promise<Result<true>> {
-      if (!config.TWILIO_ACCOUNT_SID) {
-        return fail('config_missing', 'Twilio is not configured.');
-      }
-      return ok(true);
-    },
-  };
-}
+/**
+ * Build a notifications adapter backed by Twilio SMS and optional WhatsApp delivery.
+ *
+ * @param config - Validated Twilio credentials and sender configuration.
+ * @returns A notifications provider for SMS and Twilio WhatsApp delivery.
+ * @example
+ * const notifications = createTwilioNotifications(resolveTwilioConfig(process.env));
+ */
+export const createTwilioNotifications = (config: TwilioConfigType): NotificationsProvider => ({
+  name: 'twilio',
+  send: (params: SendNotificationParamsType) => {
+    if (params.channel === 'sms') {
+      return sendTwilioSmsOtp(params.to, config).pipe(Effect.as({ id: 'twilio-sms' }));
+    }
 
-export function resolveTwilioConfig(env: Record<string, string | undefined>): TwilioConfig {
-  return parseEnv(twilioConfigSchema, env);
-}
+    if (params.channel === 'push') {
+      return Effect.fail(
+        new NotificationsError({
+          code: 'NOTIFICATIONS_INVALID_CHANNEL',
+          message: 'Twilio adapter does not support push; use Expo.',
+        }),
+      );
+    }
+
+    if (params.data !== undefined && params.data.channel === 'whatsapp') {
+      return sendTwilioWhatsApp(params.to, params.body, config).pipe(
+        Effect.map((result) => ({ id: result.sid })),
+      );
+    }
+
+    return Effect.fail(
+      new NotificationsError({
+        code: 'NOTIFICATIONS_INVALID_CHANNEL',
+        message: 'Unsupported notification channel for Twilio.',
+      }),
+    );
+  },
+  verifyDelivery: () => {
+    if (config.TWILIO_ACCOUNT_SID.length === 0) {
+      return Effect.fail(
+        new NotificationsError({
+          code: 'NOTIFICATIONS_CONFIG_INVALID',
+          message: 'Twilio is not configured.',
+        }),
+      );
+    }
+    return Effect.succeed(true);
+  },
+});
+
+/**
+ * Parse Twilio configuration from an environment source.
+ *
+ * @param env - Environment variables containing Twilio credentials.
+ * @returns Validated Twilio configuration.
+ * @example
+ * const config = resolveTwilioConfig(process.env);
+ */
+export const resolveTwilioConfig = (env: Record<string, string | undefined>): TwilioConfigType =>
+  parseEnv(TwilioConfigSchema, env);

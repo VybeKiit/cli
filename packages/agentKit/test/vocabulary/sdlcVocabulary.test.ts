@@ -1,7 +1,7 @@
 import {
   renderSdlcVocabularyTable,
   SDLC_VOCABULARY,
-} from '@vybekiit/agentKit/vocabulary/sdlcVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/sdlcVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderSdlcVocabularyTable', () => {

@@ -6,29 +6,25 @@ import {
   loadInspectHighlightColor,
   saveInspectHighlightColor,
 } from '../inspectHighlightColor';
+import { resolveBrowserStorage } from './browserStorage';
 
-function browserStorage(): Storage | null {
-  if (typeof globalThis.localStorage === 'undefined') {
-    return null;
-  }
-  try {
-    return globalThis.localStorage;
-  } catch {
-    return null;
-  }
-}
-
-/** Persisted inspect highlight ring color for pick mode. */
-export function useReportInspectHighlightColor() {
+/**
+ * Manage persisted inspect highlight ring color.
+ *
+ * @returns Current color plus setters for saving or resetting the color.
+ * @example
+ * const { color, setColor, resetColor } = useReportInspectHighlightColor();
+ */
+export const useReportInspectHighlightColor = () => {
   const [color, setColorState] = useState(DEFAULT_INSPECT_HIGHLIGHT_COLOR);
 
   useEffect(() => {
-    setColorState(loadInspectHighlightColor(browserStorage()));
+    setColorState(loadInspectHighlightColor(resolveBrowserStorage()));
   }, []);
 
   const setColor = useCallback((next: string) => {
     setColorState(next);
-    saveInspectHighlightColor(browserStorage(), next);
+    saveInspectHighlightColor(resolveBrowserStorage(), next);
   }, []);
 
   const resetColor = useCallback(() => {
@@ -36,4 +32,4 @@ export function useReportInspectHighlightColor() {
   }, [setColor]);
 
   return { color, setColor, resetColor };
-}
+};

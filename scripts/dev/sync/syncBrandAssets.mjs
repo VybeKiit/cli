@@ -3,8 +3,11 @@
  * Sync VybeKiit brand SVGs from assets/brand/ into apps and templates.
  *
  * SSOT:
- *   assets/brand/vybekiit-icon.svg  — favicon / app icon (dark tile + white chevrons)
- *   assets/brand/vybekiit-logo.svg  — transparent mark for headers / marketing
+ *   assets/brand/vybekiit-icon.svg           — favicon / app icon (dark tile + white mark)
+ *   assets/brand/vybekiit-logo.svg           — transparent white mark for dark surfaces
+ *   assets/brand/vybekiit-profile.svg        — square profile/avatar logo
+ *   assets/brand/vybekiit-wordmark.svg       — white wordmark for dark surfaces
+ *   assets/brand/vybekiit-wordmark-dark.svg  — dark wordmark for light surfaces
  *
  * Usage:
  *   node scripts/syncBrandAssets.mjs [--dry-run]
@@ -27,14 +30,38 @@ const SYNC_MAP = [
       'apps/landing/app/icon.svg',
       'apps/componentLibrary/app/icon.svg',
       'templates/web/app/icon.svg',
+      'templates/web/public/logo.svg',
       'templates/extension/public/icon/icon.svg',
       'templates/mobile/assets/icon.svg',
       'templates/spa/public/favicon.svg',
+      'templates/spa/public/images/logo/logo-icon.svg',
     ],
   },
   {
     source: 'vybekiit-logo.svg',
-    targets: ['apps/landing/public/vybekiit-logo.svg', 'templates/web/public/vybekiit-logo.svg'],
+    targets: [
+      'apps/landing/public/vybekiit-logo.svg',
+      'apps/localDevelopmentWebsite/public/vybekiit-logo.svg',
+      'templates/web/public/vybekiit-logo.svg',
+      'templates/extension/public/vybekiit-logo.svg',
+    ],
+  },
+  {
+    source: 'vybekiit-profile.svg',
+    targets: ['apps/landing/public/vybekiit-profile.svg'],
+  },
+  {
+    source: 'vybekiit-wordmark.svg',
+    targets: [
+      'apps/landing/public/vybekiit-wordmark.svg',
+      'templates/web/public/vybekiit-wordmark.svg',
+      'templates/spa/public/images/logo/auth-logo.svg',
+      'templates/spa/public/images/logo/logo-dark.svg',
+    ],
+  },
+  {
+    source: 'vybekiit-wordmark-dark.svg',
+    targets: ['templates/spa/public/images/logo/logo.svg'],
   },
 ];
 

@@ -1,22 +1,52 @@
-/** Env flag — Report Mode dock renders only when this is truthy in local dev. */
+/** Env flag that allows Report Mode to render on a local dev host. */
 export const REPORT_MODE_ENABLED_ENV = 'VYBE_REPORT_MODE';
 
-function isTruthyFlag(raw: string | undefined): boolean {
-  const normalized = raw?.trim().toLowerCase();
+/**
+ * Parse a truthy env flag value.
+ *
+ * @param raw - Optional raw env value.
+ * @returns `true` when the value is `1` or `true`.
+ * @example
+ * const enabled = isTruthyFlag(process.env.VYBE_REPORT_MODE);
+ */
+const isTruthyFlag = (raw: string | undefined): boolean => {
+  if (raw === undefined) {
+    return false;
+  }
+
+  const normalized = raw.trim().toLowerCase();
   return normalized === '1' || normalized === 'true';
-}
+};
 
-/** True when running the Next/Vite dev server — never true in production builds. */
-export function isVybeLocalDevHost(env: Record<string, string | undefined>): boolean {
-  return env.NODE_ENV === 'development';
-}
+/**
+ * Check whether the host is running a local development build.
+ *
+ * @param env - Environment variables from the app host.
+ * @returns `true` when `NODE_ENV` is `development`.
+ * @example
+ * const local = isVybeLocalDevHost(process.env);
+ */
+export const isVybeLocalDevHost = (env: Record<string, string | undefined>): boolean =>
+  env.NODE_ENV === 'development';
 
-/** Report Mode opt-in flag (local vibe-coder QA tool). */
-export function isReportModeEnabled(env: Record<string, string | undefined>): boolean {
-  return isTruthyFlag(env[REPORT_MODE_ENABLED_ENV]);
-}
+/**
+ * Check whether the Report Mode opt-in flag is enabled.
+ *
+ * @param env - Environment variables from the app host.
+ * @returns `true` when `VYBE_REPORT_MODE` is truthy.
+ * @example
+ * const enabled = isReportModeEnabled(process.env);
+ */
+export const isReportModeEnabled = (env: Record<string, string | undefined>): boolean =>
+  isTruthyFlag(env[REPORT_MODE_ENABLED_ENV]);
 
-/** Report Mode shell should mount only on a local dev host with the flag on. */
-export function shouldShowReportMode(env: Record<string, string | undefined>): boolean {
-  return isVybeLocalDevHost(env) && isReportModeEnabled(env);
-}
+/**
+ * Decide whether the Report Mode shell should mount.
+ *
+ * @param env - Environment variables from the app host.
+ * @returns `true` only on a local dev host with Report Mode enabled.
+ * @example
+ * const show = shouldShowReportMode(process.env);
+ */
+export const shouldShowReportMode = (env: Record<string, string | undefined>): boolean =>
+  isVybeLocalDevHost(env) && isReportModeEnabled(env);

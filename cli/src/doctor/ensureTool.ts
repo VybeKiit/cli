@@ -18,7 +18,7 @@ import {
  * (via subprocess) to precheck/install just the one CLI it needs before minting a token.
  */
 
-export interface EnsureToolResult {
+export type EnsureToolResult = {
   readonly tool: string;
   /** False when the tool name isn't a known toolchain entry. */
   readonly known: boolean;
@@ -32,47 +32,94 @@ export interface EnsureToolResult {
   readonly loginHint?: string;
   /** Set when install failed for a missing prerequisite (e.g. Homebrew). */
   readonly missingRequirement?: string;
-}
+};
 
-function toPlatform(platform: NodeJS.Platform): Platform | null {
-  return platform === 'darwin' || platform === 'win32' || platform === 'linux' ? platform : null;
-}
+/**
+ * Narrow Node's platform string to the OS families doctor supports.
+ *
+ * @param platform - Raw `process.platform` value.
+ * @returns Supported platform, or null when unsupported.
+ * @example
+ * const platform = toPlatform(process.platform);
+ */
+const toPlatform = (platform: NodeJS.Platform): Platform | null =>
+  platform === 'darwin' || platform === 'win32' || platform === 'linux' ? platform : null;
 
-function succeeds(command: string, args: readonly string[]): boolean {
-  return spawnSync(command, [...args], { stdio: 'ignore' }).status === 0;
-}
+/**
+ * Probe whether a command exits successfully.
+ *
+ * @param command - Executable to run.
+ * @param args - Arguments passed to the executable.
+ * @returns True when the command exits with status zero.
+ * @example
+ * const installed = succeeds('gh', ['--version']);
+ */
+const succeeds = (command: string, args: readonly string[]): boolean =>
+  spawnSync(command, [...args], { stdio: 'ignore' }).status === 0;
 
-function errorCode(error: Error | undefined): string | undefined {
-  return error && 'code' in error && typeof error.code === 'string' ? error.code : undefined;
-}
+/**
+ * Read a Node spawn error code when one exists.
+ *
+ * @param error - Optional spawn error.
+ * @returns Error code string, or undefined when absent.
+ * @example
+ * const code = errorCode(result.error);
+ */
+const errorCode = (error: Error | undefined): string | undefined =>
+  error !== undefined && 'code' in error && typeof error.code === 'string' ? error.code : undefined;
 
-function runInstall(
+/**
+ * Run one install action and translate missing prerequisites.
+ *
+ * @param action - Planned install command.
+ * @param log - Logger used for buyer-visible progress.
+ * @returns Install success and optional missing prerequisite.
+ * @example
+ * const outcome = runInstall(action, console);
+ */
+const runInstall = (
   action: InstallAction,
   log: Pick<Console, 'log'>,
-): { ok: boolean; missingRequirement?: string } {
+): { ok: boolean; missingRequirement?: string } => {
   log.log(`[doctor] setting up ${action.tool}: ${action.command} ${action.args.join(' ')}`);
   const result = spawnSync(action.command, [...action.args], { stdio: 'inherit' });
   if (errorCode(result.error) === 'ENOENT') {
     return action.requires ? { ok: false, missingRequirement: action.requires } : { ok: false };
   }
   return { ok: result.status === 0 };
-}
+};
 
-function probeAuth(tool: Tool): boolean | null {
-  if (!tool.auth) return null;
+/**
+ * Probe auth for tools that declare an auth check.
+ *
+ * @param tool - Tool declaration to probe.
+ * @returns Auth state, or null when no auth probe exists.
+ * @example
+ * const authed = probeAuth(tool);
+ */
+const probeAuth = (tool: Tool): boolean | null => {
+  if (tool.auth === undefined) {
+    return null;
+  }
   return succeeds(tool.auth.command, tool.auth.args);
-}
+};
 
 /**
  * Ensure a single named tool is installed (installing if missing) and report its auth
  * state. Idempotent: an already-present tool triggers no install.
+ *
+ * @param name - Tool name requested by the caller.
+ * @param log - Logger used for install progress and setup errors.
+ * @returns Ensure result describing installation and auth state.
+ * @example
+ * const result = ensureTool('wrangler', console);
  */
-export function ensureTool(
+export const ensureTool = (
   name: string,
   log: Pick<Console, 'log' | 'error'> = console,
-): EnsureToolResult {
+): EnsureToolResult => {
   const tool = findToolByName(name);
-  if (!tool) {
+  if (tool === undefined) {
     return { tool: name, known: false, installed: false, installedNow: false, authed: null };
   }
 
@@ -89,16 +136,17 @@ export function ensureTool(
   let missingRequirement: string | undefined;
   if (!present) {
     const [action] = planInstall(platform, presence, [tool]);
-    if (action) {
+    if (action !== undefined) {
       const outcome = runInstall(action, log);
+      ({ missingRequirement } = outcome);
       installedNow = outcome.ok;
-      missingRequirement = outcome.missingRequirement;
     }
   }
 
   const installed = present || installedNow;
   const authed = installed ? probeAuth(tool) : null;
-  const loginHint = installed && authed === false ? tool.auth?.loginHint : undefined;
+  const loginHint =
+    installed && authed === false && tool.auth !== undefined ? tool.auth.loginHint : undefined;
 
   return {
     tool: tool.name,
@@ -109,22 +157,29 @@ export function ensureTool(
     ...(loginHint ? { loginHint } : {}),
     ...(missingRequirement ? { missingRequirement } : {}),
   };
-}
+};
 
-/** Human-readable summary line for one ensure result. */
-export function formatEnsureResult(result: EnsureToolResult): string {
+/**
+ * Format one ensure result as a buyer-readable status line.
+ *
+ * @param result - Ensure result to format.
+ * @returns Human-readable setup status.
+ * @example
+ * const line = formatEnsureResult(result);
+ */
+export const formatEnsureResult = (result: EnsureToolResult): string => {
   if (!result.known) {
-    return `✗ ${result.tool} — not a known tool. Run \`vybekiit doctor\` for the full check.`;
+    return `✗ ${result.tool} - not a known tool. Run \`vybekiit doctor\` for the full check.`;
   }
   if (!result.installed) {
     const fix = result.missingRequirement
       ? ` Install ${result.missingRequirement} first, then re-run.`
       : ' Re-run to try again.';
-    return `✗ ${result.tool} — couldn't be set up.${fix}`;
+    return `✗ ${result.tool} - couldn't be set up.${fix}`;
   }
   const state = result.installedNow ? 'installed just now' : 'already installed';
   if (result.authed === false) {
-    return `→ ${result.tool} — ${state}, but you're not signed in yet. One-time: run \`${result.loginHint}\`.`;
+    return `→ ${result.tool} - ${state}, but you're not signed in yet. One-time: run \`${result.loginHint}\`.`;
   }
-  return `✓ ${result.tool} — ready (${state}).`;
-}
+  return `✓ ${result.tool} - ready (${state}).`;
+};

@@ -23,9 +23,15 @@ interface PlacedProps {
   readonly className?: string;
 }
 
-function place({ x, y, scale = 1 }: { x: number; y: number; scale?: number | undefined }): string {
-  return scale === 1 ? `translate(${x} ${y})` : `translate(${x} ${y}) scale(${scale})`;
-}
+const place = ({
+  x,
+  y,
+  scale = 1,
+}: {
+  x: number;
+  y: number;
+  scale?: number | undefined;
+}): string => (scale === 1 ? `translate(${x} ${y})` : `translate(${x} ${y}) scale(${scale})`);
 
 export type OctopusExpression =
   | 'focused'
@@ -41,14 +47,18 @@ export type OctopusExpression =
  * top-left of the 24-unit grid; `size` is the rendered edge length in canvas units.
  * Eye cutouts in the path show the scene through them, so pupils + mouth are drawn
  * on top to give each scene a readable expression.
+ *
+ * @returns SVG group for the assistant body.
+ * @example
+ * <OctopusBody x={80} y={96} />;
  */
-export function OctopusBody({
+export const OctopusBody = ({
   x,
   y,
   size = 64,
   expression = 'focused',
   className,
-}: PlacedProps & { readonly size?: number; readonly expression?: OctopusExpression }) {
+}: PlacedProps & { readonly size?: number; readonly expression?: OctopusExpression }) => {
   const s = size / 24;
   const leftEye = { cx: 6.74, cy: 9.5 };
   const rightEye = { cx: 17.25, cy: 9.5 };
@@ -66,9 +76,9 @@ export function OctopusBody({
       </g>
     </g>
   );
-}
+};
 
-function OctopusFace({
+const OctopusFace = ({
   expression,
   leftEye,
   rightEye,
@@ -76,7 +86,7 @@ function OctopusFace({
   readonly expression: OctopusExpression;
   readonly leftEye: { cx: number; cy: number };
   readonly rightEye: { cx: number; cy: number };
-}) {
+}) => {
   if (expression === 'sleepy') {
     return (
       <>
@@ -123,9 +133,9 @@ function OctopusFace({
       {mouth}
     </>
   );
-}
+};
 
-function octopusMouthPath(expression: OctopusExpression): ReactNode {
+const octopusMouthPath = (expression: OctopusExpression): ReactNode => {
   const y = 13;
   if (expression === 'sad') {
     return (
@@ -161,46 +171,52 @@ function octopusMouthPath(expression: OctopusExpression): ReactNode {
       strokeWidth="0.55"
     />
   );
-}
+};
 
-function MiniHeart({ cx, cy }: { readonly cx: number; readonly cy: number }) {
-  return (
-    <path
-      d={`M${cx} ${cy + 0.9} C${cx - 1.1} ${cy - 0.3} ${cx - 0.5} ${cy - 1.2} ${cx} ${cy - 0.4} C${cx + 0.5} ${cy - 1.2} ${cx + 1.1} ${cy - 0.3} ${cx} ${cy + 0.9}Z`}
-      fill="#E11D48"
-    />
-  );
-}
+const MiniHeart = ({ cx, cy }: { readonly cx: number; readonly cy: number }) => (
+  <path
+    d={`M${cx} ${cy + 0.9} C${cx - 1.1} ${cy - 0.3} ${cx - 0.5} ${cy - 1.2} ${cx} ${cy - 0.4} C${cx + 0.5} ${cy - 1.2} ${cx + 1.1} ${cy - 0.3} ${cx} ${cy + 0.9}Z`}
+    fill="#E11D48"
+  />
+);
 
-/** Desk surface + front edge. Local origin: left end of the desk top. */
-export function Desk({
+/**
+ * Desk surface and front edge.
+ *
+ * @returns SVG group for a desk surface.
+ * @example
+ * <Desk x={0} y={160} scale={1} />;
+ */
+export const Desk = ({
   x,
   y,
   scale,
   className,
   width = 320,
-}: PlacedProps & { readonly width?: number }) {
-  return (
-    <g className={className} transform={place({ x, y, scale })}>
-      <rect fill="#B98A6E" height="8" rx="2" width={width} x="0" y="0" />
-      <rect fill="#9C6F55" height="10" width={width} x="0" y="8" />
-    </g>
-  );
-}
+}: PlacedProps & { readonly width?: number }) => (
+  <g className={className} transform={place({ x, y, scale })}>
+    <rect fill="#B98A6E" height="8" rx="2" width={width} x="0" y="0" />
+    <rect fill="#9C6F55" height="10" width={width} x="0" y="8" />
+  </g>
+);
 
 /**
  * Open MacBook drawn as lid (screen) + hinge + keyboard deck, seen slightly from
  * the front. Local origin: bottom-left corner of the keyboard deck. `screen` fills
  * the display so scenes can theme it (terminal, error, etc.).
+ *
+ * @returns SVG group for an open laptop.
+ * @example
+ * <MacBook x={120} y={150} scale={1} />;
  */
-export function MacBook({
+export const MacBook = ({
   x,
   y,
   scale,
   className,
   screen,
   screenGlow = true,
-}: PlacedProps & { readonly screen?: ReactNode; readonly screenGlow?: boolean }) {
+}: PlacedProps & { readonly screen?: ReactNode; readonly screenGlow?: boolean }) => {
   return (
     <g className={className} transform={place({ x, y, scale })}>
       {/* keyboard deck (trapezoid base) */}
@@ -218,13 +234,17 @@ export function MacBook({
       </g>
     </g>
   );
-}
+};
 
 /**
  * Office chair seen from behind-left, so the octopus sits in front of the back.
  * Local origin: center of the seat cushion top.
+ *
+ * @returns SVG group for an office chair.
+ * @example
+ * <OfficeChair x={90} y={160} scale={1} />;
  */
-export function OfficeChair({ x, y, scale, className }: PlacedProps) {
+export const OfficeChair = ({ x, y, scale, className }: PlacedProps) => {
   return (
     <g className={className} transform={place({ x, y, scale })}>
       {/* backrest */}
@@ -247,34 +267,38 @@ export function OfficeChair({ x, y, scale, className }: PlacedProps) {
       <circle cx="26" cy="42" fill="#374151" r="4" />
     </g>
   );
-}
+};
 
-/** Steaming coffee mug. Local origin: bottom-center of the mug. */
-export function CoffeeMug({ x, y, scale, className }: PlacedProps) {
-  return (
-    <g className={className} transform={place({ x, y, scale })}>
-      <path
-        className="scene-steam scene-steam--a"
-        d="M-3 -18 q-2 -3 0 -6"
-        fill="none"
-        stroke="#C9B7A8"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-      />
-      <path
-        className="scene-steam scene-steam--b"
-        d="M2 -18 q2 -3 0 -6"
-        fill="none"
-        stroke="#C9B7A8"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-      />
-      <rect fill="#E5E7EB" height="14" rx="2" width="14" x="-7" y="-14" />
-      <path d="M7 -12 h4 a3 3 0 0 1 0 8 h-4" fill="none" stroke="#E5E7EB" strokeWidth="2" />
-      <rect fill={CLAUDE_CODE_BRAND_HEX} height="3" rx="1" width="14" x="-7" y="-14" />
-    </g>
-  );
-}
+/**
+ * Steaming coffee mug.
+ *
+ * @returns SVG group for a mug prop.
+ * @example
+ * <CoffeeMug x={210} y={152} scale={1} />;
+ */
+export const CoffeeMug = ({ x, y, scale, className }: PlacedProps) => (
+  <g className={className} transform={place({ x, y, scale })}>
+    <path
+      className="scene-steam scene-steam--a"
+      d="M-3 -18 q-2 -3 0 -6"
+      fill="none"
+      stroke="#C9B7A8"
+      strokeLinecap="round"
+      strokeWidth="1.4"
+    />
+    <path
+      className="scene-steam scene-steam--b"
+      d="M2 -18 q2 -3 0 -6"
+      fill="none"
+      stroke="#C9B7A8"
+      strokeLinecap="round"
+      strokeWidth="1.4"
+    />
+    <rect fill="#E5E7EB" height="14" rx="2" width="14" x="-7" y="-14" />
+    <path d="M7 -12 h4 a3 3 0 0 1 0 8 h-4" fill="none" stroke="#E5E7EB" strokeWidth="2" />
+    <rect fill={CLAUDE_CODE_BRAND_HEX} height="3" rx="1" width="14" x="-7" y="-14" />
+  </g>
+);
 
 const CONFETTI_COLORS = ['#FBBF24', '#34D399', '#60A5FA', '#F472B6', '#A855F7', '#FB7185'];
 
@@ -282,15 +306,19 @@ const CONFETTI_COLORS = ['#FBBF24', '#34D399', '#60A5FA', '#F472B6', '#A855F7', 
  * A real confetti burst — many particles across the top of the canvas, each with
  * varied color, rotation, and staggered fall timing (CSS drives the fall). Local
  * origin: top-left of the burst area; `width` spans the spread.
+ *
+ * @returns SVG group for animated confetti.
+ * @example
+ * <ConfettiField x={0} y={0} scale={1} />;
  */
-export function ConfettiField({
+export const ConfettiField = ({
   x,
   y,
   scale,
   className,
   width = 320,
   count = 26,
-}: PlacedProps & { readonly width?: number; readonly count?: number }) {
+}: PlacedProps & { readonly width?: number; readonly count?: number }) => {
   const bits = Array.from({ length: count }, (_, i) => {
     const px = (i * 61) % width;
     const py = (i * 37) % 40;
@@ -324,10 +352,16 @@ export function ConfettiField({
       ))}
     </g>
   );
-}
+};
 
-/** Soft radial-ish backdrop panel to give scenes depth. Fills the whole canvas. */
-export function SceneBackdrop({
+/**
+ * Soft backdrop panel for scene depth.
+ *
+ * @returns SVG defs and rectangle for the scene background.
+ * @example
+ * <SceneBackdrop id="scene-bg" />;
+ */
+export const SceneBackdrop = ({
   width = 320,
   height = 220,
   from = '#FFF7F3',
@@ -339,16 +373,14 @@ export function SceneBackdrop({
   readonly from?: string;
   readonly to?: string;
   readonly id: string;
-}) {
-  return (
-    <>
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={from} />
-          <stop offset="1" stopColor={to} />
-        </linearGradient>
-      </defs>
-      <rect fill={`url(#${id})`} height={height} width={width} x="0" y="0" />
-    </>
-  );
-}
+}) => (
+  <>
+    <defs>
+      <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stopColor={from} />
+        <stop offset="1" stopColor={to} />
+      </linearGradient>
+    </defs>
+    <rect fill={`url(#${id})`} height={height} width={width} x="0" y="0" />
+  </>
+);

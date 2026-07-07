@@ -15,26 +15,51 @@ const FEATURES: readonly FeatureName[] = [
   'file-upload',
 ];
 
-function isFeatureName(value: string): value is FeatureName {
-  return (FEATURES as readonly string[]).includes(value);
-}
+/**
+ * Resolve a feature name from CLI input.
+ *
+ * @param value - Candidate feature name.
+ * @returns Feature name when supported, otherwise undefined.
+ * @example
+ * const feature = resolveFeatureName('payments');
+ */
+const resolveFeatureName = (value: string): FeatureName | undefined =>
+  FEATURES.find((feature) => feature === value);
 
-async function pathExists(path: string): Promise<boolean> {
+/**
+ * Check whether a path exists on disk.
+ *
+ * @param path - Absolute path to probe.
+ * @returns True when the path is accessible.
+ * @example
+ * const exists = await pathExists('/tmp/app/backend/package.json');
+ */
+const pathExists = async (path: string): Promise<boolean> => {
   try {
     await access(path);
     return true;
   } catch {
     return false;
   }
-}
+};
 
-export async function runPlanReadiness(
+/**
+ * Plan readiness tasks for a feature and template.
+ *
+ * @param args - CLI arguments after `plan-readiness`; feature then optional template.
+ * @param cwd - Project directory used for template detection.
+ * @returns JSON readiness plan plus the process exit code.
+ * @example
+ * const result = await runPlanReadiness(['payments', 'web'], process.cwd());
+ */
+export const runPlanReadiness = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly json: string; readonly exitCode: number }> {
+): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const [featureArg, templateArg] = args;
+  const feature = featureArg === undefined ? undefined : resolveFeatureName(featureArg);
 
-  if (!(featureArg && isFeatureName(featureArg))) {
+  if (feature === undefined) {
     return {
       json: JSON.stringify({
         ok: false,
@@ -47,13 +72,13 @@ export async function runPlanReadiness(
   let template: TemplateId | null = null;
   if (templateArg === 'backend') {
     template = 'backend';
-  } else if (templateArg && isTemplateName(templateArg)) {
+  } else if (templateArg !== undefined && templateArg !== '' && isTemplateName(templateArg)) {
     template = templateArg;
   } else {
     template = await detectTemplateName(cwd);
   }
 
-  if (!template) {
+  if (template === null) {
     return {
       json: JSON.stringify({ ok: false, error: 'Could not detect template.' }),
       exitCode: 1,
@@ -65,7 +90,7 @@ export async function runPlanReadiness(
 
   const plan = planFeatureReadiness({
     template,
-    feature: featureArg,
+    feature,
     hasBackend,
     hasWeb,
   });
@@ -74,4 +99,4 @@ export async function runPlanReadiness(
     json: JSON.stringify({ ok: true, plan }, null, 2),
     exitCode: 0,
   };
-}
+};

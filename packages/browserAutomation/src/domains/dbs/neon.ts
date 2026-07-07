@@ -6,33 +6,48 @@ import { spawnSync } from 'node:child_process';
  * the CLI resolves it headlessly once the builder has run `neonctl auth`.
  */
 
-interface NeonProject {
+type NeonProject = {
   id: string;
   name: string;
-}
+};
 
-/** List the signed-in user's Neon projects (empty when the CLI can't answer). */
-export function listNeonProjects(): NeonProject[] {
+/**
+ * List the signed-in user's Neon projects (empty when the CLI can't answer).
+ *
+ * @returns Resolved list of provider resources.
+ * @example
+ * const result = listNeonProjects();
+ */
+export const listNeonProjects = (): NeonProject[] => {
   const result = spawnSync('neonctl', ['projects', 'list', '--output', 'json'], {
     encoding: 'utf8',
   });
   if (result.status !== 0) return [];
   try {
-    const parsed = JSON.parse(result.stdout ?? '') as { projects?: NeonProject[] } | NeonProject[];
-    return Array.isArray(parsed) ? parsed : (parsed.projects ?? []);
+    const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+    const parsed = JSON.parse(stdout) as { projects?: NeonProject[] } | NeonProject[];
+    if (Array.isArray(parsed)) return parsed;
+    return parsed.projects === undefined ? [] : parsed.projects;
   } catch {
     return [];
   }
-}
+};
 
-/** Read a pooled Postgres connection string for a project via the CLI. */
-export function readNeonConnectionString(projectId: string): string | null {
+/**
+ * Read a pooled Postgres connection string for a project via the CLI.
+ *
+ * @param projectId - Provider project id to inspect.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = readNeonConnectionString('project-id');
+ */
+export const readNeonConnectionString = (projectId: string): string | null => {
   const result = spawnSync(
     'neonctl',
     ['connection-string', '--project-id', projectId, '--pooled'],
     { encoding: 'utf8' },
   );
   if (result.status !== 0) return null;
-  const out = (result.stdout ?? '').trim();
+  const out = typeof result.stdout === 'string' ? result.stdout.trim() : '';
   return out.startsWith('postgres') ? out : null;
-}
+};

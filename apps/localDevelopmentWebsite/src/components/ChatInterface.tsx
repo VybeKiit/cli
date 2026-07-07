@@ -1,19 +1,23 @@
 'use client';
 
 import { ScrollArea, SidebarProvider } from '@vybekiit/ui';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { AgentBadge } from '@/components/AgentBadge';
-import { AgentCarousel } from '@/components/AgentCarousel';
+import { useEffect, useRef, useState } from 'react';
 import { ChatInput } from '@/components/ChatInput';
 import { ChatMessage } from '@/components/ChatMessage';
-import { ChatSidebar, ChatSidebarTrigger } from '@/components/ChatSidebar';
+import { ChatSidebar } from '@/components/ChatSidebar';
 import { WorkflowRunner } from '@/components/WorkflowRunner';
-import { useAgentSessions } from '@/hooks';
-import { cn } from '@/lib/utils';
+import { useAgentSessions, useDaemon } from '@/hooks';
 import { useAgentStore, useChatStore } from '@/stores';
 
-const WELCOME_MESSAGE = `Hi — I'm your VybeKiit agent. I can scaffold your SaaS, wire auth, payments, and deploy it. Try asking me to "ship the full SaaS workflow" and watch the steps complete.`;
+const WELCOME_MESSAGE = `Hi — I'm your VybeKiit assistant. Tell me what you'd like to build or fix, and I'll guide you step by step. Everything stays on your computer.`;
 
+/**
+ * Render the chat surface component.
+ *
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <ChatInterface />;
+ */
 export const ChatInterface = () => {
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
@@ -22,11 +26,16 @@ export const ChatInterface = () => {
   const agentsMap = useAgentStore((s) => s.agents);
   const activeAgent = agentsMap[activeAgentId];
   const { refresh: refreshSessions } = useAgentSessions();
+  useDaemon();
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
+  const foundConversation = conversations.find((conversation) => conversation.id === activeId);
+  const activeConversation = foundConversation === undefined ? null : foundConversation;
+  const firstConversation = conversations.at(0);
+  const firstConversationId = firstConversation === undefined ? null : firstConversation.id;
+  const activeMessageCount = activeConversation === null ? 0 : activeConversation.messages.length;
 
   useEffect(() => {
     if (conversations.length === 0) {
@@ -34,77 +43,67 @@ export const ChatInterface = () => {
       addMessage(c.id, { role: 'agent', content: WELCOME_MESSAGE });
       setActiveId(c.id);
     } else if (!activeId) {
-      setActiveId(conversations[0]?.id ?? null);
+      setActiveId(firstConversationId);
     }
-  }, [conversations.length, activeId, createConversation, addMessage, activeAgent.id]);
+  }, [
+    conversations.length,
+    activeId,
+    firstConversationId,
+    createConversation,
+    addMessage,
+    activeAgent.id,
+  ]);
 
   useEffect(() => {
-    if (activeConversation && activeConversation.messages.length > 0) {
+    if (activeMessageCount > 0) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [activeConversation?.messages.length]);
-
-  const handleAgentSwitch = useCallback(() => {
-    refreshSessions();
-  }, [refreshSessions]);
+  }, [activeMessageCount]);
 
   return (
     <SidebarProvider defaultOpen={true} className="!min-h-0 h-screen overflow-hidden bg-zinc-950">
-      {/* Sidebar — sits as direct child of SidebarProvider */}
       <ChatSidebar activeId={activeId} onSelect={setActiveId} />
 
-      {/* Main content area — fills remaining space */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <AgentCarousel />
-
-        <header className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-4 py-2.5">
-          <div className="flex items-center gap-3">
-            <ChatSidebarTrigger className="text-zinc-400 hover:text-zinc-100" />
-            <h1 className="font-bold text-base text-white sm:text-lg">
-              VybeKiit <span className="text-vybe-400">Chat</span>
-            </h1>
+        <header className="flex shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-950 px-5 py-4">
+          <div>
+            <h1 className="text-lg font-semibold text-white sm:text-xl">VybeKiit Local Dev</h1>
+            <p className="text-sm text-zinc-400">Talk to {activeAgent.name} and watch it work</p>
           </div>
-          <AgentBadge agent={activeAgent} pulse={true} />
         </header>
 
-        <div className="flex flex-1 overflow-hidden">
-          <main className="flex min-w-0 flex-1 flex-col">
-            <ScrollArea className="flex-1">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <ScrollArea className="flex-1">
+            <div className="mx-auto max-w-3xl px-4 pb-6 pt-4 sm:px-6">
+              <section className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
+                <WorkflowRunner />
+              </section>
+
               {activeConversation ? (
-                <div className="mx-auto max-w-3xl px-2 pb-4 sm:px-4 sm:pb-6">
+                <div className="space-y-1">
                   {activeConversation.messages.map((msg) => (
                     <ChatMessage key={msg.id} message={msg} />
                   ))}
                   <div ref={bottomRef} />
                 </div>
               ) : (
-                <div className="flex h-full items-center justify-center px-4 text-center text-zinc-500">
+                <div className="flex h-full items-center justify-center px-4 py-12 text-center text-zinc-500">
                   Select or start a conversation.
                 </div>
               )}
-            </ScrollArea>
+            </div>
+          </ScrollArea>
 
-            <div className="mx-auto w-full max-w-3xl px-2 pb-3 sm:px-4 sm:pb-4">
+          <div className="border-t border-zinc-800 bg-zinc-950 px-4 py-4 sm:px-6">
+            <div className="mx-auto w-full max-w-3xl">
               <ChatInput
                 conversationId={activeId}
                 disabled={!activeConversation}
-                onAgentSwitch={handleAgentSwitch}
+                onAgentSwitch={refreshSessions}
               />
             </div>
-          </main>
-
-          <aside
-            className={cn(
-              'hidden min-w-0 shrink-0 overflow-y-auto border-l border-zinc-800 bg-zinc-950/30 xl:block',
-              'w-[420px]',
-            )}
-          >
-            <div className="p-4">
-              <h3 className="mb-3 font-semibold text-zinc-200">Live workflow</h3>
-              <WorkflowRunner compact={true} />
-            </div>
-          </aside>
-        </div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );

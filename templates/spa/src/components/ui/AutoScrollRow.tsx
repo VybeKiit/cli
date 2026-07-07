@@ -19,24 +19,31 @@ type AutoScrollRowProps = {
   readonly rowClassName?: string;
 };
 
-function cloneForLoop(children: ReactNode) {
+const clonedKeyFor = (key: React.Key | null, defaultKey: string): string => {
+  if (key === null) {
+    return `${defaultKey}-clone`;
+  }
+  return `${key}-clone`;
+};
+
+const cloneForLoop = (children: ReactNode) => {
   if (isValidElement(children)) {
     return cloneElement(children as ReactElement<{ 'aria-hidden'?: boolean }>, {
       'aria-hidden': true,
-      key: `${children.key ?? 'row'}-clone`,
+      key: clonedKeyFor(children.key, 'row'),
     });
   }
 
   return Children.map(children, (child, index) => {
     if (!isValidElement(child)) return child;
     return cloneElement(child as ReactElement, {
-      key: `${child.key ?? index}-clone`,
+      key: clonedKeyFor(child.key, String(index)),
     });
   });
-}
+};
 
 /** Horizontal row that scrolls on its own and loops seamlessly (edge fade included). */
-export function AutoScrollRow({
+export const AutoScrollRow = ({
   children,
   ariaLabel,
   durationDesktop = '80s',
@@ -45,7 +52,7 @@ export function AutoScrollRow({
   className,
   trackClassName,
   rowClassName,
-}: AutoScrollRowProps) {
+}: AutoScrollRowProps) => {
   const style = {
     ['--auto-scroll-duration-desktop' as string]: durationDesktop,
     ['--auto-scroll-duration-mobile' as string]: durationMobile,
@@ -64,4 +71,4 @@ export function AutoScrollRow({
       </div>
     </div>
   );
-}
+};

@@ -5,26 +5,24 @@ import type { SecurityPolicy } from './types';
 
 const APP_ORIGIN = 'https://myapp.com';
 
-function strictPolicy(): SecurityPolicy {
-  return {
-    rateLimit: {
-      enabled: false,
-      windowSeconds: 60,
-      defaultMax: 60,
-      tierMax: {
-        'auth-strict': 2,
-        'public-form': 30,
-        webhook: 60,
-        authenticated: 60,
-        'public-read': 120,
-        default: 60,
-      },
+const strictPolicy = (): SecurityPolicy => ({
+  rateLimit: {
+    enabled: false,
+    windowSeconds: 60,
+    defaultMax: 60,
+    tierMax: {
+      'auth-strict': 2,
+      'public-form': 30,
+      webhook: 60,
+      authenticated: 60,
+      'public-read': 120,
+      default: 60,
     },
-    originLock: { enabled: true, allowedOrigins: [] },
-  };
-}
+  },
+  originLock: { enabled: true, allowedOrigins: [] },
+});
 
-function mockRes() {
+const mockRes = () => {
   const res = {
     statusCode: 200,
     headers: {} as Record<string, string>,
@@ -42,7 +40,7 @@ function mockRes() {
     body: undefined as unknown,
   };
   return res;
-}
+};
 
 describe('createExpressSecurityMiddleware', () => {
   it('blocks cross-origin state-changing API requests', () => {

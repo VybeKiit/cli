@@ -1,31 +1,36 @@
 import type { Browser, BrowserContext, Page } from 'playwright';
+import type { VerbLogger } from './verbLogger';
 
 export type AttachedSession = {
-  browser: Browser;
-  context: BrowserContext;
-  dispose: () => Promise<void>;
+  readonly browser: Browser;
+  readonly context: BrowserContext;
+  readonly dispose: () => Promise<void>;
   /** When false, dispose leaves the tab open for the builder's session. */
-  ownsPage: boolean;
+  readonly ownsPage: boolean;
+  /** Current Playwright page; login waiters may replace it with the authenticated tab. */
   page: Page;
 };
 
 export type BaseVerbContext = {
-  cdpEndpoint?: string;
-  log?: Pick<Console, 'error' | 'log' | 'warn'>;
+  readonly cdpEndpoint?: string;
+  readonly log?: VerbLogger;
   /** Chrome user-data-dir override (`--profile=` or `--profile=last`). */
-  profilePath?: string;
+  readonly profilePath?: string;
 };
 
 export const DEFAULT_CDP_ENDPOINT = 'http://localhost:9222';
 
+const HOME_DIR =
+  process.env.HOME === undefined || process.env.HOME.length === 0 ? '~' : process.env.HOME;
+
 export const PROFILE_PATHS = {
-  cloudflare: `${process.env.HOME ?? '~'}/.cf-chrome-profile`,
-  extension: `${process.env.HOME ?? '~'}/.cws-chrome-profile`,
-  google: `${process.env.HOME ?? '~'}/.google-chrome-profile`,
-  ls: `${process.env.HOME ?? '~'}/.ls-chrome-profile`,
-  namecheap: `${process.env.HOME ?? '~'}/.nc-chrome-profile`,
-  godaddy: `${process.env.HOME ?? '~'}/.gd-chrome-profile`,
-  supabase: `${process.env.HOME ?? '~'}/.supabase-chrome-profile`,
+  cloudflare: `${HOME_DIR}/.cf-chrome-profile`,
+  extension: `${HOME_DIR}/.cws-chrome-profile`,
+  google: `${HOME_DIR}/.google-chrome-profile`,
+  ls: `${HOME_DIR}/.ls-chrome-profile`,
+  namecheap: `${HOME_DIR}/.nc-chrome-profile`,
+  godaddy: `${HOME_DIR}/.gd-chrome-profile`,
+  supabase: `${HOME_DIR}/.supabase-chrome-profile`,
 } as const;
 
 /** @deprecated Use PROFILE_PATHS.extension */

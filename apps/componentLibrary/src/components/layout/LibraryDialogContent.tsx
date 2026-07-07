@@ -6,7 +6,16 @@ import { X } from 'lucide-react';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-/** Dialog content with overlay z-index above the layout hover popover. */
+/**
+ * Renders dialog content above the layout hover popover.
+ *
+ * @param props - Dialog content props.
+ * @returns The dialog portal content.
+ * @example
+ * ```tsx
+ * <LibraryDialogContent>Dialog</LibraryDialogContent>
+ * ```
+ */
 export const LibraryDialogContent = forwardRef<
   ElementRef<typeof DialogPrimitive.Content>,
   ComponentPropsWithoutRef<typeof DialogPrimitive.Content>

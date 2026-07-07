@@ -1,4 +1,4 @@
-import { loadCatalog, searchComponents, suggestBlend } from '@vybekiit/uiCatalogMcp/catalog.js';
+import { loadCatalog, searchComponents, suggestBlend } from '@vybekiit/ui-catalog-mcp/catalog.js';
 import { describe, expect, it } from 'vitest';
 
 const sampleCatalog = {

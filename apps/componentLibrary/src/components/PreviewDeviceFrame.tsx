@@ -6,13 +6,21 @@ import { IPhoneMockup } from '@/components/deviceMockups/iphoneMockup';
 import { MacbookMockup } from '@/components/deviceMockups/macbookMockup';
 import { TabletMockup } from '@/components/deviceMockups/tabletMockup';
 
-export function PreviewDeviceFrame({
+/**
+ * Render the preview device frame component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <PreviewDeviceFrame {...props} />;
+ */
+export const PreviewDeviceFrame = ({
   viewport,
   children,
 }: {
   viewport: ViewportPreset;
   children: ReactNode;
-}) {
+}) => {
   if (viewport === 'mobile') {
     return (
       <div className="flex justify-center py-2 transition-all duration-300 ease-in-out">
@@ -44,4 +52,4 @@ export function PreviewDeviceFrame({
   }
 
   return <>{children}</>;
-}
+};

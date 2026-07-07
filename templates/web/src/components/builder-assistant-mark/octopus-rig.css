@@ -378,14 +378,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .octo-rig__frame {
-    animation: none !important;
-    opacity: 0 !important;
+    animation: none;
+    opacity: 0;
   }
   /* Freeze on the first (neutral) frame. */
   .octo-rig__frame:first-child {
-    opacity: 1 !important;
+    opacity: 1;
   }
   .octo-rig__accent {
-    animation: none !important;
+    animation: none;
   }
 }

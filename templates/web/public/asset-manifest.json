@@ -1,8 +1,265 @@
 {
   "files": {
+    "brand-marks/appstore.webp": {
+      "source": "brand-marks/appstore.webp",
+      "optimized": "brand-marks/appstore.webp",
+      "variants": {
+        "avif": "brand-marks/appstore.avif"
+      }
+    },
+    "brand-marks/aws.webp": {
+      "source": "brand-marks/aws.webp",
+      "optimized": "brand-marks/aws.webp",
+      "variants": {
+        "avif": "brand-marks/aws.avif"
+      }
+    },
+    "brand-marks/betterauth.webp": {
+      "source": "brand-marks/betterauth.webp",
+      "optimized": "brand-marks/betterauth.webp",
+      "variants": {
+        "avif": "brand-marks/betterauth.avif"
+      }
+    },
+    "brand-marks/claude.webp": {
+      "source": "brand-marks/claude.webp",
+      "optimized": "brand-marks/claude.webp",
+      "variants": {
+        "avif": "brand-marks/claude.avif"
+      }
+    },
+    "brand-marks/cloudflare.webp": {
+      "source": "brand-marks/cloudflare.webp",
+      "optimized": "brand-marks/cloudflare.webp",
+      "variants": {
+        "avif": "brand-marks/cloudflare.avif"
+      }
+    },
+    "brand-marks/cursor.webp": {
+      "source": "brand-marks/cursor.webp",
+      "optimized": "brand-marks/cursor.webp",
+      "variants": {
+        "avif": "brand-marks/cursor.avif"
+      }
+    },
+    "brand-marks/expo.webp": {
+      "source": "brand-marks/expo.webp",
+      "optimized": "brand-marks/expo.webp",
+      "variants": {
+        "avif": "brand-marks/expo.avif"
+      }
+    },
+    "brand-marks/figma.webp": {
+      "source": "brand-marks/figma.webp",
+      "optimized": "brand-marks/figma.webp",
+      "variants": {
+        "avif": "brand-marks/figma.avif"
+      }
+    },
+    "brand-marks/github.webp": {
+      "source": "brand-marks/github.webp",
+      "optimized": "brand-marks/github.webp",
+      "variants": {
+        "avif": "brand-marks/github.avif"
+      }
+    },
+    "brand-marks/google.webp": {
+      "source": "brand-marks/google.webp",
+      "optimized": "brand-marks/google.webp",
+      "variants": {
+        "avif": "brand-marks/google.avif"
+      }
+    },
+    "brand-marks/googlechrome.webp": {
+      "source": "brand-marks/googlechrome.webp",
+      "optimized": "brand-marks/googlechrome.webp",
+      "variants": {
+        "avif": "brand-marks/googlechrome.avif"
+      }
+    },
+    "brand-marks/googleplay.webp": {
+      "source": "brand-marks/googleplay.webp",
+      "optimized": "brand-marks/googleplay.webp",
+      "variants": {
+        "avif": "brand-marks/googleplay.avif"
+      }
+    },
+    "brand-marks/lemonsqueezy.webp": {
+      "source": "brand-marks/lemonsqueezy.webp",
+      "optimized": "brand-marks/lemonsqueezy.webp",
+      "variants": {
+        "avif": "brand-marks/lemonsqueezy.avif"
+      }
+    },
+    "brand-marks/mongodb.webp": {
+      "source": "brand-marks/mongodb.webp",
+      "optimized": "brand-marks/mongodb.webp",
+      "variants": {
+        "avif": "brand-marks/mongodb.avif"
+      }
+    },
+    "brand-marks/nextdotjs.webp": {
+      "source": "brand-marks/nextdotjs.webp",
+      "optimized": "brand-marks/nextdotjs.webp",
+      "variants": {
+        "avif": "brand-marks/nextdotjs.avif"
+      }
+    },
+    "brand-marks/nodedotjs.webp": {
+      "source": "brand-marks/nodedotjs.webp",
+      "optimized": "brand-marks/nodedotjs.webp",
+      "variants": {
+        "avif": "brand-marks/nodedotjs.avif"
+      }
+    },
+    "brand-marks/openai.webp": {
+      "source": "brand-marks/openai.webp",
+      "optimized": "brand-marks/openai.webp",
+      "variants": {
+        "avif": "brand-marks/openai.avif"
+      }
+    },
+    "brand-marks/paypal.webp": {
+      "source": "brand-marks/paypal.webp",
+      "optimized": "brand-marks/paypal.webp",
+      "variants": {
+        "avif": "brand-marks/paypal.avif"
+      }
+    },
+    "brand-marks/plausible.webp": {
+      "source": "brand-marks/plausible.webp",
+      "optimized": "brand-marks/plausible.webp",
+      "variants": {
+        "avif": "brand-marks/plausible.avif"
+      }
+    },
+    "brand-marks/playwright.webp": {
+      "source": "brand-marks/playwright.webp",
+      "optimized": "brand-marks/playwright.webp",
+      "variants": {
+        "avif": "brand-marks/playwright.avif"
+      }
+    },
+    "brand-marks/react.webp": {
+      "source": "brand-marks/react.webp",
+      "optimized": "brand-marks/react.webp",
+      "variants": {
+        "avif": "brand-marks/react.avif"
+      }
+    },
+    "brand-marks/resend.webp": {
+      "source": "brand-marks/resend.webp",
+      "optimized": "brand-marks/resend.webp",
+      "variants": {
+        "avif": "brand-marks/resend.avif"
+      }
+    },
+    "brand-marks/sentry.webp": {
+      "source": "brand-marks/sentry.webp",
+      "optimized": "brand-marks/sentry.webp",
+      "variants": {
+        "avif": "brand-marks/sentry.avif"
+      }
+    },
+    "brand-marks/shadcn.webp": {
+      "source": "brand-marks/shadcn.webp",
+      "optimized": "brand-marks/shadcn.webp",
+      "variants": {
+        "avif": "brand-marks/shadcn.avif"
+      }
+    },
+    "brand-marks/sonner.webp": {
+      "source": "brand-marks/sonner.webp",
+      "optimized": "brand-marks/sonner.webp",
+      "variants": {
+        "avif": "brand-marks/sonner.avif"
+      }
+    },
+    "brand-marks/stripe.webp": {
+      "source": "brand-marks/stripe.webp",
+      "optimized": "brand-marks/stripe.webp",
+      "variants": {
+        "avif": "brand-marks/stripe.avif"
+      }
+    },
+    "brand-marks/supabase.webp": {
+      "source": "brand-marks/supabase.webp",
+      "optimized": "brand-marks/supabase.webp",
+      "variants": {
+        "avif": "brand-marks/supabase.avif"
+      }
+    },
+    "brand-marks/tailwindcss.webp": {
+      "source": "brand-marks/tailwindcss.webp",
+      "optimized": "brand-marks/tailwindcss.webp",
+      "variants": {
+        "avif": "brand-marks/tailwindcss.avif"
+      }
+    },
+    "brand-marks/typescript.webp": {
+      "source": "brand-marks/typescript.webp",
+      "optimized": "brand-marks/typescript.webp",
+      "variants": {
+        "avif": "brand-marks/typescript.avif"
+      }
+    },
+    "brand-marks/vercel.webp": {
+      "source": "brand-marks/vercel.webp",
+      "optimized": "brand-marks/vercel.webp",
+      "variants": {
+        "avif": "brand-marks/vercel.avif"
+      }
+    },
+    "brand-marks/wxt.webp": {
+      "source": "brand-marks/wxt.webp",
+      "optimized": "brand-marks/wxt.webp",
+      "variants": {
+        "avif": "brand-marks/wxt.avif"
+      }
+    },
     "logo.svg": {
       "source": "logo.svg",
       "optimized": "logo.svg",
+      "variants": {}
+    },
+    "logos/marquee/apple.svg": {
+      "source": "logos/marquee/apple.svg",
+      "optimized": "logos/marquee/apple.svg",
+      "variants": {}
+    },
+    "logos/marquee/google.svg": {
+      "source": "logos/marquee/google.svg",
+      "optimized": "logos/marquee/google.svg",
+      "variants": {}
+    },
+    "logos/marquee/linkedin.svg": {
+      "source": "logos/marquee/linkedin.svg",
+      "optimized": "logos/marquee/linkedin.svg",
+      "variants": {}
+    },
+    "logos/marquee/meta.svg": {
+      "source": "logos/marquee/meta.svg",
+      "optimized": "logos/marquee/meta.svg",
+      "variants": {}
+    },
+    "logos/marquee/microsoft.svg": {
+      "source": "logos/marquee/microsoft.svg",
+      "optimized": "logos/marquee/microsoft.svg",
+      "variants": {}
+    },
+    "logos/marquee/x.svg": {
+      "source": "logos/marquee/x.svg",
+      "optimized": "logos/marquee/x.svg",
+      "variants": {}
+    },
+    "vybekiit-logo.svg": {
+      "source": "vybekiit-logo.svg",
+      "optimized": "vybekiit-logo.svg",
+      "variants": {}
+    },
+    "vybekiit-wordmark.svg": {
+      "source": "vybekiit-wordmark.svg",
+      "optimized": "vybekiit-wordmark.svg",
       "variants": {}
     }
   }

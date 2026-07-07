@@ -1,12 +1,13 @@
 import { spawn } from 'node:child_process';
 import { isAbsolute, relative } from 'node:path';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import { VerifyGateFailedError } from './errors';
 import type { VerbContext } from './types';
 
 type VerifyGateStep = {
-  args: string[];
-  command: string;
-  env?: NodeJS.ProcessEnv;
+  readonly args: readonly string[];
+  readonly command: string;
+  readonly env?: NodeJS.ProcessEnv;
 };
 
 /**
@@ -34,9 +35,14 @@ type VerifyGateStep = {
  *
  * The commands are run sequentially (not in parallel) so the first failure
  * stops the chain — no point running tests if typecheck already fails.
+ *
+ * @param ctx - Extension verb context.
+ * @returns A promise that resolves when all gate steps pass.
+ * @example
+ * await runVerifyGate(ctx);
  */
-export async function runVerifyGate(ctx: VerbContext): Promise<void> {
-  const log = ctx.log ?? console;
+export const runVerifyGate = async (ctx: VerbContext): Promise<void> => {
+  const log = resolveVerbLogger(ctx);
   const extensionDir = isAbsolute(ctx.extension.dir)
     ? relative(ctx.repoRoot, ctx.extension.dir)
     : ctx.extension.dir;
@@ -54,30 +60,40 @@ export async function runVerifyGate(ctx: VerbContext): Promise<void> {
   for (const step of steps) {
     const display = `${step.command} ${step.args.join(' ')}`;
     log.log(`[cws] gate: ${display}`);
+    // biome-ignore lint/performance/noAwaitInLoops: verify gate steps intentionally stop on the first failing command.
     const exitCode = await runStep(step.command, step.args, ctx.repoRoot, step.env);
-    if (exitCode !== 0) throw new VerifyGateFailedError(display, exitCode);
+    if (exitCode !== 0) {
+      throw new VerifyGateFailedError(display, exitCode);
+    }
   }
-}
+};
 
 /**
  * Spawn one step, inherit stdio so the developer sees real output, return
  * the exit code. We deliberately do not capture stdout/stderr — the
  * developer sees `pnpm`'s normal progress in their terminal, which is the
  * right experience for a gate.
+ *
+ * @param command - Executable to spawn.
+ * @param args - Arguments passed to the executable.
+ * @param cwd - Working directory for the spawned process.
+ * @param env - Extra environment values for the step.
+ * @returns A promise that resolves with the process exit code.
+ * @example
+ * const code = await runStep('pnpm', ['test'], repoRoot);
  */
-function runStep(
+const runStep = (
   command: string,
   args: readonly string[],
   cwd: string,
   env: NodeJS.ProcessEnv = {},
-): Promise<number> {
-  return new Promise((resolve, reject) => {
+): Promise<number> =>
+  new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
       env: { ...process.env, ...env },
       stdio: 'inherit',
     });
     child.on('error', reject);
-    child.on('close', (code) => resolve(code ?? 1));
+    child.on('close', (code) => resolve(code === null ? 1 : code));
   });
-}

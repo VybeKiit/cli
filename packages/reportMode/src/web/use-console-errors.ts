@@ -3,24 +3,47 @@
 import { useEffect, useRef } from 'react';
 import { ConsoleErrorBuffer } from '../types';
 
-function describeError(error: unknown, message: string): string {
+/**
+ * Describe a captured window error.
+ *
+ * @param error - Error object supplied by the browser when available.
+ * @param message - Fallback browser error message.
+ * @returns Human-readable error description.
+ * @example
+ * const description = describeError(error, String(message));
+ */
+const describeError = (error: unknown, message: string): string => {
   if (error instanceof Error) {
     return `${error.name}: ${error.message}`;
   }
   return typeof message === 'string' ? message : 'Unknown error';
-}
+};
 
-function describeRejection(reason: unknown): string {
+/**
+ * Describe an unhandled promise rejection reason.
+ *
+ * @param reason - Rejection reason supplied by the browser.
+ * @returns Human-readable rejection description.
+ * @example
+ * const description = describeRejection(event.reason);
+ */
+const describeRejection = (reason: unknown): string => {
   if (reason instanceof Error) {
     return `${reason.name}: ${reason.message}`;
   }
   return typeof reason === 'string' ? reason : 'Unhandled promise rejection';
-}
+};
 
-/** Capture recent console errors while Report Mode is mounted (dev only). */
-export function useConsoleErrorBuffer(): ConsoleErrorBuffer {
+/**
+ * Capture recent console errors while Report Mode is mounted.
+ *
+ * @returns A bounded console error buffer for the current Report Mode session.
+ * @example
+ * const consoleErrors = useConsoleErrorBuffer();
+ */
+export const useConsoleErrorBuffer = (): ConsoleErrorBuffer => {
   const bufferRef = useRef<ConsoleErrorBuffer | null>(null);
-  if (!bufferRef.current) {
+  if (bufferRef.current === null) {
     bufferRef.current = new ConsoleErrorBuffer(3);
   }
   const buffer = bufferRef.current;
@@ -53,4 +76,4 @@ export function useConsoleErrorBuffer(): ConsoleErrorBuffer {
   }, [buffer]);
 
   return buffer;
-}
+};

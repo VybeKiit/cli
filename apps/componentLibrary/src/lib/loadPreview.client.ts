@@ -3,7 +3,17 @@
 // @ts-nocheck
 import type { CatalogEntry } from '@library/data/catalog';
 
-export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<string, unknown>> {
+/**
+ * Dynamically imports the preview module for a catalog entry.
+ *
+ * @param entry - Catalog entry to load.
+ * @returns The imported preview module.
+ * @example
+ * const mod = await loadPreviewModule(entry);
+ */
+export const loadPreviewModule = async (
+  entry: CatalogEntry,
+): Promise<Record<string, unknown>> => {
   if (
     entry.namespace === 'vybekiit' &&
     entry.name.startsWith('claude-octopus-') &&
@@ -13,30 +23,16 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
     return import(`@library/demos/vybekiit/${entry.name}`);
   }
   switch (entry.previewKey) {
-    case 'kokonutui/ai-prompt':
-      return import('@library/demos/kokonutui/ai-prompt');
-    case 'kokonutui/command-button':
-      return import('@library/demos/kokonutui/command-button');
     case 'kokonutui/card-flip':
       return import('@library/demos/kokonutui/card-flip');
-    case 'kokonutui/smooth-drawer':
-      return import('@library/demos/kokonutui/smooth-drawer');
     case 'kokonutui/shape-hero':
       return import('@library/demos/kokonutui/shape-hero');
     case 'kokonutui/ai-text-loading':
       return import('@library/demos/kokonutui/ai-text-loading');
     case 'kokonutui/shimmer-text':
       return import('@library/demos/kokonutui/shimmer-text');
-    case 'kokonutui/carousel-cards':
-      return import('@library/demos/kokonutui/carousel-cards');
     case 'kokonutui/file-upload':
       return import('@library/demos/kokonutui/file-upload');
-    case 'kokonutui/action-search-bar':
-      return import('@library/demos/kokonutui/action-search-bar');
-    case 'kokonutui/ai-input-search':
-      return import('@library/demos/kokonutui/ai-input-search');
-    case 'kokonutui/currency-transfer':
-      return import('@library/demos/kokonutui/currency-transfer');
     case 'kokonutui/background-paths':
       return import('@library/demos/kokonutui/background-paths');
     case 'kokonutui/beams-background':
@@ -49,28 +45,14 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/kokonutui/smooth-tab');
     case 'kokonutui/team-selector':
       return import('@library/demos/kokonutui/team-selector');
-    case 'kokonutui/switch-button':
-      return import('@library/demos/kokonutui/switch-button');
     case 'kokonutui/bento-grid':
       return import('@library/demos/kokonutui/bento-grid');
-    case 'kokonutui/social-button':
-      return import('@library/demos/kokonutui/social-button');
-    case 'kokonutui/hold-button':
-      return import('@library/demos/kokonutui/hold-button');
-    case 'kokonutui/attract-button':
-      return import('@library/demos/kokonutui/attract-button');
-    case 'kokonutui/gradient-button':
-      return import('@library/demos/kokonutui/gradient-button');
-    case 'kokonutui/v0-button':
-      return import('@library/demos/kokonutui/v0-button');
     case 'kokonutui/toolbar':
       return import('@library/demos/kokonutui/toolbar');
     case 'kokonutui/ai-loading':
       return import('@library/demos/kokonutui/ai-loading');
     case 'kokonutui/card-stack':
       return import('@library/demos/kokonutui/card-stack');
-    case 'kokonutui/avatar-picker':
-      return import('@library/demos/kokonutui/avatar-picker');
     case 'kokonutui/type-writer':
       return import('@library/demos/kokonutui/type-writer');
     case 'kokonutui/swoosh-text':
@@ -83,240 +65,28 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/kokonutui/matrix-text');
     case 'kokonutui/dynamic-text':
       return import('@library/demos/kokonutui/dynamic-text');
-    case 'kokonutui/particle-button':
-      return import('@library/demos/kokonutui/particle-button');
     case 'kokonutui/tweet-card':
       return import('@library/demos/kokonutui/tweet-card');
     case 'kokonutui/scroll-text':
       return import('@library/demos/kokonutui/scroll-text');
-    case 'kokonutui/liquid-glass-card':
-      return import('@library/demos/kokonutui/liquid-glass-card');
-    case 'untitled/app-store-buttons-outline':
-      return import('@library/demos/untitled/app-store-buttons-outline');
-    case 'untitled/app-store-buttons':
-      return import('@library/demos/untitled/app-store-buttons');
-    case 'untitled/close-button':
-      return import('@library/demos/untitled/close-button');
-    case 'untitled/social-logos':
-      return import('@library/demos/untitled/social-logos');
-    case 'untitled/hint-text':
-      return import('@library/demos/untitled/hint-text');
-    case 'untitled/checkbox':
-      return import('@library/demos/untitled/checkbox');
-    case 'untitled/popover':
-      return import('@library/demos/untitled/popover');
-    case 'untitled/select-shared':
-      return import('@library/demos/untitled/select-shared');
-    case 'untitled/form':
-      return import('@library/demos/untitled/form');
-    case 'untitled/hook-form':
-      return import('@library/demos/untitled/hook-form');
-    case 'untitled/radio-buttons':
-      return import('@library/demos/untitled/radio-buttons');
-    case 'untitled/progress-indicators':
-      return import('@library/demos/untitled/progress-indicators');
-    case 'untitled/simple-circle':
-      return import('@library/demos/untitled/simple-circle');
-    case 'untitled/modal':
-      return import('@library/demos/untitled/modal');
-    case 'untitled/pagination-base':
-      return import('@library/demos/untitled/pagination-base');
-    case 'untitled/pagination-dot':
-      return import('@library/demos/untitled/pagination-dot');
-    case 'untitled/pagination-line':
-      return import('@library/demos/untitled/pagination-line');
-    case 'gluestack/index.web':
-      return import('@library/demos/gluestack/index.web');
-    case 'bundui/accordion-default':
-      return import('@library/demos/bundui/accordion-default');
-    case 'bundui/accordion-collapsible':
-      return import('@library/demos/bundui/accordion-collapsible');
-    case 'bundui/accordion-with-plus-icon':
-      return import('@library/demos/bundui/accordion-with-plus-icon');
-    case 'bundui/alert-default':
-      return import('@library/demos/bundui/alert-default');
-    case 'bundui/alert-with-icon':
-      return import('@library/demos/bundui/alert-with-icon');
-    case 'bundui/alert-with-title':
-      return import('@library/demos/bundui/alert-with-title');
-    case 'bundui/alert-with-action-button':
-      return import('@library/demos/bundui/alert-with-action-button');
-    case 'bundui/alert-with-dismiss':
-      return import('@library/demos/bundui/alert-with-dismiss');
-    case 'bundui/alert-success':
-      return import('@library/demos/bundui/alert-success');
-    case 'bundui/alert-warning':
-      return import('@library/demos/bundui/alert-warning');
-    case 'bundui/alert-danger':
-      return import('@library/demos/bundui/alert-danger');
-    case 'bundui/avatar-default':
-      return import('@library/demos/bundui/avatar-default');
-    case 'bundui/avatar-fallback-only':
-      return import('@library/demos/bundui/avatar-fallback-only');
-    case 'bundui/avatar-with-status-indicator':
-      return import('@library/demos/bundui/avatar-with-status-indicator');
-    case 'bundui/avatar-avatar-group':
-      return import('@library/demos/bundui/avatar-avatar-group');
-    case 'bundui/avatar-sizes':
-      return import('@library/demos/bundui/avatar-sizes');
-    case 'bundui/badge-default':
-      return import('@library/demos/bundui/badge-default');
-    case 'bundui/badge-secondary':
-      return import('@library/demos/bundui/badge-secondary');
-    case 'bundui/badge-destructive':
-      return import('@library/demos/bundui/badge-destructive');
-    case 'bundui/badge-outline':
-      return import('@library/demos/bundui/badge-outline');
-    case 'bundui/badge-indicator':
-      return import('@library/demos/bundui/badge-indicator');
-    case 'bundui/badge-with-icon':
-      return import('@library/demos/bundui/badge-with-icon');
-    case 'bundui/badge-with-dismiss':
-      return import('@library/demos/bundui/badge-with-dismiss');
-    case 'bundui/button-default':
-      return import('@library/demos/bundui/button-default');
-    case 'bundui/button-secondary':
-      return import('@library/demos/bundui/button-secondary');
-    case 'bundui/button-destructive':
-      return import('@library/demos/bundui/button-destructive');
-    case 'bundui/button-outline':
-      return import('@library/demos/bundui/button-outline');
-    case 'bundui/button-ghost':
-      return import('@library/demos/bundui/button-ghost');
-    case 'bundui/button-link':
-      return import('@library/demos/bundui/button-link');
-    case 'bundui/button-with-icon':
-      return import('@library/demos/bundui/button-with-icon');
-    case 'bundui/button-only-icon':
-      return import('@library/demos/bundui/button-only-icon');
-    case 'bundui/button-icon-sizes':
-      return import('@library/demos/bundui/button-icon-sizes');
-    case 'bundui/button-sizes':
-      return import('@library/demos/bundui/button-sizes');
-    case 'bundui/button-disabled':
-      return import('@library/demos/bundui/button-disabled');
-    case 'bundui/button-loading':
-      return import('@library/demos/bundui/button-loading');
-    case 'bundui/button-loading-with-icon':
-      return import('@library/demos/bundui/button-loading-with-icon');
-    case 'bundui/calendar':
-      return import('@library/demos/bundui/calendar');
-    case 'bundui/card-default':
-      return import('@library/demos/bundui/card-default');
-    case 'bundui/card-with-header':
-      return import('@library/demos/bundui/card-with-header');
-    case 'bundui/card-with-header-description':
-      return import('@library/demos/bundui/card-with-header-description');
-    case 'bundui/card-with-header-icon':
-      return import('@library/demos/bundui/card-with-header-icon');
-    case 'bundui/card-with-footer':
-      return import('@library/demos/bundui/card-with-footer');
-    case 'bundui/card-colored':
-      return import('@library/demos/bundui/card-colored');
-    case 'bundui/carousel-01':
-      return import('@library/demos/bundui/carousel-01');
-    case 'bundui/carousel-02':
-      return import('@library/demos/bundui/carousel-02');
-    case 'bundui/carousel-03':
-      return import('@library/demos/bundui/carousel-03');
-    case 'bundui/chart':
-      return import('@library/demos/bundui/chart');
-    case 'bundui/checkbox':
-      return import('@library/demos/bundui/checkbox');
-    case 'bundui/collapsible':
-      return import('@library/demos/bundui/collapsible');
-    case 'bundui/combobox':
-      return import('@library/demos/bundui/combobox');
-    case 'bundui/command':
-      return import('@library/demos/bundui/command');
-    case 'bundui/context-menu':
-      return import('@library/demos/bundui/context-menu');
-    case 'bundui/data-table-01':
-      return import('@library/demos/bundui/data-table-01');
-    case 'bundui/data-table-02':
-      return import('@library/demos/bundui/data-table-02');
-    case 'bundui/date-picker':
-      return import('@library/demos/bundui/date-picker');
-    case 'bundui/dialog':
-      return import('@library/demos/bundui/dialog');
-    case 'bundui/drawer':
-      return import('@library/demos/bundui/drawer');
-    case 'bundui/dropdown-menu':
-      return import('@library/demos/bundui/dropdown-menu');
-    case 'bundui/hover-card':
-      return import('@library/demos/bundui/hover-card');
-    case 'bundui/input':
-      return import('@library/demos/bundui/input');
-    case 'bundui/popover':
-      return import('@library/demos/bundui/popover');
-    case 'bundui/radio-group':
-      return import('@library/demos/bundui/radio-group');
-    case 'bundui/select-01':
-      return import('@library/demos/bundui/select-01');
-    case 'bundui/select-02':
-      return import('@library/demos/bundui/select-02');
-    case 'bundui/select-03':
-      return import('@library/demos/bundui/select-03');
-    case 'bundui/select-04':
-      return import('@library/demos/bundui/select-04');
-    case 'bundui/select-05':
-      return import('@library/demos/bundui/select-05');
-    case 'bundui/sheet':
-      return import('@library/demos/bundui/sheet');
-    case 'bundui/sidebar':
-      return import('@library/demos/bundui/sidebar');
-    case 'bundui/skeleton':
-      return import('@library/demos/bundui/skeleton');
-    case 'bundui/switch':
-      return import('@library/demos/bundui/switch');
-    case 'bundui/tabs':
-      return import('@library/demos/bundui/tabs');
-    case 'bundui/tooltip':
-      return import('@library/demos/bundui/tooltip');
-    case 'bundui/hero-sections-01':
-      return import('@library/demos/bundui/hero-sections-01');
-    case 'bundui/cta-sections-01':
-      return import('@library/demos/bundui/cta-sections-01');
-    case 'bundui/pricing-sections-01':
-      return import('@library/demos/bundui/pricing-sections-01');
-    case 'bundui/newsletter-sections':
-      return import('@library/demos/bundui/newsletter-sections');
-    case 'bundui/sign-in-forms-01':
-      return import('@library/demos/bundui/sign-in-forms-01');
-    case 'bundui/modal-dialogs-01':
-      return import('@library/demos/bundui/modal-dialogs-01');
     case 'bundui/animated-text':
       return import('@library/demos/bundui/animated-text');
     case 'bundui/animated-gradient-text':
       return import('@library/demos/bundui/animated-gradient-text');
-    case 'bundui/text-morph-animation':
-      return import('@library/demos/bundui/text-morph-animation');
     case 'bundui/text-gradient-scroll':
       return import('@library/demos/bundui/text-gradient-scroll');
     case 'bundui/circle-path':
       return import('@library/demos/bundui/circle-path');
     case 'bundui/flip-card':
       return import('@library/demos/bundui/flip-card');
-    case 'bundui/magnetic-hover-effect-01':
-      return import('@library/demos/bundui/magnetic-hover-effect-01');
-    case 'bundui/magnetic-hover-effect-02':
-      return import('@library/demos/bundui/magnetic-hover-effect-02');
     case 'bundui/tilt-effect':
       return import('@library/demos/bundui/tilt-effect');
-    case 'bundui/ripple-effect-01':
-      return import('@library/demos/bundui/ripple-effect-01');
-    case 'bundui/ripple-effect-02':
-      return import('@library/demos/bundui/ripple-effect-02');
-    case 'bundui/ripple-effect-03':
-      return import('@library/demos/bundui/ripple-effect-03');
     case 'bundui/mouse-trail':
       return import('@library/demos/bundui/mouse-trail');
     case 'bundui/animated-beam':
       return import('@library/demos/bundui/animated-beam');
     case 'bundui/animated-tab':
       return import('@library/demos/bundui/animated-tab');
-    case 'bundui/animated-gradient-border':
-      return import('@library/demos/bundui/animated-gradient-border');
     case 'bundui/counter-animation':
       return import('@library/demos/bundui/counter-animation');
     case 'bundui/floating-button':
@@ -329,16 +99,10 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/bundui/image-reveal');
     case 'bundui/marquee-effect':
       return import('@library/demos/bundui/marquee-effect');
-    case 'bundui/parallax-cards':
-      return import('@library/demos/bundui/parallax-cards');
     case 'bundui/sliding-number':
       return import('@library/demos/bundui/sliding-number');
     case 'bundui/countdown':
       return import('@library/demos/bundui/countdown');
-    case 'bundui/meteor-shower-animation':
-      return import('@library/demos/bundui/meteor-shower-animation');
-    case 'bundui/snowfall-animation':
-      return import('@library/demos/bundui/snowfall-animation');
     case 'bundui/fireworks':
       return import('@library/demos/bundui/fireworks');
     case 'bundui/floating-paths':
@@ -411,12 +175,8 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/kibo/tree');
     case 'kibo/video-player':
       return import('@library/demos/kibo/video-player');
-    case 'magicui/magic-card':
-      return import('@library/demos/magicui/magic-card');
     case 'magicui/android':
       return import('@library/demos/magicui/android');
-    case 'magicui/warp-background':
-      return import('@library/demos/magicui/warp-background');
     case 'magicui/line-shadow-text':
       return import('@library/demos/magicui/line-shadow-text');
     case 'magicui/aurora-text':
@@ -429,8 +189,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/pointer');
     case 'magicui/smooth-cursor':
       return import('@library/demos/magicui/smooth-cursor');
-    case 'magicui/progressive-blur':
-      return import('@library/demos/magicui/progressive-blur');
     case 'magicui/neon-gradient-card':
       return import('@library/demos/magicui/neon-gradient-card');
     case 'magicui/noise-texture':
@@ -451,8 +209,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/hero-video-dialog');
     case 'magicui/marquee':
       return import('@library/demos/magicui/marquee');
-    case 'magicui/glare-hover':
-      return import('@library/demos/magicui/glare-hover');
     case 'magicui/shimmer-button':
       return import('@library/demos/magicui/shimmer-button');
     case 'magicui/client-tweet-card':
@@ -471,8 +227,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/animated-shiny-text');
     case 'magicui/animated-grid-pattern':
       return import('@library/demos/magicui/animated-grid-pattern');
-    case 'magicui/border-beam':
-      return import('@library/demos/magicui/border-beam');
     case 'magicui/text-reveal':
       return import('@library/demos/magicui/text-reveal');
     case 'magicui/dia-text-reveal':
@@ -481,8 +235,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/hyper-text');
     case 'magicui/orbiting-circles':
       return import('@library/demos/magicui/orbiting-circles');
-    case 'magicui/dock':
-      return import('@library/demos/magicui/dock');
     case 'magicui/word-rotate':
       return import('@library/demos/magicui/word-rotate');
     case 'magicui/avatar-circles':
@@ -503,20 +255,12 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/scroll-based-velocity');
     case 'magicui/shiny-button':
       return import('@library/demos/magicui/shiny-button');
-    case 'magicui/shine-border':
-      return import('@library/demos/magicui/shine-border');
     case 'magicui/animated-circular-progress-bar':
       return import('@library/demos/magicui/animated-circular-progress-bar');
-    case 'magicui/confetti':
-      return import('@library/demos/magicui/confetti');
-    case 'magicui/cool-mode':
-      return import('@library/demos/magicui/cool-mode');
     case 'magicui/pulsating-button':
       return import('@library/demos/magicui/pulsating-button');
     case 'magicui/ripple-button':
       return import('@library/demos/magicui/ripple-button');
-    case 'magicui/file-tree':
-      return import('@library/demos/magicui/file-tree');
     case 'magicui/blur-fade':
       return import('@library/demos/magicui/blur-fade');
     case 'magicui/safari':
@@ -545,18 +289,12 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/kinetic-text');
     case 'magicui/text-3d-flip':
       return import('@library/demos/magicui/text-3d-flip');
-    case 'magicui/magic-card-demo':
-      return import('@/components/magicui/magic-card-demo');
-    case 'magicui/magic-card-demo-2':
-      return import('@/components/magicui/magic-card-demo-2');
     case 'magicui/android-demo':
       return import('@/components/magicui/android-demo');
     case 'magicui/android-demo-2':
       return import('@/components/magicui/android-demo-2');
     case 'magicui/android-demo-3':
       return import('@/components/magicui/android-demo-3');
-    case 'magicui/warp-background-demo':
-      return import('@/components/magicui/warp-background-demo');
     case 'magicui/line-shadow-text-demo':
       return import('@/components/magicui/line-shadow-text-demo');
     case 'magicui/aurora-text-demo':
@@ -565,28 +303,14 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/morphing-text-demo');
     case 'magicui/scroll-progress-demo':
       return import('@/components/magicui/scroll-progress-demo');
-    case 'magicui/lens-demo':
-      return import('@/components/magicui/lens-demo');
-    case 'magicui/lens-demo-2':
-      return import('@/components/magicui/lens-demo-2');
-    case 'magicui/lens-demo-3':
-      return import('@/components/magicui/lens-demo-3');
     case 'magicui/pointer-demo-1':
       return import('@/components/magicui/pointer-demo-1');
     case 'magicui/smooth-cursor-demo':
       return import('@/components/magicui/smooth-cursor-demo');
-    case 'magicui/progressive-blur-demo':
-      return import('@/components/magicui/progressive-blur-demo');
     case 'magicui/neon-gradient-card-demo':
       return import('@/components/magicui/neon-gradient-card-demo');
     case 'magicui/noise-texture-demo':
       return import('@/components/magicui/noise-texture-demo');
-    case 'magicui/noise-texture-demo-2':
-      return import('@/components/magicui/noise-texture-demo-2');
-    case 'magicui/noise-texture-demo-3':
-      return import('@/components/magicui/noise-texture-demo-3');
-    case 'magicui/noise-texture-demo-4':
-      return import('@/components/magicui/noise-texture-demo-4');
     case 'magicui/meteors-demo':
       return import('@/components/magicui/meteors-demo');
     case 'magicui/grid-pattern-demo':
@@ -633,12 +357,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/marquee-3d');
     case 'magicui/globe-demo':
       return import('@/components/magicui/globe-demo');
-    case 'magicui/glare-hover-demo':
-      return import('@/components/magicui/glare-hover-demo');
-    case 'magicui/glare-hover-demo-cta':
-      return import('@/components/magicui/glare-hover-demo-cta');
-    case 'magicui/glare-hover-demo-alert':
-      return import('@/components/magicui/glare-hover-demo-alert');
     case 'magicui/tweet-card-demo':
       return import('@/components/magicui/tweet-card-demo');
     case 'magicui/tweet-card-images':
@@ -647,8 +365,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/tweet-card-meta-preview');
     case 'magicui/shimmer-button-demo':
       return import('@/components/magicui/shimmer-button-demo');
-    case 'magicui/bento-demo-vertical':
-      return import('@/components/magicui/bento-demo-vertical');
     case 'magicui/number-ticker-demo':
       return import('@/components/magicui/number-ticker-demo');
     case 'magicui/number-ticker-demo-2':
@@ -671,14 +387,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/interactive-grid-pattern-demo');
     case 'magicui/interactive-grid-pattern-demo-2':
       return import('@/components/magicui/interactive-grid-pattern-demo-2');
-    case 'magicui/border-beam-demo':
-      return import('@/components/magicui/border-beam-demo');
-    case 'magicui/border-beam-demo-2':
-      return import('@/components/magicui/border-beam-demo-2');
-    case 'magicui/border-beam-demo-3':
-      return import('@/components/magicui/border-beam-demo-3');
-    case 'magicui/border-beam-demo-4':
-      return import('@/components/magicui/border-beam-demo-4');
     case 'magicui/animated-beam-demo':
       return import('@/components/magicui/animated-beam-demo');
     case 'magicui/animated-beam-unidirectional':
@@ -705,8 +413,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/animated-gradient-text-demo-2');
     case 'magicui/orbiting-circles-demo':
       return import('@/components/magicui/orbiting-circles-demo');
-    case 'magicui/dock-demo':
-      return import('@/components/magicui/dock-demo');
     case 'magicui/dock-demo-2':
       return import('@/components/magicui/dock-demo-2');
     case 'magicui/dock-demo-3':
@@ -773,38 +479,12 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/magicui/shiny-button-demo');
     case 'magicui/animated-circular-progress-bar-demo':
       return import('@/components/magicui/animated-circular-progress-bar-demo');
-    case 'magicui/shine-border-demo':
-      return import('@/components/magicui/shine-border-demo');
-    case 'magicui/shine-border-demo-2':
-      return import('@/components/magicui/shine-border-demo-2');
-    case 'magicui/confetti-demo':
-      return import('@/components/magicui/confetti-demo');
-    case 'magicui/confetti-basic-cannon':
-      return import('@/components/magicui/confetti-basic-cannon');
-    case 'magicui/confetti-random-direction':
-      return import('@/components/magicui/confetti-random-direction');
-    case 'magicui/confetti-fireworks':
-      return import('@/components/magicui/confetti-fireworks');
-    case 'magicui/confetti-stars':
-      return import('@/components/magicui/confetti-stars');
-    case 'magicui/confetti-side-cannons':
-      return import('@/components/magicui/confetti-side-cannons');
-    case 'magicui/confetti-custom-shapes':
-      return import('@/components/magicui/confetti-custom-shapes');
-    case 'magicui/confetti-emoji':
-      return import('@/components/magicui/confetti-emoji');
-    case 'magicui/cool-mode-demo':
-      return import('@/components/magicui/cool-mode-demo');
-    case 'magicui/cool-mode-custom':
-      return import('@/components/magicui/cool-mode-custom');
     case 'magicui/pulsating-button-demo':
       return import('@/components/magicui/pulsating-button-demo');
     case 'magicui/pulsating-button-demo-2':
       return import('@/components/magicui/pulsating-button-demo-2');
     case 'magicui/ripple-button-demo':
       return import('@/components/magicui/ripple-button-demo');
-    case 'magicui/file-tree-demo':
-      return import('@/components/magicui/file-tree-demo');
     case 'magicui/blur-fade-demo':
       return import('@/components/magicui/blur-fade-demo');
     case 'magicui/blur-fade-text-demo':
@@ -1007,6 +687,8 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/aceternity/spotlight-new');
     case 'aceternity/glowing-effect':
       return import('@library/demos/aceternity/glowing-effect');
+    case 'aceternity/container-text-flip':
+      return import('@library/demos/aceternity/container-text-flip');
     case 'aceternity/resizable-navbar':
       return import('@library/demos/aceternity/resizable-navbar');
     case 'aceternity/draggable-card':
@@ -1279,40 +961,6 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@/components/ai-elements/example-voice-selector');
     case 'ai-elements/example-web-preview':
       return import('@/components/ai-elements/example-web-preview');
-    case 'blocks-21st/be-ui-button':
-      return import('@library/demos/blocks-21st/be-ui-button');
-    case 'blocks-21st/be-ui-theme-toggle':
-      return import('@library/demos/blocks-21st/be-ui-theme-toggle');
-    case 'blocks-21st/be-ui-animated-badge':
-      return import('@library/demos/blocks-21st/be-ui-animated-badge');
-    case 'blocks-21st/be-ui-tilt-card':
-      return import('@library/demos/blocks-21st/be-ui-tilt-card');
-    case 'blocks-21st/be-ui-404-not-found':
-      return import('@library/demos/blocks-21st/be-ui-404-not-found');
-    case 'blocks-21st/smart-hover-auth-layout':
-      return import('@library/demos/blocks-21st/smart-hover-auth-layout');
-    case 'blocks-21st/siri-wave':
-      return import('@library/demos/blocks-21st/siri-wave');
-    case 'blocks-21st/gradient-shimmer':
-      return import('@library/demos/blocks-21st/gradient-shimmer');
-    case 'blocks-21st/scroll-fade-list':
-      return import('@library/demos/blocks-21st/scroll-fade-list');
-    case 'blocks-21st/animated-banner':
-      return import('@library/demos/blocks-21st/animated-banner');
-    case 'blocks-21st/game-of-life-loader':
-      return import('@library/demos/blocks-21st/game-of-life-loader');
-    case 'blocks-21st/iridescent-foil':
-      return import('@library/demos/blocks-21st/iridescent-foil');
-    case 'blocks-21st/modern-login-signup':
-      return import('@library/demos/blocks-21st/modern-login-signup');
-    case 'blocks-21st/apple-color-picker':
-      return import('@library/demos/blocks-21st/apple-color-picker');
-    case 'blocks-21st/contributors-section':
-      return import('@library/demos/blocks-21st/contributors-section');
-    case 'blocks-21st/cascade-text':
-      return import('@library/demos/blocks-21st/cascade-text');
-    case 'blocks-21st/card-fan-carousel':
-      return import('@library/demos/blocks-21st/card-fan-carousel');
     case 'magicui/logo-trust-grid':
       return import('@library/demos/magicui/logo-trust-grid');
     case 'kokonutui/anthropic':
@@ -1333,13 +981,7 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/vybekiit/claude-octopus-showcase');
     case 'vybekiit/claude-octopus-macos-desk':
       return import('@library/demos/vybekiit/claude-octopus-macos-desk');
-    case 'vybekiit/builder-assistant-cursor':
-      return import('@library/demos/vybekiit/builder-assistant-cursor');
-    case 'vybekiit/builder-assistant-codex':
-      return import('@library/demos/vybekiit/builder-assistant-codex');
-    case 'vybekiit/walkthrough':
-      return import('@library/demos/vybekiit/walkthrough');
     default:
       throw new Error(`No preview loader for ${entry.previewKey}`);
   }
-}
+};

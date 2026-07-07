@@ -1,22 +1,36 @@
 import { useTheme } from '@/theme/useTheme';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-/** Simple option picker — mirrors web Select for plan/account pickers. */
-export function Select<T extends string>({
+interface SelectOption<T extends string> {
+  readonly value: T;
+  readonly label: string;
+}
+
+export interface SelectProps<T extends string> {
+  readonly value: T;
+  readonly options: readonly SelectOption<T>[];
+  readonly onValueChange: (value: T) => void;
+  readonly label?: string;
+}
+
+/**
+ * Simple option picker for plan and account settings.
+ *
+ * @param props - Current value, available options, change callback, and optional label.
+ * @returns A themed option picker.
+ * @example
+ * <Select value={plan} options={options} onValueChange={setPlan} />
+ */
+export const Select = <T extends string>({
   value,
   options,
   onValueChange,
-  label,
-}: {
-  value: T;
-  options: readonly { value: T; label: string }[];
-  onValueChange: (value: T) => void;
-  label?: string;
-}) {
+  label = '',
+}: SelectProps<T>) => {
   const { colors, radius, spacing, fontSizes, fontWeights } = useTheme();
   return (
     <View style={{ gap: spacing.sm }}>
-      {label ? (
+      {label.length > 0 ? (
         <Text
           style={{
             color: colors.foreground,
@@ -50,7 +64,7 @@ export function Select<T extends string>({
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   option: {

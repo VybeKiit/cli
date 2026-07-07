@@ -38,8 +38,15 @@ interface ReportModeDevProps {
   readonly projectRoot: string;
 }
 
-/** Dev-only Report Mode — click-to-report with structured assistant handoff. */
-export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
+/**
+ * Render dev-only Report Mode with click-to-report assistant handoff.
+ *
+ * @param props - Assistant configuration and project root for generated handoffs.
+ * @returns Report Mode dock, highlight overlay, and note panel.
+ * @example
+ * <ReportModeDev assistant={assistant} projectRoot="/repo" />
+ */
+const ReportModeDev = ({ assistant, projectRoot }: ReportModeDevProps) => {
   const pathname = usePathname();
   const errorBuffer = useConsoleErrorBuffer();
   const { target: handoffTarget, setTarget: setHandoffTarget } = useReportHandoffTarget();
@@ -81,7 +88,7 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     if (!inspectActive) {
       return;
     }
-    function onKeyDown(event: KeyboardEvent) {
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (event.key !== 'Escape') {
         return;
       }
@@ -92,9 +99,9 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
       }
       deactivateInspect();
       toast('Point & fix cancelled');
-    }
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    };
+    globalThis.addEventListener('keydown', onKeyDown);
+    return () => globalThis.removeEventListener('keydown', onKeyDown);
   }, [inspectActive, inspectSelected, clearInspectSelection, deactivateInspect]);
 
   useEffect(() => {
@@ -107,39 +114,39 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     if (!dragging) {
       return;
     }
-    function onPointerMove(event: PointerEvent) {
+    const onPointerMove = (event: PointerEvent): void => {
       const x = event.clientX - dragOffset.current.x;
       const y = event.clientY - dragOffset.current.y;
       savePosition({ anchor: 'custom', customX: Math.max(0, x), customY: Math.max(0, y) });
-    }
-    function onPointerUp(event: PointerEvent) {
+    };
+    const onPointerUp = (event: PointerEvent): void => {
       setDragging(false);
-      const snapped = snapDockToNearestCorner(
-        event.clientX - dragOffset.current.x,
-        event.clientY - dragOffset.current.y,
-        window.innerWidth,
-        window.innerHeight,
-      );
+      const snapped = snapDockToNearestCorner({
+        x: event.clientX - dragOffset.current.x,
+        y: event.clientY - dragOffset.current.y,
+        viewportWidth: globalThis.innerWidth,
+        viewportHeight: globalThis.innerHeight,
+      });
       savePosition(snapped);
-    }
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
+    };
+    globalThis.addEventListener('pointermove', onPointerMove);
+    globalThis.addEventListener('pointerup', onPointerUp);
     return () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
+      globalThis.removeEventListener('pointermove', onPointerMove);
+      globalThis.removeEventListener('pointerup', onPointerUp);
     };
   }, [dragging, savePosition]);
 
-  function onDragHandlePointerDown(event: React.PointerEvent<HTMLButtonElement>) {
+  const onDragHandlePointerDown = (event: React.PointerEvent<HTMLButtonElement>): void => {
     event.preventDefault();
     const rect = dockRef.current?.getBoundingClientRect();
-    const left = rect?.left ?? event.clientX;
-    const top = rect?.top ?? event.clientY;
+    const left = rect === undefined ? event.clientX : rect.left;
+    const top = rect === undefined ? event.clientY : rect.top;
     dragOffset.current = { x: event.clientX - left, y: event.clientY - top };
     setDragging(true);
-  }
+  };
 
-  async function handleCopySpot() {
+  const handleCopySpot = async (): Promise<void> => {
     if (!spotLabel.trim()) {
       return;
     }
@@ -152,9 +159,9 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     } finally {
       setCopyingSpot(false);
     }
-  }
+  };
 
-  async function handleSubmit() {
+  const handleSubmit = async (): Promise<void> => {
     if (!(inspectSelected && inspectNote.trim())) {
       return;
     }
@@ -181,7 +188,7 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   const dockStyle = getDockPlacementStyle(position) as CSSProperties;
   const tutorialActive = tutorial.active;
@@ -256,4 +263,6 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
       </div>
     </>
   );
-}
+};
+
+export { ReportModeDev };

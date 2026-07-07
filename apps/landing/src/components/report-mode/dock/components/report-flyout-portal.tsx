@@ -5,26 +5,29 @@ import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 interface ReportFlyoutPortalProps {
-  readonly open: boolean;
-  readonly style: CSSProperties;
+  readonly 'aria-label'?: string;
+  readonly children?: ReactNode;
   readonly className?: string;
-  readonly children: ReactNode;
+  readonly 'data-testid'?: string;
   readonly onMouseEnter?: () => void;
   readonly onMouseLeave?: () => void;
-  readonly 'data-testid'?: string;
+  readonly open: boolean;
   readonly role?: string;
-  readonly 'aria-label'?: string;
+  readonly style: CSSProperties;
 }
 
 /**
- * Renders hover flyouts on document.body so dock overflow cannot clip them. Forwards a ref to the
- * flyout root so `useReportFlyoutPosition` can measure its size and clamp it inside the viewport.
+ * Renders hover flyouts on document.body so dock overflow cannot clip them. Forwards a ref to the flyout root so `useReportFlyoutPosition` can measure its size and clamp it inside the viewport. <ReportFlyoutPortal open={open} ref={ref} style={style}> Menu </ReportFlyoutPortal>
+ *
+ * @returns The rendered ReportFlyoutPortal element.
+ * @example
+ * ```tsx
+ * <ReportFlyoutPortal />
+ * ```
  */
+
 export const ReportFlyoutPortal = forwardRef<HTMLDivElement, ReportFlyoutPortalProps>(
-  function ReportFlyoutPortal(
-    { open, style, className, children, onMouseEnter, onMouseLeave, ...props },
-    ref,
-  ) {
+  ({ open, style, className = '', children = null, onMouseEnter, onMouseLeave, ...props }, ref) => {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -51,3 +54,5 @@ export const ReportFlyoutPortal = forwardRef<HTMLDivElement, ReportFlyoutPortalP
     );
   },
 );
+
+ReportFlyoutPortal.displayName = 'ReportFlyoutPortal';

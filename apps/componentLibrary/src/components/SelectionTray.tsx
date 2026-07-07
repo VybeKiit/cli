@@ -4,10 +4,17 @@ import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
 import { useSelectionTrayState } from '@library/context/SelectionContext';
 import { useClipboardCopy } from '@library/hooks/useClipboardCopy';
 import { buildBulkAgentPrompt } from '@library/lib/agentPrompt';
+import { Button } from '@vybekiit/ui/button';
 import { Check, Copy, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
-export function SelectionTray() {
+/**
+ * Render the selection tray component.
+ *
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <SelectionTray />;
+ */
+export const SelectionTray = () => {
   const { count, selectedEntries, clear } = useSelectionTrayState();
   const { copy, copied } = useClipboardCopy();
 
@@ -50,4 +57,4 @@ export function SelectionTray() {
       </div>
     </div>
   );
-}
+};

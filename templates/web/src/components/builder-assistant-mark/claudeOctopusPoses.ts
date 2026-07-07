@@ -235,13 +235,20 @@ export const CLAUDE_OCTOPUS_POSES: ReadonlyArray<{
 
 export type AssistantMood = 'default' | 'sad';
 
-/** Map legacy boolean props to an explicit pose (prefer `pose` when both are set). */
-export function resolveClaudeOctopusPose(options: {
+/**
+ * Map legacy boolean props to an explicit pose, preferring `pose` when present.
+ *
+ * @param options - Explicit pose and legacy active, working, or mood flags.
+ * @returns The resolved pose id.
+ * @example
+ * resolveClaudeOctopusPose({ active: true });
+ */
+export const resolveClaudeOctopusPose = (options: {
   pose?: ClaudeOctopusPose;
   active?: boolean;
   working?: boolean;
   mood?: AssistantMood;
-}): ClaudeOctopusPose {
+}): ClaudeOctopusPose => {
   if (options.pose) {
     return options.pose;
   }
@@ -255,12 +262,18 @@ export function resolveClaudeOctopusPose(options: {
     return 'alive';
   }
   return 'idle';
-}
+};
 
-/** Catalog slug for a pose demo card (`claude-octopus-{slug}`). */
-export function claudeOctopusPoseDemoName(pose: ClaudeOctopusPose): string {
-  return `claude-octopus-${pose}`;
-}
+/**
+ * Build the catalog slug for a pose demo card.
+ *
+ * @param pose - Pose id to render in the demo.
+ * @returns Catalog-safe demo component name.
+ * @example
+ * claudeOctopusPoseDemoName('working');
+ */
+export const claudeOctopusPoseDemoName = (pose: ClaudeOctopusPose): string =>
+  `claude-octopus-${pose}`;
 
 export const CLAUDE_OCTOPUS_POSE_IDS: readonly ClaudeOctopusPose[] = CLAUDE_OCTOPUS_POSES.map(
   (item) => item.id,

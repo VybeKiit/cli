@@ -6,19 +6,31 @@ import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 /** Props for {@link AuthShell}. */
-export interface AuthShellProps {
+interface AuthShellProps {
   /** Message key for the card heading, e.g. "auth.login.title". */
-  titleKey: string;
+  readonly titleKey: string;
   /** Message key for the supporting line under the title. */
-  descriptionKey: string;
+  readonly descriptionKey: string;
   /** The form (or other body content) rendered inside the card. */
-  children: ReactNode;
+  readonly children?: ReactNode;
   /** Optional footer content (links resolved by the page). */
-  footer?: ReactNode;
+  readonly footer?: ReactNode;
 }
 
-/** Centered card layout shared by the sign-in, sign-up, and verify screens. */
-export function AuthShell({ titleKey, descriptionKey, children, footer }: AuthShellProps) {
+/**
+ * Render the centered auth card shared by sign-in, sign-up, and verify screens.
+ *
+ * @param props - Translation keys plus optional body and footer content.
+ * @returns Auth screen shell.
+ * @example
+ * <AuthShell titleKey="auth.login.title" descriptionKey="auth.login.description" />
+ */
+const AuthShell = ({
+  titleKey,
+  descriptionKey,
+  children = null,
+  footer = null,
+}: AuthShellProps) => {
   const t = useTranslations();
 
   return (
@@ -36,4 +48,7 @@ export function AuthShell({ titleKey, descriptionKey, children, footer }: AuthSh
       {footer ? <div className="mt-4 text-muted-foreground text-sm">{footer}</div> : null}
     </main>
   );
-}
+};
+
+export { AuthShell };
+export type { AuthShellProps };

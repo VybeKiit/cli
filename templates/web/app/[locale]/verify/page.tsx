@@ -8,60 +8,84 @@ import { useAsync } from '@/hooks/useAsync';
 import { useToast } from '@/hooks/useToast';
 import { useRouter } from '@/i18n/navigation';
 import { sendEmailCode, verifyEmailCode } from '@/lib/authClient';
+import type { WebClientError } from '@/lib/clientEffect';
 import type { AuthUser } from '@vybekiit/auth';
-import type { Result } from '@vybekiit/core';
+import { type Effect, Either } from 'effect';
 import { useTranslations } from 'next-intl';
-import { type FormEvent, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useCallback, useId, useState } from 'react';
 
 /** A verify-or-resend request, discriminated by `kind` for one async pipeline. */
 type AuthAction =
   | { kind: 'verify'; email: string; code: string }
   | { kind: 'resend'; email: string };
 
-function runAuthAction(action: AuthAction): Promise<Result<AuthUser | true>> {
-  if (action.kind === 'verify') return verifyEmailCode(action.email, action.code);
+const runAuthAction = (action: AuthAction): Effect.Effect<AuthUser | true, WebClientError> => {
+  if (action.kind === 'verify') {
+    return verifyEmailCode(action.email, action.code);
+  }
   return sendEmailCode(action.email);
-}
+};
 
 /** Show a catalog key or pass through a server error message. */
-function displayError(t: ReturnType<typeof useTranslations>, error: string): string {
+const displayError = (t: ReturnType<typeof useTranslations>, error: string): string => {
   try {
     return t(error as 'auth.errors.enterEmailAndPassword');
   } catch {
     return error;
   }
-}
+};
 
 /**
  * Email verification (one-time code) screen — full layout with verify + resend
  * states. Sending and checking codes are marked stubs until the `add-signin`
  * skill wires Supabase email OTP.
+ *
+ * @returns The localized email verification page.
+ * @example
+ * <VerifyPage />
  */
-export default function VerifyPage() {
+const VerifyPage = () => {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [message, setMessage] = useState('');
+  const emailId = useId();
+  const codeId = useId();
   const { toast } = useToast();
   const router = useRouter();
   const t = useTranslations();
   const { loading: pending, error, run: submit } = useAsync(runAuthAction);
 
-  async function handleVerify(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setMessage('');
-    const result = await submit({ kind: 'verify', email, code });
-    if (!result.ok) return;
-    router.push('/dashboard');
-  }
+  const handleEmailChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  }, []);
 
-  async function handleResend() {
+  const handleCodeChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setCode(event.target.value);
+  }, []);
+
+  const handleVerify = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setMessage('');
+      const result = await submit({ kind: 'verify', email, code });
+      if (Either.isLeft(result)) {
+        return;
+      }
+      router.push('/dashboard');
+    },
+    [code, email, router, submit],
+  );
+
+  const handleResend = useCallback(async () => {
     setMessage('');
     const result = await submit({ kind: 'resend', email });
-    if (!result.ok) return;
+    if (Either.isLeft(result)) {
+      return;
+    }
     const sent = t('auth.verify.codeSent');
     setMessage(sent);
     toast(sent);
-  }
+  }, [email, submit, t, toast]);
 
   return (
     <AuthShell titleKey="auth.verify.title" descriptionKey="auth.verify.description">
@@ -77,21 +101,21 @@ export default function VerifyPage() {
           </Alert>
         ) : null}
         <FormField
-          id="email"
+          id={emailId}
           label={t('auth.verify.emailLabel')}
           type="email"
           autoComplete="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={handleEmailChange}
           required={true}
         />
         <FormField
-          id="code"
+          id={codeId}
           label={t('auth.verify.codeLabel')}
           inputMode="numeric"
           autoComplete="one-time-code"
           value={code}
-          onChange={(event) => setCode(event.target.value)}
+          onChange={handleCodeChange}
           required={true}
         />
         <Button type="submit" disabled={pending}>
@@ -103,4 +127,6 @@ export default function VerifyPage() {
       </form>
     </AuthShell>
   );
-}
+};
+
+export default VerifyPage;

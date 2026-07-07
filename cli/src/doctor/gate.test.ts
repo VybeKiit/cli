@@ -3,8 +3,11 @@ import { checkAccess, formatGateFailure } from './gate';
 
 const original = process.env.VYBEKIIT_SKIP_GATE;
 afterEach(() => {
-  if (original === undefined) delete process.env.VYBEKIIT_SKIP_GATE;
-  else process.env.VYBEKIIT_SKIP_GATE = original;
+  if (original === undefined) {
+    delete process.env.VYBEKIIT_SKIP_GATE;
+  } else {
+    process.env.VYBEKIIT_SKIP_GATE = original;
+  }
 });
 
 describe('checkAccess', () => {

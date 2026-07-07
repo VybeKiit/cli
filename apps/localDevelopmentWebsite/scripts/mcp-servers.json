@@ -1,6 +1,6 @@
 {
   "$schema": "https://vybekiit.com/schemas/mcp-servers.json",
-  "description": "MCP servers for VybeKiit local development console. Works with Kiro, Claude Code, Cursor, and Codex.",
+  "description": "MCP servers for VybeKiit local Console UI. Works with Kiro, Claude Code, Cursor, and Codex.",
   "servers": [
     {
       "name": "vybekiit",

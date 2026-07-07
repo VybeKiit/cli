@@ -1,11 +1,18 @@
 import { AdminStatsCard } from '@/components/admin/admin-stats-card';
 import { AdminRevenueChart } from '@/components/admin/admin-revenue-chart';
 
-export default function AdminBillingPage() {
+/**
+ * Render the admin billing dashboard.
+ *
+ * @returns Mock revenue metrics, plan distribution, and transactions.
+ * @example
+ * <AdminBillingPage />
+ */
+const AdminBillingPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Billing & Revenue</h2>
+        <h2 className="font-bold text-2xl tracking-tight">Billing & Revenue</h2>
         <p className="text-muted-foreground">Revenue metrics and subscription management.</p>
       </div>
 
@@ -85,9 +92,9 @@ export default function AdminBillingPage() {
               date: 'Jul 2, 2025',
               status: 'refunded',
             },
-          ].map((tx, i) => (
+          ].map((tx) => (
             <div
-              key={i}
+              key={`${tx.user}-${tx.date}`}
               className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/50"
             >
               <div>
@@ -100,7 +107,7 @@ export default function AdminBillingPage() {
                 >
                   {tx.amount}
                 </span>
-                <span className="text-xs text-muted-foreground">{tx.date}</span>
+                <span className="text-muted-foreground text-xs">{tx.date}</span>
               </div>
             </div>
           ))}
@@ -108,4 +115,6 @@ export default function AdminBillingPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminBillingPage;

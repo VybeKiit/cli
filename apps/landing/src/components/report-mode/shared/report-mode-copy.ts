@@ -1,4 +1,7 @@
-/** Buyer-voice tooltip copy for Report Mode dock controls. */
+/**
+ * Buyer-voice tooltip copy for Report Mode dock controls.
+ */
+
 export const REPORT_DOCK_TOOLTIPS = {
   brandChip: 'Open or close this bar — hover to peek, click VybeKiit to pin it open or shut.',
   drag: 'Drag to move this bar anywhere on the screen.',
@@ -12,6 +15,9 @@ export const REPORT_DOCK_TOOLTIPS = {
   off: 'Turn off pick mode.',
 } as const;
 
+/**
+ * REPORT_TUTORIAL_STEPS value.
+ */
 export const REPORT_TUTORIAL_STEPS = [
   {
     id: 'welcome',

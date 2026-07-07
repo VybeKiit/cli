@@ -83,7 +83,7 @@
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: rgb(255 255 255);
 }
 
 .vybe-walkthrough-body {
@@ -133,7 +133,7 @@
 [data-walkthrough-highlight] {
   position: relative;
   z-index: 65;
-  outline: 2px solid var(--primary, #3b82f6);
+  outline: 2px solid var(--primary, rgb(59 130 246));
   outline-offset: 3px;
   border-radius: 0.5rem;
   transition: outline-offset 0.2s ease;

@@ -1,7 +1,7 @@
 import {
   scrapeGodaddyKeyPair,
   scrapeGodaddyKeysFromList,
-} from '@vybekiit/browserAutomation/domains/registrars/godaddy/scrape';
+} from '@vybekiit/browser-automation/domains/registrars/godaddy/scrape';
 import { describe, expect, it } from 'vitest';
 
 describe('godaddy scrape', () => {

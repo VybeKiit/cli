@@ -4,16 +4,21 @@ import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
-/** Small status label — mirrors web Badge variants. */
-export function Badge({
-  children,
-  variant = 'default',
-  style,
-}: {
-  children: ReactNode;
-  variant?: BadgeVariant;
-  style?: ViewStyle;
-}) {
+interface BadgeProps {
+  readonly children?: ReactNode;
+  readonly variant?: BadgeVariant;
+  readonly style?: ViewStyle;
+}
+
+/**
+ * Small themed status label.
+ *
+ * @param props - Badge content, visual variant, and optional style.
+ * @returns A themed badge.
+ * @example
+ * <Badge variant="secondary">Beta</Badge>
+ */
+export const Badge = ({ children = null, variant = 'default', style }: BadgeProps) => {
   const { colors, radius, fontSizes, fontWeights, spacing } = useTheme();
 
   const palette = {
@@ -46,7 +51,7 @@ export function Badge({
       </Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   base: {

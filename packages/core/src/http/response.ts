@@ -1,7 +1,12 @@
 import type { HttpOutcomeCode } from './outcomes';
 
-export type HttpErrorBody = { readonly code: HttpOutcomeCode; readonly error: string };
+/** Standard JSON error body returned by HTTP helpers. */
+export type HttpErrorBody = {
+  readonly code: HttpOutcomeCode;
+  readonly error: string;
+};
 
+/** Typed HTTP response union shared by route adapters. */
 export type HttpResponse<TSuccess = unknown> =
   | { readonly status: 200; readonly body: TSuccess }
   | { readonly status: 201; readonly body: TSuccess }

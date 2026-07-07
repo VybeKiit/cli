@@ -7,7 +7,7 @@ export default defineConfig({
     regions: 'src/regions.ts',
     schema: 'src/schema.ts',
     types: 'src/types.ts',
-    'cli/index': 'src/cli/index.ts',
+    'cli/index': 'src/cli/main.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,

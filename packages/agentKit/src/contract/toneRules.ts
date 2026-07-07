@@ -5,9 +5,9 @@
  */
 
 /** One bullet in the Tone section. */
-export interface ToneRule {
+export type ToneRule = {
   readonly text: string;
-}
+};
 
 /** Canonical tone rules every template agent follows when writing to the vibe coder. */
 export const TONE_RULES: readonly ToneRule[] = [
@@ -31,10 +31,11 @@ export const TONE_RULES: readonly ToneRule[] = [
 /**
  * Render the `## Tone` section for `language.md`.
  *
- * Does not include the following `## Right-to-left languages` section — callers paste
- * this block above it.
+ * @returns The rendered render tone section text.
+ * @example
+ * const result = renderToneSection();
  */
-export function renderToneSection(): string {
+export const renderToneSection = (): string => {
   const lines = [
     '## Tone',
     '',
@@ -45,4 +46,4 @@ export function renderToneSection(): string {
     lines.push(`- ${rule.text}`);
   }
   return lines.join('\n');
-}
+};

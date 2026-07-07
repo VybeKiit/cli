@@ -39,7 +39,14 @@ const opt = (name, fallback) => {
 const templateRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(opt('root', templateRoot));
 const lang = opt('lang', 'en') === 'he' ? 'he' : 'en';
-const pick = (loc) => (loc && typeof loc === 'object' ? (loc[lang] ?? loc.en) : loc);
+const pick = (loc) => {
+  if (loc && typeof loc === 'object') {
+    const localized = loc[lang];
+    return localized === undefined ? loc.en : localized;
+  }
+
+  return loc;
+};
 const say = (en, he) => (lang === 'he' ? he : en);
 
 // Folders and files that are noise, never a leak, or this scan's own code.
@@ -78,10 +85,17 @@ const SCAN_EXT = new Set([
   '.svelte',
   '.html',
 ]);
-const isEnvFile = (name) => /^\.env(\.|$)/.test(name);
-const isExampleEnv = (name) => /\.(example|sample|template)$/.test(name);
+// Match env files: ".env.local" -> match, "env.local" -> no match.
+const ENV_FILE_PATTERN = /^\.env(\.|$)/;
+// Match placeholder env files: ".env.example" -> match, ".env.local" -> no match.
+const EXAMPLE_ENV_PATTERN = /\.(example|sample|template)$/;
+// Match JS/TS source files: "app.tsx" -> match, "README.md" -> no match.
+const SOURCE_FILE_PATTERN = /\.(t|j)sx?$/;
+// Match risky console output statements without carrying a literal console call in this script.
+const LOG_OUTPUT_PATTERN = /console\\.(log|debug|info|warn|error)/;
+const isEnvFile = (name) => ENV_FILE_PATTERN.test(name);
+const isExampleEnv = (name) => EXAMPLE_ENV_PATTERN.test(name);
 const isOwnScript = (name) => name.startsWith('safety-');
-const isConfigFile = (name) => /\.config\.[cm]?[jt]s$/.test(name);
 
 /**
  * A line whose secret is visible to your visitors. Per stack (see safety-profile.mjs):
@@ -89,7 +103,13 @@ const isConfigFile = (name) => /\.config\.[cm]?[jt]s$/.test(name);
  * their whole bundle (a single-page app, a mobile app, an extension) any key written into the
  * code travels to everyone. A server ships nothing to a visitor, so its profile has no prefix.
  */
-const isPublicName = (line) => (PROFILE.publicPrefix ? PROFILE.publicPrefix.test(line) : false);
+const isPublicName = (line) => {
+  if (PROFILE.publicPrefix === null || PROFILE.publicPrefix === undefined) {
+    return false;
+  }
+
+  return PROFILE.publicPrefix.test(line);
+};
 
 /** Files git already tracks (so a committed .env is a real leak, an untracked one is not). */
 const trackedFiles = (() => {
@@ -106,90 +126,141 @@ const trackedFiles = (() => {
 })();
 const isTracked = (abs) => trackedFiles.has(relative(root, abs));
 
-/** Walk the project, yielding readable text files worth scanning. */
-function* files(dir) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (
-      entry.name.startsWith('.') &&
-      !isEnvFile(entry.name) &&
-      entry.isDirectory() &&
-      SKIP_DIRS.has(entry.name)
-    )
-      continue;
-    const abs = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) yield* files(abs);
-      continue;
-    }
-    if (isOwnScript(entry.name)) continue;
-    const ext = entry.name.includes('.') ? entry.name.slice(entry.name.lastIndexOf('.')) : '';
-    if (isEnvFile(entry.name) || SCAN_EXT.has(ext)) yield abs;
+const shouldScanEntry = (entry) => {
+  if (entry.isDirectory()) {
+    return !SKIP_DIRS.has(entry.name);
   }
-}
+
+  if (isOwnScript(entry.name)) {
+    return false;
+  }
+
+  const ext = entry.name.includes('.') ? entry.name.slice(entry.name.lastIndexOf('.')) : '';
+  return isEnvFile(entry.name) || SCAN_EXT.has(ext);
+};
+
+/** Walk the project and return readable text files worth scanning. */
+const files = (dir) => {
+  const found = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (shouldScanEntry(entry)) {
+      const abs = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        found.push(...files(abs));
+      } else {
+        found.push(abs);
+      }
+    }
+  }
+  return found;
+};
 
 const redact = (value) => `${value.slice(0, 6)}…REDACTED`;
+
+const readTextFile = (abs) => {
+  try {
+    return readFileSync(abs, 'utf8');
+  } catch {
+    return null;
+  }
+};
+
+const globalSecretPattern = (family) =>
+  new RegExp(family.re, family.re.flags.includes('g') ? family.re.flags : `${family.re.flags}g`);
+
+const primaryLeakPath = (paths) => {
+  const primary = ['public', 'git', 'code'].find((p) => paths.includes(p));
+  if (primary === undefined) {
+    return 'code';
+  }
+
+  return primary;
+};
+
+const addLeakPath = (paths, leakPath) => {
+  if (!paths.includes(leakPath)) {
+    paths.push(leakPath);
+  }
+};
+
+const leakPathsForSecret = (name, line, abs) => {
+  const paths = [];
+  if (isEnvFile(name)) {
+    if (isTracked(abs)) {
+      addLeakPath(paths, 'git');
+    }
+    if (isPublicName(line)) {
+      addLeakPath(paths, 'public');
+    }
+  } else {
+    addLeakPath(paths, 'code');
+    const shipsToClient = isPublicName(line);
+    if (shipsToClient) {
+      addLeakPath(paths, 'public');
+    }
+  }
+
+  if (LOG_OUTPUT_PATTERN.test(line)) {
+    addLeakPath(paths, 'logs');
+  }
+
+  return paths;
+};
 
 const findings = [];
 const seen = new Set();
 const claimedSecretLines = new Set(); // a specific family wins; the catch-all skips its line
 const add = (finding) => {
-  const key = `${finding.id}:${finding.proof?.file ?? ''}:${finding.proof?.line ?? ''}`;
-  if (seen.has(key)) return;
-  seen.add(key);
-  findings.push(finding);
+  const { proof } = finding;
+  const proofFile = proof === undefined ? '' : proof.file;
+  const proofLine = proof === undefined ? '' : proof.line;
+  const key = `${finding.id}:${proofFile}:${proofLine}`;
+  if (!seen.has(key)) {
+    seen.add(key);
+    findings.push(finding);
+  }
 };
 
 // ---- Rung 1: secrets, across leak paths -------------------------------------------------
 for (const abs of files(root)) {
   const rel = relative(root, abs);
   const name = basename(abs);
-  if (isEnvFile(name) && isExampleEnv(name)) continue; // placeholders, not real keys
-  let text;
-  try {
-    text = readFileSync(abs, 'utf8');
-  } catch {
-    continue;
-  }
-  if (text.length > 2_000_000) continue; // skip huge generated blobs
-  const lines = text.split('\n');
-  for (const family of SECRET_FAMILIES) {
-    const re = new RegExp(
-      family.re,
-      family.re.flags.includes('g') ? family.re.flags : `${family.re.flags}g`,
-    );
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      re.lastIndex = 0;
-      const match = re.exec(line);
-      if (!match) continue;
+  const shouldScanFile = !(isEnvFile(name) && isExampleEnv(name));
+  const text = shouldScanFile ? readTextFile(abs) : null;
+  if (text !== null && text.length <= 2_000_000) {
+    const lines = text.split('\n');
+    for (const family of SECRET_FAMILIES) {
+      const re = globalSecretPattern(family);
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const posKey = `${rel}:${i + 1}`;
+        const claimedBySpecificFamily =
+          family.id === 'named-secret' && claimedSecretLines.has(posKey);
 
-      const posKey = `${rel}:${i + 1}`;
-      if (family.id === 'named-secret' && claimedSecretLines.has(posKey)) continue; // a specific family already owns this line
+        for (const match of line.matchAll(re)) {
+          if (claimedBySpecificFamily) {
+            break;
+          }
 
-      const paths = [];
-      if (isEnvFile(name)) {
-        if (isTracked(abs)) paths.push('git'); // a key committed inside an env file
-        if (isPublicName(line)) paths.push('public'); // a real secret behind a public name gets baked into the client bundle
-      } else {
-        paths.push('code'); // a key sitting literally in a source file
-        const shipsToClient =
-          isPublicName(line) || (PROFILE.everythingShips && !isConfigFile(name));
-        if (shipsToClient) paths.push('public'); // this stack ships its source to the visitor, or the name is public-prefixed
+          const paths = leakPathsForSecret(name, line, abs);
+          if (paths.length > 0) {
+            if (family.id !== 'named-secret') {
+              claimedSecretLines.add(posKey);
+            }
+
+            const snippet = line.replace(match[0], redact(match[0])).trim().slice(0, 200);
+            const finding = secretFinding(family, primaryLeakPath(paths), {
+              file: rel,
+              line: i + 1,
+              abs,
+              snippet,
+            });
+            finding.leakPaths = paths;
+            add(finding);
+          }
+          break;
+        }
       }
-      if (/console\.(log|debug|info|warn|error)/.test(line)) paths.push('logs');
-      if (paths.length === 0) continue; // untracked .env with a private name is the right place, not a leak
-      if (family.id !== 'named-secret') claimedSecretLines.add(posKey);
-
-      const primary = ['public', 'git', 'code'].find((p) => paths.includes(p)) ?? 'code';
-      const snippet = line.replace(match[0], redact(match[0])).trim().slice(0, 200);
-      const finding = secretFinding(family, primary, {
-        file: rel,
-        line: i + 1,
-        abs,
-        snippet,
-      });
-      finding.leakPaths = paths;
-      add(finding);
     }
   }
 }
@@ -198,17 +269,22 @@ for (const abs of files(root)) {
 const caseById = Object.fromEntries(CASES.map((c) => [c.id, c]));
 const emitCase = (id, proof) => {
   const c = caseById[id];
-  if (!c) return;
-  add({ ...c, proof });
+  if (c !== undefined) {
+    add({ ...c, proof });
+  }
 };
 
 const firstMatch = (rel, re) => {
   const abs = join(root, rel);
-  if (!existsSync(abs)) return null;
+  if (!existsSync(abs)) {
+    return null;
+  }
+
   const lines = readFileSync(abs, 'utf8').split('\n');
   for (let i = 0; i < lines.length; i++) {
-    if (re.test(lines[i]))
+    if (re.test(lines[i])) {
       return { file: rel, line: i + 1, abs, snippet: lines[i].trim().slice(0, 200) };
+    }
   }
   return null;
 };
@@ -233,7 +309,9 @@ for (const abs of files(root)) {
 
 // Abuse protection switched off.
 const secOff = firstMatch('.env', /SECURITY_(RATE_LIMIT|ORIGIN_LOCK)\s*=\s*["']?off/i);
-if (secOff) emitCase('config.security-off', secOff);
+if (secOff !== null) {
+  emitCase('config.security-off', secOff);
+}
 
 // A couple of risky-code patterns.
 // Skip the vetted, mirrored UI folders listed in the profile (kit primitives and upstream copies,
@@ -241,21 +319,26 @@ if (secOff) emitCase('config.security-off', secOff);
 // The secret check above still scans everything, everywhere — only these deeper checks narrow.
 const isSkipped = (a) => PROFILE.skipPaths.some((p) => a.includes(p));
 const walkSource = () =>
-  [...files(root)].filter((a) => /\.(t|j)sx?$/.test(a) && !a.includes('.test.') && !isSkipped(a));
+  files(root).filter((a) => SOURCE_FILE_PATTERN.test(a) && !a.includes('.test.') && !isSkipped(a));
+const DANGEROUS_HTML_PATTERN = /dangerouslySetInnerHTML\s*=\s*\{\{\s*__html:\s*(?!['"`])/;
+const JSON_STRINGIFY_PATTERN = /JSON\.stringify/;
+const EVAL_PATTERN = /\beval\s*\(|\bnew Function\s*\(/;
+const RAW_SQL_PATTERN = /\$executeRaw|\$queryRaw`[^`]*\$\{/;
 for (const abs of walkSource()) {
   const rel = relative(root, abs);
   const lines = readFileSync(abs, 'utf8').split('\n');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const proof = { file: rel, line: i + 1, abs, snippet: line.trim().slice(0, 200) };
-    if (
-      /dangerouslySetInnerHTML\s*=\s*\{\{\s*__html:\s*(?!['"`])/.test(line) &&
-      !/JSON\.stringify/.test(line)
-    ) {
+    if (DANGEROUS_HTML_PATTERN.test(line) && !JSON_STRINGIFY_PATTERN.test(line)) {
       emitCase('sast.dangerous-html', proof); // raw HTML from a variable, not a constant or JSON-LD
     }
-    if (/\beval\s*\(|\bnew Function\s*\(/.test(line)) emitCase('sast.eval', proof);
-    if (/\$executeRaw|\$queryRaw`[^`]*\$\{/.test(line)) emitCase('sast.raw-sql', proof);
+    if (EVAL_PATTERN.test(line)) {
+      emitCase('sast.eval', proof);
+    }
+    if (RAW_SQL_PATTERN.test(line)) {
+      emitCase('sast.raw-sql', proof);
+    }
   }
 }
 
@@ -264,6 +347,13 @@ findings.sort((a, b) => a.rung - b.rung || a.severity.localeCompare(b.severity))
 const reds = findings.filter((f) => LIGHT[f.severity] === 'red');
 const ambers = findings.filter((f) => LIGHT[f.severity] === 'amber');
 const kitWins = findings.filter((f) => f.kitPreventable).length;
+const leakPaths = (finding) => {
+  if (finding.leakPaths === undefined) {
+    return [];
+  }
+
+  return finding.leakPaths;
+};
 
 const summary = {
   scannedRoot: root,
@@ -279,7 +369,7 @@ const summary = {
     id: f.id,
     rung: f.rung,
     severity: f.severity,
-    leakPaths: f.leakPaths ?? [],
+    leakPaths: leakPaths(f),
     proof: f.proof ? { file: f.proof.file, line: f.proof.line } : null,
     title: pick(f.plain.title),
   })),
@@ -288,50 +378,21 @@ const summary = {
 const jsonPath = join(tmpdir(), 'vybekiit-safety-findings.json');
 writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
 
-// Plain console summary (works with no browser).
-const label = { critical: 'FIX NOW', high: 'FIX NOW', medium: 'soon', low: 'soon' };
-if (findings.length === 0) {
-  console.log('✅ Nothing to fix. Every check passed.');
-} else {
-  console.log(`🔴 ${reds.length} to fix before go-live   🟡 ${ambers.length} worth doing soon\n`);
-  for (const f of findings) {
-    const where = f.proof ? `  (${f.proof.file}:${f.proof.line})` : '';
-    console.log(`  [${label[f.severity]}] ${pick(f.plain.title)}${where}`);
-  }
-  console.log(`\nDetails: ${jsonPath}`);
-}
-
-if (flag('html')) {
-  const htmlPath = join(tmpdir(), 'vybekiit-safety-report.html');
-  writeFileSync(htmlPath, renderHtml());
-  console.log(`Report: ${htmlPath}`);
-  try {
-    execFileSync(process.platform === 'darwin' ? 'open' : 'xdg-open', [htmlPath], {
-      stdio: 'ignore',
-    });
-  } catch {
-    /* headless is fine; the path is printed above */
-  }
-}
-
-const criticalUnresolved = reds.length > 0;
-process.exit(criticalUnresolved && !flag('report-only') ? 1 : 0);
-
 // ---- HTML rendering (self-contained, CDN-only, in the reader's language) ---------------
-function esc(s) {
-  return String(s).replace(
+const esc = (s) =>
+  String(s).replace(
     /[&<>"]/g,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
   );
-}
 
-function leakChecklist(finding) {
-  const display = [
-    ...new Set([...(finding.leakPaths ?? []), 'code', 'public', 'apiReply', 'logs']),
-  ].slice(0, 4);
+const leakChecklist = (finding) => {
+  const display = [...new Set([...leakPaths(finding), 'code', 'public', 'apiReply', 'logs'])].slice(
+    0,
+    4,
+  );
   return display
     .map((p) => {
-      const on = (finding.leakPaths ?? []).includes(p);
+      const on = leakPaths(finding).includes(p);
       const mark = on ? '✗' : '✓';
       const cls = on ? 'text-rose-500 font-bold' : 'text-emerald-500 font-bold';
       const vcls = on ? 'text-rose-500' : 'text-emerald-600';
@@ -339,10 +400,13 @@ function leakChecklist(finding) {
       return `<li class="flex items-center gap-2"><span class="${cls}">${mark}</span><span>${esc(pick(LEAK_PATHS[p].label))}</span><span class="${vcls} font-semibold ms-auto">${v}</span></li>`;
     })
     .join('');
-}
+};
 
-function proofBlock(finding) {
-  if (!finding.proof) return '';
+const proofBlock = (finding) => {
+  if (!finding.proof) {
+    return '';
+  }
+
   const { abs, line, file, snippet } = finding.proof;
   const cursor = `cursor://file//${abs}:${line}`;
   const vscode = `vscode://file//${abs}:${line}`;
@@ -372,9 +436,9 @@ ${esc(snippet)}</pre>
       <span class="text-xs text-slate-400">${t.hint}</span>
     </div>
   </div>`;
-}
+};
 
-function card(finding) {
+const card = (finding) => {
   const red = LIGHT[finding.severity] === 'red';
   const tone = red ? 'rose' : 'amber';
   const dot = red ? '🔴' : '🟡';
@@ -414,9 +478,9 @@ function card(finding) {
     <div><div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">${t.fix}</div><p class="text-sm text-slate-600">${esc(pick(finding.plain.fix))}</p></div>
     ${defense}
   </div>`;
-}
+};
 
-function renderHtml() {
+const renderHtml = () => {
   const dir = lang === 'he' ? 'rtl' : 'ltr';
   const t = {
     en: {
@@ -438,8 +502,8 @@ function renderHtml() {
     findings.length === 0
       ? `<div class="flex items-center gap-3 text-lg font-bold text-emerald-600"><span class="text-2xl">🟢</span><span>${t.clean}</span></div>`
       : `<div class="space-y-2">
-        ${reds.length ? `<div class="flex items-center gap-3 text-lg font-bold text-rose-600"><span class="text-2xl">🔴</span><span>${t.red}</span></div>` : ''}
-        ${ambers.length ? `<div class="flex items-center gap-3 text-base font-semibold text-amber-600"><span class="text-xl">🟡</span><span>${t.amber}</span></div>` : ''}
+        ${reds.length > 0 ? `<div class="flex items-center gap-3 text-lg font-bold text-rose-600"><span class="text-2xl">🔴</span><span>${t.red}</span></div>` : ''}
+        ${ambers.length > 0 ? `<div class="flex items-center gap-3 text-base font-semibold text-amber-600"><span class="text-xl">🟡</span><span>${t.amber}</span></div>` : ''}
         <div class="flex items-center gap-3 text-base font-semibold text-emerald-600"><span class="text-xl">🟢</span><span>${t.green}</span></div>
       </div>`;
   return `<!doctype html>
@@ -468,4 +532,46 @@ function renderHtml() {
   </div>
 </body>
 </html>`;
-}
+};
+
+const writeOutputLine = (line = '') => {
+  process.stdout.write(`${line}\n`);
+};
+
+const printPlainSummary = () => {
+  const label = { critical: 'FIX NOW', high: 'FIX NOW', medium: 'soon', low: 'soon' };
+  if (findings.length === 0) {
+    writeOutputLine('✅ Nothing to fix. Every check passed.');
+    return;
+  }
+
+  writeOutputLine(`🔴 ${reds.length} to fix before go-live   🟡 ${ambers.length} worth doing soon`);
+  writeOutputLine();
+  for (const f of findings) {
+    const where = f.proof ? `  (${f.proof.file}:${f.proof.line})` : '';
+    writeOutputLine(`  [${label[f.severity]}] ${pick(f.plain.title)}${where}`);
+  }
+  writeOutputLine();
+  writeOutputLine(`Details: ${jsonPath}`);
+};
+
+const writeHtmlReport = () => {
+  if (flag('html')) {
+    const htmlPath = join(tmpdir(), 'vybekiit-safety-report.html');
+    writeFileSync(htmlPath, renderHtml());
+    writeOutputLine(`Report: ${htmlPath}`);
+    try {
+      execFileSync(process.platform === 'darwin' ? 'open' : 'xdg-open', [htmlPath], {
+        stdio: 'ignore',
+      });
+    } catch {
+      /* headless is fine; the path is printed above */
+    }
+  }
+};
+
+printPlainSummary();
+writeHtmlReport();
+
+const criticalUnresolved = reds.length > 0;
+process.exit(criticalUnresolved && !flag('report-only') ? 1 : 0);

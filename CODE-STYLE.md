@@ -27,6 +27,18 @@ For framework/library best-practices, follow these skills — **do not restate t
 
 This file covers only what's specific to VybeKiit on top of those.
 
+## Dependency versions
+
+Shared external versions live in the pnpm workspace **catalog**. Workspace manifests use `catalog:`
+for shared deps instead of repeating ranges, and the catalog is the single source of truth. Default
+to exact latest stable versions; pin an older lane only when a peer/framework forces it, and document
+the reason next to the catalog entry or in the ADR.
+
+Current pins: `effect@3.21.4`, `@effect/vitest@0.29.0`, `@clack/prompts@1.7.0`,
+`tsup@8.5.1`, `@biomejs/biome@2.5.2`. `vitest` stays on `3.2.6` while stable
+`@effect/vitest@0.29.0` peers `vitest ^3.2.0`; do not jump to Vitest 4 until that lane is green.
+`typescript` stays on the repo's 5.x lane until the TypeScript 6 upgrade is its own gate-green pass.
+
 ## Scripts — shared `package.json` contract
 
 VybeKiit follows the **workspace-wide script contract** — the same script _names_ across every sibling repo so muscle memory and CI carry across projects. SSOT + full table: `dufflebag/templates/mdFiles/CODE-STYLE.md → Scripts`. Only `dev`/`build`/`start` bend to the stack (here via Turbo).
@@ -87,33 +99,35 @@ Never: `@/vybekiit/*` (removed), `from '../lib/…'` in templates/backend, `from
 
 ### Concern packages follow the same skeleton (Effect DI)
 Every surviving provider package (`payments`, `auth`, `db`, …) has the same shape: `types.ts`
-(interface + DTOs + **tagged errors**) · `config.ts` (`Schema.Struct` + Config `Tag` + Config `Layer`) ·
-`resolve.ts` (the service `Tag` + `Live` `Layer`) · `providers/<name>/index.ts` (one adapter) ·
-`index.ts` (named-export barrel). `core` is the exempt second kind: a library package (no provider
-seam) whose `http`/`observability`/`security` subpaths are foundation, not adapters.
+(`Schema.Struct` DTOs + `Schema.Schema.Type<>` aliases + **tagged errors** + service type) ·
+`config.ts` (`Schema.Struct` + Config `Tag` + Config `Layer` when needed) · `resolve.ts` (the service
+`Tag` + `Live` `Layer`) · `providers/<name>/index.ts` (one Effect-returning adapter) · `index.ts`
+(pure wildcard barrel). `core` is the exempt second kind: a library package (no provider seam) whose
+`http`/`observability`/`security` subpaths are foundation, not adapters.
 ```
 // exemplar  packages/payments/src/
-types.ts          → interface PaymentProvider + PaymentError (Data.TaggedError) + DTOs
+types.ts          → Schema DTOs + inferred types + PaymentError + PaymentService type
 config.ts         → PaymentsConfigSchema (Schema.Struct) + PaymentsConfig Tag + PaymentsConfigLive
 resolve.ts        → Payments Tag + PaymentsLive Layer (wires an adapter over the config)
 providers/{lemonSqueezy,stripe,paypal}/index.ts → createXProvider(config) — Effect-returning methods
-index.ts          → export { ... } (explicit, named)
+index.ts          → export * from './config'; export * from './resolve'; export * from './types';
 ```
 _Why:_ one predictable shape per concern → the agent (and a junior) can navigate any package blind.
 
 ### Return `Effect<A, E>`; model expected failures as tagged errors
 Package boundaries that can fail for expected reasons return `Effect.Effect<A, E>`, where `E` is a
-`Data.TaggedError` carrying a stable `code` + `message`. Bugs and missing config still **throw**
-(fail-loud at boot). No `Result`, no `ok`/`err`/`fail`, no raw `try/catch` across an Effect seam —
-recover with `Effect.catchTag`/`catchAll`.
+`Data.TaggedError` carrying a stable `code` + `message`. No `Result`, no `ok`/`err`/`fail`, no raw
+`try/catch` across an Effect seam — wrap IO with `Effect.try` / `Effect.tryPromise` and recover with
+`Effect.catchTag` / `Effect.catchAll`. Runtime provider-map misses are expected configuration/code
+failures, so they return a typed error before adapter construction; never fall back with `??`.
 ```ts
 // packages/payments/src/types.ts — expected failure → typed error channel
 export class PaymentError extends Data.TaggedError('PaymentError')<{
   readonly code: string; readonly message: string;
 }> {}
-createCheckout(params: CheckoutParams): Effect.Effect<CheckoutResult, PaymentError>;
-// packages/core/src/config.ts — config error → throw (fail loud)
-throw new Error(`Invalid VybeKiit configuration:\n${issues}`);
+createCheckout(params: CheckoutParamsType): Effect.Effect<CheckoutResultType, PaymentError>;
+// no silent map fallback
+return Effect.fail(new PaymentError({ code: 'PAYMENT_PROVIDER_UNSUPPORTED', message }));
 ```
 _Why:_ the buyer's agent branches on the tagged `code` to translate failures into plain language, and
 Effect composes the error channel through the whole program instead of hand-plumbed `Result`.
@@ -134,6 +148,10 @@ _Why:_ a feature never fails because an *unrelated* group of keys is blank; a mi
 crashes at startup with one actionable message the `doctor` skill can translate; `core` stops knowing
 about `stripe`.
 
+Defaults belong here, not in runtime lookup code. `Schema.optionalWith(..., { default })` is allowed
+for explicit product defaults (`EMAIL_PROVIDER=cloudflare`, safe boolean toggles, blank env values).
+Once config is decoded, missing adapters/maps are errors, not `??` fallbacks.
+
 ### Wire providers + config as Effect services (`Layer`/`Context`)
 Every concern exposes a service `Context.Tag` and a `Live` `Layer` built from its Config Layer.
 Composition roots (routes, cli, hooks) `Effect.provide` the Layers and run at the edge —
@@ -152,37 +170,85 @@ const exit = await Effect.runPromiseExit(program.pipe(Effect.provide(PaymentsLiv
 _Why:_ one wiring shape; adding an adapter or swapping a provider is a Layer change, not a call-site
 edit, and tests inject a fake `Payments` Layer instead of mocking modules.
 
-### `interface` for contracts, `type` for unions & inferred; fields `readonly`
-`interface XProvider`/`XParams` for object shapes and the provider seam; `type` for unions,
-`Record`, and `Schema.Schema.Type<>` aliases. Contract fields are `readonly`. Never `any` — use
-`unknown` and narrow. No `I`-prefix on interfaces.
+### Schema-first contracts; interfaces mainly for component props
+DTOs, config, and wire payloads start as `Schema.Struct`; exported static types are
+`Schema.Schema.Type<typeof X>` aliases named `XType`. Service seams use `Context.Tag` service types,
+not provider interfaces. Keep `interface` mainly for React/component props and framework contracts
+that are clearer as declarations. Contract fields are `readonly`. Never `any` — use `unknown` and
+narrow. No `I`-prefix on interfaces.
 ```ts
-export type PaymentProviderName = 'lemon-squeezy' | 'stripe' | 'paypal';       // union
-export interface CheckoutParams { readonly productId: string; /* … */ }        // contract
-export type PaymentsConfig = Schema.Schema.Type<typeof PaymentsConfigSchema>;   // inferred
-```
-_Why:_ readonly DTOs + no `any` keep the headless packages safe to hand a non-coder's agent.
+export const CheckoutParams = Schema.Struct({ productId: Schema.String });
+export type CheckoutParamsType = Schema.Schema.Type<typeof CheckoutParams>;
+export type PaymentService = {
+  readonly createCheckout: (params: CheckoutParamsType) => Effect.Effect<CheckoutResultType, PaymentError>;
+};
 
-### One-line TSDoc on exports — no multi-line "why" essays inline
-Every exported symbol gets a **one-line** summary. Non-obvious rationale (why a key is optional, why
-blank→default, threat model) goes in an **ADR or `CONTEXT.md`**, not a paragraph on the symbol.
-```ts
-// before  (packages/core/src/config.ts:securityConfigSchema) — ~15 lines of prose inline
-/**
- * App-layer security — the protection every SaaS needs but a non-coder never thinks
- * to ask for, so the kit ships it on by default ... one source of truth, three
- * enforcement points ... `SECURITY_ORIGIN_LOCK`: reject cross-site POSTs whose ...
- */
-// after — one line; the "why" lives in ADR-0009
-/** Secure-by-default app-layer limits (rate limit, origin lock). Rationale: ADR-0009. */
+export interface CheckoutButtonProps {
+  readonly children?: React.ReactNode;
+}
 ```
-_Why:_ the dense essays are the single biggest driver of file length (`config.ts` is 676 lines and
-still the repo's longest — one-line every remaining essay to pull it toward the ~200–400 line rule).
-Durable "why" belongs where decisions live.
+_Why:_ one runtime schema becomes validation + type source of truth, while props stay ergonomic at
+the UI boundary.
+
+### Component props default at the boundary · [taste]
+Component props still use `interface`, and optional props get safe defaults in the parameter
+destructure when there is a sensible default. `children` defaults by case: `null` when rendering
+nothing is the right semantic value, or an empty fragment when the component expects a renderable
+slot.
+```tsx
+export interface EmptyStateProps {
+  readonly title?: string;
+  readonly children?: React.ReactNode;
+}
+
+export const EmptyState = ({ title = 'Nothing here yet', children = null }: EmptyStateProps) => (
+  <section>
+    <h2>{title}</h2>
+    {children}
+  </section>
+);
+```
+_Why:_ callers should not need defensive prop plumbing; defaults are deliberate at the UI boundary,
+not hidden in business logic.
+
+### Function TSDoc is complete; durable why lives in docs
+Every exported function gets a summary, `@param` for every parameter, `@returns`, and `@example`.
+Exported non-functions get a short summary. Local helpers get TSDoc when the name/body is not
+self-evident. Non-obvious durable rationale (why a key is optional, why blank→default, threat model)
+goes in an ADR or `CONTEXT.md`, not a paragraph on the symbol.
+```ts
+/**
+ * Send one transactional email through the injected Email service.
+ *
+ * @param params - Validated send parameters for the email message.
+ * @returns An Effect that succeeds with the provider message id or fails with EmailError.
+ * @example
+ * const result = await Effect.runPromise(sendEmail(params).pipe(Effect.provide(makeEmailLive())));
+ */
+export const sendEmail = (params: SendEmailParamsType) => Effect.flatMap(Email, ({ send }) => send(params));
+```
+_Why:_ functions are the seams agents reuse; params/returns/examples make the intended call shape
+unambiguous. Durable "why" belongs where decisions live.
+
+### Authored functions are const-arrow only · [lint+taste]
+Use `const` arrow functions for authored functions, especially exports. `function*` is allowed inside
+`Effect.gen` because that is Effect's generator API; framework-required declarations are the only
+other exception.
+```ts
+// chosen
+export const makeEmailLive = (source: EnvSource = process.env): Layer.Layer<Email, EmailError> =>
+  Layer.unwrapEffect(parseEmailConfig(source));
+
+// not this
+export function makeEmailLive(source: EnvSource = process.env): Layer.Layer<Email, EmailError> {
+  return Layer.unwrapEffect(parseEmailConfig(source));
+}
+```
+_Why:_ exported surfaces stay visually consistent and compose cleanly with Effect pipelines.
 
 ### camelCase folders and files; UI + contracts keep framework convention; verb-first functions
 First-party module folders are **camelCase** (`packages/clientState`, `packages/browserAutomation`,
-`providers/betterAuth`, `providers/lemonSqueezy`, `src/uiStore`). The published `@vybekiit/*` name and
+`providers/betterAuth`, `providers/lemonSqueezy`, `src/uiStore`). The package identity `@vybekiit/*` and
 config values stay kebab, so folder and identity diverge on purpose: `agentKit` → `@vybekiit/agent-kit`,
 `providers/lemonSqueezy` → `PAYMENTS_PROVIDER=lemon-squeezy`. Folders whose name **is** an external
 contract keep that form and are never camelCased: Next.js route segments (the folder is the URL,
@@ -204,7 +270,7 @@ Everything else we author — including private tooling like `browserAutomation`
 ```ts
 // packages/core/src/envSource.ts   (renames: provider-dispatch.ts → providerDispatch.ts · use-async.ts → useAsync.ts)
 // unchanged: templates/web/src/components/hero-section.tsx (UI component keeps framework convention)
-export function resolveEnvProvider<P>(/* … */) { /* … */ }
+export const resolveEnvProvider = <P>(/* … */) => { /* … */ };
 ```
 
 ### Prefer a plain condition over a regex; else a one-line example comment
@@ -222,17 +288,20 @@ const bucket = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'
 _Why:_ half the kit's regexes are really a `startsWith`; the rest are opaque, and one example turns
 "what does this match?" into a fact the buyer's agent can verify without running it.
 
-### Named exports only; one explicit barrel per package · [lint: noDefaultExport]
-Re-export the public surface explicitly from `index.ts` (with `type` modifiers on types). No
-`export default` except a framework requirement (Cloudflare Worker handler, `tsup.config.ts`).
-Enforced: `noDefaultExport` is `error` under `packages/**` in `biome.json`; framework files that
-require a default (Next.js pages/route handlers, `*.config.ts`) are the exempted overrides.
+### Named exports only; `index.ts` is a pure wildcard barrel · [lint+taste]
+Package `index.ts` files are import surfaces only: wildcard re-exports and no implementation code,
+constants, service wiring, side effects, conditionals, or runtime fallback logic. No `export default`
+except a framework requirement (Cloudflare Worker handler, `tsup.config.ts`). Target enforcement:
+promote `noDefaultExport` under `packages/**` once existing framework/config exceptions are carved
+out cleanly.
 ```ts
 // packages/payments/src/index.ts
-export { Payments, PaymentsLive } from './resolve';
-export { type CheckoutParams, type CheckoutResult, PaymentError } from './types';
+export * from './config';
+export * from './resolve';
+export * from './types';
 ```
-_Why:_ named exports keep re-exports greppable and tree-shakeable; a default export hides the name.
+_Why:_ the barrel is an import surface, not a module body. Wildcard barrels keep imports clean and
+make entrypoints boring to review.
 
 ### Colocate tests as `*.test.ts`; use `@effect/vitest`
 New tests live beside their subject (`foo.ts` + `foo.test.ts`), not in a per-package `test/` dir.
@@ -252,11 +321,11 @@ it.effect('parses a valid webhook into an OrderEvent', () =>
 _Why:_ the test moves/renames/deletes with the code it covers; `@effect/vitest` runs the effect and
 asserts on the typed success/failure channel instead of unwrapping by hand.
 
-### No bare `console.*` in published packages · [lint: noConsole]
+### No bare `console.*` in maintained packages · [lint: noConsole]
 Headless packages return an `Effect` (log via `Effect.log*`) or use `createLogger`
 (production-silent). `console` is for `cli/`, template-owned `report-mode`, and private tooling —
-code whose job is terminal/agent output. Enforced: `noConsole` is `error` under `packages/**` in
-`biome.json`.
+code whose job is terminal/agent output. Target enforcement: promote `noConsole` under maintained
+packages once the existing CLI/tooling subpaths are carved out cleanly.
 _Why:_ a stray `console.log` in a buyer's `node_modules` is noise they can't turn off.
 
 ### Deduplication gate — run before creating · [lint: dedup]
@@ -296,6 +365,139 @@ shell out via `execFile` + `promisify` (not `execSync`), and **scrub secrets/tok
 const MIRRORS = [ /* … */ ];
 ```
 
+## Canonical example
+
+The first positive target is `packages/email`: convert the send flow to Effect + Schema + Layer,
+with a pure wildcard barrel. This is illustrative documentation until the package itself is migrated.
+
+```ts
+// packages/email/src/types.ts
+import { Context, Data, Effect, Schema } from 'effect';
+
+/** One transactional email, normalized before provider delivery. */
+export const SendEmailParams = Schema.Struct({
+  to: Schema.String.pipe(Schema.minLength(1)),
+  from: Schema.String.pipe(Schema.minLength(1)),
+  subject: Schema.String.pipe(Schema.minLength(1)),
+  html: Schema.String.pipe(Schema.minLength(1)),
+  text: Schema.optional(Schema.String),
+});
+export type SendEmailParamsType = Schema.Schema.Type<typeof SendEmailParams>;
+
+/** Provider message id returned after a successful send. */
+export const SendEmailResult = Schema.Struct({ id: Schema.String.pipe(Schema.minLength(1)) });
+export type SendEmailResultType = Schema.Schema.Type<typeof SendEmailResult>;
+
+/** Expected email failures that callers may recover from. */
+export class EmailError extends Data.TaggedError('EmailError')<{
+  readonly code: 'EMAIL_CONFIG_INVALID' | 'EMAIL_PROVIDER_UNSUPPORTED' | 'EMAIL_SEND_FAILED';
+  readonly message: string;
+}> {}
+
+/** Effect service contract for transactional email delivery. */
+export type EmailService = {
+  readonly send: (
+    params: SendEmailParamsType,
+  ) => Effect.Effect<SendEmailResultType, EmailError>;
+};
+
+/** Injectable email service tag used by composition roots and tests. */
+export class Email extends Context.Tag('@vybekiit/email/Email')<Email, EmailService>() {}
+```
+
+```ts
+// packages/email/src/resolve.ts
+import { type EnvSource, parseEnv } from '@vybekiit/core';
+import { Effect, Layer } from 'effect';
+import { EmailConfig, type EmailConfigType, type EmailProviderNameType } from './config';
+import { makeCloudflareEmailLive } from './providers/cloudflare';
+import { Email, EmailError, type SendEmailParamsType, type SendEmailResultType } from './types';
+
+const emailProviderLayers = {
+  cloudflare: makeCloudflareEmailLive,
+} satisfies Partial<Record<EmailProviderNameType, (source: EnvSource) => Layer.Layer<Email, EmailError>>>;
+
+/**
+ * Parse the email provider selector from the environment.
+ *
+ * @param source - Environment object to read, usually process.env at a composition root.
+ * @returns An Effect containing the decoded email config or a tagged email error.
+ * @example
+ * const config = await Effect.runPromise(parseEmailConfig({ EMAIL_PROVIDER: 'cloudflare' }));
+ */
+const parseEmailConfig = (source: EnvSource): Effect.Effect<EmailConfigType, EmailError> =>
+  Effect.try({
+    try: () => parseEnv(EmailConfig, source),
+    catch: (caught) =>
+      new EmailError({
+        code: 'EMAIL_CONFIG_INVALID',
+        message: caught instanceof Error ? caught.message : String(caught),
+      }),
+  });
+
+/**
+ * Resolve the selected provider Layer without falling back to another adapter.
+ *
+ * @param provider - Provider key decoded from EmailConfig.
+ * @param source - Environment object forwarded to the selected provider Layer.
+ * @returns An Effect containing the provider Layer, or EMAIL_PROVIDER_UNSUPPORTED.
+ * @example
+ * const layer = await Effect.runPromise(findEmailLayer('cloudflare', process.env));
+ */
+const findEmailLayer = (
+  provider: EmailProviderNameType,
+  source: EnvSource,
+): Effect.Effect<Layer.Layer<Email, EmailError>, EmailError> => {
+  const makeLayer = emailProviderLayers[provider];
+
+  if (makeLayer === undefined) {
+    return Effect.fail(
+      new EmailError({
+        code: 'EMAIL_PROVIDER_UNSUPPORTED',
+        message: 'No email adapter is registered for provider ' + provider + '.',
+      }),
+    );
+  }
+
+  return Effect.succeed(makeLayer(source));
+};
+
+/**
+ * Build the configured Email Layer from environment config.
+ *
+ * @param source - Environment object to parse; defaults to process.env at the runtime edge.
+ * @returns A Layer that provides Email or fails with EmailError during construction.
+ * @example
+ * const program = sendEmail(params).pipe(Effect.provide(makeEmailLive(process.env)));
+ */
+export const makeEmailLive = (source: EnvSource = process.env): Layer.Layer<Email, EmailError> =>
+  Layer.unwrapEffect(
+    parseEmailConfig(source).pipe(
+      Effect.flatMap(({ EMAIL_PROVIDER }) => findEmailLayer(EMAIL_PROVIDER, source)),
+    ),
+  );
+
+/**
+ * Send one transactional email through the injected Email service.
+ *
+ * @param params - Validated send parameters for the email message.
+ * @returns An Effect that succeeds with the provider message id or fails with EmailError.
+ * @example
+ * const result = await Effect.runPromise(sendEmail(params).pipe(Effect.provide(makeEmailLive())));
+ */
+export const sendEmail = (
+  params: SendEmailParamsType,
+): Effect.Effect<SendEmailResultType, EmailError, Email> =>
+  Effect.flatMap(Email, ({ send }) => send(params));
+```
+
+```ts
+// packages/email/src/index.ts
+export * from './config';
+export * from './resolve';
+export * from './types';
+```
+
 ## Recipes
 
 ### Add an adapter to an existing concern (`payments`, `auth`, `db`, …)
@@ -306,18 +508,19 @@ const MIRRORS = [ /* … */ ];
 5. Add `providers/<name>/index.test.ts` (colocated, `@effect/vitest`). Add keys to `.env.example`.
 6. **No new skill** — goal-named buyer skills already route to the interface.
 
-### Add a new capability — decide the bucket first (ADR-0025)
-Default to **template-owned code** (`templates/*/src/lib/…`). Create a **published `@vybekiit/*`
-package only** when it has real headless logic AND a buyer-runtime consumer OR ≥2 real adapters —
-and even then, foundational plumbing every app needs (an HTTP client, a logger, security limits)
-folds into `core` as a subpath rather than earning its own package. Never publish a
-single-`local`-provider stub; there is no `shared/` tier to reach for.
+### Add a new capability — decide the bucket first (ADR-0033)
+Default to **template-owned code** (`templates/*/src/lib/…`) when the buyer will customize it. Use a
+**private workspace package** (`packages/*`, `private: true`) when the logic is maintained headless
+code the buyer should not edit. Foundational plumbing every app needs (an HTTP client, a logger,
+security limits) folds into `core` as a subpath rather than earning its own package. Never create a
+public `@vybekiit/*` package; there is no public tier and no `shared/` tier to reach for.
 
 ### Add owned code two templates both need
 Author it in each template as owned code (`templates/<t>/src/lib/<name>.ts`) and register it in the
 `check:templates` sync check so the copies can't drift. A buyer only ever scaffolds **one** stack,
 so this is never buyer-facing duplication — it is one owned file per template, kept consistent by a
-maintainer gate. Reach for a published package only if the code also earns a spine slot above.
+maintainer gate. Reach for a private workspace package only when the logic should stay maintained
+and headless.
 
 ### Run the dedup gate (before creating any new export)
 1. Decide intent — what function/class/hook you're about to create.
@@ -331,10 +534,10 @@ maintainer gate. Reach for a published package only if the code also earns a spi
 ## Exemplars
 
 Write new code like these:
-- `packages/payments/` — the concern-package skeleton (types/config/resolve-Layer/providers/barrel).
+- `packages/email/` after the canonical migration — Schema-first DTOs, tagged errors, Layers, and pure wildcard barrel.
+- `packages/payments/` after touched slices are converted — the concern-package skeleton (types/config/resolve-Layer/providers/barrel).
 - `packages/core/src/config.ts` — `parseEnv` over `Schema.decodeUnknownSync`.
-- `packages/core/src/envSource.ts` — `resolveEnvProvider` dispatch.
-- `packages/payments/src/resolve.ts` — a service `Tag` + `Live` `Layer`.
+- `packages/payments/src/resolve.ts` after conversion — a service `Tag` + `Live` `Layer`.
 - `scripts/mirrorRepos.mjs` — a typed `.mjs` maintainer script.
 
 ## Never
@@ -344,16 +547,22 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - **Add `publishConfig` to any `packages/*`** — every concern package is `private: true`; the CLI is the only public artifact and bundles what it needs · [taste] (ADR-0033).
 - **Point buyers at `npm i @vybekiit/*`** (e.g. re-adding the `workspace:*`→npm scaffold rewrite) — the packages are private; delivery is the gated monorepo clone · [taste] (ADR-0033).
 - `Result`/`ok`/`err`/`fail` or `Promise<Result<…>>` — return `Effect<A, E>` with a tagged error · `packages/core/src/result.ts` (retires with the Effect migration) · [taste] (ADR-0023).
-- Raw `try/catch` across an Effect seam — recover with `Effect.catchTag`/`catchAll` · [taste].
-- `zod` anywhere — validate with Effect `Schema` · pre-Effect manifests (ADR-0023) · [lint: noRestrictedImports].
-- `@inquirer/prompts` — the CLI standardizes on `@clack/prompts` · `cli/src/prompts/envWizard.ts` · [lint: noRestrictedImports] (ADR-0025).
+- Raw `try/catch` across an Effect seam — wrap IO with `Effect.try` / `Effect.tryPromise`, then recover with `Effect.catchTag`/`catchAll` · [taste].
+- Runtime map fallback (`adapters[key] ?? adapters.default`) — Schema owns defaults; missing maps return typed errors before construction · [taste].
+- `zod` in maintained code or authored starter paths — validate with Effect `Schema` · pre-Effect manifests (ADR-0023) · [lint: noRestrictedImports].
+- `@inquirer/prompts` — the CLI standardizes on `@clack/prompts` · `cli/src/prompts/envWizard.ts` · [lint: noRestrictedImports] (ADR-0034).
 - A regex where a plain string method reads as clearly, or a kept regex with **no one-line example comment** above it · [taste].
 - `new`-ing a provider at a call site — resolve it from its `Layer` · [taste].
-- `switch`/`===` on a `*_PROVIDER` value — use the Layer selector / `resolveEnvProvider` · [taste] (ADR-0018).
+- `switch`/`===` on a `*_PROVIDER` value — use the concern's Layer selector and return a typed error on a miss · [taste] (ADR-0018).
+- `function` declarations in authored TypeScript — export const-arrow functions; `function*` only inside `Effect.gen` · [lint+taste].
+- Implementation code in `index.ts` — barrels are wildcard re-exports only; no constants, helpers, side effects, or wiring · [lint+taste].
 - `export default` in package source (except Worker handler / `tsup.config.ts`) · [lint: noDefaultExport under `packages/**`].
-- Bare `console.*` in a published package — return an `Effect` or use `createLogger` · [lint: noConsole under `packages/**`].
+- Bare `console.*` in a maintained package — return an `Effect` or use `createLogger` · [lint: noConsole under `packages/**`].
 - `any`, or a cast except at a vendor-type seam (e.g. Supabase dynamic tables) · [lint: noExplicitAny].
-- Multi-line "why" essays on a symbol — one line; put the why in an ADR/`CONTEXT.md` · `packages/core/src/config.ts` (676 LOC) · [taste].
+- Exported functions without summary, `@param`, `@returns`, and `@example` · [lint+taste].
+- `isRecord`/`isObject`/`isDefined`/`noop`/`assertNever` and one-row predicates like `isName`/`isKey` unless they are domain-specific and reused · [lint+taste].
+- Generic `result`/`data`/`temp` names when a domain noun is known · [taste].
+- Multi-line "why" essays on a symbol — function docs explain call shape; durable rationale goes in an ADR/`CONTEXT.md` · [taste].
 - Scattered URLs/secrets — centralize endpoints in `core`; keys live only in `.env` · [taste].
 - **Fire-and-forget async in serverless** — never call an async side-effect (logging, tracking, sending) without `await` or `waitUntil()` in an API route, cron handler, or edge worker. Un-awaited promises are killed when the response completes; the work silently never happens · [lint: no-floating-promises].
 - **Creating/extending an export without running `vybekiit dedup` first** — the gate catches exact dups, structural dups, and concern-overlap; skipping it is how the codebase rots · [lint: dedup] (ADR-0031).
@@ -361,12 +570,17 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 
 ## Dependency notes
 
-Library decisions live in ADRs; this section only flags health.
-- **Adopted (ADR-0023):** `effect@3.21.4` (effect system + `Schema` + `Layer`), `@effect/vitest@0.29.0`.
-  Pinned exactly — the API moves fast; bump deliberately.
-- **Removed (ADR-0023):** `zod` — replaced everywhere by Effect `Schema`. The zod 3→4 upgrade is cancelled.
-- **Pinned:** `vitest@3.2.6` — capped at 3.x because stable `@effect/vitest@0.29.0` peers `vitest ^3.2.0` (vitest 4 needs a `@effect/vitest` beta).
-- **Resolved (ADR-0025):** the CLI standardizes on `@clack/prompts`; `@inquirer/prompts` is removed
-  (its one use, `cli/src/prompts/envWizard.ts`, ports to `@clack`) and banned via `noRestrictedImports`.
+Library decisions live in ADRs; this section only flags health and the current catalog lane.
+- **SSOT (ADR-0034):** shared external versions live in the pnpm workspace catalog and manifests use
+  `catalog:`. Exact latest stable is the default; peer/framework exceptions are documented.
+- **Adopted (ADR-0023):** `effect@3.21.4` (effect system + `Schema` + `Layer`) and
+  `@effect/vitest@0.29.0` (peers `effect ^3.21.0`, `vitest ^3.2.0`).
+- **Removed (ADR-0023):** `zod` — replaced in maintained code and authored starter paths by Effect
+  `Schema`. Quarantined third-party examples do not become style exemplars.
+- **Pinned lane:** `vitest@3.2.6` until the stable `@effect/vitest` peer moves beyond `vitest ^3.2.0`.
+- **Pinned lane:** TypeScript stays on the repo's 5.x lane until the TS 6 upgrade is its own
+  gate-green pass.
+- **Resolved (ADR-0034):** the CLI standardizes on `@clack/prompts@1.7.0`; `@inquirer/prompts` stays
+  banned via `noRestrictedImports`.
 - **Stale (accepted):** `@lemonsqueezy/lemonsqueezy.js` — treat as docs-only; drive via `browser-automation` `ls` (CONTEXT.md).
-- **Pre-1.0 (watch):** `agnix ^0.36` (agent-config linter).
+- **Pre-1.0 (watch):** `agnix@0.37.5` (agent-config linter).

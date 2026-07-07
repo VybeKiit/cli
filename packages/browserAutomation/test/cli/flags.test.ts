@@ -2,7 +2,7 @@ import {
   parseGlobalFlags,
   parseSetupArgs,
   requireNonInteractive,
-} from '@vybekiit/browserAutomation/cli/flags';
+} from '@vybekiit/browser-automation/cli/flags';
 import { describe, expect, it } from 'vitest';
 
 describe('parseGlobalFlags', () => {

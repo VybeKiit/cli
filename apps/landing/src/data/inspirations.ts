@@ -117,6 +117,5 @@ export const INSPIRATION_DIRECTIONS: readonly InspirationDirection[] = [
   },
 ];
 
-export function getInspirationBySlug(slug: string): InspirationDirection | undefined {
-  return INSPIRATION_DIRECTIONS.find((d) => d.slug === slug);
-}
+export const getInspirationBySlug = (slug: string): InspirationDirection | undefined =>
+  INSPIRATION_DIRECTIONS.find((d) => d.slug === slug);

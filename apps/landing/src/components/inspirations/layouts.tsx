@@ -28,85 +28,79 @@ const STORYBOARD_SCENES = ['Wireframe', 'Checkout live', 'Deployed'] as const;
 
 const STACK_PATH = ['Auth', 'Database', 'Payments', 'Deploy', 'Updates'] as const;
 
-export function TerminalToLiveLayout({ direction }: { direction: InspirationDirection }) {
-  return (
-    <InspirationChrome direction={direction}>
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
-        <div className="flex flex-col gap-6">
-          <p
-            className="font-mono text-sm uppercase tracking-widest"
-            style={{ color: direction.palette.accent }}
-          >
-            agent-as-operator
-          </p>
-          <h1 className="text-balance font-bold text-4xl tracking-tight sm:text-5xl">
-            {direction.headline}
-          </h1>
-          <p className="text-balance text-lg" style={{ color: direction.palette.muted }}>
-            {direction.subhead}
-          </p>
-          <InspirationCta direction={direction} />
-        </div>
-        <AgentSessionDemo />
-      </section>
-    </InspirationChrome>
-  );
-}
-
-export function SplitScreenLayout({ direction }: { direction: InspirationDirection }) {
-  return (
-    <InspirationChrome direction={direction}>
-      <section className="grid min-h-[80vh] lg:grid-cols-2">
-        <div className="flex flex-col justify-center gap-4 bg-neutral-200/80 p-8 lg:p-16">
-          <span className="w-fit rounded-full bg-red-500/15 px-3 py-1 font-medium text-red-700 text-xs">
-            builder alone
-          </span>
-          <ul className="space-y-2 text-sm">
-            {CHAOS_ITEMS.map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-neutral-600 line-through decoration-red-400/70"
-              >
-                <span className="text-red-500" aria-hidden={true}>
-                  ✕
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <p className="text-neutral-500 text-sm">scattered chores, no operator</p>
-        </div>
-        <div
-          className="flex flex-col justify-center gap-6 p-8 lg:p-16"
-          style={{ background: `linear-gradient(135deg, ${direction.palette.accent}15, #ECFDF5)` }}
+export const TerminalToLiveLayout = ({ direction }: { direction: InspirationDirection }) => (
+  <InspirationChrome direction={direction}>
+    <section className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
+      <div className="flex flex-col gap-6">
+        <p
+          className="font-mono text-sm uppercase tracking-widest"
+          style={{ color: direction.palette.accent }}
         >
-          <h1 className="text-balance font-bold text-3xl sm:text-4xl">{direction.headline}</h1>
-          <p className="text-balance text-lg" style={{ color: direction.palette.muted }}>
-            {direction.subhead}
-          </p>
-          <ol className="space-y-3">
-            {AGENT_TIMELINE.map((step, i) => (
-              <li key={step} className="flex items-center gap-3">
-                <span
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full font-bold text-xs"
-                  style={{ background: direction.palette.accent, color: '#fff' }}
-                >
-                  {i + 1}
-                </span>
-                <span className={i === AGENT_TIMELINE.length - 1 ? 'font-semibold' : ''}>
-                  {step}
-                </span>
-              </li>
-            ))}
-          </ol>
-          <InspirationCta direction={direction} />
-        </div>
-      </section>
-    </InspirationChrome>
-  );
-}
+          agent-as-operator
+        </p>
+        <h1 className="text-balance font-bold text-4xl tracking-tight sm:text-5xl">
+          {direction.headline}
+        </h1>
+        <p className="text-balance text-lg" style={{ color: direction.palette.muted }}>
+          {direction.subhead}
+        </p>
+        <InspirationCta direction={direction} />
+      </div>
+      <AgentSessionDemo />
+    </section>
+  </InspirationChrome>
+);
 
-export function ThreePlatformLayout({ direction }: { direction: InspirationDirection }) {
+export const SplitScreenLayout = ({ direction }: { direction: InspirationDirection }) => (
+  <InspirationChrome direction={direction}>
+    <section className="grid min-h-[80vh] lg:grid-cols-2">
+      <div className="flex flex-col justify-center gap-4 bg-neutral-200/80 p-8 lg:p-16">
+        <span className="w-fit rounded-full bg-red-500/15 px-3 py-1 font-medium text-red-700 text-xs">
+          builder alone
+        </span>
+        <ul className="space-y-2 text-sm">
+          {CHAOS_ITEMS.map((item) => (
+            <li
+              key={item}
+              className="flex items-center gap-2 text-neutral-600 line-through decoration-red-400/70"
+            >
+              <span className="text-red-500" aria-hidden={true}>
+                ✕
+              </span>
+              {item}
+            </li>
+          ))}
+        </ul>
+        <p className="text-neutral-500 text-sm">scattered chores, no operator</p>
+      </div>
+      <div
+        className="flex flex-col justify-center gap-6 p-8 lg:p-16"
+        style={{ background: `linear-gradient(135deg, ${direction.palette.accent}15, #ECFDF5)` }}
+      >
+        <h1 className="text-balance font-bold text-3xl sm:text-4xl">{direction.headline}</h1>
+        <p className="text-balance text-lg" style={{ color: direction.palette.muted }}>
+          {direction.subhead}
+        </p>
+        <ol className="space-y-3">
+          {AGENT_TIMELINE.map((step, i) => (
+            <li key={step} className="flex items-center gap-3">
+              <span
+                className="flex size-7 shrink-0 items-center justify-center rounded-full font-bold text-xs"
+                style={{ background: direction.palette.accent, color: '#fff' }}
+              >
+                {i + 1}
+              </span>
+              <span className={i === AGENT_TIMELINE.length - 1 ? 'font-semibold' : ''}>{step}</span>
+            </li>
+          ))}
+        </ol>
+        <InspirationCta direction={direction} />
+      </div>
+    </section>
+  </InspirationChrome>
+);
+
+export const ThreePlatformLayout = ({ direction }: { direction: InspirationDirection }) => {
   const [unwrapped, setUnwrapped] = useState(false);
 
   useEffect(() => {
@@ -174,9 +168,9 @@ export function ThreePlatformLayout({ direction }: { direction: InspirationDirec
       </section>
     </InspirationChrome>
   );
-}
+};
 
-export function ReceiptMorLayout({ direction }: { direction: InspirationDirection }) {
+export const ReceiptMorLayout = ({ direction }: { direction: InspirationDirection }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -231,70 +225,68 @@ export function ReceiptMorLayout({ direction }: { direction: InspirationDirectio
       </section>
     </InspirationChrome>
   );
-}
+};
 
-export function DirectorsChairLayout({ direction }: { direction: InspirationDirection }) {
-  return (
-    <InspirationChrome direction={direction}>
-      <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 py-20">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `radial-gradient(ellipse at center top, ${direction.palette.accent}33 0%, transparent 60%)`,
-          }}
-        />
-        <h1 className="relative max-w-3xl text-balance text-center font-bold text-4xl sm:text-5xl">
-          {direction.headline}
-        </h1>
+export const DirectorsChairLayout = ({ direction }: { direction: InspirationDirection }) => (
+  <InspirationChrome direction={direction}>
+    <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 py-20">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at center top, ${direction.palette.accent}33 0%, transparent 60%)`,
+        }}
+      />
+      <h1 className="relative max-w-3xl text-balance text-center font-bold text-4xl sm:text-5xl">
+        {direction.headline}
+      </h1>
+      <p
+        className="relative mt-4 max-w-xl text-balance text-center text-lg"
+        style={{ color: direction.palette.muted }}
+      >
+        {direction.subhead}
+      </p>
+      <div
+        className="relative mt-10 w-full max-w-lg rounded-xl border-2 p-6 text-start shadow-xl"
+        style={{
+          borderColor: direction.palette.accent,
+          background: `${direction.palette.accent}11`,
+        }}
+      >
         <p
-          className="relative mt-4 max-w-xl text-balance text-center text-lg"
-          style={{ color: direction.palette.muted }}
+          className="mb-1 font-mono text-xs uppercase tracking-widest"
+          style={{ color: direction.palette.accent }}
         >
-          {direction.subhead}
+          Your instruction
         </p>
-        <div
-          className="relative mt-10 w-full max-w-lg rounded-xl border-2 p-6 text-start shadow-xl"
-          style={{
-            borderColor: direction.palette.accent,
-            background: `${direction.palette.accent}11`,
-          }}
-        >
-          <p
-            className="mb-1 font-mono text-xs uppercase tracking-widest"
-            style={{ color: direction.palette.accent }}
+        <p className="text-balance font-medium text-lg">
+          &ldquo;I want a booking app for dog groomers&rdquo;
+        </p>
+      </div>
+      <div className="relative mt-8 flex w-full max-w-2xl flex-wrap justify-center gap-3">
+        {STORYBOARD_SCENES.map((scene, i) => (
+          <div
+            key={scene}
+            className="vybe-check-item flex min-w-[100px] flex-1 flex-col items-center gap-2 rounded-lg border px-4 py-3"
+            style={{
+              animationDelay: `${400 + i * 200}ms`,
+              borderColor: `${direction.palette.accent}55`,
+            }}
           >
-            Your instruction
-          </p>
-          <p className="text-balance font-medium text-lg">
-            &ldquo;I want a booking app for dog groomers&rdquo;
-          </p>
-        </div>
-        <div className="relative mt-8 flex w-full max-w-2xl flex-wrap justify-center gap-3">
-          {STORYBOARD_SCENES.map((scene, i) => (
-            <div
-              key={scene}
-              className="vybe-check-item flex min-w-[100px] flex-1 flex-col items-center gap-2 rounded-lg border px-4 py-3"
-              style={{
-                animationDelay: `${400 + i * 200}ms`,
-                borderColor: `${direction.palette.accent}55`,
-              }}
-            >
-              <span className="font-mono text-xs" style={{ color: direction.palette.accent }}>
-                Scene {i + 1}
-              </span>
-              <span className="font-medium text-sm">{scene}</span>
-            </div>
-          ))}
-        </div>
-        <div className="relative mt-10">
-          <InspirationCta direction={direction} />
-        </div>
-      </section>
-    </InspirationChrome>
-  );
-}
+            <span className="font-mono text-xs" style={{ color: direction.palette.accent }}>
+              Scene {i + 1}
+            </span>
+            <span className="font-medium text-sm">{scene}</span>
+          </div>
+        ))}
+      </div>
+      <div className="relative mt-10">
+        <InspirationCta direction={direction} />
+      </div>
+    </section>
+  </InspirationChrome>
+);
 
-export function ChecklistLayout({ direction }: { direction: InspirationDirection }) {
+export const ChecklistLayout = ({ direction }: { direction: InspirationDirection }) => {
   const [unlocked, setUnlocked] = useState(0);
 
   useEffect(() => {
@@ -363,54 +355,49 @@ export function ChecklistLayout({ direction }: { direction: InspirationDirection
       </section>
     </InspirationChrome>
   );
-}
+};
 
-export function VibeCoderLayout({ direction }: { direction: InspirationDirection }) {
-  return (
-    <InspirationChrome direction={direction}>
-      <section className="mx-auto max-w-4xl px-6 py-16 sm:py-24">
-        <p
-          className="text-balance font-bold text-3xl leading-snug sm:text-5xl"
-          style={{ color: direction.palette.fg, fontFamily: 'Georgia, serif' }}
-        >
-          &ldquo;Describe the product like a voice note.&rdquo;
-        </p>
-        <p
-          className="mt-6 max-w-xl text-balance text-lg"
-          style={{ color: direction.palette.muted }}
-        >
-          {direction.subhead}
-        </p>
-        <div
-          className="mt-10 rounded-3xl border-2 border-dashed p-8"
-          style={{ borderColor: `${direction.palette.accent}44`, background: direction.palette.bg }}
-        >
-          <h1 className="text-balance font-bold text-2xl sm:text-3xl">{direction.headline}</h1>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div
-              className="rounded-2xl rounded-bl-sm bg-white px-6 py-4 font-medium text-lg shadow-md"
-              style={{ color: direction.palette.fg }}
-            >
-              make me a booking app
-            </div>
-            <span className="hidden text-2xl sm:inline">→</span>
-            <div
-              className="rounded-full px-4 py-2 font-mono text-sm"
-              style={{ background: direction.palette.accent, color: '#fff' }}
-            >
-              yourapp.com ✓ live
-            </div>
+export const VibeCoderLayout = ({ direction }: { direction: InspirationDirection }) => (
+  <InspirationChrome direction={direction}>
+    <section className="mx-auto max-w-4xl px-6 py-16 sm:py-24">
+      <p
+        className="text-balance font-bold text-3xl leading-snug sm:text-5xl"
+        style={{ color: direction.palette.fg, fontFamily: 'Georgia, serif' }}
+      >
+        &ldquo;Describe the product like a voice note.&rdquo;
+      </p>
+      <p className="mt-6 max-w-xl text-balance text-lg" style={{ color: direction.palette.muted }}>
+        {direction.subhead}
+      </p>
+      <div
+        className="mt-10 rounded-3xl border-2 border-dashed p-8"
+        style={{ borderColor: `${direction.palette.accent}44`, background: direction.palette.bg }}
+      >
+        <h1 className="text-balance font-bold text-2xl sm:text-3xl">{direction.headline}</h1>
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div
+            className="rounded-2xl rounded-bl-sm bg-white px-6 py-4 font-medium text-lg shadow-md"
+            style={{ color: direction.palette.fg }}
+          >
+            make me a booking app
           </div>
-          <div className="mt-10">
-            <InspirationCta direction={direction} />
+          <span className="hidden text-2xl sm:inline">→</span>
+          <div
+            className="rounded-full px-4 py-2 font-mono text-sm"
+            style={{ background: direction.palette.accent, color: '#fff' }}
+          >
+            yourapp.com ✓ live
           </div>
         </div>
-      </section>
-    </InspirationChrome>
-  );
-}
+        <div className="mt-10">
+          <InspirationCta direction={direction} />
+        </div>
+      </div>
+    </section>
+  </InspirationChrome>
+);
 
-export function BeforeAfterLayout({ direction }: { direction: InspirationDirection }) {
+export const BeforeAfterLayout = ({ direction }: { direction: InspirationDirection }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(50);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -517,9 +504,9 @@ export function BeforeAfterLayout({ direction }: { direction: InspirationDirecti
       </section>
     </InspirationChrome>
   );
-}
+};
 
-export function QuietStackLayout({ direction }: { direction: InspirationDirection }) {
+export const QuietStackLayout = ({ direction }: { direction: InspirationDirection }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -582,9 +569,9 @@ export function QuietStackLayout({ direction }: { direction: InspirationDirectio
       </section>
     </InspirationChrome>
   );
-}
+};
 
-export function BoldStatementLayout({ direction }: { direction: InspirationDirection }) {
+export const BoldStatementLayout = ({ direction }: { direction: InspirationDirection }) => {
   const [verbIndex, setVerbIndex] = useState(0);
 
   useEffect(() => {
@@ -630,4 +617,4 @@ export function BoldStatementLayout({ direction }: { direction: InspirationDirec
       </section>
     </InspirationChrome>
   );
-}
+};

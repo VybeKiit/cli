@@ -22,43 +22,53 @@ const MIRROR_ORG = 'VybeKiit';
  * @property clone - downloads a template mirror into a target dir (see {@link cloneMirror})
  * @property exists - true when a path is present on disk (the monorepo-local probe)
  */
-export interface ResolveDeps {
+export type ResolveDeps = {
   readonly clone: (template: TemplateName, targetDir: string) => Promise<void>;
   readonly exists: (path: string) => Promise<boolean>;
-}
+};
 
 /** A resolved template source directory plus an optional teardown for any temp clone. */
-export interface ResolvedSource {
+export type ResolvedSource = {
   /** Directory whose `<template>/` subdir holds the template files (what `scaffold` joins onto). */
   readonly source: string;
   /** Removes any temp clone created for a published install; absent for in-place sources. */
   readonly cleanup?: () => Promise<void>;
-}
+};
 
-/** True when a path exists on disk — the default monorepo-local probe for {@link ResolveDeps}. */
-async function pathExists(path: string): Promise<boolean> {
+/**
+ * Check whether a path exists on disk.
+ *
+ * @param path - Absolute or relative path to probe.
+ * @returns True when the path is accessible.
+ * @example
+ * await pathExists('/tmp/vybekiit/templates/web');
+ */
+const pathExists = async (path: string): Promise<boolean> => {
   try {
     await access(path);
     return true;
   } catch {
     return false;
   }
-}
+};
 
 /**
  * Download a private template mirror (`VybeKiit/<template>`) into `targetDir` via `gh`.
  *
  * The published CLI ships no template files (the gate keeps the proprietary templates
- * off public npm — ADR-0005), so a real install clones the matching mirror using the
+ * off public npm, so a real install clones the matching mirror using the
  * buyer's `gh` device-flow token. The clone is shallow and tag-free; it lands at the
  * mirror's ROOT, so callers pass `<temp>/<template>` to keep `scaffold`'s
  * `join(source, template)` shape intact. A failure is almost always "not signed in",
- * so it's rethrown as a {@link ScaffoldError} naming the one fix — never raw stderr.
+ * so it's rethrown as a {@link ScaffoldError} naming the one fix, never raw stderr.
  *
- * @param template - which template mirror to clone
- * @param targetDir - directory `gh` clones into (must not already exist)
+ * @param template - Template mirror to clone.
+ * @param targetDir - Directory `gh` clones into, which must not already exist.
+ * @returns Promise that resolves after the mirror is cloned.
+ * @example
+ * await cloneMirror('web', '/tmp/vybekiit-web');
  */
-export async function cloneMirror(template: TemplateName, targetDir: string): Promise<void> {
+export const cloneMirror = async (template: TemplateName, targetDir: string): Promise<void> => {
   try {
     await execFileAsync('gh', [
       'repo',
@@ -70,34 +80,38 @@ export async function cloneMirror(template: TemplateName, targetDir: string): Pr
       '1',
       '--no-tags',
     ]);
-  } catch {
+  } catch (error) {
     throw new ScaffoldError(
-      `Couldn't download the ${template} template. Make sure your assistant is signed in to GitHub — run: gh auth login --web`,
+      `Couldn't download the ${template} template. Make sure your assistant is signed in to GitHub: run gh auth login --web`,
+      { cause: error },
     );
   }
-}
+};
 
 /**
  * Locate the template source for one template, in ADR-0005 order:
  *
- * 1. `VYBEKIIT_TEMPLATES_DIR` set → that dir (dev/CI override), no cleanup.
- * 2. Else the monorepo-local `templates/` dir if it actually holds the template → it,
+ * 1. `VYBEKIIT_TEMPLATES_DIR` set: that dir (dev/CI override), no cleanup.
+ * 2. Else the monorepo-local `templates/` dir if it actually holds the template: it,
  *    no cleanup (the contributor's working copy).
- * 3. Else (a published install with no bundled templates) → clone the matching private
+ * 3. Else (a published install with no bundled templates): clone the matching private
  *    mirror into a temp dir and return that, with a `cleanup` that removes it.
  *
- * Deps are injected so all three branches — including the clone and its failure — are
+ * Deps are injected so all three branches, including the clone and its failure, are
  * testable without touching the network.
  *
- * @param template - the template being scaffolded
- * @param deps - injectable clone + existence seams (defaults use real `gh` + `fs`)
+ * @param template - Template being scaffolded.
+ * @param deps - Injectable clone and existence seams.
+ * @returns Resolved source root plus cleanup when a temp clone was created.
+ * @example
+ * const source = await resolveTemplatesSource('web');
  */
-export async function resolveTemplatesSource(
+export const resolveTemplatesSource = async (
   template: TemplateName,
   deps: ResolveDeps = { clone: cloneMirror, exists: pathExists },
-): Promise<ResolvedSource> {
+): Promise<ResolvedSource> => {
   const override = process.env.VYBEKIIT_TEMPLATES_DIR;
-  if (override) {
+  if (override !== undefined && override !== '') {
     return { source: override };
   }
 
@@ -114,4 +128,4 @@ export async function resolveTemplatesSource(
     throw error;
   }
   return { source: tempRoot, cleanup: () => rm(tempRoot, { recursive: true, force: true }) };
-}
+};

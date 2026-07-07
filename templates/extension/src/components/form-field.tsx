@@ -3,12 +3,20 @@ import { cn } from '@/lib/utils';
 import type { InputHTMLAttributes } from 'react';
 
 export interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  id: string;
-  error?: string;
+  readonly label: string;
+  readonly id: string;
+  readonly error?: string;
 }
 
-export function FormField({ label, id, error = '', className, ...props }: FormFieldProps) {
+/**
+ * Render a labeled input with inline validation text.
+ *
+ * @param props - Native input props plus label and optional error message.
+ * @returns A form field with accessible error wiring.
+ * @example
+ * <FormField id="email" label="Email" value={email} />
+ */
+export const FormField = ({ label, id, error = '', className, ...props }: FormFieldProps) => {
   const errorId = `${id}-error`;
   return (
     <div className="flex flex-col gap-1.5">
@@ -29,4 +37,4 @@ export function FormField({ label, id, error = '', className, ...props }: FormFi
       ) : null}
     </div>
   );
-}
+};

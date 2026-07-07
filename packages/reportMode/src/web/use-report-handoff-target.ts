@@ -7,30 +7,26 @@ import {
   type ReportHandoffTarget,
   saveReportHandoffTarget,
 } from '../handoffTarget';
+import { resolveBrowserStorage } from './browserStorage';
 
-function browserStorage(): Storage | null {
-  if (typeof globalThis.localStorage === 'undefined') {
-    return null;
-  }
-  try {
-    return globalThis.localStorage;
-  } catch {
-    return null;
-  }
-}
-
-/** Persisted choice: paste into the open chat vs open a new assistant chat. */
-export function useReportHandoffTarget() {
+/**
+ * Manage the persisted Report Mode handoff target.
+ *
+ * @returns Current target and setter that persists the next target.
+ * @example
+ * const { target, setTarget } = useReportHandoffTarget();
+ */
+export const useReportHandoffTarget = () => {
   const [target, setTargetState] = useState<ReportHandoffTarget>(DEFAULT_REPORT_HANDOFF_TARGET);
 
   useEffect(() => {
-    setTargetState(loadReportHandoffTarget(browserStorage()));
+    setTargetState(loadReportHandoffTarget(resolveBrowserStorage()));
   }, []);
 
   const setTarget = useCallback((next: ReportHandoffTarget) => {
     setTargetState(next);
-    saveReportHandoffTarget(browserStorage(), next);
+    saveReportHandoffTarget(resolveBrowserStorage(), next);
   }, []);
 
   return { target, setTarget };
-}
+};

@@ -1,8 +1,3 @@
-export { resolveSearchProvider } from './resolve';
-export type {
-  SearchDocument,
-  SearchHit,
-  SearchProvider,
-  SearchProviderName,
-} from './types';
-export { SearchError } from './types';
+export * from './config';
+export * from './resolve';
+export * from './types';

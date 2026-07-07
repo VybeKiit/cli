@@ -69,6 +69,14 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue | null>(null);
 
+/**
+ * Render the Form Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Form Item component.
+ * @example
+ * <FormItem />;
+ */
 const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     const id = React.useId();
@@ -82,6 +90,14 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 );
 FormItem.displayName = 'FormItem';
 
+/**
+ * Render the Form Label component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Form Label component.
+ * @example
+ * <FormLabel />;
+ */
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -99,6 +115,14 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = 'FormLabel';
 
+/**
+ * Render the Form Control component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Form Control component.
+ * @example
+ * <FormControl />;
+ */
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -110,13 +134,21 @@ const FormControl = React.forwardRef<
       ref={ref}
       id={formItemId}
       aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
-      aria-invalid={!!error}
+      aria-invalid={Boolean(error)}
       {...props}
     />
   );
 });
 FormControl.displayName = 'FormControl';
 
+/**
+ * Render the Form Description component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Form Description component.
+ * @example
+ * <FormDescription />;
+ */
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -134,12 +166,23 @@ const FormDescription = React.forwardRef<
 });
 FormDescription.displayName = 'FormDescription';
 
+/**
+ * Render the Form Message component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Form Message component.
+ * @example
+ * <FormMessage />;
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? '') : children;
+  let body = children;
+  if (error) {
+    body = error.message === undefined ? '' : String(error.message);
+  }
 
   if (!body) {
     return null;
@@ -149,7 +192,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn('text-[0.8rem] font-medium text-destructive', className)}
+      className={cn('font-medium text-[0.8rem] text-destructive', className)}
       {...props}
     >
       {body}

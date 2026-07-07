@@ -1,5 +1,6 @@
 'use client';
 
+import { Effect, Either } from 'effect';
 import { type FormEvent, useState } from 'react';
 import { FormField } from '@/components/form-field';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -29,24 +30,26 @@ const NO_FIELD_ERRORS: FieldErrors = { githubUsername: '', email: '' };
  * redirects to the hosted checkout; on failure it shows a visible error and keeps
  * the form usable. The GitHub username is collected here because the gate invites
  * that exact account once payment clears — there is no account system of our own.
+ *
+ * @returns The checkout form React element.
+ * @example
+ * <CheckoutForm />
  */
-export function CheckoutForm() {
+const CheckoutForm = () => {
   const [githubUsername, setGithubUsername] = useState('');
   const [email, setEmail] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(NO_FIELD_ERRORS);
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  function validate(): FieldErrors {
-    return {
-      githubUsername: isValidGithubUsername(githubUsername)
-        ? ''
-        : 'Enter a valid GitHub username (letters, numbers, single hyphens).',
-      email: isValidEmail(email) ? '' : 'Enter a valid email address.',
-    };
-  }
+  const validate = (): FieldErrors => ({
+    githubUsername: isValidGithubUsername(githubUsername)
+      ? ''
+      : 'Enter a valid GitHub username (letters, numbers, single hyphens).',
+    email: isValidEmail(email) ? '' : 'Enter a valid email address.',
+  });
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setSubmitError('');
 
@@ -57,15 +60,17 @@ export function CheckoutForm() {
     }
 
     setSubmitting(true);
-    const result = await postJson<CheckoutResponse>('/api/checkout', { githubUsername, email });
-    if (result.ok) {
+    const result = await Effect.runPromise(
+      Effect.either(postJson<CheckoutResponse>('/api/checkout', { githubUsername, email })),
+    );
+    if (Either.isRight(result)) {
       // Leave `submitting` true: we are navigating away to the hosted checkout.
-      window.location.assign(result.value.url);
+      window.location.assign(result.right.url);
       return;
     }
-    setSubmitError(result.error.message);
+    setSubmitError(result.left.message);
     setSubmitting(false);
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} noValidate={true} className="flex flex-col gap-5">
@@ -102,4 +107,6 @@ export function CheckoutForm() {
       </p>
     </form>
   );
-}
+};
+
+export { CheckoutForm };

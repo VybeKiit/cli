@@ -9,7 +9,7 @@ describe('i18n', () => {
   });
 
   it('documents expected Chrome message keys in _locales/en/messages.json', async () => {
-    const messages = (await import('../../public/_locales/en/messages.json')).default as Record<
+    const messages = (await import('../../../public/_locales/en/messages.json')).default as Record<
       string,
       { message: string }
     >;

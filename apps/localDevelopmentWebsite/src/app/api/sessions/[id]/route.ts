@@ -1,31 +1,47 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { NextResponse } from 'next/server';
 
 const KIRO_SESSIONS_DIR = join(homedir(), '.kiro', 'sessions', 'cli');
 
-export interface KiroMessage {
-  role: string;
-  content: string;
-  timestamp?: string | undefined;
-}
+/** Message row loaded from a Kiro session file. */
+export type KiroMessage = {
+  readonly role: string;
+  readonly content: string;
+  readonly timestamp?: string | undefined;
+};
 
-export interface KiroSessionDetail {
-  session_id: string;
-  title: string;
-  cwd: string;
-  messages: KiroMessage[];
-  created_at: string;
-  updated_at: string;
-}
+/** Hydrated Kiro session response returned by the session detail route. */
+export type KiroSessionDetail = {
+  readonly session_id: string;
+  readonly title: string;
+  readonly cwd: string;
+  readonly messages: KiroMessage[];
+  readonly created_at: string;
+  readonly updated_at: string;
+};
+
+const valueText = (data: Record<string, unknown>, key: string, defaultValue: string): string => {
+  const value = data[key];
+  if (value === undefined || value === null) {
+    return defaultValue;
+  }
+  return String(value);
+};
 
 /**
  * Fetch a single session by ID. Currently supports Kiro sessions.
  * Returns messages hydrated from the filesystem JSON.
+ *
+ * @param _request - Incoming Next.js request.
+ * @param context - Route params containing the session id.
+ * @returns JSON response with the hydrated Kiro session detail.
+ * @example
+ * const response = await GET(request, { params: Promise.resolve({ id: 'abc' }) });
  */
-export const GET = async (_request: Request, { params }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params;
+export const GET = async (_request: Request, context: { params: Promise<{ id: string }> }) => {
+  const { id } = await context.params;
 
   try {
     const raw = await readFile(join(KIRO_SESSIONS_DIR, `${id}.json`), 'utf-8');
@@ -34,24 +50,22 @@ export const GET = async (_request: Request, { params }: { params: Promise<{ id:
     const messages: KiroMessage[] = [];
     if (Array.isArray(data.messages)) {
       for (const m of data.messages as Array<Record<string, unknown>>) {
-        const km: KiroMessage = {
-          role: String(m.role ?? 'agent'),
-          content: String(m.content ?? ''),
+        const message: KiroMessage = {
+          role: valueText(m, 'role', 'agent'),
+          content: valueText(m, 'content', ''),
+          ...(m.timestamp ? { timestamp: String(m.timestamp) } : {}),
         };
-        if (m.timestamp) {
-          km.timestamp = String(m.timestamp);
-        }
-        messages.push(km);
+        messages.push(message);
       }
     }
 
     const detail: KiroSessionDetail = {
-      session_id: String(data.session_id ?? id),
-      title: String(data.title ?? '(untitled)').slice(0, 120),
-      cwd: String(data.cwd ?? ''),
+      session_id: valueText(data, 'session_id', id),
+      title: valueText(data, 'title', '(untitled)').slice(0, 120),
+      cwd: valueText(data, 'cwd', ''),
       messages,
-      created_at: String(data.created_at ?? ''),
-      updated_at: String(data.updated_at ?? ''),
+      created_at: valueText(data, 'created_at', ''),
+      updated_at: valueText(data, 'updated_at', ''),
     };
 
     return NextResponse.json(detail);

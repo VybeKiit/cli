@@ -2,6 +2,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Table component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table component.
+ * @example
+ * <Table />;
+ */
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className="relative w-full overflow-auto">
@@ -11,6 +19,14 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
 );
 Table.displayName = 'Table';
 
+/**
+ * Render the Table Header component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Header component.
+ * @example
+ * <TableHeader />;
+ */
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
@@ -19,6 +35,14 @@ const TableHeader = React.forwardRef<
 ));
 TableHeader.displayName = 'TableHeader';
 
+/**
+ * Render the Table Body component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Body component.
+ * @example
+ * <TableBody />;
+ */
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
@@ -27,6 +51,14 @@ const TableBody = React.forwardRef<
 ));
 TableBody.displayName = 'TableBody';
 
+/**
+ * Render the Table Footer component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Footer component.
+ * @example
+ * <TableFooter />;
+ */
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
@@ -39,6 +71,14 @@ const TableFooter = React.forwardRef<
 ));
 TableFooter.displayName = 'TableFooter';
 
+/**
+ * Render the Table Row component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Row component.
+ * @example
+ * <TableRow />;
+ */
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
     <tr
@@ -53,6 +93,14 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
 );
 TableRow.displayName = 'TableRow';
 
+/**
+ * Render the Table Head component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Head component.
+ * @example
+ * <TableHead />;
+ */
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
@@ -68,6 +116,14 @@ const TableHead = React.forwardRef<
 ));
 TableHead.displayName = 'TableHead';
 
+/**
+ * Render the Table Cell component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Cell component.
+ * @example
+ * <TableCell />;
+ */
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
@@ -83,11 +139,19 @@ const TableCell = React.forwardRef<
 ));
 TableCell.displayName = 'TableCell';
 
+/**
+ * Render the Table Caption component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Table Caption component.
+ * @example
+ * <TableCaption />;
+ */
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
-  <caption ref={ref} className={cn('mt-4 text-sm text-muted-foreground', className)} {...props} />
+  <caption ref={ref} className={cn('mt-4 text-muted-foreground text-sm', className)} {...props} />
 ));
 TableCaption.displayName = 'TableCaption';
 

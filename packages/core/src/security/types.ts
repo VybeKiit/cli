@@ -1,3 +1,5 @@
+import type { RouteTier } from './routes';
+
 /**
  * Shared shapes for `@vybekiit/security`.
  *
@@ -17,14 +19,14 @@
  * in practice). `originHeader` is intentionally `string | null` because browsers omit
  * `Origin` on same-origin GETs and top-level navigations.
  */
-export interface SecurityRequest {
+export type SecurityRequest = {
   readonly method: string;
   readonly originHeader: string | null;
   readonly appOrigin: string;
   readonly clientId: string;
   /** API path for tiered limits (e.g. `/api/auth/signin`). Optional for backward compat. */
   readonly path?: string;
-}
+};
 
 /**
  * The guard's decision. `allowed: true` means let the request through. A block carries
@@ -40,15 +42,13 @@ export type SecurityVerdict =
       readonly retryAfterSeconds?: number;
     };
 
-import type { RouteTier } from './routes';
-
 /**
  * The resolved, normalized security policy — the env SSOT turned into typed values the
  * engine acts on. Produced by {@link resolveSecurityPolicy} from the core
  * `securityConfigSchema`; `allowedOrigins` is the parsed CSV (already lowercased and
  * de-blanked), so the hot path never re-parses strings.
  */
-export interface SecurityPolicy {
+export type SecurityPolicy = {
   readonly rateLimit: {
     readonly enabled: boolean;
     readonly windowSeconds: number;
@@ -60,4 +60,4 @@ export interface SecurityPolicy {
     /** Extra origins allowed past the same-origin check, beyond the app's own origin. */
     readonly allowedOrigins: readonly string[];
   };
-}
+};

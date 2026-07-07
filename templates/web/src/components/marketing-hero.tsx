@@ -7,10 +7,13 @@ import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
 /**
- * Normalized marketing hero — Magic UI–inspired gradient frame, built from kit
- * primitives only (ui-consistency contract). One effect block per page.
+ * Render the localized marketing hero.
+ *
+ * @returns The public home-page hero section.
+ * @example
+ * <MarketingHero />
  */
-export function MarketingHero() {
+const MarketingHero = () => {
   const t = useTranslations();
 
   return (
@@ -37,4 +40,6 @@ export function MarketingHero() {
       </Card>
     </section>
   );
-}
+};
+
+export { MarketingHero };

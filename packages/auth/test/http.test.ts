@@ -5,16 +5,16 @@ import type { AuthProvider } from '@vybekiit/auth/types';
 import { Effect } from 'effect';
 import { describe, expect, it, vi } from 'vitest';
 
-function deps(overrides: Partial<AuthHttpDeps> & { provider: AuthProvider }): AuthHttpDeps {
+const deps = (overrides: Partial<AuthHttpDeps> & { provider: AuthProvider }): AuthHttpDeps => {
   const sessionToken = { current: null as string | null };
   return {
-    resolveAuth: () => overrides.provider,
+    resolveAuth: () => Effect.succeed(overrides.provider),
     session: {
-      setSession: async (token: string) => {
+      setSession: (token: string) => {
         sessionToken.current = token;
       },
-      readSession: async () => sessionToken.current,
-      clearSession: async () => {
+      readSession: () => sessionToken.current,
+      clearSession: () => {
         sessionToken.current = null;
       },
       ...overrides.session,
@@ -26,7 +26,7 @@ function deps(overrides: Partial<AuthHttpDeps> & { provider: AuthProvider }): Au
       ...overrides.telemetry,
     },
   };
-}
+};
 
 describe('auth http handlers', () => {
   it('handleSignIn persists sessionToken and returns user only', async () => {
@@ -55,9 +55,9 @@ describe('auth http handlers', () => {
     const httpDeps = deps({
       provider,
       session: {
-        setSession: async () => {},
-        readSession: async () => LOCAL_DEV_SESSION_TOKEN,
-        clearSession: async () => {},
+        setSession: () => undefined,
+        readSession: () => LOCAL_DEV_SESSION_TOKEN,
+        clearSession: () => undefined,
       },
     });
 

@@ -20,22 +20,39 @@ export type Result<T, E = VybeKiitError> =
  * `code` is a stable, machine-readable discriminant (skills branch on it to pick
  * the right plain-language message); `message` is the developer-facing detail.
  */
-export interface VybeKiitError {
+export type VybeKiitError = {
   readonly code: string;
   readonly message: string;
-}
+};
 
-/** Wrap a success value in a {@link Result}. */
-export function ok<T>(value: T): Result<T, never> {
-  return { ok: true, value };
-}
+/**
+ * Wrap a success value in a {@link Result}.
+ *
+ * @param value - Success payload to expose on the `value` branch.
+ * @returns A successful Result.
+ * @example
+ * const result = ok({ id: 'order_1' });
+ */
+export const ok = <T>(value: T): Result<T, never> => ({ ok: true, value });
 
-/** Wrap a failure in a {@link Result}. */
-export function err<E = VybeKiitError>(error: E): Result<never, E> {
-  return { ok: false, error };
-}
+/**
+ * Wrap a failure payload in a {@link Result}.
+ *
+ * @param error - Failure payload to expose on the `error` branch.
+ * @returns A failed Result.
+ * @example
+ * const result = err({ code: 'not_found', message: 'Order not found.' });
+ */
+export const err = <E = VybeKiitError>(error: E): Result<never, E> => ({ ok: false, error });
 
-/** Build a {@link VybeKiitError}-shaped failure from a stable code + message. */
-export function fail(code: string, message: string): Result<never, VybeKiitError> {
-  return err({ code, message });
-}
+/**
+ * Build a {@link VybeKiitError}-shaped failure from a stable code and message.
+ *
+ * @param code - Machine-readable code agents can branch on.
+ * @param message - Developer-facing failure detail.
+ * @returns A failed Result with the standard VybeKiit error shape.
+ * @example
+ * const result = fail('unauthorized', 'Sign in first.');
+ */
+export const fail = (code: string, message: string): Result<never, VybeKiitError> =>
+  err({ code, message });

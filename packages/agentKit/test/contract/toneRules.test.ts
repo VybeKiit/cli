@@ -1,4 +1,4 @@
-import { renderToneSection, TONE_RULES } from '@vybekiit/agentKit/contract/toneRules';
+import { renderToneSection, TONE_RULES } from '@vybekiit/agent-kit/contract/toneRules';
 import { describe, expect, it } from 'vitest';
 
 describe('renderToneSection', () => {

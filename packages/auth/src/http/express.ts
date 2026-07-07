@@ -1,5 +1,6 @@
-import { decodeJsonBody } from '@vybekiit/core/http';
+import { decodeJsonBody, type JsonBodyResult } from '@vybekiit/core/http';
 import { sendHttpResponse } from '@vybekiit/core/http/express';
+import type { Schema } from 'effect';
 import type { Request, Response, Router } from 'express';
 import { Router as createRouter } from 'express';
 import type { AuthHttpDeps } from './handlers';
@@ -38,20 +39,24 @@ export type {
 
 type ExpressDeps = AuthHttpDeps | ((req: Request, res: Response) => AuthHttpDeps);
 
-function resolveDeps(deps: ExpressDeps, req: Request, res: Response): AuthHttpDeps {
-  return typeof deps === 'function' ? deps(req, res) : deps;
-}
+const resolveDeps = (deps: ExpressDeps, req: Request, res: Response): AuthHttpDeps =>
+  typeof deps === 'function' ? deps(req, res) : deps;
 
-function parseBody<A, I>(
+const parseBody = <A, I>(
   raw: unknown,
-  schema: import('effect').Schema.Schema<A, I, never>,
+  schema: Schema.Schema<A, I, never>,
   invalidMessage: string,
-) {
-  return decodeJsonBody(raw, schema, invalidMessage);
-}
+): JsonBodyResult<A> => decodeJsonBody(raw, schema, invalidMessage);
 
-/** Mount on `/api/auth` — replaces duplicated Express auth controllers. */
-export function createExpressAuthRouter(deps: ExpressDeps): Router {
+/**
+ * Create an Express router for the shared auth HTTP routes.
+ *
+ * @param deps - Static or per-request auth HTTP dependencies.
+ * @returns An Express router mounted by the backend template.
+ * @example
+ * const router = createExpressAuthRouter(createBackendAuthHttpDeps);
+ */
+export const createExpressAuthRouter = (deps: ExpressDeps): Router => {
   const router = createRouter();
 
   router.post('/signup', async (req, res) => {
@@ -142,4 +147,4 @@ export function createExpressAuthRouter(deps: ExpressDeps): Router {
   });
 
   return router;
-}
+};

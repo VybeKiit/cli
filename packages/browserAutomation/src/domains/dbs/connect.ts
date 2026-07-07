@@ -1,21 +1,31 @@
-import { connectToChrome } from '@vybekiit/browserAutomation/core/connect';
+import { connectToChrome } from '@vybekiit/browser-automation/core/connect';
 import {
   rememberProfilePath,
   resolveProfilePath,
-} from '@vybekiit/browserAutomation/core/profileResolve';
-import type { AttachedSession } from '@vybekiit/browserAutomation/core/types';
+} from '@vybekiit/browser-automation/core/profileResolve';
+import type { AttachedSession } from '@vybekiit/browser-automation/core/types';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import { waitForSupabaseAuthenticated } from './dashboard/waitForAuthenticated';
 import { SUPABASE_DASHBOARD_URL, type SupabaseVerbContext } from './types';
 
-export interface ConnectToSupabaseChromeOptions {
+export type ConnectToSupabaseChromeOptions = {
   /** When true (default), pause on login until the dashboard is reachable. */
   waitForAuth?: boolean;
-}
+};
 
-export async function connectToSupabaseChrome(
+/**
+ * Connect To Supabase Chrome.
+ *
+ * @param ctx - Shared verb context for automation side effects.
+ * @param options - Operation options.
+ * @returns Promise resolving with an attached browser session.
+ * @example
+ * const result = await connectToSupabaseChrome(ctx, options);
+ */
+export const connectToSupabaseChrome = async (
   ctx: SupabaseVerbContext,
   options: ConnectToSupabaseChromeOptions = {},
-): Promise<AttachedSession> {
+): Promise<AttachedSession> => {
   const waitForAuth = options.waitForAuth !== false;
   const profilePath = await resolveProfilePath('supabase', ctx.profilePath);
   await rememberProfilePath('supabase', profilePath);
@@ -29,9 +39,9 @@ export async function connectToSupabaseChrome(
   if (waitForAuth) {
     session.page = await waitForSupabaseAuthenticated(
       session.page,
-      ctx.log ?? console,
+      resolveVerbLogger(ctx),
       session.context,
     );
   }
   return session;
-}
+};

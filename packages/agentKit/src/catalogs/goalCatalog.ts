@@ -3,13 +3,14 @@
  * Source of truth for {@link planGoalRouting} and {@link checkGoalDrift}.
  */
 
+// biome-ignore lint/style/noExcessiveLinesPerFile: Goal catalog is the routing SSOT and stays within CODE-STYLE's catalog-size target.
 export type TemplateId = 'web' | 'mobile' | 'extension' | 'backend' | 'spa';
 
-export interface GoalCatalogEntry {
+export type GoalCatalogEntry = {
   readonly id: string;
   readonly phrases: readonly string[];
   readonly skills: Readonly<Record<TemplateId, string | null>>;
-}
+};
 
 export const GOAL_ENTRIES: readonly GoalCatalogEntry[] = [
   {

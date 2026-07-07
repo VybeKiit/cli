@@ -1,10 +1,11 @@
-import { connectToCwsChrome } from '@vybekiit/browserAutomation/domains/extension/connect';
-import { MissingItemIdError } from '@vybekiit/browserAutomation/domains/extension/errors';
-import type { VerbContext } from '@vybekiit/browserAutomation/domains/extension/types';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToCwsChrome } from '@vybekiit/browser-automation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browser-automation/domains/extension/errors';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
 import {
   discoverDeveloperGroupId,
   packageUrl,
-} from '@vybekiit/browserAutomation/domains/extension/urls';
+} from '@vybekiit/browser-automation/domains/extension/urls';
 
 /**
  * One row of the published-versions table. Captures version string,
@@ -12,9 +13,9 @@ import {
  * (live, rolled back, in review).
  */
 export type CwsVersionRow = {
-  publishedAt: string;
-  status: string;
-  version: string;
+  readonly publishedAt: string;
+  readonly status: string;
+  readonly version: string;
 };
 
 /**
@@ -28,15 +29,20 @@ export type CwsVersionRow = {
  * with empty cells are filtered out so chrome on the page (e.g. headers,
  * info icons) doesn't pollute the result. Returns `[]` when the table
  * isn't present (a brand-new item with no published versions).
+ *
+ * @param ctx - Extension automation context with repo paths, auth state, and logging.
+ * @returns Published package version rows in page-rendered order.
+ * @example
+ * const rows = await readVersionHistory(ctx);
  */
-export async function readVersionHistory(ctx: VerbContext): Promise<CwsVersionRow[]> {
+export const readVersionHistory = async (ctx: VerbContext): Promise<CwsVersionRow[]> => {
   if (!ctx.extension.chromeWebStoreId) {
     throw new MissingItemIdError(ctx.extension.key, 'readVersionHistory');
   }
 
   const session = await connectToCwsChrome(ctx);
   try {
-    const log = ctx.log ?? console;
+    const log = resolveVerbLogger(ctx);
     log.log(`[cws] reading version history for ${ctx.extension.name}`);
 
     const groupId = await discoverDeveloperGroupId(session.page);
@@ -50,13 +56,14 @@ export async function readVersionHistory(ctx: VerbContext): Promise<CwsVersionRo
         const out = [];
         for (const status of ['Draft', 'Published']) {
           const start = lines.findIndex((line) => line.toLowerCase() === status.toLowerCase());
-          if (start === -1) continue;
-          const rest = lines.slice(start + 1);
-          const end = rest.findIndex((line) => ['Draft', 'Published'].some((candidate) => candidate.toLowerCase() === line.toLowerCase()));
-          const section = end === -1 ? rest : rest.slice(0, end);
-          const versionLine = section.find((line) => /^Version\\s+\\d+\\.\\d+\\.\\d+$/i.test(line));
-          const version = versionLine?.match(/(\\d+\\.\\d+\\.\\d+)/)?.[1];
-          if (version) out.push({ version, publishedAt: '', status });
+          if (start !== -1) {
+            const rest = lines.slice(start + 1);
+            const end = rest.findIndex((line) => ['Draft', 'Published'].some((candidate) => candidate.toLowerCase() === line.toLowerCase()));
+            const section = end === -1 ? rest : rest.slice(0, end);
+            const versionLine = section.find((line) => /^Version\\s+\\d+\\.\\d+\\.\\d+$/i.test(line));
+            const version = versionLine?.match(/(\\d+\\.\\d+\\.\\d+)/)?.[1];
+            if (version) out.push({ version, publishedAt: '', status });
+          }
         }
         return out;
       };
@@ -66,13 +73,13 @@ export async function readVersionHistory(ctx: VerbContext): Promise<CwsVersionRo
       const out = [];
       for (const row of Array.from(document.querySelectorAll('table tbody tr'))) {
         const cells = Array.from(row.querySelectorAll('td')).map((c) => text(c));
-        if (cells.length < 2) continue;
-        if (!cells.some(Boolean)) continue;
-        out.push({
-          version: cells[0] || '',
-          publishedAt: cells[1] || '',
-          status: cells[2] || cells[cells.length - 1] || '',
-        });
+        if (cells.length >= 2 && cells.some(Boolean)) {
+          out.push({
+            version: cells[0] || '',
+            publishedAt: cells[1] || '',
+            status: cells[2] || cells[cells.length - 1] || '',
+          });
+        }
       }
       return out;
     })()`)) as CwsVersionRow[];
@@ -81,4 +88,4 @@ export async function readVersionHistory(ctx: VerbContext): Promise<CwsVersionRo
   } finally {
     await session.dispose();
   }
-}
+};

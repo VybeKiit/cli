@@ -5,8 +5,17 @@ import { resolveVybeAssistant, shouldShowReportMode } from '@vybekiit/report-mod
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
-/** Dev-only Report Mode for landing QA — structured prompts back to your assistant. */
-export function ReportModeDevShell() {
+/**
+ * Dev-only Report Mode for landing QA — structured prompts back to your assistant.
+ *
+ * @returns The rendered ReportModeDevShell element.
+ * @example
+ * ```tsx
+ * <ReportModeDevShell />
+ * ```
+ */
+
+export const ReportModeDevShell = () => {
   if (!shouldShowReportMode(process.env)) {
     return null;
   }
@@ -20,4 +29,4 @@ export function ReportModeDevShell() {
       <ReportModeDev assistant={assistant} projectRoot={projectRoot} />
     </TooltipProvider>
   );
-}
+};

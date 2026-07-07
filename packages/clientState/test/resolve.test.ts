@@ -1,6 +1,6 @@
-import { defaultQueryOptions } from '@vybekiit/clientState/query/client';
+import { defaultQueryOptions } from '@vybekiit/client-state/query/client';
 
-import { resolveClientState } from '@vybekiit/clientState/resolve';
+import { resolveClientState } from '@vybekiit/client-state/resolve';
 import { describe, expect, it } from 'vitest';
 
 describe('resolveClientState', () => {
@@ -26,7 +26,7 @@ describe('resolveClientState', () => {
   });
 });
 
-describe('defaultQueryOptions', () => {
+describe('query defaults', () => {
   it('is stable across surfaces', () => {
     expect(defaultQueryOptions.queries.retry).toBe(1);
     expect(defaultQueryOptions.queries.refetchOnWindowFocus).toBe(true);

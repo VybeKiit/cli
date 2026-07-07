@@ -1,7 +1,7 @@
 import {
   CWS_ALL_REGIONS,
   isCwsAllRegions,
-} from '@vybekiit/browserAutomation/domains/extension/regions';
+} from '@vybekiit/browser-automation/domains/extension/regions';
 import { describe, expect, it } from 'vitest';
 
 describe('CWS regions', () => {

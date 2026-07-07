@@ -673,7 +673,7 @@ async function ensureVybeKiitMascotDemo(name, demoFile) {
       demoFile,
       `'use client';
 
-export { default } from '@/components/builder-assistant-mark/BuilderAssistantMarkShowcase';
+export { BuilderAssistantMarkShowcase } from '@/components/builder-assistant-mark/BuilderAssistantMarkShowcase';
 `,
       'utf8',
     );
@@ -689,13 +689,18 @@ export { default } from '@/components/builder-assistant-mark/BuilderAssistantMar
 
 import { BuilderAssistantMark } from '@/components/builder-assistant-mark';
 
-export default function ${previewName}() {
-  return (
-    <div className="flex min-h-[280px] items-center justify-center bg-muted/20 p-10">
-      <BuilderAssistantMark assistant="${assistant}" size="xxl" />
-    </div>
-  );
-}
+/**
+ * Renders the ${assistant} assistant mark preview.
+ *
+ * @returns The rendered assistant mark preview.
+ * @example
+ * <${previewName} />
+ */
+export const ${previewName} = () => (
+  <div className="flex min-h-[280px] items-center justify-center bg-muted/20 p-10">
+    <BuilderAssistantMark assistant="${assistant}" size="xxl" />
+  </div>
+);
 `,
       'utf8',
     );
@@ -1467,7 +1472,10 @@ export interface CatalogEntry {
   portable?: boolean;
 }
 
-export const CATALOG_ENTRIES: CatalogEntry[] = ${JSON.stringify(entries, null, 2)} as CatalogEntry[];
+// Emitted via JSON.parse so tsc doesn't compute a giant union over every literal entry.
+export const CATALOG_ENTRIES: CatalogEntry[] = JSON.parse(
+  ${JSON.stringify(JSON.stringify(entries))},
+) as CatalogEntry[];
 
 export const CATALOG_BY_KEY: Record<string, CatalogEntry> = Object.fromEntries(
   CATALOG_ENTRIES.map((e) => [e.previewKey, e]),
@@ -1535,7 +1543,17 @@ export const CATALOG_NAMESPACES: readonly string[] = ${JSON.stringify(namespaces
 // @ts-nocheck
 import type { CatalogEntry } from '@library/data/catalog';
 
-export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<string, unknown>> {
+/**
+ * Dynamically imports the preview module for a catalog entry.
+ *
+ * @param entry - Catalog entry to load.
+ * @returns The imported preview module.
+ * @example
+ * const mod = await loadPreviewModule(entry);
+ */
+export const loadPreviewModule = async (
+  entry: CatalogEntry,
+): Promise<Record<string, unknown>> => {
   if (
     entry.namespace === 'vybekiit' &&
     entry.name.startsWith('claude-octopus-') &&
@@ -1547,7 +1565,7 @@ export async function loadPreviewModule(entry: CatalogEntry): Promise<Record<str
   switch (entry.previewKey) {
 ${loaderSwitchBody}
   }
-}
+};
 `;
 
   await mkdir(dirname(OUT_CATALOG), { recursive: true });

@@ -4,24 +4,52 @@ import { resolve } from 'node:path';
 export const EXTENSION_STORE_REL = '.vybekiit/store/extension';
 
 export type CwsStoreConfig = {
-  chromeWebStoreId: string;
-  key: string;
-  name: string;
-  version?: string;
+  readonly chromeWebStoreId: string;
+  readonly key: string;
+  readonly name: string;
+  readonly version?: string;
 };
 
-export function extensionStoreDir(repoRoot: string): string {
-  return resolve(repoRoot, EXTENSION_STORE_REL);
-}
+/**
+ * Resolve the Chrome Web Store state folder for a repo.
+ *
+ * @param repoRoot - Absolute repository root.
+ * @returns Absolute path to the extension store folder.
+ * @example
+ * const dir = extensionStoreDir('/repo');
+ */
+export const extensionStoreDir = (repoRoot: string): string =>
+  resolve(repoRoot, EXTENSION_STORE_REL);
 
-export function cwsJsonPath(repoRoot: string): string {
-  return resolve(extensionStoreDir(repoRoot), 'cws.json');
-}
+/**
+ * Resolve the CWS store config JSON path.
+ *
+ * @param repoRoot - Absolute repository root.
+ * @returns Absolute path to `cws.json`.
+ * @example
+ * const path = cwsJsonPath('/repo');
+ */
+export const cwsJsonPath = (repoRoot: string): string =>
+  resolve(extensionStoreDir(repoRoot), 'cws.json');
 
-export function cwsListingPath(repoRoot: string): string {
-  return resolve(extensionStoreDir(repoRoot), 'cws-listing.ts');
-}
+/**
+ * Resolve the CWS listing source path.
+ *
+ * @param repoRoot - Absolute repository root.
+ * @returns Absolute path to `cws-listing.ts`.
+ * @example
+ * const path = cwsListingPath('/repo');
+ */
+export const cwsListingPath = (repoRoot: string): string =>
+  resolve(extensionStoreDir(repoRoot), 'cws-listing.ts');
 
-export function lastSyncedAtPath(repoRoot: string): string {
-  return resolve(extensionStoreDir(repoRoot), 'last-synced-at.json');
-}
+/**
+ * Resolve the last-sync marker path.
+ *
+ * @param repoRoot - Absolute repository root.
+ * @returns Absolute path to `last-synced-at.json`.
+ * @example
+ * const path = lastSyncedAtPath('/repo');
+ */
+export const lastSyncedAtPath = (repoRoot: string): string =>
+  resolve(extensionStoreDir(repoRoot), 'last-synced-at.json');

@@ -1,11 +1,11 @@
-import { BACKEND_CLI_COMMANDS } from '@vybekiit/agentKit/catalogs/backendCapabilities';
-import type { TemplateId } from '@vybekiit/agentKit/catalogs/goalCatalog';
+import { BACKEND_CLI_COMMANDS } from '@vybekiit/agent-kit/catalogs/backendCapabilities';
+import type { TemplateId } from '@vybekiit/agent-kit/catalogs/goalCatalog';
 
 export type FeatureName = 'sign-in' | 'payments' | 'save-data' | 'deploy' | 'email' | 'file-upload';
 
 export type OrchestrationAction = 'scaffold-backend' | 'run-skill' | 'set-env' | 'verify';
 
-export interface OrchestrationStep {
+export type OrchestrationStep = {
   readonly action: OrchestrationAction;
   readonly cli?: string;
   readonly skill?: string;
@@ -16,14 +16,14 @@ export interface OrchestrationStep {
   readonly builderMessage: string;
   /** Agent-internal context (skill paths, template names). */
   readonly agentNote?: string;
-}
+};
 
-export interface FeatureReadinessPlan {
+export type FeatureReadinessPlan = {
   readonly template: TemplateId;
   readonly feature: FeatureName;
   readonly ready: boolean;
   readonly orchestrate?: readonly OrchestrationStep[];
-}
+};
 
 export type TemplateTopologyCombo =
   | 'full-stack-web'
@@ -32,30 +32,45 @@ export type TemplateTopologyCombo =
   | 'client-with-web'
   | 'client-only';
 
-export interface TemplateTopologyContext {
+export type TemplateTopologyContext = {
   readonly template: TemplateId;
   readonly hasBackend: boolean;
   readonly hasWeb: boolean;
-}
+};
 
-/** Explicit server topology for buyer projects — guides feature readiness orchestration. */
-export function resolveTemplateTopology(ctx: TemplateTopologyContext): TemplateTopologyCombo {
+/**
+ * Explicit server topology for buyer projects — guides feature readiness orchestration.
+ *
+ * @param ctx - ctx input.
+ * @returns The resolve template topology result.
+ * @example
+ * const result = resolveTemplateTopology(ctx);
+ */
+export const resolveTemplateTopology = (ctx: TemplateTopologyContext): TemplateTopologyCombo => {
   const { template, hasBackend, hasWeb } = ctx;
-  if (template === 'web') return 'full-stack-web';
-  if (template === 'backend') return 'standalone-backend';
-  if (hasBackend) return 'client-with-backend';
-  if (hasWeb) return 'client-with-web';
+  if (template === 'web') {
+    return 'full-stack-web';
+  }
+  if (template === 'backend') {
+    return 'standalone-backend';
+  }
+  if (hasBackend) {
+    return 'client-with-backend';
+  }
+  if (hasWeb) {
+    return 'client-with-web';
+  }
   return 'client-only';
-}
+};
 
-export interface FeatureReadinessContext {
+export type FeatureReadinessContext = {
   readonly template: TemplateId;
   readonly feature: FeatureName;
   /** True when a `backend/` directory exists in the buyer project. */
   readonly hasBackend: boolean;
   /** True when a Next.js web app exists (package.json has next). */
   readonly hasWeb: boolean;
-}
+};
 
 const MOBILE_EXT_ENV_KEYS: Readonly<Record<TemplateId, string>> = {
   web: 'APP_URL',
@@ -72,26 +87,33 @@ const BACKEND_FEATURES: readonly FeatureName[] = [
   'email',
   'file-upload',
 ];
+const BACKEND_URL_PLACEHOLDER = ['$', '{BACKEND_URL}'].join('');
+const WEB_APP_URL_PLACEHOLDER = ['$', '{WEB_APP_URL}'].join('');
 
-function needsBackend(template: TemplateId, feature: FeatureName): boolean {
-  if (template === 'backend') return false;
-  if (template === 'web') return false;
+const needsBackend = (template: TemplateId, feature: FeatureName): boolean => {
+  if (template === 'backend') {
+    return false;
+  }
+  if (template === 'web') {
+    return false;
+  }
   return BACKEND_FEATURES.includes(feature);
-}
+};
 
-function backendOrchestration(
+const backendOrchestration = (
   template: TemplateId,
   feature: FeatureName,
-): readonly OrchestrationStep[] {
+): readonly OrchestrationStep[] => {
   const envKey = MOBILE_EXT_ENV_KEYS[template];
-  const skillMap: Partial<Record<FeatureName, string>> = {
+  const skillMap: Readonly<Record<FeatureName, string>> = {
     'sign-in': 'connect-account',
     payments: 'setup-payments',
     'save-data': 'save-data',
+    deploy: 'onboarding',
     email: 'wire-email',
     'file-upload': 'add-upload',
   };
-  const skill = skillMap[feature] ?? 'onboarding';
+  const skill = skillMap[feature];
 
   return [
     {
@@ -109,7 +131,7 @@ function backendOrchestration(
     {
       action: 'set-env',
       envKey,
-      envValue: '${BACKEND_URL}',
+      envValue: BACKEND_URL_PLACEHOLDER,
       builderMessage: 'Connecting your app to the server…',
       agentNote: `Set ${envKey} to backend dev URL (default http://localhost:4000)`,
     },
@@ -120,14 +142,18 @@ function backendOrchestration(
       agentNote: 'Manual or automated verify per skill contract',
     },
   ];
-}
+};
 
 /**
  * Detect whether a feature is ready or return orchestration steps to auto-scaffold.
- * Never blocks — always returns steps the agent can execute.
+ *
+ * @param ctx - ctx input.
+ * @returns The plan feature readiness result.
+ * @example
+ * const result = planFeatureReadiness(ctx);
  */
-export function planFeatureReadiness(ctx: FeatureReadinessContext): FeatureReadinessPlan {
-  const { template, feature, hasBackend, hasWeb } = ctx;
+export const planFeatureReadiness = (ctx: FeatureReadinessContext): FeatureReadinessPlan => {
+  const { template, feature } = ctx;
   const topology = resolveTemplateTopology(ctx);
 
   if (topology === 'full-stack-web' || topology === 'standalone-backend') {
@@ -153,7 +179,7 @@ export function planFeatureReadiness(ctx: FeatureReadinessContext): FeatureReadi
         {
           action: 'set-env',
           envKey,
-          envValue: '${WEB_APP_URL}',
+          envValue: WEB_APP_URL_PLACEHOLDER,
           builderMessage: 'Connecting your app to your website…',
           agentNote:
             'Buyer has Next.js web — point client at web APP_URL instead of scaffolding backend',
@@ -168,4 +194,4 @@ export function planFeatureReadiness(ctx: FeatureReadinessContext): FeatureReadi
   }
 
   return { template, feature, ready: true };
-}
+};

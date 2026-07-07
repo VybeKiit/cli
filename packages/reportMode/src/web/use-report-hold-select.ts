@@ -5,17 +5,31 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const REPORT_HOLD_MS = 2000;
 const REPORT_HOLD_MS_REDUCED = 400;
 
-function holdDurationMs(): number {
+/**
+ * Resolve the hold duration, respecting reduced-motion preferences.
+ *
+ * @returns Hold duration in milliseconds.
+ * @example
+ * const duration = holdDurationMs();
+ */
+const holdDurationMs = (): number => {
   if (typeof globalThis.matchMedia === 'undefined') {
     return REPORT_HOLD_MS;
   }
   return globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
     ? REPORT_HOLD_MS_REDUCED
     : REPORT_HOLD_MS;
-}
+};
 
-/** Hover-and-hold fills progress, then applies the chosen value. */
-export function useReportHoldSelect<T>(onSelect: (value: T) => void) {
+/**
+ * Manage hover-and-hold selection progress.
+ *
+ * @param onSelect - Callback invoked when the hold completes.
+ * @returns Pending value, progress, and hold control actions.
+ * @example
+ * const hold = useReportHoldSelect((value) => setCorner(value));
+ */
+export const useReportHoldSelect = <T>(onSelect: (value: T) => void) => {
   const [pending, setPending] = useState<T | null>(null);
   const [progress, setProgress] = useState(0);
   const rafRef = useRef<number | null>(null);
@@ -42,7 +56,7 @@ export function useReportHoldSelect<T>(onSelect: (value: T) => void) {
       setProgress(0);
       startRef.current = performance.now();
 
-      function tick(now: number) {
+      const tick = (now: number): void => {
         const elapsed = now - startRef.current;
         const duration = holdDurationMs();
         const next = Math.min(1, elapsed / duration);
@@ -55,7 +69,7 @@ export function useReportHoldSelect<T>(onSelect: (value: T) => void) {
           return;
         }
         rafRef.current = requestAnimationFrame(tick);
-      }
+      };
 
       rafRef.current = requestAnimationFrame(tick);
     },
@@ -72,4 +86,4 @@ export function useReportHoldSelect<T>(onSelect: (value: T) => void) {
   );
 
   return { pending, progress, startHold, cancelHold };
-}
+};

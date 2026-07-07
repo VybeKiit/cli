@@ -5,7 +5,7 @@ export type VybeAssistant = 'cursor' | 'claude' | 'codex';
 export type ReportPlatform = 'web' | 'mobile' | 'extension';
 
 /** Structured payload captured when a vibe coder reports a broken UI element. */
-export interface ReportPayload {
+export type ReportPayload = {
   readonly route: string;
   readonly selector: string;
   readonly spotLabel?: string;
@@ -14,17 +14,32 @@ export interface ReportPayload {
   readonly consoleErrors: readonly string[];
   readonly builderNote: string;
   readonly platform?: ReportPlatform;
-}
+};
 
 /** Ring buffer for recent console errors (browser or RN dev). */
 export class ConsoleErrorBuffer {
   private readonly max: number;
   private readonly errors: string[] = [];
 
+  /**
+   * Create a bounded console error buffer.
+   *
+   * @param max - Maximum number of messages to retain.
+   * @example
+   * const buffer = new ConsoleErrorBuffer(3);
+   */
   constructor(max = 3) {
     this.max = max;
   }
 
+  /**
+   * Add one console error message to the buffer.
+   *
+   * @param message - Error message to retain.
+   * @returns Nothing.
+   * @example
+   * buffer.push('TypeError: failed');
+   */
   push(message: string): void {
     this.errors.push(message);
     while (this.errors.length > this.max) {
@@ -32,10 +47,24 @@ export class ConsoleErrorBuffer {
     }
   }
 
+  /**
+   * Read the current buffered errors.
+   *
+   * @returns A readonly snapshot of retained error messages.
+   * @example
+   * const errors = buffer.snapshot();
+   */
   snapshot(): readonly string[] {
     return [...this.errors];
   }
 
+  /**
+   * Clear all retained console errors.
+   *
+   * @returns Nothing.
+   * @example
+   * buffer.clear();
+   */
   clear(): void {
     this.errors.length = 0;
   }

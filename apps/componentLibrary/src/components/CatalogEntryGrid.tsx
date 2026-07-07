@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 const CARD_ROW_ESTIMATE = 420;
 const VIRTUALIZE_THRESHOLD = 32;
 
-function chunkRows<T>(items: readonly T[], columnCount: number): T[][] {
+const chunkRows = <T,>(items: readonly T[], columnCount: number): T[][] => {
   if (columnCount < 1) {
     return [items.slice()];
   }
@@ -18,10 +18,10 @@ function chunkRows<T>(items: readonly T[], columnCount: number): T[][] {
     rows.push(items.slice(index, index + columnCount));
   }
   return rows;
-}
+};
 
-function useColumnCount(gridClassName: string): number {
-  return useMemo(() => {
+const useColumnCount = (gridClassName: string): number =>
+  useMemo(() => {
     if (gridClassName.includes('grid-cols-6')) {
       return 6;
     }
@@ -39,7 +39,6 @@ function useColumnCount(gridClassName: string): number {
     }
     return 1;
   }, [gridClassName]);
-}
 
 interface CatalogEntryGridProps {
   readonly entries: readonly CatalogEntry[];
@@ -48,12 +47,20 @@ interface CatalogEntryGridProps {
   readonly tourAnchorKey?: string;
 }
 
-export function CatalogEntryGrid({
+/**
+ * Render the catalog entry grid component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogEntryGrid {...props} />;
+ */
+export const CatalogEntryGrid = ({
   entries,
   gridClassName,
   virtualize,
   tourAnchorKey,
-}: CatalogEntryGridProps) {
+}: CatalogEntryGridProps) => {
   const columnCount = useColumnCount(gridClassName);
   const rows = useMemo(() => chunkRows(entries, columnCount), [columnCount, entries]);
   const shouldVirtualize = virtualize && entries.length >= VIRTUALIZE_THRESHOLD;
@@ -82,7 +89,10 @@ export function CatalogEntryGrid({
   return (
     <div className="relative w-full" style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
       {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-        const rowEntries = rows[virtualRow.index] ?? [];
+        const rowEntries = rows[virtualRow.index];
+        if (rowEntries === undefined) {
+          throw new Error(`Virtual catalog row ${virtualRow.index} has no matching row data.`);
+        }
         return (
           <div
             className={cn(
@@ -108,4 +118,4 @@ export function CatalogEntryGrid({
       })}
     </div>
   );
-}
+};

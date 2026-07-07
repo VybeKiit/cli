@@ -8,10 +8,18 @@ const decodeTwilioVerificationCheck = Schema.decodeUnknownEither(
   TwilioVerificationCheckResponseSchema,
 );
 
-export function readTwilioVerificationStatus(body: unknown): string | undefined {
+/**
+ * Read the Twilio Verify status from an unknown response body.
+ *
+ * @param body - Unknown JSON body returned by Twilio Verify.
+ * @returns The status string when the body matches the Twilio shape.
+ * @example
+ * const status = readTwilioVerificationStatus({ status: 'approved' });
+ */
+export const readTwilioVerificationStatus = (body: unknown): string | undefined => {
   const parsed = decodeTwilioVerificationCheck(body);
   return Either.isRight(parsed) ? parsed.right.status : undefined;
-}
+};
 
 export const TwilioMessageResponseSchema = Schema.Struct({
   sid: Schema.optional(Schema.String),
@@ -19,7 +27,15 @@ export const TwilioMessageResponseSchema = Schema.Struct({
 
 const decodeTwilioMessage = Schema.decodeUnknownEither(TwilioMessageResponseSchema);
 
-export function readTwilioMessageSid(body: unknown): string | undefined {
+/**
+ * Read the Twilio message SID from an unknown response body.
+ *
+ * @param body - Unknown JSON body returned by Twilio Messaging.
+ * @returns The SID string when the body matches the Twilio shape.
+ * @example
+ * const sid = readTwilioMessageSid({ sid: 'SM123' });
+ */
+export const readTwilioMessageSid = (body: unknown): string | undefined => {
   const parsed = decodeTwilioMessage(body);
   return Either.isRight(parsed) ? parsed.right.sid : undefined;
-}
+};

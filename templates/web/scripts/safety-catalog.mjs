@@ -218,9 +218,17 @@ export const SECRET_FAMILIES = [
   },
 ];
 
-/** Titles and fixes read differently depending on how the key leaked. */
-function titleFor(family, leakPathId) {
-  const name = family.name;
+/**
+ * Build a finding title for one secret family and leak path.
+ *
+ * @param family - Secret family metadata from the catalog.
+ * @param leakPathId - Leak path id detected by the scanner.
+ * @returns Localized finding title.
+ * @example
+ * const title = titleFor(family, 'git');
+ */
+const titleFor = (family, leakPathId) => {
+  const { name } = family;
   if (leakPathId === 'public' || leakPathId === 'clientBundle') {
     return L(`Your ${name.en} is visible to visitors`, `${name.he} שלך גלוי למבקרים`);
   }
@@ -231,9 +239,18 @@ function titleFor(family, leakPathId) {
     );
   }
   return L(`Your ${name.en} is exposed`, `${name.he} שלך חשוף`);
-}
+};
 
-function fixFor(family, leakPathId) {
+/**
+ * Build the plain-language fix for one secret family and leak path.
+ *
+ * @param family - Secret family metadata from the catalog.
+ * @param leakPathId - Leak path id detected by the scanner.
+ * @returns Localized remediation copy.
+ * @example
+ * const fix = fixFor(family, 'public');
+ */
+const fixFor = (_family, leakPathId) => {
   if (leakPathId === 'git') {
     return L(
       'I will replace this key with a fresh one and clear the old one from your history, so the leaked one stops working. Your features keep running the same.',
@@ -244,14 +261,38 @@ function fixFor(family, leakPathId) {
     'I will move your key to a private spot only your app can read, so visitors never see it. Your features keep working exactly the same. Takes about 30 seconds.',
     'אעביר את המפתח למקום פרטי שרק האפליקציה שלך יכולה לקרוא, כך שהמבקרים לעולם לא יראו אותו. התכונות שלך ימשיכו לעבוד בדיוק אותו דבר. לוקח בערך 30 שניות.',
   );
-}
+};
+
+/**
+ * Return a localized value or the provided default.
+ *
+ * @param value - Optional localized value from the catalog entry.
+ * @param fallback - Default localized value to use when missing.
+ * @returns The configured value or fallback.
+ * @example
+ * const consequence = valueOrDefault(family.consequence, DEFAULT_CONSEQUENCE);
+ */
+const valueOrDefault = (value, fallback) => {
+  if (value === undefined) {
+    return fallback;
+  }
+
+  return value;
+};
 
 /**
  * Compose a full, buyer-facing finding for one secret on one leak path.
- * `proof` is `{ file, line, abs, snippet }` filled in by the scanner where it found the match.
+ *
+ * @param family - Secret family metadata from the catalog.
+ * @param leakPathId - Leak path id detected by the scanner.
+ * @param proof - Proof object filled in by the scanner where it found the match.
+ * @returns Full buyer-facing finding object for the safety report.
+ * @example
+ * const finding = secretFinding(family, 'code', proof);
  */
-export function secretFinding(family, leakPathId, proof) {
+export const secretFinding = (family, leakPathId, proof) => {
   const fix = fixFor(family, leakPathId);
+  const consequence = valueOrDefault(family.consequence, DEFAULT_CONSEQUENCE);
   return {
     id: `secret.${family.id}.${leakPathId}`,
     rung: 1,
@@ -263,13 +304,13 @@ export function secretFinding(family, leakPathId, proof) {
     tooltip: SECRET_TOOLTIP,
     plain: {
       title: titleFor(family, leakPathId),
-      what: family.consequence ?? DEFAULT_CONSEQUENCE,
+      what: consequence,
       fix,
     },
-    consequence: family.consequence ?? DEFAULT_CONSEQUENCE,
-    remediation: { fix, defenseInDepth: family.defense ?? DEFAULT_DEFENSE },
+    consequence,
+    remediation: { fix, defenseInDepth: valueOrDefault(family.defense, DEFAULT_DEFENSE) },
   };
-}
+};
 
 /**
  * Rungs 2 to 5 as data. The scan implements detection for the ones marked `detectable: true`

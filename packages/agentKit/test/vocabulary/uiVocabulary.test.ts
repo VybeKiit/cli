@@ -5,7 +5,7 @@ import {
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
   UI_VOCABULARY,
-} from '@vybekiit/agentKit/vocabulary/uiVocabulary';
+} from '@vybekiit/agent-kit/vocabulary/uiVocabulary';
 import { describe, expect, it } from 'vitest';
 
 describe('renderUiVocabularyTable', () => {

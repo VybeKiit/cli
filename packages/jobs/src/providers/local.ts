@@ -1,21 +1,26 @@
-import { ok, type Result } from '@vybekiit/core';
 import type { JobPayload, JobsProvider } from '@vybekiit/jobs/types';
+import { Effect } from 'effect';
 
 const queue: JobPayload[] = [];
 
-export function createLocalJobs(): JobsProvider {
-  return {
-    name: 'local',
-    async enqueue(job: JobPayload): Promise<Result<{ id: string }>> {
+/**
+ * Build the in-memory jobs provider for local development and unshipped adapters.
+ *
+ * @returns Jobs provider backed by process memory.
+ * @example
+ * const jobs = createLocalJobs();
+ */
+export const createLocalJobs = (): JobsProvider => ({
+  name: 'local',
+  enqueue: (job: JobPayload) =>
+    Effect.sync(() => {
       queue.push(job);
-      return ok({ id: `local-${queue.length}` });
-    },
-    async schedule(job: JobPayload, _runAt: Date): Promise<Result<{ id: string }>> {
+      return { id: `local-${queue.length}` };
+    }),
+  schedule: (job: JobPayload, _runAt: Date) =>
+    Effect.sync(() => {
       queue.push(job);
-      return ok({ id: `local-scheduled-${queue.length}` });
-    },
-    async verifyDelivery() {
-      return ok(true);
-    },
-  };
-}
+      return { id: `local-scheduled-${queue.length}` };
+    }),
+  verifyDelivery: () => Effect.succeed(true as const),
+});

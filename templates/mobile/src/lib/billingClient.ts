@@ -1,5 +1,6 @@
+import { Effect } from 'effect';
+import { clientError, legacyOutcomeToEffect } from '@/lib/clientEffect';
 import { postJson } from '@/lib/fetchJson';
-import { type Result, fail } from '@vybekiit/core';
 
 /**
  * Buyer-facing checkout wire point — the ONE file the `setup-payments` skill touches.
@@ -8,8 +9,18 @@ import { type Result, fail } from '@vybekiit/core';
  * `APP_URL`), which runs `resolvePaymentProvider()` on the server. Provider-agnostic:
  * switching Lemon Squeezy / Stripe / PayPal never touches the UI. Mirrors the web
  * template's `billing-client.ts` exactly so both platforms behave identically.
+ *
+ * @param planId - Pricing plan selected by the user.
+ * @returns An Effect that succeeds with the hosted checkout URL or fails with MobileClientError.
+ * @example
+ * const checkout = startCheckout('plan_pro');
  */
-export async function startCheckout(planId: string): Promise<Result<{ url: string }>> {
-  if (!planId) return fail('invalid_input', 'Pick a plan first.');
-  return postJson<{ url: string }>('/api/checkout', { productId: planId });
-}
+export const startCheckout = (planId: string) => {
+  if (!planId) {
+    return Effect.fail(clientError('invalid_input', 'Pick a plan first.'));
+  }
+
+  return legacyOutcomeToEffect(
+    postJson<{ readonly url: string }>('/api/checkout', { productId: planId }),
+  );
+};

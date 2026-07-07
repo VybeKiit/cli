@@ -180,6 +180,8 @@ const STEP_TEMPLATES: StepTemplate[] = [
 /**
  * @param userMessage - The raw text from the user's message
  * @returns A workflow with steps matching detected keywords, or null if nothing matched
+ * @example
+ * const workflow = detectWorkflow('ship my SaaS with auth and payments');
  */
 export const detectWorkflow = (userMessage: string): Workflow | null => {
   const lower = userMessage.toLowerCase();
@@ -189,31 +191,39 @@ export const detectWorkflow = (userMessage: string): Workflow | null => {
   // For "full", "ship", or "saas" — use the full saas preset order
   if (lower.includes('full') || lower.includes('ship') || lower.includes('saas')) {
     for (const template of STEP_TEMPLATES) {
-      if (seenIds.has(template.step.id)) continue;
-      // Include scaffold, landing, terms, privacy, dashboard, billing, settings, auth, database, payment, deploy
-      const saasIds = [
-        'scaffold',
-        'landing',
-        'terms',
-        'privacy',
-        'dashboard',
-        'billing',
-        'settings',
-        'auth',
-        'database',
-        'payment',
-        'deploy',
-      ];
-      if (saasIds.includes(template.step.id)) {
-        matched.push(template.step);
-        seenIds.add(template.step.id);
+      if (!seenIds.has(template.step.id)) {
+        // Include scaffold, landing, terms, privacy, dashboard, billing, settings, auth, database, payment, deploy
+        const saasIds = [
+          'scaffold',
+          'landing',
+          'terms',
+          'privacy',
+          'dashboard',
+          'billing',
+          'settings',
+          'auth',
+          'database',
+          'payment',
+          'deploy',
+        ];
+        if (saasIds.includes(template.step.id)) {
+          matched.push(template.step);
+          seenIds.add(template.step.id);
+        }
       }
     }
 
     if (matched.length > 0) {
       // Sort to the canonical order
       const orderMap = new Map(saasOrder.map((id, i) => [id, i]));
-      matched.sort((a, b) => (orderMap.get(a.id) ?? 99) - (orderMap.get(b.id) ?? 99));
+      const orderFor = (id: string): number => {
+        const order = orderMap.get(id);
+        if (order === undefined) {
+          throw new Error(`Workflow step ${id} is missing from the SaaS order.`);
+        }
+        return order;
+      };
+      matched.sort((a, b) => orderFor(a.id) - orderFor(b.id));
 
       return {
         id: `workflow-${Date.now()}`,
@@ -225,11 +235,12 @@ export const detectWorkflow = (userMessage: string): Workflow | null => {
   }
 
   for (const template of STEP_TEMPLATES) {
-    if (seenIds.has(template.step.id)) continue;
-    const hit = template.keywords.some((kw) => lower.includes(kw));
-    if (hit) {
-      matched.push(template.step);
-      seenIds.add(template.step.id);
+    if (!seenIds.has(template.step.id)) {
+      const hit = template.keywords.some((kw) => lower.includes(kw));
+      if (hit) {
+        matched.push(template.step);
+        seenIds.add(template.step.id);
+      }
     }
   }
 

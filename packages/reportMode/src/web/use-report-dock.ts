@@ -8,29 +8,25 @@ import {
   type ReportDockPosition,
   saveDockPosition,
 } from '../position';
+import { resolveBrowserStorage } from './browserStorage';
 
-function browserStorage(): Storage | null {
-  if (typeof globalThis.localStorage === 'undefined') {
-    return null;
-  }
-  try {
-    return globalThis.localStorage;
-  } catch {
-    return null;
-  }
-}
-
-/** Persisted dock placement (corner preset or custom drag position). */
-export function useReportDockPosition() {
+/**
+ * Manage persisted Report dock placement.
+ *
+ * @returns Current position plus setters for custom and corner positions.
+ * @example
+ * const { position, savePosition, setCorner } = useReportDockPosition();
+ */
+export const useReportDockPosition = () => {
   const [position, setPosition] = useState<ReportDockPosition>(DEFAULT_DOCK_POSITION);
 
   useEffect(() => {
-    setPosition(loadDockPosition(browserStorage()));
+    setPosition(loadDockPosition(resolveBrowserStorage()));
   }, []);
 
   const savePosition = useCallback((next: ReportDockPosition) => {
     setPosition(next);
-    saveDockPosition(browserStorage(), next);
+    saveDockPosition(resolveBrowserStorage(), next);
   }, []);
 
   const setCorner = useCallback(
@@ -41,4 +37,4 @@ export function useReportDockPosition() {
   );
 
   return { position, savePosition, setCorner };
-}
+};

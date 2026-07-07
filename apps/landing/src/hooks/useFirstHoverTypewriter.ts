@@ -14,12 +14,22 @@ export interface UseFirstHoverTypewriterOptions {
   readonly msPerChar?: number;
 }
 
-/** Types tooltip copy once on first manual hover; instant on later hovers. */
-export function useFirstHoverTypewriter(
+/**
+ * Types tooltip copy once on first manual hover; instant on later hovers.
+ *
+ * @param slug - Input value.
+ * @param text - Input value.
+ * @param props - Component props.
+ * @returns The hook result.
+ * @example
+ * const value = useFirstHoverTypewriter(slug, text, props);
+ */
+
+export const useFirstHoverTypewriter = (
   slug: string,
   text: string,
   { open, enabled, msPerChar = 68 }: UseFirstHoverTypewriterOptions,
-) {
+) => {
   const reduced = useReducedMotion();
   const [typedOnce, setTypedOnce] = useState(() => completedSlugs.has(slug));
 
@@ -41,4 +51,4 @@ export function useFirstHoverTypewriter(
     text: typedOnce || reduced || !enabled ? text : displayText,
     showCursor: shouldType && !isComplete,
   };
-}
+};

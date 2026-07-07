@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { Image, type ImageProps } from 'expo-image';
 import { resolveAssetDelivery } from '@vybekiit/assets';
 
@@ -8,10 +9,16 @@ type VybeImageProps = Omit<ImageProps, 'source'> & {
 };
 
 /**
- * Default image component for mobile — CDN URLs for remote uploads, local assets for bundled files.
+ * Default image component for mobile assets and remote CDN URLs.
+ *
+ * @param props - Expo image props plus a VybeKiit asset source.
+ * @returns An Expo image with the resolved local or remote asset URL.
+ * @example
+ * <VybeImage src="/hero.png" style={{ width: 240, height: 160 }} />
  */
-export function VybeImage({ src, width, style, ...props }: VybeImageProps) {
-  const delivery = resolveAssetDelivery();
+export const VybeImage = (props: VybeImageProps) => {
+  const { src, width, ...imageProps } = props;
+  const delivery = Effect.runSync(resolveAssetDelivery());
   let source: ImageProps['source'];
 
   if (typeof src === 'number') {
@@ -24,5 +31,5 @@ export function VybeImage({ src, width, style, ...props }: VybeImageProps) {
     source = src;
   }
 
-  return <Image source={source} style={style} {...props} />;
-}
+  return <Image source={source} {...imageProps} />;
+};

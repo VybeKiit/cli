@@ -1,11 +1,10 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-
+import type { CapabilitiesResponse, ModelsResponse } from '@vybekiit/assistant-chat/capabilities';
 import type { VybeAssistant } from '@vybekiit/report-mode';
 
-import type { CapabilitiesResponse, ModelsResponse } from '../../capabilities';
 import {
   CLAUDE_FALLBACK_MODELS,
   CODEX_FALLBACK_MODELS,
@@ -16,21 +15,56 @@ import {
 } from './index';
 
 const MODEL_CACHE_MS = 60_000;
+const CURSOR_TRACE_ID_ENV = 'CURSOR_TRACE_ID';
 const cache = new Map<string, { at: number; value: ModelsResponse }>();
 
-function isInstalled(command: string): boolean {
+const isInstalled = (command: string): boolean => {
   try {
-    execSync(`command -v ${command}`, { stdio: 'ignore' });
+    execFileSync('which', [command], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
   }
-}
+};
 
-export function probeCapabilities(): CapabilitiesResponse {
+const readTrimmedEnvValue = (env: NodeJS.ProcessEnv, key: string): string | undefined => {
+  const value = env[key];
+
+  if (typeof value !== 'string') {
+    return;
+  }
+
+  const trimmed = value.trim();
+
+  if (trimmed.length === 0) {
+    return;
+  }
+
+  return trimmed;
+};
+
+const resolveCodexHome = (env: NodeJS.ProcessEnv): string => {
+  const configuredHome = readTrimmedEnvValue(env, 'CODEX_HOME');
+
+  if (typeof configuredHome === 'string') {
+    return configuredHome;
+  }
+
+  return join(homedir(), '.codex');
+};
+
+/**
+ * Probe which assistant CLIs are available on the local machine.
+ *
+ * @returns Local assistant capability metadata for the browser panel.
+ * @example
+ * const capabilities = probeCapabilities();
+ */
+export const probeCapabilities = (): CapabilitiesResponse => {
   const claudeInstalled = isInstalled('claude');
   const codexInstalled = isInstalled('codex');
-  const cursorInstalled = isInstalled('cursor') || Boolean(process.env.CURSOR_TRACE_ID);
+  const cursorTraceId = readTrimmedEnvValue(process.env, CURSOR_TRACE_ID_ENV);
+  const cursorInstalled = isInstalled('cursor') || typeof cursorTraceId === 'string';
 
   return {
     assistants: [
@@ -53,23 +87,23 @@ export function probeCapabilities(): CapabilitiesResponse {
         streaming: false,
         modelPicker: false,
         installed: cursorInstalled,
-        reason: 'Deeplink-only — opens in Cursor',
+        reason: 'Deeplink-only - opens in Cursor',
       },
     ],
   };
-}
+};
 
-async function fetchJson(url: string, headers: Record<string, string>): Promise<unknown> {
+const fetchJson = async (url: string, headers: Record<string, string>): Promise<unknown> => {
   const response = await fetch(url, { headers });
   if (!response.ok) {
     throw new Error(`${response.status} ${response.statusText}`);
   }
   return response.json();
-}
+};
 
-async function probeClaudeModels(env: NodeJS.ProcessEnv): Promise<ModelsResponse> {
-  const key = env.ANTHROPIC_API_KEY?.trim();
-  if (key) {
+const probeClaudeModels = async (env: NodeJS.ProcessEnv): Promise<ModelsResponse> => {
+  const key = readTrimmedEnvValue(env, 'ANTHROPIC_API_KEY');
+  if (typeof key === 'string') {
     try {
       const payload = await fetchJson('https://api.anthropic.com/v1/models', {
         'x-api-key': key,
@@ -91,11 +125,11 @@ async function probeClaudeModels(env: NodeJS.ProcessEnv): Promise<ModelsResponse
     source: 'fallback',
     fetchedAt: new Date().toISOString(),
   };
-}
+};
 
-async function probeCodexModels(env: NodeJS.ProcessEnv): Promise<ModelsResponse> {
+const probeCodexModels = async (env: NodeJS.ProcessEnv): Promise<ModelsResponse> => {
   const models = [...CODEX_FALLBACK_MODELS];
-  const configPath = join(env.CODEX_HOME?.trim() || join(homedir(), '.codex'), 'config.toml');
+  const configPath = join(resolveCodexHome(env), 'config.toml');
   try {
     const configModel = parseCodexConfigModel(readFileSync(configPath, 'utf8'));
     if (configModel) {
@@ -105,8 +139,8 @@ async function probeCodexModels(env: NodeJS.ProcessEnv): Promise<ModelsResponse>
     // no local config
   }
 
-  const key = env.OPENAI_API_KEY?.trim();
-  if (key) {
+  const key = readTrimmedEnvValue(env, 'OPENAI_API_KEY');
+  if (typeof key === 'string') {
     try {
       const payload = await fetchJson('https://api.openai.com/v1/models', {
         Authorization: `Bearer ${key}`,
@@ -128,12 +162,21 @@ async function probeCodexModels(env: NodeJS.ProcessEnv): Promise<ModelsResponse>
     source: 'fallback',
     fetchedAt: new Date().toISOString(),
   };
-}
+};
 
-export async function probeModels(
+/**
+ * Probe available models for one assistant.
+ *
+ * @param assistant - Assistant whose models should be listed.
+ * @param env - Environment source used for API keys and local config locations.
+ * @returns A cached model response with either live or fallback data.
+ * @example
+ * const models = await probeModels('codex', process.env);
+ */
+export const probeModels = async (
   assistant: VybeAssistant,
   env: NodeJS.ProcessEnv = process.env,
-): Promise<ModelsResponse> {
+): Promise<ModelsResponse> => {
   if (assistant === 'cursor') {
     return {
       ...cursorModelsResponse(),
@@ -150,4 +193,4 @@ export async function probeModels(
   const value = assistant === 'claude' ? await probeClaudeModels(env) : await probeCodexModels(env);
   cache.set(cacheKey, { at: Date.now(), value });
   return value;
-}
+};

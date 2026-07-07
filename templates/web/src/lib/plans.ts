@@ -1,8 +1,4 @@
-/**
- * A pricing plan shown on the pricing page. Translatable fields are message keys;
- * the page resolves them with `t()`.
- */
-export interface Plan {
+interface Plan {
   /** Stable id passed to checkout. TODO(vybekiit): set to your provider's product/variant id. */
   readonly id: string;
   /** Message key for the plan name, e.g. "pricing.plans.pro.name". */
@@ -17,12 +13,13 @@ export interface Plan {
 }
 
 /** Slug derived from plan id — e.g. plan_pro → pro. */
-function _planSlug(id: string): string {
-  return id.replace(/^plan_/, '');
-}
+const planSlug = (id: string): string => {
+  const prefix = 'plan_';
+  return id.startsWith(prefix) ? id.slice(prefix.length) : id;
+};
 
 /** Build message-key paths for a plan tier. */
-function planKeys(slug: string) {
+const planKeys = (slug: string) => {
   const base = `pricing.plans.${slug}`;
   return {
     nameKey: `${base}.name`,
@@ -31,7 +28,7 @@ function planKeys(slug: string) {
     descriptionKey: `${base}.description`,
     featureKeys: [`${base}.features.0`, `${base}.features.1`, `${base}.features.2`] as const,
   };
-}
+};
 
 const free = planKeys('free');
 const pro = planKeys('pro');
@@ -40,7 +37,7 @@ const team = planKeys('team');
 /**
  * Starter pricing tiers — placeholder copy the agent rewrites via the message catalog.
  */
-export const PLANS: readonly Plan[] = [
+const PLANS: readonly Plan[] = [
   {
     id: 'plan_free',
     nameKey: free.nameKey,
@@ -68,7 +65,15 @@ export const PLANS: readonly Plan[] = [
   },
 ];
 
-/** Resolve feature keys for a plan (team omits unused index slots). */
-export function planFeatureKeys(plan: Plan): readonly string[] {
-  return plan.featureKeys;
-}
+/**
+ * Resolve feature message keys for a pricing plan.
+ *
+ * @param plan - Pricing plan from the exported `PLANS` catalog.
+ * @returns Ordered translation keys for the plan's visible feature bullets.
+ * @example
+ * const featureKeys = planFeatureKeys(PLANS[0]);
+ */
+const planFeatureKeys = (plan: Plan): readonly string[] => plan.featureKeys;
+
+export type { Plan };
+export { PLANS, planFeatureKeys, planSlug };

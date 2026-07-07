@@ -3,7 +3,7 @@
  * Web/extension: shadcn-compatible registries. Mobile: port-only rules.
  */
 
-export interface UiSourceEntry {
+export type UiSourceEntry = {
   readonly name: string;
   readonly url: string;
   readonly bestFor: string;
@@ -15,7 +15,7 @@ export interface UiSourceEntry {
   readonly github?: string;
   /** shadcn registry prefix, hosted URL template, or CLI id. */
   readonly registry?: string;
-}
+};
 
 /** Namespaced UI mirror targets in templates/web/src/components/. */
 export const UI_MIRROR_NAMESPACES = {
@@ -238,12 +238,16 @@ export const FORBIDDEN_WEB_UI_LIBS: readonly string[] = [
   '@heroui/',
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link WEB_UI_SOURCES} as a markdown table for agent ui-sources docs. */
-export function renderWebUiSourcesTable(): string {
+/**
+ * Render {@link WEB_UI_SOURCES} as a markdown table for agent ui-sources docs.
+ *
+ * @returns The rendered render web ui sources table text.
+ * @example
+ * const result = renderWebUiSourcesTable();
+ */
+export const renderWebUiSourcesTable = (): string => {
   const header = '| Source | Best for | Install | Notes |';
   const divider = '|---|---|---|---|';
   const rows = WEB_UI_SOURCES.map(
@@ -251,9 +255,14 @@ export function renderWebUiSourcesTable(): string {
       `| [${escapeCell(entry.name)}](${entry.url}) | ${escapeCell(entry.bestFor)} | ${escapeCell(entry.install)} | ${escapeCell(entry.notes)} |`,
   );
   return [header, divider, ...rows].join('\n');
-}
+};
 
-/** Bullet list of forbidden UI libraries for grep checks. */
-export function renderForbiddenWebUiLibsList(): string {
-  return FORBIDDEN_WEB_UI_LIBS.map((lib) => `- \`${lib}\``).join('\n');
-}
+/**
+ * Bullet list of forbidden UI libraries for grep checks.
+ *
+ * @returns The rendered render forbidden web ui libs list text.
+ * @example
+ * const result = renderForbiddenWebUiLibsList();
+ */
+export const renderForbiddenWebUiLibsList = (): string =>
+  FORBIDDEN_WEB_UI_LIBS.map((lib) => `- \`${lib}\``).join('\n');

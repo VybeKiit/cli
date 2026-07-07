@@ -12,6 +12,31 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./providers/postgres/*": {
+      "types": "./dist/providers/postgres/*.d.ts",
+      "import": "./dist/providers/postgres/*.js",
+      "require": "./dist/providers/postgres/*.cjs"
+    },
+    "./providers/*": {
+      "types": "./dist/providers/*/index.d.ts",
+      "import": "./dist/providers/*/index.js",
+      "require": "./dist/providers/*/index.cjs"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.ts",
+      "import": "./dist/presets/index.js",
+      "require": "./dist/presets/index.cjs"
+    },
+    "./presets/*": {
+      "types": "./dist/presets/*.d.ts",
+      "import": "./dist/presets/*.js",
+      "require": "./dist/presets/*.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
@@ -31,14 +56,14 @@
     "@neondatabase/serverless": "^0.10.4",
     "@supabase/supabase-js": "^2.47.10",
     "@vybekiit/core": "workspace:*",
-    "effect": "3.21.4",
+    "effect": "catalog:",
     "firebase-admin": "^13.0.2",
     "mongodb": "^7.4.0"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "private": true
 }

@@ -1,18 +1,28 @@
-import { connectToLsChrome } from '@vybekiit/browserAutomation/domains/payments/ls/connect';
-import { waitForLsAuthenticated } from '@vybekiit/browserAutomation/domains/payments/ls/dashboard/waitForAuthenticated';
-import type { LsVerbContext } from '@vybekiit/browserAutomation/domains/payments/ls/types';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToLsChrome } from '@vybekiit/browser-automation/domains/payments/ls/connect';
+import { waitForLsAuthenticated } from '@vybekiit/browser-automation/domains/payments/ls/dashboard/waitForAuthenticated';
+import type { LsVerbContext } from '@vybekiit/browser-automation/domains/payments/ls/types';
 
-/** Wait until builder reaches the LS dashboard after manual sign-in. */
-export async function standbyLogin(ctx: LsVerbContext): Promise<{ ready: boolean; url?: string }> {
+export type StandbyLoginResult = {
+  readonly ready: boolean;
+  readonly url?: string;
+};
+
+/**
+ * Wait until the builder reaches the Lemon Squeezy dashboard after manual sign-in.
+ *
+ * @param ctx - Runtime verb context from the CLI.
+ * @returns Dashboard readiness and current URL when authenticated.
+ * @example
+ * const result = await standbyLogin(ctx);
+ */
+export const standbyLogin = async (ctx: LsVerbContext): Promise<StandbyLoginResult> => {
   const session = await connectToLsChrome(ctx, { waitForAuth: false });
 
   try {
     try {
-      session.page = await waitForLsAuthenticated(
-        session.page,
-        ctx.log ?? console,
-        session.context,
-      );
+      const log = resolveVerbLogger(ctx);
+      session.page = await waitForLsAuthenticated(session.page, log, session.context);
       return { ready: session.page.url().includes('/dashboard'), url: session.page.url() };
     } catch {
       return { ready: false };
@@ -20,4 +30,4 @@ export async function standbyLogin(ctx: LsVerbContext): Promise<{ ready: boolean
   } finally {
     await session.dispose();
   }
-}
+};

@@ -6,9 +6,15 @@ import {
 } from '@vybekiit/payments/http/handlers';
 import { CheckoutBodySchema, PracticeCompleteBodySchema } from '@vybekiit/payments/http/schemas';
 import { isPaymentsUnconfigured } from '@vybekiit/payments/practice';
+import { Effect } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-describe('isPaymentsUnconfigured', () => {
+// practice_plan_pro_123 -> match
+const practiceOrderIdPattern = /^practice_plan_pro_/;
+// "Webhook body must be raw bytes." -> match
+const rawBytesErrorPattern = /raw bytes/;
+
+describe('payment practice detection', () => {
   it('is true when no payment anchor keys are set', () => {
     expect(isPaymentsUnconfigured({})).toBe(true);
   });
@@ -51,7 +57,9 @@ describe('checkout body schema', () => {
   it('requires productId', () => {
     const result = decodeJsonBody({}, CheckoutBodySchema, 'productId is required.');
     expect(result.ok).toBe(false);
-    if (result.ok) return;
+    if (result.ok) {
+      return;
+    }
     expect(result.response.status).toBe(400);
     expect(result.response.body).toEqual({
       code: 'bad_input',
@@ -65,7 +73,7 @@ describe('handlePracticeComplete', () => {
     const result = await handlePracticeComplete(
       { productId: 'plan_pro' },
       {
-        fulfillOrder: async () => ({ ok: true, value: true }),
+        fulfillOrder: () => Effect.succeed(true as const),
       },
     );
     expect(result.status).toBe(200);
@@ -74,7 +82,7 @@ describe('handlePracticeComplete', () => {
     }
     expect(result.body.ok).toBe(true);
     if ('orderId' in result.body) {
-      expect(result.body.orderId).toMatch(/^practice_plan_pro_/);
+      expect(result.body.orderId).toMatch(practiceOrderIdPattern);
     }
   });
 });
@@ -83,7 +91,9 @@ describe('practice complete body schema', () => {
   it('requires productId', () => {
     const result = decodeJsonBody({}, PracticeCompleteBodySchema, 'productId is required.');
     expect(result.ok).toBe(false);
-    if (result.ok) return;
+    if (result.ok) {
+      return;
+    }
     expect(result.response.body).toEqual({
       code: 'bad_input',
       error: 'productId is required.',
@@ -98,6 +108,6 @@ describe('readWebhookRawBody', () => {
   });
 
   it('throws for unexpected body shapes', () => {
-    expect(() => readWebhookRawBody({})).toThrow(/raw bytes/);
+    expect(() => readWebhookRawBody({})).toThrow(rawBytesErrorPattern);
   });
 });

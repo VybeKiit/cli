@@ -36,9 +36,17 @@ export const REALTIME_TABLES = [
   'notifications_log',
 ] as const;
 
-export function renderRealtimeGrants(tables: readonly string[]): string {
+/**
+ * Render SQL that adds tables to the Supabase Realtime publication.
+ *
+ * @param tables - Public table names to add to the publication.
+ * @returns SQL grant statements for the supplied tables.
+ * @example
+ * const sql = renderRealtimeGrants(['notifications_log']);
+ */
+export const renderRealtimeGrants = (tables: readonly string[]): string => {
   const lines = tables.map(
     (table) => `alter publication supabase_realtime add table public.${table};`,
   );
   return `-- Realtime publication grants\n${lines.join('\n')}`;
-}
+};

@@ -21,11 +21,11 @@
  * `say` is what the agent says out loud; `why` is private context that helps the
  * agent decide how much, if anything, the builder actually needs to know.
  */
-export interface ToolVocabularyEntry {
+export type ToolVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 /**
  * Jargon-about-the-tools the builder must never hear, mapped to plain phrasing.
@@ -93,19 +93,16 @@ export const TOOL_VOCABULARY: readonly ToolVocabularyEntry[] = [
 ];
 
 /** Escape a cell so a literal pipe never breaks the markdown table layout. */
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
 /**
  * Render {@link TOOL_VOCABULARY} as a GitHub-flavored markdown table.
  *
- * Columns: "Don't say (jargon)" | "Say instead (plain)" | "Why it matters to
- * them" — matching the existing `language.md` tables so a template can paste the
- * output straight into its "Talking about the tools themselves" section. This is
- * the rendering the templates embed, so the table has exactly one source.
+ * @returns The rendered render tool vocabulary table text.
+ * @example
+ * const result = renderToolVocabularyTable();
  */
-export function renderToolVocabularyTable(): string {
+export const renderToolVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = TOOL_VOCABULARY.map(
@@ -113,4 +110,4 @@ export function renderToolVocabularyTable(): string {
       `| ${escapeCell(entry.jargon)} | ${escapeCell(entry.say)} | ${escapeCell(entry.why)} |`,
   );
   return [header, divider, ...rows].join('\n');
-}
+};

@@ -13,10 +13,18 @@ import { detectWorkflow } from '@/lib/workflowDetection';
 import { saasWorkflow } from '@/lib/workflows';
 import { useChatStore, useWorkflowStore } from '@/stores';
 
-interface WorkflowRunnerProps {
+type WorkflowRunnerProps = {
   compact?: boolean;
-}
+};
 
+/**
+ * Render the workflow runner component.
+ *
+ * @param compact - Whether to render the smaller workflow layout.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <WorkflowRunner compact={true} />;
+ */
 export const WorkflowRunner = ({ compact = false }: WorkflowRunnerProps) => {
   const workflow = useWorkflowStore((s) => s.workflow);
   const isRunning = useWorkflowStore((s) => s.isRunning);
@@ -52,7 +60,8 @@ export const WorkflowRunner = ({ compact = false }: WorkflowRunnerProps) => {
   }, [workflow, setWorkflow]);
 
   // Celebrate when workflow completes (all steps done)
-  const allStepsDone = workflow?.steps.every((s) => s.status === 'done') ?? false;
+  const allStepsDone =
+    workflow === null ? false : workflow.steps.every((step) => step.status === 'done');
   const prevAllDone = useRef(allStepsDone);
 
   useEffect(() => {
@@ -74,10 +83,13 @@ export const WorkflowRunner = ({ compact = false }: WorkflowRunnerProps) => {
   if (!workflow) return null;
 
   // Compute progress flat
-  const allSteps = workflow.steps.flatMap((s) => [
-    { id: s.id, status: s.status },
-    ...(s.subSteps?.map((sub) => ({ id: sub.id, status: sub.status })) ?? []),
-  ]);
+  const allSteps = workflow.steps.flatMap((step) => {
+    const subSteps =
+      step.subSteps === undefined
+        ? []
+        : step.subSteps.map((sub) => ({ id: sub.id, status: sub.status }));
+    return [{ id: step.id, status: step.status }, ...subSteps];
+  });
   const doneCount = allSteps.filter((s) => s.status === 'done').length;
   const progress = allSteps.length > 0 ? (doneCount / allSteps.length) * 100 : 0;
 
@@ -106,6 +118,7 @@ export const WorkflowRunner = ({ compact = false }: WorkflowRunnerProps) => {
           )}
           <div>
             <h2
+              data-testid="workflow-title"
               className={cn(
                 'font-bold tracking-tight text-zinc-50',
                 compact ? 'text-base' : 'text-xl',

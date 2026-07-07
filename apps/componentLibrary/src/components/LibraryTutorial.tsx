@@ -5,6 +5,7 @@ import { useWalkthrough, Walkthrough, type WalkthroughStep } from '@/components/
 
 const STORAGE_KEY = 'vybekiit-ui-library-tutorial-v1';
 
+/** DOM targets used by the library walkthrough tutorial. */
 export const TUTORIAL_TARGETS = {
   search: '[data-tour="search"]',
   library: '[data-tour="library-filter"]',
@@ -62,7 +63,15 @@ interface LibraryTutorialProps {
   readonly onForceClose?: () => void;
 }
 
-export function LibraryTutorial({ forceOpen = false, onForceClose }: LibraryTutorialProps) {
+/**
+ * Render the library tutorial component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <LibraryTutorial {...props} />;
+ */
+export const LibraryTutorial = ({ forceOpen = false, onForceClose }: LibraryTutorialProps) => {
   const state = useWalkthrough({ storageKey: STORAGE_KEY, totalSteps: STEPS.length });
   const wasActive = useRef(false);
 
@@ -85,10 +94,17 @@ export function LibraryTutorial({ forceOpen = false, onForceClose }: LibraryTuto
   }, [state.active, forceOpen, onForceClose]);
 
   return <Walkthrough state={state} steps={STEPS} variant="dialog" />;
-}
+};
 
-export function resetLibraryTutorial() {
+/**
+ * Reset library tutorial.
+ *
+ * @returns The value produced by resetLibraryTutorial.
+ * @example
+ * const result = resetLibraryTutorial();
+ */
+export const resetLibraryTutorial = () => {
   if (typeof window !== 'undefined') {
     window.localStorage.removeItem(STORAGE_KEY);
   }
-}
+};

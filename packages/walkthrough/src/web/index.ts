@@ -1,8 +1,2 @@
-'use client';
-
-export type { WalkthroughStep } from '../index';
-export {
-  type UseWalkthroughOptions,
-  useWalkthrough,
-  type WalkthroughState,
-} from './use-walkthrough';
+export type * from '@vybekiit/walkthrough';
+export * from './useWalkthrough';

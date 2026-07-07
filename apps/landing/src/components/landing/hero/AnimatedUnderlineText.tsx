@@ -9,21 +9,29 @@ interface AnimatedUnderlineTextProps {
   readonly active?: boolean;
 }
 
-/** Single sweep underline after text completes (respects reduced motion). */
-export function AnimatedUnderlineText({
+/**
+ * Single sweep underline after text completes (respects reduced motion).
+ *
+ * @param props - Component props.
+ * @returns The rendered AnimatedUnderlineText element.
+ * @example
+ * ```tsx
+ * <AnimatedUnderlineText />
+ * ```
+ */
+
+export const AnimatedUnderlineText = ({
   children,
   className,
   active = true,
-}: AnimatedUnderlineTextProps) {
-  return (
-    <span
-      className={cn(
-        'hero-animated-underline',
-        active && 'hero-animated-underline--active',
-        className,
-      )}
-    >
-      {children}
-    </span>
-  );
-}
+}: AnimatedUnderlineTextProps) => (
+  <span
+    className={cn(
+      'hero-animated-underline',
+      active && 'hero-animated-underline--active',
+      className,
+    )}
+  >
+    {children}
+  </span>
+);

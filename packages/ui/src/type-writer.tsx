@@ -3,22 +3,24 @@
 import { useEffect, useState } from 'react';
 import { cn } from './utils';
 
-type TypeWriterProps = {
-  text: string;
-  speed?: number;
-  cursor?: boolean;
-  className?: string;
-  onComplete?: () => void;
-};
+interface TypeWriterProps {
+  readonly text: string;
+  readonly speed?: number;
+  readonly cursor?: boolean;
+  readonly className?: string;
+  readonly onComplete?: () => void;
+}
 
-/** Typewriter text animation with blinking cursor. */
-export const TypeWriter = ({
-  text,
-  speed = 40,
-  cursor = true,
-  className,
-  onComplete,
-}: TypeWriterProps) => {
+/**
+ * Typewriter text animation with an optional blinking cursor.
+ *
+ * @param props - Text, typing speed in milliseconds, cursor flag, classes, and completion handler.
+ * @returns A span that reveals text over time.
+ * @example
+ * <TypeWriter text="Building your app" speed={30} />;
+ */
+export const TypeWriter = (props: TypeWriterProps) => {
+  const { text, speed = 40, cursor = true, className = '', onComplete } = props;
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
 

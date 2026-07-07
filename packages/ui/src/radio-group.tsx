@@ -6,6 +6,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Radio Group component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Radio Group component.
+ * @example
+ * <RadioGroup />;
+ */
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
@@ -14,6 +22,14 @@ const RadioGroup = React.forwardRef<
 ));
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
+/**
+ * Render the Radio Group Item component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Radio Group Item component.
+ * @example
+ * <RadioGroupItem />;
+ */
 const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>

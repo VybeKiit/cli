@@ -5,17 +5,25 @@ import { useEffect, useMemo, useState } from 'react';
 
 type Scheme = 'light' | 'dark';
 
-function readScheme(): Scheme {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
+const readScheme = (): Scheme => {
+  if (typeof globalThis.matchMedia === 'undefined') {
+    return 'light';
+  }
+  return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
 
-/** Apply `@vybekiit/tokens` CSS variables from the OS color scheme. */
-export function useTheme(): { scheme: Scheme } {
+/**
+ * Apply `@vybekiit/tokens` CSS variables from the OS color scheme.
+ *
+ * @returns The active color scheme read from the visitor's OS preference.
+ * @example
+ * const { scheme } = useTheme();
+ */
+export const useTheme = (): { scheme: Scheme } => {
   const [scheme, setScheme] = useState<Scheme>(readScheme);
 
   useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const media = globalThis.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => setScheme(media.matches ? 'dark' : 'light');
     media.addEventListener('change', onChange);
     return () => media.removeEventListener('change', onChange);
@@ -31,4 +39,4 @@ export function useTheme(): { scheme: Scheme } {
   }, [vars]);
 
   return { scheme };
-}
+};

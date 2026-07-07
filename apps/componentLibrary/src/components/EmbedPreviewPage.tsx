@@ -10,6 +10,7 @@ import {
   type ComponentType,
   type ReactNode,
   Suspense,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -61,7 +62,7 @@ const EMBED_UNAVAILABLE: Record<UnavailableReason, string> = {
   nodemo: 'Live preview is coming soon.',
 };
 
-function EmbedPageFallback() {
+const EmbedPageFallback = () => {
   const isInteractive =
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('interactive') === '1';
@@ -71,9 +72,9 @@ function EmbedPageFallback() {
   }
 
   return <PreviewLoadingOverlay className={cn('p-6', FULL_MIN_H)} />;
-}
+};
 
-function PreviewHost({
+const PreviewHost = ({
   Preview,
   previewKey,
   isThumb,
@@ -81,7 +82,7 @@ function PreviewHost({
   Preview: ComponentType;
   previewKey: string;
   isThumb: boolean;
-}) {
+}) => {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -105,22 +106,22 @@ function PreviewHost({
       );
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [previewKey, Preview, isThumb]);
+  }, [previewKey, isThumb]);
 
   return (
     <div className={cn(isThumb && 'vk-embed-thumb-host')} ref={hostRef}>
       <Preview />
     </div>
   );
-}
+};
 
-function EmbedPreviewInner({
+const EmbedPreviewInner = ({
   previewKey,
   loadPreviewModule,
 }: {
   readonly previewKey: string;
   readonly loadPreviewModule: (entry: CatalogEntry) => Promise<Record<string, unknown>>;
-}) {
+}) => {
   const searchParams = useSearchParams();
   const entry = CATALOG_BY_KEY[previewKey];
 
@@ -133,13 +134,13 @@ function EmbedPreviewInner({
   const isThumb = searchParams.get('thumb') === '1';
   const isInteractive = searchParams.get('interactive') === '1';
 
-  const applyTheme = (theme: string | null, primary: string | null) => {
+  const applyTheme = useCallback((theme: string | null, primary: string | null) => {
     const root = document.documentElement;
     const isDark = theme === 'dark';
     root.classList.toggle('dark', isDark);
     root.classList.toggle('light', !isDark);
-    applyPrimaryVars(root, primary ?? DEFAULT_PRIMARY);
-  };
+    applyPrimaryVars(root, primary === null ? DEFAULT_PRIMARY : primary);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -149,7 +150,7 @@ function EmbedPreviewInner({
     return () => {
       root.classList.remove('vk-embed-thumb', 'vk-embed-interactive');
     };
-  }, [themeParam, primaryParam, isThumb, isInteractive]);
+  }, [themeParam, primaryParam, isThumb, isInteractive, applyTheme]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -169,7 +170,7 @@ function EmbedPreviewInner({
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, []);
+  }, [applyTheme]);
 
   useEffect(() => {
     if (!entry) {
@@ -179,9 +180,13 @@ function EmbedPreviewInner({
     }
 
     if (!entry.buildSafe) {
-      setError(
-        EMBED_UNAVAILABLE[entry.unavailableReason ?? (entry.requiresEnv ? 'env' : 'nodemo')],
-      );
+      const unavailableReason =
+        entry.unavailableReason === undefined
+          ? entry.requiresEnv
+            ? 'env'
+            : 'nodemo'
+          : entry.unavailableReason;
+      setError(EMBED_UNAVAILABLE[unavailableReason]);
       setLoading(false);
       return;
     }
@@ -283,18 +288,24 @@ function EmbedPreviewInner({
       </PreviewErrorBoundary>
     </div>
   );
-}
+};
 
-export function EmbedPreviewPage({
+/**
+ * Render the embed preview page component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <EmbedPreviewPage {...props} />;
+ */
+export const EmbedPreviewPage = ({
   previewKey,
   loadPreviewModule,
 }: {
   readonly previewKey: string;
   readonly loadPreviewModule: (entry: CatalogEntry) => Promise<Record<string, unknown>>;
-}) {
-  return (
-    <Suspense fallback={<EmbedPageFallback />}>
-      <EmbedPreviewInner loadPreviewModule={loadPreviewModule} previewKey={previewKey} />
-    </Suspense>
-  );
-}
+}) => (
+  <Suspense fallback={<EmbedPageFallback />}>
+    <EmbedPreviewInner loadPreviewModule={loadPreviewModule} previewKey={previewKey} />
+  </Suspense>
+);

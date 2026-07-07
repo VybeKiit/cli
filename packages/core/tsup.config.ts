@@ -7,18 +7,7 @@ import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAlias
  * `./http` (+ client/express/next), `./observability`, `./security` (+ express).
  */
 export default defineConfig({
-  entry: [
-    'src/index.ts',
-    'src/node.ts',
-    'src/http/index.ts',
-    'src/http/responseSchemas.ts',
-    'src/http/client/index.ts',
-    'src/http/express.ts',
-    'src/http/next.ts',
-    'src/observability/index.ts',
-    'src/security/index.ts',
-    'src/security/express.ts',
-  ],
+  entry: ['src/**/*.ts', '!src/**/*.test.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,

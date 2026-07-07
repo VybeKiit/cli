@@ -29,6 +29,14 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
+/**
+ * Render the shared extension button.
+ *
+ * @param props - Native button props plus variant, size, and optional Slot rendering.
+ * @returns A themed button or slotted child.
+ * @example
+ * <Button type="button">Continue</Button>
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';

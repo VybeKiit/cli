@@ -12,11 +12,21 @@ export interface AnimatedNumberProps {
   readonly className?: string;
 }
 
-/** Rolling number reveal when the element enters view (once per page load). */
-export function AnimatedNumber({ value, className }: AnimatedNumberProps) {
+/**
+ * Rolling number reveal when the element enters view (once per page load).
+ *
+ * @param props - Component props.
+ * @returns The rendered AnimatedNumber element.
+ * @example
+ * ```tsx
+ * <AnimatedNumber />
+ * ```
+ */
+
+export const AnimatedNumber = ({ value, className }: AnimatedNumberProps) => {
   const { ref, inView } = useInViewOnce();
   const parsed = parseDisplayNumber(value);
-  const target = parsed?.value ?? 0;
+  const target = parsed === null ? 0 : parsed.value;
   const animatedValue = useAnimatedNumber(target, inView && parsed !== null);
 
   if (!parsed) {
@@ -36,4 +46,4 @@ export function AnimatedNumber({ value, className }: AnimatedNumberProps) {
       />
     </span>
   );
-}
+};

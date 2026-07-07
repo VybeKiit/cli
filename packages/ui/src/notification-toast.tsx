@@ -5,14 +5,14 @@ import { cn } from './utils';
 
 type ToastVariant = 'success' | 'info' | 'warning' | 'error';
 
-type NotificationToastProps = {
-  message: string;
-  variant?: ToastVariant;
-  icon?: ReactNode;
-  duration?: number;
-  onDismiss?: () => void;
-  className?: string;
-};
+interface NotificationToastProps {
+  readonly message: string;
+  readonly variant?: ToastVariant;
+  readonly icon?: ReactNode;
+  readonly duration?: number;
+  readonly onDismiss?: () => void;
+  readonly className?: string;
+}
 
 const VARIANT_STYLES = {
   success: { bg: 'bg-emerald-500/10 border-emerald-500/30', color: 'text-emerald-300' },
@@ -21,15 +21,16 @@ const VARIANT_STYLES = {
   error: { bg: 'bg-red-500/10 border-red-500/30', color: 'text-red-300' },
 };
 
-/** Animated notification toast with auto-dismiss. */
-export const NotificationToast = ({
-  message,
-  variant = 'info',
-  icon,
-  duration = 4000,
-  onDismiss,
-  className,
-}: NotificationToastProps) => {
+/**
+ * Animated notification toast with optional auto-dismiss.
+ *
+ * @param props - Toast message, variant, icon, duration, dismiss handler, and classes.
+ * @returns A dismissible notification toast element.
+ * @example
+ * <NotificationToast message="Saved" variant="success" />;
+ */
+export const NotificationToast = (props: NotificationToastProps) => {
+  const { message, variant = 'info', icon = null, duration = 4000, onDismiss, className = '' } = props;
   const [visible, setVisible] = useState(true);
   const style = VARIANT_STYLES[variant];
 

@@ -1,22 +1,22 @@
 import {
   detectAgentTool,
   resolveGlobalSkillPath,
-} from '@vybekiit/agentKit/catalogs/toolSkillPaths';
-import { lintExtensionSkill } from '@vybekiit/agentKit/lint/lintExtensionSkill';
+} from '@vybekiit/agent-kit/catalogs/toolSkillPaths';
+import { lintExtensionSkill } from '@vybekiit/agent-kit/lint/lintExtensionSkill';
 import {
   AGENT_LAYER_EXTENSION_PREFIX,
   isAgentLayerExtensionPath,
-} from '@vybekiit/agentKit/planners/agentLayerSync';
+} from '@vybekiit/agent-kit/planners/agentLayerSync';
 import {
   extractExtensionGoalIndexRows,
   formatExtensionGoalIndexRow,
   mergeGoalIndexOnSync,
-} from '@vybekiit/agentKit/planners/mergeGoalIndex';
+} from '@vybekiit/agent-kit/planners/mergeGoalIndex';
 import {
   renderBuyerGoalExtensionSkill,
   renderGlobalAgentSkill,
   renderPlatformWrapperExtensionSkill,
-} from '@vybekiit/agentKit/render/extensionSkillTemplates';
+} from '@vybekiit/agent-kit/render/extensionSkillTemplates';
 import { describe, expect, it } from 'vitest';
 
 const VALID_BUYER = renderBuyerGoalExtensionSkill({
@@ -31,6 +31,7 @@ const VALID_WRAPPER = renderPlatformWrapperExtensionSkill({
   techLabel: 'PlanetScale',
   docsUrl: 'https://planetscale.com/docs',
   kitWiring: [
+    // biome-ignore lint/security/noSecrets: Test fixture contains a fake env setting, not a credential.
     'Set `DATA_PROVIDER=planetscale` when adapter ships.',
     'Use `resolveDataProvider()` in app code.',
   ],
@@ -76,6 +77,7 @@ describe('lintExtensionSkill', () => {
   });
 });
 
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('mergeGoalIndexOnSync', () => {
   const synced = `| "go live" | \`skills/go-live.md\` |`;
 
@@ -95,6 +97,7 @@ describe('mergeGoalIndexOnSync', () => {
   });
 });
 
+// biome-ignore lint/security/noSecrets: Test title is a public function name, not a credential.
 describe('formatExtensionGoalIndexRow', () => {
   it('formats table row', () => {
     expect(formatExtensionGoalIndexRow('refer a friend', 'referral-program')).toContain(

@@ -9,29 +9,29 @@ import {
 } from '../../dev/recorder/shared/probe/classify';
 import type { DomCandidate, PageSnapshot } from '../../dev/recorder/shared/probe/types';
 
-function candidate(overrides: Partial<DomCandidate> & { tag: string }): DomCandidate {
-  return {
-    ariaLabel: null,
-    associatedLabel: null,
-    href: null,
-    id: null,
-    nearestHeading: null,
-    placeholder: null,
-    role: null,
-    textContent: null,
-    type: null,
-    ...overrides,
-  };
-}
+const candidate = (overrides: Partial<DomCandidate> & { tag: string }): DomCandidate => ({
+  ariaLabel: null,
+  associatedLabel: null,
+  href: null,
+  id: null,
+  nearestHeading: null,
+  placeholder: null,
+  role: null,
+  textContent: null,
+  type: null,
+  ...overrides,
+});
 
-function page(pathname: string, candidates: DomCandidate[], hrefs: string[] = []): PageSnapshot {
-  return {
-    url: `https://app.lemonsqueezy.com${pathname}`,
-    pathname,
-    candidates,
-    hrefs,
-  };
-}
+const page = (
+  pathname: string,
+  candidates: DomCandidate[],
+  hrefs: string[] = [],
+): PageSnapshot => ({
+  url: `https://app.lemonsqueezy.com${pathname}`,
+  pathname,
+  candidates,
+  hrefs,
+});
 
 describe('candidateToEntry', () => {
   it('prefers role+name for buttons', () => {

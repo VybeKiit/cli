@@ -27,7 +27,7 @@ export type AgentToolId =
   | 'zed'
   | 'generic';
 
-export interface ToolSkillPathEntry {
+export type ToolSkillPathEntry = {
   readonly id: AgentToolId;
   readonly label: string;
   /** Home-relative path template; `<name>` is the skill stem. */
@@ -36,7 +36,7 @@ export interface ToolSkillPathEntry {
   readonly skillsShAgent?: string;
   /** Hint for detecting this tool in the buyer project. */
   readonly detectHint: string;
-}
+};
 
 export const TOOL_SKILL_PATHS: readonly ToolSkillPathEntry[] = [
   {
@@ -184,32 +184,69 @@ export const EXTENSION_PATHS = {
   upstreamPin: '.agents/skills/<name>/',
 } as const;
 
-export function resolveGlobalSkillPath(tool: AgentToolId, skillStem: string): string {
-  const entry = TOOL_SKILL_PATHS.find((e) => e.id === tool) ?? TOOL_SKILL_PATHS.at(-1)!;
-  return entry.globalSkillPath.replace('<name>', skillStem);
-}
+type AgentToolDetectionRule = {
+  readonly path: string;
+  readonly tool: Exclude<AgentToolId, 'generic'>;
+};
 
-export function detectAgentTool(projectFiles: Readonly<Record<string, boolean>>): AgentToolId {
-  if (projectFiles['.cursor/rules/vybekiit.mdc']) return 'cursor';
-  if (projectFiles['CLAUDE.md']) return 'claude';
-  if (projectFiles['.github/copilot-instructions.md']) return 'copilot';
-  if (projectFiles['.kiro/steering/']) return 'kiro';
-  if (projectFiles['.windsurf/rules/']) return 'windsurf';
-  if (projectFiles['.clinerules/']) return 'cline';
-  if (projectFiles['.amazonq/rules/']) return 'amazonq';
-  if (projectFiles['.continue/rules/']) return 'continue';
-  if (projectFiles['.junie/AGENTS.md']) return 'junie';
-  if (projectFiles['.gemini/styleguide.md']) return 'gemini';
-  if (projectFiles['CONVENTIONS.md']) return 'aider';
-  if (projectFiles['.augment-guidelines']) return 'augment';
-  if (projectFiles['.roo/rules/']) return 'roo';
-  if (projectFiles['GEMINI.md']) return 'gemini-cli';
-  if (projectFiles['.trae/rules/']) return 'trae';
-  if (projectFiles['.agent/rules/']) return 'antigravity';
-  if (projectFiles['replit.md']) return 'replit';
-  if (projectFiles['.devin/']) return 'devin';
-  if (projectFiles['.opencode/']) return 'opencode';
-  if (projectFiles['.zed/']) return 'zed';
-  if (projectFiles['AGENTS.md']) return 'codex';
+const AGENT_TOOL_DETECTION_RULES: readonly AgentToolDetectionRule[] = [
+  { path: '.cursor/rules/vybekiit.mdc', tool: 'cursor' },
+  { path: 'CLAUDE.md', tool: 'claude' },
+  { path: '.github/copilot-instructions.md', tool: 'copilot' },
+  { path: '.kiro/steering/', tool: 'kiro' },
+  { path: '.windsurf/rules/', tool: 'windsurf' },
+  { path: '.clinerules/', tool: 'cline' },
+  { path: '.amazonq/rules/', tool: 'amazonq' },
+  { path: '.continue/rules/', tool: 'continue' },
+  { path: '.junie/AGENTS.md', tool: 'junie' },
+  { path: '.gemini/styleguide.md', tool: 'gemini' },
+  { path: 'CONVENTIONS.md', tool: 'aider' },
+  { path: '.augment-guidelines', tool: 'augment' },
+  { path: '.roo/rules/', tool: 'roo' },
+  { path: 'GEMINI.md', tool: 'gemini-cli' },
+  { path: '.trae/rules/', tool: 'trae' },
+  { path: '.agent/rules/', tool: 'antigravity' },
+  { path: 'replit.md', tool: 'replit' },
+  { path: '.devin/', tool: 'devin' },
+  { path: '.opencode/', tool: 'opencode' },
+  { path: '.zed/', tool: 'zed' },
+  { path: 'AGENTS.md', tool: 'codex' },
+];
+
+const resolveToolSkillPathEntry = (tool: AgentToolId): ToolSkillPathEntry => {
+  const entry = TOOL_SKILL_PATHS.find((candidate) => candidate.id === tool);
+  if (entry === undefined) {
+    throw new Error(`Missing global skill path entry for ${tool}`);
+  }
+  return entry;
+};
+
+/**
+ * Resolve the machine-global skill path for a detected assistant.
+ *
+ * @param tool - tool input.
+ * @param skillStem - skill stem input.
+ * @returns The rendered resolve global skill path text.
+ * @example
+ * const result = resolveGlobalSkillPath(tool, skillStem);
+ */
+export const resolveGlobalSkillPath = (tool: AgentToolId, skillStem: string): string => {
+  const entry = resolveToolSkillPathEntry(tool);
+  return entry.globalSkillPath.replace('<name>', skillStem);
+};
+
+/**
+ * Detect the active assistant from project-local marker files.
+ *
+ * @param projectFiles - project files input.
+ * @returns The detect agent tool result.
+ * @example
+ * const result = detectAgentTool(projectFiles);
+ */
+export const detectAgentTool = (projectFiles: Readonly<Record<string, boolean>>): AgentToolId => {
+  const match = AGENT_TOOL_DETECTION_RULES.find((rule) => projectFiles[rule.path] === true);
+  if (match !== undefined) {
+    return match.tool;
+  }
   return 'generic';
-}
+};

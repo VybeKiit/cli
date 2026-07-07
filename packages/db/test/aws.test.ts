@@ -1,3 +1,5 @@
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: SDK command mocks intentionally use small fake classes.
+// biome-ignore-all lint/complexity/noExcessiveLinesPerFunction: AWS provider contract cases stay grouped for auditability.
 import { createAwsDataProvider } from '@vybekiit/db/providers/aws';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,7 +14,11 @@ const { send, command } = vi.hoisted(() => {
   const make = (name: string) =>
     class {
       readonly name = name;
-      constructor(public readonly input: Record<string, unknown>) {}
+      readonly input: Record<string, unknown>;
+
+      constructor(input: Record<string, unknown>) {
+        this.input = input;
+      }
     };
   return {
     send: vi.fn(),
@@ -32,18 +38,22 @@ vi.mock('@aws-sdk/lib-dynamodb', () => ({
   ...command,
 }));
 
-/** The single command issued to `send`, with its tag and payload typed for assertions. */
-function sentCommand(): { name: string; input: Record<string, unknown> } {
-  return send.mock.calls[0]?.[0];
-}
+/**
+ * Return the single SDK command issued to the mocked document client.
+ *
+ * @returns Captured command tag and payload for assertions.
+ * @example
+ * expect(sentCommand().name).toBe('Put');
+ */
+const sentCommand = (): { name: string; input: Record<string, unknown> } => send.mock.calls[0]?.[0];
 
 const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
 const run = Effect.runPromise;
 
-interface Order {
+type Order = {
   readonly id: string;
-  email: string;
-}
+  readonly email: string;
+};
 
 beforeEach(() => {
   vi.clearAllMocks();

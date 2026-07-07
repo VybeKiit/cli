@@ -11,12 +11,12 @@
 
   "home.hero.badge": "Built with VybeKiit",
   "home.hero.title": "Your app starts here.",
-  "home.hero.description": "Tell your AI agent what you want to build. It wires the payments, the database, and the deploy — you just describe the idea.",
+  "home.hero.description": "Tell your AI agent what you want to build. It wires payments, data, and launch steps while you describe the idea.",
   "home.hero.cta.getStarted": "Get started",
   "home.hero.cta.seePricing": "See pricing",
 
   "home.features.payments.title": "Payments built in",
-  "home.features.payments.body": "Take money on day one — Lemon Squeezy, Stripe, or PayPal.",
+  "home.features.payments.body": "Take money on day one with checkout wired in.",
   "home.features.data.title": "Your data, ready",
   "home.features.data.body": "A database and sign-in wired up without the setup headache.",
   "home.features.deploy.title": "Live in minutes",
@@ -46,7 +46,7 @@
   "auth.verify.codeLabel": "Code",
   "auth.verify.submit": "Verify",
   "auth.verify.submitting": "Checking...",
-  "auth.verify.resend": "Resend code",
+  "auth.verify.resend": "Send code again",
   "auth.verify.codeSent": "We sent you a new code.",
 
   "auth.errors.enterEmailAndPassword": "Enter your email and password.",
@@ -89,11 +89,11 @@
   "dashboard.tabs.nextSteps": "Next steps",
 
   "dashboard.stats.users.label": "Users",
-  "dashboard.stats.users.value": "—",
+  "dashboard.stats.users.value": "-",
   "dashboard.stats.revenue.label": "Revenue",
-  "dashboard.stats.revenue.value": "—",
+  "dashboard.stats.revenue.value": "-",
   "dashboard.stats.activeToday.label": "Active today",
-  "dashboard.stats.activeToday.value": "—",
+  "dashboard.stats.activeToday.value": "-",
 
   "dashboard.gettingStarted.title": "Getting started",
   "dashboard.gettingStarted.description": "A few things you can ask your AI agent to do next.",

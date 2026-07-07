@@ -41,6 +41,14 @@ type DeployLogosProps = {
   active: boolean;
 };
 
+/**
+ * Render the deploy logos component.
+ *
+ * @param active - Whether deploy logos should appear highlighted.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <DeployLogos active={true} />;
+ */
 export const DeployLogos = ({ active }: DeployLogosProps) => (
   <div className="flex flex-wrap gap-2 mt-2">
     {DEPLOY_LOGOS.map((provider) => (

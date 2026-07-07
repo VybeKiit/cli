@@ -5,6 +5,14 @@ import * as React from 'react';
 
 import { cn } from './utils';
 
+/**
+ * Render the Avatar component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Avatar component.
+ * @example
+ * <Avatar />;
+ */
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
@@ -17,6 +25,14 @@ const Avatar = React.forwardRef<
 ));
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
+/**
+ * Render the Avatar Image component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Avatar Image component.
+ * @example
+ * <AvatarImage />;
+ */
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
@@ -29,6 +45,14 @@ const AvatarImage = React.forwardRef<
 ));
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
+/**
+ * Render the Avatar Fallback component.
+ *
+ * @param props - Component props forwarded to the underlying UI primitive.
+ * @returns The rendered Avatar Fallback component.
+ * @example
+ * <AvatarFallback />;
+ */
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>

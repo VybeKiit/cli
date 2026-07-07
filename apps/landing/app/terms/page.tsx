@@ -10,7 +10,7 @@ export const metadata = {
  * plain-language skeleton; a human should review before any real launch (this is
  * not legal advice).
  */
-export default function TermsPage() {
+const TermsPage = () => {
   return (
     <CheckoutShell>
       <article className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
@@ -28,4 +28,6 @@ export default function TermsPage() {
       </article>
     </CheckoutShell>
   );
-}
+};
+
+export default TermsPage;

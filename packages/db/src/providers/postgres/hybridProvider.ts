@@ -1,8 +1,10 @@
-import { neon } from '@neondatabase/serverless';
-import { fail, ok, type Result } from '@vybekiit/core';
-import { type DataProviderResult, toEffectDataProvider } from '@vybekiit/db/effectBridge';
+// biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: Hybrid provider keeps native-table and JSONB conflict behavior colocated.
+// biome-ignore-all lint/style/noExcessiveLinesPerFile: Splitting this adapter would hide shared SQL state across operations.
+
 import { PRESET_TABLE_NAMES } from '@vybekiit/db/presets/catalog';
-import type { DataProvider, DbRecord, QueryFilter } from '@vybekiit/db/types';
+import { failDb, tryDb } from '@vybekiit/db/providerEffect';
+import type { DataProvider, DbError, DbRecord, QueryFilter } from '@vybekiit/db/types';
+import { Effect } from 'effect';
 import { POSTGRES_CAPABILITIES } from './shared';
 
 export type SqlClient = {
@@ -10,19 +12,63 @@ export type SqlClient = {
   (query: string, params?: unknown[]): Promise<unknown[]>;
 };
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
+/**
+ * Return whether a collection is backed by a native preset table.
+ *
+ * @param collection - Collection name to classify.
+ * @returns `true` when the collection has a generated Postgres table.
+ * @example
+ * const native = isPresetTable('orders');
+ */
+const isPresetTable = (collection: string): boolean => PRESET_TABLE_NAMES.has(collection);
 
-function isPresetTable(collection: string): boolean {
-  return PRESET_TABLE_NAMES.has(collection);
-}
+/**
+ * Narrow a dynamic Postgres row to the caller's record type.
+ *
+ * @param row - Postgres row returned from a dynamic table.
+ * @returns Row narrowed to the caller's record type.
+ * @example
+ * const order = rowToRecord<OrderRecord>(row);
+ */
+const rowToRecord = <T extends DbRecord>(row: Record<string, unknown>): T => row as T;
 
-function rowToRecord<T extends DbRecord>(row: Record<string, unknown>): T {
-  return row as T;
-}
+/**
+ * Resolve the stored id for a hybrid Postgres record.
+ *
+ * @param id - Caller-provided record id.
+ * @returns The provided id, or a generated id when the caller supplied an empty string.
+ * @example
+ * const id = recordId(record.id);
+ */
+const recordId = (id: string): string => {
+  if (id.length === 0) {
+    return crypto.randomUUID();
+  }
+  return id;
+};
 
-async function ensureJsonbTable(sql: SqlClient): Promise<void> {
+/**
+ * Return the JSONB payload shape for a record by removing the provider id field.
+ *
+ * @param record - Record being stored in the JSONB fallback table.
+ * @returns Record payload without the top-level `id`.
+ * @example
+ * const payload = payloadWithoutId(record);
+ */
+const payloadWithoutId = <T extends DbRecord>(record: T): Record<string, unknown> => {
+  const { id: _id, ...payload } = record;
+  return payload;
+};
+
+/**
+ * Ensure the JSONB fallback table exists before custom collection writes.
+ *
+ * @param sql - SQL client used by the provider.
+ * @returns Promise that resolves after the table exists.
+ * @example
+ * await ensureJsonbTable(sql);
+ */
+const ensureJsonbTable = async (sql: SqlClient): Promise<void> => {
   await sql`
     CREATE TABLE IF NOT EXISTS vybekiit_data (
       collection text NOT NULL,
@@ -31,266 +77,306 @@ async function ensureJsonbTable(sql: SqlClient): Promise<void> {
       PRIMARY KEY (collection, id)
     )
   `;
-}
+};
 
-/** Hybrid Postgres provider: native tables for presets, jsonb blob for custom collections. */
-export function createHybridPostgresProvider(
-  sql: SqlClient,
-  name: 'neon' | 'railway',
-): DataProvider {
-  const impl: DataProviderResult = {
-    name,
-    capabilities: POSTGRES_CAPABILITIES,
-
-    async insert<T extends DbRecord>(collection: string, record: T): Promise<Result<T>> {
-      try {
-        if (isPresetTable(collection)) {
-          const id = record.id || crypto.randomUUID();
-          const cols = { ...record, id };
-          const keys = Object.keys(cols);
-          const values = keys.map((key) => cols[key as keyof typeof cols]);
-          const colList = keys.join(', ');
-          const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
-          await sql(
-            `INSERT INTO public.${collection} (${colList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
-            values,
-          );
-          return ok({ ...record, id } as T);
-        }
-        await ensureJsonbTable(sql);
-        const id = record.id || crypto.randomUUID();
-        const payload = { ...record };
-        delete (payload as { id?: string }).id;
-        await sql`
+/**
+ * Build a hybrid Postgres provider for native preset tables plus JSONB custom data.
+ *
+ * @param sql - SQL client for the selected Postgres host.
+ * @param name - Provider identity exposed to callers.
+ * @returns Data provider backed by the selected Postgres host.
+ * @example
+ * const provider = createHybridPostgresProvider(sql, 'neon');
+ */
+export const createHybridPostgresProvider =
+  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: Hybrid adapter keeps native-table and JSONB methods near shared SQL helpers.
+  (sql: SqlClient, name: 'neon' | 'railway'): DataProvider => {
+    const insert = <T extends DbRecord>(collection: string, record: T): Effect.Effect<T, DbError> =>
+      tryDb(
+        'db_insert_failed',
+        async () => {
+          if (isPresetTable(collection)) {
+            const id = recordId(record.id);
+            const cols = { ...record, id };
+            const keys = Object.keys(cols);
+            const values = keys.map((key) => cols[key as keyof typeof cols]);
+            const colList = keys.join(', ');
+            const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
+            await sql(
+              `INSERT INTO public.${collection} (${colList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
+              values,
+            );
+            return { ...record, id } as T;
+          }
+          await ensureJsonbTable(sql);
+          const id = recordId(record.id);
+          const payload = payloadWithoutId(record);
+          await sql`
           INSERT INTO vybekiit_data (collection, id, payload)
           VALUES (${collection}, ${id}, ${JSON.stringify(payload)}::jsonb)
         `;
-        return ok({ ...record, id } as T);
-      } catch (error) {
-        return fail('db_insert_failed', errorMessage(error));
-      }
-    },
+          return { ...record, id } as T;
+        },
+        'unknown Postgres error',
+      );
 
-    async get<T extends DbRecord>(collection: string, id: string): Promise<Result<T | null>> {
-      try {
-        if (isPresetTable(collection)) {
-          const rows = (await sql(`SELECT * FROM public.${collection} WHERE id = $1 LIMIT 1`, [
-            id,
-          ])) as Record<string, unknown>[];
-          return ok(rows[0] ? rowToRecord<T>(rows[0]) : null);
-        }
-        await ensureJsonbTable(sql);
-        const rows = await sql`
+    const get = <T extends DbRecord>(
+      collection: string,
+      id: string,
+    ): Effect.Effect<T | null, DbError> =>
+      tryDb(
+        'db_get_failed',
+        async () => {
+          if (isPresetTable(collection)) {
+            const rows = (await sql(`SELECT * FROM public.${collection} WHERE id = $1 LIMIT 1`, [
+              id,
+            ])) as Record<string, unknown>[];
+            const [row] = rows;
+            if (row === undefined) {
+              return null;
+            }
+            return rowToRecord<T>(row);
+          }
+          await ensureJsonbTable(sql);
+          const rows = await sql`
           SELECT id, payload FROM vybekiit_data
           WHERE collection = ${collection} AND id = ${id}
           LIMIT 1
         `;
-        const row = rows[0] as { id: string; payload: Record<string, unknown> } | undefined;
-        return ok(row ? rowToRecord<T>({ id: row.id, ...row.payload }) : null);
-      } catch (error) {
-        return fail('db_get_failed', errorMessage(error));
-      }
-    },
+          const row = rows[0] as { id: string; payload: Record<string, unknown> } | undefined;
+          if (row === undefined) {
+            return null;
+          }
+          return rowToRecord<T>({ id: row.id, ...row.payload });
+        },
+        'unknown Postgres error',
+      );
 
-    async query<T extends DbRecord>(
+    const query = <T extends DbRecord>(
       collection: string,
       filter: QueryFilter<T>,
-    ): Promise<Result<T[]>> {
-      try {
-        if (isPresetTable(collection)) {
-          const entries = Object.entries(filter);
-          if (entries.length === 0) {
-            const rows = (await sql(`SELECT * FROM public.${collection}`)) as Record<
-              string,
-              unknown
-            >[];
-            return ok(rows.map((row) => rowToRecord<T>(row)));
+    ): Effect.Effect<T[], DbError> =>
+      tryDb(
+        'db_query_failed',
+        async () => {
+          if (isPresetTable(collection)) {
+            const entries = Object.entries(filter);
+            if (entries.length === 0) {
+              const rows = (await sql(`SELECT * FROM public.${collection}`)) as Record<
+                string,
+                unknown
+              >[];
+              return rows.map((row) => rowToRecord<T>(row));
+            }
+            const where = entries.map(([key], index) => `${key} = $${index + 1}`).join(' AND ');
+            const values = entries.map(([, value]) => value);
+            const rows = (await sql(
+              `SELECT * FROM public.${collection} WHERE ${where}`,
+              values,
+            )) as Record<string, unknown>[];
+            return rows.map((row) => rowToRecord<T>(row));
           }
-          const where = entries.map(([key], index) => `${key} = $${index + 1}`).join(' AND ');
-          const values = entries.map(([, value]) => value);
-          const rows = (await sql(
-            `SELECT * FROM public.${collection} WHERE ${where}`,
-            values,
-          )) as Record<string, unknown>[];
-          return ok(rows.map((row) => rowToRecord<T>(row)));
-        }
-        await ensureJsonbTable(sql);
-        const rows = (await sql`
+          await ensureJsonbTable(sql);
+          const rows = (await sql`
           SELECT id, payload FROM vybekiit_data WHERE collection = ${collection}
         `) as Array<{ id: string; payload: Record<string, unknown> }>;
-        const fields = Object.entries(filter);
-        const matches = rows
-          .map((row) => rowToRecord<T>({ id: row.id, ...row.payload }))
-          .filter((record) => fields.every(([key, value]) => record[key as keyof T] === value));
-        return ok(matches);
-      } catch (error) {
-        return fail('db_query_failed', errorMessage(error));
-      }
-    },
+          const fields = Object.entries(filter);
+          const matches = rows
+            .map((row) => rowToRecord<T>({ id: row.id, ...row.payload }))
+            .filter((record) => fields.every(([key, value]) => record[key as keyof T] === value));
+          return matches;
+        },
+        'unknown Postgres error',
+      );
 
-    async update<T extends DbRecord>(
+    const update = <T extends DbRecord>(
       collection: string,
       id: string,
       patch: Partial<Omit<T, 'id'>>,
-    ): Promise<Result<T>> {
-      const existing = await this.get<T>(collection, id);
-      if (!existing.ok) return existing;
-      if (!existing.value) {
-        return fail('not_found', `No record ${id} in ${collection}.`);
-      }
-      try {
-        const updated = { ...existing.value, ...patch, id } as T;
-        if (isPresetTable(collection)) {
-          const entries = Object.entries(patch);
-          if (entries.length === 0) return ok(updated);
-          const setClause = entries.map(([key], index) => `${key} = $${index + 2}`).join(', ');
-          const values = [id, ...entries.map(([, value]) => value)];
-          await sql(`UPDATE public.${collection} SET ${setClause} WHERE id = $1`, values);
-          return ok(updated);
+    ): Effect.Effect<T, DbError> =>
+      Effect.gen(function* () {
+        const existing = yield* get<T>(collection, id);
+        if (existing === null) {
+          return yield* failDb('not_found', `No record ${id} in ${collection}.`);
         }
-        const payload = { ...updated };
-        delete (payload as { id?: string }).id;
-        await sql`
+        const updated = { ...existing, ...patch, id } as T;
+        yield* tryDb(
+          'db_update_failed',
+          async () => {
+            if (isPresetTable(collection)) {
+              const entries = Object.entries(patch);
+              if (entries.length === 0) {
+                return;
+              }
+              const setClause = entries.map(([key], index) => `${key} = $${index + 2}`).join(', ');
+              const values = [id, ...entries.map(([, value]) => value)];
+              await sql(`UPDATE public.${collection} SET ${setClause} WHERE id = $1`, values);
+              return;
+            }
+            const payload = payloadWithoutId(updated);
+            await sql`
           UPDATE vybekiit_data
           SET payload = ${JSON.stringify(payload)}::jsonb
           WHERE collection = ${collection} AND id = ${id}
         `;
-        return ok(updated);
-      } catch (error) {
-        return fail('db_update_failed', errorMessage(error));
-      }
-    },
+          },
+          'unknown Postgres error',
+        );
+        return updated;
+      });
 
-    async remove(collection: string, id: string): Promise<Result<true>> {
-      try {
-        if (isPresetTable(collection)) {
-          const rows = (await sql(`DELETE FROM public.${collection} WHERE id = $1 RETURNING id`, [
-            id,
-          ])) as unknown[];
-          if (!rows.length) {
-            return fail('not_found', `No record ${id} in ${collection}.`);
-          }
-          return ok(true);
-        }
-        await ensureJsonbTable(sql);
-        const rows = await sql`
+    const remove = (collection: string, id: string): Effect.Effect<true, DbError> =>
+      Effect.gen(function* () {
+        const removed = yield* tryDb(
+          'db_remove_failed',
+          async () => {
+            if (isPresetTable(collection)) {
+              const rows = (await sql(
+                `DELETE FROM public.${collection} WHERE id = $1 RETURNING id`,
+                [id],
+              )) as unknown[];
+              return rows.length > 0;
+            }
+            await ensureJsonbTable(sql);
+            const rows = await sql`
           DELETE FROM vybekiit_data
           WHERE collection = ${collection} AND id = ${id}
           RETURNING id
         `;
-        if (!rows.length) {
-          return fail('not_found', `No record ${id} in ${collection}.`);
+            return rows.length > 0;
+          },
+          'unknown Postgres error',
+        );
+        if (!removed) {
+          return yield* failDb('not_found', `No record ${id} in ${collection}.`);
         }
-        return ok(true);
-      } catch (error) {
-        return fail('db_remove_failed', errorMessage(error));
-      }
-    },
+        return true as const;
+      });
 
-    async upsert<T extends DbRecord>(
+    const upsert = <T extends DbRecord>(
       collection: string,
       record: T,
       conflictKey: keyof T & string,
-    ): Promise<Result<T>> {
-      try {
+    ): Effect.Effect<T, DbError> =>
+      Effect.gen(function* () {
         const conflictValue = record[conflictKey];
-        const existing = await this.query<T>(collection, {
+        const existing = yield* query<T>(collection, {
           [conflictKey]: conflictValue,
         } as QueryFilter<T>);
-        if (existing.ok && existing.value.length > 0) {
-          const row = existing.value[0];
-          if (row) {
-            const updated = { ...row, ...record, id: row.id } as T;
-            if (isPresetTable(collection)) {
-              const entries = Object.entries(record).filter(([key]) => key !== 'id');
-              if (entries.length > 0) {
-                const setClause = entries
-                  .map(([key], index) => `${key} = $${index + 2}`)
-                  .join(', ');
-                const values = [row.id, ...entries.map(([, value]) => value)];
-                await sql(`UPDATE public.${collection} SET ${setClause} WHERE id = $1`, values);
+        const [row] = existing;
+        if (row !== undefined) {
+          const updated = { ...row, ...record, id: row.id } as T;
+          yield* tryDb(
+            'db_upsert_failed',
+            async () => {
+              if (isPresetTable(collection)) {
+                const entries = Object.entries(record).filter(([key]) => key !== 'id');
+                if (entries.length > 0) {
+                  const setClause = entries
+                    .map(([key], index) => `${key} = $${index + 2}`)
+                    .join(', ');
+                  const values = [row.id, ...entries.map(([, value]) => value)];
+                  await sql(`UPDATE public.${collection} SET ${setClause} WHERE id = $1`, values);
+                }
+                return;
               }
-              return ok(updated);
-            }
-            const payload = { ...updated };
-            delete (payload as { id?: string }).id;
-            await sql`
+              const payload = payloadWithoutId(updated);
+              await sql`
               UPDATE vybekiit_data
               SET payload = ${JSON.stringify(payload)}::jsonb
               WHERE collection = ${collection} AND id = ${row.id}
             `;
-            return ok(updated);
-          }
+            },
+            'unknown Postgres error',
+          );
+          return updated;
         }
-        return this.insert(collection, record);
-      } catch (error) {
-        return fail('db_upsert_failed', errorMessage(error));
-      }
-    },
+        return yield* insert(collection, record);
+      });
 
-    async idempotentInsert<T extends DbRecord>(
+    const idempotentInsert = <T extends DbRecord>(
       collection: string,
       record: T,
       dedupeKey: keyof T & string,
-    ): Promise<Result<T>> {
-      const existing = await this.query<T>(collection, {
-        [dedupeKey]: record[dedupeKey],
-      } as QueryFilter<T>);
-      if (existing.ok && existing.value[0]) {
-        return ok(existing.value[0]);
-      }
-      return this.insert(collection, record);
-    },
+    ): Effect.Effect<T, DbError> =>
+      Effect.gen(function* () {
+        const existing = yield* query<T>(collection, {
+          [dedupeKey]: record[dedupeKey],
+        } as QueryFilter<T>);
+        const [row] = existing;
+        if (row !== undefined) {
+          return row;
+        }
+        return yield* insert(collection, record);
+      });
 
-    async fullTextSearch<T extends DbRecord>(
+    const fullTextSearch = <T extends DbRecord>(
       collection: string,
-      query: string,
+      search: string,
       limit: number,
-    ): Promise<Result<T[]>> {
-      try {
-        const rows = (await sql(
-          `SELECT * FROM public.${collection}
+    ): Effect.Effect<T[], DbError> =>
+      tryDb(
+        'db_search_failed',
+        async () => {
+          const rows = (await sql(
+            `SELECT * FROM public.${collection}
            WHERE search_vector @@ websearch_to_tsquery('english', $1)
            LIMIT $2`,
-          [query, limit],
-        )) as Record<string, unknown>[];
-        return ok(rows.map((row) => rowToRecord<T>(row)));
-      } catch (error) {
-        return fail('db_search_failed', errorMessage(error));
-      }
-    },
+            [search, limit],
+          )) as Record<string, unknown>[];
+          return rows.map((row) => rowToRecord<T>(row));
+        },
+        'unknown Postgres error',
+      );
 
-    async bulkInsert<T extends DbRecord>(
+    const bulkInsert = <T extends DbRecord>(
       collection: string,
       records: readonly T[],
-    ): Promise<Result<T[]>> {
-      const inserted: T[] = [];
-      for (const record of records) {
-        const id = record.id || crypto.randomUUID();
-        if (isPresetTable(collection)) {
-          const cols = { ...record, id };
-          const keys = Object.keys(cols);
-          const values = keys.map((key) => cols[key as keyof typeof cols]);
-          const colList = keys.join(', ');
-          const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
-          await sql(
-            `INSERT INTO public.${collection} (${colList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
-            values,
-          );
-          inserted.push({ ...record, id } as T);
-        } else {
-          const payload = { ...record, id };
-          delete (payload as { id?: string }).id;
-          await ensureJsonbTable(sql);
-          await sql`
+    ): Effect.Effect<T[], DbError> =>
+      tryDb(
+        'db_bulk_insert_failed',
+        async () => {
+          const inserted: T[] = [];
+          for (const record of records) {
+            const id = recordId(record.id);
+            if (isPresetTable(collection)) {
+              const cols = { ...record, id };
+              const keys = Object.keys(cols);
+              const values = keys.map((key) => cols[key as keyof typeof cols]);
+              const colList = keys.join(', ');
+              const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
+              // biome-ignore lint/performance/noAwaitInLoops: Bulk inserts run in order so returned rows match input order.
+              await sql(
+                `INSERT INTO public.${collection} (${colList}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
+                values,
+              );
+              inserted.push({ ...record, id } as T);
+            } else {
+              const payload = payloadWithoutId({ ...record, id } as T);
+              await ensureJsonbTable(sql);
+              await sql`
             INSERT INTO vybekiit_data (collection, id, payload)
             VALUES (${collection}, ${id}, ${JSON.stringify(payload)}::jsonb)
           `;
-          inserted.push({ ...record, id } as T);
-        }
-      }
-      return ok(inserted);
-    },
+              inserted.push({ ...record, id } as T);
+            }
+          }
+          return inserted;
+        },
+        'unknown Postgres error',
+      );
+
+    return {
+      name,
+      capabilities: POSTGRES_CAPABILITIES,
+      insert,
+      get,
+      query,
+      update,
+      remove,
+      upsert,
+      idempotentInsert,
+      fullTextSearch,
+      bulkInsert,
+    };
   };
-  return toEffectDataProvider(impl);
-}

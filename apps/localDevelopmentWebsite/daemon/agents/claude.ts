@@ -15,6 +15,8 @@ const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
  * @param onOutput - Called for each chunk of stdout/stderr from the agent
  * @param onExit - Called when the agent process exits
  * @returns AgentProcess handle for sending input and tracking the session
+ * @example
+ * const process = spawnClaude(onOutput, onExit);
  */
 export const spawnClaude = (
   onOutput: (chunk: string) => void,
@@ -37,6 +39,9 @@ export const spawnClaude = (
 /**
  * @param agent - The running agent process
  * @param content - Text to send to the agent's stdin
+ * @returns Nothing; the content is written to the process stdin.
+ * @example
+ * sendToAgent(agent, 'continue');
  */
 export const sendToAgent = (agent: AgentProcess, content: string) => {
   agent.process.stdin?.write(content + '\n');
@@ -44,6 +49,9 @@ export const sendToAgent = (agent: AgentProcess, content: string) => {
 
 /**
  * @param agent - The running agent process to stop
+ * @returns Nothing; the process receives SIGTERM.
+ * @example
+ * stopAgent(agent);
  */
 export const stopAgent = (agent: AgentProcess) => {
   agent.process.kill('SIGTERM');

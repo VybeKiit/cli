@@ -54,6 +54,38 @@ const GoLiveDot = ({ status }: { status: WorkflowStep['status'] }) => (
   />
 );
 
+const containerClass = (status: WorkflowStep['status'], isDeploy: boolean, isActive: boolean) => {
+  if (isDeploy && status === 'running') return 'border-emerald-500/30 bg-emerald-950/10';
+  if (isDeploy && isActive) return 'border-emerald-500/30 bg-emerald-950/10';
+  if (isDeploy && status === 'pending') return 'border-orange-500/20 bg-orange-950/5';
+  if (status === 'running')
+    return 'border-vybe-500/30 bg-vybe-950/20 shadow-[0_0_16px_rgba(139,92,246,0.08)]';
+  if (status === 'done') return 'border-emerald-500/20 bg-emerald-950/10';
+  return 'border-zinc-800 bg-zinc-900/40';
+};
+
+const stepIconColor = (status: WorkflowStep['status'], isDeploy: boolean) => {
+  if (status === 'done') return 'text-emerald-400';
+  if (status === 'running') return isDeploy ? 'text-emerald-400' : 'text-vybe-400';
+  return 'text-zinc-500';
+};
+
+const subIconColor = (status: WorkflowStep['status']) => {
+  if (status === 'done') return 'text-emerald-400';
+  if (status === 'running') return 'text-vybe-400';
+  return 'text-zinc-500';
+};
+
+/**
+ * Render the workflow step item component.
+ *
+ * @param step - Workflow step to render.
+ * @param index - Step position used for staggered animation.
+ * @param compact - Whether to render the smaller step layout.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <WorkflowStepItem step={step} index={0} compact={true} />;
+ */
 export const WorkflowStepItem = ({ step, index, compact = false }: WorkflowStepItemProps) => {
   const hasIcon = !!STEP_ICONS[step.id];
   const isActive = step.status === 'running' || step.status === 'done';
@@ -64,22 +96,14 @@ export const WorkflowStepItem = ({ step, index, compact = false }: WorkflowStepI
 
   return (
     <motion.div
+      data-status={step.status}
+      data-testid={`workflow-step-${step.id}`}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       className={cn(
         'relative rounded-xl border transition overflow-hidden',
-        isDeploy && step.status === 'running'
-          ? 'border-emerald-500/30 bg-emerald-950/10'
-          : isDeploy && isActive
-            ? 'border-emerald-500/30 bg-emerald-950/10'
-            : isDeploy && step.status === 'pending'
-              ? 'border-orange-500/20 bg-orange-950/5'
-              : step.status === 'running'
-                ? 'border-vybe-500/30 bg-vybe-950/20 shadow-[0_0_16px_rgba(139,92,246,0.08)]'
-                : step.status === 'done'
-                  ? 'border-emerald-500/20 bg-emerald-950/10'
-                  : 'border-zinc-800 bg-zinc-900/40',
+        containerClass(step.status, isDeploy, isActive),
         compact ? 'p-2.5' : 'p-4',
       )}
     >
@@ -91,18 +115,7 @@ export const WorkflowStepItem = ({ step, index, compact = false }: WorkflowStepI
         {isDeploy ? <GoLiveDot status={step.status} /> : <StatusIndicator status={step.status} />}
 
         {hasIcon && !isDeploy && (
-          <StepIcon
-            stepId={step.id}
-            className={cn(
-              step.status === 'done'
-                ? 'text-emerald-400'
-                : step.status === 'running'
-                  ? isDeploy
-                    ? 'text-emerald-400'
-                    : 'text-vybe-400'
-                  : 'text-zinc-500',
-            )}
-          />
+          <StepIcon stepId={step.id} className={stepIconColor(step.status, isDeploy)} />
         )}
 
         <div className="min-w-0 flex-1">
@@ -138,17 +151,7 @@ export const WorkflowStepItem = ({ step, index, compact = false }: WorkflowStepI
               <div key={sub.id} className="flex items-center gap-2.5">
                 <StatusIndicator status={sub.status} />
                 {subHasIcon && (
-                  <StepIcon
-                    stepId={sub.id}
-                    className={cn(
-                      'h-4 w-4',
-                      sub.status === 'done'
-                        ? 'text-emerald-400'
-                        : sub.status === 'running'
-                          ? 'text-vybe-400'
-                          : 'text-zinc-500',
-                    )}
-                  />
+                  <StepIcon stepId={sub.id} className={cn('h-4 w-4', subIconColor(sub.status))} />
                 )}
                 <span className={cn('text-zinc-300', compact ? 'text-[11px]' : 'text-xs')}>
                   {sub.label}

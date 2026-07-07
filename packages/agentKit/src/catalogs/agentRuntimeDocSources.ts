@@ -2,11 +2,11 @@
  * Official agent-runtime documentation URLs fetched in CI before skill lint runs.
  * Each entry includes phrases that must appear in the live doc (drift detection).
  */
-export interface AgentRuntimeDocSource {
+export type AgentRuntimeDocSource = {
   readonly id: string;
   readonly url: string;
   readonly mustInclude: readonly string[];
-}
+};
 
 export const AGENT_RUNTIME_DOC_SOURCES: readonly AgentRuntimeDocSource[] = [
   {

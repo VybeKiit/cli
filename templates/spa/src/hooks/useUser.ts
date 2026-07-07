@@ -5,15 +5,22 @@ import { useQuery } from '@tanstack/react-query';
 
 const ME_ENDPOINT = '/api/auth/me';
 
-async function fetchCurrentUser(): Promise<AuthUser | null> {
+const fetchCurrentUser = async (): Promise<AuthUser | null> => {
   const result = await getJson<AuthUser>(ME_ENDPOINT);
   return result.ok ? result.value : null;
-}
+};
 
-export function useUser(): { user: AuthUser | null; loading: boolean } {
+/**
+ * Load the current authenticated user for SPA pages.
+ *
+ * @returns The current user and loading state.
+ * @example
+ * const { user, loading } = useUser();
+ */
+export const useUser = (): { user: AuthUser | null; loading: boolean } => {
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.auth.me,
     queryFn: fetchCurrentUser,
   });
-  return { user: data ?? null, loading: isLoading };
-}
+  return { user: data === undefined ? null : data, loading: isLoading };
+};

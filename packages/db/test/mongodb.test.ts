@@ -1,3 +1,4 @@
+// biome-ignore-all lint/complexity/noExcessiveLinesPerFunction: Mongo provider contract cases stay grouped for auditability.
 import { createMongoDataProvider } from '@vybekiit/db/providers/mongodb';
 import { Effect } from 'effect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -26,10 +27,10 @@ vi.mock('mongodb', () => ({
 const config = { MONGODB_URI: 'mongodb+srv://x', MONGODB_DB: 'app' };
 const run = Effect.runPromise;
 
-interface Order {
+type Order = {
   readonly id: string;
-  email: string;
-}
+  readonly email: string;
+};
 
 beforeEach(() => {
   vi.clearAllMocks();

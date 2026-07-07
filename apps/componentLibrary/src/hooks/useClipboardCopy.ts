@@ -2,7 +2,15 @@
 
 import { useCallback, useRef, useState } from 'react';
 
-export function useClipboardCopy(resetMs = 2000) {
+/**
+ * Read clipboard copy state for the component library.
+ *
+ * @param resetMs - Input passed to this resetMs parameter.
+ * @returns The state or callback exposed by useClipboardCopy.
+ * @example
+ * const value = useClipboardCopy(resetMs);
+ */
+export const useClipboardCopy = (resetMs = 2000) => {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -24,4 +32,4 @@ export function useClipboardCopy(resetMs = 2000) {
   );
 
   return { copy, copied };
-}
+};

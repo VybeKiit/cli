@@ -1,10 +1,10 @@
 'use client';
 
 import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
+import { Button } from '@vybekiit/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/ui/button';
 
 interface CatalogPaginationBarProps {
   readonly page: number;
@@ -14,13 +14,21 @@ interface CatalogPaginationBarProps {
   readonly onPageChange: (page: number) => void;
 }
 
-export function CatalogPaginationBar({
+/**
+ * Render the catalog pagination bar component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <CatalogPaginationBar {...props} />;
+ */
+export const CatalogPaginationBar = ({
   page,
   pageCount,
   total,
   pageSize,
   onPageChange,
-}: CatalogPaginationBarProps) {
+}: CatalogPaginationBarProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -77,4 +85,4 @@ export function CatalogPaginationBar({
     </nav>,
     document.body,
   );
-}
+};

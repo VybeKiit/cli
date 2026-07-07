@@ -1,6 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
-async function prepareReportDock(page: Page) {
+// matches whole word "dom", not "domain"
+const DOM_WORD_PATTERN = /\bdom\b/;
+// matches whole word "selector"
+const SELECTOR_WORD_PATTERN = /\bselector\b/;
+
+const prepareReportDock = async (page: Page) => {
   await page.goto('/en/');
   const skip = page.getByRole('button', { name: 'Skip' });
   if (await skip.isVisible()) {
@@ -9,7 +14,7 @@ async function prepareReportDock(page: Page) {
   const brandToggle = page.getByTestId('report-mode-brand-toggle');
   await brandToggle.hover();
   await brandToggle.click();
-}
+};
 
 test.describe('Report Mode (dev)', () => {
   test.beforeEach(async ({ context }) => {
@@ -96,9 +101,7 @@ test.describe('Report Mode (dev)', () => {
     const reportUi = page.locator('[data-report-mode-ui="true"]');
     const uiText = await reportUi.allInnerTexts();
     const combined = uiText.join('\n').toLowerCase();
-    // `\bdom\b` = whole word "dom" only — matches "dom" but not "domain"
-    expect(combined).not.toMatch(/\bdom\b/);
-    // `\bselector\b` = whole word "selector" — e.g. blocks "CSS selector" in UI copy
-    expect(combined).not.toMatch(/\bselector\b/);
+    expect(combined).not.toMatch(DOM_WORD_PATTERN);
+    expect(combined).not.toMatch(SELECTOR_WORD_PATTERN);
   });
 });

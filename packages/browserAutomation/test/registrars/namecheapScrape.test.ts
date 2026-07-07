@@ -2,7 +2,7 @@ import {
   htmlContainsWhitelistedIp,
   scrapeNamecheapApiKey,
   scrapeNamecheapApiUser,
-} from '@vybekiit/browserAutomation/domains/registrars/namecheap/scrape';
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/scrape';
 import { describe, expect, it } from 'vitest';
 
 describe('namecheap scrape', () => {

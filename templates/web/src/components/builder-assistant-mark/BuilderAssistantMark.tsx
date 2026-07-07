@@ -102,6 +102,15 @@ const POSE_GLOW: Partial<Record<ClaudeOctopusPose, string>> = {
   tired: 'builder-assistant-mark--sleep',
 };
 
+const poseGlowClass = (pose: ClaudeOctopusPose): string | undefined => {
+  const baseGlow = POSE_GLOW[pose];
+  if (baseGlow !== undefined) {
+    return baseGlow;
+  }
+
+  return claudeOctopusExtendedGlowClass(pose);
+};
+
 interface BuilderAssistantMarkProps {
   readonly assistant: VybeAssistant;
   readonly pose?: ClaudeOctopusPose;
@@ -115,15 +124,13 @@ interface BuilderAssistantMarkProps {
   readonly className?: string;
 }
 
-function markShellClass(
+const markShellClass = (
   size: BuilderAssistantMarkSize,
   className?: string,
   ...parts: Array<string | false | undefined>
-) {
-  return cn('builder-assistant-mark', builderAssistantMarkSizeClass(size), ...parts, className);
-}
+) => cn('builder-assistant-mark', builderAssistantMarkSizeClass(size), ...parts, className);
 
-function ClaudeCodeOctopusMark({
+const ClaudeCodeOctopusMark = ({
   pose: poseProp,
   size = 's',
   active = false,
@@ -137,7 +144,7 @@ function ClaudeCodeOctopusMark({
   readonly working?: boolean;
   readonly mood?: AssistantMood;
   readonly className?: string | undefined;
-}) {
+}) => {
   const pose = resolveClaudeOctopusPose({
     ...(poseProp === undefined ? {} : { pose: poseProp }),
     active,
@@ -162,7 +169,7 @@ function ClaudeCodeOctopusMark({
   const squintEyes = SQUINT_EYE_POSES.has(pose);
   const droopyEyes = DROOPY_EYE_POSES.has(pose);
 
-  const poseGlow = POSE_GLOW[pose] ?? claudeOctopusExtendedGlowClass(pose);
+  const poseGlow = poseGlowClass(pose);
   // Poses migrated to the integer grid render the sharp rig; the rest keep the
   // legacy 24-unit path body until their batch lands (additive migration).
   const rig = getRigPose(pose);
@@ -252,10 +259,16 @@ function ClaudeCodeOctopusMark({
       )}
     </span>
   );
-}
+};
 
-/** Official SVG marks for Cursor, Claude Code TUI octopus, and Codex CLI cloud. */
-export function BuilderAssistantMark({
+/**
+ * Official SVG marks for Cursor, Claude Code TUI octopus, and Codex CLI cloud.
+ *
+ * @returns A branded assistant mark sized for inline UI.
+ * @example
+ * <BuilderAssistantMark assistant="codex" size="m" />;
+ */
+export const BuilderAssistantMark = ({
   assistant,
   pose,
   size = 's',
@@ -263,7 +276,7 @@ export function BuilderAssistantMark({
   working = false,
   mood = 'default',
   className,
-}: BuilderAssistantMarkProps) {
+}: BuilderAssistantMarkProps) => {
   if (assistant === 'cursor') {
     return (
       <span
@@ -310,8 +323,14 @@ export function BuilderAssistantMark({
       <CodexMark className="builder-assistant-mark__codex-svg" />
     </span>
   );
-}
+};
 
-export function assistantLabel(assistant: VybeAssistant): string {
-  return ASSISTANT_LABELS[assistant];
-}
+/**
+ * Resolve the display label for a supported assistant id.
+ *
+ * @param assistant - Assistant identifier from report mode.
+ * @returns Human-readable assistant label.
+ * @example
+ * assistantLabel('codex');
+ */
+export const assistantLabel = (assistant: VybeAssistant): string => ASSISTANT_LABELS[assistant];

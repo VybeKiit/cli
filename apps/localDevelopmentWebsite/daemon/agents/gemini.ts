@@ -8,6 +8,8 @@ const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
  * @param onOutput - Called for each chunk of stdout/stderr from the agent
  * @param onExit - Called when the agent process exits
  * @returns AgentProcess handle for the Gemini CLI session
+ * @example
+ * const process = spawnGemini(onOutput, onExit);
  */
 export const spawnGemini = (
   onOutput: (chunk: string) => void,

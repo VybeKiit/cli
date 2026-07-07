@@ -1,7 +1,7 @@
 import {
   formatBuilderStuckMessage,
   planDocFallback,
-} from '@vybekiit/agentKit/planners/planDocFallback';
+} from '@vybekiit/agent-kit/planners/planDocFallback';
 import { describe, expect, it } from 'vitest';
 
 describe('planDocFallback', () => {

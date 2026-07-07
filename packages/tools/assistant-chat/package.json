@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@vybekiit/report-mode": "workspace:*",
-    "effect": "3.21.4"
+    "effect": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -50,12 +50,12 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "catalog:",
     "@types/react": "^19.0.2",
     "react": "^19.0.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "private": true
 }

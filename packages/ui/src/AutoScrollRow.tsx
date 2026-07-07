@@ -3,12 +3,13 @@ import {
   type CSSProperties,
   cloneElement,
   isValidElement,
+  type Key,
   type ReactElement,
   type ReactNode,
 } from 'react';
 import { cn } from './utils';
 
-type AutoScrollRowProps = {
+interface AutoScrollRowProps {
   readonly children: ReactNode;
   readonly ariaLabel: string;
   readonly durationDesktop?: string;
@@ -17,26 +18,59 @@ type AutoScrollRowProps = {
   readonly className?: string;
   readonly trackClassName?: string;
   readonly rowClassName?: string;
+}
+
+/**
+ * Build a stable clone key for the duplicated scrolling row.
+ *
+ * @param key - Original React key, when present.
+ * @param fallback - Fallback key segment for unkeyed children.
+ * @returns A clone key with the `-clone` suffix.
+ * @example
+ * resolveCloneKey('logo', 'row') === 'logo-clone';
+ */
+const resolveCloneKey = (key: Key | null, fallback: string | number): string => {
+  if (key === null) {
+    return `${fallback}-clone`;
+  }
+  return `${String(key)}-clone`;
 };
 
-function cloneForLoop(children: ReactNode) {
+/**
+ * Clone row content for the second loop copy.
+ *
+ * @param children - Original row content.
+ * @returns A clone tree marked as hidden from assistive tech when possible.
+ * @example
+ * const copy = cloneForLoop(children);
+ */
+const cloneForLoop = (children: ReactNode): ReactNode => {
   if (isValidElement(children)) {
     return cloneElement(children as ReactElement<{ 'aria-hidden'?: boolean }>, {
       'aria-hidden': true,
-      key: `${children.key ?? 'row'}-clone`,
+      key: resolveCloneKey(children.key, 'row'),
     });
   }
 
   return Children.map(children, (child, index) => {
-    if (!isValidElement(child)) return child;
+    if (!isValidElement(child)) {
+      return child;
+    }
     return cloneElement(child as ReactElement, {
-      key: `${child.key ?? index}-clone`,
+      key: resolveCloneKey(child.key, index),
     });
   });
-}
+};
 
-/** Horizontal row that scrolls on its own and loops seamlessly (edge fade included). */
-export function AutoScrollRow({
+/**
+ * Render a horizontal row that scrolls and loops seamlessly.
+ *
+ * @param props - Row content, accessible label, and optional timing/class overrides.
+ * @returns A self-looping horizontal row with a hidden clone track.
+ * @example
+ * <AutoScrollRow ariaLabel="Partners">...</AutoScrollRow>;
+ */
+export const AutoScrollRow = ({
   children,
   ariaLabel,
   durationDesktop = '80s',
@@ -45,7 +79,7 @@ export function AutoScrollRow({
   className,
   trackClassName,
   rowClassName,
-}: AutoScrollRowProps) {
+}: AutoScrollRowProps) => {
   const style = {
     ['--auto-scroll-duration-desktop' as string]: durationDesktop,
     ['--auto-scroll-duration-mobile' as string]: durationMobile,
@@ -64,4 +98,4 @@ export function AutoScrollRow({
       </div>
     </div>
   );
-}
+};

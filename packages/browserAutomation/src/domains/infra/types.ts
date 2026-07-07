@@ -1,5 +1,5 @@
-import { CLOUDFLARE_DASHBOARD_URL } from '@vybekiit/browserAutomation/core/constants';
-import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
+import { CLOUDFLARE_DASHBOARD_URL } from '@vybekiit/browser-automation/core/constants';
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 
 export type CfVerbContext = BaseVerbContext;
 
@@ -7,12 +7,12 @@ export type CfVerbContext = BaseVerbContext;
 export const CF_DASHBOARD_URL = CLOUDFLARE_DASHBOARD_URL;
 
 /** Result of Cloudflare API token creation. */
-export interface CfSetupResult {
+export type CfSetupResult = {
   token: string;
   tokenId: string;
   accountId: string;
   name: string;
-}
+};
 
 /** Env block written to .env. Token is NOT included in agent-visible output. */
 export type CfEnvBlock = {
@@ -20,9 +20,15 @@ export type CfEnvBlock = {
   CLOUDFLARE_API_TOKEN: string;
 } & Record<string, string>;
 
-export function cfEnvBlock(result: CfSetupResult): CfEnvBlock {
-  return {
-    CLOUDFLARE_ACCOUNT_ID: result.accountId,
-    CLOUDFLARE_API_TOKEN: result.token,
-  };
-}
+/**
+ * Cf Env Block.
+ *
+ * @param result - Operation result to convert.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = cfEnvBlock(result);
+ */
+export const cfEnvBlock = (result: CfSetupResult): CfEnvBlock => ({
+  CLOUDFLARE_ACCOUNT_ID: result.accountId,
+  CLOUDFLARE_API_TOKEN: result.token,
+});

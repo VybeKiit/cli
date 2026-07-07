@@ -1,6 +1,5 @@
 export * from './AutoScrollRow';
 export * from './accordion';
-// Vibe UI — animated components for the development console
 export * from './agent-avatar';
 export * from './agent-logo';
 export * from './alert';
@@ -61,4 +60,5 @@ export * from './toggle-group';
 export * from './tooltip';
 export * from './type-writer';
 export * from './use-mobile';
-export { cn } from './utils';
+export * from './utils';
+export * from './vybekiit-logo';

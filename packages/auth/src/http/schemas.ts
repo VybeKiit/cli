@@ -2,8 +2,11 @@ import { Schema } from 'effect';
 
 const NonEmpty = Schema.String.pipe(Schema.minLength(1));
 
+// "hello@example.com" matches, "hello" does not.
+const EMAIL_ADDRESS_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const EmailField = Schema.String.pipe(
-  Schema.filter((value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), {
+  Schema.filter((value) => EMAIL_ADDRESS_PATTERN.test(value), {
     message: () => 'must be a valid email',
   }),
 );

@@ -1,36 +1,47 @@
-import { CdpUnreachableError } from '@vybekiit/browserAutomation/core/errors';
+import { CdpUnreachableError } from '@vybekiit/browser-automation/core/errors';
 import { type Browser, chromium, type Page } from 'playwright';
 
-export type RecorderSession = {
-  browser: Browser;
-  dispose: () => Promise<void>;
-  ownsPage: boolean;
-  page: Page;
-};
+export interface RecorderSession {
+  readonly browser: Browser;
+  readonly dispose: () => Promise<void>;
+  readonly ownsPage: boolean;
+  readonly page: Page;
+}
 
-export async function attachRecorderSession(options: {
-  cdpEndpoint: string;
-  profileHint: string;
-  startUrl: string;
-  tabUrlPattern: RegExp;
-}): Promise<RecorderSession> {
+export interface RecorderSessionOptions {
+  readonly cdpEndpoint: string;
+  readonly profileHint: string;
+  readonly startUrl: string;
+  readonly tabUrlPattern: RegExp;
+}
+
+/**
+ * Attach the recorder to a dedicated Chrome session.
+ *
+ * @param options - CDP endpoint, profile hint, start URL, and tab reuse pattern.
+ * @returns The recorder browser session.
+ * @example
+ * const session = await attachRecorderSession({ cdpEndpoint, profileHint, startUrl, tabUrlPattern });
+ */
+export const attachRecorderSession = async (
+  options: RecorderSessionOptions,
+): Promise<RecorderSession> => {
   const { cdpEndpoint, profileHint, startUrl, tabUrlPattern } = options;
 
   let browser: Browser;
   try {
     browser = await chromium.connectOverCDP(cdpEndpoint, { timeout: 15_000, noDefaults: true });
   } catch (err) {
-    throw new CdpUnreachableError(cdpEndpoint, profileHint, err);
+    // biome-ignore lint/style/useErrorCause: CdpUnreachableError stores the cause through its ErrorOptions constructor.
+    throw new CdpUnreachableError(cdpEndpoint, profileHint, { cause: err });
   }
 
-  const context = browser.contexts()[0];
-  if (!context) {
+  const [context] = browser.contexts();
+  if (context === undefined) {
     await browser.close().catch(() => undefined);
-    throw new CdpUnreachableError(
-      cdpEndpoint,
-      profileHint,
-      new Error('Connected to Chrome but no browser context was found.'),
-    );
+    throw new CdpUnreachableError(cdpEndpoint, profileHint, {
+      cause: new Error('Connected to Chrome but no browser context was found.'),
+    });
   }
 
   const existing = context
@@ -41,17 +52,17 @@ export async function attachRecorderSession(options: {
   let page: Page;
   let ownsPage: boolean;
 
-  if (existing) {
-    page = existing;
-    ownsPage = false;
-    await page.bringToFront();
-    console.log(`Reusing open tab for Inspector: ${page.url()}`);
-  } else {
+  if (existing === undefined) {
     page = await context.newPage();
     ownsPage = true;
     console.log(`Opening ${startUrl}`);
     await page.goto(startUrl, { waitUntil: 'domcontentloaded' });
     console.log(`Opened new tab for Inspector: ${page.url()}`);
+  } else {
+    page = existing;
+    ownsPage = false;
+    await page.bringToFront();
+    console.log(`Reusing open tab for Inspector: ${page.url()}`);
   }
 
   return {
@@ -65,22 +76,31 @@ export async function attachRecorderSession(options: {
       await browser.close({ reason: 'recorder session complete' }).catch(() => undefined);
     },
   };
-}
+};
 
-export function printInspectorInstructions(draftPath: string, applyCommand: string): void {
+/**
+ * Print the manual Playwright Inspector recording instructions.
+ *
+ * @param draftPath - Draft file where copied locators should be pasted.
+ * @param applyCommand - Command that converts the draft into the generated registry.
+ * @returns Nothing; writes instructions to stdout.
+ * @example
+ * printInspectorInstructions('/tmp/selectors.txt', 'pnpm recorder:apply');
+ */
+export const printInspectorInstructions = (draftPath: string, applyCommand: string): void => {
   console.log(
     [
       '',
       'Playwright Inspector should be open. In it:',
       '  1. Confirm the highlighted browser tab matches the page you want to record.',
       '  2. Click "Pick locator" (target icon, top-left of Inspector).',
-      '  3. Click each field — the suggested locator appears in the Inspector panel.',
+      '  3. Click each field - the suggested locator appears in the Inspector panel.',
       `  4. Copy each locator into ${draftPath}`,
       '     (one line per field: fieldKey = getByRole(...)).',
-      '     Inspector does NOT write to the draft file automatically — paste manually.',
+      '     Inspector does NOT write to the draft file automatically - paste manually.',
       '  5. Close the Inspector window when done.',
       `  6. Run \`${applyCommand}\` to write the generated registry.`,
       '',
     ].join('\n'),
   );
-}
+};

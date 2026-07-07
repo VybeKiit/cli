@@ -1,4 +1,4 @@
-import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 
 export type NcVerbContext = BaseVerbContext;
 
@@ -23,7 +23,15 @@ export type NcEnvBlock = {
   NAMECHEAP_SANDBOX?: string;
 };
 
-export function ncSetupEnvBlock(result: NcSetupResult): NcEnvBlock {
+/**
+ * Nc Setup Env Block.
+ *
+ * @param result - Operation result to convert.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = ncSetupEnvBlock(result);
+ */
+export const ncSetupEnvBlock = (result: NcSetupResult): NcEnvBlock => {
   const env: NcEnvBlock = {
     NAMECHEAP_API_USER: result.apiUser,
     NAMECHEAP_API_KEY: result.apiKey,
@@ -33,4 +41,4 @@ export function ncSetupEnvBlock(result: NcSetupResult): NcEnvBlock {
     env.NAMECHEAP_SANDBOX = '1';
   }
   return env;
-}
+};

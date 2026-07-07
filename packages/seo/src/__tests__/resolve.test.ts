@@ -1,12 +1,31 @@
-import { resolveSeoProvider } from '@vybekiit/seo/resolve';
-import { describe, expect, it } from 'vitest';
+import { it } from '@effect/vitest';
+import { resolveSeoProvider, resolveSeoService } from '@vybekiit/seo/resolve';
+import { Effect } from 'effect';
+import { describe, expect } from 'vitest';
 
 const env = {
   APP_URL: 'https://example.com',
   NODE_ENV: 'production',
 };
 
-describe('resolveSeoProvider', () => {
+describe('resolveSeoService', () => {
+  it.effect('resolves the local SEO service from Schema config', () =>
+    Effect.gen(function* () {
+      const seo = yield* resolveSeoService(env);
+      expect(seo.name).toBe('local');
+    }),
+  );
+
+  it.effect('fails loud for invalid app URL config', () =>
+    Effect.gen(function* () {
+      const error = yield* Effect.flip(resolveSeoService({ APP_URL: 'not-a-url' }));
+      expect(error.code).toBe('SEO_CONFIG_INVALID');
+      expect(error.message).toContain('APP_URL');
+    }),
+  );
+});
+
+describe('resolveSeoProvider metadata', () => {
   it('builds metadata with canonical URL', () => {
     const seo = resolveSeoProvider(env);
     const meta = seo.buildMetadata({ title: 'Home', path: '/about' });
@@ -35,7 +54,9 @@ describe('resolveSeoProvider', () => {
     expect(jsonLd['@context']).toBe('https://schema.org');
     expect(jsonLd['@type']).toBe('BlogPosting');
   });
+});
 
+describe('resolveSeoProvider content helpers', () => {
   it('builds FAQPage JSON-LD', () => {
     const seo = resolveSeoProvider(env);
     const jsonLd = seo.buildJsonLdFaq([

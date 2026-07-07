@@ -3,8 +3,11 @@ import {
   formatAgentLayerSyncSummary,
   isAgentLayerExtensionPath,
   planAgentLayerSync,
-} from '@vybekiit/agentKit/planners/agentLayerSync';
+} from '@vybekiit/agent-kit/planners/agentLayerSync';
 import { describe, expect, it } from 'vitest';
+
+// "Refreshing" -> true
+const REFRESHING_SUMMARY_PATTERN = /Refreshing/;
 
 describe('AGENT_LAYER_PATHS', () => {
   it('includes core agent layer files', () => {
@@ -41,7 +44,7 @@ describe('planAgentLayerSync', () => {
 describe('formatAgentLayerSyncSummary', () => {
   it('uses plain language', () => {
     expect(formatAgentLayerSyncSummary({ pathsToSync: ['AGENTS.md'], upToDate: false })).toMatch(
-      /Refreshing/,
+      REFRESHING_SUMMARY_PATTERN,
     );
   });
 });

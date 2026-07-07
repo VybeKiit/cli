@@ -1,4 +1,4 @@
-import { isNcAuthenticatedUrl } from '@vybekiit/browserAutomation/domains/registrars/namecheap/dashboard/authUrl';
+import { isNcAuthenticatedUrl } from '@vybekiit/browser-automation/domains/registrars/namecheap/dashboard/authUrl';
 import { describe, expect, it } from 'vitest';
 
 describe('isNcAuthenticatedUrl', () => {

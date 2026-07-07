@@ -3,8 +3,18 @@
 import { HERO_STACK_MARKS } from '@/data/brandMarks3d';
 import { cn } from '@/lib/utils';
 
-/** Static product-stack marks behind the hero headline — CSS float only, no WebGL. */
-export function HeroProductStackOrbit({ className }: { readonly className?: string }) {
+/**
+ * Static product-stack marks behind the hero headline — CSS float only, no WebGL.
+ *
+ * @param props - Component props.
+ * @returns The rendered HeroProductStackOrbit element.
+ * @example
+ * ```tsx
+ * <HeroProductStackOrbit />
+ * ```
+ */
+
+export const HeroProductStackOrbit = ({ className }: { readonly className?: string }) => {
   if (HERO_STACK_MARKS.length === 0) return null;
 
   return (
@@ -38,4 +48,4 @@ export function HeroProductStackOrbit({ className }: { readonly className?: stri
       ))}
     </div>
   );
-}
+};

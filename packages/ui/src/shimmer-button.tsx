@@ -3,24 +3,32 @@
 import type { ReactNode } from 'react';
 import { cn } from './utils';
 
-type ShimmerButtonProps = {
-  children: ReactNode;
-  color?: string;
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  className?: string;
-  onClick?: () => void;
-};
+interface ShimmerButtonProps {
+  readonly children?: ReactNode;
+  readonly color?: string;
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly disabled?: boolean;
+  readonly className?: string;
+  readonly onClick?: () => void;
+}
 
-/** Button with animated gradient shimmer. Eye-catching for CTAs and primary actions. */
-export const ShimmerButton = ({
-  children,
-  color = '#7c3aed',
-  size = 'md',
-  disabled = false,
-  className,
-  onClick,
-}: ShimmerButtonProps) => {
+/**
+ * Button with an animated gradient shimmer for primary actions.
+ *
+ * @param props - Button content, color, size, disabled state, classes, and click handler.
+ * @returns A shimmer-styled button element.
+ * @example
+ * <ShimmerButton onClick={save}>Save</ShimmerButton>;
+ */
+export const ShimmerButton = (props: ShimmerButtonProps) => {
+  const {
+    children = null,
+    color = '#7c3aed',
+    size = 'md',
+    disabled = false,
+    className = '',
+    onClick,
+  } = props;
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',
@@ -35,7 +43,7 @@ export const ShimmerButton = ({
       className={cn(
         'relative overflow-hidden rounded-xl font-semibold text-white transition-all duration-300',
         'hover:scale-105 hover:shadow-lg active:scale-95',
-        'disabled:opacity-50 disabled:pointer-events-none',
+        'disabled:pointer-events-none disabled:opacity-50',
         sizeClasses[size],
         className,
       )}

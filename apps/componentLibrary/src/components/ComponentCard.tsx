@@ -13,7 +13,7 @@ import { postPreviewTheme } from '@library/lib/previewMessaging';
 import { buildPreviewSrc, type PreviewMode } from '@library/lib/theme';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { type MouseEvent, memo, useEffect, useRef, useState } from 'react';
+import { type MouseEvent, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -44,6 +44,14 @@ const UNAVAILABLE_CHIP: Record<UnavailableReason, string> = {
   nodemo: 'No preview',
 };
 
+const sourceLabelFor = (namespace: string): string => {
+  const label = SOURCE_LABELS[namespace];
+  if (label === undefined) {
+    return namespace;
+  }
+  return label;
+};
+
 interface ComponentCardProps {
   readonly entry: CatalogEntry;
   readonly href: string;
@@ -57,13 +65,7 @@ const CARD_PREVIEW_UNLOAD_MS = 15_000;
 
 /** Lazy iframe — static thumb in grid; hover/focus enables interaction. */
 const CardPreview = memo(
-  function CardPreview({
-    entry,
-    mode,
-  }: {
-    readonly entry: CatalogEntry;
-    readonly mode: PreviewMode;
-  }) {
+  ({ entry, mode }: { readonly entry: CatalogEntry; readonly mode: PreviewMode }) => {
     const hostRef = useRef<HTMLDivElement>(null);
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const { primary } = usePreviewTheme();
@@ -76,10 +78,10 @@ const CardPreview = memo(
     const hasSrcRef = useRef(false);
     const pendingLoadRef = useRef(false);
 
-    const releaseLoadSlot = () => {
+    const releaseLoadSlot = useCallback(() => {
       releaseSlotRef.current?.();
       releaseSlotRef.current = null;
-    };
+    }, []);
 
     useEffect(() => {
       const host = hostRef.current;
@@ -92,7 +94,7 @@ const CardPreview = memo(
 
       const observer = new IntersectionObserver(
         ([intersection]) => {
-          const visible = intersection?.isIntersecting ?? false;
+          const visible = intersection === undefined ? false : intersection.isIntersecting === true;
 
           if (unloadTimer) {
             clearTimeout(unloadTimer);
@@ -156,7 +158,7 @@ const CardPreview = memo(
         pendingLoadRef.current = false;
         observer.disconnect();
       };
-    }, [entry.namespace, entry.name, wasLoaded]);
+    }, [entry.namespace, entry.name, wasLoaded, releaseLoadSlot]);
 
     useEffect(() => {
       if (!src) {
@@ -229,31 +231,30 @@ const CardPreview = memo(
   },
   (prev, next) => prev.entry.previewKey === next.entry.previewKey && prev.mode === next.mode,
 );
+CardPreview.displayName = 'CardPreview';
 
-const CardPreviewWithTheme = memo(function CardPreviewWithTheme({
-  entry,
-}: {
-  readonly entry: CatalogEntry;
-}) {
+const CardPreviewWithTheme = memo(({ entry }: { readonly entry: CatalogEntry }) => {
   const { resolvedTheme } = useTheme();
   const previewMode: PreviewMode = resolvedTheme === 'dark' ? 'dark' : 'light';
   return <CardPreview entry={entry} mode={previewMode} />;
 });
+CardPreviewWithTheme.displayName = 'CardPreviewWithTheme';
 
-function componentCardPropsEqual(prev: ComponentCardProps, next: ComponentCardProps): boolean {
-  return (
-    prev.entry.previewKey === next.entry.previewKey &&
-    prev.href === next.href &&
-    prev.tourAnchor === next.tourAnchor
-  );
-}
+const componentCardPropsEqual = (prev: ComponentCardProps, next: ComponentCardProps): boolean =>
+  prev.entry.previewKey === next.entry.previewKey &&
+  prev.href === next.href &&
+  prev.tourAnchor === next.tourAnchor;
 
-export const ComponentCard = memo(function ComponentCard({
-  entry,
-  href,
-  tourAnchor = false,
-}: ComponentCardProps) {
-  const sourceLabel = SOURCE_LABELS[entry.namespace] ?? entry.namespace;
+/**
+ * Render the component card component.
+ *
+ * @param props - Props passed to this component.
+ * @returns A React element for the component-library UI.
+ * @example
+ * const element = <ComponentCard {...props} />;
+ */
+export const ComponentCard = memo(({ entry, href, tourAnchor = false }: ComponentCardProps) => {
+  const sourceLabel = sourceLabelFor(entry.namespace);
 
   return (
     <article
@@ -284,15 +285,23 @@ export const ComponentCard = memo(function ComponentCard({
           <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
             {entry.kind}
           </span>
-          {entry.previewable ? (
-            <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
-              live
-            </span>
-          ) : entry.unavailableReason ? (
-            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              {UNAVAILABLE_CHIP[entry.unavailableReason]}
-            </span>
-          ) : null}
+          {(() => {
+            if (entry.previewable) {
+              return (
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                  live
+                </span>
+              );
+            }
+            if (entry.unavailableReason) {
+              return (
+                <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                  {UNAVAILABLE_CHIP[entry.unavailableReason]}
+                </span>
+              );
+            }
+            return null;
+          })()}
         </div>
         <span className="font-semibold text-base group-hover:text-primary">{entry.name}</span>
         <span className="mt-1 truncate font-mono text-[11px] text-muted-foreground">
@@ -302,3 +311,4 @@ export const ComponentCard = memo(function ComponentCard({
     </article>
   );
 }, componentCardPropsEqual);
+ComponentCard.displayName = 'ComponentCard';

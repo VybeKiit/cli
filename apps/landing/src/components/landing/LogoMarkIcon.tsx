@@ -29,9 +29,9 @@ export type LogoMarkIconData = Pick<SimpleIcon, 'title' | 'slug' | 'path'> & {
 };
 
 /**
- * Official full-color raster marks (128×128 WebP @ q92, transparent).
- * Codex uses the inline SVG cloud mark — not the OpenAI blossom raster.
+ * Official full-color raster marks (128×128 WebP @ q92, transparent). Codex uses the inline SVG cloud mark — not the OpenAI blossom raster.
  */
+
 export const LOGO_MARK_RASTERS: Record<string, string> = {
   openai: '/brand-marks/openai.webp',
   amazonaws: '/brand-marks/aws.webp',
@@ -86,6 +86,9 @@ const customSvgMarks: Record<string, LogoMarkIconData> = {
   },
 };
 
+/**
+ * LOGO_MARK_ICONS value.
+ */
 export const LOGO_MARK_ICONS: Record<string, LogoMarkIconData> = {
   nextdotjs: siNextdotjs,
   tailwindcss: siTailwindcss,
@@ -120,12 +123,23 @@ interface LogoMarkIconProps {
   readonly slug: string;
   readonly className?: string;
   /** Force the transparent SVG silhouette (currentColor-tinted) over the raster.
-   *  Needed on dark bands where the rasters' baked-in white tile reads as a box. */
+   *  Needed on dark bands where the rasters' baked-in white tile reads as a box.
+   */
   readonly mono?: boolean;
 }
 
-/** Official brand mark — raster WebP when available, otherwise mono SVG path. */
-export function LogoMarkIcon({ slug, className, mono = false }: LogoMarkIconProps) {
+/**
+ * Official brand mark — raster WebP when available, otherwise mono SVG path.
+ *
+ * @param props - Component props.
+ * @returns The rendered LogoMarkIcon element.
+ * @example
+ * ```tsx
+ * <LogoMarkIcon />
+ * ```
+ */
+
+export const LogoMarkIcon = ({ slug, className, mono = false }: LogoMarkIconProps) => {
   if (slug === 'codex') {
     return (
       <CodexMark
@@ -162,9 +176,9 @@ export function LogoMarkIcon({ slug, className, mono = false }: LogoMarkIconProp
       className={className}
       fill="currentColor"
       role="img"
-      viewBox={icon.viewBox ?? '0 0 24 24'}
+      viewBox={icon.viewBox === undefined ? '0 0 24 24' : icon.viewBox}
     >
       <path d={icon.path} />
     </svg>
   );
-}
+};

@@ -1,16 +1,18 @@
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: SES command/client mocks intentionally use tiny fake classes.
+import { it } from '@effect/vitest';
 import { createSesEmail } from '@vybekiit/email/providers/ses';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Effect } from 'effect';
+import { beforeEach, describe, expect, vi } from 'vitest';
 
-/**
- * `vi.mock` is hoisted above imports, so its factory's refs must be hoisted too. The
- * fake SendEmailCommand captures `input`, letting a test assert the exact SES payload,
- * while `send` is stubbed per case.
- */
 const { send, command } = vi.hoisted(() => ({
   send: vi.fn(),
   command: {
     SendEmailCommand: class {
-      constructor(public readonly input: Record<string, unknown>) {}
+      readonly input: Record<string, unknown>;
+
+      constructor(input: Record<string, unknown>) {
+        this.input = input;
+      }
     },
   },
 }));
@@ -22,12 +24,26 @@ vi.mock('@aws-sdk/client-sesv2', () => ({
   ...command,
 }));
 
-/** The SES payload passed to the single SendEmailCommand the adapter issued. */
-function sentInput(): Record<string, unknown> {
-  return send.mock.calls[0]?.[0]?.input;
-}
+/**
+ * Return the command input sent to the mocked SES client.
+ *
+ * @returns Captured SES command input.
+ * @example
+ * expect(sentInput()).toMatchObject({ FromEmailAddress: 'hello@example.com' });
+ */
+const sentInput = (): Record<string, unknown> => {
+  const [call] = send.mock.calls;
+  if (call === undefined) {
+    throw new Error('Expected SES send to be called.');
+  }
+  const [commandInput] = call;
+  if (commandInput === undefined) {
+    throw new Error('Expected SES command input.');
+  }
+  return commandInput.input;
+};
 
-const config = { AWS_REGION: 'us-east-1', AWS_DYNAMODB_TABLE_PREFIX: '' };
+const config = { AWS_REGION: 'us-east-1' };
 
 const params = {
   to: 'buyer@example.com',
@@ -45,52 +61,58 @@ describe('createSesEmail.send', () => {
     expect(createSesEmail(config).name).toBe('ses');
   });
 
-  it('issues a SendEmailCommand with the normalized fields and maps MessageId to id', async () => {
-    send.mockResolvedValue({ MessageId: 'ses_msg_1' });
+  it.effect('issues a SendEmailCommand with the normalized fields and maps MessageId to id', () =>
+    Effect.gen(function* () {
+      send.mockResolvedValue({ MessageId: 'ses_msg_1' });
 
-    const result = await createSesEmail(config).send(params);
+      const result = yield* createSesEmail(config).send(params);
 
-    expect(result.ok && result.value.id).toBe('ses_msg_1');
-    expect(sentInput()).toEqual({
-      FromEmailAddress: 'hello@example.com',
-      Destination: { ToAddresses: ['buyer@example.com'] },
-      Content: {
-        Simple: {
-          Subject: { Data: 'Welcome' },
-          Body: { Html: { Data: '<p>Hi</p>' } },
+      expect(result.id).toBe('ses_msg_1');
+      expect(sentInput()).toEqual({
+        FromEmailAddress: 'hello@example.com',
+        Destination: { ToAddresses: ['buyer@example.com'] },
+        Content: {
+          Simple: {
+            Subject: { Data: 'Welcome' },
+            Body: { Html: { Data: '<p>Hi</p>' } },
+          },
         },
-      },
-    });
-  });
+      });
+    }),
+  );
 
-  it('includes the plain-text body when provided', async () => {
-    send.mockResolvedValue({ MessageId: 'ses_msg_2' });
+  it.effect('includes the plain-text body when provided', () =>
+    Effect.gen(function* () {
+      send.mockResolvedValue({ MessageId: 'ses_msg_2' });
 
-    await createSesEmail(config).send({ ...params, text: 'Hi' });
+      yield* createSesEmail(config).send({ ...params, text: 'Hi' });
 
-    const content = sentInput().Content as { Simple: { Body: Record<string, unknown> } };
-    expect(content.Simple.Body).toEqual({
-      Html: { Data: '<p>Hi</p>' },
-      Text: { Data: 'Hi' },
-    });
-  });
+      const content = sentInput().Content as { readonly Simple: { readonly Body: unknown } };
+      expect(content.Simple.Body).toEqual({
+        Html: { Data: '<p>Hi</p>' },
+        Text: { Data: 'Hi' },
+      });
+    }),
+  );
 
-  it('maps an SDK error to fail("email_send_failed")', async () => {
-    send.mockRejectedValue(new Error('email address is not verified'));
+  it.effect('maps an SDK error to EMAIL_SEND_FAILED', () =>
+    Effect.gen(function* () {
+      send.mockRejectedValue(new Error('email address is not verified'));
 
-    const result = await createSesEmail(config).send(params);
+      const error = yield* Effect.flip(createSesEmail(config).send(params));
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('email_send_failed');
-      expect(result.error.message).toBe('email address is not verified');
-    }
-  });
+      expect(error.code).toBe('EMAIL_SEND_FAILED');
+      expect(error.message).toBe('email address is not verified');
+    }),
+  );
 
-  it('fails when SES returns no MessageId', async () => {
-    send.mockResolvedValue({});
-    const result = await createSesEmail(config).send(params);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe('email_send_failed');
-  });
+  it.effect('fails when SES returns no MessageId', () =>
+    Effect.gen(function* () {
+      send.mockResolvedValue({});
+
+      const error = yield* Effect.flip(createSesEmail(config).send(params));
+
+      expect(error.code).toBe('EMAIL_INVALID_RESPONSE');
+    }),
+  );
 });

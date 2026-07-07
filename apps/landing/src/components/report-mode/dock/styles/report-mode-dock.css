@@ -74,16 +74,6 @@
   }
 }
 
-@keyframes report-mode-vybe-shimmer {
-  0%,
-  100% {
-    opacity: 0.65;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 @keyframes report-mode-menu-pop {
   from {
     opacity: 0;
@@ -393,10 +383,7 @@
 .report-mode-icon--vybe {
   width: 0.95rem;
   height: 0.95rem;
-}
-
-.report-mode-icon-vybe-accent {
-  animation: report-mode-vybe-shimmer 2.4s ease-in-out infinite;
+  background: currentColor;
 }
 
 .report-mode-dock-btn {
@@ -888,7 +875,6 @@
   .report-mode-icon--chat-current .report-mode-icon-chat-line,
   .report-mode-icon--chat-new .report-mode-icon-chat-spark,
   .report-mode-icon--chat-new .report-mode-icon-chat-star,
-  .report-mode-icon-vybe-accent,
   .report-mode-dock-btn--pin:hover .report-mode-icon--pin,
   .report-mode-flyout,
   .report-mode-note-btn:hover .report-mode-icon--send,

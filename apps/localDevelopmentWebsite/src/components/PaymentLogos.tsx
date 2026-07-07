@@ -31,6 +31,14 @@ type PaymentLogosProps = {
   active: boolean;
 };
 
+/**
+ * Render the payment logos component.
+ *
+ * @param active - Whether payment logos should appear highlighted.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <PaymentLogos active={true} />;
+ */
 export const PaymentLogos = ({ active }: PaymentLogosProps) => (
   <div className="flex flex-wrap gap-2 mt-2">
     {PAYMENT_LOGOS.map((provider) => (

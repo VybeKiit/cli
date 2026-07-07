@@ -1,3 +1,4 @@
+// biome-ignore-all lint/security/noSecrets: public config schema names and placeholder test values are not secrets.
 import {
   appConfigSchema,
   godaddyConfigSchema,
@@ -9,6 +10,20 @@ import {
 } from '@vybekiit/core/config';
 import { err, fail, ok } from '@vybekiit/core/result';
 import { describe, expect, it } from 'vitest';
+
+// "LEMONSQUEEZY_API_KEY ... LEMONSQUEEZY_WEBHOOK_SECRET" -> match
+const MISSING_LEMONSQUEEZY_KEYS_PATTERN =
+  /LEMONSQUEEZY_API_KEY[\s\S]*LEMONSQUEEZY_STORE_ID[\s\S]*LEMONSQUEEZY_WEBHOOK_SECRET/;
+// "SECURITY_RATE_LIMIT_MAX must be positive" -> match
+const SECURITY_RATE_LIMIT_MAX_PATTERN = /SECURITY_RATE_LIMIT_MAX/;
+// "SECURITY_RATE_LIMIT must be on/off" -> match
+const SECURITY_RATE_LIMIT_PATTERN = /SECURITY_RATE_LIMIT/;
+// "GOOGLE_OAUTH_REDIRECT_URI must be a valid URL" -> match
+const GOOGLE_REDIRECT_URI_PATTERN = /GOOGLE_OAUTH_REDIRECT_URI/;
+// "NAMECHEAP_API_KEY is required" -> match
+const NAMECHEAP_API_KEY_PATTERN = /NAMECHEAP_API_KEY/;
+// "GODADDY_API_SECRET is required" -> match
+const GODADDY_API_SECRET_PATTERN = /GODADDY_API_SECRET/;
 
 describe('parseEnv', () => {
   it('applies defaults for the app config', () => {
@@ -28,7 +43,7 @@ describe('parseEnv', () => {
 
   it('throws a single error listing every missing key', () => {
     expect(() => parseEnv(lemonSqueezyConfigSchema, {})).toThrowError(
-      /LEMONSQUEEZY_API_KEY[\s\S]*LEMONSQUEEZY_STORE_ID[\s\S]*LEMONSQUEEZY_WEBHOOK_SECRET/,
+      MISSING_LEMONSQUEEZY_KEYS_PATTERN,
     );
   });
 });
@@ -57,16 +72,16 @@ describe('securityConfigSchema', () => {
 
   it('rejects a non-positive or non-integer rate limit', () => {
     expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '0' })).toThrowError(
-      /SECURITY_RATE_LIMIT_MAX/,
+      SECURITY_RATE_LIMIT_MAX_PATTERN,
     );
     expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT_MAX: '1.5' })).toThrowError(
-      /SECURITY_RATE_LIMIT_MAX/,
+      SECURITY_RATE_LIMIT_MAX_PATTERN,
     );
   });
 
   it('rejects an unknown toggle value', () => {
     expect(() => parseEnv(securityConfigSchema, { SECURITY_RATE_LIMIT: 'yes' })).toThrowError(
-      /SECURITY_RATE_LIMIT/,
+      SECURITY_RATE_LIMIT_PATTERN,
     );
   });
 });
@@ -79,7 +94,7 @@ describe('googleOAuthConfigSchema', () => {
   it('rejects a malformed redirect URI', () => {
     expect(() =>
       parseEnv(googleOAuthConfigSchema, { GOOGLE_OAUTH_REDIRECT_URI: 'not-a-url' }),
-    ).toThrowError(/GOOGLE_OAUTH_REDIRECT_URI/);
+    ).toThrowError(GOOGLE_REDIRECT_URI_PATTERN);
   });
 });
 
@@ -90,7 +105,7 @@ describe('namecheapConfigSchema', () => {
 
   it('requires all core keys when any Namecheap var is set', () => {
     expect(() => parseEnv(namecheapConfigSchema, { NAMECHEAP_API_USER: 'user' })).toThrowError(
-      /NAMECHEAP_API_KEY/,
+      NAMECHEAP_API_KEY_PATTERN,
     );
   });
 });
@@ -102,7 +117,7 @@ describe('godaddyConfigSchema', () => {
 
   it('requires both keys when any GoDaddy var is set', () => {
     expect(() => parseEnv(godaddyConfigSchema, { GODADDY_API_KEY: 'key' })).toThrowError(
-      /GODADDY_API_SECRET/,
+      GODADDY_API_SECRET_PATTERN,
     );
   });
 });

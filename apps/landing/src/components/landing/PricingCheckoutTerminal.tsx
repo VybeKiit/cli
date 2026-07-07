@@ -34,8 +34,17 @@ const CLOSE_REBUKE_LINES = [
 
 const REBUKE_LINE_DELAY_MS = 480;
 
-/** Ghostty-style terminal above pricing checkout — types the install command, then reveals outcomes. */
-export function PricingCheckoutTerminal() {
+/**
+ * Ghostty-style terminal above pricing checkout — types the install command, then reveals outcomes.
+ *
+ * @returns The rendered PricingCheckoutTerminal element.
+ * @example
+ * ```tsx
+ * <PricingCheckoutTerminal />
+ * ```
+ */
+
+export const PricingCheckoutTerminal = () => {
   const [typedChars, setTypedChars] = useState(0);
   const [visibleLines, setVisibleLines] = useState(0);
   const [animate, setAnimate] = useState(true);
@@ -81,6 +90,7 @@ export function PricingCheckoutTerminal() {
       const timer = globalThis.setTimeout(() => setVisibleLines((count) => count + 1), 520);
       return () => globalThis.clearTimeout(timer);
     }
+    return undefined;
   }, [animate, typedChars, visibleLines]);
 
   useEffect(() => {
@@ -171,4 +181,4 @@ export function PricingCheckoutTerminal() {
       ) : null}
     </MiniTerminalChrome>
   );
-}
+};

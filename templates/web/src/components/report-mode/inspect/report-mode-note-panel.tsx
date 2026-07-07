@@ -7,8 +7,9 @@ import {
 } from '@/components/report-mode/shared/report-mode-icons';
 import { Input } from '@vybekiit/ui/input';
 import { cn } from '@/lib/utils';
+import { type ChangeEvent, type KeyboardEvent, useCallback } from 'react';
 
-type ReportModeNotePanelProps = {
+interface ReportModeNotePanelProps {
   readonly note: string;
   readonly spotLabel: string;
   readonly submitting: boolean;
@@ -17,10 +18,16 @@ type ReportModeNotePanelProps = {
   readonly onSubmit: () => void;
   readonly onCancel: () => void;
   readonly onCopySpot: () => void;
-};
+}
 
-/** One-line builder note after clicking a broken spot. */
-export function ReportModeNotePanel({
+/**
+ * One-line builder note form after clicking a broken spot.
+ *
+ * @returns Report mode note panel with submit, cancel, and copy actions.
+ * @example
+ * <ReportModeNotePanel note="" spotLabel="Hero" submitting={false} onNoteChange={() => {}} onSubmit={() => {}} onCancel={() => {}} onCopySpot={() => {}} />;
+ */
+export const ReportModeNotePanel = ({
   note,
   spotLabel,
   submitting,
@@ -29,7 +36,23 @@ export function ReportModeNotePanel({
   onSubmit,
   onCancel,
   onCopySpot,
-}: ReportModeNotePanelProps) {
+}: ReportModeNotePanelProps) => {
+  const handleNoteChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      onNoteChange(event.target.value);
+    },
+    [onNoteChange],
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        onSubmit();
+      }
+    },
+    [onSubmit],
+  );
+
   return (
     <div
       className="report-mode-note-panel rounded-lg border border-white/15 bg-[#0d1117] p-4 shadow-lg"
@@ -37,10 +60,10 @@ export function ReportModeNotePanel({
       data-report-tutorial="inspect"
       data-testid="report-mode-note-panel"
     >
-      <p className="mb-2 text-sm font-medium text-white">What looks wrong here?</p>
+      <p className="mb-2 font-medium text-sm text-white">What looks wrong here?</p>
 
       <div className="report-mode-note-spot mb-3 flex items-center gap-2">
-        <p className="min-w-0 flex-1 text-xs text-white/55">
+        <p className="min-w-0 flex-1 text-white/55 text-xs">
           <span className="text-white/70">You pointed at:</span>{' '}
           <span
             className="report-mode-note-spot-label text-white/90"
@@ -68,12 +91,8 @@ export function ReportModeNotePanel({
           autoFocus={true}
           className="border-white/15 bg-white/5 text-white placeholder:text-white/40"
           data-testid="report-mode-note-input"
-          onChange={(event) => onNoteChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              onSubmit();
-            }
-          }}
+          onChange={handleNoteChange}
+          onKeyDown={handleKeyDown}
           placeholder="e.g. typewriter too fast on testimonials"
           value={note}
         />
@@ -103,4 +122,4 @@ export function ReportModeNotePanel({
       </div>
     </div>
   );
-}
+};

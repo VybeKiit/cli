@@ -9,6 +9,14 @@ type ChatMessageProps = {
   message: ChatMessageType;
 };
 
+/**
+ * Render the chat message component.
+ *
+ * @param message - Chat message to render.
+ * @returns A React element for the local dev Console UI.
+ * @example
+ * const element = <ChatMessage message={message} />;
+ */
 export const ChatMessage = ({ message }: ChatMessageProps) => {
   const isUser = message.role === 'user';
 

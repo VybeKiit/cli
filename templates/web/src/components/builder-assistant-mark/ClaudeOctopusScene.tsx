@@ -20,13 +20,13 @@ export interface ClaudeOctopusSceneProps {
 }
 
 /** Clamp a focus-derived crop so it never runs past the 320×220 world edges. */
-function cropToWorld(x: number, y: number, w: number, h: number): string {
+const cropToWorld = (x: number, y: number, w: number, h: number): string => {
   const cx = Math.max(0, Math.min(x, SCENE_WORLD.width - w));
   const cy = Math.max(0, Math.min(y, SCENE_WORLD.height - h));
   return `${cx} ${cy} ${w} ${h}`;
-}
+};
 
-function viewBoxFor(canvas: SceneCanvas, focus: SceneFocus): string {
+const viewBoxFor = (canvas: SceneCanvas, focus: SceneFocus): string => {
   if (canvas === 'wide') {
     return `0 0 ${SCENE_WORLD.width} ${SCENE_WORLD.height}`;
   }
@@ -38,7 +38,7 @@ function viewBoxFor(canvas: SceneCanvas, focus: SceneFocus): string {
   }
   // inline — tight framing on the hero focus region
   return cropToWorld(focus.x, focus.y, focus.w, focus.h);
-}
+};
 
 const CANVAS_MAX_WIDTH: Record<SceneCanvas, string> = {
   wide: '100%',
@@ -50,8 +50,16 @@ const CANVAS_MAX_WIDTH: Record<SceneCanvas, string> = {
  * Renders a deluxe Claude octopus scene. The illustration is authored once in the
  * 320×220 world; `canvas` only reframes the viewBox, so one scene serves the wide
  * marketing shot, a square card, and a tight inline thumbnail.
+ *
+ * @returns SVG scene for the requested id, or null when the id is unknown.
+ * @example
+ * <ClaudeOctopusScene scene="working-at-mac" canvas="wide" />;
  */
-export function ClaudeOctopusScene({ scene, canvas = 'wide', className }: ClaudeOctopusSceneProps) {
+export const ClaudeOctopusScene = ({
+  scene,
+  canvas = 'wide',
+  className,
+}: ClaudeOctopusSceneProps) => {
   const def = claudeOctopusScene(scene);
   if (!def) {
     return null;
@@ -72,4 +80,4 @@ export function ClaudeOctopusScene({ scene, canvas = 'wide', className }: Claude
       {def.render()}
     </svg>
   );
-}
+};

@@ -1,11 +1,21 @@
 import type { ReportDockAnchor } from '@vybekiit/report-mode';
 
-/** Chevron points outward when collapsed, inward when expanded (relative to screen edge). */
-export function getBrandChevronDirection(
+/**
+ * Chevron points outward when collapsed, inward when expanded (relative to screen edge).
+ *
+ * @param anchor - Input value.
+ * @param customX - Input value.
+ * @param expanded - Input value.
+ * @returns The computed result.
+ * @example
+ * const result = getBrandChevronDirection(anchor, customX, expanded);
+ */
+
+export const getBrandChevronDirection = (
   anchor: ReportDockAnchor,
   customX: number | undefined,
   expanded: boolean,
-): 'left' | 'right' {
+): 'left' | 'right' => {
   const dockOnRight =
     anchor === 'bottom-right' ||
     anchor === 'top-right' ||
@@ -19,4 +29,4 @@ export function getBrandChevronDirection(
   }
 
   return dockOnRight ? 'left' : 'right';
-}
+};

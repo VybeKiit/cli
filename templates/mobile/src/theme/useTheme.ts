@@ -21,9 +21,9 @@ export type ThemeColors = Record<ColorName, string>;
  * CSS variables, mobile reads it here pre-converted to RN color strings. `radius`,
  * `spacing`, `fontSizes`, and `fontWeights` pass through unchanged (RN consumes the
  * raw numbers/strings directly), so this object is the single styling source every
- * primitive imports — no component touches `@vybekiit/tokens` directly.
+ * primitive imports. No component touches `@vybekiit/tokens` directly.
  */
-export interface Theme {
+export type Theme = Readonly<{
   /** Active light/dark color set, keyed by semantic role. */
   readonly colors: ThemeColors;
   /** Which palette is active, following the OS setting. */
@@ -36,17 +36,24 @@ export interface Theme {
   readonly fontSizes: typeof fontSizes;
   /** Shared numeric font-weight strings. */
   readonly fontWeights: typeof fontWeights;
-}
+}>;
 
-/** Convert one channel-only palette into RN `hsl(...)` color strings. */
-function toRnPalette(scheme: ThemeName): ThemeColors {
+/**
+ * Convert one channel-only palette into RN `hsl(...)` color strings.
+ *
+ * @param scheme - Token palette name to convert.
+ * @returns React Native-safe semantic color map.
+ * @example
+ * const colors = toRnPalette('light');
+ */
+const toRnPalette = (scheme: ThemeName): ThemeColors => {
   const palette = tokenColors[scheme];
   const rnColors = {} as Record<ColorName, string>;
   for (const name of Object.keys(palette) as ColorName[]) {
     rnColors[name] = toRnHsl(palette[name]);
   }
   return rnColors;
-}
+};
 
 /**
  * The mobile styling hook every primitive and screen calls.
@@ -58,8 +65,10 @@ function toRnPalette(scheme: ThemeName): ThemeColors {
  * recomputes when the user flips light/dark.
  *
  * @returns the active {@link Theme}.
+ * @example
+ * const { colors } = useTheme();
  */
-export function useTheme(): Theme {
+export const useTheme = (): Theme => {
   const systemScheme = useColorScheme();
   const scheme: ThemeName = systemScheme === 'dark' ? 'dark' : 'light';
 
@@ -73,4 +82,4 @@ export function useTheme(): Theme {
     fontSizes,
     fontWeights,
   };
-}
+};

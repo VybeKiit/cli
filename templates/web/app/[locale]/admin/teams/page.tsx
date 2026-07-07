@@ -1,4 +1,11 @@
-export default function AdminTeamsPage() {
+/**
+ * Render the admin teams dashboard.
+ *
+ * @returns Mock tenant team cards.
+ * @example
+ * <AdminTeamsPage />
+ */
+const AdminTeamsPage = () => {
   // Mock data — wire to @vybekiit/tenancy
   const teams = [
     {
@@ -38,7 +45,7 @@ export default function AdminTeamsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Teams & Organizations</h2>
+        <h2 className="font-bold text-2xl tracking-tight">Teams & Organizations</h2>
         <p className="text-muted-foreground">Manage multi-tenant organizations.</p>
       </div>
 
@@ -51,10 +58,10 @@ export default function AdminTeamsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-semibold">{team.name}</h3>
-                <p className="text-sm text-muted-foreground">{team.owner}</p>
+                <p className="text-muted-foreground text-sm">{team.owner}</p>
               </div>
               <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                className={`rounded-full px-2.5 py-0.5 font-medium text-xs ${
                   team.plan === 'enterprise'
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
                     : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
@@ -63,7 +70,7 @@ export default function AdminTeamsPage() {
                 {team.plan}
               </span>
             </div>
-            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between text-muted-foreground text-sm">
               <span>👥 {team.members} members</span>
               <span>Created {team.created}</span>
             </div>
@@ -72,4 +79,6 @@ export default function AdminTeamsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminTeamsPage;

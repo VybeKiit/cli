@@ -1,5 +1,5 @@
-import { SUPABASE_DASHBOARD_URL as SUPABASE_DASHBOARD_URL_CONST } from '@vybekiit/browserAutomation/core/constants';
-import type { BaseVerbContext } from '@vybekiit/browserAutomation/core/types';
+import { SUPABASE_DASHBOARD_URL as SUPABASE_DASHBOARD_URL_CONST } from '@vybekiit/browser-automation/core/constants';
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 
 export type SupabaseVerbContext = BaseVerbContext;
 
@@ -7,12 +7,12 @@ export type SupabaseVerbContext = BaseVerbContext;
 export const SUPABASE_DASHBOARD_URL = SUPABASE_DASHBOARD_URL_CONST;
 
 /** Result of Supabase setup: project URL and API keys. */
-export interface SupabaseSetupResult {
+export type SupabaseSetupResult = {
   projectUrl: string;
   anonKey: string;
   serviceRoleKey: string;
   projectRef: string;
-}
+};
 
 /** Env block written to .env after setup. Agent never sees key values. */
 export type SupabaseEnvBlock = {
@@ -21,10 +21,16 @@ export type SupabaseEnvBlock = {
   SUPABASE_SERVICE_ROLE_KEY: string;
 } & Record<string, string>;
 
-export function supabaseEnvBlock(result: SupabaseSetupResult): SupabaseEnvBlock {
-  return {
-    SUPABASE_URL: result.projectUrl,
-    SUPABASE_ANON_KEY: result.anonKey,
-    SUPABASE_SERVICE_ROLE_KEY: result.serviceRoleKey,
-  };
-}
+/**
+ * Supabase Env Block.
+ *
+ * @param result - Operation result to convert.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = supabaseEnvBlock(result);
+ */
+export const supabaseEnvBlock = (result: SupabaseSetupResult): SupabaseEnvBlock => ({
+  SUPABASE_URL: result.projectUrl,
+  SUPABASE_ANON_KEY: result.anonKey,
+  SUPABASE_SERVICE_ROLE_KEY: result.serviceRoleKey,
+});

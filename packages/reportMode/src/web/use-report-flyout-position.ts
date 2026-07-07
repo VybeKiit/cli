@@ -4,16 +4,41 @@ import { type CSSProperties, type RefObject, useCallback, useEffect, useState } 
 import { computeFlyoutPlacement, type FlyoutAlign } from '../position';
 
 /**
- * Positions hover flyouts with fixed coordinates (used with a body portal). Places the flyout above
- * its trigger, flips below near the top edge, and clamps into the viewport so it never clips off-screen
- * when the dock is pinned to any corner — see `computeFlyoutPlacement` in `../position`.
+ * Resolve flyout dimensions from an optional element ref.
+ *
+ * @param flyoutRef - Optional ref to the measured flyout element.
+ * @returns Width and height used by flyout placement.
+ * @example
+ * const flyout = resolveFlyoutSize(flyoutRef);
  */
-export function useReportFlyoutPosition(
+const resolveFlyoutSize = (
+  flyoutRef: RefObject<HTMLElement | null> | undefined,
+): { readonly width: number; readonly height: number } => {
+  const rect = flyoutRef?.current?.getBoundingClientRect();
+  if (rect === undefined) {
+    return { width: 0, height: 0 };
+  }
+
+  return { width: rect.width, height: rect.height };
+};
+
+/**
+ * Position a hover flyout with fixed coordinates.
+ *
+ * @param open - Whether the flyout is open.
+ * @param triggerRef - Ref to the trigger element.
+ * @param align - Horizontal flyout alignment.
+ * @param flyoutRef - Optional ref to the flyout element for measuring size.
+ * @returns CSS properties for a fixed-position flyout.
+ * @example
+ * const style = useReportFlyoutPosition(open, triggerRef, 'end', flyoutRef);
+ */
+export const useReportFlyoutPosition = (
   open: boolean,
   triggerRef: RefObject<HTMLElement | null>,
   align: FlyoutAlign = 'center',
   flyoutRef?: RefObject<HTMLElement | null>,
-) {
+): CSSProperties => {
   const [style, setStyle] = useState<CSSProperties>({});
 
   const measure = useCallback(() => {
@@ -24,10 +49,9 @@ export function useReportFlyoutPosition(
     }
 
     const rect = trigger.getBoundingClientRect();
-    const flyout = flyoutRef?.current?.getBoundingClientRect();
     const { left, top } = computeFlyoutPlacement({
       trigger: rect,
-      flyout: { width: flyout?.width ?? 0, height: flyout?.height ?? 0 },
+      flyout: resolveFlyoutSize(flyoutRef),
       viewport: { width: globalThis.innerWidth, height: globalThis.innerHeight },
       align,
     });
@@ -49,4 +73,4 @@ export function useReportFlyoutPosition(
   }, [measure, open]);
 
   return style;
-}
+};

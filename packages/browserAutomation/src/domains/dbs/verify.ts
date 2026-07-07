@@ -3,15 +3,24 @@
  * PostgREST root with the key attached (anything but 401/403) confirms the URL + key pair.
  * The key stays in this module; only a boolean surfaces to the caller.
  */
-export interface SupabaseVerifyResult {
+export type SupabaseVerifyResult = {
   readonly ok: boolean;
   readonly httpStatus?: number;
-}
+};
 
-export async function verifySupabaseKeys(
+/**
+ * Verify Supabase Keys.
+ *
+ * @param projectUrl - Input value for projectUrl.
+ * @param anonKey - Input value for anonKey.
+ * @returns Promise resolving with the verification result.
+ * @example
+ * const result = await verifySupabaseKeys(projectUrl, anonKey);
+ */
+export const verifySupabaseKeys = async (
   projectUrl: string,
   anonKey: string,
-): Promise<SupabaseVerifyResult> {
+): Promise<SupabaseVerifyResult> => {
   try {
     const res = await fetch(`${projectUrl.replace(/\/$/, '')}/rest/v1/`, {
       headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
@@ -22,4 +31,4 @@ export async function verifySupabaseKeys(
   } catch {
     return { ok: false };
   }
-}
+};

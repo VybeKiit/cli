@@ -6,12 +6,19 @@ import { useAsync } from '@/hooks/useAsync';
 import { displayError, useTranslations } from '@/hooks/useTranslations';
 import { signUpWithPassword } from '@/lib/authClient';
 import { useTheme } from '@/theme/useTheme';
+import { Either } from 'effect';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Text } from 'react-native';
 
-/** Sign-up screen — RN parallel of the web signup page. */
-export default function SignupScreen() {
+/**
+ * Render the mobile sign-up screen.
+ *
+ * @returns React Native sign-up screen.
+ * @example
+ * <SignupScreen />
+ */
+const SignupScreen = () => {
   const router = useRouter();
   const { colors, fontSizes } = useTheme();
   const { t } = useTranslations();
@@ -19,11 +26,14 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const { loading: pending, error, run: signUp } = useAsync(signUpWithPassword);
 
-  async function handleSubmit() {
+  const handleSubmit = async () => {
     const result = await signUp(email, password);
-    if (!result.ok) return;
+    if (Either.isLeft(result)) {
+      return;
+    }
+
     router.replace('/verify');
-  }
+  };
 
   return (
     <AuthShell
@@ -67,4 +77,6 @@ export default function SignupScreen() {
       />
     </AuthShell>
   );
-}
+};
+
+export default SignupScreen;

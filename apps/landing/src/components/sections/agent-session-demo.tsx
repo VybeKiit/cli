@@ -17,7 +17,7 @@ const LIVE_URL = 'mealplan.app';
  * Animated faux agent session — plain-English in, execution rail out, URL chip at end.
  * Used on the production hero (landing-direction #1: Terminal-to-Live).
  */
-export function AgentSessionDemo() {
+export const AgentSessionDemo = () => {
   const [typedChars, setTypedChars] = useState(0);
   const [railIndex, setRailIndex] = useState(0);
   const [showUrl, setShowUrl] = useState(false);
@@ -113,4 +113,4 @@ export function AgentSessionDemo() {
       </div>
     </div>
   );
-}
+};

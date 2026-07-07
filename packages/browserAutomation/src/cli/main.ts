@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+
+/**
+ * vybekiit-automate — unified dashboard automation CLI (registry dispatch).
+ */
+
+import {
+  registerAnthropicDomain,
+  registerOpenAiDomain,
+} from '@vybekiit/browser-automation/domains/ai/cli';
+import { registerSupabaseDomain } from '@vybekiit/browser-automation/domains/dbs/cli';
+import {
+  registerNeonDomain,
+  registerUpstashDomain,
+} from '@vybekiit/browser-automation/domains/dbs/neonUpstash';
+import { registerExtensionDomain } from '@vybekiit/browser-automation/domains/extension/cli';
+import { registerGoogleDomain } from '@vybekiit/browser-automation/domains/google/cli';
+import { registerCfDomain } from '@vybekiit/browser-automation/domains/infra/cli';
+import {
+  registerRailwayDomain,
+  registerVercelDomain,
+} from '@vybekiit/browser-automation/domains/infra/cliAuthProvider';
+import {
+  registerGithubDomain,
+  registerResendDomain,
+  registerSentryDomain,
+} from '@vybekiit/browser-automation/domains/misc/cli';
+import {
+  registerLsDomain,
+  registerLsTopLevelAlias,
+} from '@vybekiit/browser-automation/domains/payments/ls/cli';
+import {
+  registerGdTopLevelAlias,
+  registerGodaddyDomain,
+} from '@vybekiit/browser-automation/domains/registrars/godaddy/cli';
+import {
+  registerNamecheapDomain,
+  registerNcTopLevelAlias,
+} from '@vybekiit/browser-automation/domains/registrars/namecheap/cli';
+import { parseGlobalFlags } from './flags';
+import { printError, printLine } from './output';
+import { createRegistry } from './registry';
+
+const registry = createRegistry();
+registerExtensionDomain(registry);
+registerLsDomain(registry);
+registerLsTopLevelAlias(registry);
+registerNamecheapDomain(registry);
+registerNcTopLevelAlias(registry);
+registerGodaddyDomain(registry);
+registerGdTopLevelAlias(registry);
+registerGoogleDomain(registry);
+registerSupabaseDomain(registry);
+registerCfDomain(registry);
+registerRailwayDomain(registry);
+registerVercelDomain(registry);
+registerNeonDomain(registry);
+registerUpstashDomain(registry);
+registerOpenAiDomain(registry);
+registerAnthropicDomain(registry);
+registerGithubDomain(registry);
+registerResendDomain(registry);
+registerSentryDomain(registry);
+
+const main = async (argv: string[]): Promise<number> => {
+  const { flags, rest } = parseGlobalFlags(argv);
+
+  if (rest.length === 0 || rest[0] === '--help' || rest[0] === '-h') {
+    printLine(registry.formatHelp());
+    return 0;
+  }
+
+  const [domainName, commandName, ...commandArgs] = rest;
+  if (!(domainName && commandName)) {
+    printError('Usage: vybekiit-automate <domain> <command> [args]', flags.json);
+    return 1;
+  }
+
+  if (domainName === 'payments' && commandArgs[0]) {
+    const payDomain = registry.resolveDomain(`payments/${commandName}`);
+    if (payDomain) {
+      const subCommand = commandArgs[0];
+      const subArgs = commandArgs.slice(1);
+      const def = payDomain.commands[subCommand];
+      if (!def) {
+        printError(
+          `Unknown command "${subCommand}" for domain payments/${commandName}`,
+          flags.json,
+        );
+        return 1;
+      }
+      try {
+        return await def.run({ flags, args: subArgs });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        printError(message, flags.json);
+        return 1;
+      }
+    }
+  }
+
+  const domain = registry.resolveDomain(domainName);
+  if (!domain) {
+    printError(`Unknown domain "${domainName}".`, flags.json);
+    return 1;
+  }
+
+  const def = domain.commands[commandName];
+  if (!def) {
+    printError(`Unknown command "${commandName}" for domain ${domain.name}.`, flags.json);
+    return 1;
+  }
+
+  try {
+    return await def.run({ flags, args: commandArgs });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    printError(message, flags.json);
+    return 1;
+  }
+};
+
+main(process.argv.slice(2)).then((code) => {
+  process.exitCode = code;
+});

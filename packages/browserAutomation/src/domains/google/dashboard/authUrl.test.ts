@@ -1,4 +1,4 @@
-import { isGoogleAuthenticatedUrl } from '@vybekiit/browserAutomation/domains/google/dashboard/authUrl';
+import { isGoogleAuthenticatedUrl } from '@vybekiit/browser-automation/domains/google/dashboard/authUrl';
 import { describe, expect, it } from 'vitest';
 
 describe('isGoogleAuthenticatedUrl', () => {

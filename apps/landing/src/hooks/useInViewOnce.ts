@@ -2,8 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-/** Fires once when element enters viewport; stays true for the rest of the page load. */
-export function useInViewOnce(threshold = 0.2) {
+/**
+ * Fires once when element enters viewport; stays true for the rest of the page load.
+ *
+ * @param threshold - Input value.
+ * @returns The hook result.
+ * @example
+ * const value = useInViewOnce(threshold);
+ */
+
+export const useInViewOnce = (threshold = 0.2) => {
   const ref = useRef<HTMLElement | null>(null);
   const [inView, setInView] = useState(false);
 
@@ -31,4 +39,4 @@ export function useInViewOnce(threshold = 0.2) {
   }, [inView, threshold]);
 
   return { ref, inView };
-}
+};
