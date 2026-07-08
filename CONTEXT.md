@@ -59,6 +59,50 @@ Updates are mirror pulls handled by the agent, not public npm package bumps. The
 maintained logic because checkout grants access to the private delivery mirror, not because the
 logic is free on npm.
 
+### Template surface language
+
+**Surface recipe**:
+A platform-neutral description of a starter app screen or flow.
+_Avoid_: React-to-native compiler, UI compiler
+
+**Starter surface**:
+A buyer-owned screen or flow generated into a template from a surface recipe.
+_Avoid_: Shared screen package, maintained UI screen
+
+**Platform renderer**:
+The web, extension, or mobile implementation that turns a surface recipe into template-owned files.
+_Avoid_: Cross-platform component compiler
+
+**Surface target**:
+An explicit recipe manifest entry for one platform output, such as `web`, `extension.popup`,
+`extension.sidepanel`, or `mobile`. Its first-party component source file uses a PascalCase
+filename that matches the exported component.
+_Avoid_: Inferred filename convention
+
+**Buyer onboarding**:
+The agent-guided setup flow that takes a customer from purchased kit to live app.
+_Avoid_: App onboarding
+
+**App onboarding**:
+The end-user flow after sign-up and before the first dashboard visit.
+_Avoid_: Buyer onboarding, walkthrough
+
+**Dashboard walkthrough**:
+The end-user tutorial shown after the dashboard is reachable.
+_Avoid_: Onboarding
+
+Relationships:
+
+- A **surface recipe** produces one **starter surface** per supported template.
+- The page recipe pipeline is the **surface recipe** source of truth: each baseline recipe declares
+  the web, extension, and mobile targets it supports, and the recipe check fails when a required
+  target is missing source, route, acceptance checks, or install notes.
+- A **surface recipe** declares **surface targets** explicitly; target source paths, exports, and
+  routes are never inferred from the recipe id or filename.
+- A **starter surface** stays **OWNED** after scaffolding; maintained updates flow through new recipes and agent-guided changes, not silent screen replacement.
+- A **platform renderer** may reuse maintained primitives, but it does not make buyer-facing screens MAINTAINED.
+- **Buyer onboarding**, **app onboarding**, and the **dashboard walkthrough** are separate flows with separate audiences.
+
 ## Repo structure
 
 > **Target shape (ADR-0033 — supersedes ADR-0025's five-package spine).** Nothing under `packages/`

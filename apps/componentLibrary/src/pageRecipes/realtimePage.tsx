@@ -1,6 +1,6 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
-import { RadioTower } from 'lucide-react';
+import { RadioTower, RefreshCcw } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed realtime page recipe.
@@ -25,9 +25,9 @@ export const RealtimePage = () => {
               A starter page for updates that appear without refreshing the browser.
             </p>
           </div>
-          <Button type="button" variant="outline">
+          <DemoActionButton icon={<RefreshCcw className="h-4 w-4" />} variant="outline">
             Refresh channel
-          </Button>
+          </DemoActionButton>
         </div>
         <div className="mt-6 space-y-3">
           {['Connected', 'Listening for updates', 'Ready for first event'].map((label) => (

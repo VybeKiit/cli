@@ -1,6 +1,6 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, PenLine } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed blog page recipe.
@@ -25,9 +25,9 @@ export const BlogPage = () => {
               A starter publishing page for articles, changelogs, or product stories.
             </p>
           </div>
-          <Button type="button" variant="outline">
+          <DemoActionButton icon={<PenLine className="h-4 w-4" />} variant="outline">
             New article
-          </Button>
+          </DemoActionButton>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {['Launch note', 'Product story', 'Customer guide'].map((title) => (
@@ -37,10 +37,13 @@ export const BlogPage = () => {
               <p className="mt-3 text-muted-foreground text-sm">
                 Replace this card with content from your publishing source.
               </p>
-              <Button className="mt-4 px-0" type="button" variant="link">
+              <DemoActionButton
+                className="mt-4 px-0"
+                icon={<ArrowRight className="h-4 w-4" />}
+                variant="link"
+              >
                 Read more
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              </DemoActionButton>
             </article>
           ))}
         </div>

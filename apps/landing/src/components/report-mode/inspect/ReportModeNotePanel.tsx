@@ -5,7 +5,7 @@ import {
   ReportCancelIcon,
   ReportCopyIcon,
   ReportSendIcon,
-} from '@/components/report-mode/shared/report-mode-icons';
+} from '@/components/report-mode/shared/ReportModeIcons';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';

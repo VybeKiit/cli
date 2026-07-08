@@ -1,7 +1,7 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Switch } from '@vybekiit/ui/switch';
-import { Flag } from 'lucide-react';
+import { Flag, Save } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed feature flags page recipe.
@@ -34,9 +34,9 @@ export const FeatureFlagsPage = () => {
             </div>
           ))}
         </div>
-        <Button className="mt-6" type="button">
+        <DemoActionButton className="mt-6" icon={<Save className="h-4 w-4" />}>
           Save flags
-        </Button>
+        </DemoActionButton>
       </section>
     </main>
   );

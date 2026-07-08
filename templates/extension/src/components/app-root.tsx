@@ -1,6 +1,8 @@
 import { AppShell } from '@/components/app-shell';
 import { HomeScreen } from '@/components/screens/home-screen';
 import { PopupMarketingScreen } from '@/components/screens/popup-marketing-screen';
+import { ExtensionSaasScreen } from '@/components/screens/saas-screen';
+import { getExtensionSaasScreen } from '@/data/saasScreens';
 import { LoginScreen } from '@/components/screens/login-screen';
 import { PricingScreen } from '@/components/screens/pricing-screen';
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
@@ -20,8 +22,9 @@ interface AppRootProps {
  * <AppRoot surface="popup" />
  */
 export const AppRoot = ({ surface }: AppRootProps) => {
-  const [view, setView] = useState<ExtensionView>('home');
+  const [view, setView] = useState<ExtensionView>(surface === 'sidepanel' ? 'dashboard' : 'home');
   const isPopup = surface === 'popup';
+  const saasScreen = getExtensionSaasScreen(view);
 
   return (
     <>
@@ -31,6 +34,7 @@ export const AppRoot = ({ surface }: AppRootProps) => {
         {view === 'home' && !isPopup ? <HomeScreen onNavigate={setView} /> : null}
         {view === 'login' ? <LoginScreen onNavigate={setView} /> : null}
         {view === 'pricing' ? <PricingScreen /> : null}
+        {saasScreen === undefined ? null : <ExtensionSaasScreen screen={saasScreen} />}
       </AppShell>
     </>
   );

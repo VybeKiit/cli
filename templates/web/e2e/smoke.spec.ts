@@ -68,4 +68,49 @@ test.describe('Web template smoke', () => {
       { timeout: 15_000 },
     );
   });
+
+  test('public SaaS routes render buyer-ready pages', async ({ page }) => {
+    const publicRoutes = [
+      { path: '/en/products', heading: 'Product catalog' },
+      { path: '/en/cart', heading: 'Cart review' },
+      { path: '/en/status', heading: 'Service status' },
+      { path: '/en/changelog', heading: 'Product changelog' },
+      { path: '/en/support', heading: 'Support center' },
+    ] as const;
+
+    for (const route of publicRoutes) {
+      await page.goto(route.path);
+      await dismissReportModeTutorial(page);
+      await expect(page.getByRole('heading', { name: route.heading })).toBeVisible();
+    }
+  });
+
+  test('signed-in SaaS routes render the full dashboard shell', async ({ page }) => {
+    await page.route('**/api/auth/me', async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        status: 200,
+        body: JSON.stringify({
+          id: 'user_demo',
+          email: 'founder@example.com',
+          name: 'Founder',
+        }),
+      });
+    });
+
+    const dashboardRoutes = [
+      { path: '/en/dashboard/settings', heading: 'User settings' },
+      { path: '/en/dashboard/products', heading: 'Product catalog' },
+      { path: '/en/dashboard/orders', heading: 'Orders' },
+      { path: '/en/dashboard/integrations', heading: 'Integrations' },
+      { path: '/en/dashboard/admin', heading: 'Admin command center' },
+    ] as const;
+
+    for (const route of dashboardRoutes) {
+      await page.goto(route.path);
+      await dismissReportModeTutorial(page);
+      await expect(page.getByRole('navigation', { name: 'Workspace navigation' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: route.heading })).toBeVisible();
+    }
+  });
 });

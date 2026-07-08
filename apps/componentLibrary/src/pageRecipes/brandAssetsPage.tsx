@@ -1,7 +1,7 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Input } from '@vybekiit/ui/input';
-import { Palette } from 'lucide-react';
+import { Palette, Save } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed brand assets page recipe.
@@ -27,9 +27,9 @@ export const BrandAssetsPage = () => {
             <div className="mt-4 space-y-3">
               <Input defaultValue="VybeKiit" />
               <Input defaultValue="#2563eb" />
-              <Button className="w-full" type="button">
+              <DemoActionButton className="w-full" icon={<Save className="h-4 w-4" />}>
                 Save style
-              </Button>
+              </DemoActionButton>
             </div>
           </aside>
           <div className="grid gap-3 sm:grid-cols-3">

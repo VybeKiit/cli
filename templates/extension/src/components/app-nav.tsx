@@ -1,15 +1,28 @@
 import { Button } from '@/components/ui/button';
+import { EXTENSION_SAAS_SCREENS } from '@/data/saasScreens';
 import { t } from '@/lib/i18n';
 import type { ExtensionView } from '@/lib/view';
 import { cn } from '@/lib/utils';
 
-const VIEWS: readonly ExtensionView[] = ['home', 'login', 'pricing'];
+const POPUP_VIEWS: readonly ExtensionView[] = ['home', 'login', 'pricing'];
 
 const VIEW_KEYS: Record<ExtensionView, string> = {
   home: 'nav_home',
   login: 'nav_login',
   pricing: 'nav_pricing',
+  dashboard: 'nav_dashboard',
+  products: 'nav_products',
+  settings: 'nav_settings',
+  status: 'nav_status',
+  changelog: 'nav_changelog',
+  admin: 'nav_admin',
 };
+
+const SIDE_PANEL_VIEWS: readonly ExtensionView[] = [
+  ...EXTENSION_SAAS_SCREENS.map((screen) => screen.view),
+  'login',
+  'pricing',
+];
 
 interface AppNavProps {
   readonly active: ExtensionView;
@@ -31,11 +44,11 @@ const AppNav = ({ active, onChange, compact = false, marketing = false }: AppNav
     className={cn(
       'flex gap-1 border-t p-2',
       marketing ? 'border-white/10 bg-[#03070d]' : 'border-border bg-background',
-      compact ? 'flex-col' : 'flex-row',
+      compact ? 'flex-col' : 'flex-row flex-wrap',
     )}
     aria-label={t('nav_label')}
   >
-    {VIEWS.map((view) => (
+    {(marketing ? POPUP_VIEWS : SIDE_PANEL_VIEWS).map((view) => (
       <AppNavButton active={active} compact={compact} key={view} onChange={onChange} view={view} />
     ))}
   </nav>
@@ -67,9 +80,10 @@ const AppNavButton = ({ active, compact, onChange, view }: AppNavButtonProps) =>
       type="button"
       size="sm"
       variant={active === view ? 'default' : 'outline'}
-      className={cn('flex-1', compact && 'w-full')}
+      className={cn(compact ? 'w-full' : 'min-w-28 flex-1')}
       onClick={handleClick}
     >
+      <span aria-hidden="true">{active === view ? '•' : '›'}</span>
       {t(VIEW_KEYS[view])}
     </Button>
   );

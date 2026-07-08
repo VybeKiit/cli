@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/SiteFooter';
+import { SiteHeader } from '@/components/SiteHeader';
 
 /** Page shell for the store's public pages: header, content, footer. */
 export const MarketingShell = ({ children }: { children: ReactNode }) => (

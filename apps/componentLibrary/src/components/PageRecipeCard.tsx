@@ -1,6 +1,6 @@
 import { CopyPageRecipePromptButton } from '@library/components/CopyPageRecipePromptButton';
 import { CopyPageRecipeSourceButton } from '@library/components/CopyPageRecipeSourceButton';
-import { PageRecipeFrame } from '@library/components/PageRecipeFrame';
+import { PageRecipePreviewGrid } from '@library/components/PageRecipePreviewGrid';
 import type { PageRecipe } from '@library/data/pageRecipes';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
@@ -36,11 +36,7 @@ export const PageRecipeCard = ({ recipe }: PageRecipeCardProps) => (
       </div>
     </div>
 
-    <div className="mt-4 grid gap-3 lg:grid-cols-[1.4fr_0.9fr_0.45fr]">
-      <PageRecipeFrame device="desktop" slug={recipe.slug} title={recipe.title} />
-      <PageRecipeFrame device="tablet" slug={recipe.slug} title={recipe.title} />
-      <PageRecipeFrame device="mobile" slug={recipe.slug} title={recipe.title} />
-    </div>
+    <PageRecipePreviewGrid className="mt-4" slug={recipe.slug} title={recipe.title} />
 
     <div className="mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
       <ul className="min-w-0 space-y-1 text-muted-foreground text-sm">
@@ -50,12 +46,17 @@ export const PageRecipeCard = ({ recipe }: PageRecipeCardProps) => (
           </li>
         ))}
       </ul>
-      <Button asChild={true} className="shrink-0" size="sm" variant="outline">
-        <Link href={`/pages/${recipe.slug}`}>
-          Open full route
-          <ArrowUpRight className="h-4 w-4" />
-        </Link>
-      </Button>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        <Button asChild={true} size="sm" variant="outline">
+          <Link href={`/pages/${recipe.slug}`}>Details</Link>
+        </Button>
+        <Button asChild={true} size="sm">
+          <Link href={`/embed/pages/${recipe.slug}`} rel="noreferrer" target="_blank">
+            Full preview
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
     </div>
   </article>
 );

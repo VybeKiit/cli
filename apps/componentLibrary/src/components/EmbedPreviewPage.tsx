@@ -180,12 +180,10 @@ const EmbedPreviewInner = ({
     }
 
     if (!entry.buildSafe) {
-      const unavailableReason =
-        entry.unavailableReason === undefined
-          ? entry.requiresEnv
-            ? 'env'
-            : 'nodemo'
-          : entry.unavailableReason;
+      let unavailableReason = entry.unavailableReason;
+      if (unavailableReason === undefined) {
+        unavailableReason = entry.requiresEnv ? 'env' : 'nodemo';
+      }
       setError(EMBED_UNAVAILABLE[unavailableReason]);
       setLoading(false);
       return;

@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AgentSessionDemo } from '@/components/inspirations/agent-session-demo';
+import { AgentSessionDemo } from '@/components/inspirations/AgentSessionDemo';
 import type { InspirationDirection } from '@/data/inspirations';
-import { InspirationChrome, InspirationCta } from './inspiration-chrome';
+import { InspirationChrome, InspirationCta } from './InspirationChrome';
 
 const VERIFY_STEPS = ['Auth', 'Database', 'Payments', 'Deploy', 'Live app'] as const;
 

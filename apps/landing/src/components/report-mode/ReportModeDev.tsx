@@ -18,12 +18,12 @@ import {
 import { usePathname } from 'next/navigation';
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { ReportDockBar } from '@/components/report-mode/dock/components/dock-bar';
+import { ReportDockBar } from '@/components/report-mode/dock/components/DockBar';
 import { getBrandChevronDirection } from '@/components/report-mode/dock/utils/report-dock-utils';
-import { ReportModeBanner } from '@/components/report-mode/inspect/report-mode-banner';
-import { ReportModeHighlight } from '@/components/report-mode/inspect/report-mode-highlight';
-import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
-import { ReportModeTutorial } from '@/components/report-mode/tutorial/report-mode-tutorial';
+import { ReportModeBanner } from '@/components/report-mode/inspect/ReportModeBanner';
+import { ReportModeHighlight } from '@/components/report-mode/inspect/ReportModeHighlight';
+import { ReportModeNotePanel } from '@/components/report-mode/inspect/ReportModeNotePanel';
+import { ReportModeTutorial } from '@/components/report-mode/tutorial/ReportModeTutorial';
 import {
   getAccessibleName,
   getCssPath,

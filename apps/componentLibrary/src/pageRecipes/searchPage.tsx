@@ -1,7 +1,7 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Input } from '@vybekiit/ui/input';
 import { Search } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed search page recipe.
@@ -25,7 +25,7 @@ export const SearchPage = () => {
             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-9" defaultValue="orders this week" />
           </div>
-          <Button type="button">Search</Button>
+          <DemoActionButton icon={<Search className="h-4 w-4" />}>Search</DemoActionButton>
         </div>
         <div className="mt-6 grid gap-3">
           {['Best match', 'Recent update', 'Saved item'].map((label) => (

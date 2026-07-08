@@ -5,7 +5,7 @@ import {
   shouldShowAssistantChat,
 } from '@vybekiit/assistant-chat';
 import { resolveVybeAssistant } from '@vybekiit/report-mode';
-import { AssistantChatLauncher } from './assistant-chat-launcher';
+import { AssistantChatLauncher } from './AssistantChatLauncher';
 
 /**
  * Dev-only mount for the vibe-coder chat tool. Renders nothing in production and

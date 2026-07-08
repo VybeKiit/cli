@@ -3,6 +3,8 @@
 import { CatalogSidebar } from '@library/components/CatalogSidebar';
 import { PageRecipeCard } from '@library/components/PageRecipeCard';
 import { PAGE_RECIPE_GROUPS, PAGE_RECIPES, type PageRecipe } from '@library/data/pageRecipes';
+import { useClientReady } from '@library/hooks/useClientReady';
+import { useDebouncedValue } from '@library/hooks/useDebouncedValue';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
 import { useRouter } from 'next/navigation';
 import { type ChangeEvent, useCallback, useMemo, useState } from 'react';
@@ -33,12 +35,42 @@ interface PageRecipeBrowserProps {
   readonly initialGroupId?: string;
 }
 
+type PageRecipeBrowserGroup = (typeof PAGE_RECIPE_GROUPS)[number];
+
+interface GroupedPageRecipes {
+  readonly group: PageRecipeBrowserGroup;
+  readonly recipes: readonly PageRecipe[];
+}
+
 const safeInitialGroupId = (groupId: string | undefined): string => {
   if (groupId !== undefined && groupSummaries.some((group) => group.id === groupId)) {
     return groupId;
   }
   return 'all';
 };
+
+const PageRecipeSections = ({ grouped }: { readonly grouped: readonly GroupedPageRecipes[] }) => (
+  <div className="space-y-8">
+    {grouped.map(({ group, recipes }) => (
+      <section key={group.id}>
+        <div className="mb-3">
+          <h2 className="font-semibold text-xl">{group.label}</h2>
+          <p className="text-muted-foreground text-sm">{group.description}</p>
+        </div>
+        <div className="grid gap-4">
+          {recipes.map((recipe) => (
+            <PageRecipeCard key={recipe.id} recipe={recipe} />
+          ))}
+        </div>
+      </section>
+    ))}
+    {grouped.length === 0 ? (
+      <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
+        No page recipes match this search.
+      </div>
+    ) : null}
+  </div>
+);
 
 /**
  * Render the Page recipe catalog browser.
@@ -50,7 +82,9 @@ const safeInitialGroupId = (groupId: string | undefined): string => {
  */
 export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) => {
   const router = useRouter();
+  const ready = useClientReady();
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, 250);
   const [groupId, setGroupId] = useState(safeInitialGroupId(initialGroupId));
 
   const handleGroupChange = useCallback(
@@ -73,9 +107,9 @@ export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) =>
         if (groupId !== 'all' && recipe.groupId !== groupId) {
           return false;
         }
-        return recipeMatchesQuery(recipe, query);
+        return recipeMatchesQuery(recipe, debouncedQuery);
       }),
-    [groupId, query],
+    [debouncedQuery, groupId],
   );
 
   const grouped = useMemo(
@@ -101,7 +135,7 @@ export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) =>
           <span className="font-semibold text-sm">Pages</span>
         </header>
 
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-6 md:p-8" data-page-recipes-ready={ready ? 'true' : 'false'}>
           <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="font-medium text-muted-foreground text-sm">
@@ -125,21 +159,7 @@ export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) =>
             />
           </div>
 
-          <div className="space-y-8">
-            {grouped.map(({ group, recipes: groupRecipes }) => (
-              <section key={group.id}>
-                <div className="mb-3">
-                  <h2 className="font-semibold text-xl">{group.label}</h2>
-                  <p className="text-muted-foreground text-sm">{group.description}</p>
-                </div>
-                <div className="grid gap-4">
-                  {groupRecipes.map((recipe) => (
-                    <PageRecipeCard key={recipe.id} recipe={recipe} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+          <PageRecipeSections grouped={grouped} />
         </main>
       </SidebarInset>
     </SidebarProvider>

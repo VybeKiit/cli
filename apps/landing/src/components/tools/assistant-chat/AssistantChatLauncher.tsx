@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { VybeLogoIcon } from '@/components/ui/CustomIcons';
 import { cn } from '@/lib/utils';
 
-import { AssistantChatPanel } from './assistant-chat-panel';
+import { AssistantChatPanel } from './AssistantChatPanel';
 
 interface AssistantChatLauncherProps {
   readonly assistant: VybeAssistant;

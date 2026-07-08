@@ -141,9 +141,12 @@ const appendAppliedPreset = (
   dryRun: boolean,
 ): Effect.Effect<void, DbError> =>
   applyPreset({ presetId, provider, databaseUrl, dryRun }).pipe(
-    Effect.map((result) => {
-      results.push(result);
-    }),
+    Effect.tap((result) =>
+      Effect.sync(() => {
+        results.push(result);
+      }),
+    ),
+    Effect.asVoid,
   );
 
 /**

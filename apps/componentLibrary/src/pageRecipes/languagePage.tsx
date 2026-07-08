@@ -1,7 +1,7 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Input } from '@vybekiit/ui/input';
-import { Languages } from 'lucide-react';
+import { Languages, Save } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed language page recipe.
@@ -30,9 +30,9 @@ export const LanguagePage = () => {
           <div className="rounded-lg border p-4">
             <p className="font-medium">Preview phrase</p>
             <p className="mt-2 text-muted-foreground">Welcome to your dashboard.</p>
-            <Button className="mt-4" type="button">
+            <DemoActionButton className="mt-4" icon={<Save className="h-4 w-4" />}>
               Save translations
-            </Button>
+            </DemoActionButton>
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@
 
 import { Effect, Either } from 'effect';
 import { type FormEvent, useState } from 'react';
-import { FormField } from '@/components/form-field';
+import { FormField } from '@/components/FormField';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';

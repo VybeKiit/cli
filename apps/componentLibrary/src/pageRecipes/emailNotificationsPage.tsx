@@ -1,8 +1,8 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Input } from '@vybekiit/ui/input';
 import { Textarea } from '@vybekiit/ui/textarea';
-import { Bell, Mail } from 'lucide-react';
+import { Bell, Mail, Send } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed email and notifications page recipe.
@@ -26,7 +26,7 @@ export const EmailNotificationsPage = () => {
           <div className="mt-5 space-y-3">
             <Input defaultValue="customer@example.com" />
             <Textarea defaultValue="Welcome to your new workspace." />
-            <Button type="button">Send test</Button>
+            <DemoActionButton icon={<Send className="h-4 w-4" />}>Send test</DemoActionButton>
           </div>
         </div>
         <div className="rounded-lg border bg-card p-5">
@@ -39,9 +39,9 @@ export const EmailNotificationsPage = () => {
             {['Product updates', 'Billing alerts', 'Weekly summary'].map((label) => (
               <div className="flex items-center justify-between rounded-lg border p-3" key={label}>
                 <span className="font-medium text-sm">{label}</span>
-                <Button size="sm" type="button" variant="outline">
+                <DemoActionButton icon={<Bell className="h-4 w-4" />} size="sm" variant="outline">
                   Enabled
-                </Button>
+                </DemoActionButton>
               </div>
             ))}
           </div>

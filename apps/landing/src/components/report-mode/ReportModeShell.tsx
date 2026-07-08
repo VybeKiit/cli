@@ -1,4 +1,4 @@
-import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
+import { ReportModeDev } from '@/components/report-mode/ReportModeDev';
 import '@/components/report-mode/dock/styles/report-mode-dock.css';
 import process from 'node:process';
 import { resolveVybeAssistant, shouldShowReportMode } from '@vybekiit/report-mode';

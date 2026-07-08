@@ -118,6 +118,78 @@ html.vk-embed-interactive body {
   min-height: 0;
 }
 
+@keyframes vk-demo-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vk-demo-slide {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vk-demo-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vk-demo-blur {
+  from {
+    filter: blur(10px);
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vk-demo-transition {
+  animation-duration: 420ms;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.vk-demo-transition[data-effect="fade"] {
+  animation-name: vk-demo-fade;
+}
+
+.vk-demo-transition[data-effect="slide"] {
+  animation-name: vk-demo-slide;
+}
+
+.vk-demo-transition[data-effect="scale"] {
+  animation-name: vk-demo-scale;
+}
+
+.vk-demo-transition[data-effect="blur"] {
+  animation-name: vk-demo-blur;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vk-demo-transition {
+    animation: none;
+  }
+}
+
 /* Catalog card — gentle auto-pan when idle; pauses on hover for inline interaction */
 @keyframes vk-card-preview-pan {
   0%,

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AgentSessionDemo } from '@/components/sections/agent-session-demo';
+import { AgentSessionDemo } from '@/components/sections/AgentSessionDemo';
 import { Button } from '@/components/ui/button';
 import { HERO } from '@/data/pillars';
 import { DEMO_VIDEO_EMBED_URL, PRICE, TRUST_BADGES } from '@/data/site';

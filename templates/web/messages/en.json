@@ -9,6 +9,10 @@
   "common.brandShort": "My App",
 
   "common.nav.pricing": "Pricing",
+  "common.nav.products": "Products",
+  "common.nav.support": "Support",
+  "common.nav.status": "Status",
+  "common.nav.changelog": "Changelog",
   "common.nav.signIn": "Sign in",
   "common.nav.terms": "Terms",
   "common.nav.privacy": "Privacy",

@@ -14,7 +14,7 @@
           "slug": "onboarding",
           "title": "Onboarding page",
           "summary": "A first-run checklist for setup progress, updates, and next actions.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/onboardingPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/OnboardingPage.tsx",
           "exportName": "OnboardingPage",
           "targetRoute": "/onboarding",
           "suggestedComponents": ["vybekiit/walkthrough"],
@@ -51,7 +51,7 @@
           "slug": "idea-planner",
           "title": "Idea planner page",
           "summary": "A planning surface for app notes and first data entities.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/ideaPlannerPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/IdeaPlannerPage.tsx",
           "exportName": "IdeaPlannerPage",
           "targetRoute": "/plan",
           "suggestedComponents": ["untitled/modals/modal", "bundui/card-default"],
@@ -76,6 +76,84 @@
       ]
     },
     {
+      "id": "dashboard-home",
+      "label": "Dashboard Home",
+      "description": "Signed-in dashboard home and command-center pages.",
+      "order": 25,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "dashboard-home",
+          "slug": "dashboard-home",
+          "title": "Dashboard home page",
+          "summary": "A generic signed-in dashboard home with overview cards and next actions.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/DashboardHomePage.tsx",
+          "exportName": "DashboardHomePage",
+          "targetRoute": "/dashboard",
+          "suggestedComponents": [
+            "bundui/app-sidebar",
+            "evilcharts/chart",
+            "kibo/glimpse",
+            "magicui/marquee"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Dashboard data",
+              "note": "Load dashboard widgets and activity from the configured app data sources.",
+              "todo": "Load dashboard widgets and activity from the configured app data sources.",
+              "owner": "client-state"
+            },
+            {
+              "kind": "service",
+              "label": "Widget preferences",
+              "note": "Save dashboard widget preferences through client state actions.",
+              "todo": "Save dashboard widget preferences through client state actions.",
+              "owner": "client-state"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows overview cards, recent activity, and a primary next action."
+          ]
+        },
+        {
+          "id": "command-center",
+          "slug": "command-center",
+          "title": "Command center page",
+          "summary": "A command palette and action launcher page for power users.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CommandCenterPage.tsx",
+          "exportName": "CommandCenterPage",
+          "targetRoute": "/command",
+          "suggestedComponents": [
+            "kibo/glimpse",
+            "bundui/input",
+            "magicui/marquee",
+            "ai-elements/message"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Command source",
+              "note": "Load command definitions and recent actions from the configured command source.",
+              "todo": "Load command definitions and recent actions from the configured command source.",
+              "owner": "core"
+            },
+            {
+              "kind": "service",
+              "label": "Command execution",
+              "note": "Execute selected commands through audited command actions.",
+              "todo": "Execute selected commands through audited command actions.",
+              "owner": "core"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page exposes search, recent commands, and runnable action states."
+          ]
+        }
+      ]
+    },
+    {
       "id": "auth",
       "label": "Auth",
       "description": "Account access pages for sign in, sign up, codes, and recovery.",
@@ -95,7 +173,7 @@
           "slug": "auth",
           "title": "Auth page",
           "summary": "A full account access page covering password, OTP, phone, and social entry.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/authPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AuthPage.tsx",
           "exportName": "AuthPage",
           "targetRoute": "/login",
           "suggestedComponents": ["supabase/sign-in-forms-01"],
@@ -120,6 +198,151 @@
       ]
     },
     {
+      "id": "legal",
+      "label": "Legal",
+      "description": "Terms, privacy, and OAuth consent policy pages.",
+      "order": 35,
+      "presetIds": [],
+      "goalIds": ["sign-in-with-google"],
+      "recipes": [
+        {
+          "id": "terms-of-service",
+          "slug": "terms-of-service",
+          "title": "Terms of service page",
+          "summary": "A public terms page with company defaults and OAuth consent links.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/TermsOfServicePage.tsx",
+          "exportName": "TermsOfServicePage",
+          "targetRoute": "/terms",
+          "suggestedComponents": ["bundui/card-default", "shadcnblocks/contact"],
+          "installNotes": [
+            {
+              "kind": "visual",
+              "label": "Company details",
+              "note": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+              "todo": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+              "owner": "legal"
+            },
+            {
+              "kind": "service",
+              "label": "OAuth links",
+              "note": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+              "todo": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows a company name, support email, optional registration ID, and public policy links."
+          ]
+        },
+        {
+          "id": "privacy-policy",
+          "slug": "privacy-policy",
+          "title": "Privacy policy page",
+          "summary": "A public privacy page with Google OAuth data disclosure defaults.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/PrivacyPolicyPage.tsx",
+          "exportName": "PrivacyPolicyPage",
+          "targetRoute": "/privacy",
+          "suggestedComponents": ["bundui/card-default", "shadcnblocks/contact"],
+          "installNotes": [
+            {
+              "kind": "visual",
+              "label": "Company details",
+              "note": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+              "todo": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+              "owner": "legal"
+            },
+            {
+              "kind": "service",
+              "label": "OAuth links",
+              "note": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+              "todo": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page explains Google profile data usage and exposes the support email."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "account-settings",
+      "label": "Account Settings",
+      "description": "User profile, account security, and preference pages.",
+      "order": 37,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "user-settings",
+          "slug": "user-settings",
+          "title": "User settings page",
+          "summary": "A profile and preference page for signed-in users.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/UserSettingsPage.tsx",
+          "exportName": "UserSettingsPage",
+          "targetRoute": "/settings/profile",
+          "suggestedComponents": [
+            "bundui/app-sidebar",
+            "bundui/avatar-default",
+            "untitled/modals/modal",
+            "shadcnblocks/contact"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Profile data",
+              "note": "Load profile and preference data from the active account service.",
+              "todo": "Load profile and preference data from the active account service.",
+              "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Save settings",
+              "note": "Save settings changes through audited user actions.",
+              "todo": "Save settings changes through audited user actions.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows profile, sessions, connected accounts, and account deletion states."
+          ]
+        },
+        {
+          "id": "account-security",
+          "slug": "account-security",
+          "title": "Account security page",
+          "summary": "A security settings page for sessions, 2FA, and recovery codes.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AccountSecurityPage.tsx",
+          "exportName": "AccountSecurityPage",
+          "targetRoute": "/settings/security",
+          "suggestedComponents": [
+            "bundui/alert-warning",
+            "bundui/data-table-01",
+            "shadcnblocks/contact"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Security data",
+              "note": "Load security sessions and recovery code status from the active auth provider.",
+              "todo": "Load security sessions and recovery code status from the active auth provider.",
+              "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Security changes",
+              "note": "Save security changes through audited account actions.",
+              "todo": "Save security changes through audited account actions.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page exposes 2FA, active sessions, trusted devices, and recovery codes."
+          ]
+        }
+      ]
+    },
+    {
       "id": "payments",
       "label": "Payments",
       "description": "Pricing and checkout handoff pages.",
@@ -138,7 +361,7 @@
           "slug": "pricing",
           "title": "Pricing page",
           "summary": "A pricing page that points live prices to the active payment provider.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/pricingPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/PricingPage.tsx",
           "exportName": "PricingPage",
           "targetRoute": "/pricing",
           "suggestedComponents": ["bundui/pricing-sections-01", "shadcnblocks/pricing"],
@@ -165,6 +388,185 @@
       ]
     },
     {
+      "id": "commerce",
+      "label": "Commerce",
+      "description": "Generic ecommerce product, cart, checkout, and order pages.",
+      "order": 45,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "product-grid",
+          "slug": "product-grid",
+          "title": "Product grid page",
+          "summary": "A generic ecommerce catalog with product cards and filters.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductGridPage.tsx",
+          "exportName": "ProductGridPage",
+          "targetRoute": "/products",
+          "suggestedComponents": [
+            "kokonutui/card-flip",
+            "bundui/card-default",
+            "magicui/marquee",
+            "shadcnblocks/pricing"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Product source",
+              "note": "Load products, prices, and categories from the configured commerce source.",
+              "todo": "Load products, prices, and categories from the configured commerce source.",
+              "owner": "commerce"
+            },
+            {
+              "kind": "service",
+              "label": "Cart action",
+              "note": "Send add-to-cart actions through the configured cart action.",
+              "todo": "Send add-to-cart actions through the configured cart action.",
+              "owner": "commerce"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows product cards, prices, filters, and add-to-cart actions."
+          ]
+        },
+        {
+          "id": "product-detail",
+          "slug": "product-detail",
+          "title": "Product detail page",
+          "summary": "A product detail page with gallery, variants, reviews, and related products.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductDetailPage.tsx",
+          "exportName": "ProductDetailPage",
+          "targetRoute": "/products/example",
+          "suggestedComponents": [
+            "kokonutui/card-flip",
+            "bundui/carousel",
+            "bundui/badge-indicator",
+            "shadcnblocks/pricing"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Product details",
+              "note": "Load product details, variants, reviews, and related products from the commerce source.",
+              "todo": "Load product details, variants, reviews, and related products from the commerce source.",
+              "owner": "commerce"
+            },
+            {
+              "kind": "service",
+              "label": "Variant cart action",
+              "note": "Send variant add-to-cart actions through the configured cart action.",
+              "todo": "Send variant add-to-cart actions through the configured cart action.",
+              "owner": "commerce"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows gallery, variant, review, related-product, and cart states."
+          ]
+        },
+        {
+          "id": "cart",
+          "slug": "cart",
+          "title": "Cart page",
+          "summary": "A cart review page with line items, coupons, totals, and checkout action.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CartPage.tsx",
+          "exportName": "CartPage",
+          "targetRoute": "/cart",
+          "suggestedComponents": [
+            "bundui/card-default",
+            "untitled/table/table",
+            "bundui/input",
+            "shadcnblocks/pricing"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Cart totals",
+              "note": "Load cart line items and totals from the configured commerce source.",
+              "todo": "Load cart line items and totals from the configured commerce source.",
+              "owner": "commerce"
+            },
+            {
+              "kind": "service",
+              "label": "Cart changes",
+              "note": "Save cart changes through the configured cart action.",
+              "todo": "Save cart changes through the configured cart action.",
+              "owner": "commerce"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows line items, coupon, total, empty state, and checkout action."
+          ]
+        },
+        {
+          "id": "checkout",
+          "slug": "checkout",
+          "title": "Checkout page",
+          "summary": "A checkout page with contact, shipping, payment, and order summary sections.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CheckoutPage.tsx",
+          "exportName": "CheckoutPage",
+          "targetRoute": "/checkout",
+          "suggestedComponents": [
+            "bundui/pricing-sections-01",
+            "bundui/input",
+            "shadcnblocks/pricing",
+            "untitled/modals/modal"
+          ],
+          "installNotes": [
+            {
+              "kind": "provider",
+              "label": "Checkout session",
+              "note": "Load checkout session and order summary from the configured commerce provider.",
+              "todo": "Load checkout session and order summary from the configured commerce provider.",
+              "owner": "commerce"
+            },
+            {
+              "kind": "provider",
+              "label": "Payment submit",
+              "note": "Submit checkout through the configured payment provider.",
+              "todo": "Submit checkout through the configured payment provider.",
+              "owner": "payments"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows contact, shipping, payment, summary, and submit-loading states."
+          ]
+        },
+        {
+          "id": "orders",
+          "slug": "orders",
+          "title": "Orders page",
+          "summary": "An order history page for receipts, fulfillment, and tracking.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/OrdersPage.tsx",
+          "exportName": "OrdersPage",
+          "targetRoute": "/orders",
+          "suggestedComponents": [
+            "untitled/table/table",
+            "bundui/badge-indicator",
+            "bundui/card-default"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Order history",
+              "note": "Load order history and fulfillment status from the configured commerce source.",
+              "todo": "Load order history and fulfillment status from the configured commerce source.",
+              "owner": "commerce"
+            },
+            {
+              "kind": "service",
+              "label": "Order actions",
+              "note": "Send invoice and reorder actions through the configured commerce actions.",
+              "todo": "Send invoice and reorder actions through the configured commerce actions.",
+              "owner": "commerce"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows order history, status badges, invoices, tracking, and reorder actions."
+          ]
+        }
+      ]
+    },
+    {
       "id": "launch",
       "label": "Launch",
       "description": "Go-live, domain, backup, and scheduled job status pages.",
@@ -177,7 +579,7 @@
           "slug": "launch-checklist",
           "title": "Launch checklist page",
           "summary": "A launch readiness page for deployment, domain, backup, and job status.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/launchChecklistPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/LaunchChecklistPage.tsx",
           "exportName": "LaunchChecklistPage",
           "targetRoute": "/launch",
           "suggestedComponents": ["vybekiit/walkthrough"],
@@ -214,7 +616,7 @@
           "slug": "file-manager",
           "title": "File manager page",
           "summary": "An upload and file metadata page for app attachments.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/fileManagerPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/FileManagerPage.tsx",
           "exportName": "FileManagerPage",
           "targetRoute": "/files",
           "suggestedComponents": ["bundui/input", "bundui/card-default"],
@@ -251,7 +653,7 @@
           "slug": "email-notifications",
           "title": "Email notifications page",
           "summary": "A page for test emails and notification preferences.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/emailNotificationsPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/EmailNotificationsPage.tsx",
           "exportName": "EmailNotificationsPage",
           "targetRoute": "/settings/notifications",
           "suggestedComponents": ["bundui/alert-default", "bundui/switch"],
@@ -272,6 +674,128 @@
             }
           ],
           "acceptanceChecks": ["The page separates email sending from notification preferences."]
+        },
+        {
+          "id": "notifications-center",
+          "slug": "notifications-center",
+          "title": "Notifications page",
+          "summary": "A notification feed and channel preference page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/NotificationsCenterPage.tsx",
+          "exportName": "NotificationsCenterPage",
+          "targetRoute": "/notifications",
+          "suggestedComponents": [
+            "bundui/alert-default",
+            "bundui/switch",
+            "ai-elements/message",
+            "kibo/glimpse"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Notification source",
+              "note": "Load notifications from the active notification source.",
+              "todo": "Load notifications from the active notification source.",
+              "owner": "notifications"
+            },
+            {
+              "kind": "service",
+              "label": "Notification preferences",
+              "note": "Save notification preferences through the notifications feature.",
+              "todo": "Save notification preferences through the notifications feature.",
+              "owner": "notifications"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows unread states, notification categories, and channel preferences."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "label": "Support",
+      "description": "Support center, help desk, and ticket pages.",
+      "order": 75,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "support-center",
+          "slug": "support-center",
+          "title": "Support center page",
+          "summary": "A help desk page with tickets, docs search, and contact actions.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/SupportCenterPage.tsx",
+          "exportName": "SupportCenterPage",
+          "targetRoute": "/support",
+          "suggestedComponents": [
+            "shadcnblocks/contact",
+            "kibo/glimpse",
+            "bundui/alert-default",
+            "ai-elements/message"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Support data",
+              "note": "Load support tickets and documentation results from the configured support provider.",
+              "todo": "Load support tickets and documentation results from the configured support provider.",
+              "owner": "support"
+            },
+            {
+              "kind": "service",
+              "label": "Support request",
+              "note": "Send support requests through the configured support action.",
+              "todo": "Send support requests through the configured support action.",
+              "owner": "support"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows ticket, docs search, contact, attachment, and status handoff states."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integrations",
+      "label": "Integrations",
+      "description": "API keys, webhooks, OAuth apps, and connected tools.",
+      "order": 77,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "integrations",
+          "slug": "integrations",
+          "title": "Integrations page",
+          "summary": "An integrations, API keys, and webhook management page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/IntegrationsPage.tsx",
+          "exportName": "IntegrationsPage",
+          "targetRoute": "/integrations",
+          "suggestedComponents": [
+            "bundui/data-table-02",
+            "bundui/card-default",
+            "kibo/glimpse",
+            "untitled/modals/modal"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Integration data",
+              "note": "Load connected integrations and API keys from the configured integrations source.",
+              "todo": "Load connected integrations and API keys from the configured integrations source.",
+              "owner": "integrations"
+            },
+            {
+              "kind": "service",
+              "label": "Integration actions",
+              "note": "Save integration changes through audited integration actions.",
+              "todo": "Save integration changes through audited integration actions.",
+              "owner": "integrations"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows API keys, webhooks, OAuth apps, scopes, and secret rotation states."
+          ]
         }
       ]
     },
@@ -288,7 +812,7 @@
           "slug": "teams",
           "title": "Teams page",
           "summary": "A workspace member and invitation page.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/teamsPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/TeamsPage.tsx",
           "exportName": "TeamsPage",
           "targetRoute": "/settings/team",
           "suggestedComponents": ["bundui/app-sidebar", "untitled/table/table"],
@@ -325,7 +849,7 @@
           "slug": "analytics",
           "title": "Analytics page",
           "summary": "A product health page for usage totals and error status.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/analyticsPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AnalyticsPage.tsx",
           "exportName": "AnalyticsPage",
           "targetRoute": "/analytics",
           "suggestedComponents": ["evilcharts/chart", "bundui/chart"],
@@ -352,6 +876,314 @@
       ]
     },
     {
+      "id": "admin",
+      "label": "Admin",
+      "description": "Owner, support, billing risk, and audit control-center pages.",
+      "order": 95,
+      "presetIds": ["organizations", "audit_log", "feature_flags"],
+      "goalIds": ["add-teams", "track-errors", "harden"],
+      "recipes": [
+        {
+          "id": "admin-panel",
+          "slug": "admin-panel",
+          "title": "Admin panel page",
+          "summary": "A combined owner control center for users, billing risk, support, audit log, and release controls.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AdminPanelPage.tsx",
+          "exportName": "AdminPanelPage",
+          "targetRoute": "/admin",
+          "suggestedComponents": [
+            "bundui/app-sidebar",
+            "untitled/table/table",
+            "evilcharts/chart",
+            "kibo/glimpse",
+            "magicui/marquee",
+            "shadcnblocks/contact"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Admin data",
+              "note": "Load users, plans, tickets, and admin events from the configured admin data sources.",
+              "todo": "Load users, plans, tickets, and admin events from the configured admin data sources.",
+              "owner": "admin"
+            },
+            {
+              "kind": "service",
+              "label": "Audited actions",
+              "note": "Save admin actions through audited server actions.",
+              "todo": "Save admin actions through audited server actions.",
+              "owner": "admin"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page exposes user, billing, support, and audit controls without calling production services."
+          ]
+        },
+        {
+          "id": "user-management",
+          "slug": "user-management",
+          "title": "User management page",
+          "summary": "An admin users table with role and access controls.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/UserManagementPage.tsx",
+          "exportName": "UserManagementPage",
+          "targetRoute": "/admin/users",
+          "suggestedComponents": [
+            "bundui/app-sidebar",
+            "untitled/table/table",
+            "bundui/badge-indicator"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Admin users",
+              "note": "Load users, roles, and account status from the configured admin user source.",
+              "todo": "Load users, roles, and account status from the configured admin user source.",
+              "owner": "admin"
+            },
+            {
+              "kind": "service",
+              "label": "Access changes",
+              "note": "Save user access changes through audited admin actions.",
+              "todo": "Save user access changes through audited admin actions.",
+              "owner": "admin"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows user search, roles, suspend/restore states, and invite actions."
+          ]
+        },
+        {
+          "id": "audit-log",
+          "slug": "audit-log",
+          "title": "Audit log page",
+          "summary": "A filterable audit trail page for admin and security events.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AuditLogPage.tsx",
+          "exportName": "AuditLogPage",
+          "targetRoute": "/admin/audit-log",
+          "suggestedComponents": [
+            "untitled/table/table",
+            "bundui/data-table-01",
+            "bundui/badge-indicator"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Audit events",
+              "note": "Load audit events from the configured audit log source.",
+              "todo": "Load audit events from the configured audit log source.",
+              "owner": "compliance"
+            },
+            {
+              "kind": "service",
+              "label": "Audit export",
+              "note": "Export audit events through the configured compliance action.",
+              "todo": "Export audit events through the configured compliance action.",
+              "owner": "compliance"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows actor, target, severity, filters, export, and retention states."
+          ]
+        },
+        {
+          "id": "billing-admin",
+          "slug": "billing-admin",
+          "title": "Billing admin page",
+          "summary": "An admin billing page for subscriptions, invoices, and failed payments.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/BillingAdminPage.tsx",
+          "exportName": "BillingAdminPage",
+          "targetRoute": "/admin/billing",
+          "suggestedComponents": [
+            "untitled/table/table",
+            "bundui/pricing-sections-01",
+            "shadcnblocks/pricing"
+          ],
+          "installNotes": [
+            {
+              "kind": "provider",
+              "label": "Billing provider data",
+              "note": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+              "todo": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+              "owner": "payments"
+            },
+            {
+              "kind": "provider",
+              "label": "Billing admin actions",
+              "note": "Save billing admin actions through audited payment actions.",
+              "todo": "Save billing admin actions through audited payment actions.",
+              "owner": "payments"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows subscriptions, failed payments, invoices, credits, refunds, and retry actions."
+          ]
+        },
+        {
+          "id": "system-health",
+          "slug": "system-health",
+          "title": "System health page",
+          "summary": "A system health page for services, queues, jobs, and errors.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/SystemHealthPage.tsx",
+          "exportName": "SystemHealthPage",
+          "targetRoute": "/admin/health",
+          "suggestedComponents": [
+            "evilcharts/chart",
+            "bundui/badge-indicator",
+            "bundui/alert-default"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Health source",
+              "note": "Load service health, queue depth, and job status from the configured observability source.",
+              "todo": "Load service health, queue depth, and job status from the configured observability source.",
+              "owner": "observability"
+            },
+            {
+              "kind": "service",
+              "label": "Health actions",
+              "note": "Send health actions through the configured operations actions.",
+              "todo": "Send health actions through the configured operations actions.",
+              "owner": "operations"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows service status, queues, cron jobs, error rates, and incident thresholds."
+          ]
+        },
+        {
+          "id": "role-permissions",
+          "slug": "role-permissions",
+          "title": "Role permissions page",
+          "summary": "A role and permissions matrix page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/RolePermissionsPage.tsx",
+          "exportName": "RolePermissionsPage",
+          "targetRoute": "/admin/roles",
+          "suggestedComponents": ["untitled/table/table", "bundui/switch", "bundui/data-table-02"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Authorization source",
+              "note": "Load roles and permissions from the configured authorization source.",
+              "todo": "Load roles and permissions from the configured authorization source.",
+              "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Authorization actions",
+              "note": "Save role changes through audited authorization actions.",
+              "todo": "Save role changes through audited authorization actions.",
+              "owner": "auth"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows role matrix, invite policy, owner protection, and permission edit states."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crm",
+      "label": "CRM",
+      "description": "Customer management, customer detail, and sales pipeline pages.",
+      "order": 98,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "customers",
+          "slug": "customers",
+          "title": "Customers page",
+          "summary": "A customer list and segmentation page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomersPage.tsx",
+          "exportName": "CustomersPage",
+          "targetRoute": "/customers",
+          "suggestedComponents": ["untitled/table/table", "bundui/app-sidebar", "kibo/glimpse"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Customer records",
+              "note": "Load customer records and segments from the configured CRM source.",
+              "todo": "Load customer records and segments from the configured CRM source.",
+              "owner": "crm"
+            },
+            {
+              "kind": "service",
+              "label": "Customer changes",
+              "note": "Save customer owner and segment changes through CRM actions.",
+              "todo": "Save customer owner and segment changes through CRM actions.",
+              "owner": "crm"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows customers, segments, account owners, and export actions."
+          ]
+        },
+        {
+          "id": "customer-detail",
+          "slug": "customer-detail",
+          "title": "Customer detail page",
+          "summary": "A customer profile page with timeline, notes, and related records.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomerDetailPage.tsx",
+          "exportName": "CustomerDetailPage",
+          "targetRoute": "/customers/example",
+          "suggestedComponents": [
+            "bundui/card-default",
+            "untitled/table/table",
+            "shadcnblocks/contact"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Customer timeline",
+              "note": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+              "todo": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+              "owner": "crm"
+            },
+            {
+              "kind": "service",
+              "label": "Customer notes",
+              "note": "Save customer notes and owner changes through CRM actions.",
+              "todo": "Save customer notes and owner changes through CRM actions.",
+              "owner": "crm"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows timeline, notes, invoices, files, support tickets, and owner controls."
+          ]
+        },
+        {
+          "id": "pipeline",
+          "slug": "pipeline",
+          "title": "Pipeline page",
+          "summary": "A CRM pipeline board page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/PipelinePage.tsx",
+          "exportName": "PipelinePage",
+          "targetRoute": "/pipeline",
+          "suggestedComponents": ["kokonutui/bento-grid", "bundui/card-default", "magicui/marquee"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Pipeline data",
+              "note": "Load pipeline stages and opportunities from the configured CRM source.",
+              "todo": "Load pipeline stages and opportunities from the configured CRM source.",
+              "owner": "crm"
+            },
+            {
+              "kind": "service",
+              "label": "Pipeline actions",
+              "note": "Save opportunity stage changes through CRM actions.",
+              "todo": "Save opportunity stage changes through CRM actions.",
+              "owner": "crm"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows pipeline stages, opportunity cards, owners, values, and due dates."
+          ]
+        }
+      ]
+    },
+    {
       "id": "ai",
       "label": "AI",
       "description": "AI assistant, conversations, and embeddings pages.",
@@ -364,7 +1196,7 @@
           "slug": "ai-assistant",
           "title": "AI assistant page",
           "summary": "A chat workspace for AI conversations and knowledge retrieval.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/aiAssistantPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/AiAssistantPage.tsx",
           "exportName": "AiAssistantPage",
           "targetRoute": "/assistant",
           "suggestedComponents": ["ai-elements/agent", "prompt-kit/ai-prompt"],
@@ -401,7 +1233,7 @@
           "slug": "search",
           "title": "Search page",
           "summary": "A search page for indexed app records.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/searchPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/SearchPage.tsx",
           "exportName": "SearchPage",
           "targetRoute": "/search",
           "suggestedComponents": ["kokonutui/action-search-bar", "kibo/glimpse"],
@@ -438,7 +1270,7 @@
           "slug": "realtime",
           "title": "Realtime page",
           "summary": "A live activity page for database updates.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/realtimePage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/RealtimePage.tsx",
           "exportName": "RealtimePage",
           "targetRoute": "/activity",
           "suggestedComponents": ["bundui/badge-indicator", "bundui/card-default"],
@@ -463,6 +1295,74 @@
       ]
     },
     {
+      "id": "productivity",
+      "label": "Productivity",
+      "description": "Tasks and calendar pages for work management.",
+      "order": 125,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "tasks",
+          "slug": "tasks",
+          "title": "Tasks page",
+          "summary": "A task list page with priority and assignment controls.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/TasksPage.tsx",
+          "exportName": "TasksPage",
+          "targetRoute": "/tasks",
+          "suggestedComponents": ["untitled/table/table", "bundui/badge-indicator", "bundui/input"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Task data",
+              "note": "Load tasks, assignees, and priorities from the configured task source.",
+              "todo": "Load tasks, assignees, and priorities from the configured task source.",
+              "owner": "tasks"
+            },
+            {
+              "kind": "service",
+              "label": "Task actions",
+              "note": "Save task changes through the configured task actions.",
+              "todo": "Save task changes through the configured task actions.",
+              "owner": "tasks"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows task priorities, assignees, due dates, blocked states, and bulk actions."
+          ]
+        },
+        {
+          "id": "calendar",
+          "slug": "calendar",
+          "title": "Calendar page",
+          "summary": "A calendar and booking page with event controls.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/CalendarPage.tsx",
+          "exportName": "CalendarPage",
+          "targetRoute": "/calendar",
+          "suggestedComponents": ["bundui/calendar", "bundui/card-default", "kibo/glimpse"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Calendar data",
+              "note": "Load events, bookings, and reminders from the configured calendar source.",
+              "todo": "Load events, bookings, and reminders from the configured calendar source.",
+              "owner": "calendar"
+            },
+            {
+              "kind": "service",
+              "label": "Calendar actions",
+              "note": "Save calendar changes through the configured calendar actions.",
+              "todo": "Save calendar changes through the configured calendar actions.",
+              "owner": "calendar"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows events, booking slots, reminders, conflicts, and sync states."
+          ]
+        }
+      ]
+    },
+    {
       "id": "blog",
       "label": "Blog",
       "description": "Publishing, article index, and changelog pages.",
@@ -475,7 +1375,7 @@
           "slug": "blog",
           "title": "Blog page",
           "summary": "An article index page for posts, changelogs, and product stories.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/blogPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/BlogPage.tsx",
           "exportName": "BlogPage",
           "targetRoute": "/blog",
           "suggestedComponents": ["tailark/blog-section", "bundui/card-default"],
@@ -500,6 +1400,144 @@
       ]
     },
     {
+      "id": "content-platform",
+      "label": "Content Platform",
+      "description": "Docs, media gallery, status, and changelog pages.",
+      "order": 135,
+      "presetIds": [],
+      "goalIds": [],
+      "recipes": [
+        {
+          "id": "media-gallery",
+          "slug": "media-gallery",
+          "title": "Media gallery page",
+          "summary": "A media asset gallery and upload page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/MediaGalleryPage.tsx",
+          "exportName": "MediaGalleryPage",
+          "targetRoute": "/media",
+          "suggestedComponents": [
+            "kokonutui/file-upload",
+            "magicui/marquee",
+            "bundui/card-default"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Media assets",
+              "note": "Load media assets and metadata from the configured asset source.",
+              "todo": "Load media assets and metadata from the configured asset source.",
+              "owner": "assets"
+            },
+            {
+              "kind": "service",
+              "label": "Media changes",
+              "note": "Save media uploads and metadata changes through asset actions.",
+              "todo": "Save media uploads and metadata changes through asset actions.",
+              "owner": "assets"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows asset cards, upload queue, preview panel, tags, and accessibility checks."
+          ]
+        },
+        {
+          "id": "docs",
+          "slug": "docs",
+          "title": "Docs page",
+          "summary": "A help documentation page with sidebar and article view.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/DocsPage.tsx",
+          "exportName": "DocsPage",
+          "targetRoute": "/docs",
+          "suggestedComponents": ["tailark/blog-section", "kibo/glimpse", "bundui/app-sidebar"],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Docs content",
+              "note": "Load documentation collections and articles from the configured content source.",
+              "todo": "Load documentation collections and articles from the configured content source.",
+              "owner": "cms"
+            },
+            {
+              "kind": "service",
+              "label": "Docs feedback",
+              "note": "Save documentation feedback through the configured feedback action.",
+              "todo": "Save documentation feedback through the configured feedback action.",
+              "owner": "cms"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows docs sidebar, article view, search, feedback, and stale-doc states."
+          ]
+        },
+        {
+          "id": "status",
+          "slug": "status",
+          "title": "Status page",
+          "summary": "A public service status and incident page.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/StatusPage.tsx",
+          "exportName": "StatusPage",
+          "targetRoute": "/status",
+          "suggestedComponents": [
+            "bundui/badge-indicator",
+            "evilcharts/chart",
+            "bundui/alert-default"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Status source",
+              "note": "Load public service status and incidents from the configured status source.",
+              "todo": "Load public service status and incidents from the configured status source.",
+              "owner": "status"
+            },
+            {
+              "kind": "service",
+              "label": "Status updates",
+              "note": "Publish incident updates through the configured status action.",
+              "todo": "Publish incident updates through the configured status action.",
+              "owner": "status"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows service health, incidents, uptime, subscriptions, and publish states."
+          ]
+        },
+        {
+          "id": "changelog",
+          "slug": "changelog",
+          "title": "Changelog page",
+          "summary": "A product changelog page with release timeline and subscriptions.",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/ChangelogPage.tsx",
+          "exportName": "ChangelogPage",
+          "targetRoute": "/changelog",
+          "suggestedComponents": [
+            "tailark/blog-section",
+            "bundui/badge-indicator",
+            "magicui/marquee"
+          ],
+          "installNotes": [
+            {
+              "kind": "service",
+              "label": "Changelog content",
+              "note": "Load changelog entries from the configured content source.",
+              "todo": "Load changelog entries from the configured content source.",
+              "owner": "cms"
+            },
+            {
+              "kind": "service",
+              "label": "Changelog publish",
+              "note": "Publish changelog updates through the configured content action.",
+              "todo": "Publish changelog updates through the configured content action.",
+              "owner": "cms"
+            }
+          ],
+          "acceptanceChecks": [
+            "The page shows release entries, timeline, tags, subscriptions, and publish states."
+          ]
+        }
+      ]
+    },
+    {
       "id": "safety",
       "label": "Safety",
       "description": "Doctor, hardening, security checklist, and audit pages.",
@@ -512,7 +1550,7 @@
           "slug": "safety",
           "title": "Safety page",
           "summary": "A doctor and launch safety checklist page.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/safetyPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/SafetyPage.tsx",
           "exportName": "SafetyPage",
           "targetRoute": "/safety",
           "suggestedComponents": ["bundui/alert-warning", "bundui/data-table-01"],
@@ -549,7 +1587,7 @@
           "slug": "brand-assets",
           "title": "Brand assets page",
           "summary": "A visual setup page for logos, images, colors, and shape.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/brandAssetsPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/BrandAssetsPage.tsx",
           "exportName": "BrandAssetsPage",
           "targetRoute": "/brand",
           "suggestedComponents": ["bundui/avatar-default", "magicui/marquee"],
@@ -586,7 +1624,7 @@
           "slug": "language",
           "title": "Language page",
           "summary": "A translation setup page for locales and visible strings.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/languagePage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/LanguagePage.tsx",
           "exportName": "LanguagePage",
           "targetRoute": "/settings/language",
           "suggestedComponents": ["bundui/tabs", "bundui/select-01"],
@@ -623,7 +1661,7 @@
           "slug": "feature-flags",
           "title": "Feature flags page",
           "summary": "A release control page for turning app features on and off.",
-          "sourcePath": "apps/componentLibrary/src/pageRecipes/featureFlagsPage.tsx",
+          "sourcePath": "apps/componentLibrary/src/pageRecipes/FeatureFlagsPage.tsx",
           "exportName": "FeatureFlagsPage",
           "targetRoute": "/admin/feature-flags",
           "suggestedComponents": ["bundui/switch", "bundui/data-table-02"],

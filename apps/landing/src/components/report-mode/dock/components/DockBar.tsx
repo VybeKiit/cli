@@ -1,16 +1,13 @@
 'use client';
 
 import type { ReportDockAnchor, ReportHandoffTarget, VybeAssistant } from '@vybekiit/report-mode';
-import { ReportModeBrandChip } from '@/components/report-mode/dock/components/brand-chip';
-import { ReportHandoffMenu } from '@/components/report-mode/dock/components/handoff-menu';
-import { ReportHighlightColorMenu } from '@/components/report-mode/dock/components/highlight-color-menu';
-import { ReportPinMenu } from '@/components/report-mode/dock/components/pin-menu';
-import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
+import { ReportModeBrandChip } from '@/components/report-mode/dock/components/BrandChip';
+import { ReportHandoffMenu } from '@/components/report-mode/dock/components/HandoffMenu';
+import { ReportHighlightColorMenu } from '@/components/report-mode/dock/components/HighlightColorMenu';
+import { ReportPinMenu } from '@/components/report-mode/dock/components/PinMenu';
+import { ReportControlHint } from '@/components/report-mode/shared/ReportControlHint';
+import { ReportDragIcon, ReportTargetIcon } from '@/components/report-mode/shared/ReportModeIcons';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
-import {
-  ReportDragIcon,
-  ReportTargetIcon,
-} from '@/components/report-mode/shared/report-mode-icons';
 import { cn } from '@/lib/utils';
 
 interface ReportDockBarProps {

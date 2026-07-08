@@ -7,11 +7,11 @@ import {
   useReportHoverMenu,
 } from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
-import { ReportHoldOption } from '@/components/report-mode/dock/components/hold-option';
-import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
-import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
+import { ReportHoldOption } from '@/components/report-mode/dock/components/HoldOption';
+import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/ReportFlyoutPortal';
+import { ReportControlHint } from '@/components/report-mode/shared/ReportControlHint';
+import { ReportChatHandoffIcon } from '@/components/report-mode/shared/ReportModeIcons';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
-import { ReportChatHandoffIcon } from '@/components/report-mode/shared/report-mode-icons';
 import { cn } from '@/lib/utils';
 
 const HANDOFF_OPTIONS: readonly ReportHandoffTarget[] = ['current-chat', 'new-chat'];

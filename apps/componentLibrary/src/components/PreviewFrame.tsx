@@ -151,8 +151,12 @@ export const ComponentDetail = ({ entry }: { entry: CatalogEntry }) => {
     setSize(loadPreviewSize());
   }, []);
 
-  const mode: PreviewMode =
-    modeOverride === null ? (resolvedTheme === 'dark' ? 'dark' : 'light') : modeOverride;
+  let mode: PreviewMode;
+  if (modeOverride === null) {
+    mode = resolvedTheme === 'dark' ? 'dark' : 'light';
+  } else {
+    mode = modeOverride;
+  }
   const viewportWidth = resolveViewportWidth(viewport, customWidth);
   const sizeScale = SIZE_SCALES[size];
 

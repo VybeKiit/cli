@@ -51,7 +51,7 @@ export const PAGE_RECIPES = [
     "slug": "onboarding",
     "title": "Onboarding page",
     "summary": "A first-run checklist for setup progress, updates, and next actions.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/onboardingPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/OnboardingPage.tsx",
     "exportName": "OnboardingPage",
     "targetRoute": "/onboarding",
     "suggestedComponents": [
@@ -76,7 +76,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows the current setup step and a next action."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { CheckCircle2 } from 'lucide-react';\n\n/**\n * Render a source-backed onboarding page recipe.\n *\n * @returns A ready first-run setup page component.\n * @example\n * const element = <OnboardingPage />;\n */\nexport const OnboardingPage = () => {\n  // TODO: Connect checklist progress to the user's saved setup state.\n  // TODO: Connect update prompts to the kit update workflow.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-4xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Start\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Set up your app</h1>\n        <p className=\"mt-2 text-muted-foreground\">\n          A friendly first-run page for setup progress, kit updates, and next actions.\n        </p>\n        <div className=\"mt-6 space-y-3\">\n          {['Describe the app', 'Pick a design direction', 'Connect the first feature'].map(\n            (label) => (\n              <div className=\"flex items-center gap-3 rounded-lg border p-4\" key={label}>\n                <CheckCircle2 className=\"h-5 w-5 text-emerald-600\" />\n                <span className=\"font-medium\">{label}</span>\n              </div>\n            ),\n          )}\n        </div>\n        <Button className=\"mt-6\" type=\"button\">\n          Continue setup\n        </Button>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { ArrowRight, CheckCircle2, Palette, Sparkles } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\n/**\n * Render a source-backed onboarding page recipe.\n *\n * @returns A ready first-run setup page component.\n * @example\n * const element = <OnboardingPage />;\n */\nexport const OnboardingPage = () => {\n  // TODO: Connect checklist progress to the user's saved setup state.\n  // TODO: Connect update prompts to the kit update workflow.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"slide\" title=\"App onboarding motion\">\n        <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n          <section className=\"mx-auto grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_360px]\">\n            <div className=\"rounded-lg border bg-card p-6\">\n              <Badge className=\"mb-4\" variant=\"secondary\">\n                Start\n              </Badge>\n              <h1 className=\"font-bold text-4xl tracking-tight\">Set up your app</h1>\n              <p className=\"mt-2 max-w-2xl text-muted-foreground\">\n                A friendly first-run page for setup progress, kit updates, and next actions.\n              </p>\n              <div className=\"mt-6 grid gap-3 md:grid-cols-3\">\n                {['Describe the app', 'Pick a design direction', 'Connect the first feature'].map(\n                  (label) => (\n                    <div className=\"rounded-lg border p-4\" key={label}>\n                      <CheckCircle2 className=\"mb-3 h-5 w-5 text-emerald-600\" />\n                      <span className=\"font-medium\">{label}</span>\n                      <p className=\"mt-2 text-muted-foreground text-sm\">\n                        Short, guided setup step with safe defaults.\n                      </p>\n                    </div>\n                  ),\n                )}\n              </div>\n              <DemoActionButton className=\"mt-6\" icon={<ArrowRight className=\"h-4 w-4\" />}>\n                Continue setup\n              </DemoActionButton>\n            </div>\n\n            <DemoVariantGrid\n              description=\"Use these states to judge colors, type weight, and step density.\"\n              title=\"Onboarding variants\"\n            >\n              <DemoVariantCard label=\"Primary step\" tone=\"primary\">\n                <Sparkles className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-semibold text-lg\">One clear action</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Large heading and one button.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Dense step\" tone=\"muted\">\n                <p className=\"font-medium text-sm\">Checklist density</p>\n                <p className=\"mt-1 text-muted-foreground text-xs\">\n                  Smaller copy for compact walkthrough cards.\n                </p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Color stress\" tone=\"accent\">\n                <Palette className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-medium\">Randomized palette ready</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Check contrast after every swap.</p>\n              </DemoVariantCard>\n            </DemoVariantGrid>\n          </section>\n        </main>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Connect checklist progress to the user's saved setup state.",
       "Connect update prompts to the kit update workflow."
@@ -91,7 +91,7 @@ export const PAGE_RECIPES = [
     "slug": "idea-planner",
     "title": "Idea planner page",
     "summary": "A planning surface for app notes and first data entities.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/ideaPlannerPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/IdeaPlannerPage.tsx",
     "exportName": "IdeaPlannerPage",
     "targetRoute": "/plan",
     "suggestedComponents": [
@@ -117,7 +117,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page captures the idea and shows the first entity list."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Textarea } from '@vybekiit/ui/textarea';\nimport { Lightbulb } from 'lucide-react';\n\n/**\n * Render a source-backed idea planner page recipe.\n *\n * @returns A ready idea planning and data design page component.\n * @example\n * const element = <IdeaPlannerPage />;\n */\nexport const IdeaPlannerPage = () => {\n  // TODO: Save idea notes to the configured app data store.\n  // TODO: Turn approved entities into the active database schema plan.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Planning\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Plan your app idea</h1>\n        <div className=\"mt-6 grid gap-5 lg:grid-cols-[1fr_320px]\">\n          <div className=\"rounded-lg border bg-card p-5\">\n            <Lightbulb className=\"mb-4 h-6 w-6 text-amber-600\" />\n            <Textarea\n              className=\"min-h-48\"\n              defaultValue=\"I want to help customers book, pay, and manage their work in one place.\"\n            />\n            <Button className=\"mt-4\" type=\"button\">\n              Save plan\n            </Button>\n          </div>\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <h2 className=\"font-semibold text-xl\">Suggested data</h2>\n            <div className=\"mt-4 space-y-2\">\n              {['Customers', 'Orders', 'Messages'].map((entity) => (\n                <div className=\"rounded-md border px-3 py-2 text-sm\" key={entity}>\n                  {entity}\n                </div>\n              ))}\n            </div>\n          </aside>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Textarea } from '@vybekiit/ui/textarea';\nimport { Lightbulb, Save } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed idea planner page recipe.\n *\n * @returns A ready idea planning and data design page component.\n * @example\n * const element = <IdeaPlannerPage />;\n */\nexport const IdeaPlannerPage = () => {\n  // TODO: Save idea notes to the configured app data store.\n  // TODO: Turn approved entities into the active database schema plan.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Planning\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Plan your app idea</h1>\n        <div className=\"mt-6 grid gap-5 lg:grid-cols-[1fr_320px]\">\n          <div className=\"rounded-lg border bg-card p-5\">\n            <Lightbulb className=\"mb-4 h-6 w-6 text-amber-600\" />\n            <Textarea\n              className=\"min-h-48\"\n              defaultValue=\"I want to help customers book, pay, and manage their work in one place.\"\n            />\n            <DemoActionButton className=\"mt-4\" icon={<Save className=\"h-4 w-4\" />}>\n              Save plan\n            </DemoActionButton>\n          </div>\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <h2 className=\"font-semibold text-xl\">Suggested data</h2>\n            <div className=\"mt-4 space-y-2\">\n              {['Customers', 'Orders', 'Messages'].map((entity) => (\n                <div className=\"rounded-md border px-3 py-2 text-sm\" key={entity}>\n                  {entity}\n                </div>\n              ))}\n            </div>\n          </aside>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Save idea notes to the configured app data store.",
       "Turn approved entities into the active database schema plan."
@@ -128,11 +128,97 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "dashboard-home",
+    "slug": "dashboard-home",
+    "title": "Dashboard home page",
+    "summary": "A generic signed-in dashboard home with overview cards and next actions.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/DashboardHomePage.tsx",
+    "exportName": "DashboardHomePage",
+    "targetRoute": "/dashboard",
+    "suggestedComponents": [
+      "bundui/app-sidebar",
+      "evilcharts/chart",
+      "kibo/glimpse",
+      "magicui/marquee"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Dashboard data",
+        "note": "Load dashboard widgets and activity from the configured app data sources.",
+        "todo": "Load dashboard widgets and activity from the configured app data sources.",
+        "owner": "client-state"
+      },
+      {
+        "kind": "service",
+        "label": "Widget preferences",
+        "note": "Save dashboard widget preferences through client state actions.",
+        "todo": "Save dashboard widget preferences through client state actions.",
+        "owner": "client-state"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows overview cards, recent activity, and a primary next action."
+    ],
+    "sourceCode": "import { Activity, Bell, Home, Plus, TrendingUp } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Today',\n    value: '18',\n    detail: 'Actionable items',\n    icon: <Home className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Growth',\n    value: '+12%',\n    detail: 'Weekly activity',\n    icon: <TrendingUp className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Alerts',\n    value: '4',\n    detail: 'Needs review',\n    icon: <Bell className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Activity',\n    value: 'Live',\n    detail: 'Updated now',\n    icon: <Activity className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst dashboardItems = [\n  {\n    title: 'Overview cards',\n    description: 'Today, growth, alerts, and next-step panels.',\n    badge: 'Overview',\n  },\n  {\n    title: 'Recent activity',\n    description: 'Latest signups, orders, updates, and admin events.',\n    badge: 'Activity',\n  },\n  {\n    title: 'Recommended actions',\n    description: 'The one or two actions that move the app forward.',\n    badge: 'Actions',\n  },\n] as const;\n\nconst dashboardControls = [\n  {\n    title: 'Pin widgets',\n    description: 'Allow users to pin the panels they care about.',\n    badge: 'Widgets',\n  },\n  {\n    title: 'Dismiss alerts',\n    description: 'Let users clean up action items once handled.',\n    badge: 'Alerts',\n  },\n  {\n    title: 'Refresh data',\n    description: 'Show a visible refresh state for dashboard cards.',\n    badge: 'Refresh',\n  },\n] as const;\n\n/**\n * Render a source-backed dashboard home page recipe.\n *\n * @returns A generic signed-in dashboard home page.\n * @example\n * const element = <DashboardHomePage />;\n */\nexport const DashboardHomePage = () => {\n  // TODO: Load dashboard widgets and activity from the configured app data sources.\n  // TODO: Save dashboard widget preferences through client state actions.\n  return (\n    <DemoQuickWinPage\n      active=\"dashboard\"\n      badge=\"Dashboard\"\n      detailItems={dashboardControls}\n      detailTitle=\"Dashboard controls\"\n      listDescription=\"A better generic dashboard home than analytics-only, ready for every SaaS template.\"\n      listItems={dashboardItems}\n      listTitle=\"Dashboard home\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add widget', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View activity',\n        icon: <Activity className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A signed-in dashboard home with overview cards, recent activity, alerts, and recommended next actions.\"\n      title=\"Dashboard home\"\n      transition=\"fade\"\n      variantDescription=\"Dashboard homes need clear priorities, recent activity, and fast action entry points.\"\n      variantItems={dashboardControls}\n      variantTitle=\"Dashboard component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load dashboard widgets and activity from the configured app data sources.",
+      "Save dashboard widget preferences through client state actions."
+    ],
+    "groupId": "dashboard-home",
+    "groupLabel": "Dashboard Home",
+    "groupDescription": "Signed-in dashboard home and command-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "command-center",
+    "slug": "command-center",
+    "title": "Command center page",
+    "summary": "A command palette and action launcher page for power users.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CommandCenterPage.tsx",
+    "exportName": "CommandCenterPage",
+    "targetRoute": "/command",
+    "suggestedComponents": [
+      "kibo/glimpse",
+      "bundui/input",
+      "magicui/marquee",
+      "ai-elements/message"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Command source",
+        "note": "Load command definitions and recent actions from the configured command source.",
+        "todo": "Load command definitions and recent actions from the configured command source.",
+        "owner": "core"
+      },
+      {
+        "kind": "service",
+        "label": "Command execution",
+        "note": "Execute selected commands through audited command actions.",
+        "todo": "Execute selected commands through audited command actions.",
+        "owner": "core"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page exposes search, recent commands, and runnable action states."
+    ],
+    "sourceCode": "import { Command, Eye, Plus, Search, Zap } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Commands',\n    value: '42',\n    detail: 'Searchable actions',\n    icon: <Command className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Recent',\n    value: '8',\n    detail: 'Fast access',\n    icon: <Search className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Automations',\n    value: '5',\n    detail: 'One-click flows',\n    icon: <Zap className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Pinned',\n    value: '6',\n    detail: 'User shortcuts',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst commandItems = [\n  {\n    title: 'Command palette',\n    description: 'Search actions, pages, records, and help articles.',\n    badge: 'Search',\n  },\n  {\n    title: 'Action launcher',\n    description: 'Create tasks, invite users, add products, and open support.',\n    badge: 'Actions',\n  },\n  {\n    title: 'Recent commands',\n    description: 'Last-used actions and keyboard-friendly shortcuts.',\n    badge: 'Recent',\n  },\n] as const;\n\nconst commandControls = [\n  {\n    title: 'Pin commands',\n    description: 'Promote common actions to the top of the palette.',\n    badge: 'Pin',\n  },\n  {\n    title: 'Scope search',\n    description: 'Search across records, pages, docs, and actions.',\n    badge: 'Scope',\n  },\n  {\n    title: 'Keyboard labels',\n    description: 'Show shortcuts without relying on visible help text.',\n    badge: 'Keys',\n  },\n] as const;\n\n/**\n * Render a source-backed command center page recipe.\n *\n * @returns A command palette and action launcher page.\n * @example\n * const element = <CommandCenterPage />;\n */\nexport const CommandCenterPage = () => {\n  // TODO: Load command definitions and recent actions from the configured command source.\n  // TODO: Execute selected commands through audited command actions.\n  return (\n    <DemoQuickWinPage\n      active=\"dashboard\"\n      badge=\"Command\"\n      detailItems={commandControls}\n      detailTitle=\"Command controls\"\n      listDescription=\"A command surface for power users, operators, and vibe-coder workflows.\"\n      listItems={commandItems}\n      listTitle=\"Command center\"\n      metrics={metrics}\n      primaryAction={{ label: 'Run command', icon: <Zap className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search actions',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A command center page with search, action launcher, keyboard-style commands, and recent shortcuts.\"\n      title=\"Command center\"\n      transition=\"scale\"\n      variantDescription=\"Command surfaces need fast scanning, search states, and clear action grouping.\"\n      variantItems={commandControls}\n      variantTitle=\"Command component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load command definitions and recent actions from the configured command source.",
+      "Execute selected commands through audited command actions."
+    ],
+    "groupId": "dashboard-home",
+    "groupLabel": "Dashboard Home",
+    "groupDescription": "Signed-in dashboard home and command-center pages.",
+    "providerPointers": []
+  },
+  {
     "id": "auth",
     "slug": "auth",
     "title": "Auth page",
     "summary": "A full account access page covering password, OTP, phone, and social entry.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/authPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AuthPage.tsx",
     "exportName": "AuthPage",
     "targetRoute": "/login",
     "suggestedComponents": [
@@ -157,7 +243,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page renders account access choices before auth is configured."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Label } from '@vybekiit/ui/label';\nimport { MessageCircle, ShieldCheck } from 'lucide-react';\nimport { useId } from 'react';\n\n/**\n * Render a source-backed auth page recipe.\n *\n * @returns A ready auth page component for sign-in, sign-up, OTP, and reset flows.\n * @example\n * const element = <AuthPage />;\n */\nexport const AuthPage = () => {\n  const emailId = useId();\n  const passwordId = useId();\n\n  // TODO: Connect this form to the active Supabase auth provider.\n  // TODO: Connect phone and email-code buttons to the configured auth methods.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_420px] lg:items-center\">\n        <div className=\"space-y-6\">\n          <Badge className=\"w-fit\" variant=\"secondary\">\n            Account access\n          </Badge>\n          <div className=\"space-y-3\">\n            <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">Welcome back</h1>\n            <p className=\"max-w-xl text-muted-foreground\">\n              A complete starter screen for sign in, sign up, verification, phone codes, and\n              password recovery.\n            </p>\n          </div>\n          <div className=\"grid gap-3 sm:grid-cols-2\">\n            <div className=\"rounded-lg border bg-card p-4\">\n              <ShieldCheck className=\"mb-3 h-5 w-5 text-emerald-600\" />\n              <p className=\"font-medium text-sm\">Protected account area</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Connect the submit action to your auth provider before launch.\n              </p>\n            </div>\n            <div className=\"rounded-lg border bg-card p-4\">\n              <MessageCircle className=\"mb-3 h-5 w-5 text-blue-600\" />\n              <p className=\"font-medium text-sm\">Code-based sign in</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Email links, SMS codes, and social sign in share the same layout.\n              </p>\n            </div>\n          </div>\n        </div>\n\n        <form className=\"rounded-lg border bg-card p-5 shadow-sm\">\n          <div className=\"mb-5\">\n            <h2 className=\"font-semibold text-xl\">Sign in</h2>\n            <p className=\"mt-1 text-muted-foreground text-sm\">\n              Use the default values while you wire the provider.\n            </p>\n          </div>\n          <div className=\"space-y-4\">\n            <div className=\"space-y-2\">\n              <Label htmlFor={emailId}>Email</Label>\n              <Input defaultValue=\"founder@example.com\" id={emailId} type=\"email\" />\n            </div>\n            <div className=\"space-y-2\">\n              <Label htmlFor={passwordId}>Password</Label>\n              <Input defaultValue=\"start-here\" id={passwordId} type=\"password\" />\n            </div>\n            <Button className=\"w-full\" type=\"button\">\n              Continue\n            </Button>\n            <div className=\"grid gap-2 sm:grid-cols-2\">\n              <Button type=\"button\" variant=\"outline\">\n                Email code\n              </Button>\n              <Button type=\"button\" variant=\"outline\">\n                Phone code\n              </Button>\n            </div>\n            <Button className=\"w-full\" type=\"button\" variant=\"ghost\">\n              Continue with Google\n            </Button>\n          </div>\n        </form>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Label } from '@vybekiit/ui/label';\nimport {\n  AlertCircle,\n  CheckCircle2,\n  KeyRound,\n  LoaderCircle,\n  Mail,\n  MessageCircle,\n  Phone,\n  Shield,\n  ShieldCheck,\n} from 'lucide-react';\nimport { type SVGProps, useId } from 'react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst GoogleLogo = (props: SVGProps<SVGSVGElement>) => (\n  <svg aria-label=\"Google\" role=\"img\" viewBox=\"0 0 24 24\" {...props}>\n    <path\n      d=\"M21.6 12.23c0-.73-.07-1.43-.19-2.1H12v3.98h5.38a4.6 4.6 0 0 1-1.99 3.02v2.5h3.22c1.89-1.74 2.99-4.3 2.99-7.4Z\"\n      fill=\"#4285F4\"\n    />\n    <path\n      d=\"M12 22c2.7 0 4.96-.9 6.61-2.44l-3.22-2.5c-.9.6-2.04.95-3.39.95-2.6 0-4.8-1.76-5.59-4.12H3.08v2.58A9.99 9.99 0 0 0 12 22Z\"\n      fill=\"#34A853\"\n    />\n    <path\n      d=\"M6.41 13.89A6.01 6.01 0 0 1 6.1 12c0-.66.11-1.3.31-1.89V7.53H3.08A9.99 9.99 0 0 0 2 12c0 1.61.39 3.13 1.08 4.47l3.33-2.58Z\"\n      fill=\"#FBBC05\"\n    />\n    <path\n      d=\"M12 5.98c1.47 0 2.78.5 3.82 1.5l2.86-2.86C16.96 3 14.7 2 12 2a9.99 9.99 0 0 0-8.92 5.53l3.33 2.58C7.2 7.74 9.4 5.98 12 5.98Z\"\n      fill=\"#EA4335\"\n    />\n  </svg>\n);\n\n/**\n * Render a source-backed auth page recipe.\n *\n * @returns A ready auth page component for sign-in, sign-up, OTP, and reset flows.\n * @example\n * const element = <AuthPage />;\n */\nexport const AuthPage = () => {\n  const emailId = useId();\n  const passwordId = useId();\n  const errorEmailId = useId();\n  const errorTextId = useId();\n\n  // TODO: Connect this form to the active Supabase auth provider.\n  // TODO: Connect phone and email-code buttons to the configured auth methods.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"fade\" title=\"Auth motion pass\">\n        <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n          <section className=\"mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_420px] lg:items-start\">\n            <div className=\"space-y-6\">\n              <Badge className=\"w-fit\" variant=\"secondary\">\n                Account access\n              </Badge>\n              <div className=\"space-y-3\">\n                <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">Welcome back</h1>\n                <p className=\"max-w-xl text-muted-foreground\">\n                  A complete starter screen for sign in, sign up, verification, phone codes, and\n                  password recovery.\n                </p>\n              </div>\n              <div className=\"grid gap-3 sm:grid-cols-2\">\n                <div className=\"rounded-lg border bg-card p-4\">\n                  <ShieldCheck className=\"mb-3 h-5 w-5 text-emerald-600\" />\n                  <p className=\"font-medium text-sm\">Protected account area</p>\n                  <p className=\"mt-1 text-muted-foreground text-sm\">\n                    Connect the submit action to your auth provider before launch.\n                  </p>\n                </div>\n                <div className=\"rounded-lg border bg-card p-4\">\n                  <MessageCircle className=\"mb-3 h-5 w-5 text-blue-600\" />\n                  <p className=\"font-medium text-sm\">Code-based sign in</p>\n                  <p className=\"mt-1 text-muted-foreground text-sm\">\n                    Email links, SMS codes, and social sign in share the same layout.\n                  </p>\n                </div>\n              </div>\n\n              <DemoVariantGrid\n                description=\"Compare form density, error color, success color, and copy scale.\"\n                title=\"Auth states\"\n              >\n                <DemoVariantCard label=\"Loaded\" tone=\"muted\">\n                  <CheckCircle2 className=\"mb-3 h-5 w-5 text-emerald-600\" />\n                  <p className=\"font-medium text-sm\">Default form is ready.</p>\n                  <p className=\"mt-1 text-muted-foreground text-xs\">\n                    Safe example values keep the layout stable.\n                  </p>\n                </DemoVariantCard>\n                <DemoVariantCard label=\"Input error\">\n                  <AlertCircle className=\"mb-3 h-5 w-5 text-destructive\" />\n                  <div className=\"space-y-2\">\n                    <Label htmlFor={errorEmailId}>Email with error</Label>\n                    <Input\n                      aria-describedby={errorTextId}\n                      aria-invalid={true}\n                      defaultValue=\"not-an-email\"\n                      id={errorEmailId}\n                      type=\"email\"\n                    />\n                    <p className=\"text-destructive text-xs\" id={errorTextId}>\n                      Enter a valid email address.\n                    </p>\n                  </div>\n                </DemoVariantCard>\n                <DemoVariantCard label=\"Success\" tone=\"primary\">\n                  <CheckCircle2 className=\"mb-3 h-5 w-5 text-emerald-600\" />\n                  <p className=\"font-medium text-sm\">Magic link sent.</p>\n                  <p className=\"mt-1 text-muted-foreground text-xs\">founder@example.com</p>\n                </DemoVariantCard>\n              </DemoVariantGrid>\n            </div>\n\n            <form className=\"rounded-lg border bg-card p-5 shadow-sm\">\n              <div className=\"mb-5\">\n                <h2 className=\"font-semibold text-xl\">Sign in</h2>\n                <p className=\"mt-1 text-muted-foreground text-sm\">\n                  Use the default values while you wire the provider.\n                </p>\n              </div>\n              <div className=\"space-y-4\">\n                <div className=\"space-y-2\">\n                  <Label className=\"flex items-center gap-2\" htmlFor={emailId}>\n                    <Mail aria-label=\"Email\" className=\"h-4 w-4\" role=\"img\" />\n                    Email\n                  </Label>\n                  <Input defaultValue=\"founder@example.com\" id={emailId} type=\"email\" />\n                </div>\n                <div className=\"space-y-2\">\n                  <Label className=\"flex items-center gap-2\" htmlFor={passwordId}>\n                    <KeyRound aria-label=\"Password\" className=\"h-4 w-4\" role=\"img\" />\n                    Password\n                  </Label>\n                  <Input defaultValue=\"start-here\" id={passwordId} type=\"password\" />\n                </div>\n                <DemoActionButton className=\"w-full\" icon={<Shield className=\"h-4 w-4\" />}>\n                  Continue\n                </DemoActionButton>\n                <div className=\"grid gap-2 sm:grid-cols-2\">\n                  <DemoActionButton icon={<Mail className=\"h-4 w-4\" />} variant=\"outline\">\n                    Email code\n                  </DemoActionButton>\n                  <DemoActionButton icon={<Phone className=\"h-4 w-4\" />} variant=\"outline\">\n                    Phone code\n                  </DemoActionButton>\n                </div>\n                <DemoActionButton\n                  className=\"w-full\"\n                  icon={<GoogleLogo className=\"h-4 w-4\" />}\n                  variant=\"ghost\"\n                >\n                  Continue with Google\n                </DemoActionButton>\n                <div className=\"rounded-md border bg-muted/30 p-3 text-muted-foreground text-sm\">\n                  <LoaderCircle className=\"mr-2 inline h-4 w-4 animate-spin\" />\n                  Loading state copies the same button width during provider handoff.\n                </div>\n              </div>\n            </form>\n          </section>\n        </main>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Connect this form to the active Supabase auth provider.",
       "Connect phone and email-code buttons to the configured auth methods."
@@ -168,11 +254,178 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "terms-of-service",
+    "slug": "terms-of-service",
+    "title": "Terms of service page",
+    "summary": "A public terms page with company defaults and OAuth consent links.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/TermsOfServicePage.tsx",
+    "exportName": "TermsOfServicePage",
+    "targetRoute": "/terms",
+    "suggestedComponents": [
+      "bundui/card-default",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "visual",
+        "label": "Company details",
+        "note": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+        "todo": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+        "owner": "legal"
+      },
+      {
+        "kind": "service",
+        "label": "OAuth links",
+        "note": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+        "todo": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+        "owner": "auth"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows a company name, support email, optional registration ID, and public policy links."
+    ],
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';\nimport { CheckCircle2, Download, FileText, Mail, ShieldCheck } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\nconst companyProfile = {\n  name: 'Example Company',\n  supportEmail: 'support@example.com',\n  optionalRegistrationId: 'Optional company registration ID',\n  homeUrl: 'https://example.com',\n  termsUrl: 'https://example.com/terms',\n  privacyUrl: 'https://example.com/privacy',\n} as const;\n\nconst termsSections = [\n  {\n    title: 'Accounts',\n    copy: 'You are responsible for keeping your account details accurate and protecting access to your account. Contact support right away if you think your account was used without permission.',\n  },\n  {\n    title: 'Acceptable use',\n    copy: 'Do not use the app to break the law, harm others, overload the service, bypass security, scrape private data, or upload content you do not have permission to use.',\n  },\n  {\n    title: 'Payments and plans',\n    copy: 'If the app sells paid plans, billing details, refunds, renewals, and cancellations should match the active payment provider and the checkout copy shown to customers.',\n  },\n  {\n    title: 'Changes and availability',\n    copy: 'We may improve, change, pause, or end parts of the service. We will try to communicate material changes through the app or the support email on this page.',\n  },\n] as const;\n\n/**\n * Render a source-backed terms of service page recipe.\n *\n * @returns A ready terms of service page component with Google OAuth link defaults.\n * @example\n * const element = <TermsOfServicePage />;\n */\nexport const TermsOfServicePage = () => {\n  // TODO: Replace Example Company, support@example.com, and optional registration ID before publishing.\n  // TODO: Confirm Google OAuth consent links point to the live privacy and terms pages.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl space-y-8\">\n        <header className=\"grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start\">\n          <div className=\"space-y-4\">\n            <Badge className=\"w-fit\" variant=\"secondary\">\n              Legal\n            </Badge>\n            <div className=\"space-y-3\">\n              <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">Terms of service</h1>\n              <p className=\"max-w-3xl text-muted-foreground\">\n                These default terms give {companyProfile.name} a clear public terms page that can be\n                linked from the Google OAuth consent screen.\n              </p>\n            </div>\n            <div className=\"flex flex-wrap gap-2\">\n              <DemoActionButton icon={<CheckCircle2 className=\"h-4 w-4\" />}>\n                Accept terms\n              </DemoActionButton>\n              <DemoActionButton icon={<Download className=\"h-4 w-4\" />} variant=\"outline\">\n                Download copy\n              </DemoActionButton>\n            </div>\n          </div>\n\n          <Card>\n            <CardHeader>\n              <div className=\"flex items-center gap-2\">\n                <FileText className=\"h-5 w-5 text-blue-600\" />\n                <CardTitle>Company details</CardTitle>\n              </div>\n            </CardHeader>\n            <CardContent className=\"space-y-3 text-sm\">\n              <div>\n                <p className=\"text-muted-foreground\">Company</p>\n                <p className=\"font-medium\">{companyProfile.name}</p>\n              </div>\n              <div>\n                <p className=\"text-muted-foreground\">Support email</p>\n                <a className=\"font-medium underline\" href={`mailto:${companyProfile.supportEmail}`}>\n                  {companyProfile.supportEmail}\n                </a>\n              </div>\n              <div>\n                <p className=\"text-muted-foreground\">Optional company ID</p>\n                <p className=\"font-medium\">{companyProfile.optionalRegistrationId}</p>\n              </div>\n            </CardContent>\n          </Card>\n        </header>\n\n        <Card>\n          <CardHeader>\n            <div className=\"flex items-center gap-2\">\n              <ShieldCheck className=\"h-5 w-5 text-emerald-600\" />\n              <CardTitle>Google OAuth consent</CardTitle>\n            </div>\n          </CardHeader>\n          <CardContent className=\"space-y-3 text-sm\">\n            <p className=\"text-muted-foreground\">\n              Keep this page public and link it beside the privacy policy in the OAuth consent\n              setup. The app name, homepage, support email, privacy URL, and terms URL should match\n              the brand shown to users.\n            </p>\n            <div className=\"grid gap-2 md:grid-cols-3\">\n              {[companyProfile.homeUrl, companyProfile.privacyUrl, companyProfile.termsUrl].map(\n                (url) => (\n                  <div className=\"rounded-md border px-3 py-2\" key={url}>\n                    {url}\n                  </div>\n                ),\n              )}\n            </div>\n          </CardContent>\n        </Card>\n\n        <div className=\"grid gap-4 md:grid-cols-2\">\n          {termsSections.map((section) => (\n            <Card key={section.title}>\n              <CardHeader>\n                <div className=\"flex items-center gap-2\">\n                  <CheckCircle2 className=\"h-5 w-5 text-emerald-600\" />\n                  <CardTitle>{section.title}</CardTitle>\n                </div>\n              </CardHeader>\n              <CardContent className=\"text-muted-foreground text-sm\">{section.copy}</CardContent>\n            </Card>\n          ))}\n        </div>\n\n        <footer className=\"rounded-lg border bg-card p-5\">\n          <div className=\"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between\">\n            <p className=\"text-muted-foreground text-sm\">\n              Have a qualified legal reviewer approve this before launch.\n            </p>\n            <a\n              className=\"inline-flex items-center gap-2 text-sm underline\"\n              href={`mailto:${companyProfile.supportEmail}`}\n            >\n              <Mail className=\"h-4 w-4\" />\n              {companyProfile.supportEmail}\n            </a>\n          </div>\n        </footer>\n      </section>\n    </main>\n  );\n};\n",
+    "todos": [
+      "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+      "Confirm Google OAuth consent links point to the live privacy and terms pages."
+    ],
+    "groupId": "legal",
+    "groupLabel": "Legal",
+    "groupDescription": "Terms, privacy, and OAuth consent policy pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "privacy-policy",
+    "slug": "privacy-policy",
+    "title": "Privacy policy page",
+    "summary": "A public privacy page with Google OAuth data disclosure defaults.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/PrivacyPolicyPage.tsx",
+    "exportName": "PrivacyPolicyPage",
+    "targetRoute": "/privacy",
+    "suggestedComponents": [
+      "bundui/card-default",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "visual",
+        "label": "Company details",
+        "note": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+        "todo": "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+        "owner": "legal"
+      },
+      {
+        "kind": "service",
+        "label": "OAuth links",
+        "note": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+        "todo": "Confirm Google OAuth consent links point to the live privacy and terms pages.",
+        "owner": "auth"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page explains Google profile data usage and exposes the support email."
+    ],
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';\nimport { CheckCircle2, Mail, ShieldCheck } from 'lucide-react';\n\nconst companyProfile = {\n  name: 'Example Company',\n  supportEmail: 'support@example.com',\n  optionalRegistrationId: 'Optional company registration ID',\n  homeUrl: 'https://example.com',\n  termsUrl: 'https://example.com/terms',\n  privacyUrl: 'https://example.com/privacy',\n} as const;\n\nconst googleDataItems = [\n  'Your name, email address, and profile image from Google sign in.',\n  'The date and time you sign in so the app can protect your account.',\n  'Basic account activity needed to keep your session secure.',\n] as const;\n\nconst policySections = [\n  {\n    title: 'What we collect',\n    copy: 'We collect the details you give us directly, account details from approved sign-in providers, and usage details needed to run and protect the app.',\n  },\n  {\n    title: 'How we use data',\n    copy: 'We use data to create your account, keep you signed in, provide the service, prevent abuse, respond to support requests, and improve reliability.',\n  },\n  {\n    title: 'Sharing',\n    copy: 'We do not sell personal data. We share data only with service providers that help us run the app, comply with the law, or protect users.',\n  },\n  {\n    title: 'Deletion',\n    copy: 'You can request account export or deletion by emailing the support address on this page. We will respond using the contact details tied to your account.',\n  },\n] as const;\n\n/**\n * Render a source-backed privacy policy page recipe.\n *\n * @returns A ready privacy policy page component with Google OAuth disclosure defaults.\n * @example\n * const element = <PrivacyPolicyPage />;\n */\nexport const PrivacyPolicyPage = () => {\n  // TODO: Replace Example Company, support@example.com, and optional registration ID before publishing.\n  // TODO: Confirm Google OAuth consent links point to the live privacy and terms pages.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl space-y-8\">\n        <header className=\"space-y-4\">\n          <Badge className=\"w-fit\" variant=\"secondary\">\n            Legal\n          </Badge>\n          <div className=\"space-y-3\">\n            <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">Privacy policy</h1>\n            <p className=\"max-w-3xl text-muted-foreground\">\n              {companyProfile.name} uses this page as the public privacy policy for the app,\n              including the Google OAuth consent disclosure.\n            </p>\n          </div>\n          <div className=\"grid gap-3 text-sm md:grid-cols-3\">\n            <div className=\"rounded-lg border bg-card p-4\">\n              <p className=\"text-muted-foreground\">Company</p>\n              <p className=\"mt-1 font-medium\">{companyProfile.name}</p>\n            </div>\n            <div className=\"rounded-lg border bg-card p-4\">\n              <p className=\"text-muted-foreground\">Support email</p>\n              <a className=\"mt-1 block font-medium\" href={`mailto:${companyProfile.supportEmail}`}>\n                {companyProfile.supportEmail}\n              </a>\n            </div>\n            <div className=\"rounded-lg border bg-card p-4\">\n              <p className=\"text-muted-foreground\">Optional company ID</p>\n              <p className=\"mt-1 font-medium\">{companyProfile.optionalRegistrationId}</p>\n            </div>\n          </div>\n        </header>\n\n        <Card>\n          <CardHeader>\n            <div className=\"flex items-center gap-2\">\n              <ShieldCheck className=\"h-5 w-5 text-emerald-600\" />\n              <CardTitle>Google OAuth consent</CardTitle>\n            </div>\n          </CardHeader>\n          <CardContent className=\"space-y-4 text-sm\">\n            <p className=\"text-muted-foreground\">\n              This app asks Google only for profile information needed to create and protect a user\n              account. The public OAuth consent screen should point to this privacy policy URL and\n              to the terms page URL before production review.\n            </p>\n            <ul className=\"space-y-3\">\n              {googleDataItems.map((item) => (\n                <li className=\"flex gap-2\" key={item}>\n                  <CheckCircle2 className=\"mt-0.5 h-4 w-4 shrink-0 text-emerald-600\" />\n                  <span>{item}</span>\n                </li>\n              ))}\n            </ul>\n          </CardContent>\n        </Card>\n\n        <div className=\"grid gap-4 md:grid-cols-2\">\n          {policySections.map((section) => (\n            <Card key={section.title}>\n              <CardHeader>\n                <CardTitle>{section.title}</CardTitle>\n              </CardHeader>\n              <CardContent className=\"text-muted-foreground text-sm\">{section.copy}</CardContent>\n            </Card>\n          ))}\n        </div>\n\n        <footer className=\"rounded-lg border bg-card p-5\">\n          <div className=\"flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between\">\n            <div>\n              <p className=\"font-medium\">Contact and policy links</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Home: {companyProfile.homeUrl} · Terms: {companyProfile.termsUrl} · Privacy:{' '}\n                {companyProfile.privacyUrl}\n              </p>\n            </div>\n            <a\n              className=\"inline-flex items-center gap-2 text-sm underline\"\n              href={`mailto:${companyProfile.supportEmail}`}\n            >\n              <Mail className=\"h-4 w-4\" />\n              {companyProfile.supportEmail}\n            </a>\n          </div>\n        </footer>\n      </section>\n    </main>\n  );\n};\n",
+    "todos": [
+      "Replace Example Company, support@example.com, and optional registration ID before publishing.",
+      "Confirm Google OAuth consent links point to the live privacy and terms pages."
+    ],
+    "groupId": "legal",
+    "groupLabel": "Legal",
+    "groupDescription": "Terms, privacy, and OAuth consent policy pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "user-settings",
+    "slug": "user-settings",
+    "title": "User settings page",
+    "summary": "A profile and preference page for signed-in users.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/UserSettingsPage.tsx",
+    "exportName": "UserSettingsPage",
+    "targetRoute": "/settings/profile",
+    "suggestedComponents": [
+      "bundui/app-sidebar",
+      "bundui/avatar-default",
+      "untitled/modals/modal",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Profile data",
+        "note": "Load profile and preference data from the active account service.",
+        "todo": "Load profile and preference data from the active account service.",
+        "owner": "auth"
+      },
+      {
+        "kind": "service",
+        "label": "Save settings",
+        "note": "Save settings changes through audited user actions.",
+        "todo": "Save settings changes through audited user actions.",
+        "owner": "auth"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows profile, sessions, connected accounts, and account deletion states."
+    ],
+    "sourceCode": "import { Eye, Save, Settings, ShieldCheck, User } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Profile fields',\n    value: '8',\n    detail: 'Ready to edit',\n    icon: <User className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Security',\n    value: '2FA',\n    detail: 'Recommended next',\n    icon: <ShieldCheck className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Sessions',\n    value: '4',\n    detail: 'Active devices',\n    icon: <Settings className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Privacy',\n    value: 'On',\n    detail: 'Export available',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst profileItems = [\n  {\n    title: 'Personal profile',\n    description: 'Name, avatar, timezone, and preferred contact email.',\n    badge: 'Profile',\n  },\n  {\n    title: 'Connected accounts',\n    description: 'Google, GitHub, and password sign-in methods in one place.',\n    badge: 'Auth',\n  },\n  {\n    title: 'Danger zone',\n    description: 'Export data, deactivate account, and delete-account confirmation states.',\n    badge: 'Safety',\n  },\n] as const;\n\nconst settingItems = [\n  {\n    title: 'Email updates',\n    description: 'Product, billing, and security messages.',\n    badge: 'Email',\n  },\n  {\n    title: 'Session alerts',\n    description: 'Notify the user when a new device signs in.',\n    badge: 'Security',\n  },\n  {\n    title: 'Public profile',\n    description: 'Toggle whether team members can see profile metadata.',\n    badge: 'Privacy',\n  },\n] as const;\n\n/**\n * Render a source-backed user settings page recipe.\n *\n * @returns A profile, account, and preference settings page.\n * @example\n * const element = <UserSettingsPage />;\n */\nexport const UserSettingsPage = () => {\n  // TODO: Load profile and preference data from the active account service.\n  // TODO: Save settings changes through audited user actions.\n  return (\n    <DemoQuickWinPage\n      active=\"settings\"\n      badge=\"Settings\"\n      detailItems={settingItems}\n      detailTitle=\"Preference controls\"\n      listDescription=\"Common account controls every SaaS app needs after signup.\"\n      listItems={profileItems}\n      listTitle=\"Account sections\"\n      metrics={metrics}\n      primaryAction={{ label: 'Save settings', icon: <Save className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Preview profile',\n        icon: <Eye className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A complete user settings surface for profile, account access, sessions, privacy, and account deletion states.\"\n      title=\"User settings\"\n      transition=\"slide\"\n      variantDescription=\"Profile pages need dense forms, security cues, and clear destructive-action boundaries.\"\n      variantItems={settingItems}\n      variantTitle=\"Settings component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load profile and preference data from the active account service.",
+      "Save settings changes through audited user actions."
+    ],
+    "groupId": "account-settings",
+    "groupLabel": "Account Settings",
+    "groupDescription": "User profile, account security, and preference pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "account-security",
+    "slug": "account-security",
+    "title": "Account security page",
+    "summary": "A security settings page for sessions, 2FA, and recovery codes.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AccountSecurityPage.tsx",
+    "exportName": "AccountSecurityPage",
+    "targetRoute": "/settings/security",
+    "suggestedComponents": [
+      "bundui/alert-warning",
+      "bundui/data-table-01",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Security data",
+        "note": "Load security sessions and recovery code status from the active auth provider.",
+        "todo": "Load security sessions and recovery code status from the active auth provider.",
+        "owner": "auth"
+      },
+      {
+        "kind": "service",
+        "label": "Security changes",
+        "note": "Save security changes through audited account actions.",
+        "todo": "Save security changes through audited account actions.",
+        "owner": "auth"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page exposes 2FA, active sessions, trusted devices, and recovery codes."
+    ],
+    "sourceCode": "import { Download, KeyRound, LockKeyhole, RefreshCw, ShieldCheck } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: '2FA status',\n    value: 'Ready',\n    detail: 'Authenticator setup',\n    icon: <ShieldCheck className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Sessions',\n    value: '4',\n    detail: '2 trusted devices',\n    icon: <LockKeyhole className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Recovery codes',\n    value: '10',\n    detail: 'Download once',\n    icon: <KeyRound className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Risk checks',\n    value: 'Clean',\n    detail: 'No blocked attempts',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst securityItems = [\n  {\n    title: 'Two-factor authentication',\n    description: 'Set up authenticator apps and backup login methods.',\n    badge: '2FA',\n  },\n  {\n    title: 'Active sessions',\n    description: 'Review browsers, mobile devices, and extension sessions.',\n    badge: 'Sessions',\n  },\n  {\n    title: 'Recovery codes',\n    description: 'Generate, download, and rotate backup codes.',\n    badge: 'Codes',\n  },\n] as const;\n\nconst policyItems = [\n  {\n    title: 'Require re-authentication',\n    description: 'Ask for password before sensitive account changes.',\n    badge: 'Policy',\n  },\n  {\n    title: 'Device trust',\n    description: 'Mark trusted devices and show unknown device warnings.',\n    badge: 'Device',\n  },\n  {\n    title: 'Login alerts',\n    description: 'Send alerts for suspicious sign-in attempts.',\n    badge: 'Alerts',\n  },\n] as const;\n\n/**\n * Render a source-backed account security page recipe.\n *\n * @returns A security settings page for sessions, 2FA, and recovery codes.\n * @example\n * const element = <AccountSecurityPage />;\n */\nexport const AccountSecurityPage = () => {\n  // TODO: Load security sessions and recovery code status from the active auth provider.\n  // TODO: Save security changes through audited account actions.\n  return (\n    <DemoQuickWinPage\n      active=\"settings\"\n      badge=\"Security\"\n      detailItems={policyItems}\n      detailTitle=\"Security policies\"\n      listDescription=\"A focused account-hardening surface for signed-in users.\"\n      listItems={securityItems}\n      listTitle=\"Account protection\"\n      metrics={metrics}\n      primaryAction={{ label: 'Rotate codes', icon: <RefreshCw className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Download codes',\n        icon: <Download className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A security settings page for two-factor authentication, active sessions, trusted devices, and recovery codes.\"\n      title=\"Account security\"\n      transition=\"scale\"\n      variantDescription=\"Security settings need visible risk states, backup paths, and clear session controls.\"\n      variantItems={policyItems}\n      variantTitle=\"Security component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load security sessions and recovery code status from the active auth provider.",
+      "Save security changes through audited account actions."
+    ],
+    "groupId": "account-settings",
+    "groupLabel": "Account Settings",
+    "groupDescription": "User profile, account security, and preference pages.",
+    "providerPointers": []
+  },
+  {
     "id": "pricing",
     "slug": "pricing",
     "title": "Pricing page",
     "summary": "A pricing page that points live prices to the active payment provider.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/pricingPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/PricingPage.tsx",
     "exportName": "PricingPage",
     "targetRoute": "/pricing",
     "suggestedComponents": [
@@ -198,7 +451,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page never claims UI card text is the source of truth for prices."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { CheckCircle2 } from 'lucide-react';\n\nconst planFeatures = ['Checkout handoff', 'Customer portal link', 'Order webhook checklist'];\nconst plans = [\n  { name: 'Starter', price: '29', featured: false },\n  { name: 'Growth', price: '79', featured: true },\n  { name: 'Scale', price: '149', featured: false },\n];\n\n/**\n * Render a source-backed pricing page recipe.\n *\n * @returns A ready pricing page component with provider-owned pricing notes.\n * @example\n * const element = <PricingPage />;\n */\nexport const PricingPage = () => {\n  // TODO: Read plans from the active payment provider configuration.\n  // TODO: Send checkout clicks to the configured payments checkout route.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <div className=\"max-w-2xl space-y-4\">\n          <Badge className=\"w-fit\" variant=\"secondary\">\n            Payments\n          </Badge>\n          <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">\n            Pick the plan that fits your launch\n          </h1>\n          <p className=\"text-muted-foreground\">\n            Prices shown here are safe defaults for the recipe preview. Live prices belong in the\n            active payment provider and app config.\n          </p>\n        </div>\n\n        <div className=\"mt-8 grid gap-4 lg:grid-cols-3\">\n          {plans.map((plan) => (\n            <article className=\"rounded-lg border bg-card p-5 shadow-sm\" key={plan.name}>\n              <div className=\"flex items-start justify-between gap-3\">\n                <div>\n                  <h2 className=\"font-semibold text-xl\">{plan.name}</h2>\n                  <p className=\"mt-1 text-muted-foreground text-sm\">\n                    Default display tier for local preview.\n                  </p>\n                </div>\n                {plan.featured ? <Badge>Popular</Badge> : null}\n              </div>\n              <p className=\"mt-6 font-bold text-3xl\">${plan.price}</p>\n              <p className=\"text-muted-foreground text-sm\">per month</p>\n              <ul className=\"mt-5 space-y-3 text-sm\">\n                {planFeatures.map((feature) => (\n                  <li className=\"flex items-center gap-2\" key={feature}>\n                    <CheckCircle2 className=\"h-4 w-4 text-emerald-600\" />\n                    <span>{feature}</span>\n                  </li>\n                ))}\n              </ul>\n              <Button\n                className=\"mt-6 w-full\"\n                type=\"button\"\n                variant={plan.featured ? 'default' : 'outline'}\n              >\n                Start checkout\n              </Button>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { CheckCircle2, CreditCard, LineChart, Sparkles } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst planFeatures = ['Checkout handoff', 'Customer portal link', 'Order webhook checklist'];\nconst plans = [\n  { name: 'Starter', price: '29', featured: false },\n  { name: 'Growth', price: '79', featured: true },\n  { name: 'Scale', price: '149', featured: false },\n];\n\n/**\n * Render a source-backed pricing page recipe.\n *\n * @returns A ready pricing page component with provider-owned pricing notes.\n * @example\n * const element = <PricingPage />;\n */\nexport const PricingPage = () => {\n  // TODO: Read plans from the active payment provider configuration.\n  // TODO: Send checkout clicks to the configured payments checkout route.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"scale\" title=\"Pricing motion pass\">\n        <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n          <section className=\"mx-auto max-w-6xl\">\n            <div className=\"max-w-2xl space-y-4\">\n              <Badge className=\"w-fit\" variant=\"secondary\">\n                Payments\n              </Badge>\n              <h1 className=\"font-bold text-4xl tracking-tight md:text-5xl\">\n                Pick the plan that fits your launch\n              </h1>\n              <p className=\"text-muted-foreground\">\n                Prices shown here are safe defaults for the recipe preview. Live prices belong in\n                the active payment provider and app config.\n              </p>\n            </div>\n\n            <div className=\"mt-8 grid gap-4 lg:grid-cols-3\">\n              {plans.map((plan) => (\n                <article className=\"rounded-lg border bg-card p-5 shadow-sm\" key={plan.name}>\n                  <div className=\"flex items-start justify-between gap-3\">\n                    <div>\n                      <h2 className=\"font-semibold text-xl\">{plan.name}</h2>\n                      <p className=\"mt-1 text-muted-foreground text-sm\">\n                        Default display tier for local preview.\n                      </p>\n                    </div>\n                    {plan.featured ? <Badge>Popular</Badge> : null}\n                  </div>\n                  <p className=\"mt-6 font-bold text-3xl\">${plan.price}</p>\n                  <p className=\"text-muted-foreground text-sm\">per month</p>\n                  <ul className=\"mt-5 space-y-3 text-sm\">\n                    {planFeatures.map((feature) => (\n                      <li className=\"flex items-center gap-2\" key={feature}>\n                        <CheckCircle2 className=\"h-4 w-4 text-emerald-600\" />\n                        <span>{feature}</span>\n                      </li>\n                    ))}\n                  </ul>\n                  <DemoActionButton\n                    className=\"mt-6 w-full\"\n                    icon={<CreditCard className=\"h-4 w-4\" />}\n                    variant={plan.featured ? 'default' : 'outline'}\n                  >\n                    Start checkout\n                  </DemoActionButton>\n                </article>\n              ))}\n            </div>\n\n            <DemoVariantGrid\n              className=\"mt-6\"\n              description=\"Compare sales-card emphasis before copying the page into a template.\"\n              title=\"Pricing variants\"\n            >\n              <DemoVariantCard label=\"Hero price\" tone=\"primary\">\n                <p className=\"font-bold text-4xl\">$79</p>\n                <p className=\"text-muted-foreground text-sm\">Large, conversion-focused type.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Trust row\" tone=\"muted\">\n                <Sparkles className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-medium\">Includes setup checklist</p>\n                <p className=\"text-muted-foreground text-sm\">Good for lower-friction pricing.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Metric card\" tone=\"accent\">\n                <LineChart className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-medium\">12 checkout events</p>\n                <p className=\"text-muted-foreground text-sm\">Preview billing dashboard density.</p>\n              </DemoVariantCard>\n            </DemoVariantGrid>\n          </section>\n        </main>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Read plans from the active payment provider configuration.",
       "Send checkout clicks to the configured payments checkout route."
@@ -214,11 +467,225 @@ export const PAGE_RECIPES = [
     ]
   },
   {
+    "id": "product-grid",
+    "slug": "product-grid",
+    "title": "Product grid page",
+    "summary": "A generic ecommerce catalog with product cards and filters.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductGridPage.tsx",
+    "exportName": "ProductGridPage",
+    "targetRoute": "/products",
+    "suggestedComponents": [
+      "kokonutui/card-flip",
+      "bundui/card-default",
+      "magicui/marquee",
+      "shadcnblocks/pricing"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Product source",
+        "note": "Load products, prices, and categories from the configured commerce source.",
+        "todo": "Load products, prices, and categories from the configured commerce source.",
+        "owner": "commerce"
+      },
+      {
+        "kind": "service",
+        "label": "Cart action",
+        "note": "Send add-to-cart actions through the configured cart action.",
+        "todo": "Send add-to-cart actions through the configured cart action.",
+        "owner": "commerce"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows product cards, prices, filters, and add-to-cart actions."
+    ],
+    "sourceCode": "import { Filter, PackageSearch, Plus, Search, ShoppingCart } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Products',\n    value: '48',\n    detail: '12 featured',\n    icon: <PackageSearch className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Categories',\n    value: '8',\n    detail: 'Filter-ready',\n    icon: <Filter className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Cart adds',\n    value: '312',\n    detail: '+14% this week',\n    icon: <ShoppingCart className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Drafts',\n    value: '5',\n    detail: 'Need images',\n    icon: <Plus className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst productItems = [\n  {\n    title: 'Starter kit license',\n    description: 'Digital product card with badge, price, and CTA.',\n    badge: '$49',\n  },\n  {\n    title: 'Template bundle',\n    description: 'Grouped bundle card with savings label and preview state.',\n    badge: '$99',\n  },\n  {\n    title: 'Consulting add-on',\n    description: 'Service product card with booking and availability state.',\n    badge: '$299',\n  },\n] as const;\n\nconst catalogControls = [\n  {\n    title: 'Filter by category',\n    description: 'Product cards respond to categories and tags.',\n    badge: 'Filter',\n  },\n  {\n    title: 'Sort by price',\n    description: 'Low-to-high and featured-first sorting controls.',\n    badge: 'Sort',\n  },\n  {\n    title: 'Quick add',\n    description: 'Cart button shows loading and selected state.',\n    badge: 'Cart',\n  },\n] as const;\n\n/**\n * Render a source-backed product grid page recipe.\n *\n * @returns A generic ecommerce product card grid page.\n * @example\n * const element = <ProductGridPage />;\n */\nexport const ProductGridPage = () => {\n  // TODO: Load products, prices, and categories from the configured commerce source.\n  // TODO: Send add-to-cart actions through the configured cart action.\n  return (\n    <DemoQuickWinPage\n      active=\"products\"\n      badge=\"Products\"\n      detailItems={catalogControls}\n      detailTitle=\"Catalog controls\"\n      listDescription=\"Reusable product cards for digital products, services, subscriptions, and physical goods.\"\n      listItems={productItems}\n      listTitle=\"Product card view\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add product', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search catalog',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A generic ecommerce catalog with product cards, filters, sorting, prices, badges, and quick add actions.\"\n      title=\"Product catalog\"\n      transition=\"fade\"\n      variantDescription=\"Product grids need card density, responsive filters, and obvious price/action hierarchy.\"\n      variantItems={catalogControls}\n      variantTitle=\"Product card variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load products, prices, and categories from the configured commerce source.",
+      "Send add-to-cart actions through the configured cart action."
+    ],
+    "groupId": "commerce",
+    "groupLabel": "Commerce",
+    "groupDescription": "Generic ecommerce product, cart, checkout, and order pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "product-detail",
+    "slug": "product-detail",
+    "title": "Product detail page",
+    "summary": "A product detail page with gallery, variants, reviews, and related products.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductDetailPage.tsx",
+    "exportName": "ProductDetailPage",
+    "targetRoute": "/products/example",
+    "suggestedComponents": [
+      "kokonutui/card-flip",
+      "bundui/carousel",
+      "bundui/badge-indicator",
+      "shadcnblocks/pricing"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Product details",
+        "note": "Load product details, variants, reviews, and related products from the commerce source.",
+        "todo": "Load product details, variants, reviews, and related products from the commerce source.",
+        "owner": "commerce"
+      },
+      {
+        "kind": "service",
+        "label": "Variant cart action",
+        "note": "Send variant add-to-cart actions through the configured cart action.",
+        "todo": "Send variant add-to-cart actions through the configured cart action.",
+        "owner": "commerce"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows gallery, variant, review, related-product, and cart states."
+    ],
+    "sourceCode": "import { Eye, HeartPulse, Package, Plus, ShoppingCart } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Variant count',\n    value: '6',\n    detail: 'Color and size',\n    icon: <Package className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Reviews',\n    value: '4.8',\n    detail: '128 ratings',\n    icon: <HeartPulse className=\"h-5 w-5\" />,\n    tone: 'rose',\n  },\n  {\n    label: 'Stock',\n    value: '42',\n    detail: 'Ready to ship',\n    icon: <ShoppingCart className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Upsells',\n    value: '3',\n    detail: 'Related items',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst detailItems = [\n  {\n    title: 'Image gallery',\n    description: 'Primary image, thumbnail strip, and detail preview states.',\n    badge: 'Media',\n  },\n  {\n    title: 'Variant selector',\n    description: 'Size, color, quantity, and availability options.',\n    badge: 'Options',\n  },\n  {\n    title: 'Related products',\n    description: 'Recommendations, bundles, and recently viewed products.',\n    badge: 'Upsell',\n  },\n] as const;\n\nconst purchaseControls = [\n  {\n    title: 'Quantity stepper',\n    description: 'Increase, decrease, and disabled low-stock states.',\n    badge: 'Qty',\n  },\n  {\n    title: 'Review summary',\n    description: 'Rating, count, and top review snippet.',\n    badge: 'Reviews',\n  },\n  {\n    title: 'Shipping estimate',\n    description: 'Delivery, return, and warranty messaging.',\n    badge: 'Shipping',\n  },\n] as const;\n\n/**\n * Render a source-backed product detail page recipe.\n *\n * @returns A generic ecommerce product detail page.\n * @example\n * const element = <ProductDetailPage />;\n */\nexport const ProductDetailPage = () => {\n  // TODO: Load product details, variants, reviews, and related products from the commerce source.\n  // TODO: Send variant add-to-cart actions through the configured cart action.\n  return (\n    <DemoQuickWinPage\n      active=\"products\"\n      badge=\"Product\"\n      detailItems={purchaseControls}\n      detailTitle=\"Purchase controls\"\n      listDescription=\"The detail route buyers expect after clicking a product card.\"\n      listItems={detailItems}\n      listTitle=\"Product detail sections\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add to cart', icon: <ShoppingCart className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Save item',\n        icon: <Plus className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A product detail page with gallery, variants, quantity, reviews, related products, and clear cart action.\"\n      title=\"Product detail\"\n      transition=\"slide\"\n      variantDescription=\"Product detail pages need media, option controls, stock states, and review confidence.\"\n      variantItems={purchaseControls}\n      variantTitle=\"Product detail variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load product details, variants, reviews, and related products from the commerce source.",
+      "Send variant add-to-cart actions through the configured cart action."
+    ],
+    "groupId": "commerce",
+    "groupLabel": "Commerce",
+    "groupDescription": "Generic ecommerce product, cart, checkout, and order pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "cart",
+    "slug": "cart",
+    "title": "Cart page",
+    "summary": "A cart review page with line items, coupons, totals, and checkout action.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CartPage.tsx",
+    "exportName": "CartPage",
+    "targetRoute": "/cart",
+    "suggestedComponents": [
+      "bundui/card-default",
+      "untitled/table/table",
+      "bundui/input",
+      "shadcnblocks/pricing"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Cart totals",
+        "note": "Load cart line items and totals from the configured commerce source.",
+        "todo": "Load cart line items and totals from the configured commerce source.",
+        "owner": "commerce"
+      },
+      {
+        "kind": "service",
+        "label": "Cart changes",
+        "note": "Save cart changes through the configured cart action.",
+        "todo": "Save cart changes through the configured cart action.",
+        "owner": "commerce"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows line items, coupon, total, empty state, and checkout action."
+    ],
+    "sourceCode": "import { CreditCard, Package, RefreshCw, ShoppingCart, Truck } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Items',\n    value: '3',\n    detail: 'Ready for checkout',\n    icon: <ShoppingCart className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Subtotal',\n    value: '$147',\n    detail: 'Before tax',\n    icon: <CreditCard className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Shipping',\n    value: 'Free',\n    detail: 'Over threshold',\n    icon: <Truck className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Saved',\n    value: '2',\n    detail: 'Move later',\n    icon: <Package className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst cartItems = [\n  {\n    title: 'Line item rows',\n    description: 'Product, quantity, price, remove, and save-for-later actions.',\n    badge: 'Items',\n  },\n  {\n    title: 'Coupon code',\n    description: 'Apply discount, error, and success states.',\n    badge: 'Coupon',\n  },\n  {\n    title: 'Order summary',\n    description: 'Subtotal, taxes, shipping, discounts, and total.',\n    badge: 'Total',\n  },\n] as const;\n\nconst cartControls = [\n  { title: 'Quantity updates', description: 'Shows loading when quantity changes.', badge: 'Qty' },\n  {\n    title: 'Empty cart state',\n    description: 'Guides users back to product browsing.',\n    badge: 'Empty',\n  },\n  {\n    title: 'Checkout handoff',\n    description: 'Moves the buyer to the configured checkout route.',\n    badge: 'Checkout',\n  },\n] as const;\n\n/**\n * Render a source-backed cart page recipe.\n *\n * @returns A cart review page with line items and totals.\n * @example\n * const element = <CartPage />;\n */\nexport const CartPage = () => {\n  // TODO: Load cart line items and totals from the configured commerce source.\n  // TODO: Save cart changes through the configured cart action.\n  return (\n    <DemoQuickWinPage\n      active=\"orders\"\n      badge=\"Cart\"\n      detailItems={cartControls}\n      detailTitle=\"Cart controls\"\n      listDescription=\"A checkout-ready cart with line items, totals, coupons, and empty state coverage.\"\n      listItems={cartItems}\n      listTitle=\"Cart review\"\n      metrics={metrics}\n      primaryAction={{ label: 'Checkout', icon: <CreditCard className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Update cart',\n        icon: <RefreshCw className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A generic cart route with line items, coupon handling, order summary, and checkout loading states.\"\n      title=\"Cart review\"\n      transition=\"scale\"\n      variantDescription=\"Cart pages need editable quantities, readable totals, and clear checkout hierarchy.\"\n      variantItems={cartControls}\n      variantTitle=\"Cart component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load cart line items and totals from the configured commerce source.",
+      "Save cart changes through the configured cart action."
+    ],
+    "groupId": "commerce",
+    "groupLabel": "Commerce",
+    "groupDescription": "Generic ecommerce product, cart, checkout, and order pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "checkout",
+    "slug": "checkout",
+    "title": "Checkout page",
+    "summary": "A checkout page with contact, shipping, payment, and order summary sections.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CheckoutPage.tsx",
+    "exportName": "CheckoutPage",
+    "targetRoute": "/checkout",
+    "suggestedComponents": [
+      "bundui/pricing-sections-01",
+      "bundui/input",
+      "shadcnblocks/pricing",
+      "untitled/modals/modal"
+    ],
+    "installNotes": [
+      {
+        "kind": "provider",
+        "label": "Checkout session",
+        "note": "Load checkout session and order summary from the configured commerce provider.",
+        "todo": "Load checkout session and order summary from the configured commerce provider.",
+        "owner": "commerce"
+      },
+      {
+        "kind": "provider",
+        "label": "Payment submit",
+        "note": "Submit checkout through the configured payment provider.",
+        "todo": "Submit checkout through the configured payment provider.",
+        "owner": "payments"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows contact, shipping, payment, summary, and submit-loading states."
+    ],
+    "sourceCode": "import { CreditCard, LockKeyhole, MapPin, Receipt, Truck } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Steps',\n    value: '3',\n    detail: 'Contact, ship, pay',\n    icon: <Truck className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Secure',\n    value: 'TLS',\n    detail: 'Payment handoff',\n    icon: <LockKeyhole className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Total',\n    value: '$147',\n    detail: 'Ready to pay',\n    icon: <Receipt className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Address',\n    value: 'Valid',\n    detail: 'Shipping ready',\n    icon: <MapPin className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst checkoutItems = [\n  {\n    title: 'Contact information',\n    description: 'Email, phone, account, and guest checkout states.',\n    badge: 'Contact',\n  },\n  {\n    title: 'Shipping method',\n    description: 'Address, shipping speed, taxes, and delivery estimate.',\n    badge: 'Shipping',\n  },\n  {\n    title: 'Payment handoff',\n    description: 'Provider handoff, summary, and order confirmation.',\n    badge: 'Payment',\n  },\n] as const;\n\nconst checkoutControls = [\n  {\n    title: 'Save address',\n    description: 'Persist shipping details for signed-in users.',\n    badge: 'Address',\n  },\n  {\n    title: 'Validate payment',\n    description: 'Show provider errors without hiding the retry action.',\n    badge: 'Payment',\n  },\n  {\n    title: 'Confirm order',\n    description: 'Disable duplicate submits while order is being created.',\n    badge: 'Order',\n  },\n] as const;\n\n/**\n * Render a source-backed checkout page recipe.\n *\n * @returns A checkout page with contact, shipping, payment, and summary sections.\n * @example\n * const element = <CheckoutPage />;\n */\nexport const CheckoutPage = () => {\n  // TODO: Load checkout session and order summary from the configured commerce provider.\n  // TODO: Submit checkout through the configured payment provider.\n  return (\n    <DemoQuickWinPage\n      active=\"orders\"\n      badge=\"Checkout\"\n      detailItems={checkoutControls}\n      detailTitle=\"Checkout controls\"\n      listDescription=\"A generic checkout flow for physical, digital, or subscription products.\"\n      listItems={checkoutItems}\n      listTitle=\"Checkout steps\"\n      metrics={metrics}\n      primaryAction={{ label: 'Pay now', icon: <CreditCard className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Review order',\n        icon: <Receipt className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A checkout route with contact details, shipping choices, payment handoff, and order summary states.\"\n      title=\"Checkout\"\n      transition=\"slide\"\n      variantDescription=\"Checkout pages need clear steps, provider handoff, totals, and duplicate-submit protection.\"\n      variantItems={checkoutControls}\n      variantTitle=\"Checkout component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load checkout session and order summary from the configured commerce provider.",
+      "Submit checkout through the configured payment provider."
+    ],
+    "groupId": "commerce",
+    "groupLabel": "Commerce",
+    "groupDescription": "Generic ecommerce product, cart, checkout, and order pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "orders",
+    "slug": "orders",
+    "title": "Orders page",
+    "summary": "An order history page for receipts, fulfillment, and tracking.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/OrdersPage.tsx",
+    "exportName": "OrdersPage",
+    "targetRoute": "/orders",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/badge-indicator",
+      "bundui/card-default"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Order history",
+        "note": "Load order history and fulfillment status from the configured commerce source.",
+        "todo": "Load order history and fulfillment status from the configured commerce source.",
+        "owner": "commerce"
+      },
+      {
+        "kind": "service",
+        "label": "Order actions",
+        "note": "Send invoice and reorder actions through the configured commerce actions.",
+        "todo": "Send invoice and reorder actions through the configured commerce actions.",
+        "owner": "commerce"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows order history, status badges, invoices, tracking, and reorder actions."
+    ],
+    "sourceCode": "import { Download, Eye, Package, Receipt, Truck } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Orders',\n    value: '24',\n    detail: 'Last 30 days',\n    icon: <Receipt className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'In transit',\n    value: '5',\n    detail: 'Trackable',\n    icon: <Truck className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Downloads',\n    value: '18',\n    detail: 'Digital access',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Returns',\n    value: '1',\n    detail: 'Needs review',\n    icon: <Package className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst orderItems = [\n  {\n    title: 'Order history',\n    description: 'Order number, date, amount, status, and receipt action.',\n    badge: 'History',\n  },\n  {\n    title: 'Shipment tracking',\n    description: 'Carrier status, expected delivery, and tracking link.',\n    badge: 'Shipping',\n  },\n  {\n    title: 'Digital access',\n    description: 'Download links, license keys, and fulfillment state.',\n    badge: 'Digital',\n  },\n] as const;\n\nconst orderControls = [\n  {\n    title: 'Download invoice',\n    description: 'Expose invoices and receipts for accounting.',\n    badge: 'Invoice',\n  },\n  {\n    title: 'Request return',\n    description: 'Start return, exchange, or refund workflows.',\n    badge: 'Return',\n  },\n  {\n    title: 'Reorder items',\n    description: 'Add previous order items back into cart.',\n    badge: 'Reorder',\n  },\n] as const;\n\n/**\n * Render a source-backed orders page recipe.\n *\n * @returns An order history page for receipts, fulfillment, and tracking.\n * @example\n * const element = <OrdersPage />;\n */\nexport const OrdersPage = () => {\n  // TODO: Load order history and fulfillment status from the configured commerce source.\n  // TODO: Send invoice and reorder actions through the configured commerce actions.\n  return (\n    <DemoQuickWinPage\n      active=\"orders\"\n      badge=\"Orders\"\n      detailItems={orderControls}\n      detailTitle=\"Order actions\"\n      listDescription=\"A signed-in ecommerce route for tracking purchases and invoices.\"\n      listItems={orderItems}\n      listTitle=\"Order history\"\n      metrics={metrics}\n      primaryAction={{ label: 'Download invoice', icon: <Download className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View details',\n        icon: <Eye className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"An orders page with status badges, tracking, invoices, downloads, returns, and reorder actions.\"\n      title=\"Orders\"\n      transition=\"fade\"\n      variantDescription=\"Order pages need status scanning, invoice access, and fulfillment clarity.\"\n      variantItems={orderControls}\n      variantTitle=\"Order component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load order history and fulfillment status from the configured commerce source.",
+      "Send invoice and reorder actions through the configured commerce actions."
+    ],
+    "groupId": "commerce",
+    "groupLabel": "Commerce",
+    "groupDescription": "Generic ecommerce product, cart, checkout, and order pages.",
+    "providerPointers": []
+  },
+  {
     "id": "launch-checklist",
     "slug": "launch-checklist",
     "title": "Launch checklist page",
     "summary": "A launch readiness page for deployment, domain, backup, and job status.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/launchChecklistPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/LaunchChecklistPage.tsx",
     "exportName": "LaunchChecklistPage",
     "targetRoute": "/launch",
     "suggestedComponents": [
@@ -243,7 +710,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page exposes launch status without needing provider secrets."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Rocket } from 'lucide-react';\n\n/**\n * Render a source-backed launch checklist page recipe.\n *\n * @returns A ready go-live, domain, backup, and job status page component.\n * @example\n * const element = <LaunchChecklistPage />;\n */\nexport const LaunchChecklistPage = () => {\n  // TODO: Connect deployment status to the configured hosting provider.\n  // TODO: Connect scheduled job status to the jobs feature.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Go live\n        </Badge>\n        <div className=\"flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Launch checklist</h1>\n            <p className=\"mt-2 text-muted-foreground\">\n              One page for domain, backup, deployment, and scheduled job readiness.\n            </p>\n          </div>\n          <Rocket className=\"h-10 w-10 text-blue-600\" />\n        </div>\n        <div className=\"mt-6 grid gap-3 sm:grid-cols-2\">\n          {['Back up code', 'Connect domain', 'Put app online', 'Check scheduled jobs'].map(\n            (label) => (\n              <div className=\"rounded-lg border p-4\" key={label}>\n                <p className=\"font-medium\">{label}</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Ready for provider wiring.</p>\n              </div>\n            ),\n          )}\n        </div>\n        <Button className=\"mt-6\" type=\"button\">\n          Continue launch\n        </Button>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { ArrowRight, Rocket } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed launch checklist page recipe.\n *\n * @returns A ready go-live, domain, backup, and job status page component.\n * @example\n * const element = <LaunchChecklistPage />;\n */\nexport const LaunchChecklistPage = () => {\n  // TODO: Connect deployment status to the configured hosting provider.\n  // TODO: Connect scheduled job status to the jobs feature.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Go live\n        </Badge>\n        <div className=\"flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Launch checklist</h1>\n            <p className=\"mt-2 text-muted-foreground\">\n              One page for domain, backup, deployment, and scheduled job readiness.\n            </p>\n          </div>\n          <Rocket className=\"h-10 w-10 text-blue-600\" />\n        </div>\n        <div className=\"mt-6 grid gap-3 sm:grid-cols-2\">\n          {['Back up code', 'Connect domain', 'Put app online', 'Check scheduled jobs'].map(\n            (label) => (\n              <div className=\"rounded-lg border p-4\" key={label}>\n                <p className=\"font-medium\">{label}</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Ready for provider wiring.</p>\n              </div>\n            ),\n          )}\n        </div>\n        <DemoActionButton className=\"mt-6\" icon={<ArrowRight className=\"h-4 w-4\" />}>\n          Continue launch\n        </DemoActionButton>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Connect deployment status to the configured hosting provider.",
       "Connect scheduled job status to the jobs feature."
@@ -258,7 +725,7 @@ export const PAGE_RECIPES = [
     "slug": "file-manager",
     "title": "File manager page",
     "summary": "An upload and file metadata page for app attachments.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/fileManagerPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/FileManagerPage.tsx",
     "exportName": "FileManagerPage",
     "targetRoute": "/files",
     "suggestedComponents": [
@@ -284,7 +751,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows an upload slot and metadata handoff."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { UploadCloud } from 'lucide-react';\n\n/**\n * Render a source-backed file manager page recipe.\n *\n * @returns A ready file upload page component.\n * @example\n * const element = <FileManagerPage />;\n */\nexport const FileManagerPage = () => {\n  // TODO: Connect file selection to the configured upload provider.\n  // TODO: Save uploaded file metadata through the file metadata preset.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-4xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Files\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Upload and organize files</h1>\n        <div className=\"mt-6 rounded-lg border border-dashed bg-card p-8 text-center\">\n          <UploadCloud className=\"mx-auto h-10 w-10 text-blue-600\" />\n          <h2 className=\"mt-4 font-semibold text-xl\">Drop files here</h2>\n          <p className=\"mx-auto mt-2 max-w-md text-muted-foreground text-sm\">\n            This recipe uses default labels until an upload provider is connected.\n          </p>\n          <div className=\"mx-auto mt-5 max-w-sm\">\n            <Input type=\"file\" />\n          </div>\n          <Button className=\"mt-4\" type=\"button\">\n            Upload file\n          </Button>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { FileText, FolderOpen, ImageIcon, UploadCloud } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoAppShell } from './shared/DemoAppShell';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst files = [\n  { name: 'brand-guide.pdf', type: 'PDF', size: '2.4 MB' },\n  { name: 'hero-image.png', type: 'Image', size: '860 KB' },\n  { name: 'launch-copy.md', type: 'Text', size: '18 KB' },\n];\n\n/**\n * Render a source-backed file manager page recipe.\n *\n * @returns A ready file upload page component.\n * @example\n * const element = <FileManagerPage />;\n */\nexport const FileManagerPage = () => {\n  // TODO: Connect file selection to the configured upload provider.\n  // TODO: Save uploaded file metadata through the file metadata preset.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"slide\" title=\"Files motion pass\">\n        <DemoAppShell active=\"files\" title=\"Upload and organize files\">\n          <section className=\"grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]\">\n            <div className=\"rounded-lg border border-dashed bg-card p-8 text-center\">\n              <UploadCloud className=\"mx-auto h-10 w-10 text-blue-600\" />\n              <Badge className=\"mt-4\" variant=\"secondary\">\n                Files\n              </Badge>\n              <h2 className=\"mt-4 font-semibold text-xl\">Drop files here</h2>\n              <p className=\"mx-auto mt-2 max-w-md text-muted-foreground text-sm\">\n                This recipe uses default labels until an upload provider is connected.\n              </p>\n              <div className=\"mx-auto mt-5 max-w-sm\">\n                <Input type=\"file\" />\n              </div>\n              <DemoActionButton className=\"mt-4\" icon={<UploadCloud className=\"h-4 w-4\" />}>\n                Upload file\n              </DemoActionButton>\n            </div>\n\n            <aside className=\"rounded-lg border bg-card p-5\">\n              <div className=\"flex items-center gap-2\">\n                <FolderOpen className=\"h-5 w-5 text-primary\" />\n                <h2 className=\"font-semibold\">Recent files</h2>\n              </div>\n              <div className=\"mt-4 space-y-3\">\n                {files.map((file) => (\n                  <div className=\"rounded-lg border p-3\" key={file.name}>\n                    <div className=\"flex items-center gap-3\">\n                      <FileText className=\"h-4 w-4 text-muted-foreground\" />\n                      <div className=\"min-w-0\">\n                        <p className=\"truncate font-medium text-sm\">{file.name}</p>\n                        <p className=\"text-muted-foreground text-xs\">\n                          {file.type} · {file.size}\n                        </p>\n                      </div>\n                    </div>\n                  </div>\n                ))}\n              </div>\n            </aside>\n          </section>\n\n          <DemoVariantGrid\n            className=\"mt-6\"\n            description=\"Upload states should stay readable across dense and visual file cards.\"\n            title=\"File component variants\"\n          >\n            <DemoVariantCard label=\"Image card\" tone=\"accent\">\n              <ImageIcon className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-semibold\">hero-image.png</p>\n              <p className=\"text-muted-foreground text-sm\">Large visual file row.</p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Document card\" tone=\"muted\">\n              <FileText className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium text-sm\">brand-guide.pdf</p>\n              <p className=\"text-muted-foreground text-xs\">Compact metadata row.</p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Upload action\" tone=\"primary\">\n              <UploadCloud className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium\">1s simulated upload</p>\n              <p className=\"text-muted-foreground text-sm\">Button state mirrors API handoff.</p>\n            </DemoVariantCard>\n          </DemoVariantGrid>\n        </DemoAppShell>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Connect file selection to the configured upload provider.",
       "Save uploaded file metadata through the file metadata preset."
@@ -299,7 +766,7 @@ export const PAGE_RECIPES = [
     "slug": "email-notifications",
     "title": "Email notifications page",
     "summary": "A page for test emails and notification preferences.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/emailNotificationsPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/EmailNotificationsPage.tsx",
     "exportName": "EmailNotificationsPage",
     "targetRoute": "/settings/notifications",
     "suggestedComponents": [
@@ -325,7 +792,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page separates email sending from notification preferences."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Textarea } from '@vybekiit/ui/textarea';\nimport { Bell, Mail } from 'lucide-react';\n\n/**\n * Render a source-backed email and notifications page recipe.\n *\n * @returns A ready notification settings page component.\n * @example\n * const element = <EmailNotificationsPage />;\n */\nexport const EmailNotificationsPage = () => {\n  // TODO: Send test emails through the configured email provider.\n  // TODO: Save notification preferences through the notifications feature.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto grid max-w-6xl gap-5 lg:grid-cols-2\">\n        <div className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            Email\n          </Badge>\n          <Mail className=\"mb-4 h-6 w-6 text-blue-600\" />\n          <h1 className=\"font-bold text-3xl tracking-tight\">Send a test email</h1>\n          <div className=\"mt-5 space-y-3\">\n            <Input defaultValue=\"customer@example.com\" />\n            <Textarea defaultValue=\"Welcome to your new workspace.\" />\n            <Button type=\"button\">Send test</Button>\n          </div>\n        </div>\n        <div className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            Notifications\n          </Badge>\n          <Bell className=\"mb-4 h-6 w-6 text-amber-600\" />\n          <h2 className=\"font-bold text-3xl tracking-tight\">Alert preferences</h2>\n          <div className=\"mt-5 space-y-3\">\n            {['Product updates', 'Billing alerts', 'Weekly summary'].map((label) => (\n              <div className=\"flex items-center justify-between rounded-lg border p-3\" key={label}>\n                <span className=\"font-medium text-sm\">{label}</span>\n                <Button size=\"sm\" type=\"button\" variant=\"outline\">\n                  Enabled\n                </Button>\n              </div>\n            ))}\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Textarea } from '@vybekiit/ui/textarea';\nimport { Bell, Mail, Send } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed email and notifications page recipe.\n *\n * @returns A ready notification settings page component.\n * @example\n * const element = <EmailNotificationsPage />;\n */\nexport const EmailNotificationsPage = () => {\n  // TODO: Send test emails through the configured email provider.\n  // TODO: Save notification preferences through the notifications feature.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto grid max-w-6xl gap-5 lg:grid-cols-2\">\n        <div className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            Email\n          </Badge>\n          <Mail className=\"mb-4 h-6 w-6 text-blue-600\" />\n          <h1 className=\"font-bold text-3xl tracking-tight\">Send a test email</h1>\n          <div className=\"mt-5 space-y-3\">\n            <Input defaultValue=\"customer@example.com\" />\n            <Textarea defaultValue=\"Welcome to your new workspace.\" />\n            <DemoActionButton icon={<Send className=\"h-4 w-4\" />}>Send test</DemoActionButton>\n          </div>\n        </div>\n        <div className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            Notifications\n          </Badge>\n          <Bell className=\"mb-4 h-6 w-6 text-amber-600\" />\n          <h2 className=\"font-bold text-3xl tracking-tight\">Alert preferences</h2>\n          <div className=\"mt-5 space-y-3\">\n            {['Product updates', 'Billing alerts', 'Weekly summary'].map((label) => (\n              <div className=\"flex items-center justify-between rounded-lg border p-3\" key={label}>\n                <span className=\"font-medium text-sm\">{label}</span>\n                <DemoActionButton icon={<Bell className=\"h-4 w-4\" />} size=\"sm\" variant=\"outline\">\n                  Enabled\n                </DemoActionButton>\n              </div>\n            ))}\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Send test emails through the configured email provider.",
       "Save notification preferences through the notifications feature."
@@ -336,11 +803,140 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "notifications-center",
+    "slug": "notifications-center",
+    "title": "Notifications page",
+    "summary": "A notification feed and channel preference page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/NotificationsCenterPage.tsx",
+    "exportName": "NotificationsCenterPage",
+    "targetRoute": "/notifications",
+    "suggestedComponents": [
+      "bundui/alert-default",
+      "bundui/switch",
+      "ai-elements/message",
+      "kibo/glimpse"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Notification source",
+        "note": "Load notifications from the active notification source.",
+        "todo": "Load notifications from the active notification source.",
+        "owner": "notifications"
+      },
+      {
+        "kind": "service",
+        "label": "Notification preferences",
+        "note": "Save notification preferences through the notifications feature.",
+        "todo": "Save notification preferences through the notifications feature.",
+        "owner": "notifications"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows unread states, notification categories, and channel preferences."
+    ],
+    "sourceCode": "import { Bell, Eye, Mail, RefreshCw, Save } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Unread',\n    value: '12',\n    detail: 'Across all channels',\n    icon: <Bell className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Email',\n    value: 'On',\n    detail: 'Digest enabled',\n    icon: <Mail className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Mentions',\n    value: '3',\n    detail: 'Needs attention',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Sync',\n    value: 'Live',\n    detail: 'Updated now',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst notificationItems = [\n  {\n    title: 'Product activity',\n    description: 'Mentions, comments, assignments, and workspace updates.',\n    badge: 'Feed',\n  },\n  {\n    title: 'Billing notices',\n    description: 'Invoices, failed payments, credits, and renewal reminders.',\n    badge: 'Billing',\n  },\n  {\n    title: 'Security alerts',\n    description: 'New device sign-in and permission-change notifications.',\n    badge: 'Security',\n  },\n] as const;\n\nconst channelItems = [\n  {\n    title: 'Email digest',\n    description: 'Bundle lower-priority updates into daily summaries.',\n    badge: 'Email',\n  },\n  {\n    title: 'Push alerts',\n    description: 'Immediate mobile alerts for urgent events.',\n    badge: 'Push',\n  },\n  {\n    title: 'In-app inbox',\n    description: 'Keep a complete notification history in the app.',\n    badge: 'Inbox',\n  },\n] as const;\n\n/**\n * Render a source-backed notifications center page recipe.\n *\n * @returns A notification feed and channel preference page.\n * @example\n * const element = <NotificationsCenterPage />;\n */\nexport const NotificationsCenterPage = () => {\n  // TODO: Load notifications from the active notification source.\n  // TODO: Save notification preferences through the notifications feature.\n  return (\n    <DemoQuickWinPage\n      active=\"notifications\"\n      badge=\"Notifications\"\n      detailItems={channelItems}\n      detailTitle=\"Channel controls\"\n      listDescription=\"Feed, unread, and preference states for every average SaaS.\"\n      listItems={notificationItems}\n      listTitle=\"Notification inbox\"\n      metrics={metrics}\n      primaryAction={{ label: 'Save preferences', icon: <Save className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Mark all read',\n        icon: <Eye className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A notification center with unread states, channel preferences, and security or billing alert categories.\"\n      title=\"Notifications\"\n      transition=\"fade\"\n      variantDescription=\"Notification pages need inbox density, unread badges, and channel controls.\"\n      variantItems={channelItems}\n      variantTitle=\"Notification component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load notifications from the active notification source.",
+      "Save notification preferences through the notifications feature."
+    ],
+    "groupId": "communication",
+    "groupLabel": "Communication",
+    "groupDescription": "Email and notification settings pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "support-center",
+    "slug": "support-center",
+    "title": "Support center page",
+    "summary": "A help desk page with tickets, docs search, and contact actions.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/SupportCenterPage.tsx",
+    "exportName": "SupportCenterPage",
+    "targetRoute": "/support",
+    "suggestedComponents": [
+      "shadcnblocks/contact",
+      "kibo/glimpse",
+      "bundui/alert-default",
+      "ai-elements/message"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Support data",
+        "note": "Load support tickets and documentation results from the configured support provider.",
+        "todo": "Load support tickets and documentation results from the configured support provider.",
+        "owner": "support"
+      },
+      {
+        "kind": "service",
+        "label": "Support request",
+        "note": "Send support requests through the configured support action.",
+        "todo": "Send support requests through the configured support action.",
+        "owner": "support"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows ticket, docs search, contact, attachment, and status handoff states."
+    ],
+    "sourceCode": "import { BookOpen, LifeBuoy, Mail, Search, Send } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Open tickets',\n    value: '6',\n    detail: '2 waiting on user',\n    icon: <LifeBuoy className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Docs matches',\n    value: '24',\n    detail: 'Search-ready articles',\n    icon: <BookOpen className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Response time',\n    value: '2h',\n    detail: 'Median first reply',\n    icon: <Mail className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Escalations',\n    value: '1',\n    detail: 'High priority',\n    icon: <Send className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst supportItems = [\n  {\n    title: 'Ticket inbox',\n    description: 'Open, waiting, solved, and escalated support tickets.',\n    badge: 'Tickets',\n  },\n  {\n    title: 'Docs search',\n    description: 'Search help articles before creating a ticket.',\n    badge: 'Docs',\n  },\n  {\n    title: 'Contact support',\n    description: 'Subject, message, attachments, and priority controls.',\n    badge: 'Contact',\n  },\n] as const;\n\nconst supportControls = [\n  {\n    title: 'Attach diagnostics',\n    description: 'Include browser, device, and account context.',\n    badge: 'Context',\n  },\n  {\n    title: 'Escalate urgent issues',\n    description: 'Flag billing, data loss, or outage reports.',\n    badge: 'Priority',\n  },\n  {\n    title: 'Show status link',\n    description: 'Point users to live incident updates.',\n    badge: 'Status',\n  },\n] as const;\n\n/**\n * Render a source-backed support center page recipe.\n *\n * @returns A help desk page with tickets, docs search, and contact actions.\n * @example\n * const element = <SupportCenterPage />;\n */\nexport const SupportCenterPage = () => {\n  // TODO: Load support tickets and documentation results from the configured support provider.\n  // TODO: Send support requests through the configured support action.\n  return (\n    <DemoQuickWinPage\n      active=\"support\"\n      badge=\"Support\"\n      detailItems={supportControls}\n      detailTitle=\"Support defaults\"\n      listDescription=\"Help center surfaces need tickets, docs, contact, and status in one route.\"\n      listItems={supportItems}\n      listTitle=\"Support workspace\"\n      metrics={metrics}\n      primaryAction={{ label: 'Create ticket', icon: <Send className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search docs',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A support center for help docs, ticket status, contact forms, attachments, and incident handoff.\"\n      title=\"Support center\"\n      transition=\"slide\"\n      variantDescription=\"Support pages need searchable docs, priority states, and visible response expectations.\"\n      variantItems={supportControls}\n      variantTitle=\"Support component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load support tickets and documentation results from the configured support provider.",
+      "Send support requests through the configured support action."
+    ],
+    "groupId": "support",
+    "groupLabel": "Support",
+    "groupDescription": "Support center, help desk, and ticket pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "integrations",
+    "slug": "integrations",
+    "title": "Integrations page",
+    "summary": "An integrations, API keys, and webhook management page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/IntegrationsPage.tsx",
+    "exportName": "IntegrationsPage",
+    "targetRoute": "/integrations",
+    "suggestedComponents": [
+      "bundui/data-table-02",
+      "bundui/card-default",
+      "kibo/glimpse",
+      "untitled/modals/modal"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Integration data",
+        "note": "Load connected integrations and API keys from the configured integrations source.",
+        "todo": "Load connected integrations and API keys from the configured integrations source.",
+        "owner": "integrations"
+      },
+      {
+        "kind": "service",
+        "label": "Integration actions",
+        "note": "Save integration changes through audited integration actions.",
+        "todo": "Save integration changes through audited integration actions.",
+        "owner": "integrations"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows API keys, webhooks, OAuth apps, scopes, and secret rotation states."
+    ],
+    "sourceCode": "import { Eye, Globe2, KeyRound, Plug, Webhook } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Connected tools',\n    value: '5',\n    detail: '2 need refresh',\n    icon: <Plug className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'API keys',\n    value: '3',\n    detail: 'One expires soon',\n    icon: <KeyRound className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Webhooks',\n    value: '9',\n    detail: 'All delivering',\n    icon: <Webhook className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'OAuth apps',\n    value: '2',\n    detail: 'Google and GitHub',\n    icon: <Globe2 className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst integrationItems = [\n  {\n    title: 'Connected accounts',\n    description: 'OAuth providers, scopes, status, and disconnect controls.',\n    badge: 'OAuth',\n  },\n  {\n    title: 'API keys',\n    description: 'Create, copy, rotate, and revoke developer keys.',\n    badge: 'Keys',\n  },\n  {\n    title: 'Webhooks',\n    description: 'Delivery URL, signing secret, retries, and event filters.',\n    badge: 'Hooks',\n  },\n] as const;\n\nconst integrationControls = [\n  {\n    title: 'Rotate secrets',\n    description: 'Expose safe key rotation and reveal-once behavior.',\n    badge: 'Security',\n  },\n  {\n    title: 'Retry failed hooks',\n    description: 'Show delivery failures and retry actions.',\n    badge: 'Reliability',\n  },\n  {\n    title: 'Limit scopes',\n    description: 'Keep OAuth permissions visible before connection.',\n    badge: 'Scopes',\n  },\n] as const;\n\n/**\n * Render a source-backed integrations page recipe.\n *\n * @returns An integrations, API keys, and webhook management page.\n * @example\n * const element = <IntegrationsPage />;\n */\nexport const IntegrationsPage = () => {\n  // TODO: Load connected integrations and API keys from the configured integrations source.\n  // TODO: Save integration changes through audited integration actions.\n  return (\n    <DemoQuickWinPage\n      active=\"integrations\"\n      badge=\"Integrations\"\n      detailItems={integrationControls}\n      detailTitle=\"Integration controls\"\n      listDescription=\"A plug-and-play route for API keys, webhooks, OAuth apps, and connected tools.\"\n      listItems={integrationItems}\n      listTitle=\"Connected tools\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add integration', icon: <Plug className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View keys',\n        icon: <Eye className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A complete integration surface covering API keys, webhooks, OAuth apps, scopes, retries, and secret rotation.\"\n      title=\"Integrations\"\n      transition=\"scale\"\n      variantDescription=\"Integration pages need credential safety, delivery status, and clear connected-tool cards.\"\n      variantItems={integrationControls}\n      variantTitle=\"Integration component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load connected integrations and API keys from the configured integrations source.",
+      "Save integration changes through audited integration actions."
+    ],
+    "groupId": "integrations",
+    "groupLabel": "Integrations",
+    "groupDescription": "API keys, webhooks, OAuth apps, and connected tools.",
+    "providerPointers": []
+  },
+  {
     "id": "teams",
     "slug": "teams",
     "title": "Teams page",
     "summary": "A workspace member and invitation page.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/teamsPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/TeamsPage.tsx",
     "exportName": "TeamsPage",
     "targetRoute": "/settings/team",
     "suggestedComponents": [
@@ -366,7 +962,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page offers member roles and invite entry before team wiring."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Label } from '@vybekiit/ui/label';\nimport { UsersRound } from 'lucide-react';\nimport { useId } from 'react';\n\n/**\n * Render a source-backed teams page recipe.\n *\n * @returns A ready team invite and member management page.\n * @example\n * const element = <TeamsPage />;\n */\nexport const TeamsPage = () => {\n  const inviteEmailId = useId();\n\n  // TODO: Load organizations and memberships from the active teams data model.\n  // TODO: Send invite requests through the configured team invitation action.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto grid max-w-6xl gap-6 lg:grid-cols-[360px_1fr]\">\n        <aside className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            Teams\n          </Badge>\n          <h1 className=\"font-bold text-3xl tracking-tight\">Invite your team</h1>\n          <p className=\"mt-2 text-muted-foreground text-sm\">\n            A compact team setup page for organizations, seats, roles, and invites.\n          </p>\n          <div className=\"mt-6 space-y-2\">\n            <Label htmlFor={inviteEmailId}>Invite email</Label>\n            <Input defaultValue=\"teammate@example.com\" id={inviteEmailId} />\n            <Button className=\"w-full\" type=\"button\">\n              Send invite\n            </Button>\n          </div>\n        </aside>\n        <div className=\"rounded-lg border bg-card p-5\">\n          <div className=\"flex items-center gap-3\">\n            <UsersRound className=\"h-5 w-5 text-blue-600\" />\n            <h2 className=\"font-semibold text-xl\">Workspace members</h2>\n          </div>\n          <div className=\"mt-5 grid gap-3\">\n            {['Owner', 'Editor', 'Viewer'].map((role) => (\n              <div className=\"flex items-center justify-between rounded-lg border p-3\" key={role}>\n                <div>\n                  <p className=\"font-medium\">{role}</p>\n                  <p className=\"text-muted-foreground text-sm\">Default role row for setup.</p>\n                </div>\n                <Button size=\"sm\" type=\"button\" variant=\"outline\">\n                  Change\n                </Button>\n              </div>\n            ))}\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Label } from '@vybekiit/ui/label';\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';\nimport { MailPlus, ShieldCheck, UserCog, UsersRound } from 'lucide-react';\nimport { useId } from 'react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoAppShell } from './shared/DemoAppShell';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst memberRows = [\n  { name: 'Maya Chen', email: 'maya@example.com', role: 'Owner' },\n  { name: 'Noah Green', email: 'noah@example.com', role: 'Editor' },\n  { name: 'Rina Fox', email: 'rina@example.com', role: 'Viewer' },\n];\n\nconst roleOptions = ['Owner', 'Admin', 'Editor', 'Viewer'] as const;\n\n/**\n * Render a source-backed teams page recipe.\n *\n * @returns A ready team invite and member management page.\n * @example\n * const element = <TeamsPage />;\n */\nexport const TeamsPage = () => {\n  const inviteEmailId = useId();\n\n  // TODO: Load organizations and memberships from the active teams data model.\n  // TODO: Send invite requests through the configured team invitation action.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"slide\" title=\"Teams motion pass\">\n        <DemoAppShell active=\"teams\" title=\"Team settings\">\n          <section className=\"grid gap-6 xl:grid-cols-[360px_1fr]\">\n            <aside className=\"rounded-lg border bg-card p-5\">\n              <Badge className=\"mb-4\" variant=\"secondary\">\n                Teams\n              </Badge>\n              <h2 className=\"font-bold text-3xl tracking-tight\">Invite your team</h2>\n              <p className=\"mt-2 text-muted-foreground text-sm\">\n                A compact team setup page for organizations, seats, roles, and invites.\n              </p>\n              <div className=\"mt-6 space-y-2\">\n                <Label htmlFor={inviteEmailId}>Invite email</Label>\n                <Input defaultValue=\"teammate@example.com\" id={inviteEmailId} />\n                <DemoActionButton className=\"w-full\" icon={<MailPlus className=\"h-4 w-4\" />}>\n                  Send invite\n                </DemoActionButton>\n              </div>\n            </aside>\n\n            <div className=\"rounded-lg border bg-card p-5\">\n              <div className=\"flex items-center gap-3\">\n                <UsersRound className=\"h-5 w-5 text-blue-600\" />\n                <h2 className=\"font-semibold text-xl\">Workspace members</h2>\n              </div>\n              <div className=\"mt-5 grid gap-3\">\n                {memberRows.map((member) => (\n                  <div\n                    className=\"grid gap-3 rounded-lg border p-3 sm:grid-cols-[minmax(0,1fr)_160px] sm:items-center\"\n                    key={member.email}\n                  >\n                    <div className=\"min-w-0\">\n                      <p className=\"font-medium\">{member.name}</p>\n                      <p className=\"truncate text-muted-foreground text-sm\">{member.email}</p>\n                    </div>\n                    <Select defaultValue={member.role}>\n                      <SelectTrigger aria-label={`Change role for ${member.name}`}>\n                        <UserCog className=\"mr-2 h-4 w-4 text-muted-foreground\" />\n                        <SelectValue />\n                      </SelectTrigger>\n                      <SelectContent>\n                        {roleOptions.map((role) => (\n                          <SelectItem key={role} value={role}>\n                            {role}\n                          </SelectItem>\n                        ))}\n                      </SelectContent>\n                    </Select>\n                  </div>\n                ))}\n              </div>\n            </div>\n          </section>\n\n          <DemoVariantGrid\n            className=\"mt-6\"\n            description=\"Role, invite, and permission cards keep the team UI scannable.\"\n            title=\"Team component variants\"\n          >\n            <DemoVariantCard label=\"Owner\" tone=\"primary\">\n              <ShieldCheck className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-semibold\">Full workspace access</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Large label, strong status color.\n              </p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Editor\" tone=\"accent\">\n              <UserCog className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium\">Can update content</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">Balanced card for common roles.</p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Viewer\" tone=\"muted\">\n              <UsersRound className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium text-sm\">Read-only seat</p>\n              <p className=\"mt-1 text-muted-foreground text-xs\">Compact for dense member lists.</p>\n            </DemoVariantCard>\n          </DemoVariantGrid>\n        </DemoAppShell>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Load organizations and memberships from the active teams data model.",
       "Send invite requests through the configured team invitation action."
@@ -381,7 +977,7 @@ export const PAGE_RECIPES = [
     "slug": "analytics",
     "title": "Analytics page",
     "summary": "A product health page for usage totals and error status.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/analyticsPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AnalyticsPage.tsx",
     "exportName": "AnalyticsPage",
     "targetRoute": "/analytics",
     "suggestedComponents": [
@@ -407,7 +1003,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows product health without inventing production metrics."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Activity, BarChart3 } from 'lucide-react';\n\n/**\n * Render a source-backed analytics page recipe.\n *\n * @returns A ready analytics and error tracking page component.\n * @example\n * const element = <AnalyticsPage />;\n */\nexport const AnalyticsPage = () => {\n  // TODO: Connect usage totals to the configured analytics provider.\n  // TODO: Connect error alerts to the configured tracking provider.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Analytics\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Product health</h1>\n        <div className=\"mt-6 grid gap-4 md:grid-cols-3\">\n          {['Visitors', 'Signups', 'Errors'].map((label, index) => (\n            <article className=\"rounded-lg border bg-card p-5\" key={label}>\n              {index === 2 ? (\n                <Activity className=\"mb-3 h-5 w-5 text-rose-600\" />\n              ) : (\n                <BarChart3 className=\"mb-3 h-5 w-5 text-blue-600\" />\n              )}\n              <p className=\"text-muted-foreground text-sm\">{label}</p>\n              <p className=\"mt-2 font-bold text-3xl\">{index === 2 ? '0' : 'Ready'}</p>\n            </article>\n          ))}\n        </div>\n        <Button className=\"mt-6\" type=\"button\">\n          Open report\n        </Button>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Activity, BarChart3, Download, Gauge, TrendingUp } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoAppShell } from './shared/DemoAppShell';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst metrics = [\n  { label: 'Visitors', value: '12.8k', trend: '+18%', tone: 'blue' },\n  { label: 'Signups', value: '842', trend: '+9%', tone: 'emerald' },\n  { label: 'Errors', value: '0', trend: 'Clean', tone: 'rose' },\n];\n\n/**\n * Render a source-backed analytics page recipe.\n *\n * @returns A ready analytics and error tracking page component.\n * @example\n * const element = <AnalyticsPage />;\n */\nexport const AnalyticsPage = () => {\n  // TODO: Connect usage totals to the configured analytics provider.\n  // TODO: Connect error alerts to the configured tracking provider.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"blur\" title=\"Analytics motion pass\">\n        <DemoAppShell active=\"analytics\" title=\"Product health\">\n          <section>\n            <div className=\"flex flex-wrap items-start justify-between gap-3\">\n              <div>\n                <Badge className=\"mb-4\" variant=\"secondary\">\n                  Analytics\n                </Badge>\n                <p className=\"max-w-2xl text-muted-foreground\">\n                  Monitor usage, conversion, and error health from one signed-in dashboard surface.\n                </p>\n              </div>\n              <DemoActionButton icon={<Download className=\"h-4 w-4\" />} variant=\"outline\">\n                Export report\n              </DemoActionButton>\n            </div>\n\n            <div className=\"mt-6 grid gap-4 md:grid-cols-3\">\n              {metrics.map((metric) => (\n                <article className=\"rounded-lg border bg-card p-5\" key={metric.label}>\n                  {metric.label === 'Errors' ? (\n                    <Activity className=\"mb-3 h-5 w-5 text-rose-600\" />\n                  ) : (\n                    <BarChart3 className=\"mb-3 h-5 w-5 text-blue-600\" />\n                  )}\n                  <p className=\"text-muted-foreground text-sm\">{metric.label}</p>\n                  <div className=\"mt-2 flex items-end justify-between gap-3\">\n                    <p className=\"font-bold text-3xl\">{metric.value}</p>\n                    <Badge variant=\"secondary\">{metric.trend}</Badge>\n                  </div>\n                </article>\n              ))}\n            </div>\n\n            <DemoVariantGrid\n              className=\"mt-6\"\n              description=\"Stress-test metric cards across color, density, and font scale.\"\n              title=\"Analytics component variants\"\n            >\n              <DemoVariantCard label=\"Large KPI\" tone=\"primary\">\n                <TrendingUp className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-bold text-4xl\">68%</p>\n                <p className=\"text-muted-foreground text-sm\">Activation rate</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Compact KPI\" tone=\"muted\">\n                <Gauge className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-semibold text-xl\">Fast</p>\n                <p className=\"text-muted-foreground text-xs\">Small-card health label.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Alert KPI\">\n                <Activity className=\"mb-2 h-5 w-5 text-rose-600\" />\n                <p className=\"font-medium\">No production errors</p>\n                <p className=\"text-muted-foreground text-sm\">Keeps red state readable.</p>\n              </DemoVariantCard>\n            </DemoVariantGrid>\n          </section>\n        </DemoAppShell>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Connect usage totals to the configured analytics provider.",
       "Connect error alerts to the configured tracking provider."
@@ -418,11 +1014,392 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "admin-panel",
+    "slug": "admin-panel",
+    "title": "Admin panel page",
+    "summary": "A combined owner control center for users, billing risk, support, audit log, and release controls.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AdminPanelPage.tsx",
+    "exportName": "AdminPanelPage",
+    "targetRoute": "/admin",
+    "suggestedComponents": [
+      "bundui/app-sidebar",
+      "untitled/table/table",
+      "evilcharts/chart",
+      "kibo/glimpse",
+      "magicui/marquee",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Admin data",
+        "note": "Load users, plans, tickets, and admin events from the configured admin data sources.",
+        "todo": "Load users, plans, tickets, and admin events from the configured admin data sources.",
+        "owner": "admin"
+      },
+      {
+        "kind": "service",
+        "label": "Audited actions",
+        "note": "Save admin actions through audited server actions.",
+        "todo": "Save admin actions through audited server actions.",
+        "owner": "admin"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page exposes user, billing, support, and audit controls without calling production services."
+    ],
+    "sourceCode": "import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';\nimport { Badge } from '@vybekiit/ui/badge';\nimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';\nimport { Progress } from '@vybekiit/ui/progress';\nimport { Separator } from '@vybekiit/ui/separator';\nimport { Switch } from '@vybekiit/ui/switch';\nimport { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@vybekiit/ui/table';\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@vybekiit/ui/tabs';\nimport {\n  Activity,\n  AlertTriangle,\n  CreditCard,\n  Database,\n  FileClock,\n  LifeBuoy,\n  LockKeyhole,\n  Search,\n  ShieldCheck,\n  UsersRound,\n} from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoAppShell } from './shared/DemoAppShell';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst adminMetrics = [\n  {\n    label: 'Users',\n    value: '1,284',\n    detail: '+42 this week',\n    Icon: UsersRound,\n    className: 'text-blue-600',\n  },\n  {\n    label: 'Billing risk',\n    value: '7',\n    detail: 'Needs review',\n    Icon: CreditCard,\n    className: 'text-amber-600',\n  },\n  {\n    label: 'Open tickets',\n    value: '18',\n    detail: '4 high priority',\n    Icon: LifeBuoy,\n    className: 'text-violet-600',\n  },\n  {\n    label: 'Audit events',\n    value: '342',\n    detail: 'Last 24 hours',\n    Icon: FileClock,\n    className: 'text-emerald-600',\n  },\n];\n\nconst userRows = [\n  { name: 'Maya Chen', email: 'maya@example.com', plan: 'Growth', status: 'Owner' },\n  { name: 'Noah Green', email: 'noah@example.com', plan: 'Starter', status: 'Trial' },\n  { name: 'Rina Fox', email: 'rina@example.com', plan: 'Scale', status: 'Support' },\n];\n\nconst auditRows = [\n  'Role changed for Noah Green',\n  'Invoice retry scheduled',\n  'Feature flag enabled for beta dashboard',\n  'Support ticket escalated',\n];\n\nconst componentStack = [\n  'BundUI app sidebar',\n  'Untitled table',\n  'EvilCharts health metric',\n  'Kibo search glimpse',\n  'Magic UI movement',\n  'shadcnblocks admin cards',\n];\n\n/**\n * Render a source-backed admin panel page recipe.\n *\n * @returns A combined admin control center page for owners and operators.\n * @example\n * const element = <AdminPanelPage />;\n */\nexport const AdminPanelPage = () => {\n  // TODO: Load users, plans, tickets, and admin events from the configured admin data sources.\n  // TODO: Save admin actions through audited server actions.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"scale\" title=\"Admin motion pass\">\n        <DemoAppShell active=\"admin\" eyebrow=\"Owner console\" title=\"Admin command center\">\n          <section className=\"space-y-6\">\n            <div className=\"flex flex-wrap items-start justify-between gap-3\">\n              <div>\n                <Badge className=\"mb-4\" variant=\"secondary\">\n                  Admin\n                </Badge>\n                <p className=\"max-w-3xl text-muted-foreground\">\n                  One operational surface for users, organizations, billing risk, support, audit\n                  events, and release controls.\n                </p>\n              </div>\n              <div className=\"flex flex-wrap gap-2\">\n                <DemoActionButton icon={<Search className=\"h-4 w-4\" />} variant=\"outline\">\n                  Search users\n                </DemoActionButton>\n                <DemoActionButton icon={<AlertTriangle className=\"h-4 w-4\" />}>\n                  Review queue\n                </DemoActionButton>\n              </div>\n            </div>\n\n            <div className=\"grid gap-4 md:grid-cols-2 xl:grid-cols-4\">\n              {adminMetrics.map(({ Icon, className, detail, label, value }) => (\n                <Card className=\"rounded-lg\" key={label}>\n                  <CardHeader className=\"flex flex-row items-start justify-between space-y-0 pb-2\">\n                    <div>\n                      <CardDescription>{label}</CardDescription>\n                      <CardTitle className=\"mt-2 text-3xl\">{value}</CardTitle>\n                    </div>\n                    <Icon className={`h-5 w-5 ${className}`} />\n                  </CardHeader>\n                  <CardContent>\n                    <p className=\"text-muted-foreground text-sm\">{detail}</p>\n                  </CardContent>\n                </Card>\n              ))}\n            </div>\n\n            <div className=\"grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]\">\n              <Card className=\"rounded-lg\">\n                <CardHeader>\n                  <CardTitle>Workspace operations</CardTitle>\n                  <CardDescription>\n                    Combined table, tabs, badges, and audit states from the shared UI library.\n                  </CardDescription>\n                </CardHeader>\n                <CardContent>\n                  <Tabs defaultValue=\"users\">\n                    <TabsList className=\"grid w-full grid-cols-3\">\n                      <TabsTrigger value=\"users\">Users</TabsTrigger>\n                      <TabsTrigger value=\"billing\">Billing</TabsTrigger>\n                      <TabsTrigger value=\"audit\">Audit log</TabsTrigger>\n                    </TabsList>\n                    <TabsContent value=\"users\">\n                      <Table>\n                        <TableHeader>\n                          <TableRow>\n                            <TableHead>User</TableHead>\n                            <TableHead>Plan</TableHead>\n                            <TableHead>Status</TableHead>\n                          </TableRow>\n                        </TableHeader>\n                        <TableBody>\n                          {userRows.map((user) => (\n                            <TableRow key={user.email}>\n                              <TableCell>\n                                <div className=\"flex items-center gap-3\">\n                                  <Avatar className=\"h-9 w-9\">\n                                    <AvatarFallback>{user.name.slice(0, 2)}</AvatarFallback>\n                                  </Avatar>\n                                  <div>\n                                    <p className=\"font-medium\">{user.name}</p>\n                                    <p className=\"text-muted-foreground text-xs\">{user.email}</p>\n                                  </div>\n                                </div>\n                              </TableCell>\n                              <TableCell>{user.plan}</TableCell>\n                              <TableCell>\n                                <Badge variant=\"secondary\">{user.status}</Badge>\n                              </TableCell>\n                            </TableRow>\n                          ))}\n                        </TableBody>\n                      </Table>\n                    </TabsContent>\n                    <TabsContent value=\"billing\">\n                      <div className=\"space-y-4 rounded-lg border p-4\">\n                        <div>\n                          <div className=\"mb-2 flex items-center justify-between gap-3\">\n                            <p className=\"font-medium\">Failed payment queue</p>\n                            <Badge variant=\"outline\">7 accounts</Badge>\n                          </div>\n                          <Progress value={68} />\n                        </div>\n                        <Separator />\n                        <div className=\"grid gap-3 sm:grid-cols-2\">\n                          <div className=\"rounded-lg border p-3\">\n                            <p className=\"font-semibold\">Revenue recovery</p>\n                            <p className=\"text-muted-foreground text-sm\">\n                              Retry reminders and plan downgrade handoff.\n                            </p>\n                          </div>\n                          <div className=\"rounded-lg border p-3\">\n                            <p className=\"font-semibold\">Plan exceptions</p>\n                            <p className=\"text-muted-foreground text-sm\">\n                              Manual credits, refunds, and account notes.\n                            </p>\n                          </div>\n                        </div>\n                      </div>\n                    </TabsContent>\n                    <TabsContent value=\"audit\">\n                      <div className=\"grid gap-3\">\n                        {auditRows.map((event) => (\n                          <div\n                            className=\"flex items-center gap-3 rounded-lg border p-3\"\n                            key={event}\n                          >\n                            <Activity className=\"h-4 w-4 text-emerald-600\" />\n                            <p className=\"text-sm\">{event}</p>\n                          </div>\n                        ))}\n                      </div>\n                    </TabsContent>\n                  </Tabs>\n                </CardContent>\n              </Card>\n\n              <div className=\"space-y-4\">\n                <Card className=\"rounded-lg\">\n                  <CardHeader>\n                    <CardTitle className=\"flex items-center gap-2\">\n                      <LockKeyhole className=\"h-5 w-5 text-rose-600\" />\n                      Admin safeguards\n                    </CardTitle>\n                    <CardDescription>Default controls for privileged operations.</CardDescription>\n                  </CardHeader>\n                  <CardContent className=\"space-y-4\">\n                    {['Require two-step approval', 'Log destructive actions', 'Notify owner'].map(\n                      (label, index) => (\n                        <div className=\"flex items-center justify-between gap-3\" key={label}>\n                          <span className=\"text-sm\">{label}</span>\n                          <Switch defaultChecked={index !== 0} />\n                        </div>\n                      ),\n                    )}\n                  </CardContent>\n                </Card>\n\n                <Card className=\"rounded-lg\">\n                  <CardHeader>\n                    <CardTitle className=\"flex items-center gap-2\">\n                      <Database className=\"h-5 w-5 text-blue-600\" />\n                      Combined component stack\n                    </CardTitle>\n                    <CardDescription>\n                      Admin pulls from the supported recipe library catalog.\n                    </CardDescription>\n                  </CardHeader>\n                  <CardContent className=\"grid gap-2\">\n                    {componentStack.map((item) => (\n                      <div className=\"rounded-md border bg-muted/40 px-3 py-2 text-sm\" key={item}>\n                        {item}\n                      </div>\n                    ))}\n                  </CardContent>\n                </Card>\n              </div>\n            </div>\n\n            <DemoVariantGrid\n              description=\"A control center needs dense tables, risk cards, switches, and audit rows to compose cleanly.\"\n              title=\"Admin component variants\"\n            >\n              <DemoVariantCard label=\"Security\" tone=\"primary\">\n                <ShieldCheck className=\"mb-2 h-5 w-5 text-primary\" />\n                <p className=\"font-semibold\">Privileged actions</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Strong status treatment.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Risk\" tone=\"accent\">\n                <AlertTriangle className=\"mb-2 h-5 w-5 text-amber-600\" />\n                <p className=\"font-medium\">Billing review</p>\n                <p className=\"mt-1 text-muted-foreground text-sm\">Warm warning tone.</p>\n              </DemoVariantCard>\n              <DemoVariantCard label=\"Activity\" tone=\"muted\">\n                <FileClock className=\"mb-2 h-5 w-5 text-emerald-600\" />\n                <p className=\"font-medium text-sm\">Audit trace</p>\n                <p className=\"mt-1 text-muted-foreground text-xs\">Compact event row.</p>\n              </DemoVariantCard>\n            </DemoVariantGrid>\n          </section>\n        </DemoAppShell>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
+    "todos": [
+      "Load users, plans, tickets, and admin events from the configured admin data sources.",
+      "Save admin actions through audited server actions."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "user-management",
+    "slug": "user-management",
+    "title": "User management page",
+    "summary": "An admin users table with role and access controls.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/UserManagementPage.tsx",
+    "exportName": "UserManagementPage",
+    "targetRoute": "/admin/users",
+    "suggestedComponents": [
+      "bundui/app-sidebar",
+      "untitled/table/table",
+      "bundui/badge-indicator"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Admin users",
+        "note": "Load users, roles, and account status from the configured admin user source.",
+        "todo": "Load users, roles, and account status from the configured admin user source.",
+        "owner": "admin"
+      },
+      {
+        "kind": "service",
+        "label": "Access changes",
+        "note": "Save user access changes through audited admin actions.",
+        "todo": "Save user access changes through audited admin actions.",
+        "owner": "admin"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows user search, roles, suspend/restore states, and invite actions."
+    ],
+    "sourceCode": "import { LockKeyhole, Plus, Search, UserCog, UsersRound } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Users',\n    value: '1.2k',\n    detail: 'Across workspaces',\n    icon: <UsersRound className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Invites',\n    value: '18',\n    detail: 'Pending acceptance',\n    icon: <Plus className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Suspended',\n    value: '4',\n    detail: 'Needs review',\n    icon: <LockKeyhole className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Roles',\n    value: '6',\n    detail: 'Editable policies',\n    icon: <UserCog className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n] as const;\n\nconst userItems = [\n  {\n    title: 'User table',\n    description: 'Search, role, plan, status, and last-active columns.',\n    badge: 'Table',\n  },\n  {\n    title: 'Invite controls',\n    description: 'Invite by email, assign role, and resend invitation.',\n    badge: 'Invite',\n  },\n  {\n    title: 'Suspend or restore',\n    description: 'Privileged account actions with review states.',\n    badge: 'Access',\n  },\n] as const;\n\nconst userControls = [\n  {\n    title: 'Role change audit',\n    description: 'Log every role update to the audit trail.',\n    badge: 'Audit',\n  },\n  {\n    title: 'Bulk actions',\n    description: 'Select users and apply status changes safely.',\n    badge: 'Bulk',\n  },\n  {\n    title: 'Support impersonation',\n    description: 'Make impersonation explicit and time-limited.',\n    badge: 'Support',\n  },\n] as const;\n\n/**\n * Render a source-backed user management admin page recipe.\n *\n * @returns An admin users table with role and access controls.\n * @example\n * const element = <UserManagementPage />;\n */\nexport const UserManagementPage = () => {\n  // TODO: Load users, roles, and account status from the configured admin user source.\n  // TODO: Save user access changes through audited admin actions.\n  return (\n    <DemoQuickWinPage\n      active=\"admin\"\n      badge=\"Admin users\"\n      detailItems={userControls}\n      detailTitle=\"Access controls\"\n      listDescription=\"Admin user management for roles, support access, invites, and account status.\"\n      listItems={userItems}\n      listTitle=\"User management\"\n      metrics={metrics}\n      primaryAction={{ label: 'Invite user', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search users',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A user management page for admins to search users, assign roles, suspend accounts, and review support access.\"\n      title=\"User management\"\n      transition=\"slide\"\n      variantDescription=\"User admin pages need dense tables, bulk states, role badges, and clear destructive controls.\"\n      variantItems={userControls}\n      variantTitle=\"User management variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load users, roles, and account status from the configured admin user source.",
+      "Save user access changes through audited admin actions."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "audit-log",
+    "slug": "audit-log",
+    "title": "Audit log page",
+    "summary": "A filterable audit trail page for admin and security events.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AuditLogPage.tsx",
+    "exportName": "AuditLogPage",
+    "targetRoute": "/admin/audit-log",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/data-table-01",
+      "bundui/badge-indicator"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Audit events",
+        "note": "Load audit events from the configured audit log source.",
+        "todo": "Load audit events from the configured audit log source.",
+        "owner": "compliance"
+      },
+      {
+        "kind": "service",
+        "label": "Audit export",
+        "note": "Export audit events through the configured compliance action.",
+        "todo": "Export audit events through the configured compliance action.",
+        "owner": "compliance"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows actor, target, severity, filters, export, and retention states."
+    ],
+    "sourceCode": "import { Activity, Download, FileClock, Filter, ShieldCheck } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Events',\n    value: '342',\n    detail: 'Last 24 hours',\n    icon: <FileClock className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'High risk',\n    value: '5',\n    detail: 'Needs review',\n    icon: <ShieldCheck className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Actors',\n    value: '28',\n    detail: 'Humans and jobs',\n    icon: <Activity className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Exports',\n    value: 'CSV',\n    detail: 'Compliance ready',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n] as const;\n\nconst auditItems = [\n  {\n    title: 'Actor and target',\n    description: 'Who did what, to which resource, and when.',\n    badge: 'Trace',\n  },\n  {\n    title: 'Severity filters',\n    description: 'Info, warning, critical, billing, and access events.',\n    badge: 'Filter',\n  },\n  {\n    title: 'Export trail',\n    description: 'Download filtered events for compliance review.',\n    badge: 'Export',\n  },\n] as const;\n\nconst auditControls = [\n  {\n    title: 'Retention policy',\n    description: 'Show how long admin events remain available.',\n    badge: 'Policy',\n  },\n  {\n    title: 'Sensitive event flag',\n    description: 'Highlight destructive or privileged actions.',\n    badge: 'Risk',\n  },\n  {\n    title: 'Search metadata',\n    description: 'Filter by actor, organization, resource, or event type.',\n    badge: 'Search',\n  },\n] as const;\n\n/**\n * Render a source-backed audit log page recipe.\n *\n * @returns A filterable audit trail page for admin and security events.\n * @example\n * const element = <AuditLogPage />;\n */\nexport const AuditLogPage = () => {\n  // TODO: Load audit events from the configured audit log source.\n  // TODO: Export audit events through the configured compliance action.\n  return (\n    <DemoQuickWinPage\n      active=\"admin\"\n      badge=\"Audit\"\n      detailItems={auditControls}\n      detailTitle=\"Audit controls\"\n      listDescription=\"A compliance-ready event view for admin actions and system changes.\"\n      listItems={auditItems}\n      listTitle=\"Audit log\"\n      metrics={metrics}\n      primaryAction={{ label: 'Export log', icon: <Download className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Filter events',\n        icon: <Filter className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A filterable audit log with actor, target, severity, search, export, and retention controls.\"\n      title=\"Audit log\"\n      transition=\"fade\"\n      variantDescription=\"Audit pages need scan-friendly event rows, severity filters, and export clarity.\"\n      variantItems={auditControls}\n      variantTitle=\"Audit component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load audit events from the configured audit log source.",
+      "Export audit events through the configured compliance action."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "billing-admin",
+    "slug": "billing-admin",
+    "title": "Billing admin page",
+    "summary": "An admin billing page for subscriptions, invoices, and failed payments.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/BillingAdminPage.tsx",
+    "exportName": "BillingAdminPage",
+    "targetRoute": "/admin/billing",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/pricing-sections-01",
+      "shadcnblocks/pricing"
+    ],
+    "installNotes": [
+      {
+        "kind": "provider",
+        "label": "Billing provider data",
+        "note": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+        "todo": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+        "owner": "payments"
+      },
+      {
+        "kind": "provider",
+        "label": "Billing admin actions",
+        "note": "Save billing admin actions through audited payment actions.",
+        "todo": "Save billing admin actions through audited payment actions.",
+        "owner": "payments"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows subscriptions, failed payments, invoices, credits, refunds, and retry actions."
+    ],
+    "sourceCode": "import { CreditCard, Download, Receipt, RefreshCw, Search } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'MRR',\n    value: '$18k',\n    detail: '+8% this month',\n    icon: <CreditCard className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Failed payments',\n    value: '7',\n    detail: 'Retry queue',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Invoices',\n    value: '124',\n    detail: 'This cycle',\n    icon: <Receipt className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Credits',\n    value: '3',\n    detail: 'Manual review',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst billingItems = [\n  {\n    title: 'Subscriptions',\n    description: 'Plan, status, renewal, cancellation, and trial columns.',\n    badge: 'Subs',\n  },\n  {\n    title: 'Failed payment queue',\n    description: 'Retry status, dunning stage, and customer contact.',\n    badge: 'Risk',\n  },\n  {\n    title: 'Manual credits',\n    description: 'Credits, refunds, invoice notes, and account overrides.',\n    badge: 'Credits',\n  },\n] as const;\n\nconst billingControls = [\n  {\n    title: 'Retry payments',\n    description: 'Trigger provider-safe retries without duplicate charges.',\n    badge: 'Retry',\n  },\n  {\n    title: 'Download invoices',\n    description: 'Expose invoice PDFs and CSV exports.',\n    badge: 'Export',\n  },\n  {\n    title: 'Plan override',\n    description: 'Make manual plan changes explicit and auditable.',\n    badge: 'Override',\n  },\n] as const;\n\n/**\n * Render a source-backed billing admin page recipe.\n *\n * @returns An admin billing page for subscriptions, invoices, and failed payments.\n * @example\n * const element = <BillingAdminPage />;\n */\nexport const BillingAdminPage = () => {\n  // TODO: Load subscriptions, invoices, and failed payments from the configured payments provider.\n  // TODO: Save billing admin actions through audited payment actions.\n  return (\n    <DemoQuickWinPage\n      active=\"admin\"\n      badge=\"Admin billing\"\n      detailItems={billingControls}\n      detailTitle=\"Billing controls\"\n      listDescription=\"Admin payment operations for subscription health, invoices, and manual review.\"\n      listItems={billingItems}\n      listTitle=\"Billing operations\"\n      metrics={metrics}\n      primaryAction={{ label: 'Retry payments', icon: <RefreshCw className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search invoices',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"An admin billing page for failed payments, subscriptions, invoices, credits, refunds, and plan overrides.\"\n      title=\"Billing admin\"\n      transition=\"scale\"\n      variantDescription=\"Billing admin pages need risk queues, invoice actions, and provider-safe retry states.\"\n      variantItems={billingControls}\n      variantTitle=\"Billing admin variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+      "Save billing admin actions through audited payment actions."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "system-health",
+    "slug": "system-health",
+    "title": "System health page",
+    "summary": "A system health page for services, queues, jobs, and errors.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/SystemHealthPage.tsx",
+    "exportName": "SystemHealthPage",
+    "targetRoute": "/admin/health",
+    "suggestedComponents": [
+      "evilcharts/chart",
+      "bundui/badge-indicator",
+      "bundui/alert-default"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Health source",
+        "note": "Load service health, queue depth, and job status from the configured observability source.",
+        "todo": "Load service health, queue depth, and job status from the configured observability source.",
+        "owner": "observability"
+      },
+      {
+        "kind": "service",
+        "label": "Health actions",
+        "note": "Send health actions through the configured operations actions.",
+        "todo": "Send health actions through the configured operations actions.",
+        "owner": "operations"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows service status, queues, cron jobs, error rates, and incident thresholds."
+    ],
+    "sourceCode": "import { Activity, HeartPulse, MonitorCheck, RefreshCw, Signal } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Uptime',\n    value: '99.99%',\n    detail: '30-day window',\n    icon: <MonitorCheck className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Queues',\n    value: '3',\n    detail: 'All draining',\n    icon: <Activity className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Cron jobs',\n    value: '12',\n    detail: '1 delayed',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Errors',\n    value: '0.04%',\n    detail: 'Below threshold',\n    icon: <HeartPulse className=\"h-5 w-5\" />,\n    tone: 'rose',\n  },\n] as const;\n\nconst healthItems = [\n  {\n    title: 'Service status',\n    description: 'API, database, storage, email, and worker health.',\n    badge: 'Services',\n  },\n  {\n    title: 'Queue depth',\n    description: 'Background job backlog and retry states.',\n    badge: 'Queues',\n  },\n  {\n    title: 'Scheduled jobs',\n    description: 'Cron health, last run, next run, and failure count.',\n    badge: 'Cron',\n  },\n] as const;\n\nconst healthControls = [\n  {\n    title: 'Incident threshold',\n    description: 'Define when warnings become visible incidents.',\n    badge: 'Threshold',\n  },\n  {\n    title: 'Retry failed jobs',\n    description: 'Run safe retries for failed background work.',\n    badge: 'Retry',\n  },\n  {\n    title: 'Notify maintainers',\n    description: 'Send alerts through the configured notification provider.',\n    badge: 'Notify',\n  },\n] as const;\n\n/**\n * Render a source-backed system health page recipe.\n *\n * @returns A system health page for services, queues, jobs, and errors.\n * @example\n * const element = <SystemHealthPage />;\n */\nexport const SystemHealthPage = () => {\n  // TODO: Load service health, queue depth, and job status from the configured observability source.\n  // TODO: Send health actions through the configured operations actions.\n  return (\n    <DemoQuickWinPage\n      active=\"admin\"\n      badge=\"Health\"\n      detailItems={healthControls}\n      detailTitle=\"Operations controls\"\n      listDescription=\"A maintainer-facing page for services, queues, cron jobs, and error rates.\"\n      listItems={healthItems}\n      listTitle=\"System health\"\n      metrics={metrics}\n      primaryAction={{ label: 'Refresh health', icon: <RefreshCw className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View incidents',\n        icon: <Signal className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A system health dashboard for services, background queues, scheduled jobs, uptime, and error rates.\"\n      title=\"System health\"\n      transition=\"fade\"\n      variantDescription=\"Health pages need dense service status, queue states, and clear incident thresholds.\"\n      variantItems={healthControls}\n      variantTitle=\"System health variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load service health, queue depth, and job status from the configured observability source.",
+      "Send health actions through the configured operations actions."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "role-permissions",
+    "slug": "role-permissions",
+    "title": "Role permissions page",
+    "summary": "A role and permissions matrix page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/RolePermissionsPage.tsx",
+    "exportName": "RolePermissionsPage",
+    "targetRoute": "/admin/roles",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/switch",
+      "bundui/data-table-02"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Authorization source",
+        "note": "Load roles and permissions from the configured authorization source.",
+        "todo": "Load roles and permissions from the configured authorization source.",
+        "owner": "auth"
+      },
+      {
+        "kind": "service",
+        "label": "Authorization actions",
+        "note": "Save role changes through audited authorization actions.",
+        "todo": "Save role changes through audited authorization actions.",
+        "owner": "auth"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows role matrix, invite policy, owner protection, and permission edit states."
+    ],
+    "sourceCode": "import { LockKeyhole, Save, ShieldCheck, UserCog, UsersRound } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Roles',\n    value: '6',\n    detail: 'Owner to viewer',\n    icon: <UserCog className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Permissions',\n    value: '24',\n    detail: 'Grouped by area',\n    icon: <LockKeyhole className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Policies',\n    value: '4',\n    detail: 'Invite defaults',\n    icon: <ShieldCheck className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Members',\n    value: '38',\n    detail: 'Role-assigned',\n    icon: <UsersRound className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst roleItems = [\n  {\n    title: 'Permissions matrix',\n    description: 'Rows for capabilities and columns for roles.',\n    badge: 'Matrix',\n  },\n  {\n    title: 'Role editor',\n    description: 'Rename roles, set defaults, and edit capability groups.',\n    badge: 'Editor',\n  },\n  {\n    title: 'Invite policy',\n    description: 'Control who can invite and which role is default.',\n    badge: 'Policy',\n  },\n] as const;\n\nconst roleControls = [\n  {\n    title: 'Require owner approval',\n    description: 'Escalate risky role changes.',\n    badge: 'Approval',\n  },\n  {\n    title: 'Protect owner role',\n    description: 'Prevent removing the last account owner.',\n    badge: 'Owner',\n  },\n  {\n    title: 'Audit permission edits',\n    description: 'Record every role capability change.',\n    badge: 'Audit',\n  },\n] as const;\n\n/**\n * Render a source-backed role permissions page recipe.\n *\n * @returns A role and permissions matrix page.\n * @example\n * const element = <RolePermissionsPage />;\n */\nexport const RolePermissionsPage = () => {\n  // TODO: Load roles and permissions from the configured authorization source.\n  // TODO: Save role changes through audited authorization actions.\n  return (\n    <DemoQuickWinPage\n      active=\"admin\"\n      badge=\"Roles\"\n      detailItems={roleControls}\n      detailTitle=\"Permission safeguards\"\n      listDescription=\"A permissions matrix for owners, admins, editors, viewers, and custom roles.\"\n      listItems={roleItems}\n      listTitle=\"Role permissions\"\n      metrics={metrics}\n      primaryAction={{ label: 'Save roles', icon: <Save className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Review policy',\n        icon: <ShieldCheck className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A permissions page for role matrices, invite policy, owner protection, and audited authorization changes.\"\n      title=\"Role permissions\"\n      transition=\"slide\"\n      variantDescription=\"Role pages need matrices, policy switches, and strong safeguards around owner access.\"\n      variantItems={roleControls}\n      variantTitle=\"Permission component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load roles and permissions from the configured authorization source.",
+      "Save role changes through audited authorization actions."
+    ],
+    "groupId": "admin",
+    "groupLabel": "Admin",
+    "groupDescription": "Owner, support, billing risk, and audit control-center pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "customers",
+    "slug": "customers",
+    "title": "Customers page",
+    "summary": "A customer list and segmentation page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomersPage.tsx",
+    "exportName": "CustomersPage",
+    "targetRoute": "/customers",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/app-sidebar",
+      "kibo/glimpse"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Customer records",
+        "note": "Load customer records and segments from the configured CRM source.",
+        "todo": "Load customer records and segments from the configured CRM source.",
+        "owner": "crm"
+      },
+      {
+        "kind": "service",
+        "label": "Customer changes",
+        "note": "Save customer owner and segment changes through CRM actions.",
+        "todo": "Save customer owner and segment changes through CRM actions.",
+        "owner": "crm"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows customers, segments, account owners, and export actions."
+    ],
+    "sourceCode": "import { Building2, Download, Search, User, Users } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Customers',\n    value: '842',\n    detail: '+38 this month',\n    icon: <Users className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Accounts',\n    value: '126',\n    detail: 'B2B workspaces',\n    icon: <Building2 className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Owners',\n    value: '12',\n    detail: 'Sales-assigned',\n    icon: <User className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Exports',\n    value: 'CSV',\n    detail: 'CRM ready',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst customerItems = [\n  {\n    title: 'Customer table',\n    description: 'Name, company, plan, owner, health, and lifecycle stage.',\n    badge: 'Table',\n  },\n  {\n    title: 'Saved segments',\n    description: 'Trial, active, at-risk, enterprise, and churned views.',\n    badge: 'Segments',\n  },\n  {\n    title: 'Account owners',\n    description: 'Assign sales, support, or success owner per customer.',\n    badge: 'Owners',\n  },\n] as const;\n\nconst customerControls = [\n  {\n    title: 'Health score',\n    description: 'Show usage, billing, support, and login signals.',\n    badge: 'Health',\n  },\n  {\n    title: 'Bulk export',\n    description: 'Export selected customers to CSV or CRM.',\n    badge: 'Export',\n  },\n  {\n    title: 'Lifecycle stage',\n    description: 'Track lead, trial, active, and expansion states.',\n    badge: 'Stage',\n  },\n] as const;\n\n/**\n * Render a source-backed customers page recipe.\n *\n * @returns A customer list and segmentation page.\n * @example\n * const element = <CustomersPage />;\n */\nexport const CustomersPage = () => {\n  // TODO: Load customer records and segments from the configured CRM source.\n  // TODO: Save customer owner and segment changes through CRM actions.\n  return (\n    <DemoQuickWinPage\n      active=\"customers\"\n      badge=\"Customers\"\n      detailItems={customerControls}\n      detailTitle=\"Customer controls\"\n      listDescription=\"A CRM-style customer index that works for SaaS, ecommerce, and service apps.\"\n      listItems={customerItems}\n      listTitle=\"Customer database\"\n      metrics={metrics}\n      primaryAction={{ label: 'Export customers', icon: <Download className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search customers',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A customer management route with segmentation, account ownership, status badges, and CRM export states.\"\n      title=\"Customers\"\n      transition=\"fade\"\n      variantDescription=\"Customer pages need segmentation, owner assignment, and health-state scanning.\"\n      variantItems={customerControls}\n      variantTitle=\"Customer component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load customer records and segments from the configured CRM source.",
+      "Save customer owner and segment changes through CRM actions."
+    ],
+    "groupId": "crm",
+    "groupLabel": "CRM",
+    "groupDescription": "Customer management, customer detail, and sales pipeline pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "customer-detail",
+    "slug": "customer-detail",
+    "title": "Customer detail page",
+    "summary": "A customer profile page with timeline, notes, and related records.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomerDetailPage.tsx",
+    "exportName": "CustomerDetailPage",
+    "targetRoute": "/customers/example",
+    "suggestedComponents": [
+      "bundui/card-default",
+      "untitled/table/table",
+      "shadcnblocks/contact"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Customer timeline",
+        "note": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+        "todo": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+        "owner": "crm"
+      },
+      {
+        "kind": "service",
+        "label": "Customer notes",
+        "note": "Save customer notes and owner changes through CRM actions.",
+        "todo": "Save customer notes and owner changes through CRM actions.",
+        "owner": "crm"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows timeline, notes, invoices, files, support tickets, and owner controls."
+    ],
+    "sourceCode": "import { CreditCard, FileClock, LifeBuoy, Plus, User } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Health',\n    value: '82',\n    detail: 'Expansion ready',\n    icon: <User className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Invoices',\n    value: '14',\n    detail: 'All paid',\n    icon: <CreditCard className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Tickets',\n    value: '2',\n    detail: 'One waiting',\n    icon: <LifeBuoy className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Timeline',\n    value: '38',\n    detail: 'Recent events',\n    icon: <FileClock className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst detailItems = [\n  {\n    title: 'Customer timeline',\n    description: 'Notes, logins, payments, tickets, and plan changes.',\n    badge: 'Timeline',\n  },\n  {\n    title: 'Account notes',\n    description: 'Pinned internal notes and next actions.',\n    badge: 'Notes',\n  },\n  {\n    title: 'Related records',\n    description: 'Invoices, files, support tickets, and opportunities.',\n    badge: 'Records',\n  },\n] as const;\n\nconst detailControls = [\n  { title: 'Add note', description: 'Capture sales, support, or success context.', badge: 'Note' },\n  {\n    title: 'Escalate support',\n    description: 'Turn customer context into a support follow-up.',\n    badge: 'Support',\n  },\n  {\n    title: 'Update owner',\n    description: 'Assign an account owner with audit trail.',\n    badge: 'Owner',\n  },\n] as const;\n\n/**\n * Render a source-backed customer detail page recipe.\n *\n * @returns A customer profile page with timeline, notes, and related records.\n * @example\n * const element = <CustomerDetailPage />;\n */\nexport const CustomerDetailPage = () => {\n  // TODO: Load customer timeline, notes, invoices, and support records from the configured CRM source.\n  // TODO: Save customer notes and owner changes through CRM actions.\n  return (\n    <DemoQuickWinPage\n      active=\"customers\"\n      badge=\"Customer\"\n      detailItems={detailControls}\n      detailTitle=\"Customer actions\"\n      listDescription=\"A detail view that unifies account context, support, billing, and activity.\"\n      listItems={detailItems}\n      listTitle=\"Customer profile\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add note', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Open support',\n        icon: <LifeBuoy className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A customer detail page with timeline, notes, invoices, support tickets, files, and owner controls.\"\n      title=\"Customer detail\"\n      transition=\"scale\"\n      variantDescription=\"Customer detail pages need timeline density, cross-domain records, and clear account actions.\"\n      variantItems={detailControls}\n      variantTitle=\"Customer detail variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+      "Save customer notes and owner changes through CRM actions."
+    ],
+    "groupId": "crm",
+    "groupLabel": "CRM",
+    "groupDescription": "Customer management, customer detail, and sales pipeline pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "pipeline",
+    "slug": "pipeline",
+    "title": "Pipeline page",
+    "summary": "A CRM pipeline board page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/PipelinePage.tsx",
+    "exportName": "PipelinePage",
+    "targetRoute": "/pipeline",
+    "suggestedComponents": [
+      "kokonutui/bento-grid",
+      "bundui/card-default",
+      "magicui/marquee"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Pipeline data",
+        "note": "Load pipeline stages and opportunities from the configured CRM source.",
+        "todo": "Load pipeline stages and opportunities from the configured CRM source.",
+        "owner": "crm"
+      },
+      {
+        "kind": "service",
+        "label": "Pipeline actions",
+        "note": "Save opportunity stage changes through CRM actions.",
+        "todo": "Save opportunity stage changes through CRM actions.",
+        "owner": "crm"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows pipeline stages, opportunity cards, owners, values, and due dates."
+    ],
+    "sourceCode": "import { Columns3, Filter, Plus, RefreshCw, Users } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Deals',\n    value: '37',\n    detail: 'Across stages',\n    icon: <Columns3 className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Value',\n    value: '$82k',\n    detail: 'Open pipeline',\n    icon: <Users className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Stalled',\n    value: '6',\n    detail: 'Needs action',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Stages',\n    value: '5',\n    detail: 'Lead to won',\n    icon: <Filter className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst pipelineItems = [\n  {\n    title: 'Kanban board',\n    description: 'Lead, qualified, proposal, won, and lost columns.',\n    badge: 'Board',\n  },\n  {\n    title: 'Opportunity cards',\n    description: 'Company, value, owner, next step, and due date.',\n    badge: 'Cards',\n  },\n  {\n    title: 'Stage filters',\n    description: 'Owner, priority, expected close, and source filters.',\n    badge: 'Filters',\n  },\n] as const;\n\nconst pipelineControls = [\n  { title: 'Move deal', description: 'Drag or action-move cards between stages.', badge: 'Move' },\n  {\n    title: 'Set next step',\n    description: 'Attach a task or meeting to each opportunity.',\n    badge: 'Next',\n  },\n  {\n    title: 'Mark lost reason',\n    description: 'Capture reason codes before closing a deal.',\n    badge: 'Reason',\n  },\n] as const;\n\n/**\n * Render a source-backed pipeline page recipe.\n *\n * @returns A CRM pipeline board page.\n * @example\n * const element = <PipelinePage />;\n */\nexport const PipelinePage = () => {\n  // TODO: Load pipeline stages and opportunities from the configured CRM source.\n  // TODO: Save opportunity stage changes through CRM actions.\n  return (\n    <DemoQuickWinPage\n      active=\"pipeline\"\n      badge=\"Pipeline\"\n      detailItems={pipelineControls}\n      detailTitle=\"Pipeline controls\"\n      listDescription=\"A generic CRM kanban workflow for leads, sales, recruiting, or project stages.\"\n      listItems={pipelineItems}\n      listTitle=\"Pipeline board\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add deal', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Filter board',\n        icon: <Filter className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A pipeline board with stage columns, opportunity cards, owners, values, due dates, and next steps.\"\n      title=\"Pipeline\"\n      transition=\"slide\"\n      variantDescription=\"Pipeline pages need column scanning, card density, and action-ready deal states.\"\n      variantItems={pipelineControls}\n      variantTitle=\"Pipeline component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load pipeline stages and opportunities from the configured CRM source.",
+      "Save opportunity stage changes through CRM actions."
+    ],
+    "groupId": "crm",
+    "groupLabel": "CRM",
+    "groupDescription": "Customer management, customer detail, and sales pipeline pages.",
+    "providerPointers": []
+  },
+  {
     "id": "ai-assistant",
     "slug": "ai-assistant",
     "title": "AI assistant page",
     "summary": "A chat workspace for AI conversations and knowledge retrieval.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/aiAssistantPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/AiAssistantPage.tsx",
     "exportName": "AiAssistantPage",
     "targetRoute": "/assistant",
     "suggestedComponents": [
@@ -448,7 +1425,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page renders a chat surface without calling an AI provider."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Bot, Sparkles } from 'lucide-react';\n\n/**\n * Render a source-backed AI assistant page recipe.\n *\n * @returns A ready AI assistant page component for chat or smart replies.\n * @example\n * const element = <AiAssistantPage />;\n */\nexport const AiAssistantPage = () => {\n  // TODO: Connect messages to the configured AI provider and conversation table.\n  // TODO: Connect retrieval to the embeddings preset when knowledge search is enabled.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto grid max-w-6xl gap-5 lg:grid-cols-[320px_1fr]\">\n        <aside className=\"rounded-lg border bg-card p-5\">\n          <Badge className=\"mb-4\" variant=\"secondary\">\n            AI\n          </Badge>\n          <h1 className=\"font-bold text-3xl tracking-tight\">Assistant workspace</h1>\n          <p className=\"mt-2 text-muted-foreground text-sm\">\n            A starter chat surface for support, onboarding, or internal operators.\n          </p>\n          <div className=\"mt-6 rounded-lg border p-3\">\n            <Sparkles className=\"mb-2 h-4 w-4 text-amber-600\" />\n            <p className=\"font-medium text-sm\">Knowledge search ready</p>\n            <p className=\"text-muted-foreground text-sm\">Wire embeddings before using live data.</p>\n          </div>\n        </aside>\n        <div className=\"flex min-h-[520px] flex-col rounded-lg border bg-card\">\n          <div className=\"border-b p-4\">\n            <div className=\"flex items-center gap-2\">\n              <Bot className=\"h-5 w-5 text-blue-600\" />\n              <h2 className=\"font-semibold\">AI assistant</h2>\n            </div>\n          </div>\n          <div className=\"flex-1 space-y-3 p-4\">\n            <div className=\"max-w-[80%] rounded-lg bg-muted p-3 text-sm\">\n              Ask about a workflow, support case, or app setup step.\n            </div>\n            <div className=\"ml-auto max-w-[80%] rounded-lg bg-primary p-3 text-primary-foreground text-sm\">\n              Draft a launch checklist for my product.\n            </div>\n          </div>\n          <div className=\"flex gap-2 border-t p-4\">\n            <Input defaultValue=\"What should I do next?\" />\n            <Button type=\"button\">Send</Button>\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Bot, FileUp, Paperclip, Send, Sparkles, WandSparkles } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\nimport { DemoAppShell } from './shared/DemoAppShell';\nimport { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';\nimport { DemoTransitionStage } from './shared/DemoTransitionStage';\nimport { DemoVariantCard, DemoVariantGrid } from './shared/DemoVariantGrid';\n\nconst sampleAttachments = ['requirements.pdf', 'pricing-notes.md'];\n\n/**\n * Render a source-backed AI assistant page recipe.\n *\n * @returns A ready AI assistant page component for chat or smart replies.\n * @example\n * const element = <AiAssistantPage />;\n */\nexport const AiAssistantPage = () => {\n  // TODO: Connect messages to the configured AI provider and conversation table.\n  // TODO: Connect retrieval to the embeddings preset when knowledge search is enabled.\n  return (\n    <DemoThemeRandomizer>\n      <DemoTransitionStage defaultTransition=\"fade\" title=\"AI workspace motion pass\">\n        <DemoAppShell active=\"dashboard\" title=\"Assistant workspace\">\n          <section className=\"grid gap-5 xl:grid-cols-[320px_1fr]\">\n            <aside className=\"rounded-lg border bg-card p-5\">\n              <Badge className=\"mb-4\" variant=\"secondary\">\n                AI\n              </Badge>\n              <h2 className=\"font-bold text-3xl tracking-tight\">Assistant workspace</h2>\n              <p className=\"mt-2 text-muted-foreground text-sm\">\n                A starter chat surface for support, onboarding, or internal operators.\n              </p>\n              <div className=\"mt-6 rounded-lg border p-3\">\n                <Sparkles className=\"mb-2 h-4 w-4 text-amber-600\" />\n                <p className=\"font-medium text-sm\">Knowledge search ready</p>\n                <p className=\"text-muted-foreground text-sm\">\n                  Wire embeddings before using live data.\n                </p>\n              </div>\n              <div className=\"mt-3 rounded-lg border p-3\">\n                <FileUp className=\"mb-2 h-4 w-4 text-primary\" />\n                <p className=\"font-medium text-sm\">File uploads</p>\n                <p className=\"text-muted-foreground text-sm\">\n                  Attach PDFs, images, and notes before sending a prompt.\n                </p>\n              </div>\n            </aside>\n            <div className=\"flex min-h-[560px] flex-col rounded-lg border bg-card\">\n              <div className=\"border-b p-4\">\n                <div className=\"flex items-center gap-2\">\n                  <Bot className=\"h-5 w-5 text-blue-600\" />\n                  <h2 className=\"font-semibold\">AI assistant</h2>\n                </div>\n              </div>\n              <div className=\"flex-1 space-y-3 p-4\">\n                <div className=\"max-w-[80%] rounded-lg bg-muted p-3 text-sm\">\n                  Ask about a workflow, support case, or app setup step.\n                </div>\n                <div className=\"ml-auto max-w-[80%] rounded-lg bg-primary p-3 text-primary-foreground text-sm\">\n                  Draft a launch checklist for my product.\n                </div>\n                <div className=\"grid gap-2 sm:grid-cols-2\">\n                  {sampleAttachments.map((file) => (\n                    <div className=\"flex items-center gap-2 rounded-lg border p-3 text-sm\" key={file}>\n                      <Paperclip className=\"h-4 w-4 text-muted-foreground\" />\n                      <span className=\"truncate\">{file}</span>\n                    </div>\n                  ))}\n                </div>\n              </div>\n              <div className=\"space-y-3 border-t p-4\">\n                <label className=\"flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 p-3 text-muted-foreground text-sm hover:bg-muted\">\n                  <Paperclip className=\"h-4 w-4\" />\n                  Attach files\n                  <Input className=\"sr-only\" multiple={true} type=\"file\" />\n                </label>\n                <div className=\"flex gap-2\">\n                  <Input defaultValue=\"What should I do next?\" />\n                  <DemoActionButton icon={<Send className=\"h-4 w-4\" />}>Send</DemoActionButton>\n                </div>\n              </div>\n            </div>\n          </section>\n\n          <DemoVariantGrid\n            className=\"mt-6\"\n            description=\"Compare assistant states, file attachments, and prompt actions.\"\n            title=\"AI component variants\"\n          >\n            <DemoVariantCard label=\"Prompt action\" tone=\"primary\">\n              <WandSparkles className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-semibold\">Generate next steps</p>\n              <p className=\"text-muted-foreground text-sm\">Strong action with icon-first button.</p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Attachment\" tone=\"muted\">\n              <Paperclip className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium text-sm\">requirements.pdf</p>\n              <p className=\"text-muted-foreground text-xs\">Small metadata row.</p>\n            </DemoVariantCard>\n            <DemoVariantCard label=\"Assistant reply\" tone=\"accent\">\n              <Bot className=\"mb-2 h-5 w-5 text-primary\" />\n              <p className=\"font-medium\">I found 3 launch blockers.</p>\n              <p className=\"text-muted-foreground text-sm\">Bubble style under palette stress.</p>\n            </DemoVariantCard>\n          </DemoVariantGrid>\n        </DemoAppShell>\n      </DemoTransitionStage>\n    </DemoThemeRandomizer>\n  );\n};\n",
     "todos": [
       "Connect messages to the configured AI provider and conversation table.",
       "Connect retrieval to the embeddings preset when knowledge search is enabled."
@@ -463,7 +1440,7 @@ export const PAGE_RECIPES = [
     "slug": "search",
     "title": "Search page",
     "summary": "A search page for indexed app records.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/searchPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/SearchPage.tsx",
     "exportName": "SearchPage",
     "targetRoute": "/search",
     "suggestedComponents": [
@@ -489,7 +1466,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows a search box and safe default result labels."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Search } from 'lucide-react';\n\n/**\n * Render a source-backed search page recipe.\n *\n * @returns A ready search page component for indexed app content.\n * @example\n * const element = <SearchPage />;\n */\nexport const SearchPage = () => {\n  // TODO: Connect the search input to the configured search provider.\n  // TODO: Replace default result labels with records from the search index.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Search\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Find anything in your app</h1>\n        <div className=\"mt-6 flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row\">\n          <div className=\"relative flex-1\">\n            <Search className=\"absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground\" />\n            <Input className=\"pl-9\" defaultValue=\"orders this week\" />\n          </div>\n          <Button type=\"button\">Search</Button>\n        </div>\n        <div className=\"mt-6 grid gap-3\">\n          {['Best match', 'Recent update', 'Saved item'].map((label) => (\n            <article className=\"rounded-lg border bg-card p-4\" key={label}>\n              <p className=\"font-medium\">{label}</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Default result row. Connect this to indexed records before launch.\n              </p>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Search } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed search page recipe.\n *\n * @returns A ready search page component for indexed app content.\n * @example\n * const element = <SearchPage />;\n */\nexport const SearchPage = () => {\n  // TODO: Connect the search input to the configured search provider.\n  // TODO: Replace default result labels with records from the search index.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Search\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Find anything in your app</h1>\n        <div className=\"mt-6 flex flex-col gap-2 rounded-lg border bg-card p-3 sm:flex-row\">\n          <div className=\"relative flex-1\">\n            <Search className=\"absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground\" />\n            <Input className=\"pl-9\" defaultValue=\"orders this week\" />\n          </div>\n          <DemoActionButton icon={<Search className=\"h-4 w-4\" />}>Search</DemoActionButton>\n        </div>\n        <div className=\"mt-6 grid gap-3\">\n          {['Best match', 'Recent update', 'Saved item'].map((label) => (\n            <article className=\"rounded-lg border bg-card p-4\" key={label}>\n              <p className=\"font-medium\">{label}</p>\n              <p className=\"mt-1 text-muted-foreground text-sm\">\n                Default result row. Connect this to indexed records before launch.\n              </p>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Connect the search input to the configured search provider.",
       "Replace default result labels with records from the search index."
@@ -504,7 +1481,7 @@ export const PAGE_RECIPES = [
     "slug": "realtime",
     "title": "Realtime page",
     "summary": "A live activity page for database updates.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/realtimePage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/RealtimePage.tsx",
     "exportName": "RealtimePage",
     "targetRoute": "/activity",
     "suggestedComponents": [
@@ -530,7 +1507,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page makes live status visible without requiring a socket."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { RadioTower } from 'lucide-react';\n\n/**\n * Render a source-backed realtime page recipe.\n *\n * @returns A ready live activity page component.\n * @example\n * const element = <RealtimePage />;\n */\nexport const RealtimePage = () => {\n  // TODO: Subscribe to the configured realtime publication.\n  // TODO: Replace default activity labels with live events from the database.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Realtime\n        </Badge>\n        <div className=\"flex flex-col justify-between gap-4 sm:flex-row sm:items-start\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Live activity</h1>\n            <p className=\"mt-2 max-w-2xl text-muted-foreground\">\n              A starter page for updates that appear without refreshing the browser.\n            </p>\n          </div>\n          <Button type=\"button\" variant=\"outline\">\n            Refresh channel\n          </Button>\n        </div>\n        <div className=\"mt-6 space-y-3\">\n          {['Connected', 'Listening for updates', 'Ready for first event'].map((label) => (\n            <div className=\"flex items-center gap-3 rounded-lg border p-3\" key={label}>\n              <RadioTower className=\"h-4 w-4 text-emerald-600\" />\n              <span className=\"font-medium text-sm\">{label}</span>\n            </div>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { RadioTower, RefreshCcw } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed realtime page recipe.\n *\n * @returns A ready live activity page component.\n * @example\n * const element = <RealtimePage />;\n */\nexport const RealtimePage = () => {\n  // TODO: Subscribe to the configured realtime publication.\n  // TODO: Replace default activity labels with live events from the database.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Realtime\n        </Badge>\n        <div className=\"flex flex-col justify-between gap-4 sm:flex-row sm:items-start\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Live activity</h1>\n            <p className=\"mt-2 max-w-2xl text-muted-foreground\">\n              A starter page for updates that appear without refreshing the browser.\n            </p>\n          </div>\n          <DemoActionButton icon={<RefreshCcw className=\"h-4 w-4\" />} variant=\"outline\">\n            Refresh channel\n          </DemoActionButton>\n        </div>\n        <div className=\"mt-6 space-y-3\">\n          {['Connected', 'Listening for updates', 'Ready for first event'].map((label) => (\n            <div className=\"flex items-center gap-3 rounded-lg border p-3\" key={label}>\n              <RadioTower className=\"h-4 w-4 text-emerald-600\" />\n              <span className=\"font-medium text-sm\">{label}</span>\n            </div>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Subscribe to the configured realtime publication.",
       "Replace default activity labels with live events from the database."
@@ -541,11 +1518,95 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "tasks",
+    "slug": "tasks",
+    "title": "Tasks page",
+    "summary": "A task list page with priority and assignment controls.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/TasksPage.tsx",
+    "exportName": "TasksPage",
+    "targetRoute": "/tasks",
+    "suggestedComponents": [
+      "untitled/table/table",
+      "bundui/badge-indicator",
+      "bundui/input"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Task data",
+        "note": "Load tasks, assignees, and priorities from the configured task source.",
+        "todo": "Load tasks, assignees, and priorities from the configured task source.",
+        "owner": "tasks"
+      },
+      {
+        "kind": "service",
+        "label": "Task actions",
+        "note": "Save task changes through the configured task actions.",
+        "todo": "Save task changes through the configured task actions.",
+        "owner": "tasks"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows task priorities, assignees, due dates, blocked states, and bulk actions."
+    ],
+    "sourceCode": "import { CheckSquare, ClipboardList, Filter, Plus, RefreshCw } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Tasks',\n    value: '42',\n    detail: 'Across projects',\n    icon: <ClipboardList className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Due today',\n    value: '8',\n    detail: 'Needs focus',\n    icon: <CheckSquare className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Blocked',\n    value: '3',\n    detail: 'Waiting on owner',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'rose',\n  },\n  {\n    label: 'Completed',\n    value: '64%',\n    detail: 'This week',\n    icon: <Filter className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n] as const;\n\nconst taskItems = [\n  {\n    title: 'Task list',\n    description: 'Title, priority, assignee, due date, and status.',\n    badge: 'List',\n  },\n  {\n    title: 'Priority lanes',\n    description: 'Today, upcoming, blocked, and done sections.',\n    badge: 'Priority',\n  },\n  {\n    title: 'Assignment states',\n    description: 'Owner avatars, unassigned state, and handoff copy.',\n    badge: 'Owner',\n  },\n] as const;\n\nconst taskControls = [\n  {\n    title: 'Create task',\n    description: 'Quick add with title, owner, due date, and priority.',\n    badge: 'Create',\n  },\n  {\n    title: 'Bulk complete',\n    description: 'Mark selected tasks complete with loading state.',\n    badge: 'Bulk',\n  },\n  { title: 'Filter by owner', description: 'Personal and team task views.', badge: 'Filter' },\n] as const;\n\n/**\n * Render a source-backed tasks page recipe.\n *\n * @returns A task list page with priority and assignment controls.\n * @example\n * const element = <TasksPage />;\n */\nexport const TasksPage = () => {\n  // TODO: Load tasks, assignees, and priorities from the configured task source.\n  // TODO: Save task changes through the configured task actions.\n  return (\n    <DemoQuickWinPage\n      active=\"tasks\"\n      badge=\"Tasks\"\n      detailItems={taskControls}\n      detailTitle=\"Task controls\"\n      listDescription=\"A productivity route for internal apps, SaaS dashboards, and project tools.\"\n      listItems={taskItems}\n      listTitle=\"Task workspace\"\n      metrics={metrics}\n      primaryAction={{ label: 'Add task', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Filter tasks',\n        icon: <Filter className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A task management page with priorities, assignees, due dates, blocked states, and bulk actions.\"\n      title=\"Tasks\"\n      transition=\"fade\"\n      variantDescription=\"Task pages need dense rows, priority indicators, and quick owner/date controls.\"\n      variantItems={taskControls}\n      variantTitle=\"Task component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load tasks, assignees, and priorities from the configured task source.",
+      "Save task changes through the configured task actions."
+    ],
+    "groupId": "productivity",
+    "groupLabel": "Productivity",
+    "groupDescription": "Tasks and calendar pages for work management.",
+    "providerPointers": []
+  },
+  {
+    "id": "calendar",
+    "slug": "calendar",
+    "title": "Calendar page",
+    "summary": "A calendar and booking page with event controls.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/CalendarPage.tsx",
+    "exportName": "CalendarPage",
+    "targetRoute": "/calendar",
+    "suggestedComponents": [
+      "bundui/calendar",
+      "bundui/card-default",
+      "kibo/glimpse"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Calendar data",
+        "note": "Load events, bookings, and reminders from the configured calendar source.",
+        "todo": "Load events, bookings, and reminders from the configured calendar source.",
+        "owner": "calendar"
+      },
+      {
+        "kind": "service",
+        "label": "Calendar actions",
+        "note": "Save calendar changes through the configured calendar actions.",
+        "todo": "Save calendar changes through the configured calendar actions.",
+        "owner": "calendar"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows events, booking slots, reminders, conflicts, and sync states."
+    ],
+    "sourceCode": "import { CalendarDays, Eye, Plus, RefreshCw, UsersRound } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Events',\n    value: '18',\n    detail: 'This week',\n    icon: <CalendarDays className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Bookings',\n    value: '6',\n    detail: 'Pending confirm',\n    icon: <UsersRound className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Reminders',\n    value: '9',\n    detail: 'Scheduled',\n    icon: <RefreshCw className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Conflicts',\n    value: '1',\n    detail: 'Needs action',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst calendarItems = [\n  {\n    title: 'Calendar grid',\n    description: 'Month, week, day, and agenda-friendly event cards.',\n    badge: 'Grid',\n  },\n  {\n    title: 'Booking slots',\n    description: 'Availability, timezone, and confirmation states.',\n    badge: 'Booking',\n  },\n  {\n    title: 'Reminders',\n    description: 'Email, push, and in-app reminder preferences.',\n    badge: 'Alerts',\n  },\n] as const;\n\nconst calendarControls = [\n  {\n    title: 'Create event',\n    description: 'Title, time, guests, location, and notes.',\n    badge: 'Create',\n  },\n  {\n    title: 'Reschedule booking',\n    description: 'Move events while preserving reminders.',\n    badge: 'Move',\n  },\n  {\n    title: 'Sync calendars',\n    description: 'Show external calendar sync and error states.',\n    badge: 'Sync',\n  },\n] as const;\n\n/**\n * Render a source-backed calendar page recipe.\n *\n * @returns A calendar and booking page with event controls.\n * @example\n * const element = <CalendarPage />;\n */\nexport const CalendarPage = () => {\n  // TODO: Load events, bookings, and reminders from the configured calendar source.\n  // TODO: Save calendar changes through the configured calendar actions.\n  return (\n    <DemoQuickWinPage\n      active=\"calendar\"\n      badge=\"Calendar\"\n      detailItems={calendarControls}\n      detailTitle=\"Calendar controls\"\n      listDescription=\"Scheduling route for bookings, reminders, team calendars, and event-heavy apps.\"\n      listItems={calendarItems}\n      listTitle=\"Calendar workspace\"\n      metrics={metrics}\n      primaryAction={{ label: 'Create event', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View agenda',\n        icon: <CalendarDays className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A calendar page with event lists, booking slots, reminders, conflicts, and external sync states.\"\n      title=\"Calendar\"\n      transition=\"scale\"\n      variantDescription=\"Calendar pages need clear dates, event density, booking states, and timezone-aware copy.\"\n      variantItems={calendarControls}\n      variantTitle=\"Calendar component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load events, bookings, and reminders from the configured calendar source.",
+      "Save calendar changes through the configured calendar actions."
+    ],
+    "groupId": "productivity",
+    "groupLabel": "Productivity",
+    "groupDescription": "Tasks and calendar pages for work management.",
+    "providerPointers": []
+  },
+  {
     "id": "blog",
     "slug": "blog",
     "title": "Blog page",
     "summary": "An article index page for posts, changelogs, and product stories.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/blogPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/BlogPage.tsx",
     "exportName": "BlogPage",
     "targetRoute": "/blog",
     "suggestedComponents": [
@@ -571,7 +1632,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows article cards before content wiring."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { ArrowRight } from 'lucide-react';\n\n/**\n * Render a source-backed blog page recipe.\n *\n * @returns A ready article index page component.\n * @example\n * const element = <BlogPage />;\n */\nexport const BlogPage = () => {\n  // TODO: Load published posts from the configured CMS or markdown content source.\n  // TODO: Connect article cards to real blog routes.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Blog\n        </Badge>\n        <div className=\"flex flex-col justify-between gap-4 md:flex-row md:items-end\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Latest updates</h1>\n            <p className=\"mt-2 max-w-2xl text-muted-foreground\">\n              A starter publishing page for articles, changelogs, or product stories.\n            </p>\n          </div>\n          <Button type=\"button\" variant=\"outline\">\n            New article\n          </Button>\n        </div>\n        <div className=\"mt-8 grid gap-4 md:grid-cols-3\">\n          {['Launch note', 'Product story', 'Customer guide'].map((title) => (\n            <article className=\"rounded-lg border bg-card p-5\" key={title}>\n              <p className=\"text-muted-foreground text-sm\">Default article</p>\n              <h2 className=\"mt-2 font-semibold text-xl\">{title}</h2>\n              <p className=\"mt-3 text-muted-foreground text-sm\">\n                Replace this card with content from your publishing source.\n              </p>\n              <Button className=\"mt-4 px-0\" type=\"button\" variant=\"link\">\n                Read more\n                <ArrowRight className=\"h-4 w-4\" />\n              </Button>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { ArrowRight, PenLine } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed blog page recipe.\n *\n * @returns A ready article index page component.\n * @example\n * const element = <BlogPage />;\n */\nexport const BlogPage = () => {\n  // TODO: Load published posts from the configured CMS or markdown content source.\n  // TODO: Connect article cards to real blog routes.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Blog\n        </Badge>\n        <div className=\"flex flex-col justify-between gap-4 md:flex-row md:items-end\">\n          <div>\n            <h1 className=\"font-bold text-4xl tracking-tight\">Latest updates</h1>\n            <p className=\"mt-2 max-w-2xl text-muted-foreground\">\n              A starter publishing page for articles, changelogs, or product stories.\n            </p>\n          </div>\n          <DemoActionButton icon={<PenLine className=\"h-4 w-4\" />} variant=\"outline\">\n            New article\n          </DemoActionButton>\n        </div>\n        <div className=\"mt-8 grid gap-4 md:grid-cols-3\">\n          {['Launch note', 'Product story', 'Customer guide'].map((title) => (\n            <article className=\"rounded-lg border bg-card p-5\" key={title}>\n              <p className=\"text-muted-foreground text-sm\">Default article</p>\n              <h2 className=\"mt-2 font-semibold text-xl\">{title}</h2>\n              <p className=\"mt-3 text-muted-foreground text-sm\">\n                Replace this card with content from your publishing source.\n              </p>\n              <DemoActionButton\n                className=\"mt-4 px-0\"\n                icon={<ArrowRight className=\"h-4 w-4\" />}\n                variant=\"link\"\n              >\n                Read more\n              </DemoActionButton>\n            </article>\n          ))}\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Load published posts from the configured CMS or markdown content source.",
       "Connect article cards to real blog routes."
@@ -582,11 +1643,179 @@ export const PAGE_RECIPES = [
     "providerPointers": []
   },
   {
+    "id": "media-gallery",
+    "slug": "media-gallery",
+    "title": "Media gallery page",
+    "summary": "A media asset gallery and upload page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/MediaGalleryPage.tsx",
+    "exportName": "MediaGalleryPage",
+    "targetRoute": "/media",
+    "suggestedComponents": [
+      "kokonutui/file-upload",
+      "magicui/marquee",
+      "bundui/card-default"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Media assets",
+        "note": "Load media assets and metadata from the configured asset source.",
+        "todo": "Load media assets and metadata from the configured asset source.",
+        "owner": "assets"
+      },
+      {
+        "kind": "service",
+        "label": "Media changes",
+        "note": "Save media uploads and metadata changes through asset actions.",
+        "todo": "Save media uploads and metadata changes through asset actions.",
+        "owner": "assets"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows asset cards, upload queue, preview panel, tags, and accessibility checks."
+    ],
+    "sourceCode": "import { Download, Eye, Image, Plus, Search } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Assets',\n    value: '128',\n    detail: 'Images and files',\n    icon: <Image className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Storage',\n    value: '2.4GB',\n    detail: '68% used',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Uploads',\n    value: '14',\n    detail: 'This week',\n    icon: <Plus className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Needs alt',\n    value: '9',\n    detail: 'Accessibility',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n] as const;\n\nconst mediaItems = [\n  {\n    title: 'Asset grid',\n    description: 'Image cards, file cards, preview, tags, and metadata.',\n    badge: 'Grid',\n  },\n  {\n    title: 'Upload queue',\n    description: 'Progress, retry, validation, and file-type states.',\n    badge: 'Upload',\n  },\n  {\n    title: 'Preview panel',\n    description: 'Selected media preview, dimensions, and usage info.',\n    badge: 'Preview',\n  },\n] as const;\n\nconst mediaControls = [\n  {\n    title: 'Generate thumbnails',\n    description: 'Show optimized previews and fallback states.',\n    badge: 'Thumbs',\n  },\n  {\n    title: 'Tag assets',\n    description: 'Organize media by product, campaign, or page.',\n    badge: 'Tags',\n  },\n  {\n    title: 'Check accessibility',\n    description: 'Surface missing alt text and oversized assets.',\n    badge: 'A11y',\n  },\n] as const;\n\n/**\n * Render a source-backed media gallery page recipe.\n *\n * @returns A media asset gallery and upload page.\n * @example\n * const element = <MediaGalleryPage />;\n */\nexport const MediaGalleryPage = () => {\n  // TODO: Load media assets and metadata from the configured asset source.\n  // TODO: Save media uploads and metadata changes through asset actions.\n  return (\n    <DemoQuickWinPage\n      active=\"files\"\n      badge=\"Media\"\n      detailItems={mediaControls}\n      detailTitle=\"Media controls\"\n      listDescription=\"A visual file-management route for galleries, uploads, previews, and metadata.\"\n      listItems={mediaItems}\n      listTitle=\"Media gallery\"\n      metrics={metrics}\n      primaryAction={{ label: 'Upload media', icon: <Plus className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search media',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A media gallery with asset cards, upload queue, preview panel, tags, thumbnails, and accessibility checks.\"\n      title=\"Media gallery\"\n      transition=\"slide\"\n      variantDescription=\"Media pages need visual cards, metadata density, and upload progress states.\"\n      variantItems={mediaControls}\n      variantTitle=\"Media component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load media assets and metadata from the configured asset source.",
+      "Save media uploads and metadata changes through asset actions."
+    ],
+    "groupId": "content-platform",
+    "groupLabel": "Content Platform",
+    "groupDescription": "Docs, media gallery, status, and changelog pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "docs",
+    "slug": "docs",
+    "title": "Docs page",
+    "summary": "A help documentation page with sidebar and article view.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/DocsPage.tsx",
+    "exportName": "DocsPage",
+    "targetRoute": "/docs",
+    "suggestedComponents": [
+      "tailark/blog-section",
+      "kibo/glimpse",
+      "bundui/app-sidebar"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Docs content",
+        "note": "Load documentation collections and articles from the configured content source.",
+        "todo": "Load documentation collections and articles from the configured content source.",
+        "owner": "cms"
+      },
+      {
+        "kind": "service",
+        "label": "Docs feedback",
+        "note": "Save documentation feedback through the configured feedback action.",
+        "todo": "Save documentation feedback through the configured feedback action.",
+        "owner": "cms"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows docs sidebar, article view, search, feedback, and stale-doc states."
+    ],
+    "sourceCode": "import { BookOpen, Eye, Search, Send, UsersRound } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Articles',\n    value: '64',\n    detail: 'Across collections',\n    icon: <BookOpen className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Searches',\n    value: '1.8k',\n    detail: 'This month',\n    icon: <Search className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Helpful',\n    value: '91%',\n    detail: 'Feedback score',\n    icon: <Eye className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Authors',\n    value: '5',\n    detail: 'Can edit docs',\n    icon: <UsersRound className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst docsItems = [\n  {\n    title: 'Docs sidebar',\n    description: 'Collections, articles, anchors, and active section.',\n    badge: 'Sidebar',\n  },\n  {\n    title: 'Article view',\n    description: 'Title, content blocks, callouts, and feedback controls.',\n    badge: 'Article',\n  },\n  {\n    title: 'Search results',\n    description: 'Query, empty state, highlighted terms, and popular docs.',\n    badge: 'Search',\n  },\n] as const;\n\nconst docsControls = [\n  {\n    title: 'Collect feedback',\n    description: 'Ask whether the article solved the problem.',\n    badge: 'Feedback',\n  },\n  { title: 'Suggest edits', description: 'Let team members propose doc changes.', badge: 'Edits' },\n  {\n    title: 'Track stale docs',\n    description: 'Flag articles that need owner review.',\n    badge: 'Review',\n  },\n] as const;\n\n/**\n * Render a source-backed docs page recipe.\n *\n * @returns A help documentation page with sidebar and article view.\n * @example\n * const element = <DocsPage />;\n */\nexport const DocsPage = () => {\n  // TODO: Load documentation collections and articles from the configured content source.\n  // TODO: Save documentation feedback through the configured feedback action.\n  return (\n    <DemoQuickWinPage\n      active=\"docs\"\n      badge=\"Docs\"\n      detailItems={docsControls}\n      detailTitle=\"Documentation controls\"\n      listDescription=\"A help-docs route that can back support, onboarding, and product education.\"\n      listItems={docsItems}\n      listTitle=\"Documentation\"\n      metrics={metrics}\n      primaryAction={{ label: 'Send feedback', icon: <Send className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'Search docs',\n        icon: <Search className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A documentation page with collection sidebar, article view, search results, feedback, and stale-doc checks.\"\n      title=\"Docs\"\n      transition=\"fade\"\n      variantDescription=\"Docs pages need navigable sidebars, readable articles, and feedback loops.\"\n      variantItems={docsControls}\n      variantTitle=\"Docs component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load documentation collections and articles from the configured content source.",
+      "Save documentation feedback through the configured feedback action."
+    ],
+    "groupId": "content-platform",
+    "groupLabel": "Content Platform",
+    "groupDescription": "Docs, media gallery, status, and changelog pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "status",
+    "slug": "status",
+    "title": "Status page",
+    "summary": "A public service status and incident page.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/StatusPage.tsx",
+    "exportName": "StatusPage",
+    "targetRoute": "/status",
+    "suggestedComponents": [
+      "bundui/badge-indicator",
+      "evilcharts/chart",
+      "bundui/alert-default"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Status source",
+        "note": "Load public service status and incidents from the configured status source.",
+        "todo": "Load public service status and incidents from the configured status source.",
+        "owner": "status"
+      },
+      {
+        "kind": "service",
+        "label": "Status updates",
+        "note": "Publish incident updates through the configured status action.",
+        "todo": "Publish incident updates through the configured status action.",
+        "owner": "status"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows service health, incidents, uptime, subscriptions, and publish states."
+    ],
+    "sourceCode": "import { Activity, Bell, HeartPulse, MonitorCheck, Signal } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Overall',\n    value: 'Operational',\n    detail: 'All systems normal',\n    icon: <MonitorCheck className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Incidents',\n    value: '0',\n    detail: 'Current',\n    icon: <Signal className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Latency',\n    value: '82ms',\n    detail: 'API median',\n    icon: <Activity className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n  {\n    label: 'Subscribers',\n    value: '918',\n    detail: 'Status alerts',\n    icon: <Bell className=\"h-5 w-5\" />,\n    tone: 'slate',\n  },\n] as const;\n\nconst statusItems = [\n  {\n    title: 'Service list',\n    description: 'API, auth, database, storage, email, and jobs.',\n    badge: 'Services',\n  },\n  {\n    title: 'Incident timeline',\n    description: 'Current incidents, historical updates, and resolution notes.',\n    badge: 'Incidents',\n  },\n  {\n    title: 'Subscribe controls',\n    description: 'Email, RSS, webhook, and in-app status notifications.',\n    badge: 'Subscribe',\n  },\n] as const;\n\nconst statusControls = [\n  {\n    title: 'Post update',\n    description: 'Publish incident updates with timestamp and severity.',\n    badge: 'Update',\n  },\n  {\n    title: 'Notify subscribers',\n    description: 'Send incident updates through configured channels.',\n    badge: 'Notify',\n  },\n  {\n    title: 'Show uptime',\n    description: 'Expose rolling uptime without leaking internal details.',\n    badge: 'Uptime',\n  },\n] as const;\n\n/**\n * Render a source-backed status page recipe.\n *\n * @returns A public service status and incident page.\n * @example\n * const element = <StatusPage />;\n */\nexport const StatusPage = () => {\n  // TODO: Load public service status and incidents from the configured status source.\n  // TODO: Publish incident updates through the configured status action.\n  return (\n    <DemoQuickWinPage\n      active=\"status\"\n      badge=\"Status\"\n      detailItems={statusControls}\n      detailTitle=\"Incident controls\"\n      eyebrow=\"Public\"\n      listDescription=\"A public trust page for operational status, incident updates, and subscribers.\"\n      listItems={statusItems}\n      listTitle=\"Service status\"\n      metrics={metrics}\n      primaryAction={{ label: 'Subscribe', icon: <Bell className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View incidents',\n        icon: <HeartPulse className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A public status page with service health, incidents, uptime, subscriptions, and update publishing states.\"\n      title=\"Service status\"\n      transition=\"scale\"\n      variantDescription=\"Status pages need public clarity, operational confidence, and incident history.\"\n      variantItems={statusControls}\n      variantTitle=\"Status component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load public service status and incidents from the configured status source.",
+      "Publish incident updates through the configured status action."
+    ],
+    "groupId": "content-platform",
+    "groupLabel": "Content Platform",
+    "groupDescription": "Docs, media gallery, status, and changelog pages.",
+    "providerPointers": []
+  },
+  {
+    "id": "changelog",
+    "slug": "changelog",
+    "title": "Changelog page",
+    "summary": "A product changelog page with release timeline and subscriptions.",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/ChangelogPage.tsx",
+    "exportName": "ChangelogPage",
+    "targetRoute": "/changelog",
+    "suggestedComponents": [
+      "tailark/blog-section",
+      "bundui/badge-indicator",
+      "magicui/marquee"
+    ],
+    "installNotes": [
+      {
+        "kind": "service",
+        "label": "Changelog content",
+        "note": "Load changelog entries from the configured content source.",
+        "todo": "Load changelog entries from the configured content source.",
+        "owner": "cms"
+      },
+      {
+        "kind": "service",
+        "label": "Changelog publish",
+        "note": "Publish changelog updates through the configured content action.",
+        "todo": "Publish changelog updates through the configured content action.",
+        "owner": "cms"
+      }
+    ],
+    "acceptanceChecks": [
+      "The page shows release entries, timeline, tags, subscriptions, and publish states."
+    ],
+    "sourceCode": "import { Bell, Download, FileClock, Megaphone, Plus } from 'lucide-react';\nimport { DemoQuickWinPage } from './shared/DemoQuickWinPage';\n\nconst metrics = [\n  {\n    label: 'Releases',\n    value: '18',\n    detail: 'This quarter',\n    icon: <Megaphone className=\"h-5 w-5\" />,\n    tone: 'blue',\n  },\n  {\n    label: 'Drafts',\n    value: '3',\n    detail: 'Need review',\n    icon: <Plus className=\"h-5 w-5\" />,\n    tone: 'amber',\n  },\n  {\n    label: 'Subscribers',\n    value: '2.1k',\n    detail: 'Product updates',\n    icon: <Bell className=\"h-5 w-5\" />,\n    tone: 'emerald',\n  },\n  {\n    label: 'Exports',\n    value: 'RSS',\n    detail: 'Feed ready',\n    icon: <Download className=\"h-5 w-5\" />,\n    tone: 'violet',\n  },\n] as const;\n\nconst changelogItems = [\n  {\n    title: 'Release entries',\n    description: 'Feature, fix, improvement, and deprecation posts.',\n    badge: 'Entries',\n  },\n  {\n    title: 'Version timeline',\n    description: 'Grouped releases with dates, tags, and highlights.',\n    badge: 'Timeline',\n  },\n  {\n    title: 'Subscription CTA',\n    description: 'Email, RSS, and in-app update subscriptions.',\n    badge: 'Subscribe',\n  },\n] as const;\n\nconst changelogControls = [\n  {\n    title: 'Publish release',\n    description: 'Move drafts into public changelog entries.',\n    badge: 'Publish',\n  },\n  {\n    title: 'Tag entry type',\n    description: 'Mark feature, fix, improvement, or breaking change.',\n    badge: 'Tags',\n  },\n  {\n    title: 'Notify subscribers',\n    description: 'Send updates only after publish confirmation.',\n    badge: 'Notify',\n  },\n] as const;\n\n/**\n * Render a source-backed changelog page recipe.\n *\n * @returns A product changelog page with release timeline and subscriptions.\n * @example\n * const element = <ChangelogPage />;\n */\nexport const ChangelogPage = () => {\n  // TODO: Load changelog entries from the configured content source.\n  // TODO: Publish changelog updates through the configured content action.\n  return (\n    <DemoQuickWinPage\n      active=\"changelog\"\n      badge=\"Changelog\"\n      detailItems={changelogControls}\n      detailTitle=\"Release controls\"\n      eyebrow=\"Public\"\n      listDescription=\"A public product updates page for feature launches, fixes, and version notes.\"\n      listItems={changelogItems}\n      listTitle=\"Product changelog\"\n      metrics={metrics}\n      primaryAction={{ label: 'Subscribe', icon: <Bell className=\"h-4 w-4\" /> }}\n      secondaryAction={{\n        label: 'View timeline',\n        icon: <FileClock className=\"h-4 w-4\" />,\n        variant: 'outline',\n      }}\n      summary=\"A changelog page with release entries, version timeline, category tags, subscriptions, and publish states.\"\n      title=\"Product changelog\"\n      transition=\"slide\"\n      variantDescription=\"Changelog pages need readable timelines, release tags, and subscription paths.\"\n      variantItems={changelogControls}\n      variantTitle=\"Changelog component variants\"\n    />\n  );\n};\n",
+    "todos": [
+      "Load changelog entries from the configured content source.",
+      "Publish changelog updates through the configured content action."
+    ],
+    "groupId": "content-platform",
+    "groupLabel": "Content Platform",
+    "groupDescription": "Docs, media gallery, status, and changelog pages.",
+    "providerPointers": []
+  },
+  {
     "id": "safety",
     "slug": "safety",
     "title": "Safety page",
     "summary": "A doctor and launch safety checklist page.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/safetyPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/SafetyPage.tsx",
     "exportName": "SafetyPage",
     "targetRoute": "/safety",
     "suggestedComponents": [
@@ -612,7 +1841,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page tells the vibe coder the one thing to fix next."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { ShieldAlert, ShieldCheck } from 'lucide-react';\n\n/**\n * Render a source-backed safety page recipe.\n *\n * @returns A ready safety, hardening, and doctor status page component.\n * @example\n * const element = <SafetyPage />;\n */\nexport const SafetyPage = () => {\n  // TODO: Connect checks to the configured safety scanner and audit log.\n  // TODO: Connect incident rows to the configured error tracking provider.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Safety\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Ready to ship checklist</h1>\n        <div className=\"mt-6 grid gap-4 lg:grid-cols-[1fr_360px]\">\n          <div className=\"space-y-3\">\n            {['Sign-in protected', 'Secrets hidden', 'Error alerts connected'].map((label) => (\n              <div className=\"flex items-center gap-3 rounded-lg border bg-card p-4\" key={label}>\n                <ShieldCheck className=\"h-5 w-5 text-emerald-600\" />\n                <span className=\"font-medium\">{label}</span>\n              </div>\n            ))}\n          </div>\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <ShieldAlert className=\"mb-3 h-5 w-5 text-amber-600\" />\n            <h2 className=\"font-semibold text-xl\">Doctor status</h2>\n            <p className=\"mt-2 text-muted-foreground text-sm\">\n              Use this page to show the one thing that needs attention before launch.\n            </p>\n            <Button className=\"mt-5 w-full\" type=\"button\">\n              Run checks\n            </Button>\n          </aside>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Play, ShieldAlert, ShieldCheck } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed safety page recipe.\n *\n * @returns A ready safety, hardening, and doctor status page component.\n * @example\n * const element = <SafetyPage />;\n */\nexport const SafetyPage = () => {\n  // TODO: Connect checks to the configured safety scanner and audit log.\n  // TODO: Connect incident rows to the configured error tracking provider.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-8 text-foreground\">\n      <section className=\"mx-auto max-w-6xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Safety\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Ready to ship checklist</h1>\n        <div className=\"mt-6 grid gap-4 lg:grid-cols-[1fr_360px]\">\n          <div className=\"space-y-3\">\n            {['Sign-in protected', 'Secrets hidden', 'Error alerts connected'].map((label) => (\n              <div className=\"flex items-center gap-3 rounded-lg border bg-card p-4\" key={label}>\n                <ShieldCheck className=\"h-5 w-5 text-emerald-600\" />\n                <span className=\"font-medium\">{label}</span>\n              </div>\n            ))}\n          </div>\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <ShieldAlert className=\"mb-3 h-5 w-5 text-amber-600\" />\n            <h2 className=\"font-semibold text-xl\">Doctor status</h2>\n            <p className=\"mt-2 text-muted-foreground text-sm\">\n              Use this page to show the one thing that needs attention before launch.\n            </p>\n            <DemoActionButton className=\"mt-5 w-full\" icon={<Play className=\"h-4 w-4\" />}>\n              Run checks\n            </DemoActionButton>\n          </aside>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Connect checks to the configured safety scanner and audit log.",
       "Connect incident rows to the configured error tracking provider."
@@ -627,7 +1856,7 @@ export const PAGE_RECIPES = [
     "slug": "brand-assets",
     "title": "Brand assets page",
     "summary": "A visual setup page for logos, images, colors, and shape.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/brandAssetsPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/BrandAssetsPage.tsx",
     "exportName": "BrandAssetsPage",
     "targetRoute": "/brand",
     "suggestedComponents": [
@@ -653,7 +1882,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page only suggests visual edits for image, color, and shape."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Palette } from 'lucide-react';\n\n/**\n * Render a source-backed brand assets page recipe.\n *\n * @returns A ready image, logo, and color setup page component.\n * @example\n * const element = <BrandAssetsPage />;\n */\nexport const BrandAssetsPage = () => {\n  // TODO: Replace default logo and image slots with uploaded brand assets.\n  // TODO: Save color and shape choices through the design token source.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Brand\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Brand assets</h1>\n        <div className=\"mt-6 grid gap-5 lg:grid-cols-[320px_1fr]\">\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <Palette className=\"mb-4 h-6 w-6 text-rose-600\" />\n            <h2 className=\"font-semibold text-xl\">Visual settings</h2>\n            <div className=\"mt-4 space-y-3\">\n              <Input defaultValue=\"VybeKiit\" />\n              <Input defaultValue=\"#2563eb\" />\n              <Button className=\"w-full\" type=\"button\">\n                Save style\n              </Button>\n            </div>\n          </aside>\n          <div className=\"grid gap-3 sm:grid-cols-3\">\n            {['Logo', 'Hero image', 'App icon'].map((label) => (\n              <div className=\"rounded-lg border bg-card p-5 text-center\" key={label}>\n                <div className=\"mx-auto mb-3 h-16 w-16 rounded-lg bg-muted\" />\n                <p className=\"font-medium\">{label}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Palette, Save } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed brand assets page recipe.\n *\n * @returns A ready image, logo, and color setup page component.\n * @example\n * const element = <BrandAssetsPage />;\n */\nexport const BrandAssetsPage = () => {\n  // TODO: Replace default logo and image slots with uploaded brand assets.\n  // TODO: Save color and shape choices through the design token source.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Brand\n        </Badge>\n        <h1 className=\"font-bold text-4xl tracking-tight\">Brand assets</h1>\n        <div className=\"mt-6 grid gap-5 lg:grid-cols-[320px_1fr]\">\n          <aside className=\"rounded-lg border bg-card p-5\">\n            <Palette className=\"mb-4 h-6 w-6 text-rose-600\" />\n            <h2 className=\"font-semibold text-xl\">Visual settings</h2>\n            <div className=\"mt-4 space-y-3\">\n              <Input defaultValue=\"VybeKiit\" />\n              <Input defaultValue=\"#2563eb\" />\n              <DemoActionButton className=\"w-full\" icon={<Save className=\"h-4 w-4\" />}>\n                Save style\n              </DemoActionButton>\n            </div>\n          </aside>\n          <div className=\"grid gap-3 sm:grid-cols-3\">\n            {['Logo', 'Hero image', 'App icon'].map((label) => (\n              <div className=\"rounded-lg border bg-card p-5 text-center\" key={label}>\n                <div className=\"mx-auto mb-3 h-16 w-16 rounded-lg bg-muted\" />\n                <p className=\"font-medium\">{label}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Replace default logo and image slots with uploaded brand assets.",
       "Save color and shape choices through the design token source."
@@ -668,7 +1897,7 @@ export const PAGE_RECIPES = [
     "slug": "language",
     "title": "Language page",
     "summary": "A translation setup page for locales and visible strings.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/languagePage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/LanguagePage.tsx",
     "exportName": "LanguagePage",
     "targetRoute": "/settings/language",
     "suggestedComponents": [
@@ -694,7 +1923,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page makes language choices visible before translation wiring."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Input } from '@vybekiit/ui/input';\nimport { Languages } from 'lucide-react';\n\n/**\n * Render a source-backed language page recipe.\n *\n * @returns A ready translation management page component.\n * @example\n * const element = <LanguagePage />;\n */\nexport const LanguagePage = () => {\n  // TODO: Connect locale choices to the configured i18n routing source.\n  // TODO: Replace default strings with translated message files.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Languages\n        </Badge>\n        <Languages className=\"mb-4 h-8 w-8 text-blue-600\" />\n        <h1 className=\"font-bold text-4xl tracking-tight\">Translate your app</h1>\n        <div className=\"mt-6 grid gap-4 md:grid-cols-2\">\n          <div className=\"space-y-3\">\n            <Input defaultValue=\"English\" />\n            <Input defaultValue=\"Hebrew\" />\n            <Input defaultValue=\"Spanish\" />\n          </div>\n          <div className=\"rounded-lg border p-4\">\n            <p className=\"font-medium\">Preview phrase</p>\n            <p className=\"mt-2 text-muted-foreground\">Welcome to your dashboard.</p>\n            <Button className=\"mt-4\" type=\"button\">\n              Save translations\n            </Button>\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Input } from '@vybekiit/ui/input';\nimport { Languages, Save } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed language page recipe.\n *\n * @returns A ready translation management page component.\n * @example\n * const element = <LanguagePage />;\n */\nexport const LanguagePage = () => {\n  // TODO: Connect locale choices to the configured i18n routing source.\n  // TODO: Replace default strings with translated message files.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Languages\n        </Badge>\n        <Languages className=\"mb-4 h-8 w-8 text-blue-600\" />\n        <h1 className=\"font-bold text-4xl tracking-tight\">Translate your app</h1>\n        <div className=\"mt-6 grid gap-4 md:grid-cols-2\">\n          <div className=\"space-y-3\">\n            <Input defaultValue=\"English\" />\n            <Input defaultValue=\"Hebrew\" />\n            <Input defaultValue=\"Spanish\" />\n          </div>\n          <div className=\"rounded-lg border p-4\">\n            <p className=\"font-medium\">Preview phrase</p>\n            <p className=\"mt-2 text-muted-foreground\">Welcome to your dashboard.</p>\n            <DemoActionButton className=\"mt-4\" icon={<Save className=\"h-4 w-4\" />}>\n              Save translations\n            </DemoActionButton>\n          </div>\n        </div>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Connect locale choices to the configured i18n routing source.",
       "Replace default strings with translated message files."
@@ -709,7 +1938,7 @@ export const PAGE_RECIPES = [
     "slug": "feature-flags",
     "title": "Feature flags page",
     "summary": "A release control page for turning app features on and off.",
-    "sourcePath": "apps/componentLibrary/src/pageRecipes/featureFlagsPage.tsx",
+    "sourcePath": "apps/componentLibrary/src/pageRecipes/FeatureFlagsPage.tsx",
     "exportName": "FeatureFlagsPage",
     "targetRoute": "/admin/feature-flags",
     "suggestedComponents": [
@@ -735,7 +1964,7 @@ export const PAGE_RECIPES = [
     "acceptanceChecks": [
       "The page shows release switches without hiding the owning config."
     ],
-    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Button } from '@vybekiit/ui/button';\nimport { Switch } from '@vybekiit/ui/switch';\nimport { Flag } from 'lucide-react';\n\n/**\n * Render a source-backed feature flags page recipe.\n *\n * @returns A ready feature flag management page component.\n * @example\n * const element = <FeatureFlagsPage />;\n */\nexport const FeatureFlagsPage = () => {\n  // TODO: Load flags from the configured feature flag source.\n  // TODO: Save flag changes through the feature flags preset.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Feature flags\n        </Badge>\n        <div className=\"flex items-center gap-3\">\n          <Flag className=\"h-7 w-7 text-emerald-600\" />\n          <h1 className=\"font-bold text-4xl tracking-tight\">Control releases</h1>\n        </div>\n        <div className=\"mt-6 space-y-3\">\n          {['New checkout', 'Beta dashboard', 'AI assistant'].map((label, index) => (\n            <div className=\"flex items-center justify-between rounded-lg border p-4\" key={label}>\n              <div>\n                <p className=\"font-medium\">{label}</p>\n                <p className=\"text-muted-foreground text-sm\">Default flag row for setup.</p>\n              </div>\n              <Switch defaultChecked={index === 0} />\n            </div>\n          ))}\n        </div>\n        <Button className=\"mt-6\" type=\"button\">\n          Save flags\n        </Button>\n      </section>\n    </main>\n  );\n};\n",
+    "sourceCode": "import { Badge } from '@vybekiit/ui/badge';\nimport { Switch } from '@vybekiit/ui/switch';\nimport { Flag, Save } from 'lucide-react';\nimport { DemoActionButton } from './shared/DemoActionButton';\n\n/**\n * Render a source-backed feature flags page recipe.\n *\n * @returns A ready feature flag management page component.\n * @example\n * const element = <FeatureFlagsPage />;\n */\nexport const FeatureFlagsPage = () => {\n  // TODO: Load flags from the configured feature flag source.\n  // TODO: Save flag changes through the feature flags preset.\n  return (\n    <main className=\"min-h-screen bg-background px-4 py-10 text-foreground\">\n      <section className=\"mx-auto max-w-5xl rounded-lg border bg-card p-6\">\n        <Badge className=\"mb-4\" variant=\"secondary\">\n          Feature flags\n        </Badge>\n        <div className=\"flex items-center gap-3\">\n          <Flag className=\"h-7 w-7 text-emerald-600\" />\n          <h1 className=\"font-bold text-4xl tracking-tight\">Control releases</h1>\n        </div>\n        <div className=\"mt-6 space-y-3\">\n          {['New checkout', 'Beta dashboard', 'AI assistant'].map((label, index) => (\n            <div className=\"flex items-center justify-between rounded-lg border p-4\" key={label}>\n              <div>\n                <p className=\"font-medium\">{label}</p>\n                <p className=\"text-muted-foreground text-sm\">Default flag row for setup.</p>\n              </div>\n              <Switch defaultChecked={index === 0} />\n            </div>\n          ))}\n        </div>\n        <DemoActionButton className=\"mt-6\" icon={<Save className=\"h-4 w-4\" />}>\n          Save flags\n        </DemoActionButton>\n      </section>\n    </main>\n  );\n};\n",
     "todos": [
       "Load flags from the configured feature flag source.",
       "Save flag changes through the feature flags preset."
@@ -774,6 +2003,15 @@ export const PAGE_RECIPE_GROUPS = [
     "providerPointers": []
   },
   {
+    "id": "dashboard-home",
+    "label": "Dashboard Home",
+    "description": "Signed-in dashboard home and command-center pages.",
+    "order": 25,
+    "presetIds": [],
+    "goalIds": [],
+    "providerPointers": []
+  },
+  {
     "id": "auth",
     "label": "Auth",
     "description": "Account access pages for sign in, sign up, codes, and recovery.",
@@ -789,6 +2027,26 @@ export const PAGE_RECIPE_GROUPS = [
       "setup-sms",
       "sign-in-with-google"
     ],
+    "providerPointers": []
+  },
+  {
+    "id": "legal",
+    "label": "Legal",
+    "description": "Terms, privacy, and OAuth consent policy pages.",
+    "order": 35,
+    "presetIds": [],
+    "goalIds": [
+      "sign-in-with-google"
+    ],
+    "providerPointers": []
+  },
+  {
+    "id": "account-settings",
+    "label": "Account Settings",
+    "description": "User profile, account security, and preference pages.",
+    "order": 37,
+    "presetIds": [],
+    "goalIds": [],
     "providerPointers": []
   },
   {
@@ -809,6 +2067,15 @@ export const PAGE_RECIPE_GROUPS = [
         "note": "Change live prices in the active payment provider dashboard and provider config."
       }
     ]
+  },
+  {
+    "id": "commerce",
+    "label": "Commerce",
+    "description": "Generic ecommerce product, cart, checkout, and order pages.",
+    "order": 45,
+    "presetIds": [],
+    "goalIds": [],
+    "providerPointers": []
   },
   {
     "id": "launch",
@@ -853,6 +2120,24 @@ export const PAGE_RECIPE_GROUPS = [
     "providerPointers": []
   },
   {
+    "id": "support",
+    "label": "Support",
+    "description": "Support center, help desk, and ticket pages.",
+    "order": 75,
+    "presetIds": [],
+    "goalIds": [],
+    "providerPointers": []
+  },
+  {
+    "id": "integrations",
+    "label": "Integrations",
+    "description": "API keys, webhooks, OAuth apps, and connected tools.",
+    "order": 77,
+    "presetIds": [],
+    "goalIds": [],
+    "providerPointers": []
+  },
+  {
     "id": "teams",
     "label": "Teams",
     "description": "Organization and team invite pages.",
@@ -875,6 +2160,32 @@ export const PAGE_RECIPE_GROUPS = [
       "add-analytics",
       "track-errors"
     ],
+    "providerPointers": []
+  },
+  {
+    "id": "admin",
+    "label": "Admin",
+    "description": "Owner, support, billing risk, and audit control-center pages.",
+    "order": 95,
+    "presetIds": [
+      "organizations",
+      "audit_log",
+      "feature_flags"
+    ],
+    "goalIds": [
+      "add-teams",
+      "track-errors",
+      "harden"
+    ],
+    "providerPointers": []
+  },
+  {
+    "id": "crm",
+    "label": "CRM",
+    "description": "Customer management, customer detail, and sales pipeline pages.",
+    "order": 98,
+    "presetIds": [],
+    "goalIds": [],
     "providerPointers": []
   },
   {
@@ -918,6 +2229,15 @@ export const PAGE_RECIPE_GROUPS = [
     "providerPointers": []
   },
   {
+    "id": "productivity",
+    "label": "Productivity",
+    "description": "Tasks and calendar pages for work management.",
+    "order": 125,
+    "presetIds": [],
+    "goalIds": [],
+    "providerPointers": []
+  },
+  {
     "id": "blog",
     "label": "Blog",
     "description": "Publishing, article index, and changelog pages.",
@@ -926,6 +2246,15 @@ export const PAGE_RECIPE_GROUPS = [
     "goalIds": [
       "add-blog"
     ],
+    "providerPointers": []
+  },
+  {
+    "id": "content-platform",
+    "label": "Content Platform",
+    "description": "Docs, media gallery, status, and changelog pages.",
+    "order": 135,
+    "presetIds": [],
+    "goalIds": [],
     "providerPointers": []
   },
   {

@@ -5,6 +5,13 @@
   "navigation.screen.verify": "Verify email",
   "navigation.screen.pricing": "Pricing",
   "navigation.screen.dashboard": "Dashboard",
+  "navigation.screen.onboarding": "Onboarding",
+  "navigation.screen.settings": "Settings",
+  "navigation.screen.products": "Products",
+  "navigation.screen.orders": "Orders",
+  "navigation.screen.status": "Status",
+  "navigation.screen.changelog": "Changelog",
+  "navigation.screen.app": "App",
 
   "common.close": "Close",
   "common.fallback.user": "User",

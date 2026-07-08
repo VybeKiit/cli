@@ -3,8 +3,8 @@
 import { DEFAULT_INSPECT_HIGHLIGHT_COLOR, INSPECT_HIGHLIGHT_PRESETS } from '@vybekiit/report-mode';
 import { useReportFlyoutPosition, useReportHoverMenu } from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
-import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
-import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
+import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/ReportFlyoutPortal';
+import { ReportControlHint } from '@/components/report-mode/shared/ReportControlHint';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { cn } from '@/lib/utils';
 

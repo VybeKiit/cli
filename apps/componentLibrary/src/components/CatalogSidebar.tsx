@@ -1,6 +1,7 @@
 'use client';
 
 import { CATALOG_CATEGORIES, COMPONENT_CATALOG_COUNT } from '@library/data/catalog.meta';
+import { TEMPLATE_SURFACE_NAV_ITEMS, type TemplateSurfaceId } from '@library/data/templateSurfaces';
 import { prefetchCategoryShard } from '@library/lib/catalogFetch';
 import {
   Sidebar,
@@ -16,10 +17,14 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@vybekiit/ui/sidebar';
-import { LayoutGrid, PanelsTopLeft } from 'lucide-react';
+import { LayoutGrid, MonitorSmartphone, PanelsTopLeft, Puzzle, Smartphone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from 'react';
+import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
+
+type CatalogSurface = 'components' | 'pages' | TemplateSurfaceId;
 
 interface PageGroupSummary {
   readonly id: string;
@@ -28,13 +33,25 @@ interface PageGroupSummary {
 }
 
 interface CatalogSidebarProps {
-  readonly surface?: 'components' | 'pages';
+  readonly surface?: CatalogSurface;
   readonly category?: string;
   readonly onCategoryChange?: (slug: string) => void;
   readonly pageGroups?: readonly PageGroupSummary[];
   readonly activePageGroup?: string;
   readonly onPageGroupChange?: (id: string) => void;
 }
+
+interface PageGroupMenuLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  readonly groupId: string;
+  readonly onPageGroupChange?: (id: string) => void;
+  readonly children: ReactNode;
+}
+
+const templateSurfaceIcons: Record<TemplateSurfaceId, typeof LayoutGrid> = {
+  'website-saas': MonitorSmartphone,
+  'mobile-saas': Smartphone,
+  'extension-saas': Puzzle,
+};
 
 const SidebarBrand = () => {
   const { state } = useSidebar();
@@ -59,6 +76,33 @@ const SidebarBrand = () => {
           <span className="truncate text-sidebar-foreground/60 text-xs">UI Library</span>
         </span>
       )}
+    </Link>
+  );
+};
+
+const pageGroupHref = (groupId: string): string =>
+  groupId === 'all' ? '/pages' : `/pages?group=${groupId}`;
+
+const PageGroupMenuLink = ({
+  groupId,
+  onPageGroupChange,
+  onClick,
+  children,
+  ...props
+}: PageGroupMenuLinkProps) => {
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      onClick?.(event);
+      if (!event.defaultPrevented) {
+        onPageGroupChange?.(groupId);
+      }
+    },
+    [groupId, onClick, onPageGroupChange],
+  );
+
+  return (
+    <Link {...props} href={pageGroupHref(groupId)} onClick={handleClick}>
+      {children}
     </Link>
   );
 };
@@ -115,6 +159,23 @@ export const CatalogSidebar = ({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {TEMPLATE_SURFACE_NAV_ITEMS.map((item) => {
+                const Icon = templateSurfaceIcons[item.id];
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      asChild={true}
+                      isActive={surface === item.id}
+                      tooltip={item.label}
+                    >
+                      <Link href={item.href}>
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -164,27 +225,31 @@ export const CatalogSidebar = ({
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
+                    asChild={true}
                     isActive={activePageGroup === 'all'}
-                    onClick={() => onPageGroupChange?.('all')}
                     tooltip={`All Page recipes (${pageCount})`}
-                    type="button"
                   >
-                    <span>All Pages</span>
-                    <span className={cn('ms-auto text-xs tabular-nums opacity-70')}>
-                      {pageCount}
-                    </span>
+                    <PageGroupMenuLink groupId="all" onPageGroupChange={onPageGroupChange}>
+                      <span>All Pages</span>
+                      <span className={cn('ms-auto text-xs tabular-nums opacity-70')}>
+                        {pageCount}
+                      </span>
+                    </PageGroupMenuLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 {pageGroups.map((group) => (
                   <SidebarMenuItem key={group.id}>
                     <SidebarMenuButton
+                      asChild={true}
                       isActive={activePageGroup === group.id}
-                      onClick={() => onPageGroupChange?.(group.id)}
                       tooltip={`${group.label} (${group.count})`}
-                      type="button"
                     >
-                      <span>{group.label}</span>
-                      <span className="ms-auto text-xs tabular-nums opacity-70">{group.count}</span>
+                      <PageGroupMenuLink groupId={group.id} onPageGroupChange={onPageGroupChange}>
+                        <span>{group.label}</span>
+                        <span className="ms-auto text-xs tabular-nums opacity-70">
+                          {group.count}
+                        </span>
+                      </PageGroupMenuLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

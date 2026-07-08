@@ -16,6 +16,13 @@ const SCREEN_TITLES = {
   verify: 'navigation.screen.verify',
   pricing: 'navigation.screen.pricing',
   dashboard: 'navigation.screen.dashboard',
+  onboarding: 'navigation.screen.onboarding',
+  settings: 'navigation.screen.settings',
+  products: 'navigation.screen.products',
+  orders: 'navigation.screen.orders',
+  serviceStatus: 'navigation.screen.status',
+  changelog: 'navigation.screen.changelog',
+  dynamic: 'navigation.screen.app',
 } as const;
 
 /**
@@ -51,6 +58,13 @@ const RootLayout = () => {
           <Stack.Screen name="verify" options={{ title: t(SCREEN_TITLES.verify) }} />
           <Stack.Screen name="pricing" options={{ title: t(SCREEN_TITLES.pricing) }} />
           <Stack.Screen name="dashboard" options={{ title: t(SCREEN_TITLES.dashboard) }} />
+          <Stack.Screen name="onboarding" options={{ title: t(SCREEN_TITLES.onboarding) }} />
+          <Stack.Screen name="settings" options={{ title: t(SCREEN_TITLES.settings) }} />
+          <Stack.Screen name="products" options={{ title: t(SCREEN_TITLES.products) }} />
+          <Stack.Screen name="orders" options={{ title: t(SCREEN_TITLES.orders) }} />
+          <Stack.Screen name="service-status" options={{ title: t(SCREEN_TITLES.serviceStatus) }} />
+          <Stack.Screen name="changelog" options={{ title: t(SCREEN_TITLES.changelog) }} />
+          <Stack.Screen name="[screen]" options={{ title: t(SCREEN_TITLES.dynamic) }} />
         </Stack>
         <Toaster />
         <ReportModeDev />

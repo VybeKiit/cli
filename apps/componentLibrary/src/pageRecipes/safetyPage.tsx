@@ -1,6 +1,6 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
-import { ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Play, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed safety page recipe.
@@ -34,9 +34,9 @@ export const SafetyPage = () => {
             <p className="mt-2 text-muted-foreground text-sm">
               Use this page to show the one thing that needs attention before launch.
             </p>
-            <Button className="mt-5 w-full" type="button">
+            <DemoActionButton className="mt-5 w-full" icon={<Play className="h-4 w-4" />}>
               Run checks
-            </Button>
+            </DemoActionButton>
           </aside>
         </div>
       </section>

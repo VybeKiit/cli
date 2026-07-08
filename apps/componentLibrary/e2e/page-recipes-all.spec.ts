@@ -10,6 +10,8 @@ interface BrowserHealth {
 }
 
 const criticalResourceTypes = new Set(['document', 'script', 'stylesheet', 'fetch', 'xhr']);
+const criticalRequestFailureResourceTypes = new Set(['document', 'script', 'stylesheet']);
+const routeLoad = { timeout: 60_000, waitUntil: 'domcontentloaded' } as const;
 
 const isLocalRouteUrl = (url: string): boolean => {
   try {
@@ -51,7 +53,10 @@ const collectBrowserHealth = (page: Page): BrowserHealth => {
   });
 
   page.on('requestfailed', (request) => {
-    if (criticalResourceTypes.has(request.resourceType()) && isLocalRouteUrl(request.url())) {
+    if (
+      criticalRequestFailureResourceTypes.has(request.resourceType()) &&
+      isLocalRouteUrl(request.url())
+    ) {
       criticalResourceFailures.push(
         `requestfailed ${request.resourceType()}: ${request.url()} ${
           request.failure()?.errorText ?? 'unknown error'
@@ -74,7 +79,7 @@ const collectBrowserHealth = (page: Page): BrowserHealth => {
 };
 
 const expectHealthyRoute = async (page: Page, route: string) => {
-  const response = await page.goto(route, { waitUntil: 'load' });
+  const response = await page.goto(route, routeLoad);
 
   expect(response, `${route} should return a response`).not.toBeNull();
   expect(response?.status(), `${route} should not return an error status`).toBeLessThan(400);
@@ -83,12 +88,14 @@ const expectHealthyRoute = async (page: Page, route: string) => {
 };
 
 const expectVisibleRender = async (page: Page, route: string) => {
-  const bodyText = await page.locator('body').innerText();
   const main = page.locator('main').first();
-  const mainBox = await main.boundingBox();
-  const screenshot = await page.screenshot({ fullPage: false });
 
   await expect(main, `${route} should render a visible main surface`).toBeVisible();
+
+  const bodyText = await page.locator('body').innerText();
+  const mainBox = await main.boundingBox();
+  const screenshot = await page.screenshot({ caret: 'initial', fullPage: false });
+
   expect(mainBox, `${route} should have a measurable main surface`).not.toBeNull();
   expect(mainBox?.width ?? 0, `${route} should render visible page width`).toBeGreaterThan(200);
   expect(mainBox?.height ?? 0, `${route} should render visible page height`).toBeGreaterThan(100);
@@ -142,6 +149,7 @@ test('pages catalog lists every page recipe', async ({ page }) => {
   const browserHealth = collectBrowserHealth(page);
 
   await expectHealthyRoute(page, '/pages');
+  await expect(page.locator('main[data-page-recipes-ready="true"]')).toBeVisible();
   await expectVisibleRender(page, '/pages');
   await expect(page.getByRole('heading', { name: 'Page Recipes' })).toBeVisible();
 

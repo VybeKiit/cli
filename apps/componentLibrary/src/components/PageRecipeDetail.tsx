@@ -3,7 +3,7 @@
 import { CatalogSidebar } from '@library/components/CatalogSidebar';
 import { CopyPageRecipePromptButton } from '@library/components/CopyPageRecipePromptButton';
 import { CopyPageRecipeSourceButton } from '@library/components/CopyPageRecipeSourceButton';
-import { PageRecipeFrame } from '@library/components/PageRecipeFrame';
+import { PageRecipePreviewGrid } from '@library/components/PageRecipePreviewGrid';
 import { PAGE_RECIPE_GROUPS, PAGE_RECIPES, type PageRecipe } from '@library/data/pageRecipes';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
@@ -86,11 +86,7 @@ export const PageRecipeDetail = ({ recipe }: PageRecipeDetailProps) => {
 
           <section className="mt-8">
             <h2 className="mb-3 font-semibold text-lg">Responsive preview</h2>
-            <div className="grid gap-4 lg:grid-cols-[1.4fr_0.9fr_0.45fr]">
-              <PageRecipeFrame device="desktop" slug={recipe.slug} title={recipe.title} />
-              <PageRecipeFrame device="tablet" slug={recipe.slug} title={recipe.title} />
-              <PageRecipeFrame device="mobile" slug={recipe.slug} title={recipe.title} />
-            </div>
+            <PageRecipePreviewGrid slug={recipe.slug} title={recipe.title} />
           </section>
 
           <section className="mt-8 grid gap-4 lg:grid-cols-2">

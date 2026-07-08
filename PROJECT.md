@@ -63,6 +63,16 @@ assumes the agent is the developer.
 - **v1.0** — web only + the money pipeline; private packages `core`/`payments`/`auth`/`db`; the dogfooded
   landing page. Goal: a stranger pays → gets invited → scaffolds a web app → wires payments →
   deploys live in session #1 (the keystone).
+- **SaaS baseline pack** — every first-party app template should feel plug-and-play for an average
+  SaaS: auth, signed-in shell, dashboard, settings, pricing/billing, and a first-run product
+  flow. App onboarding happens after sign-up and before the dashboard; the dashboard walkthrough
+  teaches the product after the dashboard is reachable. App onboarding is mandatory but skippable:
+  new users land there after sign-up, answer a few lightweight setup prompts, and can skip directly
+  to the dashboard. Web and extension reuse maintained web primitives; mobile renders the same
+  surface recipes with native primitives. The existing page recipe pipeline is the source of truth:
+  extend `scripts/data/page-recipe-manifest.json` and
+  `scripts/dev/sync/buildPageRecipeIndex.mjs --check` so the component library verifies every
+  baseline web, extension, and mobile piece before template files are generated.
 - **v1.1** — `update-kit`, `add-signin`, `save-data`, `buy-domain`, `setup-email`.
 - **mobile** (Expo, at full web parity) — pulled forward into v1.0.
 - **v3** — extension (WXT).

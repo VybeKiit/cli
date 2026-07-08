@@ -1,6 +1,9 @@
 'use client';
 
 import { SiteFooter } from '@/components/site-footer';
+import { SaasIcon } from '@/components/saas-page-view';
+import { DASHBOARD_NAV_LINKS } from '@/data/saasPages';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';
 import { Button } from '@vybekiit/ui/button';
 import {
@@ -10,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@vybekiit/ui/dropdown-menu';
 import { Separator } from '@vybekiit/ui/separator';
-import { Link, useRouter } from '@/i18n/navigation';
 import { signOut } from '@/lib/authClient';
+import { cn } from '@/lib/utils';
 import type { AuthUser } from '@vybekiit/auth';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useState } from 'react';
@@ -32,6 +35,7 @@ interface DashboardShellProps {
 export const DashboardShell = ({ user, children = null }: DashboardShellProps) => {
   const [pending, setPending] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations();
   const userEmail =
     user.email === null || user.email === '' ? t('common.fallback.user') : user.email;
@@ -48,7 +52,7 @@ export const DashboardShell = ({ user, children = null }: DashboardShellProps) =
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link href="/dashboard" className="font-semibold text-lg">
             {t('common.productName')}
           </Link>
@@ -70,7 +74,34 @@ export const DashboardShell = ({ user, children = null }: DashboardShellProps) =
         </div>
         <Separator />
       </header>
-      <div className="flex-1">{children}</div>
+      <div className="mx-auto grid w-full max-w-7xl flex-1 gap-6 px-6 py-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <nav
+            aria-label="Workspace navigation"
+            className="flex gap-2 overflow-x-auto rounded-lg border bg-card p-2 lg:flex-col lg:overflow-visible"
+          >
+            {DASHBOARD_NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 font-medium text-sm transition-colors',
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  )}
+                >
+                  <SaasIcon name={link.icon} />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+        <div className="min-w-0">{children}</div>
+      </div>
       <SiteFooter />
     </div>
   );

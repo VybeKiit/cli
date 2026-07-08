@@ -19,6 +19,24 @@
   "nav_pricing": {
     "message": "Pricing"
   },
+  "nav_dashboard": {
+    "message": "Dashboard"
+  },
+  "nav_products": {
+    "message": "Products"
+  },
+  "nav_settings": {
+    "message": "User settings"
+  },
+  "nav_status": {
+    "message": "Status"
+  },
+  "nav_changelog": {
+    "message": "Changelog"
+  },
+  "nav_admin": {
+    "message": "Admin"
+  },
   "popup_title": {
     "message": "My VybeKiit Extension"
   },

@@ -1,7 +1,7 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
 import { Textarea } from '@vybekiit/ui/textarea';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Save } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed idea planner page recipe.
@@ -27,9 +27,9 @@ export const IdeaPlannerPage = () => {
               className="min-h-48"
               defaultValue="I want to help customers book, pay, and manage their work in one place."
             />
-            <Button className="mt-4" type="button">
+            <DemoActionButton className="mt-4" icon={<Save className="h-4 w-4" />}>
               Save plan
-            </Button>
+            </DemoActionButton>
           </div>
           <aside className="rounded-lg border bg-card p-5">
             <h2 className="font-semibold text-xl">Suggested data</h2>

@@ -1,6 +1,6 @@
 import { Badge } from '@vybekiit/ui/badge';
-import { Button } from '@vybekiit/ui/button';
-import { Rocket } from 'lucide-react';
+import { ArrowRight, Rocket } from 'lucide-react';
+import { DemoActionButton } from './shared/DemoActionButton';
 
 /**
  * Render a source-backed launch checklist page recipe.
@@ -37,9 +37,9 @@ export const LaunchChecklistPage = () => {
             ),
           )}
         </div>
-        <Button className="mt-6" type="button">
+        <DemoActionButton className="mt-6" icon={<ArrowRight className="h-4 w-4" />}>
           Continue launch
-        </Button>
+        </DemoActionButton>
       </section>
     </main>
   );

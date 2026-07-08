@@ -1,1 +1,22 @@
-{"entries":[{"source":"vybekiit","namespace":"vybekiit","name":"walkthrough","previewKey":"vybekiit/walkthrough","importPath":"@/components/walkthrough/walkthrough","category":"application","kind":"component","renderMode":"demo","previewable":false,"buildSafe":false,"requiresEnv":false,"unavailableReason":"nodemo","demoSource":"manual","relatedExamples":[],"tags":["tutorial","walkthrough","coach-marks","onboarding","spotlight","dialog"],"portable":false}]}
+{
+  "entries": [
+    {
+      "source": "vybekiit",
+      "namespace": "vybekiit",
+      "name": "walkthrough",
+      "previewKey": "vybekiit/walkthrough",
+      "importPath": "@/components/walkthrough/walkthrough",
+      "category": "application",
+      "kind": "component",
+      "renderMode": "demo",
+      "previewable": false,
+      "buildSafe": false,
+      "requiresEnv": false,
+      "unavailableReason": "nodemo",
+      "demoSource": "manual",
+      "relatedExamples": [],
+      "tags": ["tutorial", "walkthrough", "coach-marks", "onboarding", "spotlight", "dialog"],
+      "portable": false
+    }
+  ]
+}

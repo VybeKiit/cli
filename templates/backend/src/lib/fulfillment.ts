@@ -10,18 +10,18 @@ type OrderRecord = {
   readonly refunded: boolean;
 };
 
-/** Tagged fulfillment failure returned through the Effect error channel. */
-export class FulfillmentError extends EffectData.TaggedError('FulfillmentError')<{
-  readonly code: 'fulfillment_failed';
-  readonly message: string;
-}> {}
-
 type FulfillmentResult =
   | { readonly ok: true; readonly value: true }
   | {
       readonly ok: false;
       readonly error: { readonly code: 'fulfillment_failed'; readonly message: string };
     };
+
+/** Tagged fulfillment failure returned through the Effect error channel. */
+export class FulfillmentError extends EffectData.TaggedError('FulfillmentError')<{
+  readonly code: 'fulfillment_failed';
+  readonly message: string;
+}> {}
 
 /**
  * Create a typed fulfillment failure.

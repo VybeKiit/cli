@@ -1,5 +1,7 @@
 import { PAGE_RECIPE_COMPONENTS } from '@library/data/pageRecipeComponents';
 import { PAGE_RECIPE_BY_SLUG } from '@library/data/pageRecipes';
+import { DemoThemeRandomizer } from '@library/pageRecipes/shared/DemoThemeRandomizer';
+import { DemoTransitionStage } from '@library/pageRecipes/shared/DemoTransitionStage';
 
 interface PageRecipeEmbedProps {
   readonly slug: string;
@@ -23,7 +25,11 @@ export const PageRecipeEmbed = ({ slug }: PageRecipeEmbedProps) => {
 
   return (
     <div className="min-h-screen bg-background text-foreground" data-page-recipe={recipe.slug}>
-      <RecipeComponent />
+      <DemoThemeRandomizer>
+        <DemoTransitionStage title={`${recipe.title} motion pass`}>
+          <RecipeComponent />
+        </DemoTransitionStage>
+      </DemoThemeRandomizer>
     </div>
   );
 };

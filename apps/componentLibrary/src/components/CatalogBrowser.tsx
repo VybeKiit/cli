@@ -17,6 +17,7 @@ import {
   COMPONENT_CATALOG_COUNT,
 } from '@library/data/catalog.meta';
 import { useCatalogPool } from '@library/hooks/useCatalogPool';
+import { useDebouncedValue } from '@library/hooks/useDebouncedValue';
 import { CATALOG_PAGE_SIZE, loadInfiniteScrollEnabled } from '@library/lib/catalogScrollMode';
 import { matchesCatalogQuery } from '@library/lib/catalogSearch';
 import { categoryLabelFromSlug } from '@library/lib/categoryLabels';
@@ -25,7 +26,7 @@ import { Button } from '@vybekiit/ui/button';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
 import { CircleHelp } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type TabKind = 'all' | 'components' | 'examples';
 
@@ -70,11 +71,11 @@ export const CatalogBrowser = () => {
   const initialLibrary = libraryParam === null ? 'all' : libraryParam;
 
   const [query, setQuery] = useState('');
-  const deferredQuery = useDeferredValue(query);
+  const debouncedQuery = useDebouncedValue(query, 250);
   const [category, setCategory] = useState<string>(initialCategory);
   const [library, setLibrary] = useState<string>(initialLibrary);
   const [tab, setTab] = useState<TabKind>(initialTab);
-  const { pool, poolReady } = useCatalogPool(category, deferredQuery, ready);
+  const { pool, poolReady } = useCatalogPool(category, debouncedQuery, ready);
   const [tourOpen, setTourOpen] = useState(false);
   const [infiniteScroll, setInfiniteScroll] = useState(false);
   const [scrollHydrated, setScrollHydrated] = useState(false);
@@ -92,7 +93,7 @@ export const CatalogBrowser = () => {
   useEffect(() => {
     setPage(1);
     setVisibleCount(CATALOG_PAGE_SIZE);
-  }, [deferredQuery, category, library, tab]);
+  }, [debouncedQuery, category, library, tab]);
 
   const syncUrl = useCallback(
     (next: { category?: string; library?: string; tab?: TabKind }) => {
@@ -134,9 +135,9 @@ export const CatalogBrowser = () => {
         if (category !== 'all' && entry.category !== category) {
           return false;
         }
-        return matchesCatalogQuery(entry, deferredQuery);
+        return matchesCatalogQuery(entry, debouncedQuery);
       }),
-    [poolForTab, deferredQuery, category, library],
+    [poolForTab, debouncedQuery, category, library],
   );
 
   const orderedFiltered = useMemo(

@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { INSPIRATION_DIRECTIONS } from '@/data/inspirations';
-import { INSPIRATION_LAYOUTS } from '../layout-registry';
+import { INSPIRATION_LAYOUTS } from '../LayoutRegistry';
 
 /**
  * Gallery guard tests for the ten inspiration layouts (#35).

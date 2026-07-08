@@ -23,6 +23,8 @@ export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> {
   /** Button label text. */
   title: string;
+  /** Optional compact icon text rendered before the label. */
+  icon?: string;
   /** Visual variant. Defaults to `default`. */
   variant?: ButtonVariant;
   /** Size preset. Defaults to `default`. */
@@ -51,6 +53,7 @@ const resolveButtonOpacity = (isDisabled: boolean, pressed: boolean): number => 
  */
 export const Button = ({
   title = '',
+  icon,
   variant = 'default',
   size = 'default',
   loading = false,
@@ -112,16 +115,29 @@ export const Button = ({
       {loading ? (
         <ActivityIndicator color={textColor} size="small" />
       ) : (
-        <Text
-          style={{
-            color: textColor,
-            fontSize: fontSizes.sm,
-            fontWeight: fontWeights.medium,
-            textDecorationLine: variant === 'link' ? 'underline' : 'none',
-          }}
-        >
-          {title}
-        </Text>
+        <>
+          {icon === undefined ? null : (
+            <Text
+              style={{
+                color: textColor,
+                fontSize: fontSizes.sm,
+                fontWeight: fontWeights.semibold,
+              }}
+            >
+              {icon}
+            </Text>
+          )}
+          <Text
+            style={{
+              color: textColor,
+              fontSize: fontSizes.sm,
+              fontWeight: fontWeights.medium,
+              textDecorationLine: variant === 'link' ? 'underline' : 'none',
+            }}
+          >
+            {title}
+          </Text>
+        </>
       )}
     </Pressable>
   );
