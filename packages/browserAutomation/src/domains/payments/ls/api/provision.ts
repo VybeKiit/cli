@@ -169,6 +169,19 @@ export const createWebhookViaApi = async (
   };
 };
 
+/**
+ * Delete a Lemon Squeezy webhook by id (used to clean up a creation smoke test).
+ *
+ * @param apiKey - Lemon Squeezy API key with store access.
+ * @param webhookId - Webhook id returned by {@link createWebhookViaApi}.
+ * @returns Nothing; resolves once the webhook is removed.
+ * @example
+ * await deleteWebhookViaApi(apiKey, '117421');
+ */
+export const deleteWebhookViaApi = async (apiKey: string, webhookId: string): Promise<void> => {
+  await lsApiFetch<unknown>(apiKey, `/webhooks/${webhookId}`, { method: 'DELETE' });
+};
+
 export type LsApiVariantLookup = {
   readonly productId: string;
   readonly variantId: string;

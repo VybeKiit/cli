@@ -10,3 +10,4 @@ export * from './verbs/setup';
 export * from './verbs/standbyLogin';
 export * from './verbs/uploadProductFiles';
 export * from './verbs/uploadProductImage';
+export * from './verifyCheckout';

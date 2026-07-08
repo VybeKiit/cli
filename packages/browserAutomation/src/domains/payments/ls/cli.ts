@@ -1,3 +1,4 @@
+import process from 'node:process';
 import {
   type LsSetupCliArgs,
   parseSetupArgs,
@@ -7,8 +8,15 @@ import { printJson, printLine } from '@vybekiit/browser-automation/cli/output';
 import type { CommandRegistry } from '@vybekiit/browser-automation/cli/registry';
 import { baseVerbContext } from '@vybekiit/browser-automation/cli/verbContext';
 import { promptLsSetup } from '@vybekiit/browser-automation/cli/wizard';
+import { connectToChrome } from '@vybekiit/browser-automation/core/connect';
+import { resolveProfilePath } from '@vybekiit/browser-automation/core/profileResolve';
 import { runLsSetup, standbyLogin } from '.';
 import { lsSetupEnvBlock, verifyVariantViaApi } from './api/verifyVariant';
+import {
+  assertLemonSqueezyTestMode,
+  verifyMoneyPipeline,
+  verifyWebhookCreation,
+} from './verifyCheckout';
 
 /**
  * Collect missing required setup flag names.
@@ -92,6 +100,24 @@ const resolveSetupParams = (
 };
 
 /**
+ * Read a `--name=value` or `--name value` flag from raw CLI args.
+ *
+ * @param args - Raw argument tokens.
+ * @param name - Flag name without dashes.
+ * @returns The flag value, or undefined when absent.
+ * @example
+ * const url = readFlag(args, 'url');
+ */
+const readFlag = (args: readonly string[], name: string): string | undefined => {
+  const withEquals = args.find((arg) => arg.startsWith(`--${name}=`));
+  if (withEquals !== undefined) {
+    return withEquals.slice(name.length + 3);
+  }
+  const index = args.indexOf(`--${name}`);
+  return index >= 0 && index + 1 < args.length ? args[index + 1] : undefined;
+};
+
+/**
  * Register the Lemon Squeezy payment automation domain.
  *
  * @param registry - CLI command registry to mutate.
@@ -152,6 +178,69 @@ export const registerLsDomain = (registry: CommandRegistry): void => {
             }
           }
           return 0;
+        },
+      },
+      'verify-checkout': {
+        description:
+          'Verify the money pipeline in test mode: webhook creation + a full fake purchase through the kit checkout UI',
+        run: async ({ args, flags }) => {
+          const url = readFlag(args, 'url') ?? 'http://localhost:3010/checkout';
+          const apiKey = process.env.LEMONSQUEEZY_API_KEY ?? '';
+          const guard = await assertLemonSqueezyTestMode(apiKey);
+          if (!guard.testMode) {
+            if (flags.json) {
+              printJson({ ok: false, reason: guard.message });
+            } else {
+              printLine(`Refusing to run: ${guard.message}`);
+            }
+            return 1;
+          }
+
+          // Webhook leg — without it a paid order never reaches the kit's /api/webhook, so
+          // fulfillment/invite never fires (the exact place a vibe coder gets stuck).
+          const storeId = process.env.LEMONSQUEEZY_STORE_ID ?? '';
+          const webhookUrl = readFlag(args, 'webhook-url') ?? 'https://example.com/api/webhook';
+          const webhook =
+            storeId.length > 0
+              ? await verifyWebhookCreation({ apiKey, storeId, url: webhookUrl })
+              : { ok: false, message: 'Set LEMONSQUEEZY_STORE_ID to test webhook creation.' };
+
+          // Checkout leg — a full fake purchase through the UI.
+          const ctx = baseVerbContext(flags);
+          const profilePath = await resolveProfilePath('ls', ctx.profilePath);
+          const session = await connectToChrome({
+            ...ctx,
+            profileHint: profilePath,
+            startUrl: url,
+          });
+          let checkout: Awaited<ReturnType<typeof verifyMoneyPipeline>>;
+          try {
+            const github = readFlag(args, 'github');
+            const email = readFlag(args, 'email');
+            checkout = await verifyMoneyPipeline(session.page, {
+              checkoutUrl: url,
+              ...(github === undefined ? {} : { githubUsername: github }),
+              ...(email === undefined ? {} : { email }),
+            });
+          } finally {
+            await session.dispose();
+          }
+
+          const ok = webhook.ok && checkout.ok;
+          if (flags.json) {
+            printJson({ ok, webhook, checkout });
+          } else {
+            printLine(`webhook:  ${webhook.ok ? 'OK' : 'FAIL'} - ${webhook.message}`);
+            printLine(
+              `checkout: ${checkout.ok ? 'OK' : 'FAIL'} [${checkout.stage}] ${checkout.message}`,
+            );
+            printLine(
+              ok
+                ? 'Money pipeline verified end to end (test mode).'
+                : 'Money pipeline has a gap (see above).',
+            );
+          }
+          return ok ? 0 : 1;
         },
       },
     },
