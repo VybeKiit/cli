@@ -1,7 +1,7 @@
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ComponentCard from '../../components/common/ComponentCard';
-import Alert from '../../components/tailadmin-ui/alert/Alert';
-import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ComponentCard from '@/components/common/ComponentCard';
+import Alert from '@/components/tailadmin-ui/alert/Alert';
+import PageMeta from '@/components/common/PageMeta';
 
 const Alerts = () => (
   <>

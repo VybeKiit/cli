@@ -1,8 +1,8 @@
-import { useModal } from '../../hooks/useModal';
-import { Modal } from '../tailadmin-ui/modal';
-import Button from '../tailadmin-ui/button/Button';
-import Input from '../form/input/InputField';
-import Label from '../form/Label';
+import { useModal } from '@/hooks/useModal';
+import { Modal } from '@/components/tailadmin-ui/modal';
+import Button from '@/components/tailadmin-ui/button/Button';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
 
 const UserAddressCard = () => {
   const { isOpen, openModal, closeModal } = useModal();

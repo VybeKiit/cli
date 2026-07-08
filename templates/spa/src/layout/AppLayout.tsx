@@ -1,4 +1,4 @@
-import { SidebarProvider, useSidebar } from '../context/SidebarContext';
+import { SidebarProvider, useSidebar } from '@/context/SidebarContext';
 import { Outlet } from '@tanstack/react-router';
 import AppHeader from './AppHeader';
 import Backdrop from './Backdrop';

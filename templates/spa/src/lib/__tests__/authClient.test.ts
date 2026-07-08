@@ -5,10 +5,10 @@ import {
   signInWithPassword,
   signUpWithPassword,
   verifyEmailCode,
-} from '../authClient';
-import { startCheckout } from '../billingClient';
-import { DEV_USER, signInFailureHandler } from '../../test/msw/handlers';
-import { mswServer } from '../../test/msw/server';
+} from '@/lib/authClient';
+import { startCheckout } from '@/lib/billingClient';
+import { DEV_USER, signInFailureHandler } from '@/test/msw/handlers';
+import { mswServer } from '@/test/msw/server';
 
 const runClient = <A, E>(program: Effect.Effect<A, E>): Promise<Either.Either<A, E>> =>
   Effect.runPromise(Effect.either(program));

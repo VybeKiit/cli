@@ -1,9 +1,9 @@
-import PageBreadcrumb from '../../components/common/PageBreadCrumb';
-import ResponsiveImage from '../../components/tailadmin-ui/images/ResponsiveImage';
-import TwoColumnImageGrid from '../../components/tailadmin-ui/images/TwoColumnImageGrid';
-import ThreeColumnImageGrid from '../../components/tailadmin-ui/images/ThreeColumnImageGrid';
-import ComponentCard from '../../components/common/ComponentCard';
-import PageMeta from '../../components/common/PageMeta';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import ResponsiveImage from '@/components/tailadmin-ui/images/ResponsiveImage';
+import TwoColumnImageGrid from '@/components/tailadmin-ui/images/TwoColumnImageGrid';
+import ThreeColumnImageGrid from '@/components/tailadmin-ui/images/ThreeColumnImageGrid';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageMeta from '@/components/common/PageMeta';
 
 const Images = () => (
   <>

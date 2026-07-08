@@ -1,5 +1,5 @@
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '../../icons';
-import Badge from '../tailadmin-ui/badge/Badge';
+import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '@/icons';
+import Badge from '@/components/tailadmin-ui/badge/Badge';
 
 const EcommerceMetrics = () => {
   return (

@@ -1,9 +1,9 @@
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
 import { useState } from 'react';
-import { Dropdown } from '../tailadmin-ui/dropdown/Dropdown';
-import { DropdownItem } from '../tailadmin-ui/dropdown/DropdownItem';
-import { MoreDotIcon } from '../../icons';
+import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
+import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
+import { MoreDotIcon } from '@/icons';
 
 const MonthlyTarget = () => {
   const series = [75.55];

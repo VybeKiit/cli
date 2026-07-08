@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
 import flatpickr from 'flatpickr';
-import ChartTab from '../common/ChartTab';
-import { CalenderIcon } from '../../icons';
+import ChartTab from '@/components/common/ChartTab';
+import { CalenderIcon } from '@/icons';
 
 const StatisticsChart = () => {
   const datePickerRef = useRef<HTMLInputElement>(null);

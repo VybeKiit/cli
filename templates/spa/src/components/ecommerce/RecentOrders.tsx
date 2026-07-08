@@ -1,5 +1,5 @@
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../tailadmin-ui/table';
-import Badge from '../tailadmin-ui/badge/Badge';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/tailadmin-ui/table';
+import Badge from '@/components/tailadmin-ui/badge/Badge';
 
 // Define the TypeScript interface for the table rows
 interface Product {

@@ -2,13 +2,13 @@ import { Either } from 'effect';
 import { useNavigate } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '../../icons';
-import Label from '../form/Label';
-import Input from '../form/input/InputField';
-import Checkbox from '../form/input/Checkbox';
-import Button from '../tailadmin-ui/button/Button';
-import { useAsync } from '../../hooks/useAsync';
-import { signInWithPassword } from '../../lib/authClient';
+import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import Checkbox from '@/components/form/input/Checkbox';
+import Button from '@/components/tailadmin-ui/button/Button';
+import { useAsync } from '@/hooks/useAsync';
+import { signInWithPassword } from '@/lib/authClient';
 
 const SignInForm = () => {
   const [email, setEmail] = useState('');

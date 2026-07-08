@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Dropdown } from '../tailadmin-ui/dropdown/Dropdown';
-import { DropdownItem } from '../tailadmin-ui/dropdown/DropdownItem';
+import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
+import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
 import { Link } from '@tanstack/react-router';
 
 const NotificationDropdown = () => {
