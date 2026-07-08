@@ -1,10 +1,11 @@
 import type { AuthUser } from '@vybekiit/auth';
 import { http, HttpResponse } from 'msw';
 
-export const DEV_USER: AuthUser = { id: 'local-dev-user', email: 'you@local.dev' };
+/** Default signed-in user returned by local MSW auth handlers. */
+const DEV_USER: AuthUser = { id: 'local-dev-user', email: 'you@local.dev' };
 
 /** Default MSW handlers for buyer-facing wire points (auth + checkout). */
-export const wirePointHandlers = [
+const wirePointHandlers = [
   http.post('/api/auth/signin', async () => HttpResponse.json(DEV_USER)),
   http.post('/api/auth/signup', async () => HttpResponse.json(DEV_USER)),
   http.post('/api/auth/send-code', async () => HttpResponse.json({ ok: true })),
@@ -13,9 +14,17 @@ export const wirePointHandlers = [
   http.post('/api/checkout', async () => HttpResponse.json({ url: 'https://pay.example/c/1' })),
 ];
 
-/** Handler that simulates an auth route failure. */
-export function signInFailureHandler(message = 'Wrong password.') {
-  return http.post('/api/auth/signin', async () =>
+/**
+ * Build a handler that simulates an auth route failure.
+ *
+ * @param message - Error message returned by the fake auth route.
+ * @returns An MSW handler for failed sign-in requests.
+ * @example
+ * server.use(signInFailureHandler('Wrong password.'));
+ */
+const signInFailureHandler = (message = 'Wrong password.') =>
+  http.post('/api/auth/signin', async () =>
     HttpResponse.json({ code: 'unauthorized', error: message }, { status: 401 }),
   );
-}
+
+export { DEV_USER, signInFailureHandler, wirePointHandlers };

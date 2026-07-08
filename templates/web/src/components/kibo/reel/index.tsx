@@ -11,8 +11,8 @@ import type {
   VideoHTMLAttributes,
 } from 'react';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@vybekiit/ui/button';
+import { Progress } from '@vybekiit/ui/progress';
 import { cn } from '@/lib/utils';
 
 // Explicit type for reel items

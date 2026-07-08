@@ -1,14 +1,10 @@
-import {
-  type EnvSource,
-  isBackendUnconfigured,
-  parseEnv,
-  resolveEnvProvider,
-} from '@vybekiit/core';
-import { Context, Effect, Layer } from 'effect';
+import { type EnvSource, isBackendUnconfigured, parseEnv } from '@vybekiit/core';
+import { Context, Effect, Layer, type Schema } from 'effect';
 import {
   AuthConfigSchema,
   BetterAuthConfigSchema,
   CognitoConfigSchema,
+  type DataConfig,
   DataConfigSchema,
   MongoConfigSchema,
   SupabaseAuthConfigSchema,
@@ -16,104 +12,221 @@ import {
 import { type BetterAuthInstance, createBetterAuthProvider } from './providers/betterAuth';
 import { type CognitoClientLike, createCognitoAuthProvider } from './providers/cognito';
 import { createLocalAuthProvider } from './providers/local';
-import { type SupabaseAuthClientLike, createSupabaseAuthProvider } from './providers/supabase';
-import type { AuthProvider } from './types';
+import { createSupabaseAuthProvider, type SupabaseAuthClientLike } from './providers/supabase';
+import { AuthError, type AuthProvider, type AuthProviderName } from './types';
 
 /** Test seams for {@link resolveAuthProvider}; omit in production. */
-export interface ResolveAuthInjections {
+export type ResolveAuthInjections = {
   readonly betterAuthInstance?: BetterAuthInstance;
   readonly cognitoClient?: CognitoClientLike;
   readonly supabaseAuthClient?: SupabaseAuthClientLike;
-}
+};
+
+type AuthProviderFactory = (source: EnvSource) => Effect.Effect<AuthProvider, AuthError>;
+
+type DataProviderName = DataConfig['DATA_PROVIDER'];
+
+const authErrorMessage = (caught: unknown): string =>
+  caught instanceof Error ? caught.message : String(caught);
+
+const parseAuthConfigSlice = <A, I>(
+  schema: Schema.Schema<A, I>,
+  source: EnvSource,
+): Effect.Effect<A, AuthError> =>
+  Effect.try({
+    try: () => parseEnv(schema, source),
+    catch: (caught) =>
+      new AuthError({
+        code: 'auth_config_invalid',
+        message: authErrorMessage(caught),
+      }),
+  });
+
+const createProviderNotRegisteredError = (kind: string, provider: string): AuthError =>
+  new AuthError({
+    code: 'auth_provider_unsupported',
+    message: `No auth adapter is registered for ${kind} provider ${provider}.`,
+  });
+
+const findAuthProviderFactory = (
+  provider: string,
+  factories: Readonly<Record<string, AuthProviderFactory | undefined>>,
+  kind: string,
+): Effect.Effect<AuthProviderFactory, AuthError> => {
+  const createProvider = factories[provider];
+
+  if (createProvider === undefined) {
+    return Effect.fail(createProviderNotRegisteredError(kind, provider));
+  }
+
+  return Effect.succeed(createProvider);
+};
+
+const injectedBetterAuthOptions = (
+  injections: ResolveAuthInjections,
+): { readonly instance?: BetterAuthInstance } =>
+  injections.betterAuthInstance === undefined ? {} : { instance: injections.betterAuthInstance };
+
+const createSupabaseFactory =
+  (injections: ResolveAuthInjections): AuthProviderFactory =>
+  (source) =>
+    parseAuthConfigSlice(SupabaseAuthConfigSchema, source).pipe(
+      Effect.map((config) =>
+        createSupabaseAuthProvider({
+          config,
+          ...(injections.supabaseAuthClient === undefined
+            ? {}
+            : { client: injections.supabaseAuthClient }),
+        }),
+      ),
+    );
+
+const createCognitoFactory =
+  (injections: ResolveAuthInjections): AuthProviderFactory =>
+  (source) =>
+    parseAuthConfigSlice(CognitoConfigSchema, source).pipe(
+      Effect.map((config) =>
+        createCognitoAuthProvider({
+          config,
+          ...(injections.cognitoClient === undefined ? {} : { client: injections.cognitoClient }),
+        }),
+      ),
+    );
+
+const createBetterAuthPostgresFactory = (
+  injections: ResolveAuthInjections,
+): AuthProviderFactory => {
+  const betterAuthOptions = injectedBetterAuthOptions(injections);
+
+  return (source) =>
+    parseAuthConfigSlice(BetterAuthConfigSchema, source).pipe(
+      Effect.map((config) =>
+        createBetterAuthProvider({
+          config,
+          ...betterAuthOptions,
+        }),
+      ),
+    );
+};
+
+const createBetterAuthMongoFactory = (injections: ResolveAuthInjections): AuthProviderFactory => {
+  const betterAuthOptions = injectedBetterAuthOptions(injections);
+
+  return (source) =>
+    Effect.all({
+      config: parseAuthConfigSlice(BetterAuthConfigSchema, source),
+      mongo: parseAuthConfigSlice(MongoConfigSchema, source),
+    }).pipe(
+      Effect.map(({ config, mongo }) =>
+        createBetterAuthProvider({
+          config,
+          mongo,
+          ...betterAuthOptions,
+        }),
+      ),
+    );
+};
+
+const createBetterAuthFactory =
+  (
+    betterAuthPostgres: AuthProviderFactory,
+    betterAuthMongo: AuthProviderFactory,
+  ): AuthProviderFactory =>
+  (source) =>
+    parseAuthConfigSlice(DataConfigSchema, source).pipe(
+      Effect.flatMap(({ DATA_PROVIDER }) =>
+        DATA_PROVIDER === 'mongodb' ? betterAuthMongo(source) : betterAuthPostgres(source),
+      ),
+    );
+
+const buildAuthProviderFactories = (
+  injections: ResolveAuthInjections,
+): {
+  readonly explicit: Record<AuthProviderName, AuthProviderFactory>;
+  readonly data: Record<DataProviderName, AuthProviderFactory>;
+} => {
+  const supabaseAuth = createSupabaseFactory(injections);
+  const cognito = createCognitoFactory(injections);
+  const betterAuthPostgres = createBetterAuthPostgresFactory(injections);
+  const betterAuthMongo = createBetterAuthMongoFactory(injections);
+  const betterAuth = createBetterAuthFactory(betterAuthPostgres, betterAuthMongo);
+
+  return {
+    explicit: {
+      local: () => Effect.succeed(createLocalAuthProvider()),
+      cognito,
+      supabase: supabaseAuth,
+      'better-auth': betterAuth,
+    },
+    data: {
+      local: () => Effect.succeed(createLocalAuthProvider()),
+      supabase: supabaseAuth,
+      aws: cognito,
+      mongodb: betterAuthMongo,
+      neon: betterAuthPostgres,
+      firebase: betterAuthPostgres,
+      railway: betterAuthPostgres,
+    },
+  };
+};
+
+const resolveAuthProviderFromData = (
+  env: EnvSource,
+  factories: Record<DataProviderName, AuthProviderFactory>,
+): Effect.Effect<AuthProvider, AuthError> =>
+  parseAuthConfigSlice(DataConfigSchema, env).pipe(
+    Effect.flatMap(({ DATA_PROVIDER }) =>
+      findAuthProviderFactory(DATA_PROVIDER, factories, 'data').pipe(
+        Effect.flatMap((createProvider) => createProvider(env)),
+      ),
+    ),
+  );
 
 /**
- * Construct the configured auth provider from the environment — the single call site
- * the add-signin skill and server routes use, so they never name Supabase Auth,
- * better-auth, or Cognito (ADR-0003, ADR-0024).
+ * Resolve the configured auth provider without throwing across the Effect boundary.
  *
- * Resolution:
- * - Nothing configured → the local dev identity (ADR-0008).
- * - `AUTH_PROVIDER=local|cognito|supabase` → that adapter directly.
- * - `AUTH_PROVIDER=better-auth` → better-auth bound to Mongo (`DATA_PROVIDER=mongodb`)
- *   else Postgres.
- * - `AUTH_PROVIDER` unset → **auth follows data**: `supabase` → Supabase Auth (the
- *   default), `aws` → Cognito, `mongodb` → better-auth-on-Mongo, other Postgres
- *   (`neon`/`railway`/`firebase`) → better-auth, `local` → local.
- *
- * @param env - environment source (defaults to `process.env`)
- * @param injections - test seams; omit in production
- * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}).
+ * @param env - Environment source to parse; defaults to `process.env`.
+ * @param injections - Test seams for provider clients; omit in production.
+ * @returns An Effect that succeeds with the selected auth provider or fails with AuthError.
+ * @example
+ * const provider = await Effect.runPromise(resolveAuthProvider({ AUTH_PROVIDER: 'local' }));
  */
-export function resolveAuthProvider(
+export const resolveAuthProvider = (
   env: EnvSource = process.env,
   injections: ResolveAuthInjections = {},
-): AuthProvider {
-  if (isBackendUnconfigured(env)) return createLocalAuthProvider();
+): Effect.Effect<AuthProvider, AuthError> => {
+  if (isBackendUnconfigured(env)) {
+    return Effect.succeed(createLocalAuthProvider());
+  }
 
-  const supabaseAuth = (): AuthProvider =>
-    createSupabaseAuthProvider({
-      config: parseEnv(SupabaseAuthConfigSchema, env),
-      ...(injections.supabaseAuthClient ? { client: injections.supabaseAuthClient } : {}),
-    });
-  const cognito = (): AuthProvider =>
-    createCognitoAuthProvider({
-      config: parseEnv(CognitoConfigSchema, env),
-      ...(injections.cognitoClient ? { client: injections.cognitoClient } : {}),
-    });
-  const injectedInstance = injections.betterAuthInstance
-    ? { instance: injections.betterAuthInstance }
-    : {};
-  const betterAuthPostgres = (source: EnvSource): AuthProvider =>
-    createBetterAuthProvider({
-      config: parseEnv(BetterAuthConfigSchema, source),
-      ...injectedInstance,
-    });
-  const betterAuthMongo = (source: EnvSource): AuthProvider =>
-    createBetterAuthProvider({
-      config: parseEnv(BetterAuthConfigSchema, source),
-      mongo: parseEnv(MongoConfigSchema, source),
-      ...injectedInstance,
-    });
-  const betterAuth = (source: EnvSource): AuthProvider =>
-    parseEnv(DataConfigSchema, source).DATA_PROVIDER === 'mongodb'
-      ? betterAuthMongo(source)
-      : betterAuthPostgres(source);
+  const factories = buildAuthProviderFactories(injections);
 
-  const { AUTH_PROVIDER } = parseEnv(AuthConfigSchema, env);
-  if (AUTH_PROVIDER === 'local') return createLocalAuthProvider();
-  if (AUTH_PROVIDER === 'cognito') return cognito();
-  if (AUTH_PROVIDER === 'supabase') return supabaseAuth();
-  if (AUTH_PROVIDER === 'better-auth') return betterAuth(env);
+  return parseAuthConfigSlice(AuthConfigSchema, env).pipe(
+    Effect.flatMap(({ AUTH_PROVIDER }) => {
+      if (AUTH_PROVIDER === undefined) {
+        return resolveAuthProviderFromData(env, factories.data);
+      }
 
-  return resolveEnvProvider<AuthProvider>(
-    parseEnv(DataConfigSchema, env).DATA_PROVIDER,
-    {
-      local: () => createLocalAuthProvider(),
-      supabase: () => supabaseAuth(),
-      aws: () => cognito(),
-      mongodb: (source) => betterAuthMongo(source),
-      neon: (source) => betterAuthPostgres(source),
-      firebase: (source) => betterAuthPostgres(source),
-      railway: (source) => betterAuthPostgres(source),
-    },
-    env,
-    'supabase',
+      return findAuthProviderFactory(AUTH_PROVIDER, factories.explicit, 'auth').pipe(
+        Effect.flatMap((createProvider) => createProvider(env)),
+      );
+    }),
   );
-}
+};
 
 /** The auth provider as an injectable service — composition roots `Effect.provide` it (ADR-0023 DI). */
 export class Auth extends Context.Tag('@vybekiit/auth/Auth')<Auth, AuthProvider>() {}
 
 /**
- * `Live` layer building {@link Auth} from the environment. Wraps {@link resolveAuthProvider},
- * so config still fails loud when the layer is built at a composition root.
+ * Build the live Auth Layer from environment config.
+ *
+ * @param env - Environment source to parse; defaults to `process.env`.
+ * @param injections - Test seams for provider clients; omit in production.
+ * @returns A Layer that provides Auth or fails with AuthError during construction.
+ * @example
+ * const runtime = ManagedRuntime.make(makeAuthLive({ AUTH_PROVIDER: 'local' }));
  */
-export function makeAuthLive(
+export const makeAuthLive = (
   env: EnvSource = process.env,
   injections: ResolveAuthInjections = {},
-): Layer.Layer<Auth> {
-  return Layer.effect(
-    Auth,
-    Effect.sync(() => resolveAuthProvider(env, injections)),
-  );
-}
+): Layer.Layer<Auth, AuthError> => Layer.effect(Auth, resolveAuthProvider(env, injections));

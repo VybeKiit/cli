@@ -1,78 +1,88 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { Badge } from '@/components/ui/badge';
+import { Play, Star } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
-const FEATURES = ['Auth ready', 'Payments wired', 'Email templates', 'Analytics'] as const;
+const AVATARS = ['#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'] as const;
 
-const STATS = [
-  { label: 'Time to ship', value: '3 days' },
-  { label: 'Components', value: '48+' },
-  { label: 'Integrations', value: '12' },
-] as const;
+/**
+ * Marketing carousel slide — a light landing hero built from the same components.
+ *
+ * @returns The rendered MarketingBlocksSlide element.
+ * @example
+ * ```tsx
+ * <MarketingBlocksSlide />
+ * ```
+ */
 
-/** Marketing blocks carousel slide — light landing preview with feature grid. */
-export function MarketingBlocksSlide() {
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-black/10 border-b bg-[#E8ECF2] px-3 py-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#28CA42]" />
-        <span className="ms-2 text-[10px] text-[var(--light-muted)]">yourproduct.com</span>
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col bg-[var(--light-card)] p-3">
-        <div className="text-center">
-          <Badge className="mb-2 text-[9px]" variant="secondary">
-            Launch ready
-          </Badge>
-          <p className="font-bold text-[var(--light-text)] text-base leading-tight">
-            Your SaaS in days
-          </p>
-          <p className="mx-auto mt-1 max-w-[220px] text-[11px] text-[var(--light-muted)] leading-relaxed">
-            Ship a polished marketing page with the same components your product uses.
-          </p>
-        </div>
-
-        <div className="mt-3 grid grid-cols-2 gap-1.5">
-          {FEATURES.map((feat) => (
-            <Card className="border-black/6 shadow-none" key={feat}>
-              <CardContent className="flex items-center gap-1.5 p-2 text-[9px] text-[var(--light-text)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--green)]" />
-                {feat}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Separator className="my-3 bg-black/8" />
-
-        <div className="grid grid-cols-3 gap-2 rounded-lg border border-black/6 bg-[var(--light-card-muted)] p-2">
-          {STATS.map((stat) => (
-            <div className="text-center" key={stat.label}>
-              <p className="text-[8px] text-[var(--light-muted)]">{stat.label}</p>
-              <p className="font-bold text-[11px] text-[var(--light-text)]">
-                <AnimatedNumber value={stat.value} />
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-auto flex flex-col items-center gap-2 pt-3">
-          <div className="flex w-full gap-2">
-            <div className="h-8 flex-1 rounded-md bg-[var(--blue)]/10" />
-            <div className="h-8 flex-1 rounded-md bg-black/5" />
-            <div className="h-8 flex-1 rounded-md bg-black/5" />
-          </div>
-          <Button className="h-7 w-full text-[10px]" size="sm" tabIndex={-1}>
-            Get started
+export const MarketingBlocksSlide = () => (
+  <div className="flex h-full items-center justify-center bg-gradient-to-b from-[#0a1120] to-[#04070d] p-3">
+    <Card className="w-full gap-0 border-black/8 bg-white py-0 shadow-2xl">
+      <CardContent className="p-5">
+        <div className="mb-5 flex items-center justify-between">
+          <span className="flex items-center gap-1.5 font-semibold text-[11px] text-[#0b1220]">
+            <span className="h-3.5 w-3.5 rounded-md bg-gradient-to-br from-[#62a1ff] to-[#1e6bff]" />
+            SaaSTrack
+          </span>
+          <Button
+            className="h-6 rounded-full bg-[#0b1220] px-2.5 text-[8px] text-white hover:bg-[#0b1220]/90"
+            size="sm"
+          >
+            Start Free Trial
           </Button>
-          <p className="text-[9px] text-[var(--light-muted)]">No credit card required</p>
         </div>
-      </div>
-    </div>
-  );
-}
+
+        <h4 className="font-bold text-[#0b1220] text-[26px] leading-[1.08] tracking-tight">
+          Ship <span className="text-[#7c3aed]">your</span> SaaS
+          <br />
+          in <span className="text-[#9aa3b2] line-through decoration-[#c7ccd6]">months</span>{' '}
+          <span className="text-[#0b1220]">days</span>
+        </h4>
+
+        <p className="mt-3 max-w-[240px] text-[#526070] text-[10px] leading-relaxed">
+          Ship one product with one team. Move from idea to traction in a weekend, not a quarter.
+        </p>
+
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex -space-x-2">
+            {AVATARS.map((color) => (
+              <span
+                className="h-6 w-6 rounded-full border-2 border-white"
+                key={color}
+                style={{ background: color }}
+              />
+            ))}
+          </div>
+          <div>
+            <div className="flex gap-0.5 text-[#f5a623]">
+              {[0, 1, 2, 3, 4].map((index) => (
+                <Star className="h-3 w-3" fill="currentColor" key={index} strokeWidth={0} />
+              ))}
+            </div>
+            <p className="mt-0.5 text-[#8b95a7] text-[8px]">Loved by 2,000+ builders</p>
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center gap-2">
+          <Button
+            className="h-8 gap-1.5 rounded-lg bg-[#0b1220] px-3 text-[10px] text-white"
+            size="sm"
+          >
+            <Play className="h-3 w-3" fill="currentColor" strokeWidth={0} />
+            Tour in 3s
+          </Button>
+          <Button
+            className="h-8 gap-1.5 rounded-lg border-black/10 px-3 text-[#0b1220] text-[10px]"
+            size="sm"
+            variant="outline"
+          >
+            <Play className="h-3 w-3" strokeWidth={2} />
+            Start free
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);

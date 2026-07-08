@@ -2,9 +2,9 @@ import {
   TECH_REFERENCE_MAP,
   TECH_REFERENCES,
   type TechReference,
-} from '../catalogs/techReferences';
+} from '@vybekiit/agent-kit/catalogs/techReferences';
 
-export interface DocFallbackPlan {
+export type DocFallbackPlan = {
   readonly techId: string;
   readonly label: string;
   readonly docsUrl: string;
@@ -15,17 +15,21 @@ export interface DocFallbackPlan {
   readonly builderMessage: string;
   readonly suggestedSteps: readonly string[];
   readonly found: boolean;
-}
+};
 
 const BUILDER_STUCK_MESSAGE =
   "I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment.";
 
-/** Plain phrase the agent says to the builder when MCP or first debug attempt fails. */
-export function formatBuilderStuckMessage(): string {
-  return BUILDER_STUCK_MESSAGE;
-}
+/**
+ * Plain phrase the agent says to the builder when MCP or first debug attempt fails.
+ *
+ * @returns The rendered format builder stuck message text.
+ * @example
+ * const result = formatBuilderStuckMessage();
+ */
+export const formatBuilderStuckMessage = (): string => BUILDER_STUCK_MESSAGE;
 
-function defaultSteps(ref: TechReference): string[] {
+const defaultSteps = (ref: TechReference): string[] => {
   const steps = [`Open official docs: ${ref.docsUrl}`];
   if (ref.mcpDocsUrl) {
     steps.push(`If MCP is configured, verify connection to ${ref.mcpDocsUrl}`);
@@ -35,7 +39,7 @@ function defaultSteps(ref: TechReference): string[] {
         '` and follow docs without naming MCP to the builder',
     );
   }
-  if (ref.envKeys?.length) {
+  if (ref.envKeys !== undefined && ref.envKeys.length > 0) {
     steps.push(`Confirm secret settings in .env.example: ${ref.envKeys.join(', ')}`);
   }
   if (ref.troubleshootingPath) {
@@ -43,12 +47,18 @@ function defaultSteps(ref: TechReference): string[] {
   }
   steps.push(`Tell the builder: "${BUILDER_STUCK_MESSAGE}"`);
   return steps;
-}
+};
 
 /**
  * Return official doc URLs and agent steps when stuck on a provider integration.
+ *
+ * @param techId - tech id input.
+ * @param _context -  context input.
+ * @returns The plan doc fallback result.
+ * @example
+ * const result = planDocFallback(techId, context);
  */
-export function planDocFallback(techId: string, _context?: string): DocFallbackPlan {
+export const planDocFallback = (techId: string, _context?: string): DocFallbackPlan => {
   const ref = TECH_REFERENCE_MAP[techId];
   if (!ref) {
     return {
@@ -76,4 +86,4 @@ export function planDocFallback(techId: string, _context?: string): DocFallbackP
     suggestedSteps: defaultSteps(ref),
     found: true,
   };
-}
+};

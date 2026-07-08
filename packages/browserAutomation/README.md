@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/hero.webp" width="1000" height="1000" alt="VybeKiit">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/brand/vybekiit-profile.svg" width="160" height="160" alt="VybeKiit logo">
 </p>
 
 # @vybekiit/browser-automation
@@ -10,7 +10,9 @@ Dashboard automation CLI for Lemon Squeezy and Chrome Web Store.
 
 ## What it does
 
-Unified Playwright package with registry CLI `vybekiit-automate`. Domains: extension (CWS), payments/ls. Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
+Unified Playwright + CLI package with registry CLI `vybekiit-automate`. Provider credential onboarding is **CLI-first, browser-fallback** (ADR-0032): each `setup` ensures the provider's CLI via `vybekiit doctor --ensure <tool>`, mints/reads the credential headlessly where possible, verifies it live, and writes it to `.env` (the agent sees only `keysWritten`, never the value).
+
+Domains: `extension` (CWS), `payments/ls`, `registrars` (nc/gd), `google` (OAuth consent + Web client), `infra` (cloudflare/railway/vercel), `dbs` (supabase/neon/upstash), `ai` (openai/anthropic), `misc` (github/resend/sentry). Store SSOT: `.vybekiit/store/`. Agent `--json` mode or interactive wizard.
 
 ## In your app
 

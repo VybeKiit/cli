@@ -1,1 +1,1 @@
-export * from '@/components/ui/tabs';
+export * from '@vybekiit/ui/tabs';

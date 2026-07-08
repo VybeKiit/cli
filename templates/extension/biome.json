@@ -1,6 +1,6 @@
 {
   "root": false,
-  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
@@ -63,6 +63,8 @@
       },
       "correctness": {
         "noNodejsModules": "off",
+        "noSolidDestructuredProps": "off",
+        "useQwikValidLexicalScope": "off",
         "noUndeclaredDependencies": "warn",
         "noUndeclaredVariables": "warn",
         "noUnresolvedImports": "off",
@@ -70,7 +72,8 @@
         "useHookAtTopLevel": "off"
       },
       "performance": {
-        "noAwaitInLoops": "warn"
+        "noAwaitInLoops": "warn",
+        "useSolidForComponent": "off"
       },
       "suspicious": {
         "noUnnecessaryConditions": "warn",

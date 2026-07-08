@@ -13,10 +13,35 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
+    },
     "./mobile": {
       "types": "./dist/mobile/index.d.ts",
       "import": "./dist/mobile/index.js",
       "require": "./dist/mobile/index.cjs"
+    },
+    "./query/client": {
+      "types": "./dist/query/client.d.ts",
+      "import": "./dist/query/client.js",
+      "require": "./dist/query/client.cjs"
+    },
+    "./queryKeys": {
+      "types": "./dist/queryKeys.d.ts",
+      "import": "./dist/queryKeys.js",
+      "require": "./dist/queryKeys.cjs"
+    },
+    "./resolve": {
+      "types": "./dist/resolve.d.ts",
+      "import": "./dist/resolve.js",
+      "require": "./dist/resolve.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
     },
     "./web": {
       "types": "./dist/web/index.d.ts",
@@ -38,7 +63,7 @@
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-query-persist-client": "^5.101.1",
     "@vybekiit/core": "workspace:*",
-    "effect": "3.21.4",
+    "effect": "catalog:",
     "zustand": "^5.0.3"
   },
   "peerDependencies": {
@@ -53,11 +78,12 @@
   "devDependencies": {
     "@types/react": "^19.0.2",
     "react": "^19.0.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

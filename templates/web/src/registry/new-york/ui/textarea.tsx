@@ -1,1 +1,1 @@
-export * from '@/components/ui/textarea';
+export * from '@vybekiit/ui/textarea';

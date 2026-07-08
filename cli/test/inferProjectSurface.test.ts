@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
   inferProjectSurfaceSync,
-  reportModeEnvKeysForSurface,
   type ProjectSurfaceProbe,
+  reportModeEnvKeysForSurface,
 } from '../src/lib/inferProjectSurface';
 
-function probe(files: Record<string, string>): ProjectSurfaceProbe {
-  return {
-    exists: (path) => path in files,
-    readUtf8: (path) => files[path] ?? null,
-  };
-}
+const probe = (files: Record<string, string>): ProjectSurfaceProbe => ({
+  exists: (path) => path in files,
+  readUtf8: (path) => {
+    const value = files[path];
+    if (value === undefined) {
+      return null;
+    }
+    return value;
+  },
+});
 
-describe('inferProjectSurfaceSync', () => {
+describe('project surface dependency signals', () => {
   it('detects mobile from expo dependency in package.json', () => {
     const surface = inferProjectSurfaceSync(
       '/tmp',
@@ -48,6 +52,18 @@ describe('inferProjectSurfaceSync', () => {
     expect(surface.mobile).toBe(false);
   });
 
+  it('detects backend from express dependency', () => {
+    const surface = inferProjectSurfaceSync(
+      '/tmp',
+      probe({
+        'package.json': JSON.stringify({ dependencies: { express: '4.0.0' } }),
+      }),
+    );
+    expect(surface.template).toBe('backend');
+  });
+});
+
+describe('project surface layout signals', () => {
   it('detects extension from wxt.config.ts', () => {
     const surface = inferProjectSurfaceSync(
       '/tmp',
@@ -70,16 +86,6 @@ describe('inferProjectSurfaceSync', () => {
     expect(surface.template).toBe('extension');
   });
 
-  it('detects backend from express dependency', () => {
-    const surface = inferProjectSurfaceSync(
-      '/tmp',
-      probe({
-        'package.json': JSON.stringify({ dependencies: { express: '4.0.0' } }),
-      }),
-    );
-    expect(surface.template).toBe('backend');
-  });
-
   it('detects backend from src layout when package.json missing', () => {
     const surface = inferProjectSurfaceSync(
       '/tmp',
@@ -97,7 +103,7 @@ describe('inferProjectSurfaceSync', () => {
   });
 });
 
-describe('reportModeEnvKeysForSurface', () => {
+describe('report mode env keys', () => {
   it('uses mobile env key', () => {
     expect(
       reportModeEnvKeysForSurface({ template: 'mobile', mobile: true, extension: false }, 'claude'),

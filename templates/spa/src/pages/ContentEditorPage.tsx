@@ -1,9 +1,9 @@
-import PageMeta from '@/components/common/PageMeta';
+import { PageMeta } from '@/components/common/PageMeta';
 import { RichTextEditor } from '@/components/modern-ui/rich-text-editor';
 import { useI18n } from '@/lib/i18n';
 import { useState } from 'react';
 
-export default function ContentEditorPage() {
+export const ContentEditorPage = () => {
   const { t } = useI18n();
   const [html, setHtml] = useState('<p></p>');
 
@@ -22,4 +22,4 @@ export default function ContentEditorPage() {
       </div>
     </>
   );
-}
+};

@@ -1,56 +1,73 @@
 import { resolveDataProvider } from '@vybekiit/db';
+import {
+  type SearchDocument,
+  SearchError,
+  type SearchHit,
+  type SearchProvider,
+} from '@vybekiit/search/types';
 import { Effect } from 'effect';
-import { SearchError, type SearchDocument, type SearchHit, type SearchProvider } from '../types';
 
-interface SearchRow {
+const defaultSearchLimit = 10;
+const snippetLength = 120;
+
+type SearchRow = {
   readonly id: string;
   readonly content: string;
-}
+};
 
-/** Map a db failure into a {@link SearchError} with the given stable code. */
+/**
+ * Map a db failure into a {@link SearchError} with a stable code.
+ *
+ * @param code - Stable search error code.
+ * @returns A mapper from db-like failures to SearchError.
+ * @example
+ * const mapError = asSearchError('search_failed');
+ */
 const asSearchError =
-  (code: string) =>
+  (code: SearchError['code']) =>
   (error: { readonly message: string }): SearchError =>
     new SearchError({ code, message: error.message });
 
 /**
- * Supabase-backed search over the Postgres data provider — indexes into a
- * `search_documents` table and does a case-insensitive `contains` scan. The db
- * seam is Effect-native (ADR-0023), so this composes its {@link Effect} directly and
- * maps the `DbError` channel to a {@link SearchError}.
+ * Build the Supabase-backed search adapter over the data provider.
+ *
+ * @returns A search provider that indexes and scans `search_documents`.
+ * @example
+ * const search = createSupabaseSearch();
  */
-export function createSupabaseSearch(): SearchProvider {
+export const createSupabaseSearch = (): SearchProvider => {
   const data = resolveDataProvider();
   return {
     name: 'supabase',
-    index(doc: SearchDocument) {
-      return Effect.gen(function* () {
+    index: (doc: SearchDocument) =>
+      Effect.gen(function* () {
         const existing = yield* data.get<SearchRow>('search_documents', doc.id);
-        if (existing) {
-          yield* data.update<SearchRow>('search_documents', doc.id, { content: doc.content });
-        } else {
+        if (existing === null) {
           yield* data.insert<SearchRow>('search_documents', { id: doc.id, content: doc.content });
+        } else {
+          yield* data.update<SearchRow>('search_documents', doc.id, { content: doc.content });
         }
         return true as const;
-      }).pipe(Effect.mapError(asSearchError('search_index_failed')));
-    },
-    search(query: string, limit = 10) {
-      return data.query<SearchRow>('search_documents', {}).pipe(
+      }).pipe(Effect.mapError(asSearchError('search_index_failed'))),
+    search: (query: string, limit = defaultSearchLimit) =>
+      data.query<SearchRow>('search_documents', {}).pipe(
         Effect.map((rows) =>
           rows
             .filter((row) => row.content.toLowerCase().includes(query.toLowerCase()))
             .slice(0, limit)
             .map(
-              (row): SearchHit => ({ id: row.id, score: 1, snippet: row.content.slice(0, 120) }),
+              (row): SearchHit => ({
+                id: row.id,
+                score: 1,
+                snippet: row.content.slice(0, snippetLength),
+              }),
             ),
         ),
         Effect.mapError(asSearchError('search_failed')),
-      );
-    },
-    remove(id: string) {
-      return data
+      ),
+    remove: (id: string) =>
+      data
         .remove('search_documents', id)
-        .pipe(Effect.mapError(asSearchError('search_remove_failed')));
-    },
+        .pipe(Effect.mapError(asSearchError('search_remove_failed'))),
   };
-}
+};

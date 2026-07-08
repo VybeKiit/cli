@@ -1,8 +1,7 @@
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import { type Browser, chromium } from 'playwright';
-
-import type { AttachedSession, VerbContext } from './types';
-
 import { CdpUnreachableError } from './errors';
+import type { AttachedSession, VerbContext } from './types';
 
 const DEFAULT_CDP_ENDPOINT = 'http://localhost:9222';
 
@@ -25,10 +24,15 @@ const DEFAULT_CDP_ENDPOINT = 'http://localhost:9222';
  * `dispose` closes the single page this function opened and closes the
  * Playwright CDP handle. For connected browsers, Playwright documents
  * `browser.close()` as disconnecting from the browser server.
+ *
+ * @param ctx - Extension verb context.
+ * @returns Attached CWS browser session.
+ * @example
+ * const session = await connectToCwsChrome(ctx);
  */
-export async function connectToCwsChrome(ctx: VerbContext): Promise<AttachedSession> {
-  const endpoint = ctx.cdpEndpoint ?? DEFAULT_CDP_ENDPOINT;
-  const log = ctx.log ?? console;
+export const connectToCwsChrome = async (ctx: VerbContext): Promise<AttachedSession> => {
+  const endpoint = ctx.cdpEndpoint === undefined ? DEFAULT_CDP_ENDPOINT : ctx.cdpEndpoint;
+  const log = resolveVerbLogger(ctx);
 
   log.log(`[cws] attaching to CWS Chrome at ${endpoint}`);
 
@@ -36,17 +40,15 @@ export async function connectToCwsChrome(ctx: VerbContext): Promise<AttachedSess
   try {
     browser = await chromium.connectOverCDP(endpoint, { timeout: 15_000, noDefaults: true });
   } catch (err) {
-    throw new CdpUnreachableError(endpoint, err);
+    throw new CdpUnreachableError(endpoint, { cause: err });
   }
 
-  const contexts = browser.contexts();
-  const context = contexts[0];
-  if (!context) {
+  const [context] = browser.contexts();
+  if (context === undefined) {
     await browser.close().catch(() => undefined);
-    throw new CdpUnreachableError(
-      endpoint,
-      new Error('Connected to Chrome but no existing browser context was found.'),
-    );
+    throw new CdpUnreachableError(endpoint, {
+      cause: new Error('Connected to Chrome but no existing browser context was found.'),
+    });
   }
 
   const page = await context.newPage();
@@ -65,4 +67,4 @@ export async function connectToCwsChrome(ctx: VerbContext): Promise<AttachedSess
   };
 
   return { browser, context, dispose, page };
-}
+};

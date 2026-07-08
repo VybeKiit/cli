@@ -1,10 +1,11 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { VIBE_HINTS } from '@/data/vibeHints';
+import { useFirstHoverTypewriter } from '@/hooks/useFirstHoverTypewriter';
 import { cn } from '@/lib/utils';
-import type { ReactNode } from 'react';
 
 const DESKTOP_MEDIA = '(min-width: 768px)';
 
@@ -19,24 +20,44 @@ interface BrandMarkVibeHintProps {
   readonly onCascadeInterrupt?: () => void;
 }
 
-/** Muted mobile subtitle — place inside label column in product-stack rows. */
-export function BrandMarkVibeHintMobile({ slug }: { readonly slug: string }) {
+/**
+ * Muted mobile subtitle — place inside label column in product-stack rows.
+ *
+ * @param props - Component props.
+ * @returns The rendered BrandMarkVibeHintMobile element.
+ * @example
+ * ```tsx
+ * <BrandMarkVibeHintMobile />
+ * ```
+ */
+
+export const BrandMarkVibeHintMobile = ({ slug }: { readonly slug: string }) => {
   const hint = VIBE_HINTS[slug];
   if (!hint) {
     return null;
   }
 
   return <span className="brand-mark-vibe-hint md:hidden">{hint}</span>;
-}
+};
 
-/** Plain-English vibe hint — desktop tooltip; mobile subtitle lives in children. */
-export function BrandMarkVibeHint({
+/**
+ * Plain-English vibe hint — desktop tooltip; mobile subtitle lives in children.
+ *
+ * @param props - Component props.
+ * @returns The rendered BrandMarkVibeHint element.
+ * @example
+ * ```tsx
+ * <BrandMarkVibeHint />
+ * ```
+ */
+
+export const BrandMarkVibeHint = ({
   slug,
   children,
   forceOpen = false,
   side = 'top',
   onCascadeInterrupt,
-}: BrandMarkVibeHintProps) {
+}: BrandMarkVibeHintProps) => {
   const hint = VIBE_HINTS[slug];
   const [isDesktop, setIsDesktop] = useState(false);
   const [hoverOpen, setHoverOpen] = useState(false);
@@ -81,11 +102,16 @@ export function BrandMarkVibeHint({
     setHoverOpen(false);
   }, [forceOpen]);
 
+  const open = Boolean(hint) && isDesktop && (forceOpen || hoverOpen);
+  const typewriterHint = hint === undefined ? '' : hint;
+  const { text: tooltipText, showCursor } = useFirstHoverTypewriter(slug, typewriterHint, {
+    open,
+    enabled: !forceOpen && Boolean(hint),
+  });
+
   if (!hint) {
     return <>{children}</>;
   }
-
-  const open = isDesktop && (forceOpen || hoverOpen);
 
   return (
     <Tooltip open={open} onOpenChange={handleOpenChange}>
@@ -103,8 +129,8 @@ export function BrandMarkVibeHint({
         side={side}
         sideOffset={8}
       >
-        {hint}
+        <span className={cn(showCursor && 'typewriter-cursor')}>{tooltipText}</span>
       </TooltipContent>
     </Tooltip>
   );
-}
+};

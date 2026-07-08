@@ -1,138 +1,86 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import { LightPanel } from '@/components/landing/kit/LightPanel';
+import { Sparkline } from '@/components/landing/kit/Sparkline';
+import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
 import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
-import { useReducedMotion } from '@/lib/motion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 const TRANSACTIONS = [
   { amount: '$48.00', plan: 'Basic Plan', time: '2m ago' },
   { amount: '$99.00', plan: 'Pro Plan', time: '15m ago' },
   { amount: '$249.00', plan: 'Team Plan', time: '1h ago' },
-  { amount: '$48.00', plan: 'Basic Plan', time: '2h ago' },
 ] as const;
 
-/** Sparkline with stroke-dash draw animation on mount. */
-function PaymentsSparkline() {
-  const reduced = useReducedMotion();
-  return (
-    <div className="rounded-lg border border-black/6 bg-[var(--light-card-muted)] p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <p className="text-[10px] text-[var(--light-muted)] uppercase tracking-wide">
-          Revenue trend
-        </p>
-        <Badge
-          className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[10px] text-[var(--green)]"
-          variant="outline"
-        >
-          Live
-        </Badge>
-      </div>
-      <svg aria-hidden="true" className="h-20 w-full" viewBox="0 0 200 60">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <line
-            key={i}
-            stroke="rgba(0,0,0,0.06)"
-            strokeWidth="1"
-            x1={i * 50}
-            x2={i * 50}
-            y1="0"
-            y2="60"
-          />
-        ))}
-        <motion.polyline
-          animate={{ pathLength: 1 }}
-          fill="none"
-          initial={{ pathLength: reduced ? 1 : 0 }}
-          points="0,45 30,40 60,42 90,28 120,32 150,18 180,22 200,10"
-          stroke="var(--blue)"
-          strokeWidth="2"
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-        />
-      </svg>
-    </div>
-  );
-}
+/**
+ * Payments zig-zag mockup — Stripe connected, today's revenue, recent transactions.
+ *
+ * @returns The rendered PaymentsMock element.
+ * @example
+ * ```tsx
+ * <PaymentsMock />
+ * ```
+ */
 
-/** Payments zig-zag mockup — Stripe connected, stats, sparkline. */
-export function PaymentsMock() {
-  return (
-    <div className="light-ui-card w-full rounded-2xl">
-      <div className="mb-4 flex items-start justify-between gap-4">
+export const PaymentsMock = () => (
+  <LightPanel
+    className="payments-mock-panel"
+    contentClassName="payments-mock-panel__content"
+    description="Accept payments in minutes."
+    title="Payments"
+  >
+    <Card className="mb-[18px] h-[106px] gap-0 border-black/6 bg-white py-0 shadow-none">
+      <CardContent className="flex h-full items-center justify-between p-5">
         <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <h3 className="font-bold text-[var(--light-text)] text-xl">Payments</h3>
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[10px] text-[var(--green)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
+          <p className="font-semibold text-[18px] text-[var(--light-text)]">Provider</p>
+          <div className="mt-2 flex items-center gap-2">
+            <LogoMarkIcon className="h-4 w-4" slug="stripe" />
+            <span className="font-medium text-[16px] text-[var(--light-text)]">Stripe</span>
           </div>
-          <p className="text-[var(--light-muted)] text-sm">Accept payments in minutes.</p>
         </div>
-        <Badge
-          className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[var(--green)]"
-          variant="outline"
-        >
-          Live mode
-        </Badge>
-      </div>
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <span className="font-medium text-[var(--light-text)] text-sm">Stripe</span>
-        <Badge
-          className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[var(--green)]"
-          variant="outline"
-        >
+        <Badge className="border-[var(--blue)]/20 bg-[var(--blue)]/10 px-3 py-1.5 text-[14px] text-[var(--blue-strong)]">
           Connected
         </Badge>
-        <Badge
-          className="border-[var(--blue)]/30 bg-[var(--blue)]/10 text-[10px] text-[var(--blue-strong)]"
-          variant="outline"
-        >
-          Webhooks active
-        </Badge>
-      </div>
-      <div className="mb-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-black/6 bg-white/60 p-4">
-          <p className="text-[var(--light-muted)] text-xs uppercase tracking-wide">Today</p>
-          <p className="font-bold text-3xl text-[var(--light-text)]">
-            <AnimatedNumber value="$2,430.00" />
+      </CardContent>
+    </Card>
+
+    <div className="grid items-start gap-4 sm:grid-cols-2">
+      <Card className="min-h-[258px] gap-0 border-black/6 bg-white py-0 shadow-none">
+        <CardContent className="p-5">
+          <p className="text-[15px] text-[var(--light-muted)]">Today</p>
+          <div className="mt-0.5 flex items-baseline gap-2">
+            <p className="font-bold text-[30px] text-[var(--light-text)] tracking-tight">
+              $2,430.00
+            </p>
+            <span className="font-medium text-[14px] text-emerald-600">+12.5%</span>
+          </div>
+          <p className="text-[13px] text-[var(--light-muted)]">vs yesterday</p>
+          <Sparkline className="mt-5 h-[110px] w-full" id="payments-zigzag-spark" />
+        </CardContent>
+      </Card>
+
+      <Card className="min-h-[258px] gap-0 border-black/6 bg-white py-0 shadow-none">
+        <CardContent className="p-5">
+          <p className="mb-4 font-semibold text-[16px] text-[var(--light-text)]">
+            Recent Transactions
           </p>
-          <p className="text-[var(--green)] text-sm">
-            <AnimatedNumber value="+12.5%" /> vs yesterday
-          </p>
-        </div>
-        <div className="rounded-lg border border-black/6 bg-white/60 p-4">
-          <p className="text-[var(--light-muted)] text-xs uppercase tracking-wide">This month</p>
-          <p className="font-bold text-2xl text-[var(--light-text)]">
-            <AnimatedNumber value="$18,420" />
-          </p>
-          <p className="text-[var(--light-muted)] text-sm">
-            <AnimatedNumber value="142" /> transactions
-          </p>
-        </div>
-      </div>
-      <PaymentsSparkline />
-      <div className="mt-6">
-        <p className="mb-3 font-semibold text-[var(--light-text)] text-sm">Recent Transactions</p>
-        <ul className="space-y-2">
-          {TRANSACTIONS.map((tx) => (
-            <li
-              className="flex justify-between rounded-md border border-black/5 px-3 py-2 text-[var(--light-muted)] text-xs"
-              key={`${tx.plan}-${tx.time}`}
-            >
-              <span>
-                <span className="font-medium text-[var(--light-text)]">
-                  <AnimatedNumber value={tx.amount} />
-                </span>{' '}
-                {tx.plan}
-              </span>
-              <span>{tx.time}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+          <Separator className="mb-4 bg-black/6" />
+          <ul className="space-y-4">
+            {TRANSACTIONS.map((tx) => (
+              <li className="flex items-center justify-between" key={tx.plan}>
+                <div>
+                  <p className="font-semibold text-[15px] text-[var(--light-text)] leading-tight">
+                    {tx.amount}
+                  </p>
+                  <p className="text-[13px] text-[var(--light-muted)] leading-tight">{tx.plan}</p>
+                </div>
+                <span className="text-[13px] text-[var(--light-muted)]">{tx.time}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </div>
-  );
-}
+  </LightPanel>
+);

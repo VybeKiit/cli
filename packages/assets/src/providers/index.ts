@@ -1,205 +1,238 @@
-import {
-  type AppConfig,
-  type AwsConfig,
-  type CloudflareConfig,
-  type R2Config,
-  type SupabaseConfig,
-  fail,
-  ok,
-  type Result,
-} from '@vybekiit/core';
-import { runOptimizeForBuild } from '../optimize';
 import type {
-  AssetDeliveryProvider,
-  AssetUrlOptions,
-  OptimizeBuildOptions,
-  OptimizeBuildResult,
-} from '../types';
+  AssetAppConfigType,
+  AssetAwsConfigType,
+  AssetCloudflareConfigType,
+  AssetR2ConfigType,
+  AssetSupabaseConfigType,
+} from '@vybekiit/assets/config';
+import { runOptimizeForBuild } from '@vybekiit/assets/optimize';
+import {
+  type AssetDeliveryProvider,
+  AssetError,
+  type AssetUrlOptionsType,
+} from '@vybekiit/assets/types';
+import { Effect } from 'effect';
 
-/** Build-time optimization only — used before Cloudflare/Supabase credentials exist. */
-export function createLocalAssetDelivery(): AssetDeliveryProvider {
-  return {
-    name: 'local',
+type CloudflareR2DeliveryConfig = {
+  readonly cloudflare: AssetCloudflareConfigType;
+  readonly r2: AssetR2ConfigType;
+  readonly app: AssetAppConfigType;
+};
 
-    async optimizeForBuild(options: OptimizeBuildOptions): Promise<OptimizeBuildResult> {
-      return runOptimizeForBuild(options);
-    },
+type CloudflareSupabaseDeliveryConfig = {
+  readonly cloudflare: AssetCloudflareConfigType;
+  readonly supabase: AssetSupabaseConfigType;
+  readonly app: AssetAppConfigType;
+};
 
-    url(src: string, _opts?: AssetUrlOptions): string {
-      return src;
-    },
+type VercelDeliveryConfig = {
+  readonly app: AssetAppConfigType;
+};
 
-    async verifyDelivery(): Promise<Result<true>> {
-      return ok(true);
-    },
-  };
-}
+type AwsS3DeliveryConfig = {
+  readonly aws: AssetAwsConfigType;
+  readonly app: AssetAppConfigType;
+};
 
-interface CloudflareR2DeliveryConfig {
-  readonly cloudflare: CloudflareConfig;
-  readonly r2: R2Config;
-  readonly app: AppConfig;
-}
+const trimTrailingSlash = (value: string): string =>
+  value.endsWith('/') ? value.slice(0, -1) : value;
 
-function cloudflareImageResizeUrl(zoneOrigin: string, src: string, opts?: AssetUrlOptions): string {
-  const base = zoneOrigin.replace(/\/$/, '');
+const trimLeadingSlash = (value: string): string =>
+  value.startsWith('/') ? value.slice(1) : value;
+
+const isRemoteUrl = (src: string): boolean =>
+  src.startsWith('http://') || src.startsWith('https://');
+
+const resolveAssetFormat = (opts: AssetUrlOptionsType | undefined): 'webp' | 'avif' | 'auto' => {
+  if (opts === undefined || opts.format === undefined) {
+    return 'auto';
+  }
+
+  return opts.format;
+};
+
+const createDeliveryConfigError = (message: string): AssetError =>
+  new AssetError({ code: 'ASSET_DELIVERY_NOT_CONFIGURED', message });
+
+const cloudflareImageResizeUrl = (
+  zoneOrigin: string,
+  src: string,
+  opts?: AssetUrlOptionsType | undefined,
+): string => {
+  const base = trimTrailingSlash(zoneOrigin);
   const params: string[] = [];
-  if (opts?.width) {
+
+  if (opts !== undefined && opts.width !== undefined) {
     params.push(`width=${opts.width}`);
   }
-  const format = opts?.format ?? 'auto';
-  params.push(`format=${format}`);
-  const query = params.join(',');
-  const encoded = encodeURIComponent(
-    src.startsWith('http') ? src : `${base}/${src.replace(/^\//, '')}`,
-  );
-  return `${base}/cdn-cgi/image/${query}/${encoded}`;
-}
 
-export function createCloudflareR2Delivery(
+  params.push(`format=${resolveAssetFormat(opts)}`);
+
+  const query = params.join(',');
+  const sourceUrl = isRemoteUrl(src) ? src : `${base}/${trimLeadingSlash(src)}`;
+  const encoded = encodeURIComponent(sourceUrl);
+
+  return `${base}/cdn-cgi/image/${query}/${encoded}`;
+};
+
+const verifyNonEmpty = (value: string, message: string): Effect.Effect<true, AssetError> => {
+  if (value.length === 0) {
+    return Effect.fail(createDeliveryConfigError(message));
+  }
+
+  return Effect.succeed(true);
+};
+
+/**
+ * Build the local asset delivery adapter for offline scaffolds and tests.
+ *
+ * @returns An AssetDeliveryProvider that optimizes local assets and returns URLs unchanged.
+ * @example
+ * const provider = createLocalAssetDelivery();
+ */
+export const createLocalAssetDelivery = (): AssetDeliveryProvider => ({
+  name: 'local',
+  optimizeForBuild: (options) => runOptimizeForBuild(options),
+  url: (src) => src,
+  verifyDelivery: () => Effect.succeed(true),
+});
+
+/**
+ * Build the Cloudflare R2 asset delivery adapter.
+ *
+ * @param config - Cloudflare, R2, and app config decoded by the asset resolver.
+ * @returns An AssetDeliveryProvider that routes object URLs through Cloudflare image resizing.
+ * @example
+ * const provider = createCloudflareR2Delivery({ cloudflare, r2, app });
+ */
+export const createCloudflareR2Delivery = (
   config: CloudflareR2DeliveryConfig,
-): AssetDeliveryProvider {
-  const zoneOrigin = config.app.APP_URL.replace(/\/$/, '');
-  const r2Public = config.r2.R2_PUBLIC_URL.replace(/\/$/, '');
+): AssetDeliveryProvider => {
+  const zoneOrigin = trimTrailingSlash(config.app.APP_URL);
+  const r2Public = trimTrailingSlash(config.r2.R2_PUBLIC_URL);
 
   return {
     name: 'cloudflare-r2',
-
-    async optimizeForBuild(options: OptimizeBuildOptions): Promise<OptimizeBuildResult> {
-      return runOptimizeForBuild(options);
-    },
-
-    url(src: string, opts?: AssetUrlOptions): string {
-      if (src.startsWith('http://') || src.startsWith('https://')) {
+    optimizeForBuild: (options) => runOptimizeForBuild(options),
+    url: (src, opts) => {
+      if (isRemoteUrl(src)) {
         return cloudflareImageResizeUrl(zoneOrigin, src, opts);
       }
-      const objectUrl = `${r2Public}/${src.replace(/^\//, '')}`;
+
+      const objectUrl = `${r2Public}/${trimLeadingSlash(src)}`;
       return cloudflareImageResizeUrl(zoneOrigin, objectUrl, opts);
     },
-
-    async verifyDelivery(): Promise<Result<true>> {
-      if (!(r2Public && config.cloudflare.CLOUDFLARE_ACCOUNT_ID)) {
-        return fail(
-          'assets_delivery_not_configured',
-          'R2 public URL or Cloudflare account missing',
-        );
-      }
-      return ok(true);
-    },
+    verifyDelivery: () =>
+      verifyNonEmpty(config.cloudflare.CLOUDFLARE_ACCOUNT_ID, 'Cloudflare account missing'),
   };
-}
+};
 
-interface CloudflareSupabaseDeliveryConfig {
-  readonly cloudflare: CloudflareConfig;
-  readonly supabase: SupabaseConfig;
-  readonly app: AppConfig;
-}
-
-export function createCloudflareSupabaseDelivery(
+/**
+ * Build the Cloudflare plus Supabase asset delivery adapter.
+ *
+ * @param config - Cloudflare, Supabase, and app config decoded by the asset resolver.
+ * @returns An AssetDeliveryProvider that routes Supabase public objects through Cloudflare image resizing.
+ * @example
+ * const provider = createCloudflareSupabaseDelivery({ cloudflare, supabase, app });
+ */
+export const createCloudflareSupabaseDelivery = (
   config: CloudflareSupabaseDeliveryConfig,
-): AssetDeliveryProvider {
-  const zoneOrigin = config.app.APP_URL.replace(/\/$/, '');
-  const supabaseOrigin = config.supabase.SUPABASE_URL.replace(/\/$/, '');
+): AssetDeliveryProvider => {
+  const zoneOrigin = trimTrailingSlash(config.app.APP_URL);
+  const supabaseOrigin = trimTrailingSlash(config.supabase.SUPABASE_URL);
 
   return {
     name: 'cloudflare-supabase',
-
-    async optimizeForBuild(options: OptimizeBuildOptions): Promise<OptimizeBuildResult> {
-      return runOptimizeForBuild(options);
-    },
-
-    url(src: string, opts?: AssetUrlOptions): string {
-      const resolved =
-        src.startsWith('http://') || src.startsWith('https://')
-          ? src
-          : `${supabaseOrigin}/storage/v1/object/public/${src.replace(/^\//, '')}`;
+    optimizeForBuild: (options) => runOptimizeForBuild(options),
+    url: (src, opts) => {
+      const resolved = isRemoteUrl(src)
+        ? src
+        : `${supabaseOrigin}/storage/v1/object/public/${trimLeadingSlash(src)}`;
       return cloudflareImageResizeUrl(zoneOrigin, resolved, opts);
     },
-
-    async verifyDelivery(): Promise<Result<true>> {
-      if (!supabaseOrigin) {
-        return fail('assets_delivery_not_configured', 'Supabase URL missing');
-      }
-      return ok(true);
-    },
+    verifyDelivery: () => verifyNonEmpty(supabaseOrigin, 'Supabase URL missing'),
   };
-}
+};
 
-interface VercelDeliveryConfig {
-  readonly app: AppConfig;
-}
-
-export function createVercelDelivery(config: VercelDeliveryConfig): AssetDeliveryProvider {
-  const appUrl = config.app.APP_URL.replace(/\/$/, '');
+/**
+ * Build the Vercel asset delivery adapter.
+ *
+ * @param config - App config decoded by the asset resolver.
+ * @returns An AssetDeliveryProvider that maps remote images through the Next image route.
+ * @example
+ * const provider = createVercelDelivery({ app });
+ */
+export const createVercelDelivery = (config: VercelDeliveryConfig): AssetDeliveryProvider => {
+  const appUrl = trimTrailingSlash(config.app.APP_URL);
 
   return {
     name: 'vercel',
-
-    async optimizeForBuild(options: OptimizeBuildOptions): Promise<OptimizeBuildResult> {
-      return runOptimizeForBuild(options);
-    },
-
-    url(src: string, opts?: AssetUrlOptions): string {
-      const absolute =
-        src.startsWith('http://') || src.startsWith('https://')
-          ? src
-          : `${appUrl}/${src.replace(/^\//, '')}`;
+    optimizeForBuild: (options) => runOptimizeForBuild(options),
+    url: (src, opts) => {
+      const absolute = isRemoteUrl(src) ? src : `${appUrl}/${trimLeadingSlash(src)}`;
       const params = new URLSearchParams({ url: absolute });
-      if (opts?.width) {
+      const format = resolveAssetFormat(opts);
+
+      if (opts !== undefined && opts.width !== undefined) {
         params.set('w', String(opts.width));
       }
-      const format = opts?.format ?? 'auto';
+
       if (format !== 'auto') {
         params.set('fm', format);
       }
+
       return `${appUrl}/_next/image?${params.toString()}`;
     },
-
-    async verifyDelivery(): Promise<Result<true>> {
-      return ok(true);
-    },
+    verifyDelivery: () => Effect.succeed(true),
   };
-}
+};
 
-interface AwsS3DeliveryConfig {
-  readonly aws: AwsConfig;
-  readonly app: AppConfig;
-  readonly cloudFrontDomain?: string | undefined;
-}
-
-export function createAwsS3Delivery(config: AwsS3DeliveryConfig): AssetDeliveryProvider {
-  const appUrl = config.app.APP_URL.replace(/\/$/, '');
-  const cfDomain = config.cloudFrontDomain?.replace(/\/$/, '');
+/**
+ * Build the AWS S3 asset delivery adapter.
+ *
+ * @param config - AWS and app config decoded by the asset resolver.
+ * @returns An AssetDeliveryProvider that builds S3 or CloudFront-backed asset URLs.
+ * @example
+ * const provider = createAwsS3Delivery({ aws, app });
+ */
+export const createAwsS3Delivery = (config: AwsS3DeliveryConfig): AssetDeliveryProvider => {
+  const appUrl = trimTrailingSlash(config.app.APP_URL);
+  const base =
+    config.aws.AWS_CLOUDFRONT_DOMAIN === undefined
+      ? appUrl
+      : trimTrailingSlash(config.aws.AWS_CLOUDFRONT_DOMAIN);
 
   return {
     name: 'aws-s3',
+    optimizeForBuild: (options) => runOptimizeForBuild(options),
+    url: (src, opts) => {
+      const path = isRemoteUrl(src) ? src : `${base}/${trimLeadingSlash(src)}`;
 
-    async optimizeForBuild(options: OptimizeBuildOptions): Promise<OptimizeBuildResult> {
-      return runOptimizeForBuild(options);
-    },
-
-    url(src: string, opts?: AssetUrlOptions): string {
-      const base = cfDomain ?? appUrl;
-      const path = src.startsWith('http') ? src : `${base}/${src.replace(/^\//, '')}`;
-      if (!(opts?.width || opts?.format)) {
+      if (
+        opts === undefined ||
+        (opts.width === undefined && (opts.format === undefined || opts.format === 'auto'))
+      ) {
         return path;
       }
+
       const params = new URLSearchParams();
-      if (opts.width) {
+
+      if (opts.width !== undefined) {
         params.set('w', String(opts.width));
       }
-      if (opts.format && opts.format !== 'auto') {
+
+      if (opts.format !== undefined && opts.format !== 'auto') {
         params.set('format', opts.format);
       }
-      const qs = params.toString();
-      return qs ? `${path}?${qs}` : path;
-    },
 
-    async verifyDelivery(): Promise<Result<true>> {
-      if (!config.aws.AWS_REGION) {
-        return fail('assets_delivery_not_configured', 'AWS region missing');
+      const query = params.toString();
+
+      if (query.length === 0) {
+        return path;
       }
-      return ok(true);
+
+      return `${path}?${query}`;
     },
+    verifyDelivery: () => verifyNonEmpty(config.aws.AWS_REGION, 'AWS region missing'),
   };
-}
+};

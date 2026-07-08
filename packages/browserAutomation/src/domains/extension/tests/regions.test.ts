@@ -1,6 +1,8 @@
+import {
+  CWS_ALL_REGIONS,
+  isCwsAllRegions,
+} from '@vybekiit/browser-automation/domains/extension/regions';
 import { describe, expect, it } from 'vitest';
-
-import { CWS_ALL_REGIONS, isCwsAllRegions } from '../regions';
 
 describe('CWS regions', () => {
   it('recognizes the canonical all-regions selection', () => {

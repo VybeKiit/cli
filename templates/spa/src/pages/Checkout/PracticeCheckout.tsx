@@ -1,22 +1,25 @@
-import { postJson } from '@/lib/apiClient';
+import { postJson } from '@/lib/fetchJson';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 /** Practice checkout — simulates a hosted payment page when no provider keys are set. */
-export default function PracticeCheckout() {
+export const PracticeCheckout = () => {
   const navigate = useNavigate();
   const [productId, setProductId] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setProductId(new URLSearchParams(window.location.search).get('productId') ?? '');
+    const nextProductId = new URLSearchParams(window.location.search).get('productId');
+    setProductId(nextProductId === null ? '' : nextProductId);
   }, []);
 
-  async function handleComplete() {
-    if (!productId) return;
+  const handleComplete = async () => {
+    if (!productId) {
+      return;
+    }
     setPending(true);
     setError('');
     const result = await postJson<{ ok: true; orderId?: string }>(
@@ -29,7 +32,7 @@ export default function PracticeCheckout() {
       return;
     }
     navigate({ to: '/' });
-  }
+  };
 
   return (
     <div className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-6 p-6">
@@ -50,4 +53,4 @@ export default function PracticeCheckout() {
       </Card>
     </div>
   );
-}
+};

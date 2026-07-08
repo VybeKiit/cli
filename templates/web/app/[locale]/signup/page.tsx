@@ -2,40 +2,60 @@
 
 import { AuthShell } from '@/components/auth-shell';
 import { FormField } from '@/components/form-field';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
+import { Button } from '@vybekiit/ui/button';
 import { useAsync } from '@/hooks/useAsync';
 import { Link, useRouter } from '@/i18n/navigation';
 import { signUpWithPassword } from '@/lib/authClient';
+import { Either } from 'effect';
 import { useTranslations } from 'next-intl';
-import { type FormEvent, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useCallback, useId, useState } from 'react';
 
 /** Show a catalog key or pass through a server error message. */
-function displayError(t: ReturnType<typeof useTranslations>, error: string): string {
+const displayError = (t: ReturnType<typeof useTranslations>, error: string): string => {
   try {
     return t(error as 'auth.errors.enterEmailAndPassword');
   } catch {
     return error;
   }
-}
+};
 
 /**
  * Sign-up screen — full layout with loading + inline error states. Account
  * creation is a marked stub until the `add-signin` skill wires `@vybekiit/auth`.
+ *
+ * @returns The localized sign-up page.
+ * @example
+ * <SignupPage />
  */
-export default function SignupPage() {
+const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const emailId = useId();
+  const passwordId = useId();
   const { loading: pending, error, run: signUp } = useAsync(signUpWithPassword);
   const router = useRouter();
   const t = useTranslations();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const result = await signUp(email, password);
-    if (!result.ok) return;
-    router.push('/verify');
-  }
+  const handleEmailChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  }, []);
+
+  const handlePasswordChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const result = await signUp(email, password);
+      if (Either.isLeft(result)) {
+        return;
+      }
+      router.push('/verify');
+    },
+    [email, password, router, signUp],
+  );
 
   return (
     <AuthShell
@@ -57,22 +77,22 @@ export default function SignupPage() {
           </Alert>
         ) : null}
         <FormField
-          id="email"
+          id={emailId}
           label={t('auth.signup.emailLabel')}
           type="email"
           autoComplete="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={handleEmailChange}
           required={true}
         />
         <FormField
-          id="password"
+          id={passwordId}
           label={t('auth.signup.passwordLabel')}
           type="password"
           autoComplete="new-password"
           minLength={8}
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={handlePasswordChange}
           required={true}
         />
         <Button type="submit" disabled={pending}>
@@ -81,4 +101,6 @@ export default function SignupPage() {
       </form>
     </AuthShell>
   );
-}
+};
+
+export default SignupPage;

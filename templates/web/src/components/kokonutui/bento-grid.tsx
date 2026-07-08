@@ -27,13 +27,13 @@ import {
 } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import Anthropic from "@/components/icons/anthropic";
-import AnthropicDark from "@/components/icons/anthropic-dark";
-import DeepSeek from "@/components/icons/deepseek";
-import Google from "@/components/icons/gemini";
-import MistralAI from "@/components/icons/mistral";
-import OpenAI from "@/components/icons/open-ai";
-import OpenAIDark from "@/components/icons/open-ai-dark";
+import Anthropic from "@/components/kokonutui/anthropic";
+import AnthropicDark from "@/components/kokonutui/anthropic-dark";
+import DeepSeek from "@/components/kokonutui/deepseek";
+import Google from "@/components/kokonutui/gemini";
+import MistralAI from "@/components/kokonutui/mistral";
+import OpenAI from "@/components/kokonutui/open-ai";
+import OpenAIDark from "@/components/kokonutui/open-ai-dark";
 import { cn } from "@/lib/utils";
 
 interface BentoItem {

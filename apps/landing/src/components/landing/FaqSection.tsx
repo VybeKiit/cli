@@ -1,16 +1,26 @@
 'use client';
 
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { FAQ } from '@/data/faq';
 import { LANDING_EASE, LANDING_FAQ_IDS } from '@/data/landing';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 const LANDING_FAQ = FAQ.filter((item) => (LANDING_FAQ_IDS as readonly string[]).includes(item.id));
 
-/** Minimal FAQ accordion with cinematic styling. */
-export function FaqSection() {
-  const [openId, setOpenId] = useState<string | null>(LANDING_FAQ[0]?.id ?? null);
+/**
+ * Minimal FAQ accordion with cinematic styling.
+ *
+ * @returns The rendered FaqSection element.
+ * @example
+ * ```tsx
+ * <FaqSection />
+ * ```
+ */
+
+export const FaqSection = () => {
+  const firstFaq = LANDING_FAQ[0];
+  const [openId, setOpenId] = useState<string | null>(firstFaq === undefined ? null : firstFaq.id);
 
   return (
     <SectionShell className="py-16 md:py-24" id="faq">
@@ -50,4 +60,4 @@ export function FaqSection() {
       </motion.div>
     </SectionShell>
   );
-}
+};

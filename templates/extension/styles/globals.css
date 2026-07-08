@@ -46,3 +46,91 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* VybeKiit marketing shell for the toolbar popup (matches landing cinematic look). */
+.vk-popup-body {
+  margin: 0;
+  background: #02050a;
+  color: #f8fafc;
+}
+
+.vk-popup-marketing-bg {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(47, 128, 255, 0.22), transparent 55%),
+    linear-gradient(180deg, #02050a 0%, #03070d 100%);
+}
+
+.vk-popup-marketing-flare {
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.75), transparent);
+  filter: blur(10px);
+  opacity: 0.45;
+}
+
+.vk-popup-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #62a1ff;
+}
+
+.vk-popup-headline {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.vk-popup-headline-accent {
+  background: linear-gradient(90deg, #f8fafc 0%, #62a1ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.vk-popup-subhead {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #8b95a7;
+}
+
+.vk-popup-pill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  background: rgba(8, 17, 30, 0.85);
+  padding: 0.375rem 0.625rem;
+  color: #d7dce5;
+  text-align: center;
+}
+
+.vk-popup-cta {
+  border: none;
+  background: linear-gradient(180deg, #3d8bff 0%, #2f80ff 100%);
+  color: #f8fafc;
+  box-shadow: 0 0 24px rgba(47, 128, 255, 0.35);
+}
+
+.vk-popup-cta:hover {
+  background: linear-gradient(180deg, #4d95ff 0%, #1e6bff 100%);
+}
+
+.vk-popup-cta-secondary {
+  border-color: rgba(47, 128, 255, 0.35);
+  background: rgba(8, 17, 30, 0.6);
+  color: #d7dce5;
+}
+
+.vk-popup-cta-secondary:hover {
+  border-color: rgba(47, 128, 255, 0.55);
+  background: rgba(8, 17, 30, 0.9);
+  color: #f8fafc;
+}
+
+.vk-popup-cta-ghost {
+  color: #8b95a7;
+}
+
+.vk-popup-cta-ghost:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #d7dce5;
+}

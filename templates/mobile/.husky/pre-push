@@ -1,7 +1,15 @@
 #!/usr/bin/env sh
-# Agent-only push gate — the builder never runs git push.
-pnpm quality
+# VybeKiit pre-push gate — blocks push if verification fails.
+# Same checks as CI, run locally for fast feedback.
 
-if [ "$PLAYWRIGHT_ENABLED" = "true" ]; then
-  pnpm test:e2e
+echo "🔒 VybeKiit pre-push: verify before push"
+pnpm verify
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Pre-push verification failed. Push blocked."
+  echo "   Fix the issues above, then try again."
+  exit 1
 fi
+
+echo "✅ All checks passed — pushing."

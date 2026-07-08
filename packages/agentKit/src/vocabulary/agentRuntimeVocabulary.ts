@@ -4,11 +4,11 @@
  * Rendered into each template's `language.md` via {@link renderAgentRuntimeVocabularyTable}.
  */
 
-export interface AgentRuntimeVocabularyEntry {
+export type AgentRuntimeVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 export const AGENT_RUNTIME_VOCABULARY: readonly AgentRuntimeVocabularyEntry[] = [
   {
@@ -68,12 +68,16 @@ export const AGENT_RUNTIME_VOCABULARY: readonly AgentRuntimeVocabularyEntry[] = 
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link AGENT_RUNTIME_VOCABULARY} as a markdown table for `language.md`. */
-export function renderAgentRuntimeVocabularyTable(): string {
+/**
+ * Render {@link AGENT_RUNTIME_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render agent runtime vocabulary table text.
+ * @example
+ * const result = renderAgentRuntimeVocabularyTable();
+ */
+export const renderAgentRuntimeVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = AGENT_RUNTIME_VOCABULARY.map((entry) => {
@@ -81,4 +85,4 @@ export function renderAgentRuntimeVocabularyTable(): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};

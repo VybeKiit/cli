@@ -4,11 +4,11 @@
  * Rendered into each template's `language.md` via {@link renderCodeEditVocabularyTable}.
  */
 
-export interface CodeEditVocabularyEntry {
+export type CodeEditVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 export const CODE_EDIT_VOCABULARY: readonly CodeEditVocabularyEntry[] = [
   {
@@ -63,12 +63,16 @@ export const CODE_EDIT_VOCABULARY: readonly CodeEditVocabularyEntry[] = [
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link CODE_EDIT_VOCABULARY} as a markdown table for `language.md`. */
-export function renderCodeEditVocabularyTable(): string {
+/**
+ * Render {@link CODE_EDIT_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render code edit vocabulary table text.
+ * @example
+ * const result = renderCodeEditVocabularyTable();
+ */
+export const renderCodeEditVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = CODE_EDIT_VOCABULARY.map((entry) => {
@@ -76,4 +80,4 @@ export function renderCodeEditVocabularyTable(): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};

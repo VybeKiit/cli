@@ -26,108 +26,172 @@ export type DataModelPlan = {
   buyerSummary: string;
 };
 
-function tableName(entity: string): string {
-  return entity
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z0-9_]/g, '');
-}
+type DataModelCollection = DataModelPlan['collections'][number];
+type DataModelRelation = DataModelPlan['relations'][number];
+type DataModelMigration = DataModelPlan['migrations'][number];
+type MigrationBuilder = (
+  collections: readonly DataModelCollection[],
+  relations: readonly DataModelRelation[],
+) => DataModelMigration;
 
-function sqlType(type: EntityFieldType): string {
-  switch (type) {
-    case 'number':
-      return 'numeric';
-    case 'boolean':
-      return 'boolean';
-    case 'date':
-      return 'timestamptz';
-    default:
-      return 'text';
-  }
-}
+const SQL_TYPE_BY_FIELD_TYPE: Readonly<Record<EntityFieldType, string>> = {
+  string: 'text',
+  number: 'numeric',
+  boolean: 'boolean',
+  date: 'timestamptz',
+};
 
-function emitSqlTable(collection: DataModelPlan['collections'][number]): string {
+// "user profile" -> "user_profile"
+const WHITESPACE_PATTERN = /\s+/g;
+
+// "plan!" -> "plan"
+const UNSAFE_TABLE_CHARACTER_PATTERN = /[^a-z0-9_]/g;
+
+// "user_profile" -> "user profile"
+const UNDERSCORE_PATTERN = /_/g;
+
+const tableName = (entity: string): string => {
+  const normalized = entity.trim().toLowerCase();
+  const underscored = normalized.replace(WHITESPACE_PATTERN, '_');
+  return underscored.replace(UNSAFE_TABLE_CHARACTER_PATTERN, '');
+};
+
+const fieldName = (field: string): string =>
+  field.trim().toLowerCase().replace(WHITESPACE_PATTERN, '_');
+
+const sqlType = (type: EntityFieldType): string => SQL_TYPE_BY_FIELD_TYPE[type];
+
+const emitSqlTable = (collection: DataModelCollection): string => {
   const cols = collection.fields
     .map((f) => `  ${f.name} ${sqlType(f.type)}${f.required ? ' not null' : ''}`)
     .join(',\n');
   return `create table if not exists ${collection.name} (\n  id uuid primary key default gen_random_uuid(),\n${cols}\n);`;
-}
+};
 
-function emitFirebaseShape(collection: DataModelPlan['collections'][number]): object {
-  return {
-    collection: collection.name,
-    fields: Object.fromEntries(collection.fields.map((f) => [f.name, f.type])),
-    documentId: 'id',
-  };
-}
+const emitFirebaseShape = (collection: DataModelCollection): object => ({
+  collection: collection.name,
+  fields: Object.fromEntries(collection.fields.map((f) => [f.name, f.type])),
+  documentId: 'id',
+});
 
-export function planDataModel(
-  entities: EntityInput[],
-  provider: DataProviderName = 'supabase',
-): DataModelPlan {
-  const collections = entities.map((entity) => ({
+const buildCollections = (entities: readonly EntityInput[]): DataModelCollection[] =>
+  entities.map((entity) => ({
     name: tableName(entity.name),
     primaryKey: 'id' as const,
-    fields: entity.fields.map((f) => ({
-      name: f.name.replace(/\s+/g, '_').toLowerCase(),
-      type: f.type,
+    fields: entity.fields.map((field) => ({
+      name: fieldName(field.name),
+      type: field.type,
       required: true,
     })),
   }));
 
-  const relations: DataModelPlan['relations'] = [];
+const buildRelations = (
+  entities: readonly EntityInput[],
+  collections: readonly DataModelCollection[],
+): DataModelRelation[] => {
+  const relations: DataModelRelation[] = [];
   for (const entity of entities) {
     const from = tableName(entity.name);
-    for (const rel of entity.relatesTo ?? []) {
-      const to = tableName(rel.entity);
-      const foreignKey = `${to}_id`;
-      relations.push({ from, to, foreignKey, type: rel.cardinality });
-      const target = collections.find((c) => c.name === from);
-      if (target && !target.fields.some((f) => f.name === foreignKey)) {
-        target.fields.push({ name: foreignKey, type: 'string', required: false });
+    const relatedEntities = entity.relatesTo;
+    if (relatedEntities !== undefined) {
+      for (const rel of relatedEntities) {
+        const to = tableName(rel.entity);
+        const foreignKey = `${to}_id`;
+        relations.push({ from, to, foreignKey, type: rel.cardinality });
+        const target = collections.find((collection) => collection.name === from);
+        if (target !== undefined && !target.fields.some((field) => field.name === foreignKey)) {
+          target.fields.push({ name: foreignKey, type: 'string', required: false });
+        }
       }
     }
   }
+  return relations;
+};
 
-  const buyerSummary = `Your app will remember ${collections.map((c) => c.name.replace(/_/g, ' ')).join(' and ')}.`;
-
-  const migrations: DataModelPlan['migrations'] = [];
-  if (provider === 'supabase' || provider === 'neon') {
+const buildSqlMigration = (
+  provider: Extract<DataProviderName, 'supabase' | 'neon'>,
+): MigrationBuilder => {
+  const buildMigration: MigrationBuilder = (collections, relations) => {
     const sqlParts = collections.map(emitSqlTable);
     for (const rel of relations) {
       sqlParts.push(
         `alter table ${rel.from} add column if not exists ${rel.foreignKey} uuid references ${rel.to}(id);`,
       );
     }
-    migrations.push({ provider, sql: sqlParts.join('\n\n') });
-  } else if (provider === 'firebase') {
-    migrations.push({
-      provider,
-      firestoreShape: Object.fromEntries(collections.map((c) => [c.name, emitFirebaseShape(c)])),
-    });
-  } else if (provider === 'mongodb') {
-    migrations.push({
-      provider,
-      notes: collections
-        .map((c) => `Collection "${c.name}" with fields: ${c.fields.map((f) => f.name).join(', ')}`)
-        .join('; '),
-    });
-  } else if (provider === 'aws') {
-    migrations.push({
-      provider,
-      notes: collections.map((c) => `DynamoDB table "${c.name}" partition key id`).join('; '),
-    });
-  } else {
-    migrations.push({
-      provider: 'local',
-      notes: collections.map((c) => `In-memory collection "${c.name}"`).join('; '),
-    });
-  }
+    return { provider, sql: sqlParts.join('\n\n') };
+  };
+  return buildMigration;
+};
+
+const buildFirebaseMigration: MigrationBuilder = (collections) => ({
+  provider: 'firebase',
+  firestoreShape: Object.fromEntries(
+    collections.map((collection) => [collection.name, emitFirebaseShape(collection)]),
+  ),
+});
+
+const buildMongodbMigration: MigrationBuilder = (collections) => ({
+  provider: 'mongodb',
+  notes: collections
+    .map(
+      (collection) =>
+        `Collection "${collection.name}" with fields: ${collection.fields.map((field) => field.name).join(', ')}`,
+    )
+    .join('; '),
+});
+
+const buildAwsMigration: MigrationBuilder = (collections) => ({
+  provider: 'aws',
+  notes: collections
+    .map((collection) => `DynamoDB table "${collection.name}" partition key id`)
+    .join('; '),
+});
+
+const buildLocalMigration: MigrationBuilder = (collections) => ({
+  provider: 'local',
+  notes: collections.map((collection) => `In-memory collection "${collection.name}"`).join('; '),
+});
+
+const MIGRATION_BUILDERS: Readonly<Record<DataProviderName, MigrationBuilder>> = {
+  supabase: buildSqlMigration('supabase'),
+  neon: buildSqlMigration('neon'),
+  firebase: buildFirebaseMigration,
+  mongodb: buildMongodbMigration,
+  aws: buildAwsMigration,
+  local: buildLocalMigration,
+};
+
+const renderCollectionsSummary = (collections: readonly DataModelCollection[]): string =>
+  collections.map((collection) => collection.name.replace(UNDERSCORE_PATTERN, ' ')).join(' and ');
+
+/**
+ * Run plan data model.
+ *
+ * @param entities - entities input.
+ * @param provider - provider input.
+ * @returns The plan data model result.
+ * @example
+ * const result = planDataModel(entities, provider);
+ */
+export const planDataModel = (
+  entities: EntityInput[],
+  provider: DataProviderName = 'supabase',
+): DataModelPlan => {
+  const collections = buildCollections(entities);
+  const relations = buildRelations(entities, collections);
+  const buyerSummary = `Your app will remember ${renderCollectionsSummary(collections)}.`;
+  const buildMigration = MIGRATION_BUILDERS[provider];
+  const migrations = [buildMigration(collections, relations)];
 
   return { collections, relations, migrations, buyerSummary };
-}
+};
 
-export function renderDataModelSummary(plan: DataModelPlan): string {
-  return plan.buyerSummary;
-}
+/**
+ * Run render data model summary.
+ *
+ * @param plan - plan input.
+ * @returns The rendered render data model summary text.
+ * @example
+ * const result = renderDataModelSummary(plan);
+ */
+export const renderDataModelSummary = (plan: DataModelPlan): string => plan.buyerSummary;

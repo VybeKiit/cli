@@ -12,12 +12,16 @@ import { cn } from '@/lib/utils';
  * without stealing focus. Styling reuses the shared semantic Tailwind tokens
  * (`bg-background` / `border` / `text-foreground`, with the `destructive`
  * palette for errors) so toasts match the rest of the kit.
+ *
+ * @returns The toast output region.
+ * @example
+ * <Toaster />
  */
-export function Toaster() {
+const Toaster = () => {
   const { toasts } = useToast();
 
   return (
-    <output className="pointer-events-none fixed bottom-4 end-4 z-50 flex flex-col gap-2">
+    <output className="pointer-events-none fixed end-4 bottom-4 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (
         <div
           key={toast.id}
@@ -33,4 +37,6 @@ export function Toaster() {
       ))}
     </output>
   );
-}
+};
+
+export { Toaster };

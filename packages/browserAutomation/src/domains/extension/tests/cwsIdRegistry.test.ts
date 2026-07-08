@@ -1,9 +1,8 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { recordChromeWebStoreId } from '@vybekiit/browser-automation/domains/extension/cwsIdRegistry';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-import { recordChromeWebStoreId } from '../cwsIdRegistry';
 
 const NEW_EXTENSION_ID = 'abcdefghijklmnopabcdefghijklmnop';
 const EXISTING_EXTENSION_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
@@ -58,19 +57,15 @@ describe('recordChromeWebStoreId', () => {
   });
 });
 
-function cwsJsonPath(): string {
-  return join(repoRoot, '.vybekiit', 'store', 'extension', 'cws.json');
-}
+const cwsJsonPath = (): string => join(repoRoot, '.vybekiit', 'store', 'extension', 'cws.json');
 
-async function readCwsJson(): Promise<string> {
-  return readFile(cwsJsonPath(), 'utf8');
-}
+const readCwsJson = async (): Promise<string> => readFile(cwsJsonPath(), 'utf8');
 
-async function writeCwsJson(config: {
+const writeCwsJson = async (config: {
   chromeWebStoreId: string;
   key: string;
   name: string;
-}): Promise<void> {
+}): Promise<void> => {
   await mkdir(dirname(cwsJsonPath()), { recursive: true });
   await writeFile(cwsJsonPath(), `${JSON.stringify(config, null, 2)}\n`, 'utf8');
-}
+};

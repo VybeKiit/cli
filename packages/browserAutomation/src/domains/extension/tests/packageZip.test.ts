@@ -1,11 +1,10 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { findFreshestZip } from '@vybekiit/browser-automation/domains/extension/packageZip';
+
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-import type { VerbContext } from '../types';
-
-import { findFreshestZip } from '../packageZip';
 
 let repoRoot: string;
 
@@ -29,14 +28,12 @@ describe('findFreshestZip', () => {
   });
 });
 
-function createContext(): VerbContext {
-  return {
-    extension: {
-      chromeWebStoreId: 'lidnnjbepijjbbphbdhcchgpckpcbgfm',
-      dir: 'extensions/batchbeam-prompt-queue',
-      key: 'batchbeam-prompt-queue',
-      name: 'BatchBeam Prompt Queue',
-    },
-    repoRoot,
-  };
-}
+const createContext = (): VerbContext => ({
+  extension: {
+    chromeWebStoreId: 'lidnnjbepijjbbphbdhcchgpckpcbgfm',
+    dir: 'extensions/batchbeam-prompt-queue',
+    key: 'batchbeam-prompt-queue',
+    name: 'BatchBeam Prompt Queue',
+  },
+  repoRoot,
+});

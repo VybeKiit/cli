@@ -1,19 +1,17 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/container-scroll-animation';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import {
+  Card,
+  ContainerScroll,
+  Header,
+} from '@/components/aceternity/ui/container-scroll-animation';
 
 export default function ContainerScrollAnimationPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] flex-wrap items-center justify-center gap-3 overflow-hidden p-6">
+      <ContainerScroll />
+      <Header />
+      <Card />
     </div>
   );
 }

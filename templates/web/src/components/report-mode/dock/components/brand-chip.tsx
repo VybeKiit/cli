@@ -7,21 +7,36 @@ import {
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { cn } from '@/lib/utils';
+import { useCallback, type MouseEvent } from 'react';
 
-type ReportModeBrandChipProps = {
+interface ReportModeBrandChipProps {
   readonly expanded: boolean;
   readonly chevronDirection: 'left' | 'right';
   readonly onToggle: () => void;
   readonly tutorialActive?: boolean;
-};
+}
 
-/** Brand chip — VybeKiit mark + wordmark + expand/collapse chevron. */
-export function ReportModeBrandChip({
+/**
+ * Brand chip with VybeKiit mark, wordmark, and expand/collapse chevron.
+ *
+ * @returns Toggle button for the report mode dock.
+ * @example
+ * <ReportModeBrandChip expanded={false} chevronDirection="right" onToggle={() => {}} />;
+ */
+export const ReportModeBrandChip = ({
   expanded,
   chevronDirection,
   onToggle,
   tutorialActive = false,
-}: ReportModeBrandChipProps) {
+}: ReportModeBrandChipProps) => {
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      onToggle();
+    },
+    [onToggle],
+  );
+
   return (
     <ReportControlHint disabled={tutorialActive} text={REPORT_DOCK_TOOLTIPS.brandChip}>
       <button
@@ -30,10 +45,7 @@ export function ReportModeBrandChip({
         className={cn('report-mode-brand-chip', expanded && 'report-mode-brand-chip--expanded')}
         data-report-tutorial="welcome"
         data-testid="report-mode-brand-toggle"
-        onClick={(event) => {
-          event.stopPropagation();
-          onToggle();
-        }}
+        onClick={handleClick}
         type="button"
       >
         <ReportVybeMarkIcon />
@@ -42,4 +54,4 @@ export function ReportModeBrandChip({
       </button>
     </ReportControlHint>
   );
-}
+};

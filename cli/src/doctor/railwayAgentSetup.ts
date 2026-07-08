@@ -1,52 +1,73 @@
 import { spawnSync } from 'node:child_process';
 import {
   dataConfigSchema,
-  hostingConfigSchema,
-  isRailwayStackActive,
-  parseEnv,
   type EnvSource,
+  hostingConfigSchema,
+  isRailwayStackActive as isCoreRailwayStackActive,
+  parseEnv,
 } from '@vybekiit/core';
 
-export { isRailwayStackActive } from '@vybekiit/core';
+/**
+ * Check whether both Railway provider settings are active.
+ *
+ * @param env - Environment source to inspect.
+ * @returns True when the Railway stack is active.
+ * @example
+ * const active = isRailwayStackActive(process.env);
+ */
+export const isRailwayStackActive = (env: EnvSource): boolean => isCoreRailwayStackActive(env);
 
-/** Warn when only one half of the coupled Railway stack is selected. */
-export function verifyCoupledStack(env: EnvSource): string | null {
+/**
+ * Warn when only one half of the coupled Railway stack is selected.
+ *
+ * @param env - Environment source to inspect.
+ * @returns Buyer-readable warning, or null when the stack is coherent.
+ * @example
+ * const warning = verifyCoupledStack(process.env);
+ */
+export const verifyCoupledStack = (env: EnvSource): string | null => {
   const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, env);
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
   const hosting = HOSTING_PROVIDER === 'railway';
   const data = DATA_PROVIDER === 'railway';
   if (hosting && !data) {
-    return '→ Railway hosting is on but your database setting is not Railway — set DATA_PROVIDER=railway for the coupled stack.';
+    return '→ Railway hosting is on but your database setting is not Railway - set DATA_PROVIDER=railway for the coupled stack.';
   }
   if (data && !hosting) {
-    return '→ Railway database is on but your hosting setting is not Railway — set HOSTING_PROVIDER=railway for the coupled stack.';
+    return '→ Railway database is on but your hosting setting is not Railway - set HOSTING_PROVIDER=railway for the coupled stack.';
   }
   return null;
-}
+};
 
-export interface RailwayAgentSetupResult {
+export type RailwayAgentSetupResult = {
   readonly ok: boolean;
   readonly message: string;
-}
+};
 
 /**
  * Run Railway's bundled agent setup (skills + MCP merge + auth check).
  * Non-interactive; requires `railway` on PATH and signed in for full success.
+ *
+ * @param railwayInstalled - Whether the Railway CLI is installed.
+ * @param railwayAuthed - Whether the Railway CLI is signed in, or null when unknown.
+ * @returns Railway agent setup result.
+ * @example
+ * const result = runRailwayAgentSetup(true, true);
  */
-export function runRailwayAgentSetup(
+export const runRailwayAgentSetup = (
   railwayInstalled: boolean,
   railwayAuthed: boolean | null,
-): RailwayAgentSetupResult {
+): RailwayAgentSetupResult => {
   if (!railwayInstalled) {
     return {
       ok: false,
-      message: '→ Railway agent setup skipped — install the deploy CLI first.',
+      message: '→ Railway agent setup skipped - install the deploy CLI first.',
     };
   }
   if (railwayAuthed === false) {
     return {
       ok: false,
-      message: '→ Railway agent setup skipped — sign in with `railway login` first.',
+      message: '→ Railway agent setup skipped - sign in with `railway login` first.',
     };
   }
 
@@ -57,23 +78,31 @@ export function runRailwayAgentSetup(
   if (result.status === 0) {
     return {
       ok: true,
-      message: '✓ Railway — agent skills and MCP configuration updated.',
+      message: '✓ Railway - agent skills and MCP configuration updated.',
     };
   }
-  const detail = (result.stderr || result.stdout || '').trim().split('\n')[0];
+  const [detail] = `${result.stderr}${result.stdout}`.trim().split('\n');
   return {
     ok: false,
     message: detail
-      ? `→ Railway agent setup needs attention — ${detail}`
-      : '→ Railway agent setup did not complete — run `railway setup agent -y` after signing in.',
+      ? `→ Railway agent setup needs attention - ${detail}`
+      : '→ Railway agent setup did not complete - run `railway setup agent -y` after signing in.',
   };
-}
+};
 
-/** Buyer-readable lines for Railway stack checks. */
-export function formatRailwayStackReport(
+/**
+ * Format Railway stack checks as buyer-readable doctor lines.
+ *
+ * @param env - Environment values for stack detection.
+ * @param agentSetup - Optional Railway agent setup result.
+ * @returns Doctor lines for active Railway stacks.
+ * @example
+ * const lines = formatRailwayStackReport(process.env, agentSetup);
+ */
+export const formatRailwayStackReport = (
   env: EnvSource,
   agentSetup: RailwayAgentSetupResult | null,
-): readonly string[] {
+): readonly string[] => {
   if (!isRailwayStackActive(env)) {
     return [];
   }
@@ -86,4 +115,4 @@ export function formatRailwayStackReport(
     lines.push(agentSetup.message);
   }
   return lines;
-}
+};

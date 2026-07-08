@@ -1,7 +1,7 @@
 {
   "name": "@vybekiit/tokens",
   "version": "0.3.0",
-  "description": "Shared design tokens for VybeKiit — one source of truth for colors, spacing, radius, and type, consumed by web as CSS variables and by mobile as StyleSheet values. No UI.",
+  "description": "Design tokens and CSS variables for VybeKiit.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -12,6 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
@@ -23,12 +28,17 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+  "dependencies": {
+    "@vybekiit/core": "workspace:*",
+    "effect": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "private": true,
+  "vybekiit": {
+    "kind": "owned"
   }
 }

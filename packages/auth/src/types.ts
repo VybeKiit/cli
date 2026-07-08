@@ -29,18 +29,27 @@ export type AuthCapabilities = {
  * {@link Effect.Effect} that fails with a tagged {@link AuthError}; composition
  * roots run it with `Effect.runPromiseExit` at the edge.
  */
-export interface AuthProvider {
+export type AuthProvider = {
   readonly name: AuthProviderName;
   readonly capabilities: AuthCapabilities;
-  signUpWithPassword(email: string, password: string): Effect.Effect<AuthSession, AuthError>;
-  signInWithPassword(email: string, password: string): Effect.Effect<AuthSession, AuthError>;
-  sendEmailCode(email: string): Effect.Effect<true, AuthError>;
-  verifyEmailCode(email: string, code: string): Effect.Effect<AuthSession, AuthError>;
-  requestPasswordReset(email: string): Effect.Effect<true, AuthError>;
-  resetPassword(token: string, newPassword: string): Effect.Effect<AuthSession, AuthError>;
-  sendMagicLink(email: string): Effect.Effect<true, AuthError>;
-  verifyMagicLink(token: string): Effect.Effect<AuthSession, AuthError>;
-  sendSmsCode(phone: string): Effect.Effect<true, AuthError>;
-  verifySmsCode(phone: string, code: string): Effect.Effect<AuthSession, AuthError>;
-  getUser(sessionToken: string): Effect.Effect<AuthUser, AuthError>;
-}
+  readonly signUpWithPassword: (
+    email: string,
+    password: string,
+  ) => Effect.Effect<AuthSession, AuthError>;
+  readonly signInWithPassword: (
+    email: string,
+    password: string,
+  ) => Effect.Effect<AuthSession, AuthError>;
+  readonly sendEmailCode: (email: string) => Effect.Effect<true, AuthError>;
+  readonly verifyEmailCode: (email: string, code: string) => Effect.Effect<AuthSession, AuthError>;
+  readonly requestPasswordReset: (email: string) => Effect.Effect<true, AuthError>;
+  readonly resetPassword: (
+    token: string,
+    newPassword: string,
+  ) => Effect.Effect<AuthSession, AuthError>;
+  readonly sendMagicLink: (email: string) => Effect.Effect<true, AuthError>;
+  readonly verifyMagicLink: (token: string) => Effect.Effect<AuthSession, AuthError>;
+  readonly sendSmsCode: (phone: string) => Effect.Effect<true, AuthError>;
+  readonly verifySmsCode: (phone: string, code: string) => Effect.Effect<AuthSession, AuthError>;
+  readonly getUser: (sessionToken: string) => Effect.Effect<AuthUser, AuthError>;
+};

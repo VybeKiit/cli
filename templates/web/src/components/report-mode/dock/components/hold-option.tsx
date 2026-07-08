@@ -18,17 +18,23 @@ type ReportHoldOptionProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   readonly compact?: boolean;
 };
 
-function HoldRectProgress({
+const HoldRectProgress = ({
   compact,
   progress,
 }: {
   readonly compact: boolean;
   readonly progress: number;
-}) {
+}) => {
   const spec = compact ? HOLD_RECT_COMPACT : HOLD_RECT_WIDE;
   const viewW = spec.width + spec.pad * 2;
   const viewH = spec.height + spec.pad * 2;
-  const path = buildRoundedRectStrokePath(spec.pad, spec.pad, spec.width, spec.height, spec.radius);
+  const path = buildRoundedRectStrokePath({
+    height: spec.height,
+    radius: spec.radius,
+    width: spec.width,
+    x: spec.pad,
+    y: spec.pad,
+  });
   const clamped = Math.max(0, Math.min(1, progress));
 
   return (
@@ -58,10 +64,17 @@ function HoldRectProgress({
       />
     </svg>
   );
-}
+};
 
-/** Option button — hold 2s for rounded border to complete, then selection applies. */
-export function ReportHoldOption({
+/**
+ * Render a hold-to-select report-mode option.
+ *
+ * @param props - Button props plus hold state and handlers.
+ * @returns A button with an animated rounded progress ring.
+ * @example
+ * <ReportHoldOption progress={0} onHoldStart={start} onHoldCancel={cancel}>Top left</ReportHoldOption>
+ */
+const ReportHoldOption = ({
   active = false,
   pending = false,
   progress,
@@ -72,26 +85,26 @@ export function ReportHoldOption({
   children,
   onClick,
   ...props
-}: ReportHoldOptionProps) {
-  return (
-    <button
-      className={cn(
-        'report-mode-hold-option',
-        compact && 'report-mode-hold-option--compact',
-        active && 'report-mode-hold-option--active',
-        pending && 'report-mode-hold-option--pending',
-        className,
-      )}
-      onBlur={onHoldCancel}
-      onClick={onClick}
-      onFocus={onHoldStart}
-      onMouseEnter={onHoldStart}
-      onMouseLeave={onHoldCancel}
-      type="button"
-      {...props}
-    >
-      <HoldRectProgress compact={compact} progress={pending ? progress : 0} />
-      <span className="report-mode-hold-option-content">{children}</span>
-    </button>
-  );
-}
+}: ReportHoldOptionProps) => (
+  <button
+    className={cn(
+      'report-mode-hold-option',
+      compact && 'report-mode-hold-option--compact',
+      active && 'report-mode-hold-option--active',
+      pending && 'report-mode-hold-option--pending',
+      className,
+    )}
+    onBlur={onHoldCancel}
+    onClick={onClick}
+    onFocus={onHoldStart}
+    onMouseEnter={onHoldStart}
+    onMouseLeave={onHoldCancel}
+    type="button"
+    {...props}
+  >
+    <HoldRectProgress compact={compact} progress={pending ? progress : 0} />
+    <span className="report-mode-hold-option-content">{children}</span>
+  </button>
+);
+
+export { ReportHoldOption };

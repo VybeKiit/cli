@@ -18,10 +18,13 @@ import type { PaymentProvider } from './types';
  * credentials, so an app configured for one provider never trips on another's
  * blank keys. The agent swaps providers by changing one env value.
  *
- * @throws if the chosen provider's required keys are missing (via {@link parseEnv}) —
- *   a misconfigured store fails loud at boot, not deep in a request.
+ * @param env - Environment variables used to select and configure the provider.
+ * @returns The configured payment provider.
+ * @throws If the selected provider config is invalid or no adapter is registered.
+ * @example
+ * const provider = resolvePaymentProvider(process.env);
  */
-export function resolvePaymentProvider(env: EnvSource = process.env): PaymentProvider {
+export const resolvePaymentProvider = (env: EnvSource = process.env): PaymentProvider => {
   const { PAYMENTS_PROVIDER } = parseEnv(PaymentsConfigSchema, env);
   return resolveEnvProvider(
     PAYMENTS_PROVIDER,
@@ -34,7 +37,7 @@ export function resolvePaymentProvider(env: EnvSource = process.env): PaymentPro
     env,
     'lemon-squeezy',
   );
-}
+};
 
 /** The payment provider as an injectable service — composition roots `Effect.provide` it (ADR-0023 DI). */
 export class Payments extends Context.Tag('@vybekiit/payments/Payments')<
@@ -43,13 +46,15 @@ export class Payments extends Context.Tag('@vybekiit/payments/Payments')<
 >() {}
 
 /**
- * `Live` layer building {@link Payments} from the environment. Wraps the existing
- * {@link resolvePaymentProvider} factory, so config still fails loud when the layer
- * is built at a composition root.
+ * Build the live {@link Payments} layer from an environment source.
+ *
+ * @param env - Environment variables used by {@link resolvePaymentProvider}.
+ * @returns A Layer that provides the configured {@link Payments} service.
+ * @example
+ * const layer = makePaymentsLive(process.env);
  */
-export function makePaymentsLive(env: EnvSource = process.env): Layer.Layer<Payments> {
-  return Layer.effect(
+export const makePaymentsLive = (env: EnvSource = process.env): Layer.Layer<Payments> =>
+  Layer.effect(
     Payments,
     Effect.sync(() => resolvePaymentProvider(env)),
   );
-}

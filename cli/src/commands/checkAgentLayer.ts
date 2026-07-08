@@ -1,11 +1,18 @@
 import process from 'node:process';
 import { planAgentLayerCompliance } from '@vybekiit/agent-kit';
-import { loadAgentLayerSnapshot } from '../lib/agentLayerSnapshot';
 import { resolveTemplateArg } from '../lib/agentLayerIo';
+import { loadAgentLayerSnapshot } from '../lib/agentLayerSnapshot';
 
-function parseLiveDocsEnv(): Record<string, string> | undefined {
+/**
+ * Parse live documentation URLs passed through the environment.
+ *
+ * @returns String record of runtime docs, or undefined when unset or invalid.
+ * @example
+ * const liveDocs = parseLiveDocsEnv();
+ */
+const parseLiveDocsEnv = (): Record<string, string> | undefined => {
   const raw = process.env.VYBEKIIT_AGENT_RUNTIME_DOCS;
-  if (!raw?.trim()) {
+  if (raw === undefined || raw.trim() === '') {
     return;
   }
   let parsed: unknown;
@@ -14,18 +21,38 @@ function parseLiveDocsEnv(): Record<string, string> | undefined {
   } catch {
     parsed = undefined;
   }
-  return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
-    ? (parsed as Record<string, string>)
-    : undefined;
-}
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    return;
+  }
 
-export async function runCheckAgentLayer(
+  const liveDocs: Record<string, string> = {};
+  for (const [key, value] of Object.entries(parsed)) {
+    if (typeof value !== 'string') {
+      return;
+    }
+    liveDocs[key] = value;
+  }
+
+  return liveDocs;
+};
+
+/**
+ * Check the buyer-facing agent layer for structural compliance.
+ *
+ * @param args - CLI arguments after `check-agent-layer`; first item may be a template.
+ * @param cwd - Project directory containing the agent layer.
+ * @returns JSON compliance report plus the process exit code.
+ * @example
+ * const result = await runCheckAgentLayer(['web'], process.cwd());
+ */
+export const runCheckAgentLayer = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly json: string; readonly exitCode: number }> {
-  const template = await resolveTemplateArg(args[0], cwd);
+): Promise<{ readonly json: string; readonly exitCode: number }> => {
+  const [templateArg] = args;
+  const template = await resolveTemplateArg(templateArg, cwd);
 
-  if (!template) {
+  if (template === null) {
     return {
       json: JSON.stringify({
         ok: false,
@@ -64,4 +91,4 @@ export async function runCheckAgentLayer(
     ),
     exitCode: report.ok ? 0 : 1,
   };
-}
+};

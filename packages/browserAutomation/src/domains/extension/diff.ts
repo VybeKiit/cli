@@ -10,9 +10,9 @@ import type { CwsListing } from './schema';
  * always a valid argument to `fieldLocator`.
  */
 export type ListingFieldDiff = {
-  after: unknown;
-  before: unknown;
-  field: string;
+  readonly after: unknown;
+  readonly before: unknown;
+  readonly field: string;
 };
 
 /**
@@ -29,8 +29,14 @@ export type ListingFieldDiff = {
  * shallow diff at the top level would emit one giant blob per tab; a
  * fully-recursive diff would split nested shapes like `dataUseDisclosure`
  * into noise. One level deep is the readable middle ground.
+ *
+ * @param before - Baseline listing value.
+ * @param after - Candidate listing value.
+ * @returns Field-level diffs between the two listings.
+ * @example
+ * const diffs = diffListing(beforeListing, afterListing);
  */
-export function diffListing(before: CwsListing, after: CwsListing): ListingFieldDiff[] {
+export const diffListing = (before: CwsListing, after: CwsListing): ListingFieldDiff[] => {
   const diffs: ListingFieldDiff[] = [];
 
   for (const key of LISTING_KEYS) {
@@ -76,21 +82,28 @@ export function diffListing(before: CwsListing, after: CwsListing): ListingField
   // status.* is read-only — never emitted into a push diff.
 
   return diffs;
-}
+};
 
 /**
  * Render a list of field diffs as a readable plain-text block. Used in
  * `DriftDetectedError.message` and in the `--plan` output.
+ *
+ * @param diffs - Field-level listing diffs to render.
+ * @returns A readable text block describing the diffs.
+ * @example
+ * const text = formatListingDiff(diffs);
  */
-export function formatListingDiff(diffs: readonly ListingFieldDiff[]): string {
-  if (diffs.length === 0) return '(no differences)';
+export const formatListingDiff = (diffs: readonly ListingFieldDiff[]): string => {
+  if (diffs.length === 0) {
+    return '(no differences)';
+  }
   return diffs
     .map(
       (entry) =>
         `  - ${entry.field}\n      before: ${stringify(entry.before)}\n      after:  ${stringify(entry.after)}`,
     )
     .join('\n');
-}
+};
 
 const LISTING_KEYS: readonly (keyof CwsListing['listing'])[] = [
   'description',
@@ -123,19 +136,40 @@ const DISTRIBUTION_KEYS: readonly (keyof CwsListing['distribution'])[] = [
   'regions',
 ];
 
+// biome-ignore lint/security/noSecrets: schema field name, not a secret.
 const PACKAGE_KEYS: readonly (keyof CwsListing['package'])[] = ['verifiedUploadsOptIn'];
 
 /**
  * Structural equality good enough for listing fields. JSON serialisation is
  * fine here — listing values are JSON-shaped by construction (validated by
  * the Zod schema) so round-trip equality is exact.
+ *
+ * @param a - First listing field value.
+ * @param b - Second listing field value.
+ * @returns True when the JSON representations are equal.
+ * @example
+ * const same = equal({ a: 1 }, { a: 1 });
  */
-function equal(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
+const equal = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
 
-function stringify(value: unknown): string {
-  if (typeof value === 'string') return JSON.stringify(value);
-  if (value === undefined) return '(unset)';
-  return JSON.stringify(value, null, 2).replaceAll('\n', '\n      ');
-}
+/**
+ * Render one listing field value for diff output.
+ *
+ * @param value - Listing field value to render.
+ * @returns Single-line or indented JSON text.
+ * @example
+ * const text = stringify({ enabled: true });
+ */
+const stringify = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (value === undefined) {
+    return '(unset)';
+  }
+  const rendered = JSON.stringify(value, null, 2);
+  if (rendered === undefined) {
+    return String(value);
+  }
+  return rendered.replaceAll('\n', '\n      ');
+};

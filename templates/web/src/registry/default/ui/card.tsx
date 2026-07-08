@@ -1,1 +1,1 @@
-export * from '@/components/ui/card';
+export * from '@vybekiit/ui/card';

@@ -2,18 +2,10 @@
 
 import { ReportDockBar } from '@/components/report-mode/dock/components/dock-bar';
 import { getBrandChevronDirection } from '@/components/report-mode/dock/utils/report-dock-utils';
-import { useReportDockCollapse } from '@/components/report-mode/dock/hooks/use-report-dock-collapse';
-import { useReportDockPosition } from '@/components/report-mode/dock/hooks/use-report-dock';
-import { useReportHandoffTarget } from '@/components/report-mode/dock/hooks/use-report-handoff-target';
-import { useReportInspectHighlightColor } from '@/components/report-mode/dock/hooks/use-report-inspect-highlight-color';
 import { ReportModeBanner } from '@/components/report-mode/inspect/report-mode-banner';
 import { ReportModeHighlight } from '@/components/report-mode/inspect/report-mode-highlight';
 import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
-import { useInspectMode } from '@/components/report-mode/inspect/use-inspect-mode';
-import { useReportHotkey } from '@/components/report-mode/inspect/use-report-hotkey';
-import { useConsoleErrorBuffer } from '@/components/report-mode/shared/use-console-errors';
 import { ReportModeTutorial } from '@/components/report-mode/tutorial/report-mode-tutorial';
-import { useReportTutorial } from '@/components/report-mode/tutorial/use-report-tutorial';
 import {
   getAccessibleName,
   getCssPath,
@@ -27,17 +19,42 @@ import {
   snapDockToNearestCorner,
   type VybeAssistant,
 } from '@vybekiit/report-mode';
+import {
+  useConsoleErrorBuffer,
+  useInspectMode,
+  useReportDockCollapse,
+  useReportDockPosition,
+  useReportHandoffTarget,
+  useReportHotkey,
+  useReportInspectHighlightColor,
+  useReportTutorial,
+} from '@vybekiit/report-mode/web';
 import { usePathname } from '@/i18n/navigation';
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { toast } from 'sonner';
 
-type ReportModeDevProps = {
+interface ReportModeDevProps {
   readonly assistant: VybeAssistant | null;
   readonly projectRoot: string;
-};
+}
 
-/** Dev-only Report Mode — click-to-report with structured assistant handoff. */
-export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
+/**
+ * Render the dev-only click-to-report dock with assistant handoff.
+ *
+ * @param props - Active assistant target and project root used for deep links.
+ * @returns The Report Mode dock, tutorial, inspect overlay, and note panel.
+ * @example
+ * <ReportModeDev assistant="cursor" projectRoot="/workspace/app" />
+ */
+export const ReportModeDev = ({ assistant, projectRoot }: ReportModeDevProps) => {
   const pathname = usePathname();
   const errorBuffer = useConsoleErrorBuffer();
   const { target: handoffTarget, setTarget: setHandoffTarget } = useReportHandoffTarget();
@@ -74,6 +91,27 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
 
   useReportHotkey(toggleInspectActive);
 
+  // Escape backs out of pick mode one step: clear a selected element first, else exit + toast.
+  useEffect(() => {
+    if (!inspectActive) {
+      return;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+      event.preventDefault();
+      if (inspectSelected) {
+        clearInspectSelection();
+        return;
+      }
+      deactivateInspect();
+      toast('Point & fix cancelled');
+    };
+    globalThis.addEventListener('keydown', onKeyDown);
+    return () => globalThis.removeEventListener('keydown', onKeyDown);
+  }, [inspectActive, inspectSelected, clearInspectSelection, deactivateInspect]);
+
   useEffect(() => {
     if (tutorial.active && tutorial.stepIndex === 2 && !inspectActive) {
       activateInspect();
@@ -84,39 +122,39 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     if (!dragging) {
       return;
     }
-    function onPointerMove(event: PointerEvent) {
+    const onPointerMove = (event: PointerEvent) => {
       const x = event.clientX - dragOffset.current.x;
       const y = event.clientY - dragOffset.current.y;
       savePosition({ anchor: 'custom', customX: Math.max(0, x), customY: Math.max(0, y) });
-    }
-    function onPointerUp(event: PointerEvent) {
+    };
+    const onPointerUp = (event: PointerEvent) => {
       setDragging(false);
-      const snapped = snapDockToNearestCorner(
-        event.clientX - dragOffset.current.x,
-        event.clientY - dragOffset.current.y,
-        window.innerWidth,
-        window.innerHeight,
-      );
+      const snapped = snapDockToNearestCorner({
+        x: event.clientX - dragOffset.current.x,
+        y: event.clientY - dragOffset.current.y,
+        viewportWidth: globalThis.innerWidth,
+        viewportHeight: globalThis.innerHeight,
+      });
       savePosition(snapped);
-    }
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
+    };
+    globalThis.addEventListener('pointermove', onPointerMove);
+    globalThis.addEventListener('pointerup', onPointerUp);
     return () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
+      globalThis.removeEventListener('pointermove', onPointerMove);
+      globalThis.removeEventListener('pointerup', onPointerUp);
     };
   }, [dragging, savePosition]);
 
-  function onDragHandlePointerDown(event: React.PointerEvent<HTMLButtonElement>) {
+  const onDragHandlePointerDown = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const rect = dockRef.current?.getBoundingClientRect();
-    const left = rect?.left ?? event.clientX;
-    const top = rect?.top ?? event.clientY;
+    const left = rect === undefined ? event.clientX : rect.left;
+    const top = rect === undefined ? event.clientY : rect.top;
     dragOffset.current = { x: event.clientX - left, y: event.clientY - top };
     setDragging(true);
-  }
+  }, []);
 
-  async function handleCopySpot() {
+  const handleCopySpot = useCallback(async () => {
     if (!spotLabel.trim()) {
       return;
     }
@@ -129,9 +167,9 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     } finally {
       setCopyingSpot(false);
     }
-  }
+  }, [spotLabel]);
 
-  async function handleSubmit() {
+  const handleSubmit = useCallback(async () => {
     if (!(inspectSelected && inspectNote.trim())) {
       return;
     }
@@ -158,7 +196,29 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
     } finally {
       setSubmitting(false);
     }
-  }
+  }, [
+    assistant,
+    deactivateInspect,
+    errorBuffer,
+    handoffTarget,
+    inspectNote,
+    inspectSelected,
+    pathname,
+    projectRoot,
+    spotLabel,
+  ]);
+
+  const handleTutorialNext = useCallback(() => {
+    tutorial.next(4);
+  }, [tutorial]);
+
+  const handleCopySpotClick = useCallback(() => {
+    void handleCopySpot();
+  }, [handleCopySpot]);
+
+  const handleSubmitClick = useCallback(() => {
+    void handleSubmit();
+  }, [handleSubmit]);
 
   const dockStyle = getDockPlacementStyle(position) as CSSProperties;
   const tutorialActive = tutorial.active;
@@ -179,7 +239,7 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
       <ReportModeTutorial
         active={tutorialActive}
         onComplete={tutorial.complete}
-        onNext={() => tutorial.next(4)}
+        onNext={handleTutorialNext}
         onSkip={tutorial.skip}
         stepIndex={tutorial.stepIndex}
       />
@@ -223,9 +283,9 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
             copying={copyingSpot}
             note={inspectNote}
             onCancel={clearInspectSelection}
-            onCopySpot={() => void handleCopySpot()}
+            onCopySpot={handleCopySpotClick}
             onNoteChange={setInspectNote}
-            onSubmit={() => void handleSubmit()}
+            onSubmit={handleSubmitClick}
             spotLabel={spotLabel}
             submitting={submitting}
           />
@@ -233,4 +293,4 @@ export function ReportModeDev({ assistant, projectRoot }: ReportModeDevProps) {
       </div>
     </>
   );
-}
+};

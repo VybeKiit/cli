@@ -4,16 +4,31 @@ interface NodeProcess {
   cwd?: () => string;
 }
 
-function nodeProcess(): NodeProcess | undefined {
-  return (globalThis as { process?: NodeProcess }).process;
-}
+const nodeProcess = (): NodeProcess | undefined =>
+  (globalThis as { process?: NodeProcess }).process;
 
-/** Server modules read env here; never import `node:process` (breaks Next client bundles). */
-export function readNodeEnv(): Record<string, string | undefined> {
-  return nodeProcess()?.env ?? {};
-}
+/**
+ * Read Node environment variables without importing `node:process`.
+ *
+ * @returns The server process environment, or an empty object outside Node.
+ * @example
+ * const env = readNodeEnv();
+ */
+const readNodeEnv = (): Record<string, string | undefined> => {
+  const process = nodeProcess();
+  return process === undefined || process.env === undefined ? {} : process.env;
+};
 
-/** Project root for server-side asset resolution. */
-export function readNodeCwd(): string {
-  return nodeProcess()?.cwd?.() ?? '.';
-}
+/**
+ * Read the current Node working directory without importing `node:process`.
+ *
+ * @returns The current working directory, or `.` outside Node.
+ * @example
+ * const root = readNodeCwd();
+ */
+const readNodeCwd = (): string => {
+  const process = nodeProcess();
+  return process === undefined || process.cwd === undefined ? '.' : process.cwd();
+};
+
+export { readNodeCwd, readNodeEnv };

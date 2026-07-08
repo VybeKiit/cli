@@ -1,4 +1,5 @@
 import { expectedPresetsFromEnv, postgresProviderFromEnv, verifyPresets } from '@vybekiit/db';
+import { Effect, Either } from 'effect';
 
 export type PresetDoctorReport = {
   readonly checked: boolean;
@@ -6,8 +7,19 @@ export type PresetDoctorReport = {
   readonly lines: readonly string[];
 };
 
-/** Verify expected DB presets when DATABASE_URL is configured. */
-export async function verifyPresetsDoctor(env: NodeJS.ProcessEnv): Promise<PresetDoctorReport> {
+type PresetFailure = {
+  readonly message: string;
+};
+
+/**
+ * Verify expected DB presets when DATABASE_URL is configured.
+ *
+ * @param env - Process environment to inspect.
+ * @returns Doctor report for database feature presets.
+ * @example
+ * const report = await verifyPresetsDoctor(process.env);
+ */
+export const verifyPresetsDoctor = async (env: NodeJS.ProcessEnv): Promise<PresetDoctorReport> => {
   const databaseUrl = env.DATABASE_URL;
   const postgres = postgresProviderFromEnv(env);
   if (!(databaseUrl && postgres)) {
@@ -19,32 +31,37 @@ export async function verifyPresetsDoctor(env: NodeJS.ProcessEnv): Promise<Prese
     return {
       checked: true,
       ok: true,
-      lines: ['✓ DB presets — no feature-specific presets expected yet.'],
+      lines: ['✓ DB presets - no feature-specific presets expected yet.'],
     };
   }
 
-  const result = await verifyPresets(
-    expected.map((preset) => preset.id),
-    databaseUrl,
+  const result = await Effect.runPromise(
+    Effect.either(
+      verifyPresets(
+        expected.map((preset) => preset.id),
+        databaseUrl,
+      ),
+    ),
   );
-  if (!result.ok) {
+  if (Either.isLeft(result)) {
+    const error: PresetFailure = result.left;
     return {
       checked: true,
       ok: false,
-      lines: [`✗ DB presets — verification failed: ${result.error.message}`],
+      lines: [`✗ DB presets - verification failed: ${error.message}`],
     };
   }
 
   const lines: string[] = [];
-  if (result.value.ok) {
-    lines.push(`✓ DB presets — ${result.value.applied.length} feature preset(s) present.`);
+  if (result.right.ok) {
+    lines.push(`✓ DB presets - ${result.right.applied.length} feature preset(s) present.`);
   } else {
-    lines.push('⚠ DB presets — some feature tables are missing:');
-    for (const issue of result.value.issues) {
+    lines.push('⚠ DB presets - some feature tables are missing:');
+    for (const issue of result.right.issues) {
       lines.push(`  · ${issue.presetId}: ${issue.detail}`);
     }
     lines.push('  Run `vybekiit verify-presets --fix` to apply missing presets.');
   }
 
-  return { checked: true, ok: result.value.ok, lines };
-}
+  return { checked: true, ok: result.right.ok, lines };
+};

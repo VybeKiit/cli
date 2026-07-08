@@ -16,8 +16,9 @@
 A pnpm + Turborepo monorepo that ships a paid starter kit for non-technical builders. Two kinds
 of code, governed by the **Owned vs Maintained** split (see `CONTEXT.md`):
 
-- `packages/*` — **MAINTAINED**, headless, published to public npm as `@vybekiit/*`. Buyers never
-  edit these; updates reach them as version bumps. No UI, no framework lock — pure TS.
+- `packages/*` — **MAINTAINED**, headless, `private: true` — **never** published to npm (ADR-0033).
+  They ship bundled inside the `vybekiit` CLI (the only public artifact) and are consumed via the
+  workspace in the gated monorepo clone. Buyers never edit these. No UI, no framework lock — pure TS.
 - `templates/*` — **OWNED**, not published, copied into the buyer's own repo by the CLI. Includes
   all UI and the buyer-facing agent layer. Treated as the buyer's code the moment it's scaffolded.
 
@@ -27,60 +28,94 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 ## Stack & tooling
 
 - **Language:** TypeScript, strict. No `any`; narrow in `catch` (`instanceof Error`) before use.
-- **Monorepo:** pnpm workspaces + Turborepo. Packages publish to npm under `@vybekiit/*` (MIT).
+- **Monorepo:** pnpm workspaces + Turborepo. Only the `vybekiit` CLI publishes to npm (MIT, ADR-0033); every `packages/*` is `private: true`.
 - **Web/extension UI:** shadcn/ui. **Mobile UI:** plain StyleSheet primitives + `@vybekiit/tokens`.
 - **Infra the templates target:** Cloudflare (host/edge/cron/storage/email) + Supabase (db/auth).
-- **Payments:** one `@vybekiit/payments` package, one `PaymentProvider` interface, provider
-  adapters under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the
-  v1 default (Merchant of Record); the agent swaps providers via the `PAYMENTS_PROVIDER` env.
+- **Payments:** one `@vybekiit/payments` package, one payment service contract, provider adapters
+  under `providers/{lemon-squeezy,stripe,paypal}` (official SDKs). Lemon Squeezy is the v1 default
+  (Merchant of Record); the agent swaps providers via the `PAYMENTS_PROVIDER` env.
 
 ## Conventions
 
 <!-- rules digest — full guide in CODE-STYLE.md; edit there -->
 
 Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
-traceable code). **In flight: the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer` replace
-`Result` / zod / factory-wiring end-to-end, one gate-green slice at a time. The load-bearing rules —
-**full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
+traceable code). **Two refactors in flight, sequenced: (1) the publish-surface collapse — now settled
+as ADR-0033 (0 published packages; the CLI is the only public artifact, superseding ADR-0025's 5-spine);
+(2) the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer`
+replace `Result` / zod / factory-wiring end-to-end, one gate-green slice at a time, **in progress not
+complete**. The load-bearing rules — **full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
 
-- **A new module is not a new published package (ADR-0022).** Earn a public `@vybekiit/*` slot only
-  with real headless logic AND (a buyer-runtime consumer OR ≥2 adapters). Else: `shared/`
-  copy-on-scaffold, template-owned, or a `private: true` workspace package. Published spine is 6:
-  `core` (+`http`), `payments`, `auth`, `db`, `tokens`, `client-state`.
-- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (interface + DTOs + tagged `*Error`) ·
-  `config.ts` (`Schema.Struct` + Config `Tag`/`Layer`) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
-  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` barrel. `core`/`tokens` are library packages (exempt).
+- **Nothing under `packages/` is published (ADR-0033).** Every `packages/*` is `private: true` (no
+  `publishConfig`); the `vybekiit` CLI is the only public npm package and bundles the `@vybekiit/*`
+  it uses (`tsup` `noExternal: [/^@vybekiit\//]`). A new module is either **template-owned code** or a
+  **private workspace package** — there is **no public tier** and **no `shared/` tier** (plumbing
+  folds into `core`). Buyers get the maintained logic via the gated monorepo clone, never `npm i @vybekiit/*`.
+- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (`Schema.Struct` DTOs +
+  `Schema.Schema.Type<>` aliases + tagged `*Error` + service type) · `config.ts` (`Schema.Struct` +
+  Config `Tag`/`Layer` when needed) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
+  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` pure wildcard barrel. `core`
+  is the exempt library package.
 - **Provider dispatch (ADR-0018, now Effect):** wire each provider as a `Live` `Layer`; the
-  `resolveEnvProvider` selector picks the adapter from `*_PROVIDER`. Never `new` a provider at a call
-  site, never hand-roll `switch`/`===` on `*_PROVIDER`. Before editing any adapter or `resolve.ts`,
-  read `.agents/skills/extend-provider-dispatch/SKILL.md`. Ref: `packages/payments/src/resolve.ts`.
+  concern selector picks the adapter from `*_PROVIDER`. Schema config owns defaults; a missing runtime
+  adapter/map returns a typed error before construction. Never `new` a provider at a call site, never
+  hand-roll `switch`/`===` on `*_PROVIDER`, and never use `adapters[key] ?? adapters.default`. Before
+  editing any adapter or `resolve.ts`, read `.agents/skills/extend-provider-dispatch/SKILL.md`.
 - **One source of truth for config:** per-concern **`Schema.Struct`** in each package's `config.ts`
   (`core` keeps only the `parseEnv` engine); parse only your slice via `parseEnv`, fail loud. **No zod.**
   Root `.env.example` is the SSOT for keys. No scattered URLs/secrets — centralize endpoints in `core`;
   never commit secrets.
 - **Errors (ADR-0023):** return `Effect<A, E>` with a `Data.TaggedError` (`code` + `message`) for
-  expected failures; `throw` only for programmer/config errors; recover with `Effect.catchTag`. No
-  `Result`, no raw `try/catch` across an Effect seam. No bare `console.*` in published packages —
+  expected failures; recover with `Effect.catchTag`. No `Result`, no raw `try/catch` across an Effect
+  seam; wrap IO with `Effect.try` / `Effect.tryPromise`. No bare `console.*` in maintained packages —
   return an `Effect` (log via `Effect.log*`) or use `createLogger`.
 - **DI (ADR-0023):** providers + config are `Context.Tag` services wired by `Layer`; composition roots
   `Effect.provide` them and run at the edge (`runPromiseExit` on servers, one `ManagedRuntime` on clients).
 - **Naming:** first-party module **folders and files are camelCase** — everything we author + import by
   path (`providerDispatch.ts`, `useAsync.ts`, `mirrorRepos.mjs`); canonical role files keep fixed names
-  (`types.ts`/`config.ts`/`resolve.ts`/`index.ts`). **Kept on framework/ecosystem convention:** UI
-  components (`.tsx` + anything under `components/`, `dropdown-menu.tsx`), mirrored registry blocks, Next.js
-  reserved files, `*.config.ts`/`*.d.ts`, `.agents/skills/**`, `.py`/`.sh`. **Identity stays kebab:** the
-  `@vybekiit/*` name, public subpath exports, config values, route segments (`agentKit` →
-  `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
+  (`types.ts`/`config.ts`/`resolve.ts`/`index.ts`). **First-party React components are PascalCase
+  matching the export** (`FormField.tsx`, `DashboardPage.tsx`) — recipes, features, and primitives alike.
+  **Kept on framework/ecosystem convention (kebab):** shadcn/Radix + mirrored registry blocks
+  (`dropdown-menu.tsx`), Next.js reserved files, `*.config.ts`/`*.d.ts`, `.agents/skills/**`, `.py`/`.sh`.
+  **Identity stays kebab:** the `@vybekiit/*` name, public subpath exports, config values, route segments
+  (`agentKit` → `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
+- **Package kinds:** every `packages/*` declares `vybekiit.kind` = `concern` | `library` | `owned` |
+  `tooling` in its `package.json`. Kind drives the rules — only `concern` earns the full provider
+  skeleton, only `tooling` may `console`. `pnpm check:packages` fails when shape contradicts kind.
+- **UI & styling:** compose kit primitives (`@vybekiit/ui` / `@/components/ui/*`), never raw elements;
+  variants via `cva()`, classes via `cn()`, colours/spacing from design tokens (web CSS vars, mobile
+  `@vybekiit/tokens`). Fetch through `@/lib/fetchJson` + TanStack Query, always rendering loading/error/
+  empty; forms use the `FormField` primitive; `'use client'` on interactive leaves only.
+- **Effect async:** stay `Effect` until a composition root, then run once (`runPromiseExit` on servers,
+  one `ManagedRuntime` on clients); parallelize with `Effect.all(..., { concurrency })`; never
+  fire-and-forget a serverless side-effect (await it, or `waitUntil` in a Worker).
+- **CLI:** verbs register in `COMMAND_HANDLERS` (`cli/src/cliRunner.ts`); dual-mode — bare+TTY opens a
+  `@clack/prompts` menu, flags/non-TTY defer to the same functions and never hang; handle `isCancel()`;
+  `@inquirer/prompts` banned (ADR-0034); write via `process.stdout`, not `console`.
 - **Regex:** prefer a plain string method when it's as clear (`.replaceAll('x', y)` over `/x/g`); a kept
   regex gets a one-line example comment above it (`input → output` or match/no-match). Full rule in CODE-STYLE.
-- **Types:** `interface` for contracts, `type` for unions + `Schema.Schema.Type<>`; fields `readonly`;
-  `unknown` over `any`; no casts except a vendor-type seam. Named exports only; no `export default` in
-  package source (except a Worker handler / `tsup.config.ts`).
-- **Docs (changed):** a **one-line** TSDoc on each export — no multi-line "why" essays inline; put
-  durable rationale in an ADR / `CONTEXT.md`. Keep files ~200–400 lines; match the nearest sibling;
-  reuse helpers before writing new ones.
+- **Import aliases (ADR-0026):** templates `@/*` → `./src/*`; packages `@vybekiit/<pkg>/*` everywhere
+  (self-imports too). `./` colocated OK; `../` banned. Order: external → `@vybekiit` → `@/` → `./`.
+  Domain adapters live in `packages/{seo,email,…}` — not `templates/*/src/vybekiit/`. Full rule in
+  CODE-STYLE.
+- **Types:** Schema-first DTO/config/wire payloads; `type` for unions + `Schema.Schema.Type<>`;
+  interfaces mainly for component props; fields `readonly`; `unknown` over `any`; no casts except a
+  vendor-type seam. Named exports only; no `export default` in package source (except a Worker
+  handler / `tsup.config.ts`).
+- **Exports:** package `index.ts` files are pure wildcard barrels (`export * from './types'`) for
+  cleaner imports. No implementation code, constants, side effects, or wiring in `index.ts`.
+- **Functions + docs:** authored functions are const-arrow only (`function*` allowed inside
+  `Effect.gen`). Every exported function has TSDoc summary, `@param`, `@returns`, and `@example`;
+  durable rationale goes in an ADR / `CONTEXT.md`.
+- **Component props:** component prop contracts remain interfaces; optional props get safe defaults
+  at the boundary (`children` defaults to `null` or an empty render by case).
 - **Tests:** colocate `*.test.ts` next to source (not a per-package `test/` dir). Effectful code uses
   `@effect/vitest` (`it.effect` + `Exit`/`Either`). Vitest `3.2.6`, TDD red→green→refactor.
+- **Dependencies:** shared external versions live in the pnpm workspace catalog as exact stable pins;
+  workspace manifests use `catalog:`. Named catalogs only for real framework lanes.
+- **AI-slop Never list:** no one-row predicate helpers like `isRecord`/`isObject`/`isDefined`/
+  `isName`/`isKey`, no `noop`/`assertNever`, no generic `result`/`data`/`temp` names when a domain
+  noun exists, and no hidden runtime fallbacks.
 - **Maintainer scripts** are `.mjs` + JSDoc types, `execFile`+`promisify`, secrets scrubbed from logs.
 
 ## TDD & quality gate (this is load-bearing — it's also the product promise)
@@ -89,9 +124,9 @@ traceable code). **In flight: the Effect migration (ADR-0023)** — Effect + `Sc
   gate and is what makes the buyer's `update-kit` safe (green suite = safe to bump).
 - **Pre-commit runs Biome check** (format + lint-fix) on maintainer and buyer templates — it must
   never block on a failing test, so it can be inherited without trapping a non-coder.
-- **Pre-push + CI are the heavy gate** — both run `pnpm quality` (lint, typecheck, test,
-  script tests, build). A red gate is a check *the agent* fixes before push/merge.
-- Run `pnpm quality` after substantial changes (pre-push runs the same commands automatically).
+- **Pre-push + CI are the heavy gate** — both run `pnpm verify` (lint, typecheck, unit test,
+  script tests, build, e2e). A red gate is a check *the agent* fixes before push/merge.
+- Run `pnpm verify` after substantial changes (pre-push runs the same commands automatically).
 - Never `git push --no-verify` to skip a red gate unless you are deliberately re-running mirror
   sync only — then use the **mirror-repos** workflow or `pnpm mirror` manually.
 - Run `./scripts/setup-branch-protection.sh` once if GitHub Team/Pro is available on private repos.
@@ -104,11 +139,12 @@ language (per `templates/*/language.md`) · errors translated · celebrate · **
 (`—`)** in buyer-facing prose (UI titles stay unpunctuated; see Tone in `language.md`). If you
 catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing text, translate it.
 
-## Releasing packages
+## Releasing (the CLI only)
 
-- Semver. Public npm publish under `@vybekiit/*`. Breaking changes to a package = major bump and a
-  changelog note; the buyer's `update-kit` skill relies on semver to decide what's safe.
-- Templates are versioned but **not** published — they're distributed by the CLI/scaffolder.
+- Semver. **Only the `vybekiit` CLI publishes to npm** (ADR-0033); every `packages/*` is
+  `private: true` and ships bundled inside the CLI. `publish.yml` publishes just the CLI.
+- Templates + packages are versioned but **not** published — buyers get them via the gated monorepo
+  mirror clone; the buyer's `update-kit` pulls the mirror rather than bumping npm deps.
 - **Kit releases:** unified `vX.Y.Z` tag on monorepo + all mirrors after each merged PR (unless
   `no-release` label). GitHub Release notes on monorepo only. See ADR-0013 and `release.yml` /
   `publish.yml` (OIDC trusted publishing — no `NPM_TOKEN`).
@@ -120,6 +156,14 @@ catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing 
 - Pre-push hook (`.husky/pre-push`) is the local gate; CI is the remote gate.
 - Red CI on `main` opens an auto-issue (`ci-failure-issue.yml`) — fix via PR, do not push to main.
 - Branch protection: run `./scripts/setup-branch-protection.sh` (needs GitHub Team/Pro on private repos).
+
+## Scripts layout (maintainer vs buyer delivery)
+
+- **`scripts/dev/{mirror,sync,checks,codmods,publish,preview}/`** — maintainer-only tooling grouped by job. Never mirrored or scaffolded to buyers.
+- **`scripts/lib/`** — shared imports (`tsupWorkspaceAliases.mjs`, `uiCategoryTaxonomy.mjs`, `repoRoot.mjs`) used by packages and dev scripts.
+- **`scripts/data/`** — UI registry manifests, locks, and generated reports (SSOT for `pnpm sync:ui`).
+- **`templates/*/scripts/`** — buyer `pnpm verify` surface; each script must be **self-contained** (no monorepo parent paths). Local maintainer scratch may live in `templates/*/scripts/dev/` — gitignored + excluded by the CLI scaffold filter (ADR-0029).
+- **`apps/*/scripts/`**, **`infra/scripts/`** — app/infra delivery boundaries unchanged.
 
 ## Delivery mirror sync (maintainer-only)
 
@@ -146,12 +190,19 @@ you can take $1 and auto-invite yourself, the business is real.
   `packages/payments`, `packages/auth`, `packages/db`, `packages/browserAutomation`, `packages/clientState`, `cli`
   (the `vybekiit` scaffolder), and `templates/web` (a real Next.js app, `next build` + `tsc`
   gated in CI). These are real, typed, tested. `templates/web` is still OWNED scaffold payload —
-  the CLI copies it verbatim and rewrites its `@vybekiit/*` `workspace:*` deps → npm on scaffold —
-  it just no longer ships untyped/unbuilt.
-- **Payload, NOT yet workspace members** (see `pnpm-workspace.yaml`): `templates/{mobile,extension}`
-  (v2/v3 placeholders, nothing to build) and `apps/landing`, which today is a stub (webhook + the
-  GitHub-invite **gate** only). `apps/landing` joins the workspace alongside its real UI in issue #3,
-  so we don't gate an empty shell.
+  the CLI copies it verbatim, keeping its `@vybekiit/*` `workspace:*` deps (no npm rewrite; ADR-0033).
+- **Two refactors — one settled, one in progress:**
+  - **Publish surface (ADR-0033, done):** every `packages/*` is now `private: true`; the `vybekiit`
+    CLI is the only public npm artifact and bundles what it needs. This supersedes ADR-0025's 5-spine.
+    All **28** packages still physically exist in `packages/` (the by-purpose reorg lands separately),
+    but none publishes — do not add `publishConfig` to any of them.
+  - **Effect migration (ADR-0023): partial.** The spine (`core`, `payments`, `auth`, `db`,
+    `clientState`) is on Effect + `Schema` + tagged errors; `packages/core/src/result.ts` +
+    `effectInterop.ts` still exist as the bridge, and templates, tooling, `cli`, and the buyer agent
+    layer are **not yet** converted. Slices 5–8 remain. Convert-as-you-touch; `deslop` enforces per-diff.
+- **Workspace members** (see `pnpm-workspace.yaml`): `templates/{web,mobile,extension,backend,spa}`
+  and `apps/{landing,componentLibrary,localDevelopmentWebsite}` are in the workspace gate. Some are
+  still payload-first or scaffold surfaces, but they are no longer excluded from workspace resolution.
 - **The gate lives in `apps/landing`, not in the buyer template.** A buyer's app fulfills its own
   orders (`templates/web/src/lib/fulfillment.ts` → records the order); inviting to our private repo
   is *our* business logic.
@@ -161,6 +212,14 @@ you can take $1 and auto-invite yourself, the business is real.
 - **$29 pricing** is flagged as underpriced (parked, not settled).
 - Brand `vybekiit` availability confirmed free on **npm** (`@vybekiit/*` + unscoped) and **GitHub org**
   as of the scaffold; the org still has to be **created in the browser** (no API for that).
+
+## UI mirror + component library
+
+- After `pnpm sync:ui`, rebuild the gallery index: `node scripts/dev/sync/buildComponentLibraryIndex.mjs` (also runs via `apps/componentLibrary` `predev` / `build`).
+- Third-party license notes: [docs/THIRD_PARTY_UI_LICENSES.md](./docs/THIRD_PARTY_UI_LICENSES.md).
+- Dev UI library: `pnpm dev:ui-library` → `http://localhost:3002`.
+- Local dev console: `pnpm dev:local` → `http://localhost:3005` (or `vybekiit local-dev`). A visual sidecar for vibe coders that detects the active agent and animates the agent's workflow steps.
+- Gallery previews cache compiled embeds in-session; card hover enables interactive iframes for hover effects without opening the detail page.
 
 <!-- vybekiit:generated:start contract -->
 ## The contract: Decide + Guide
@@ -172,4 +231,7 @@ you can take $1 and auto-invite yourself, the business is real.
 ⑤ **Celebrate progress** — Call out small wins out loud ("Payments are working! 🎉") to keep a non-coder going.
 ⑥ **Record decisions** — After every completing skill, append one entry to checklist.md Decision log via formatChecklistEntry().
 ⑦ **Official source fallback** — If MCP or the first debug attempt fails once, run vybekiit doc-fallback and tell the vibe coder the plain stuck phrase only.
+⑧ **Fixed = live** — Never say "done" or "fixed" until the change is deployed (if the app is already online). After fixing a bug, ask: "Want me to put this fix online now?" — and verify the live URL reflects the fix before celebrating. The only exception: the vibe coder explicitly said "just fix the code, don't deploy yet."
+⑨ **Clarify before removing** — When the vibe coder asks to remove, delete, or hide a visible part of the app, and the request could refer to more than one element, ask one short clarifying question before touching code. Destructive UI changes are not reversible in the builder's eyes.
+⑩ **Keep progress visible** — After completing any skill or multi-step task, update checklist.md's Progress section: mark what's done, note what's next. The vibe coder never has to ask "where was I?" — it's always current.
 <!-- vybekiit:generated:end contract -->

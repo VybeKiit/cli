@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PRICE } from '@/data/site';
 import { cn } from '@/lib/utils';
-import { useCallback } from 'react';
 
 const PLANS = [
   {
@@ -30,8 +30,17 @@ const PLANS = [
   },
 ] as const;
 
-/** Pricing plan showcase slide — demo tiers with confetti on mock CTA. */
-export function PricingPlanSlide() {
+/**
+ * Pricing plan showcase slide — demo tiers with confetti on mock CTA.
+ *
+ * @returns The rendered PricingPlanSlide element.
+ * @example
+ * ```tsx
+ * <PricingPlanSlide />
+ * ```
+ */
+
+export const PricingPlanSlide = () => {
   const handleConfetti = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const originX = (rect.left + rect.width / 2) / window.innerWidth;
@@ -107,4 +116,4 @@ export function PricingPlanSlide() {
       </div>
     </div>
   );
-}
+};

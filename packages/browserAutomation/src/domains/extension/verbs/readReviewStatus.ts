@@ -1,8 +1,11 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { discoverDeveloperGroupId, statusUrl } from '../urls';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToCwsChrome } from '@vybekiit/browser-automation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browser-automation/domains/extension/errors';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  statusUrl,
+} from '@vybekiit/browser-automation/domains/extension/urls';
 
 /**
  * Shape of the current review status badge on the dev console.
@@ -30,15 +33,20 @@ export type CwsReviewStatus =
  * the leading state into the union; unknown labels surface as
  * `{ kind: 'unknown', label }` so Google adding a new state doesn't fail
  * the verb.
+ *
+ * @param ctx - Extension automation context with repo paths, auth state, and logging.
+ * @returns The classified Chrome Web Store review status.
+ * @example
+ * const status = await readReviewStatus(ctx);
  */
-export async function readReviewStatus(ctx: VerbContext): Promise<CwsReviewStatus> {
+export const readReviewStatus = async (ctx: VerbContext): Promise<CwsReviewStatus> => {
   if (!ctx.extension.chromeWebStoreId) {
     throw new MissingItemIdError(ctx.extension.key, 'readReviewStatus');
   }
 
   const session = await connectToCwsChrome(ctx);
   try {
-    const log = ctx.log ?? console;
+    const log = resolveVerbLogger(ctx);
     log.log(`[cws] reading review status for ${ctx.extension.name}`);
 
     const groupId = await discoverDeveloperGroupId(session.page);
@@ -54,17 +62,29 @@ export async function readReviewStatus(ctx: VerbContext): Promise<CwsReviewStatu
   } finally {
     await session.dispose();
   }
-}
+};
 
-function classifyReviewLabel(label: string): CwsReviewStatus {
+/**
+ * Classify the raw Chrome Web Store status label into a review-status union.
+ *
+ * @param label - Raw status label text from the CWS status page.
+ * @returns The classified review status.
+ * @example
+ * const status = classifyReviewLabel('Published - public');
+ */
+const classifyReviewLabel = (label: string): CwsReviewStatus => {
   const lower = label.toLowerCase();
-  if (lower.includes('draft')) return { kind: 'draft', label };
+  if (lower.includes('draft')) {
+    return { kind: 'draft', label };
+  }
   if (lower.includes('pending review') || lower.includes('in review')) {
     return { kind: 'in_review', label };
   }
-  if (lower.includes('published')) return { kind: 'published', label };
+  if (lower.includes('published')) {
+    return { kind: 'published', label };
+  }
   if (lower.includes('rejected') || lower.includes('removed')) {
     return { kind: 'rejected', label };
   }
   return { kind: 'unknown', label };
-}
+};

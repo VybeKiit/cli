@@ -22,6 +22,56 @@
       "types": "./dist/http/express.d.ts",
       "import": "./dist/http/express.js",
       "require": "./dist/http/express.cjs"
+    },
+    "./http/handlers": {
+      "types": "./dist/http/handlers.d.ts",
+      "import": "./dist/http/handlers.js",
+      "require": "./dist/http/handlers.cjs"
+    },
+    "./http/schemas": {
+      "types": "./dist/http/schemas.d.ts",
+      "import": "./dist/http/schemas.js",
+      "require": "./dist/http/schemas.cjs"
+    },
+    "./practice": {
+      "types": "./dist/practice.d.ts",
+      "import": "./dist/practice.js",
+      "require": "./dist/practice.cjs"
+    },
+    "./providers/*": {
+      "types": "./dist/providers/*/index.d.ts",
+      "import": "./dist/providers/*/index.js",
+      "require": "./dist/providers/*/index.cjs"
+    },
+    "./providers/*/checkout": {
+      "types": "./dist/providers/*/checkout.d.ts",
+      "import": "./dist/providers/*/checkout.js",
+      "require": "./dist/providers/*/checkout.cjs"
+    },
+    "./providers/*/webhook": {
+      "types": "./dist/providers/*/webhook.d.ts",
+      "import": "./dist/providers/*/webhook.js",
+      "require": "./dist/providers/*/webhook.cjs"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
+    },
+    "./paymentEffect": {
+      "types": "./dist/paymentEffect.d.ts",
+      "import": "./dist/paymentEffect.js",
+      "require": "./dist/paymentEffect.cjs"
+    },
+    "./resolve": {
+      "types": "./dist/resolve.d.ts",
+      "import": "./dist/resolve.js",
+      "require": "./dist/resolve.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
     }
   },
   "files": [
@@ -37,8 +87,7 @@
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
     "@paypal/paypal-server-sdk": "^2.4.0",
     "@vybekiit/core": "workspace:*",
-    "@vybekiit/http": "workspace:*",
-    "effect": "3.21.4",
+    "effect": "catalog:",
     "stripe": "^22.3.0"
   },
   "peerDependencies": {
@@ -51,13 +100,14 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "catalog:",
     "express": "^4.21.2",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

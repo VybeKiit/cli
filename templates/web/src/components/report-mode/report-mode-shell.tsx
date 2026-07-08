@@ -1,18 +1,25 @@
 import { ReportModeDev } from '@/components/report-mode/report-mode-dev';
 import '@/components/report-mode/dock/styles/report-mode-dock.css';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { resolveVybeAssistant } from '@vybekiit/report-mode';
-import process from 'node:process';
+import { TooltipProvider } from '@vybekiit/ui/tooltip';
+import { readNodeCwd, readNodeEnv } from '@/lib/nodeEnv';
+import { resolveVybeAssistant, shouldShowReportMode } from '@vybekiit/report-mode';
 import { Toaster } from 'sonner';
 
-/** Server wrapper — reads assistant + project root for dev-only Report Mode. */
-export function ReportModeDevShell() {
-  if (process.env.NODE_ENV !== 'development') {
+/**
+ * Render the dev-only Report Mode shell.
+ *
+ * @returns Report Mode tooling when enabled, otherwise `null`.
+ * @example
+ * <ReportModeDevShell />
+ */
+const ReportModeDevShell = () => {
+  const env = readNodeEnv();
+  if (!shouldShowReportMode(env)) {
     return null;
   }
 
-  const assistant = resolveVybeAssistant(process.env);
-  const projectRoot = process.cwd();
+  const assistant = resolveVybeAssistant(env);
+  const projectRoot = readNodeCwd();
 
   return (
     <TooltipProvider delayDuration={500} skipDelayDuration={0}>
@@ -20,4 +27,6 @@ export function ReportModeDevShell() {
       <ReportModeDev assistant={assistant} projectRoot={projectRoot} />
     </TooltipProvider>
   );
-}
+};
+
+export { ReportModeDevShell };

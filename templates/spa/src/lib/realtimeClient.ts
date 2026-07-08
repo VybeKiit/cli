@@ -1,6 +1,10 @@
 import { resolveRealtimeProvider } from '@vybekiit/realtime';
 
-/** Live updates wire point for Socket.IO / other realtime adapters. */
-export function getRealtime() {
-  return resolveRealtimeProvider();
-}
+/**
+ * Resolve the live updates provider for the SPA template.
+ *
+ * @returns The configured realtime provider.
+ * @example
+ * const realtime = getRealtime();
+ */
+export const getRealtime = () => resolveRealtimeProvider();

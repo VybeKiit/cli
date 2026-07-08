@@ -11,8 +11,14 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/** Signed-in dashboard — stats, tabs, and getting-started list. */
-export default function DashboardScreen() {
+/**
+ * Render the signed-in mobile dashboard.
+ *
+ * @returns React Native dashboard screen.
+ * @example
+ * <DashboardScreen />
+ */
+const DashboardScreen = () => {
   const { colors, spacing, fontSizes, fontWeights } = useTheme();
   const { t } = useTranslations();
   const { user, loading } = useUser();
@@ -38,7 +44,10 @@ export default function DashboardScreen() {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
+  const avatarLabel = user.email === null ? t('common.fallback.user') : user.email;
 
   return (
     <ScrollView
@@ -48,7 +57,7 @@ export default function DashboardScreen() {
       <View style={{ gap: spacing.sm }}>
         <Badge variant="secondary">{t('dashboard.badge')}</Badge>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-          <Avatar label={user.email ?? t('common.fallback.user')} />
+          <Avatar label={avatarLabel} />
           <View style={{ flex: 1, gap: spacing.xs }}>
             <Text
               style={{
@@ -113,10 +122,12 @@ export default function DashboardScreen() {
       />
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
   },
 });
+
+export default DashboardScreen;

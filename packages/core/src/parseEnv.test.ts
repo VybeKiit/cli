@@ -3,6 +3,9 @@ import { Effect, Schema } from 'effect';
 import { describe, expect } from 'vitest';
 import { appConfigSchema, parseEnv } from './config';
 
+// "Invalid VybeKiit configuration: ..." -> match
+const INVALID_CONFIG_PATTERN = /Invalid VybeKiit configuration/;
+
 describe('parseEnv — Effect Schema slices (ADR-0023)', () => {
   const ExampleSchema = Schema.Struct({ APP_URL: Schema.String });
 
@@ -12,7 +15,7 @@ describe('parseEnv — Effect Schema slices (ADR-0023)', () => {
   });
 
   it('throws a fail-loud VybeKiit message when an Effect Schema slice is invalid', () => {
-    expect(() => parseEnv(ExampleSchema, {})).toThrow(/Invalid VybeKiit configuration/);
+    expect(() => parseEnv(ExampleSchema, {})).toThrow(INVALID_CONFIG_PATTERN);
   });
 
   it('decodes a core config slice, applying its defaults', () => {

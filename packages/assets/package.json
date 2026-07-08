@@ -1,7 +1,7 @@
 {
   "name": "@vybekiit/assets",
   "version": "0.3.0",
-  "description": "Headless asset optimization and CDN delivery for VybeKiit — build-time compression plus provider-native transform URLs.",
+  "description": "Asset delivery and optimization for VybeKiit.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -12,6 +12,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.js",
+      "require": "./dist/providers/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
@@ -25,15 +35,18 @@
   },
   "dependencies": {
     "@vybekiit/core": "workspace:*",
-    "sharp": "^0.34.5",
-    "svgo": "^3.3.2"
+    "effect": "catalog:",
+    "svgo": "^3.3.2",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "@effect/vitest": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

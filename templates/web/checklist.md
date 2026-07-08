@@ -6,7 +6,7 @@ Track go-live gates and record decisions. The agent appends to the decision log 
 ## Before you go live
 
 - [ ] Sign-in works with real accounts
-- [ ] `pnpm quality` passes
+- [ ] `pnpm verify` passes
 - [ ] Doctor reports all tools ready
 - [ ] Visitor stats record a test event (when analytics is enabled)
 - [ ] Error alerts received a test event (when Sentry is enabled)

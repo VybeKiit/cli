@@ -1,31 +1,43 @@
-import { type Result, ok } from '@vybekiit/core';
-import type { KvProvider } from '../types';
+import type { KvProvider } from '@vybekiit/kv/types';
+import { Effect } from 'effect';
 
 const store = new Map<string, { value: string; expiresAt?: number }>();
 
-export function createLocalKv(): KvProvider {
-  return {
-    name: 'local',
-    async get(key: string): Promise<string | null> {
+/**
+ * Build the in-memory KV provider for local development.
+ *
+ * @returns KV provider backed by process memory.
+ * @example
+ * const kv = createLocalKv();
+ */
+export const createLocalKv = (): KvProvider => ({
+  name: 'local',
+  get: (key: string) =>
+    Effect.sync(() => {
       const entry = store.get(key);
-      if (!entry) return null;
+      if (entry === undefined) {
+        return null;
+      }
       if (entry.expiresAt !== undefined && Date.now() > entry.expiresAt) {
         store.delete(key);
         return null;
       }
       return entry.value;
-    },
-    async set(key: string, value: string, ttlSeconds?: number | undefined): Promise<Result<true>> {
+    }),
+  set: (key: string, value: string, ttlSeconds?: number | undefined) =>
+    Effect.sync(() => {
       const expiresAt = ttlSeconds === undefined ? undefined : Date.now() + ttlSeconds * 1000;
-      store.set(key, { value, ...(expiresAt === undefined ? {} : { expiresAt }) });
-      return ok(true);
-    },
-    async delete(key: string): Promise<Result<true>> {
+      if (expiresAt === undefined) {
+        store.set(key, { value });
+      } else {
+        store.set(key, { value, expiresAt });
+      }
+      return true as const;
+    }),
+  delete: (key: string) =>
+    Effect.sync(() => {
       store.delete(key);
-      return ok(true);
-    },
-    async verifyDelivery() {
-      return ok(true);
-    },
-  };
-}
+      return true as const;
+    }),
+  verifyDelivery: () => Effect.succeed(true as const),
+});

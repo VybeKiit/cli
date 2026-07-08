@@ -1,19 +1,13 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/background-beams-with-collision';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { BackgroundBeamsWithCollision } from '@/components/aceternity/background-beams-with-collision';
 
 export default function BackgroundBeamsWithCollisionPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <BackgroundBeamsWithCollision>
+        <span className="text-sm text-muted-foreground">Preview</span>
+      </BackgroundBeamsWithCollision>
     </div>
   );
 }

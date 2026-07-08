@@ -1,12 +1,11 @@
 'use client';
 
 import { ReportFlyoutPortal } from '@/components/report-mode/dock/components/report-flyout-portal';
-import { useReportFlyoutPosition } from '@/components/report-mode/dock/hooks/use-report-flyout-position';
-import { useReportHoverMenu } from '@/components/report-mode/dock/hooks/use-report-hover-menu';
 import { REPORT_DOCK_TOOLTIPS } from '@/components/report-mode/shared/report-mode-copy';
 import { ReportControlHint } from '@/components/report-mode/shared/report-control-hint';
 import { cn } from '@/lib/utils';
 import { DEFAULT_INSPECT_HIGHLIGHT_COLOR, INSPECT_HIGHLIGHT_PRESETS } from '@vybekiit/report-mode';
+import { useReportFlyoutPosition, useReportHoverMenu } from '@vybekiit/report-mode/web';
 import { useRef } from 'react';
 
 interface ReportHighlightColorMenuProps {
@@ -16,16 +15,24 @@ interface ReportHighlightColorMenuProps {
   readonly tutorialActive?: boolean;
 }
 
-/** Hover menu — click a preset or use the color picker to change the inspect highlight ring. */
-export function ReportHighlightColorMenu({
+/**
+ * Render the hover menu for the inspect highlight color.
+ *
+ * @param props - Current color plus color-change and reset callbacks.
+ * @returns Highlight color trigger and flyout.
+ * @example
+ * <ReportHighlightColorMenu color="#3b82f6" onChange={setColor} onReset={resetColor} />
+ */
+const ReportHighlightColorMenu = ({
   color,
   onChange,
   onReset,
   tutorialActive = false,
-}: ReportHighlightColorMenuProps) {
+}: ReportHighlightColorMenuProps) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
-  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center');
+  const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center', flyoutRef);
 
   return (
     <div
@@ -65,6 +72,7 @@ export function ReportHighlightColorMenu({
         onMouseEnter={openMenu}
         onMouseLeave={scheduleClose}
         open={open}
+        ref={flyoutRef}
         role="dialog"
         style={flyoutStyle}
       >
@@ -117,4 +125,6 @@ export function ReportHighlightColorMenu({
       </ReportFlyoutPortal>
     </div>
   );
-}
+};
+
+export { ReportHighlightColorMenu };

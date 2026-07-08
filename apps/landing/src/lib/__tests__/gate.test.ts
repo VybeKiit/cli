@@ -1,6 +1,7 @@
-import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 import { type GithubGateConfig, githubGateConfigSchema, parseEnv } from '@vybekiit/core';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { Effect, Either } from 'effect';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 
 const gateConfig: GithubGateConfig = {
   GITHUB_GATE_TOKEN: 'test-token',
@@ -17,8 +18,8 @@ describe('gate multi-mirror invite/remove', () => {
     const fetchMock = vi.fn().mockResolvedValue({ status: 201 });
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await inviteToRepo(gateConfig, 'buyer-user');
-    expect(result.ok).toBe(true);
+    const result = await Effect.runPromise(Effect.either(inviteToRepo(gateConfig, 'buyer-user')));
+    expect(Either.isRight(result)).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(3);
     for (const repo of gateConfig.GITHUB_GATE_REPOS) {
       expect(fetchMock).toHaveBeenCalledWith(
@@ -32,8 +33,8 @@ describe('gate multi-mirror invite/remove', () => {
     const fetchMock = vi.fn().mockResolvedValue({ status: 204 });
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await removeFromRepo(gateConfig, 'buyer-user');
-    expect(result.ok).toBe(true);
+    const result = await Effect.runPromise(Effect.either(removeFromRepo(gateConfig, 'buyer-user')));
+    expect(Either.isRight(result)).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(3);
     for (const repo of gateConfig.GITHUB_GATE_REPOS) {
       expect(fetchMock).toHaveBeenCalledWith(
@@ -51,10 +52,10 @@ describe('gate multi-mirror invite/remove', () => {
       .mockResolvedValueOnce({ status: 201 });
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await inviteToRepo(gateConfig, 'buyer-user');
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('invite_failed');
+    const result = await Effect.runPromise(Effect.either(inviteToRepo(gateConfig, 'buyer-user')));
+    expect(Either.isLeft(result)).toBe(true);
+    if (Either.isLeft(result)) {
+      expect(result.left.code).toBe('invite_failed');
     }
   });
 });

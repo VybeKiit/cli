@@ -1,5 +1,4 @@
 import type { PlatformSkillsTemplateManifest } from '@vybekiit/agent-kit';
-import { readAgentSkillSymlinkStates } from './agentSkillSymlinks';
 import {
   COMPLIANCE_FILES,
   listPlatformSkillWrappers,
@@ -8,9 +7,10 @@ import {
   readFilesByPath,
   readOptionalFile,
 } from './agentLayerIo';
+import { readAgentSkillSymlinkStates } from './agentSkillSymlinks';
 
-/** Everything check-agent-layer needs from disk — one loader, one test fixture tree. */
-export interface AgentLayerSnapshot {
+/** Everything check-agent-layer needs from disk: one loader, one test fixture tree. */
+export type AgentLayerSnapshot = {
   readonly files: Record<string, string>;
   readonly skillPaths: string[];
   readonly skillContents: Record<string, string>;
@@ -18,14 +18,23 @@ export interface AgentLayerSnapshot {
   readonly agentSkillSymlinkStates: Awaited<ReturnType<typeof readAgentSkillSymlinkStates>>;
   readonly platformSkillContents: Record<string, string>;
   readonly platformSkillsManifest?: PlatformSkillsTemplateManifest;
-}
+};
 
-export async function loadAgentLayerSnapshot(cwd: string): Promise<AgentLayerSnapshot> {
+/**
+ * Load every file and skill artifact needed by the agent-layer checker.
+ *
+ * @param cwd - Project directory containing the buyer-facing agent layer.
+ * @returns Snapshot of compliance files, skills, stubs, symlinks, and platform wrappers.
+ * @example
+ * const snapshot = await loadAgentLayerSnapshot(process.cwd());
+ */
+export const loadAgentLayerSnapshot = async (cwd: string): Promise<AgentLayerSnapshot> => {
   const skillPaths = await listSkillPaths(cwd);
   const manifestRaw = await readOptionalFile(cwd, 'platform-skills.manifest.json');
-  const platformSkillsManifest = manifestRaw
-    ? (JSON.parse(manifestRaw) as PlatformSkillsTemplateManifest)
-    : undefined;
+  const platformSkillsManifest =
+    manifestRaw !== undefined && manifestRaw !== ''
+      ? (JSON.parse(manifestRaw) as PlatformSkillsTemplateManifest)
+      : undefined;
 
   return {
     files: await readFilesByPath(cwd, COMPLIANCE_FILES),
@@ -36,4 +45,4 @@ export async function loadAgentLayerSnapshot(cwd: string): Promise<AgentLayerSna
     platformSkillContents: await listPlatformSkillWrappers(cwd),
     ...(platformSkillsManifest === undefined ? {} : { platformSkillsManifest }),
   };
-}
+};

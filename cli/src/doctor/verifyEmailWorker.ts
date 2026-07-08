@@ -1,8 +1,8 @@
 import {
   type CloudflareEmailConfig,
-  parseEnv,
   cloudflareEmailConfigSchema,
   emailConfigSchema,
+  parseEnv,
 } from '@vybekiit/core';
 
 export type EmailWorkerDoctorReport = {
@@ -11,21 +11,39 @@ export type EmailWorkerDoctorReport = {
   readonly lines: readonly string[];
 };
 
-function healthUrl(endpoint: string): string {
+// "/api/send" or "/api/send/" -> "/api/health"
+const SEND_PATH_SUFFIX_PATTERN = /\/send\/?$/;
+// "/api/" -> "/api"
+const TRAILING_SLASH_PATTERN = /\/$/;
+
+/**
+ * Build the email worker health URL from its send endpoint.
+ *
+ * @param endpoint - Configured Cloudflare email worker endpoint.
+ * @returns Health-check URL.
+ * @example
+ * const url = healthUrl('https://worker.example/api/send');
+ */
+const healthUrl = (endpoint: string): string => {
   const url = new URL(endpoint);
-  // swap a trailing "/send" or "/send/" for "/health": "/api/send" → "/api/health"
-  url.pathname = url.pathname.replace(/\/send\/?$/, '/health');
+  url.pathname = url.pathname.replace(SEND_PATH_SUFFIX_PATTERN, '/health');
   if (!url.pathname.endsWith('/health')) {
-    // drop a trailing slash before appending: "/api/" → "/api"
-    url.pathname = `${url.pathname.replace(/\/$/, '')}/health`;
+    url.pathname = `${url.pathname.replace(TRAILING_SLASH_PATTERN, '')}/health`;
   }
   return url.toString();
-}
+};
 
-/** Probe the Cloudflare email worker when cloudflare email is configured. */
-export async function verifyEmailWorkerDoctor(
+/**
+ * Probe the Cloudflare email worker when Cloudflare email is configured.
+ *
+ * @param env - Environment values used to resolve email worker settings.
+ * @returns Email worker doctor report.
+ * @example
+ * const report = await verifyEmailWorkerDoctor(process.env);
+ */
+export const verifyEmailWorkerDoctor = async (
   env: NodeJS.ProcessEnv,
-): Promise<EmailWorkerDoctorReport> {
+): Promise<EmailWorkerDoctorReport> => {
   const { EMAIL_PROVIDER } = parseEnv(emailConfigSchema, env);
   if (EMAIL_PROVIDER !== 'cloudflare') {
     return { checked: false, ok: true, lines: [] };
@@ -36,7 +54,7 @@ export async function verifyEmailWorkerDoctor(
       checked: true,
       ok: false,
       lines: [
-        '⚠ Email worker — set CLOUDFLARE_EMAIL_ENDPOINT after deploying packages/email/worker.',
+        '⚠ Email worker - set CLOUDFLARE_EMAIL_ENDPOINT after deploying packages/email/worker.',
       ],
     };
   }
@@ -49,7 +67,7 @@ export async function verifyEmailWorkerDoctor(
     return {
       checked: true,
       ok: false,
-      lines: [`✗ Email worker — ${message.split('\n')[0]}`],
+      lines: [`✗ Email worker - ${message.split('\n')[0]}`],
     };
   }
 
@@ -59,7 +77,7 @@ export async function verifyEmailWorkerDoctor(
       return {
         checked: true,
         ok: false,
-        lines: [`✗ Email worker — health check returned ${response.status}.`],
+        lines: [`✗ Email worker - health check returned ${response.status}.`],
       };
     }
     const body = (await response.json()) as { ok?: boolean };
@@ -67,20 +85,20 @@ export async function verifyEmailWorkerDoctor(
       return {
         checked: true,
         ok: false,
-        lines: ['✗ Email worker — health check did not return ok.'],
+        lines: ['✗ Email worker - health check did not return ok.'],
       };
     }
     return {
       checked: true,
       ok: true,
-      lines: ['✓ Email worker — health check passed.'],
+      lines: ['✓ Email worker - health check passed.'],
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Email worker unreachable';
     return {
       checked: true,
       ok: false,
-      lines: [`✗ Email worker — ${message}`],
+      lines: [`✗ Email worker - ${message}`],
     };
   }
-}
+};

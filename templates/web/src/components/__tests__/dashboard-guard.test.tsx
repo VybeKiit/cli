@@ -1,9 +1,10 @@
+import { render, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { DashboardGuard } from '@/components/dashboard-guard';
 import { useUser } from '@/hooks/useUser';
-import { render, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 
-vi.mock('next/navigation', () => ({
+vi.mock('@/i18n/navigation', () => ({
   useRouter: vi.fn(),
 }));
 

@@ -1,18 +1,26 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
+import { VybeKitMark } from '@vybekiit/ui/vybekiit-logo';
 import { HEADER_LINKS } from '@/data/nav';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
-/** Top navigation for marketing pages. Logical spacing mirrors under RTL. */
-export function SiteHeader() {
+/**
+ * Render the top navigation for marketing pages.
+ *
+ * @returns Localized marketing navigation with the sign-in call to action.
+ * @example
+ * <SiteHeader />
+ */
+const SiteHeader = () => {
   const t = useTranslations();
 
   return (
     <header className="border-b">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="font-semibold text-lg">
+        <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+          <VybeKitMark className="h-6 w-6" />
           {t('common.productName')}
         </Link>
         <div className="flex items-center gap-4 text-sm">
@@ -32,4 +40,6 @@ export function SiteHeader() {
       </nav>
     </header>
   );
-}
+};
+
+export { SiteHeader };

@@ -1,7 +1,6 @@
 import type { Page } from 'playwright';
-
-import type { PageSnapshot } from './types';
 import { collectHrefsFromPage, snapshotPage } from './snapshot';
+import type { PageSnapshot } from './types';
 
 export type CrawlOptions = {
   maxMs: number;

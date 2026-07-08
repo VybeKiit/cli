@@ -1,5 +1,6 @@
-import { type NamecheapConfig, parseEnv, namecheapConfigSchema } from '@vybekiit/core';
+import { type NamecheapConfig, namecheapConfigSchema, parseEnv } from '@vybekiit/core';
 import { verifyNamecheapCredentials } from '@vybekiit/deploy';
+import { Effect } from 'effect';
 
 export type NamecheapDoctorReport = {
   readonly checked: boolean;
@@ -7,10 +8,17 @@ export type NamecheapDoctorReport = {
   readonly lines: readonly string[];
 };
 
-/** Probe Namecheap API when all registrar env vars are configured. */
-export async function verifyNamecheapDoctor(
+/**
+ * Probe Namecheap API when all registrar env vars are configured.
+ *
+ * @param env - Process environment to inspect.
+ * @returns Doctor report for Namecheap credentials.
+ * @example
+ * const report = await verifyNamecheapDoctor(process.env);
+ */
+export const verifyNamecheapDoctor = async (
   env: NodeJS.ProcessEnv,
-): Promise<NamecheapDoctorReport> {
+): Promise<NamecheapDoctorReport> => {
   const hasAny = ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY', 'NAMECHEAP_CLIENT_IP'].some((key) =>
     Boolean(env[key]),
   );
@@ -26,7 +34,7 @@ export async function verifyNamecheapDoctor(
     return {
       checked: true,
       ok: false,
-      lines: [`✗ Namecheap — ${message.split('\n')[0]}`],
+      lines: [`✗ Namecheap - ${message.split('\n')[0]}`],
     };
   }
 
@@ -35,18 +43,18 @@ export async function verifyNamecheapDoctor(
   }
 
   try {
-    await verifyNamecheapCredentials(config);
+    await Effect.runPromise(verifyNamecheapCredentials(config));
     return {
       checked: true,
       ok: true,
-      lines: ['✓ Namecheap — API credentials verified.'],
+      lines: ['✓ Namecheap - API credentials verified.'],
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Namecheap probe failed';
     return {
       checked: true,
       ok: false,
-      lines: [`✗ Namecheap — ${message}`],
+      lines: [`✗ Namecheap - ${message}`],
     };
   }
-}
+};

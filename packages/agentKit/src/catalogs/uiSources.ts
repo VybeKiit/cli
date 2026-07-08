@@ -3,7 +3,7 @@
  * Web/extension: shadcn-compatible registries. Mobile: port-only rules.
  */
 
-export interface UiSourceEntry {
+export type UiSourceEntry = {
   readonly name: string;
   readonly url: string;
   readonly bestFor: string;
@@ -15,7 +15,7 @@ export interface UiSourceEntry {
   readonly github?: string;
   /** shadcn registry prefix, hosted URL template, or CLI id. */
   readonly registry?: string;
-}
+};
 
 /** Namespaced UI mirror targets in templates/web/src/components/. */
 export const UI_MIRROR_NAMESPACES = {
@@ -27,6 +27,16 @@ export const UI_MIRROR_NAMESPACES = {
   untitled: 'untitled',
   gluestack: 'gluestack',
   blocks21st: 'blocks/21st',
+  aiElements: 'ai-elements',
+  kibo: 'kibo',
+  tailark: 'tailark',
+  cult: 'cult',
+  coss: 'coss',
+  promptKit: 'prompt-kit',
+  supabase: 'supabase',
+  blocksSo: 'blocks-so',
+  evilcharts: 'evilcharts',
+  shadcnblocks: 'shadcnblocks',
 } as const;
 
 /** shadcn-compatible registries the web/extension agent may choose from. */
@@ -82,13 +92,6 @@ export const WEB_UI_SOURCES: readonly UiSourceEntry[] = [
     registry: 'https://21st.dev/r/{user}/{slug}',
   },
   {
-    name: 'Origin UI',
-    url: 'https://originui.com',
-    bestFor: 'Extra shadcn-style primitives',
-    install: 'Registry CLI',
-    notes: 'Merge into src/components/ui/ once',
-  },
-  {
     name: 'Aceternity UI',
     url: 'https://ui.aceternity.com',
     bestFor: 'High-motion landing sections',
@@ -118,53 +121,110 @@ export const WEB_UI_SOURCES: readonly UiSourceEntry[] = [
     registry: 'gluestack-ui',
   },
   {
-    name: 'Cult UI',
-    url: 'https://cult-ui.com',
-    bestFor: 'AI chat / agent UI patterns',
-    install: 'Copy-paste / registry',
-    notes: 'Map to kit forms',
+    name: 'AI Elements',
+    url: 'https://elements.ai-sdk.dev',
+    bestFor: 'AI chat, agents, streaming, tool UI',
+    install: 'npx shadcn@latest add @aielements/<name>',
+    notes: 'Mirror in components/ai-elements/; normalize to kit forms',
+    namespace: UI_MIRROR_NAMESPACES.aiElements,
+    github: 'https://github.com/vercel/ai-elements',
+    registry: '@aielements',
+  },
+  {
+    name: 'Kibo UI',
+    url: 'https://www.kibo-ui.com',
+    bestFor: 'Application UI: kanban, editor, gantt, data viz',
+    install: 'npx shadcn@latest add @kibo/<name>',
+    notes: 'Mirror in components/kibo/; never replace ui/ primitives',
+    namespace: UI_MIRROR_NAMESPACES.kibo,
+    github: 'https://github.com/shadcnblocks/kibo',
+    registry: '@kibo',
   },
   {
     name: 'Tailark',
     url: 'https://tailark.com',
-    bestFor: 'Marketing blocks, conversion layouts',
-    install: 'Copy-paste / registry',
-    notes: 'Keep token colors',
+    bestFor: 'Marketing blocks, conversion layouts (Dusk + Mist kits)',
+    install: 'npx shadcn@latest add @tailark/<name>',
+    notes: 'Mirror in components/tailark/; keep token colors',
+    namespace: UI_MIRROR_NAMESPACES.tailark,
+    github: 'https://github.com/tailark/blocks',
+    registry: '@tailark',
   },
   {
-    name: 'Tremor',
-    url: 'https://tremor.so',
-    bestFor: 'Dashboards, KPI cards, charts',
-    install: 'npm @tremor/react or blocks',
-    notes: 'Dashboard-only; wrap in kit Card',
+    name: 'Cult UI',
+    url: 'https://www.cult-ui.com',
+    bestFor: 'Tasteful motion + AI SDK agent patterns',
+    install: 'npx shadcn@latest add @cult/<name>',
+    notes: 'Mirror in components/cult/; map to kit forms; skip Cult Pro',
+    namespace: UI_MIRROR_NAMESPACES.cult,
+    github: 'https://github.com/nolly-studio/cult-ui',
+    registry: '@cult-ui',
+  },
+  {
+    name: 'COSS UI',
+    url: 'https://coss.com/ui',
+    bestFor: 'Advanced primitives and application blocks (Origin UI successor)',
+    install: 'npx shadcn@latest add @coss/<name>',
+    notes: 'Mirror in components/coss/; never merge into ui/ wholesale',
+    namespace: UI_MIRROR_NAMESPACES.coss,
+    registry: '@coss',
+  },
+  {
+    name: 'Prompt Kit',
+    url: 'https://www.prompt-kit.com',
+    bestFor: 'AI prompt input, chat shells, streaming UX',
+    install: 'npx shadcn@latest add @prompt-kit/<name>',
+    notes: 'Mirror in components/prompt-kit/; pairs with AI Elements',
+    namespace: UI_MIRROR_NAMESPACES.promptKit,
+    github: 'https://github.com/ibelick/prompt-kit',
+    registry: '@prompt-kit',
+  },
+  {
+    name: 'Supabase UI',
+    url: 'https://supabase.com/ui',
+    bestFor: 'Auth blocks, Supabase-connected patterns',
+    install: 'npx shadcn@latest add @supabase/<name>',
+    notes: 'Mirror in components/supabase/; default stack adapter is Supabase',
+    namespace: UI_MIRROR_NAMESPACES.supabase,
+    github: 'https://github.com/supabase/supabase',
+    registry: '@supabase',
+  },
+  {
+    name: 'Blocks.so',
+    url: 'https://blocks.so',
+    bestFor: 'Login, sidebar, dialog, app shell blocks',
+    install: 'npx shadcn@latest add @blocks-so/<name>',
+    notes: 'Mirror in components/blocks-so/',
+    namespace: UI_MIRROR_NAMESPACES.blocksSo,
+    github: 'https://github.com/ephraimduncan/blocks',
+    registry: '@blocks-so',
+  },
+  {
+    name: 'EvilCharts',
+    url: 'https://evilcharts.com',
+    bestFor: 'Animated Recharts dashboards',
+    install: 'npx shadcn@latest add @evilcharts/<name>',
+    notes: 'Mirror in components/evilcharts/; wrap in kit Card',
+    namespace: UI_MIRROR_NAMESPACES.evilcharts,
+    github: 'https://github.com/legions-developer/evilcharts',
+    registry: '@evilcharts',
+  },
+  {
+    name: 'Shadcnblocks (free)',
+    url: 'https://shadcnblocks.com',
+    bestFor: 'Figma-aligned marketing blocks (free tier only)',
+    install: 'npx shadcn@latest add @shadcnblocks/<name>',
+    notes: 'Mirror reachable free blocks in components/shadcnblocks/; never sync Pro tier',
+    namespace: UI_MIRROR_NAMESPACES.shadcnblocks,
+    github: 'https://github.com/shadcnblocks/shadcn-ui-blocks',
+    registry: '@shadcnblocks',
   },
   {
     name: 'shadcn/ui Charts',
     url: 'https://ui.shadcn.com/charts',
     bestFor: 'Charts (Recharts)',
     install: 'npx shadcn@latest add chart',
-    notes: 'Preferred over random chart libs',
-  },
-  {
-    name: 'shadcn.io blocks',
-    url: 'https://shadcn.io/blocks',
-    bestFor: 'Large block marketplace',
-    install: 'Registry browse',
-    notes: 'Normalize before merge',
-  },
-  {
-    name: 'Shadcnblocks',
-    url: 'https://shadcnblocks.com',
-    bestFor: 'Figma-aligned blocks',
-    install: 'Registry / copy',
-    notes: 'Free blocks OK; paid agent-only',
-  },
-  {
-    name: 'ReUI / Skiper UI / MynaUI',
-    url: 'https://reui.io',
-    bestFor: 'Additional shadcn-style sets',
-    install: 'Registry',
-    notes: 'Secondary when official shadcn lacks a pattern',
+    notes: 'Preferred baseline chart primitive in ui/',
   },
 ];
 
@@ -178,12 +238,16 @@ export const FORBIDDEN_WEB_UI_LIBS: readonly string[] = [
   '@heroui/',
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link WEB_UI_SOURCES} as a markdown table for agent ui-sources docs. */
-export function renderWebUiSourcesTable(): string {
+/**
+ * Render {@link WEB_UI_SOURCES} as a markdown table for agent ui-sources docs.
+ *
+ * @returns The rendered render web ui sources table text.
+ * @example
+ * const result = renderWebUiSourcesTable();
+ */
+export const renderWebUiSourcesTable = (): string => {
   const header = '| Source | Best for | Install | Notes |';
   const divider = '|---|---|---|---|';
   const rows = WEB_UI_SOURCES.map(
@@ -191,9 +255,14 @@ export function renderWebUiSourcesTable(): string {
       `| [${escapeCell(entry.name)}](${entry.url}) | ${escapeCell(entry.bestFor)} | ${escapeCell(entry.install)} | ${escapeCell(entry.notes)} |`,
   );
   return [header, divider, ...rows].join('\n');
-}
+};
 
-/** Bullet list of forbidden UI libraries for grep checks. */
-export function renderForbiddenWebUiLibsList(): string {
-  return FORBIDDEN_WEB_UI_LIBS.map((lib) => `- \`${lib}\``).join('\n');
-}
+/**
+ * Bullet list of forbidden UI libraries for grep checks.
+ *
+ * @returns The rendered render forbidden web ui libs list text.
+ * @example
+ * const result = renderForbiddenWebUiLibsList();
+ */
+export const renderForbiddenWebUiLibsList = (): string =>
+  FORBIDDEN_WEB_UI_LIBS.map((lib) => `- \`${lib}\``).join('\n');

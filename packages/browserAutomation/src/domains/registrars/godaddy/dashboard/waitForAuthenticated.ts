@@ -1,19 +1,29 @@
+import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { waitForRedirectAfterSignIn } from '@vybekiit/browser-automation/core/waitForRedirect';
 import type { BrowserContext, Page } from 'playwright';
-
-import { waitForRedirectAfterSignIn } from '../../../../core/waitForRedirect';
 import { isGdAuthenticatedDom } from './authDom';
 import { isGdAuthenticatedUrl } from './authUrl';
 
-export { GD_AUTHENTICATED_URL, GD_AUTH_URL_HINT, isGdAuthenticatedUrl } from './authUrl';
+export { GD_AUTH_URL_HINT, GD_AUTHENTICATED_URL, isGdAuthenticatedUrl } from './authUrl';
 
-export async function waitForGdAuthenticated(
+/**
+ * Wait For Gd Authenticated.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @param log - Input value for log.
+ * @param context - Browser context used for authenticated waits.
+ * @returns Promise resolving with the authenticated page.
+ * @example
+ * const result = await waitForGdAuthenticated(page, log, context);
+ */
+export const waitForGdAuthenticated = async (
   page: Page,
-  log: Pick<Console, 'log' | 'warn'> = console,
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
   context?: BrowserContext,
-): Promise<Page> {
-  return waitForRedirectAfterSignIn(
+): Promise<Page> =>
+  waitForRedirectAfterSignIn(
     page,
-    context ?? page.context(),
+    context === undefined ? page.context() : context,
     {
       isAuthenticated: isGdAuthenticatedUrl,
       isAuthenticatedDom: isGdAuthenticatedDom,
@@ -24,4 +34,3 @@ export async function waitForGdAuthenticated(
     },
     log,
   );
-}

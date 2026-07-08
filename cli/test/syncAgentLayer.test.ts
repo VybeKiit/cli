@@ -41,7 +41,7 @@ describe('runSyncAgentLayer', () => {
         const { cp } = await import('node:fs/promises');
         await cp(src, dest, { recursive: true, force: true });
       },
-      runSkillsUpdate: async () => {},
+      runSkillsUpdate: () => Promise.resolve(),
       pathExists: async (path) => {
         try {
           const { access } = await import('node:fs/promises');

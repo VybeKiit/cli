@@ -1,6 +1,6 @@
 name: Checks
 
-# Reusable leg (workflow_call): the repo-specific gates that `pnpm quality` runs
+# Reusable leg (workflow_call): the repo-specific gates that `pnpm verify` runs
 # after build — platform-skills audit, agent-config lint, template agent-layer, and
 # provider-dispatch. These read source only (no build output), so they run as their
 # own leg in parallel with build/test. Single-leg (ubuntu, node 22).
@@ -39,5 +39,5 @@ jobs:
       # docs fetch, and pinning does an external `skills add` network fetch. A
       # cold checkout has neither the pinned skills nor the built CLI, so it can
       # only pass after a full build + external skill fetch on every run. It
-      # stays in the local `pnpm quality` / pre-push gate, where the environment
+      # stays in the local `pnpm verify` / pre-push gate, where the environment
       # is already pinned. See docs/agents for the pinning workflow.

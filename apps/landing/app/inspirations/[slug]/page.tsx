@@ -1,17 +1,15 @@
-import { INSPIRATION_LAYOUTS } from '@/components/inspirations/layout-registry';
-import { getInspirationBySlug, INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { INSPIRATION_LAYOUTS } from '@/components/inspirations/LayoutRegistry';
+import { getInspirationBySlug, INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return INSPIRATION_DIRECTIONS.map((d) => ({ slug: d.slug }));
-}
+export const generateStaticParams = () => INSPIRATION_DIRECTIONS.map((d) => ({ slug: d.slug }));
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
   const { slug } = await params;
   const direction = getInspirationBySlug(slug);
   if (!direction) {
@@ -21,10 +19,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `VybeKiit inspiration — ${direction.name}`,
     description: direction.vibe,
   };
-}
+};
 
 /** Full-page preview for one landing vibe direction. */
-export default async function InspirationPreviewPage({ params }: PageProps) {
+const InspirationPreviewPage = async ({ params }: PageProps) => {
   const { slug } = await params;
   const direction = getInspirationBySlug(slug);
   if (!direction) {
@@ -37,4 +35,6 @@ export default async function InspirationPreviewPage({ params }: PageProps) {
   }
 
   return <Layout direction={direction} />;
-}
+};
+
+export default InspirationPreviewPage;

@@ -19,8 +19,12 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "types": ["vitest/globals", "@testing-library/jest-dom"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@vybekiit-template-web/*": ["../../templates/web/src/*"],
+      "@/registry/new-york/ui/*": ["../../templates/web/src/registry/new-york/ui/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "vitest.config.ts"]
+  "exclude": ["node_modules", "vitest.config.ts", ".open-next", ".next"]
 }

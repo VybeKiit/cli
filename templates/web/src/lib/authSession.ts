@@ -19,8 +19,15 @@ import { readNodeEnv } from './nodeEnv';
 /** Name of the httpOnly cookie holding the session marker / token. */
 const SESSION_COOKIE = 'vk_session';
 
-/** Persist a session marker for the signed-in user (httpOnly, lax, site-wide). */
-export async function setSessionCookie(token: string): Promise<void> {
+/**
+ * Persist a session marker for the signed-in user.
+ *
+ * @param token - Provider session marker or token.
+ * @returns A promise that resolves after the cookie is written.
+ * @example
+ * await setSessionCookie(sessionToken);
+ */
+const setSessionCookie = async (token: string): Promise<void> => {
   const store = await cookies();
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
@@ -28,16 +35,31 @@ export async function setSessionCookie(token: string): Promise<void> {
     path: '/',
     secure: readNodeEnv().NODE_ENV === 'production',
   });
-}
+};
 
-/** Read the current session marker, or `null` when the visitor is signed out. */
-export async function readSessionCookie(): Promise<string | null> {
+/**
+ * Read the current session marker.
+ *
+ * @returns The session marker, or `null` when the visitor is signed out.
+ * @example
+ * const token = await readSessionCookie();
+ */
+const readSessionCookie = async (): Promise<string | null> => {
   const store = await cookies();
-  return store.get(SESSION_COOKIE)?.value ?? null;
-}
+  const cookie = store.get(SESSION_COOKIE);
+  return cookie === undefined ? null : cookie.value;
+};
 
-/** Clear the session marker (sign-out). */
-export async function clearSessionCookie(): Promise<void> {
+/**
+ * Clear the session marker.
+ *
+ * @returns A promise that resolves after the cookie is deleted.
+ * @example
+ * await clearSessionCookie();
+ */
+const clearSessionCookie = async (): Promise<void> => {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
-}
+};
+
+export { clearSessionCookie, readSessionCookie, setSessionCookie };

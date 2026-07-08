@@ -74,16 +74,6 @@
   }
 }
 
-@keyframes report-mode-vybe-shimmer {
-  0%,
-  100% {
-    opacity: 0.65;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 @keyframes report-mode-menu-pop {
   from {
     opacity: 0;
@@ -342,7 +332,7 @@
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: rgb(255 255 255);
 }
 
 .report-mode-tutorial-body {
@@ -393,10 +383,7 @@
 .report-mode-icon--vybe {
   width: 0.95rem;
   height: 0.95rem;
-}
-
-.report-mode-icon-vybe-accent {
-  animation: report-mode-vybe-shimmer 2.4s ease-in-out infinite;
+  background: currentColor;
 }
 
 .report-mode-dock-btn {
@@ -424,7 +411,7 @@
 }
 
 .report-mode-dock-btn:hover {
-  color: #fff;
+  color: rgb(255 255 255);
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.1);
 }
@@ -454,7 +441,7 @@
 }
 
 .report-mode-dock-btn--report-active {
-  color: #fef3c7;
+  color: rgb(254 243 199);
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(217, 119, 6, 0.18));
   border-color: rgba(251, 191, 36, 0.45);
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.22);
@@ -598,7 +585,7 @@
 }
 
 .report-mode-highlight-preset--active {
-  border-color: #fff;
+  border-color: rgb(255 255 255);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
@@ -699,7 +686,7 @@
 }
 
 .report-mode-hold-option:hover {
-  color: #fff;
+  color: rgb(255 255 255);
   background: var(--report-surface-hover-bg);
   border-color: var(--report-surface-border);
 }
@@ -888,7 +875,6 @@
   .report-mode-icon--chat-current .report-mode-icon-chat-line,
   .report-mode-icon--chat-new .report-mode-icon-chat-spark,
   .report-mode-icon--chat-new .report-mode-icon-chat-star,
-  .report-mode-icon-vybe-accent,
   .report-mode-dock-btn--pin:hover .report-mode-icon--pin,
   .report-mode-flyout,
   .report-mode-note-btn:hover .report-mode-icon--send,

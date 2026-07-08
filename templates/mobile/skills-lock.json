@@ -119,7 +119,7 @@
       "source": "expo/skills",
       "sourceType": "github",
       "skillPath": "plugins/expo/skills/expo-observe/SKILL.md",
-      "computedHash": "4fdd09a1b7067e9c8a2d3db1e6782ae01205858f007c282cba80efd6e7181ad0"
+      "computedHash": "c171b801b407f9bd504a5fcae77634417b84bd8d8fd57dc9d675b865303d51c1"
     },
     "expo-skill-eval": {
       "source": "expo/skills",
@@ -287,7 +287,7 @@
       "source": "neondatabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/neon-postgres/SKILL.md",
-      "computedHash": "6d553b1a5ea75524861b93752c91d1ad83d6c108f08be7225b7365c42ec9e05b"
+      "computedHash": "800cc5890f74962e4e0dc15584cc17ea6f4c49f73dda35704f9630981abc3e5d"
     },
     "neon-postgres-branches": {
       "source": "neondatabase/agent-skills",
@@ -351,8 +351,8 @@
     "use-railway": {
       "source": "railwayapp/railway-skills",
       "sourceType": "github",
-      "skillPath": "skills/use-railway/SKILL.md",
-      "computedHash": "7045ad8dc382af94e3ce345b69fcab7a7466914d6d052f157a8a440ec21ec099"
+      "skillPath": "plugins/railway/skills/use-railway/SKILL.md",
+      "computedHash": "e6d2e37d3cdb0632b1abbf208f329e6521bdc12c0ec165199870e71d95d1467f"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

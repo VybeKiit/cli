@@ -1,5 +1,5 @@
 /** Pricing plan with message-catalog keys (mirrors web `plans.ts`). */
-export interface Plan {
+export type Plan = Readonly<{
   readonly id: string;
   readonly nameKey: string;
   readonly priceKey: string;
@@ -7,9 +7,17 @@ export interface Plan {
   readonly descriptionKey: string;
   readonly featureKeys: readonly string[];
   readonly featured?: boolean;
-}
+}>;
 
-function planKeys(slug: string) {
+/**
+ * Build catalog keys for a pricing plan slug.
+ *
+ * @param slug - Pricing plan slug from the message catalog.
+ * @returns Message keys used to render a plan.
+ * @example
+ * const pro = planKeys('pro');
+ */
+const planKeys = (slug: string) => {
   const base = `pricing.plans.${slug}`;
   return {
     nameKey: `${base}.name`,
@@ -18,12 +26,13 @@ function planKeys(slug: string) {
     descriptionKey: `${base}.description`,
     featureKeys: [`${base}.features.0`, `${base}.features.1`, `${base}.features.2`] as const,
   };
-}
+};
 
 const free = planKeys('free');
 const pro = planKeys('pro');
 const team = planKeys('team');
 
+/** Pricing plans rendered by the mobile pricing screen. */
 export const PLANS: readonly Plan[] = [
   {
     id: 'plan_free',

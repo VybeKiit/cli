@@ -61,8 +61,9 @@ describe('playWelcomeBanner', () => {
       write: (text) => {
         chunks.push(text);
       },
-      sleep: async () => {
+      sleep: () => {
         slept = true;
+        return Promise.resolve();
       },
     });
 

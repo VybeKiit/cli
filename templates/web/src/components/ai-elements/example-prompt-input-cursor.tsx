@@ -49,7 +49,7 @@ import {
   usePromptInputAttachments,
   usePromptInputReferencedSources,
 } from '@/components/ai-elements/prompt-input';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import type { SourceDocumentUIPart } from 'ai';
 import { AtSignIcon, CheckIcon, FilesIcon, GlobeIcon, ImageIcon, RulerIcon } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';

@@ -1,7 +1,7 @@
 'use client';
 
-import { RadioGroup, RadioGroupItem } from '@repo/shadcn-ui/components/ui/radio-group';
-import { cn } from '@repo/shadcn-ui/lib/utils';
+import { RadioGroup, RadioGroupItem } from '@vybekiit/ui/radio-group';
+import { cn } from '@/lib/utils';
 import { type ComponentProps, createContext, type HTMLAttributes, useContext } from 'react';
 import {
   Field,
@@ -9,7 +9,7 @@ import {
   FieldDescription,
   FieldLabel,
   FieldTitle,
-} from '@/components/ui/field';
+} from '@vybekiit/ui/field';
 
 export type ChoiceboxProps = ComponentProps<typeof RadioGroup>;
 

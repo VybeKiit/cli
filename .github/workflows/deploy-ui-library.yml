@@ -11,7 +11,7 @@ on:
       - 'apps/componentLibrary/**'
       - 'templates/web/src/components/**'
       - 'templates/web/.vybekiit/agent/ui-catalog-index.json'
-      - 'scripts/buildComponentLibraryIndex.mjs'
+      - 'scripts/dev/sync/buildComponentLibraryIndex.mjs'
       - 'pnpm-lock.yaml'
 
 concurrency:
@@ -42,7 +42,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: node scripts/buildComponentLibraryIndex.mjs
+      - run: node scripts/dev/sync/buildComponentLibraryIndex.mjs
 
       - run: pnpm --filter vybekiit-component-library build
         env:

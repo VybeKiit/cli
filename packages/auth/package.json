@@ -18,6 +18,11 @@
       "import": "./dist/http/index.js",
       "require": "./dist/http/index.cjs"
     },
+    "./http/*": {
+      "types": "./dist/http/*.d.ts",
+      "import": "./dist/http/*.js",
+      "require": "./dist/http/*.cjs"
+    },
     "./http/next": {
       "types": "./dist/http/next.d.ts",
       "import": "./dist/http/next.js",
@@ -32,6 +37,16 @@
       "types": "./dist/client.d.ts",
       "import": "./dist/client.js",
       "require": "./dist/client.cjs"
+    },
+    "./providers/*": {
+      "types": "./dist/providers/*.d.ts",
+      "import": "./dist/providers/*.js",
+      "require": "./dist/providers/*.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
@@ -47,10 +62,8 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.1075.0",
     "@supabase/supabase-js": "^2.47.10",
     "@vybekiit/core": "workspace:*",
-    "@vybekiit/http": "workspace:*",
-    "@vybekiit/notifications": "workspace:*",
     "better-auth": "^1.6.22",
-    "effect": "3.21.4",
+    "effect": "catalog:",
     "mongodb": "^7.4.0",
     "pg": "^8.13.1"
   },
@@ -66,11 +79,12 @@
     "@types/express": "^5.0.0",
     "@types/pg": "^8.11.10",
     "express": "^4.21.2",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

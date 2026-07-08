@@ -1,19 +1,13 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/magnetic-button';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { MagneticButton } from '@/components/aceternity/magnetic-button';
 
 export default function MagneticButtonPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <MagneticButton>
+        <span className="text-sm text-muted-foreground">Preview</span>
+      </MagneticButton>
     </div>
   );
 }

@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+
+# typescript
+*.tsbuildinfo
+
+# turbo
+.turbo/
+
+# env / secrets — only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# os
+.DS_Store
+
+# local agent state (planning intro seen, etc.)
+.vybekiit/state/
+
+# maintainer-only script scratch — never shipped to buyers (ADR-0027)
+scripts/dev/
+
+# dev-scripts — agent scratch scripts, never committed
+dev-scripts/
+
+# test artifacts
+test-results/
+playwright-report/
+coverage/
+
+# databases
+*.db
+*.sqlite
+
+# build logs
+*.log
+
+# deployment provider state
+.vercel/
+.wrangler/

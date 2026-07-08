@@ -1,8 +1,14 @@
-import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 import { type AppConfig, appConfigSchema, parseEnv, storeConfigSchema } from '@vybekiit/core';
+import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
 import { resolvePaymentProvider } from '@vybekiit/payments';
-import { Cause, Effect, Exit, Option } from 'effect';
+import { Effect, Either, Schema } from 'effect';
 import { NextResponse } from 'next/server';
+import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
+
+const LandingCheckoutBodySchema = Schema.Struct({
+  githubUsername: Schema.String,
+  email: Schema.String,
+});
 
 /**
  * Start a purchase of VybeKiit itself.
@@ -13,15 +19,27 @@ import { NextResponse } from 'next/server';
  * checkout `{ url }` for the client to redirect to. Provider-agnostic via
  * {@link resolvePaymentProvider} — Lemon Squeezy is the default Merchant of Record.
  *
- * TODO(vybekiit): live checkout needs the store's real Lemon Squeezy keys
- * (LEMONSQUEEZY_API_KEY / _STORE_ID) plus STORE_PRODUCT_ID set to the kit's variant
- * id — tracked under issue #4 (live wiring). Without them `resolvePaymentProvider()`
- * throws on the missing config and this route returns a clean 500. — skill: setup-payments
- *
  * POST body: `{ githubUsername: string, email: string }`.
+ *
+ * @param request - Incoming checkout request.
+ * @returns JSON response with a hosted checkout URL or an error.
+ * @example
+ * const response = await POST(request);
  */
-export async function POST(request: Request): Promise<NextResponse> {
-  const { githubUsername, email } = await readBody(request);
+const POST = async (request: Request): Promise<NextResponse> => {
+  const json = await readRequestJson(request);
+  if (!json.ok) {
+    return NextResponse.json(json.response.body, { status: json.response.status });
+  }
+  const parsed = decodeJsonBody(
+    json.body,
+    LandingCheckoutBodySchema,
+    'Enter your GitHub username and email.',
+  );
+  if (!parsed.ok) {
+    return NextResponse.json(parsed.response.body, { status: parsed.response.status });
+  }
+  const { githubUsername, email } = parsed.body;
 
   if (!isValidGithubUsername(githubUsername)) {
     return NextResponse.json({ error: 'Enter a valid GitHub username.' }, { status: 400 });
@@ -30,52 +48,31 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
   }
 
-  // parseEnv throws if the store's product id / provider keys are missing; a
-  // misconfigured store fails loud here rather than creating an empty cart.
   let productId: string;
   let app: AppConfig;
   try {
     productId = parseEnv(storeConfigSchema).STORE_PRODUCT_ID;
     app = parseEnv(appConfigSchema);
   } catch {
-    // Do not echo the validation detail to the client — it can name env keys.
     return NextResponse.json({ error: 'Checkout is not available right now.' }, { status: 500 });
   }
 
-  const exit = await Effect.runPromiseExit(
-    resolvePaymentProvider().createCheckout({
-      productId,
-      githubUsername,
-      email,
-      successUrl: `${app.APP_URL}/success`,
-      cancelUrl: `${app.APP_URL}/cancel`,
-    }),
+  const checkout = await Effect.runPromise(
+    Effect.either(
+      resolvePaymentProvider().createCheckout({
+        productId,
+        githubUsername,
+        email,
+        successUrl: `${app.APP_URL}/success`,
+        cancelUrl: `${app.APP_URL}/cancel`,
+      }),
+    ),
   );
 
-  if (Exit.isFailure(exit)) {
-    const message =
-      Option.getOrNull(Cause.failureOption(exit.cause))?.message ?? 'Checkout failed.';
-    return NextResponse.json({ error: message }, { status: 502 });
+  if (Either.isLeft(checkout)) {
+    return NextResponse.json({ error: checkout.left.message }, { status: 502 });
   }
-  return NextResponse.json({ url: exit.value.url });
-}
+  return NextResponse.json({ url: checkout.right.url });
+};
 
-/** The fields the checkout form posts. Strings default to empty so absent keys validate as invalid. */
-interface CheckoutBody {
-  readonly githubUsername: string;
-  readonly email: string;
-}
-
-/** Read + coerce the request body to {@link CheckoutBody}, tolerating a malformed/empty body. */
-async function readBody(request: Request): Promise<CheckoutBody> {
-  try {
-    const raw: unknown = await request.json();
-    const body = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
-    return {
-      githubUsername: typeof body.githubUsername === 'string' ? body.githubUsername : '',
-      email: typeof body.email === 'string' ? body.email : '',
-    };
-  } catch {
-    return { githubUsername: '', email: '' };
-  }
-}
+export { POST };

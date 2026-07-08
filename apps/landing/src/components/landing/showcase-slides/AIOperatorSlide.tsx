@@ -1,115 +1,107 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import { ArrowUpRight, Check, Inbox, Search, Settings, Users, Zap } from 'lucide-react';
+
+import { MiniBrowserChrome } from '@/components/landing/kit/MiniBrowserChrome';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { geistMono } from '@/lib/fonts';
 
-const TASKS = [
-  { label: 'Provision database', time: '09:41:02', status: 'done' },
-  { label: 'Wire Lemon Squeezy checkout', time: '09:41:18', status: 'done' },
-  { label: 'Deploy web template', time: '09:42:05', status: 'active' },
-  { label: 'Verify first payment', time: '09:42:31', status: 'pending' },
-  { label: 'Sync mobile bundle', time: '—', status: 'pending' },
-  { label: 'Configure email templates', time: '—', status: 'pending' },
+const TICKETS = [
+  {
+    icon: 'W',
+    title: 'Wire payment initiation',
+    body: 'Wire transfer for $2,500 to Acme Corp.',
+  },
+  {
+    icon: 'R',
+    title: 'Refund request',
+    body: 'Process a refund for Order #7234 ($89).',
+  },
+  {
+    icon: 'U',
+    title: 'User account suspension',
+    body: 'Suspend user john.doe@example.com for policy violation.',
+  },
+  {
+    icon: 'S',
+    title: 'Subscription renewal',
+    body: 'Renew the annual subscription for enterprise@company.com.',
+  },
+  {
+    icon: 'P',
+    title: 'Password reset request',
+    body: 'Reset password for user jane.smith@example.com.',
+  },
 ] as const;
 
-const LOG_LINES = [
-  '> Connecting to Supabase...',
-  '> Auth schema applied',
-  '> Running health check...',
-] as const;
+const RAIL_ICONS = [Inbox, Zap, Users, Settings] as const;
 
-function taskStatusDotClass(status: (typeof TASKS)[number]['status']): string {
-  if (status === 'done') return 'bg-[var(--green)]';
-  if (status === 'active') return 'animate-pulse bg-[var(--blue)]';
-  return 'bg-[var(--text-faint)]';
-}
+/**
+ * AI Operator carousel slide — a support-desk inbox the operator works autonomously.
+ *
+ * @returns The rendered AIOperatorSlide element.
+ * @example
+ * ```tsx
+ * <AIOperatorSlide />
+ * ```
+ */
 
-/** AI Operator carousel slide — dark task list with sidebar and log panel. */
-export function AIOperatorSlide() {
-  return (
-    <div className="flex h-full bg-[var(--bg-panel)] text-[var(--text-soft)]">
-      <aside className="hidden w-[38%] shrink-0 flex-col border-white/10 border-e p-3 sm:flex">
-        <p className="mb-2 font-semibold text-[11px] text-[var(--text-faint)] uppercase tracking-wide">
-          Queue
-        </p>
-        <ul className="flex flex-1 flex-col gap-1.5 overflow-hidden">
-          {TASKS.slice(0, 4).map((task) => (
-            <li
-              className="rounded-md border border-white/6 bg-black/25 px-2 py-1.5 text-[11px] text-white"
-              key={task.label}
-            >
-              {task.label}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-2 rounded-md border border-white/8 bg-black/30 p-2">
-          <p className="text-[10px] text-[var(--text-faint)]">Progress</p>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full w-[62%] rounded-full bg-[var(--blue)]" />
-          </div>
-          <p className="text-[10px] text-[var(--blue-soft)]">
-            <AnimatedNumber value="62%" /> complete
-          </p>
-        </div>
-        <Separator className="mt-2 bg-white/10" />
-        <Skeleton className="mt-2 h-8 w-full bg-white/10" />
+export const AIOperatorSlide = () => (
+  <MiniBrowserChrome className="h-full" dark={true} url="operator.vybekiit.com">
+    <div className="flex h-full bg-[#0a0d13] text-[var(--text-soft)]">
+      <aside className="flex w-11 shrink-0 flex-col items-center gap-4 border-white/8 border-e py-3">
+        <span className="h-6 w-6 rounded-full bg-gradient-to-br from-[#f472b6] to-[#7c3aed]" />
+        {RAIL_ICONS.map((Icon, index) => (
+          <span
+            className={index === 0 ? 'text-white' : 'text-white/35'}
+            key={Icon.displayName === undefined ? index : Icon.displayName}
+          >
+            <Icon className="h-4 w-4" strokeWidth={1.8} />
+          </span>
+        ))}
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col p-3">
-        <div className="mb-3 flex items-center justify-between border-white/10 border-b pb-2">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-base text-white">Operator</span>
-            <Badge className="text-[10px]" variant="outline">
-              v2.4
-            </Badge>
-          </div>
-          <Badge
-            className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[var(--green)]"
-            variant="outline"
-          >
-            Active
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center gap-2 border-white/8 border-b px-3 py-2.5">
+          <span className="font-semibold text-[13px] text-white">Operator</span>
+          <Badge className="border-emerald-500/20 bg-emerald-500/10 text-[10px] text-emerald-400">
+            Live
           </Badge>
         </div>
 
-        <ul className="flex flex-1 flex-col gap-1.5 overflow-hidden">
-          {TASKS.map((task) => (
-            <li key={task.label}>
-              <Card className="border-white/8 bg-black/20 shadow-none">
-                <CardContent className="flex items-center justify-between p-2">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span
-                      className={`h-2 w-2 shrink-0 rounded-full ${taskStatusDotClass(task.status)}`}
-                    />
-                    <span className="truncate text-white text-xs">{task.label}</span>
-                  </div>
-                  <span
-                    className={`shrink-0 text-[10px] text-[var(--text-faint)] ${geistMono.className}`}
-                  >
-                    {task.time}
+        <div className="px-3 pt-2.5 pb-1.5">
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[10px] text-white/40">
+            <Search className="h-3 w-3" strokeWidth={2} />
+            Search tasks...
+          </div>
+        </div>
+
+        <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden px-3 pb-3">
+          {TICKETS.map((ticket) => (
+            <li key={ticket.title}>
+              <Card className="gap-0 border-white/8 bg-white/[0.03] py-0 shadow-none">
+                <CardContent className="flex items-start gap-2.5 px-2.5 py-2">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/8 font-semibold text-[10px] text-white/70">
+                    {ticket.icon}
                   </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-[11px] text-white leading-tight">
+                      {ticket.title}
+                    </p>
+                    <p className="mt-0.5 truncate text-[9px] text-white/45 leading-tight">
+                      {ticket.body}
+                    </p>
+                  </div>
+                  <div className="mt-0.5 flex shrink-0 items-center gap-1.5 text-white/30">
+                    <Check className="h-3 w-3" strokeWidth={2} />
+                    <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
+                  </div>
                 </CardContent>
               </Card>
             </li>
           ))}
         </ul>
-
-        <div
-          className={`mt-2 rounded-md border border-white/8 bg-black/40 p-2 ${geistMono.className}`}
-        >
-          {LOG_LINES.map((line) => (
-            <p className="text-[10px] text-[var(--green)] leading-relaxed" key={line}>
-              {line}
-            </p>
-          ))}
-          <p className="text-[9px] text-[var(--text-faint)]">
-            <span className="vybe-cursor">▋</span>
-          </p>
-        </div>
       </div>
     </div>
-  );
-}
+  </MiniBrowserChrome>
+);

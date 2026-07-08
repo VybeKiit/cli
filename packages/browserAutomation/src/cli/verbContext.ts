@@ -1,10 +1,15 @@
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 import type { CliFlags } from './flags';
-import type { BaseVerbContext } from '../core/types';
 
-/** Map global CLI flags to verb context shared by all domains. */
-export function baseVerbContext(flags: CliFlags): BaseVerbContext {
-  const ctx: BaseVerbContext = {};
-  if (flags.cdp) ctx.cdpEndpoint = flags.cdp;
-  if (flags.profile) ctx.profilePath = flags.profile;
-  return ctx;
-}
+/**
+ * Map global CLI flags to verb context shared by all domains.
+ *
+ * @param flags - Parsed global CLI flags.
+ * @returns Base automation context for domain commands.
+ * @example
+ * const ctx = baseVerbContext({ json: false, yes: true, cdp: 'http://localhost:9222' });
+ */
+export const baseVerbContext = (flags: CliFlags): BaseVerbContext => ({
+  ...(flags.cdp ? { cdpEndpoint: flags.cdp } : {}),
+  ...(flags.profile ? { profilePath: flags.profile } : {}),
+});

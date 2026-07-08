@@ -27,7 +27,7 @@ asked.
    the project's checks (tests + build) yourself. Asset optimization runs in `prebuild` / start hooks
    (`scripts/optimizeAssets.mjs`) — confirm it completes without errors. Run code-readiness greps from `check-safety`
    (step 6): `node scripts/checkNoConsole.mjs`, duplicate-helper scan, logger spot-check.
-   Run **quality smoke**: `pnpm quality` (format, lint, typecheck, tests). Fix anything red before
+   Run **quality smoke**: `pnpm verify` (format, lint, typecheck, tests). Fix anything red before
    going online. Confirm production mode on the host will silence debug logs (`NODE_ENV=production`).
    If anything is red, fix it (or run `doctor`) **before** going online — never publish a broken app.
    **GEO pre-flight:** when the app has a blog or FAQ, confirm at least one public page includes JSON-LD
@@ -51,6 +51,11 @@ asked.
    **Verify:** publishing finishes green and the live URL loads. Open it and confirm the page shows.
    🎉 *Celebrate* — their app is live; give them the link to share.
 
+5b. **Verify the app's memory is up to date.** If the app saves data (`save-data` was run before),
+   confirm the live database has the same structure as the local one — run the migration status check
+   via `@vybekiit/db`'s `checkMigrationStatus()`. If pending migrations exist, apply them now.
+   **Verify:** migration status shows all applied; no pending.
+
 6. **Want their own web address?** If they'd like to use their own domain instead of the temporary
    address, run `buy-domain` next.
 
@@ -59,12 +64,18 @@ asked.
 Run `doctor`. Most failures going online are a missing secret setting — add it for them and publish
 again.
 
+## Never
+
+- Never offer a preview/staging deploy. The builder's "deploy" always means production. A preview URL confuses non-technical builders ("which one is real?") and wastes time.
+- Never say "fixed" or "done" after a code change without deploying (contract rule ⑧). If the app is already live, ask to deploy or confirm the builder wants to wait.
+
 ## Definition of done
 
 The live URL loads the latest version of their app, and they have the link.
 
 ## After completing this skill
 
+Update checklist.md Progress (mark done, note next).
 Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.
 
 If MCP or first debug fails once, run `vybekiit doc-fallback <tech-id>` and tell the builder only: *"I'm double-checking the official setup guide for this — hang tight, I'll have the next step in a moment."*

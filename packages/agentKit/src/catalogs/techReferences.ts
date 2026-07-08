@@ -3,7 +3,7 @@
  * Used by planDocFallback() and rendered into `.vybekiit/agent/tech-references.md`.
  */
 
-export interface TechReference {
+export type TechReference = {
   readonly id: string;
   readonly label: string;
   readonly docsUrl: string;
@@ -12,7 +12,7 @@ export interface TechReference {
   readonly mcpSnippet?: string;
   readonly envKeys?: readonly string[];
   readonly troubleshootingPath?: string;
-}
+};
 
 export const TECH_REFERENCES: readonly TechReference[] = [
   {
@@ -157,7 +157,14 @@ export const TECH_REFERENCE_MAP: Readonly<Record<string, TechReference>> = Objec
   TECH_REFERENCES.map((ref) => [ref.id, ref]),
 );
 
-export function renderTechReferencesTable(): string {
+/**
+ * Run render tech references table.
+ *
+ * @returns The rendered render tech references table text.
+ * @example
+ * const result = renderTechReferencesTable();
+ */
+export const renderTechReferencesTable = (): string => {
   const lines = [
     '# Official tech references (agent-only)',
     '',
@@ -167,9 +174,9 @@ export function renderTechReferencesTable(): string {
     '|---|---|---|---|',
   ];
   for (const ref of TECH_REFERENCES) {
-    const mcp = ref.mcpDocsUrl ?? '—';
-    const keys = ref.envKeys?.join(', ') ?? '—';
+    const mcp = ref.mcpDocsUrl === undefined ? '—' : ref.mcpDocsUrl;
+    const keys = ref.envKeys === undefined ? '—' : ref.envKeys.join(', ');
     lines.push(`| ${ref.id} | ${ref.docsUrl} | ${mcp} | ${keys} |`);
   }
   return lines.join('\n');
-}
+};

@@ -1,3 +1,5 @@
+// biome-ignore-all lint/security/noSecrets: Field keys are public selector ids, not secrets.
+
 /** Browser-only LS selector field keys — nested taxonomy for the product editor. */
 export const LS_DRAFT_FIELDS = [
   'product.createButton',

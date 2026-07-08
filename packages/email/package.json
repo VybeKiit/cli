@@ -1,7 +1,7 @@
 {
   "name": "@vybekiit/email",
   "version": "0.3.0",
-  "description": "Headless, provider-agnostic transactional email for VybeKiit — one EmailProvider interface with a Cloudflare adapter (send). No UI.",
+  "description": "Headless email provider adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -13,15 +13,14 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./worker": {
-      "types": "./dist/worker.d.ts",
-      "import": "./dist/worker.js",
-      "require": "./dist/worker.cjs"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
-    "dist",
-    "worker"
+    "dist"
   ],
   "sideEffects": false,
   "scripts": {
@@ -30,16 +29,18 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.1075.0",
-    "@vybekiit/core": "workspace:*"
+    "@aws-sdk/client-sesv2": "^3.758.0",
+    "@vybekiit/core": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250523.0",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "@effect/vitest": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

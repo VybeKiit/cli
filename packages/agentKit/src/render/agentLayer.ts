@@ -1,31 +1,34 @@
-import { renderContract } from '../contract/contract';
+import type { TemplateId } from '@vybekiit/agent-kit/catalogs/goalCatalog';
 import {
-  renderSessionBootstrapFile,
+  renderChecklistSeed,
+  renderProductionGates,
+} from '@vybekiit/agent-kit/catalogs/productionGates';
+import { renderTechReferencesTable } from '@vybekiit/agent-kit/catalogs/techReferences';
+import { renderWebUiSourcesTable } from '@vybekiit/agent-kit/catalogs/uiSources';
+import { renderContract } from '@vybekiit/agent-kit/contract/contract';
+import {
   renderAgentSessionBootstrap,
-} from '../contract/sessionBootstrap';
-import { renderToneSection } from '../contract/toneRules';
-import { renderWebUiSourcesTable } from '../catalogs/uiSources';
-import { renderTechReferencesTable } from '../catalogs/techReferences';
-import { renderProductionGates, renderChecklistSeed } from '../catalogs/productionGates';
-import type { TemplateId } from '../catalogs/goalCatalog';
-import { renderSdlcVocabularyTable } from '../vocabulary/sdlcVocabulary';
-import { renderToolVocabularyTable } from '../vocabulary/toolVocabulary';
+  renderSessionBootstrapFile,
+} from '@vybekiit/agent-kit/contract/sessionBootstrap';
+import { renderToneSection } from '@vybekiit/agent-kit/contract/toneRules';
+import { renderAgentRuntimeVocabularyTable } from '@vybekiit/agent-kit/vocabulary/agentRuntimeVocabulary';
+import { renderCodeEditVocabularyTable } from '@vybekiit/agent-kit/vocabulary/codeEditVocabulary';
+import { renderPaymentsVocabularyTable } from '@vybekiit/agent-kit/vocabulary/domainVocabulary';
+import { renderPeopleVocabularyTable } from '@vybekiit/agent-kit/vocabulary/peopleVocabulary';
+import { renderSdlcVocabularyTable } from '@vybekiit/agent-kit/vocabulary/sdlcVocabulary';
+import { renderToolVocabularyTable } from '@vybekiit/agent-kit/vocabulary/toolVocabulary';
 import {
   renderAgentInternalVocabularyTable,
   renderFailureVocabularyTable,
   renderUiVocabularyTable,
-} from '../vocabulary/uiVocabulary';
-import { renderPaymentsVocabularyTable } from '../vocabulary/domainVocabulary';
-import { renderPeopleVocabularyTable } from '../vocabulary/peopleVocabulary';
-import { renderAgentRuntimeVocabularyTable } from '../vocabulary/agentRuntimeVocabulary';
-import { renderCodeEditVocabularyTable } from '../vocabulary/codeEditVocabulary';
-import { renderVybekiitLayerVocabularyTable } from '../vocabulary/vybekiitLayerVocabulary';
-import { replaceGeneratedSection, wrapGeneratedSection, type GeneratedSectionId } from './markdown';
+} from '@vybekiit/agent-kit/vocabulary/uiVocabulary';
+import { renderVybekiitLayerVocabularyTable } from '@vybekiit/agent-kit/vocabulary/vybekiitLayerVocabulary';
+import { type GeneratedSectionId, replaceGeneratedSection, wrapGeneratedSection } from './markdown';
 
-export interface AgentLayerRenderTarget {
+export type AgentLayerRenderTarget = {
   readonly file: string;
   readonly sectionId: GeneratedSectionId;
-}
+};
 
 /** Files and section ids that sync-agent-layer / render-agent-layer regenerate. */
 export const AGENT_LAYER_RENDER_TARGETS: readonly AgentLayerRenderTarget[] = [
@@ -55,67 +58,60 @@ export const AGENT_LAYER_RENDER_FILES: readonly string[] = [
   ]),
 ];
 
-export interface ApplyAgentLayerOptions {
+export type ApplyAgentLayerOptions = {
   readonly template?: TemplateId;
-}
+};
 
-function renderSectionContent(sectionId: GeneratedSectionId, template: TemplateId = 'web'): string {
-  switch (sectionId) {
-    case 'contract':
-      return renderContract();
-    case 'tone':
-      return renderToneSection();
-    case 'people-vocabulary':
-      return ['## Who you are talking to', '', renderPeopleVocabularyTable()].join('\n');
-    case 'sdlc-vocabulary':
-      return ['## Quality and saving your work', '', renderSdlcVocabularyTable()].join('\n');
-    case 'ui-vocabulary':
-      return ['## UI building blocks', '', renderUiVocabularyTable()].join('\n');
-    case 'tool-vocabulary':
-      return ['## Your assistant (never name the tool)', '', renderToolVocabularyTable()].join(
-        '\n',
-      );
-    case 'agent-runtime-vocabulary':
-      return ['## Your assistant at work (runtime)', '', renderAgentRuntimeVocabularyTable()].join(
-        '\n',
-      );
-    case 'code-edit-vocabulary':
-      return [
-        '## When you change their app (outcome-only)',
-        '',
-        renderCodeEditVocabularyTable(),
-      ].join('\n');
-    case 'vybekiit-layer-vocabulary':
-      return [
-        '## How the kit works (invisible to them)',
-        '',
-        renderVybekiitLayerVocabularyTable(),
-      ].join('\n');
-    case 'failure-vocabulary':
-      return ['## When something goes wrong', '', renderFailureVocabularyTable()].join('\n');
-    case 'payments-vocabulary':
-      return ['## Payments & tax', '', renderPaymentsVocabularyTable()].join('\n');
-    case 'agent-internal-vocabulary':
-      return ['## Agent-internal — never say', '', renderAgentInternalVocabularyTable()].join('\n');
-    case 'web-ui-sources':
-      return ['# Approved UI block sources', '', renderWebUiSourcesTable()].join('\n');
-    case 'tech-references':
-      return renderTechReferencesTable();
-    case 'production-gates':
-      return renderProductionGates(template);
-    case 'session-bootstrap':
-      return renderAgentSessionBootstrap();
-    case 'goal-index-validation':
-      return '<!-- Goal drift: run `vybekiit check-goals` — non-zero exit means fix goal-index or add skills -->';
-    default:
-      return '';
-  }
-}
+type AgentLayerSectionRenderer = (template: TemplateId) => string;
 
-/** Render all agent-layer sections keyed by section id. */
-export function renderAgentLayerSections(
+const SECTION_RENDERERS: Readonly<Record<GeneratedSectionId, AgentLayerSectionRenderer>> = {
+  contract: () => renderContract(),
+  tone: () => renderToneSection(),
+  'people-vocabulary': () =>
+    ['## Who you are talking to', '', renderPeopleVocabularyTable()].join('\n'),
+  'sdlc-vocabulary': () =>
+    ['## Quality and saving your work', '', renderSdlcVocabularyTable()].join('\n'),
+  'ui-vocabulary': () => ['## UI building blocks', '', renderUiVocabularyTable()].join('\n'),
+  'tool-vocabulary': () =>
+    ['## Your assistant (never name the tool)', '', renderToolVocabularyTable()].join('\n'),
+  'agent-runtime-vocabulary': () =>
+    ['## Your assistant at work (runtime)', '', renderAgentRuntimeVocabularyTable()].join('\n'),
+  'code-edit-vocabulary': () =>
+    ['## When you change their app (outcome-only)', '', renderCodeEditVocabularyTable()].join('\n'),
+  'vybekiit-layer-vocabulary': () =>
+    ['## How the kit works (invisible to them)', '', renderVybekiitLayerVocabularyTable()].join(
+      '\n',
+    ),
+  'failure-vocabulary': () =>
+    ['## When something goes wrong', '', renderFailureVocabularyTable()].join('\n'),
+  'payments-vocabulary': () =>
+    ['## Payments & tax', '', renderPaymentsVocabularyTable()].join('\n'),
+  'agent-internal-vocabulary': () =>
+    ['## Agent-internal — never say', '', renderAgentInternalVocabularyTable()].join('\n'),
+  'web-ui-sources': () => ['# Approved UI block sources', '', renderWebUiSourcesTable()].join('\n'),
+  'tech-references': () => renderTechReferencesTable(),
+  'production-gates': (template) => renderProductionGates(template),
+  'session-bootstrap': () => renderAgentSessionBootstrap(),
+  'goal-index-validation': () =>
+    '<!-- Goal drift: run `vybekiit check-goals` — non-zero exit means fix goal-index or add skills -->',
+};
+
+const renderSectionContent = (
+  sectionId: GeneratedSectionId,
   template: TemplateId = 'web',
-): Readonly<Record<GeneratedSectionId, string>> {
+): string => SECTION_RENDERERS[sectionId](template);
+
+/**
+ * Render all agent-layer sections keyed by section id.
+ *
+ * @param template - template input.
+ * @returns The render agent layer sections result.
+ * @example
+ * const result = renderAgentLayerSections(template);
+ */
+export const renderAgentLayerSections = (
+  template: TemplateId = 'web',
+): Readonly<Record<GeneratedSectionId, string>> => {
   const ids: GeneratedSectionId[] = [
     'contract',
     'tone',
@@ -139,25 +135,31 @@ export function renderAgentLayerSections(
     GeneratedSectionId,
     string
   >;
-}
+};
 
 /**
  * Apply rendered sections to file contents (pure — caller reads/writes disk).
+ *
+ * @param files - files input.
+ * @param options - options input.
+ * @returns The apply agent layer sections result.
+ * @example
+ * const result = applyAgentLayerSections(files, options);
  */
-export function applyAgentLayerSections(
+export const applyAgentLayerSections = (
   files: Readonly<Record<string, string>>,
   options: ApplyAgentLayerOptions = {},
-): Record<string, string> {
-  const template = options.template ?? 'web';
+): Record<string, string> => {
+  const template = options.template === undefined ? 'web' : options.template;
   const sections = renderAgentLayerSections(template);
   const out: Record<string, string> = { ...files };
 
   for (const target of AGENT_LAYER_RENDER_TARGETS) {
     const current = out[target.file];
-    if (current === undefined) continue;
     const content = sections[target.sectionId];
-    if (!content) continue;
-    out[target.file] = replaceGeneratedSection(current, target.sectionId, content);
+    if (current !== undefined && content.length > 0) {
+      out[target.file] = replaceGeneratedSection(current, target.sectionId, content);
+    }
   }
 
   if (out['.vybekiit/agent/goal-index.md']) {
@@ -177,4 +179,4 @@ export function applyAgentLayerSections(
   }
 
   return out;
-}
+};

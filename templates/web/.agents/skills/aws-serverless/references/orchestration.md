@@ -198,7 +198,7 @@ Model outputs a structured response indicating a tool call or final answer. Choi
       "Arguments": {
         "ModelId": "global.anthropic.claude-sonnet-4-6",
         "Body": {
-          "anthropic_version": "bedrock-2023-05-31",
+          "ANTHROPIC_version": "bedrock-2023-05-31",
           "max_tokens": 4096,
           "messages": "{% $states.input.messages %}"
         },

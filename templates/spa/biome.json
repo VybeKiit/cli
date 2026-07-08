@@ -1,10 +1,18 @@
 {
-  "root": false,
-  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "root": true,
+  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!!**/.agents/skills", "!!**/.vybekiit", "!!**/.wxt", "!!**/.output"]
+    "includes": [
+      "**",
+      "!!.claude",
+      "!!**/.agents/skills",
+      "!!**/.vybekiit",
+      "!!**/.wxt",
+      "!!**/.output",
+      "!!public"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -55,28 +63,48 @@
       },
       "correctness": {
         "noNodejsModules": "off",
+        "noSolidDestructuredProps": "off",
         "noUndeclaredDependencies": "warn",
         "noUndeclaredVariables": "warn",
         "noUnresolvedImports": "off",
+        "useExhaustiveDependencies": "warn",
+        "useImageSize": "warn",
         "useImportExtensions": "off",
-        "useHookAtTopLevel": "off"
+        "useHookAtTopLevel": "off",
+        "useQwikValidLexicalScope": "off",
+        "useUniqueElementIds": "warn"
       },
       "performance": {
-        "noAwaitInLoops": "warn"
+        "noAwaitInLoops": "warn",
+        "noJsxPropsBind": "warn",
+        "useSolidForComponent": "off",
+        "useTopLevelRegex": "warn"
       },
       "suspicious": {
         "noUnnecessaryConditions": "warn",
         "noControlCharactersInRegex": "off",
+        "noArrayIndexKey": "warn",
         "noAssignInExpressions": "off",
         "noReturnAssign": "off",
-        "noConsole": "off",
+        "noConsole": "error",
         "noUnknownAttribute": "off",
         "noReactForwardRef": "off",
         "noUnknownAtRules": "off",
         "noReactSpecificProps": "off"
       },
       "security": {
+        "noDangerouslySetInnerHtml": "warn",
         "noSecrets": "warn"
+      },
+      "a11y": {
+        "noLabelWithoutControl": "warn",
+        "noNoninteractiveElementInteractions": "warn",
+        "noStaticElementInteractions": "warn",
+        "noSvgWithoutTitle": "warn",
+        "useFocusableInteractive": "warn",
+        "useButtonType": "warn",
+        "useKeyWithClickEvents": "warn",
+        "useSemanticElements": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",

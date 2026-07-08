@@ -1,1 +1,1 @@
-export * from '@/components/ui/input';
+export * from '@vybekiit/ui/input';

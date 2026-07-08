@@ -1,1 +1,1 @@
-export * from '@/components/ui/popover';
+export * from '@vybekiit/ui/popover';

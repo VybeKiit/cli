@@ -29,7 +29,7 @@ export type NosqlProviderName = 'mongodb' | 'firebase' | 'aws';
 
 export type PresetProviderStatus = 'stable' | 'planned';
 
-export interface PresetColumn {
+export type PresetColumn = {
   readonly name: string;
   readonly type: PresetColumnType;
   readonly required?: boolean;
@@ -37,31 +37,31 @@ export interface PresetColumn {
   readonly default?: string;
   readonly references?: { readonly table: string; readonly column: string };
   readonly generated?: string;
-}
+};
 
-export interface PresetEntity {
+export type PresetEntity = {
   readonly name: string;
   readonly columns: readonly PresetColumn[];
   readonly primaryKey?: string;
-}
+};
 
-export interface PresetRelation {
+export type PresetRelation = {
   readonly from: string;
   readonly to: string;
   readonly foreignKey: string;
   readonly type: 'one' | 'many';
-}
+};
 
-export interface PresetIndex {
+export type PresetIndex = {
   readonly table: string;
   readonly columns: readonly string[];
   readonly unique?: boolean;
   readonly method?: 'btree' | 'gin' | 'hnsw' | 'ivfflat';
   readonly where?: string;
   readonly reason: string;
-}
+};
 
-export interface PresetManifest {
+export type PresetManifest = {
   readonly id: string;
   readonly version: number;
   readonly description?: string;
@@ -79,24 +79,24 @@ export interface PresetManifest {
     Record<PostgresProviderName | NosqlProviderName, PresetProviderStatus>
   >;
   readonly helpers?: readonly string[];
-}
+};
 
-export interface RenderedPreset {
+export type RenderedPreset = {
   readonly presetId: string;
   readonly provider: PostgresProviderName | NosqlProviderName;
   readonly sql?: string;
   readonly nosqlNotes?: string;
-}
+};
 
-export interface PresetVerificationIssue {
+export type PresetVerificationIssue = {
   readonly presetId: string;
   readonly table: string;
   readonly issue: 'missing_table' | 'missing_index' | 'rls_gap';
   readonly detail: string;
-}
+};
 
-export interface PresetVerificationResult {
+export type PresetVerificationResult = {
   readonly ok: boolean;
   readonly issues: readonly PresetVerificationIssue[];
   readonly applied: readonly string[];
-}
+};

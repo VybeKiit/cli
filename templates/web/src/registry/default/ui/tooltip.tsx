@@ -1,1 +1,1 @@
-export * from '@/components/ui/tooltip';
+export * from '@vybekiit/ui/tooltip';

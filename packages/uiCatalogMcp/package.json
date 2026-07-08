@@ -1,7 +1,11 @@
 {
   "name": "@vybekiit/ui-catalog-mcp",
   "version": "0.3.0",
-  "description": "MCP server for searching VybeKiit mirrored UI component catalogs.",
+  "private": true,
+  "vybekiit": {
+    "kind": "tooling"
+  },
+  "description": "MCP server for searching VybeKiit mirrored UI component catalogs. Private maintainer tooling (ADR-0025).",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -13,6 +17,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./catalog.js": {
+      "types": "./dist/catalog.d.ts",
+      "import": "./dist/catalog.js"
     }
   },
   "files": [
@@ -26,14 +34,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "zod": "^3.24.1"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
-  },
-  "publishConfig": {
-    "access": "public"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

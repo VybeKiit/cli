@@ -38,4 +38,4 @@ Mobile-only: `navigation.screen.*`, `common.close`.
 
 ## Verify-before-advance
 
-`pnpm quality` green; reload app and confirm stack titles + one screen in the new language.
+`pnpm verify` green; reload app and confirm stack titles + one screen in the new language.

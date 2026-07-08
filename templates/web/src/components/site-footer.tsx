@@ -4,8 +4,14 @@ import { FOOTER_LINKS } from '@/data/nav';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
-/** Marketing footer with the legal links every product needs (terms + privacy). */
-export function SiteFooter() {
+/**
+ * Render the marketing footer with legal links.
+ *
+ * @returns Localized footer content for public pages.
+ * @example
+ * <SiteFooter />
+ */
+const SiteFooter = () => {
   const t = useTranslations();
   const year = new Date().getFullYear();
 
@@ -23,4 +29,6 @@ export function SiteFooter() {
       </div>
     </footer>
   );
-}
+};
+
+export { SiteFooter };

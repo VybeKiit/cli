@@ -10,12 +10,12 @@ interface RichTextEditorProps {
 }
 
 /** Simplified Tiptap editor for CMS-style content drafts. */
-export function RichTextEditor({
+export const RichTextEditor = ({
   value = '',
   onChange,
   className,
   placeholder = 'Start writing…',
-}: RichTextEditorProps) {
+}: RichTextEditorProps) => {
   const editor = useEditor({
     extensions: [StarterKit] as Extensions,
     content: value,
@@ -41,4 +41,4 @@ export function RichTextEditor({
       <EditorContent editor={editor} />
     </div>
   );
-}
+};

@@ -2,7 +2,11 @@
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["components", "hooks", "lib", "entrypoints", "styles", "env.d.ts", ".wxt"]
+  "include": ["src", "styles", "env.d.ts", ".wxt"]
 }

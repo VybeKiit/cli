@@ -1,7 +1,7 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import type { ShowcaseEntry } from '@/data/componentShowcase';
+import { cn } from '@/lib/utils';
 
 const SOURCE_LABELS: Record<string, string> = {
   bundui: 'BundUI',
@@ -18,9 +18,20 @@ interface ComponentPreviewCardProps {
   readonly className?: string;
 }
 
-/** Fixed-frame preview card with source badge and static fallback shell. */
-export function ComponentPreviewCard({ entry, className }: ComponentPreviewCardProps) {
-  const sourceLabel = SOURCE_LABELS[entry.source] ?? entry.source;
+/**
+ * Fixed-frame preview card with source badge and static fallback shell.
+ *
+ * @param props - Component props.
+ * @returns The rendered ComponentPreviewCard element.
+ * @example
+ * ```tsx
+ * <ComponentPreviewCard />
+ * ```
+ */
+
+export const ComponentPreviewCard = ({ entry, className }: ComponentPreviewCardProps) => {
+  const mappedSourceLabel = SOURCE_LABELS[entry.source];
+  const sourceLabel = mappedSourceLabel === undefined ? entry.source : mappedSourceLabel;
 
   return (
     <article
@@ -43,4 +54,4 @@ export function ComponentPreviewCard({ entry, className }: ComponentPreviewCardP
       </div>
     </article>
   );
-}
+};

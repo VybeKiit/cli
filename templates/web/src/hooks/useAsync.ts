@@ -1,53 +1,49 @@
-import type { Result } from '@vybekiit/core';
+import { Effect, Either } from 'effect';
 import { useCallback, useState } from 'react';
 
+type MessageError = Readonly<{ message: string }>;
+
 /**
- * UI state for a single async call that returns a {@link Result}.
+ * UI state for a single Effect-backed async call.
  *
- * @typeParam T - the success value carried by the wrapped function's `Result`.
+ * @typeParam T - Success value carried by the wrapped Effect.
  */
 export interface AsyncState<T> {
   /** True while a `run(...)` call is in flight. */
-  loading: boolean;
-  /** The failed `Result`'s plain `message`, or `null` when there's no error. */
-  error: string | null;
-  /** The last successful value, or `null` before the first ok result. */
-  data: T | null;
+  readonly loading: boolean;
+  /** The failed Effect error's plain `message`, or `null` when there's no error. */
+  readonly error: string | null;
+  /** The last successful value, or `null` before the first success. */
+  readonly data: T | null;
 }
 
 /**
- * Wrap an async function returning a {@link Result} into ergonomic UI state.
+ * Wrap an Effect-returning operation into ergonomic UI state.
  *
- * This is the shared async-state primitive the form screens use instead of
- * hand-rolling `useState(loading)` / `useState(error)` around every auth or
- * billing call. `run(...)` resets the previous error, flips `loading`, then on
- * completion populates either `data` (on `ok`) or `error` (the failure's plain
- * `message`, on `err`) — never both — so a screen branches on one source of truth.
- *
- * Errors are surfaced as `string | null` so they drop straight into the shared
- * `<Alert variant="destructive">` markup. `run` is stable across renders (it is
- * `useCallback`-wrapped over `fn`), so callers can depend on it safely.
- *
- * @typeParam T - the success value carried by `fn`'s `Result`.
- * @param fn - the async operation to wrap; receives whatever args `run` is given.
- * @returns The async state plus a stable `run` to invoke `fn`.
+ * @typeParam T - Success value carried by `fn`.
+ * @typeParam E - Expected failure type with a user-facing message.
+ * @typeParam Args - Argument tuple accepted by `fn`.
+ * @param fn - Effect-returning operation to invoke from the UI.
+ * @returns The async state plus a stable `run` function.
+ * @example
+ * const { run } = useAsync(signInWithPassword);
  */
-export function useAsync<T, Args extends unknown[]>(
-  fn: (...args: Args) => Promise<Result<T>>,
-): AsyncState<T> & { run: (...args: Args) => Promise<Result<T>> } {
+export const useAsync = <T, E extends MessageError, Args extends unknown[]>(
+  fn: (...args: Args) => Effect.Effect<T, E>,
+): AsyncState<T> & { readonly run: (...args: Args) => Promise<Either.Either<T, E>> } => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<T | null>(null);
 
   const run = useCallback(
-    async (...args: Args): Promise<Result<T>> => {
+    async (...args: Args): Promise<Either.Either<T, E>> => {
       setLoading(true);
       setError(null);
-      const result = await fn(...args);
-      if (result.ok) {
-        setData(result.value);
+      const result = await Effect.runPromise(Effect.either(fn(...args)));
+      if (Either.isRight(result)) {
+        setData(result.right);
       } else {
-        setError(result.error.message);
+        setError(result.left.message);
       }
       setLoading(false);
       return result;
@@ -56,4 +52,4 @@ export function useAsync<T, Args extends unknown[]>(
   );
 
   return { loading, error, data, run };
-}
+};

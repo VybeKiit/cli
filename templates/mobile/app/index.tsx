@@ -5,13 +5,26 @@ import { HOME_FEATURES } from '@/data/marketing';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useTheme } from '@/theme/useTheme';
 import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-/** Home / marketing screen — hero rhythm + feature cards mirroring the web landing page. */
-export default function HomeScreen() {
+/**
+ * Render the mobile home and marketing screen.
+ *
+ * @returns React Native home screen.
+ * @example
+ * <HomeScreen />
+ */
+const HomeScreen = () => {
   const router = useRouter();
   const { t } = useTranslations();
   const { colors, spacing, fontSizes, fontWeights, radius } = useTheme();
+  const openSignup = useCallback(() => {
+    router.push('/signup');
+  }, [router]);
+  const openPricing = useCallback(() => {
+    router.push('/pricing');
+  }, [router]);
 
   return (
     <ScrollView
@@ -34,16 +47,12 @@ export default function HomeScreen() {
             {t('home.hero.description')}
           </Text>
           <View style={{ gap: spacing.sm }}>
-            <Button
-              title={t('home.hero.cta.getStarted')}
-              size="lg"
-              onPress={() => router.push('/signup')}
-            />
+            <Button title={t('home.hero.cta.getStarted')} size="lg" onPress={openSignup} />
             <Button
               title={t('home.hero.cta.seePricing')}
               size="lg"
               variant="outline"
-              onPress={() => router.push('/pricing')}
+              onPress={openPricing}
             />
           </View>
         </CardHeader>
@@ -61,10 +70,12 @@ export default function HomeScreen() {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
   },
 });
+
+export default HomeScreen;

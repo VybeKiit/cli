@@ -1,0 +1,639 @@
+{
+  "generatedAt": "2026-07-03T12:05:05.695Z",
+  "mirrorDepCount": 126,
+  "added": [],
+  "updated": [],
+  "skipped": [
+    {
+      "name": "lucide-react",
+      "action": "skipped",
+      "version": "^0.468.0"
+    },
+    {
+      "name": "motion",
+      "action": "skipped",
+      "version": "^12.23.12"
+    },
+    {
+      "name": "@radix-ui/react-accordion",
+      "action": "skipped",
+      "version": "^1.2.14"
+    },
+    {
+      "name": "recharts",
+      "action": "skipped",
+      "version": "^3.9.0"
+    },
+    {
+      "name": "react-hook-form",
+      "action": "skipped",
+      "version": "^7.80.0"
+    },
+    {
+      "name": "@hookform/resolvers",
+      "action": "skipped",
+      "version": "^5.4.0"
+    },
+    {
+      "name": "zod",
+      "action": "skipped",
+      "version": "^3.24.1"
+    },
+    {
+      "name": "lenis",
+      "action": "skipped",
+      "version": "^1.3.25"
+    },
+    {
+      "name": "framer-motion",
+      "action": "skipped",
+      "version": "^12.23.12"
+    },
+    {
+      "name": "usehooks-ts",
+      "action": "skipped",
+      "version": "^3.1.1"
+    },
+    {
+      "name": "react-use-measure",
+      "action": "skipped",
+      "version": "^2.1.7"
+    },
+    {
+      "name": "next-themes",
+      "action": "skipped",
+      "version": "^0.4.6"
+    },
+    {
+      "name": "@radix-ui/react-use-controllable-state",
+      "action": "skipped",
+      "version": "^1.2.3"
+    },
+    {
+      "name": "radix-ui",
+      "action": "skipped",
+      "version": "^1.6.1"
+    },
+    {
+      "name": "color",
+      "action": "skipped",
+      "version": "^5.0.3"
+    },
+    {
+      "name": "date-fns",
+      "action": "skipped",
+      "version": "^4.4.0"
+    },
+    {
+      "name": "react-svg-credit-card-payment-icons",
+      "action": "skipped",
+      "version": "^6.0.4"
+    },
+    {
+      "name": "react-dropzone",
+      "action": "skipped",
+      "version": "^15.0.0"
+    },
+    {
+      "name": "@floating-ui/dom",
+      "action": "skipped",
+      "version": "^1.7.6"
+    },
+    {
+      "name": "@tiptap/core",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-code-block-lowlight",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-list",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-subscript",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-superscript",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-table",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-text-style",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extension-typography",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/extensions",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/pm",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/react",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/starter-kit",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "@tiptap/suggestion",
+      "action": "skipped",
+      "version": "^3.27.1"
+    },
+    {
+      "name": "fuse.js",
+      "action": "skipped",
+      "version": "^7.4.2"
+    },
+    {
+      "name": "lowlight",
+      "action": "skipped",
+      "version": "^3.3.0"
+    },
+    {
+      "name": "tippy.js",
+      "action": "skipped",
+      "version": "^6.3.7"
+    },
+    {
+      "name": "@dnd-kit/core",
+      "action": "skipped",
+      "version": "^6.3.1"
+    },
+    {
+      "name": "@dnd-kit/modifiers",
+      "action": "skipped",
+      "version": "^9.0.0"
+    },
+    {
+      "name": "@uidotdev/usehooks",
+      "action": "skipped",
+      "version": "^2.4.1"
+    },
+    {
+      "name": "jotai",
+      "action": "skipped",
+      "version": "^2.20.1"
+    },
+    {
+      "name": "lodash.throttle",
+      "action": "skipped",
+      "version": "^4.1.1"
+    },
+    {
+      "name": "react-image-crop",
+      "action": "skipped",
+      "version": "^11.1.2"
+    },
+    {
+      "name": "react-medium-image-zoom",
+      "action": "skipped",
+      "version": "^5.4.8"
+    },
+    {
+      "name": "@dnd-kit/sortable",
+      "action": "skipped",
+      "version": "^10.0.0"
+    },
+    {
+      "name": "@dnd-kit/utilities",
+      "action": "skipped",
+      "version": "^3.2.2"
+    },
+    {
+      "name": "tunnel-rat",
+      "action": "skipped",
+      "version": "^0.1.2"
+    },
+    {
+      "name": "culori",
+      "action": "skipped",
+      "version": "^4.0.2"
+    },
+    {
+      "name": "qrcode",
+      "action": "skipped",
+      "version": "^1.5.4"
+    },
+    {
+      "name": "@codesandbox/sandpack-react",
+      "action": "skipped",
+      "version": "^2.20.0"
+    },
+    {
+      "name": "media-chrome",
+      "action": "skipped",
+      "version": "^4.19.2"
+    },
+    {
+      "name": "shiki",
+      "action": "skipped",
+      "version": "^4.3.0"
+    },
+    {
+      "name": "react-tweet",
+      "action": "skipped",
+      "version": "^3.3.1"
+    },
+    {
+      "name": "canvas-confetti",
+      "action": "skipped",
+      "version": "^1.9.3"
+    },
+    {
+      "name": "@types/canvas-confetti",
+      "action": "skipped",
+      "version": "^1.9.0"
+    },
+    {
+      "name": "rough-notation",
+      "action": "skipped",
+      "version": "^0.5.1"
+    },
+    {
+      "name": "svg-dotted-map",
+      "action": "skipped",
+      "version": "^2.1.0"
+    },
+    {
+      "name": "@radix-ui/react-icons",
+      "action": "skipped",
+      "version": "^1.3.2"
+    },
+    {
+      "name": "countries-list",
+      "action": "skipped",
+      "version": "^3.3.0"
+    },
+    {
+      "name": "@tsparticles/react",
+      "action": "skipped",
+      "version": "^3.0.0"
+    },
+    {
+      "name": "@tsparticles/engine",
+      "action": "skipped",
+      "version": "^3.9.1"
+    },
+    {
+      "name": "@tsparticles/slim",
+      "action": "skipped",
+      "version": "^3.9.1"
+    },
+    {
+      "name": "@tabler/icons-react",
+      "action": "skipped",
+      "version": "^3.44.0"
+    },
+    {
+      "name": "mini-svg-data-uri",
+      "action": "skipped",
+      "version": "^1.4.4"
+    },
+    {
+      "name": "simplex-noise",
+      "action": "skipped",
+      "version": "^4.0.3"
+    },
+    {
+      "name": "three",
+      "action": "skipped",
+      "version": "^0.185.0"
+    },
+    {
+      "name": "@react-three/fiber",
+      "action": "skipped",
+      "version": "^9.6.1"
+    },
+    {
+      "name": "@radix-ui/react-hover-card",
+      "action": "skipped",
+      "version": "^1.1.17"
+    },
+    {
+      "name": "qss",
+      "action": "skipped",
+      "version": "^3.0.0"
+    },
+    {
+      "name": "dotted-map",
+      "action": "skipped",
+      "version": "^3.1.0"
+    },
+    {
+      "name": "react-syntax-highlighter",
+      "action": "skipped",
+      "version": "^16.1.1"
+    },
+    {
+      "name": "@react-three/drei",
+      "action": "skipped",
+      "version": "^10.7.7"
+    },
+    {
+      "name": "react-icons",
+      "action": "skipped",
+      "version": "^5.7.0"
+    },
+    {
+      "name": "cobe",
+      "action": "skipped",
+      "version": "^0.6.4"
+    },
+    {
+      "name": "ai",
+      "action": "skipped",
+      "version": "^7.0.9"
+    },
+    {
+      "name": "@xyflow/react",
+      "action": "skipped",
+      "version": "^12.11.1"
+    },
+    {
+      "name": "tokenlens",
+      "action": "skipped",
+      "version": "^1.3.1"
+    },
+    {
+      "name": "use-stick-to-bottom",
+      "action": "skipped",
+      "version": "^1.1.6"
+    },
+    {
+      "name": "react-jsx-parser",
+      "action": "skipped",
+      "version": "^2.4.1"
+    },
+    {
+      "name": "@streamdown/cjk",
+      "action": "skipped",
+      "version": "^1.0.3"
+    },
+    {
+      "name": "@streamdown/code",
+      "action": "skipped",
+      "version": "^1.1.1"
+    },
+    {
+      "name": "@streamdown/math",
+      "action": "skipped",
+      "version": "^1.0.2"
+    },
+    {
+      "name": "@streamdown/mermaid",
+      "action": "skipped",
+      "version": "^1.0.2"
+    },
+    {
+      "name": "streamdown",
+      "action": "skipped",
+      "version": "^2.5.0"
+    },
+    {
+      "name": "@rive-app/react-webgl2",
+      "action": "skipped",
+      "version": "^4.29.3"
+    },
+    {
+      "name": "nanoid",
+      "action": "skipped",
+      "version": "^5.1.16"
+    },
+    {
+      "name": "swiper",
+      "action": "skipped",
+      "version": "^14.0.1"
+    },
+    {
+      "name": "class-variance-authority",
+      "action": "skipped",
+      "version": "^0.7.1"
+    },
+    {
+      "name": "@radix-ui/react-slot",
+      "action": "skipped",
+      "version": "^1.1.1"
+    },
+    {
+      "name": "border-beam",
+      "action": "skipped",
+      "version": "^1.3.0"
+    },
+    {
+      "name": "dither-plugin",
+      "action": "skipped",
+      "version": "^1.1.1"
+    },
+    {
+      "name": "embla-carousel-autoplay",
+      "action": "skipped",
+      "version": "^8.6.0"
+    },
+    {
+      "name": "@hugeicons/core-free-icons",
+      "action": "skipped",
+      "version": "^4.2.2"
+    },
+    {
+      "name": "@hugeicons/react",
+      "action": "skipped",
+      "version": "^1.1.9"
+    },
+    {
+      "name": "@radix-ui/react-scroll-area",
+      "action": "skipped",
+      "version": "^1.2.10"
+    },
+    {
+      "name": "metal-fx",
+      "action": "skipped",
+      "version": "^1.0.4"
+    },
+    {
+      "name": "vaul",
+      "action": "skipped",
+      "version": "^1.1.2"
+    },
+    {
+      "name": "geist",
+      "action": "skipped",
+      "version": "^1.7.2"
+    },
+    {
+      "name": "@paper-design/shaders-react",
+      "action": "skipped",
+      "version": "^0.0.77"
+    },
+    {
+      "name": "@base-ui/react",
+      "action": "skipped",
+      "version": "^1.6.0"
+    },
+    {
+      "name": "@remixicon/react",
+      "action": "skipped",
+      "version": "^4.9.0"
+    },
+    {
+      "name": "@tanstack/react-table",
+      "action": "skipped",
+      "version": "^8.21.3"
+    },
+    {
+      "name": "react-markdown",
+      "action": "skipped",
+      "version": "^10.1.0"
+    },
+    {
+      "name": "remark-gfm",
+      "action": "skipped",
+      "version": "^4.0.1"
+    },
+    {
+      "name": "marked",
+      "action": "skipped",
+      "version": "^18.0.5"
+    },
+    {
+      "name": "remark-breaks",
+      "action": "skipped",
+      "version": "^4.0.0"
+    },
+    {
+      "name": "@ai-sdk/openai",
+      "action": "skipped",
+      "version": "^4.0.7"
+    },
+    {
+      "name": "@ai-sdk/react",
+      "action": "skipped",
+      "version": "^4.0.15"
+    },
+    {
+      "name": "@supabase/ssr",
+      "action": "skipped",
+      "version": "^0.12.0"
+    },
+    {
+      "name": "@supabase/supabase-js",
+      "action": "skipped",
+      "version": "^2.110.0"
+    },
+    {
+      "name": "@react-router/dev",
+      "action": "skipped",
+      "version": "^8.1.0"
+    },
+    {
+      "name": "@react-router/fs-routes",
+      "action": "skipped",
+      "version": "^8.1.0"
+    },
+    {
+      "name": "@supabase-labs/y-supabase",
+      "action": "skipped",
+      "version": "^0.1.0"
+    },
+    {
+      "name": "y-protocols",
+      "action": "skipped",
+      "version": "^1.0.7"
+    },
+    {
+      "name": "yjs",
+      "action": "skipped",
+      "version": "^13.6.31"
+    },
+    {
+      "name": "@monaco-editor/react",
+      "action": "skipped",
+      "version": "^4.7.0"
+    },
+    {
+      "name": "y-monaco",
+      "action": "skipped",
+      "version": "^0.1.6"
+    },
+    {
+      "name": "@supabase/postgrest-js",
+      "action": "skipped",
+      "version": "^2.110.0"
+    },
+    {
+      "name": "@tanstack/react-query",
+      "action": "skipped",
+      "version": "^5.101.1"
+    },
+    {
+      "name": "axios",
+      "action": "skipped",
+      "version": "^1.18.1"
+    },
+    {
+      "name": "cmdk",
+      "action": "skipped",
+      "version": "^1.1.1"
+    },
+    {
+      "name": "common-tags",
+      "action": "skipped",
+      "version": "^1.8.2"
+    },
+    {
+      "name": "openai",
+      "action": "skipped",
+      "version": "^6.45.0"
+    },
+    {
+      "name": "openapi-fetch",
+      "action": "skipped",
+      "version": "^0.17.0"
+    },
+    {
+      "name": "sonner",
+      "action": "skipped",
+      "version": "^2.0.7"
+    },
+    {
+      "name": "@vueuse/core",
+      "action": "skipped",
+      "version": "^14.3.0"
+    },
+    {
+      "name": "lucide-vue-next",
+      "action": "skipped",
+      "version": "^1.0.0"
+    },
+    {
+      "name": "@number-flow/react",
+      "action": "skipped",
+      "version": "^0.6.1"
+    }
+  ],
+  "forbidden": []
+}

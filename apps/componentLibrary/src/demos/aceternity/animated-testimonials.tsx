@@ -1,19 +1,34 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/animated-testimonials';
+import { AnimatedTestimonials } from '@/components/aceternity/ui/animated-testimonials';
 
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+const TESTIMONIALS = [
+  {
+    quote:
+      'VybeKiit helped us ship a polished product in days instead of months. The component library is incredible.',
+    name: 'Sarah Chen',
+    designation: 'Founder at LaunchPad',
+    src: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
+  },
+  {
+    quote:
+      'The AI operator bundle is exactly what we needed — web, mobile, and extension all wired together.',
+    name: 'Marcus Webb',
+    designation: 'CTO at Stackline',
+    src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+  },
+  {
+    quote: 'Best starter kit we have used. Copy a block, paste it in, and it just works.',
+    name: 'Elena Rossi',
+    designation: 'Product Lead at Nova',
+    src: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80',
+  },
+];
 
 export default function AnimatedTestimonialsPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="overflow-hidden p-4">
+      <AnimatedTestimonials autoplay={true} testimonials={TESTIMONIALS} />
     </div>
   );
 }

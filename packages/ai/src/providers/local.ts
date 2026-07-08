@@ -1,20 +1,22 @@
-import { ok, type Result } from '@vybekiit/core';
-import type { AiProvider, CompleteParams, CompleteResult } from '../types';
+import { createSingleChunkStream } from '@vybekiit/ai/singleChunkStream';
+import type { AiProvider, CompleteParamsType } from '@vybekiit/ai/types';
+import { Effect } from 'effect';
 
-export function createLocalAi(): AiProvider {
-  return {
-    name: 'local',
-    async complete(params: CompleteParams): Promise<Result<CompleteResult>> {
-      return ok({ text: `[local-ai] ${params.prompt.slice(0, 200)}` });
-    },
-    async stream(params: CompleteParams): Promise<Result<AsyncIterable<string>>> {
-      async function* gen(): AsyncIterable<string> {
-        yield `[local-ai] ${params.prompt.slice(0, 200)}`;
-      }
-      return ok(gen());
-    },
-    async verifyDelivery() {
-      return ok(true);
-    },
-  };
-}
+const localPromptPreviewLength = 200;
+
+const formatLocalCompletion = (params: CompleteParamsType): string =>
+  `[local-ai] ${params.prompt.slice(0, localPromptPreviewLength)}`;
+
+/**
+ * Build the local AI adapter for offline scaffolds and tests.
+ *
+ * @returns A local AiProvider whose methods return successful Effects.
+ * @example
+ * const text = await Effect.runPromise(createLocalAi().complete({ prompt: 'hello' }));
+ */
+export const createLocalAi = (): AiProvider => ({
+  name: 'local',
+  complete: (params) => Effect.succeed({ text: formatLocalCompletion(params) }),
+  stream: (params) => Effect.succeed(createSingleChunkStream(formatLocalCompletion(params))),
+  verifyDelivery: () => Effect.succeed(true),
+});

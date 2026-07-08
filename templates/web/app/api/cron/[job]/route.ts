@@ -1,16 +1,28 @@
 import { getJobs } from '@/lib/providers';
+import { Effect } from 'effect';
 import { NextResponse } from 'next/server';
 
-/** Cloudflare Cron entry — skill: go-live wires CF cron to this route */
-export async function GET(
+/**
+ * Handle the Cloudflare Cron entry for queued background jobs.
+ *
+ * @param _request - Incoming cron request.
+ * @param context - Route params containing the job name.
+ * @returns JSON response with the queued job id or a job error.
+ * @example
+ * const response = await GET(request, { params: Promise.resolve({ job: 'sync' }) });
+ */
+export const GET = async (
   _request: Request,
   context: { params: Promise<{ job: string }> },
-): Promise<NextResponse> {
+): Promise<NextResponse> => {
   const { job } = await context.params;
   const jobs = getJobs();
-  const result = await jobs.enqueue({ name: job, data: { source: 'cron' } });
-  if (!result.ok) {
-    return NextResponse.json({ error: result.error.message }, { status: 500 });
-  }
-  return NextResponse.json({ ok: true, id: result.value.id });
-}
+  return Effect.runPromise(
+    jobs.enqueue({ name: job, data: { source: 'cron' } }).pipe(
+      Effect.match({
+        onFailure: (error) => NextResponse.json({ error: error.message }, { status: 500 }),
+        onSuccess: (result) => NextResponse.json({ ok: true, id: result.id }),
+      }),
+    ),
+  );
+};

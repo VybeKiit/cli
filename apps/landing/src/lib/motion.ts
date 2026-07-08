@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
-/** Whether the visitor prefers reduced motion. */
-export function useReducedMotion(): boolean {
+/**
+ * Whether the visitor prefers reduced motion.
+ *
+ * @returns The hook result.
+ * @example
+ * const value = useReducedMotion();
+ */
+
+export const useReducedMotion = (): boolean => {
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
@@ -15,4 +22,4 @@ export function useReducedMotion(): boolean {
   }, []);
 
   return reduced;
-}
+};

@@ -3,17 +3,13 @@ import { useTheme } from '@/theme/useTheme';
 import { StyleSheet, Text, View } from 'react-native';
 
 /**
- * Renders the active toasts from the module-level store. Mount this once in the
- * root layout (see `app/_layout.tsx`); anywhere else can fire one via `useToast()`.
+ * Render active toasts from the module-level toast store.
  *
- * The RN parallel of the web `<Toaster />`. Accessible by default: the container
- * uses `accessibilityLiveRegion="polite"` (the RN equivalent of web's
- * `aria-live="polite"`) so screen readers announce new toasts without stealing
- * focus. Styling reuses the shared theme tokens (background/border/foreground, with
- * the `destructive` palette for errors) so toasts match the rest of the kit. It is
- * `pointerEvents="none"` so it never blocks taps on the screen beneath it.
+ * @returns The themed toast viewport.
+ * @example
+ * <Toaster />
  */
-export function Toaster() {
+export const Toaster = () => {
   const { toasts } = useToast();
   const { colors, radius, spacing, fontSizes } = useTheme();
 
@@ -51,7 +47,7 @@ export function Toaster() {
       })}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

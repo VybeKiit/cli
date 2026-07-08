@@ -22,6 +22,14 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    `/api/auth/signin` → expect "slow down"; submit `/api/contact` at human pace → still works.
    **Verify:** login protected; contact form not throttled like login.
 
+1b. **Scheduled tasks (cron safety).** If the app has any scheduled tasks (cron jobs, Vercel crons,
+   Supabase pg_cron, Cloudflare Cron Triggers):
+   - Confirm interval is 15 minutes or more for any task that touches the database
+   - Confirm tasks only run during active hours (not 24/7) unless truly needed
+   - If on a free-tier database (Supabase Free, Neon Free): warn that frequent crons prevent
+     auto-suspend and burn compute quota — the app will go down with no way to deploy a fix
+   **Verify:** no cron will silently exhaust the free tier.
+
 2. **SQL / database safety.** Grep for raw SQL, `$executeRaw`, or string-built queries — replace with
    `@vybekiit/db` `DataProvider`. If Supabase: confirm RLS on buyer tables. Every API route validates
    input with zod at the boundary.
@@ -46,6 +54,11 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    - Scan `src/lib/` for duplicate exported function names; merge duplicates
    - Spot-check API routes use `@/lib/logger` instead of bare console
    - If going live with alerts: when `OBSERVABILITY_PROVIDER=sentry`, confirm `SENTRY_DSN` is set
+   - Scan for fire-and-forget async calls in API routes and crons: any `logX()`, `trackX()`, or
+     `sendX()` called without `await` (or without `waitUntil`). In serverless, un-awaited async
+     work is killed after response — the work silently never happens. Flag and fix.
+   - Never remove a navigation or layout component without confirming which element the builder
+     means (contract rule ⑨).
    **Verify:** tell the builder *"Your app is quiet in production and uses one place for each kind of logic."*
 
 7. **UI consistency (agent-only).** Grep checks:
@@ -55,7 +68,7 @@ API route classified correctly. Output a plain pass/fail summary for the builder
    - Arbitrary Tailwind `h-[`, `w-[`, `gap-[`, `mt-[` in `app/` → review and normalize
    **Verify:** tell the builder *"Your app's buttons, spacing, and colors all match — it looks like one professional product."*
 
-8. **Quality smoke (soft).** Run `pnpm quality` — format, lint, typecheck, and tests. Report pass/fail
+8. **Quality smoke (soft).** Run `pnpm verify` — format, lint, typecheck, and tests. Report pass/fail
    in plain English. On warn-only Biome issues: fix obvious ones; do not block ship on style warnings
    unless egregious.
    **Verify:** tell the builder *"Your app is tested and tidy."*

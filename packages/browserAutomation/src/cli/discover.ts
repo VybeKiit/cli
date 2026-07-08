@@ -1,16 +1,31 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-
-import type { ExtensionConfig, VerbContext } from '../domains/extension/types';
-import { cwsJsonPath, type CwsStoreConfig } from '../domains/extension/store';
+import { parseCwsStoreConfig } from '@vybekiit/browser-automation/domains/extension/cwsStoreSchema';
+import {
+  type CwsStoreConfig,
+  cwsJsonPath,
+} from '@vybekiit/browser-automation/domains/extension/store';
+import type {
+  ExtensionConfig,
+  VerbContext,
+} from '@vybekiit/browser-automation/domains/extension/types';
 
 export type DiscoverResult = {
-  repoRoot: string;
-  store: CwsStoreConfig;
+  readonly repoRoot: string;
+  readonly store: CwsStoreConfig;
 };
 
-/** Walk up from startDir until `.vybekiit/store/extension/cws.json` exists. */
-export async function discoverStore(startDir = process.cwd()): Promise<DiscoverResult> {
+export { parseCwsStoreConfig } from '@vybekiit/browser-automation/domains/extension/cwsStoreSchema';
+
+/**
+ * Walk up from a directory until the Chrome Web Store config exists.
+ *
+ * @param startDir - Directory to start searching from.
+ * @returns The repo root and parsed store config.
+ * @example
+ * const discovered = await discoverStore(process.cwd());
+ */
+export const discoverStore = async (startDir = process.cwd()): Promise<DiscoverResult> => {
   let dir = resolve(startDir);
   const root = resolve('/');
 
@@ -22,9 +37,9 @@ export async function discoverStore(startDir = process.cwd()): Promise<DiscoverR
       return { repoRoot: dir, store };
     } catch (err) {
       if (err instanceof SyntaxError) {
-        throw new Error(`Invalid JSON in ${configPath}`);
+        throw new Error(`Invalid JSON in ${configPath}`, { cause: err });
       }
-      /* ENOENT — walk up */
+      /* ENOENT: walk up */
     }
     dir = dirname(dir);
   }
@@ -32,33 +47,31 @@ export async function discoverStore(startDir = process.cwd()): Promise<DiscoverR
   throw new Error(
     'Could not find .vybekiit/store/extension/cws.json. Run from a VybeKiit project root or create the store scaffold.',
   );
-}
+};
 
-export function parseCwsStoreConfig(parsed: unknown): CwsStoreConfig {
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('cws.json must be a JSON object.');
-  }
-  const o = parsed as Record<string, unknown>;
-  const chromeWebStoreId = typeof o.chromeWebStoreId === 'string' ? o.chromeWebStoreId : '';
-  const key = typeof o.key === 'string' && o.key.length > 0 ? o.key : 'extension';
-  const name = typeof o.name === 'string' && o.name.length > 0 ? o.name : 'Extension';
-  const version = typeof o.version === 'string' ? o.version : undefined;
-  const config: CwsStoreConfig = { chromeWebStoreId, key, name };
-  if (version !== undefined) config.version = version;
-  return config;
-}
-
-/** Build verb context for buyer repos (WXT workspace at repo root). */
-export function buildVerbContext(
+/**
+ * Build verb context for buyer repos.
+ *
+ * @param discovered - Store discovery result from `discoverStore`.
+ * @param log - Optional logger passed through to automation verbs.
+ * @returns A VerbContext rooted at the discovered buyer repo.
+ * @example
+ * const ctx = buildVerbContext(discovered, console);
+ */
+export const buildVerbContext = (
   discovered: DiscoverResult,
   log?: VerbContext['log'],
-): VerbContext {
+): VerbContext => {
   const extension: ExtensionConfig = {
     chromeWebStoreId: discovered.store.chromeWebStoreId,
     dir: '.',
     key: discovered.store.key,
     name: discovered.store.name,
+    ...(discovered.store.version ? { version: discovered.store.version } : {}),
   };
-  if (log) return { extension, repoRoot: discovered.repoRoot, log };
-  return { extension, repoRoot: discovered.repoRoot };
-}
+  return {
+    repoRoot: discovered.repoRoot,
+    extension,
+    ...(log ? { log } : {}),
+  };
+};

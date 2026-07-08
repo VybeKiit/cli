@@ -2,11 +2,21 @@ import process from 'node:process';
 import { checkGoalDrift } from '@vybekiit/agent-kit';
 import { listSkillPaths, resolveTemplateArg } from '../lib/agentLayerIo';
 
-export async function runCheckGoals(
+/**
+ * Validate that a template's goal index and skill files still agree.
+ *
+ * @param args - CLI arguments after `check-goals`; first item may be a template name.
+ * @param cwd - Project directory used for template detection and skill discovery.
+ * @returns JSON output plus the process exit code for the command.
+ * @example
+ * const result = await runCheckGoals(['web'], process.cwd());
+ */
+export const runCheckGoals = async (
   args: string[],
   cwd: string = process.cwd(),
-): Promise<{ readonly json: string; readonly exitCode: number }> {
-  const template = await resolveTemplateArg(args[0], cwd);
+): Promise<{ readonly json: string; readonly exitCode: number }> => {
+  const [templateArg] = args;
+  const template = await resolveTemplateArg(templateArg, cwd);
 
   if (!template) {
     return {
@@ -34,4 +44,4 @@ export async function runCheckGoals(
     ),
     exitCode: report.ok ? 0 : 1,
   };
-}
+};

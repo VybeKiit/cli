@@ -1,12 +1,12 @@
-import ComponentCard from "../../common/ComponentCard";
-import FileInput from "../input/FileInput";
-import Label from "../Label";
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { FileInput } from '@/components/form/input/FileInput';
+import { Label } from '@/components/form/Label';
 
-export default function FileInputExample() {
+export const FileInputExample = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Selected file:", file.name);
+      void file.name;
     }
   };
 
@@ -18,4 +18,4 @@ export default function FileInputExample() {
       </div>
     </ComponentCard>
   );
-}
+};

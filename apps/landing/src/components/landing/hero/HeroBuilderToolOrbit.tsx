@@ -17,8 +17,18 @@ const ORBIT_POSITIONS = [
   { top: '55%', right: '20%', delay: '-1.5s' },
 ] as const;
 
-/** Floating builder-tool marks behind the hero headline. */
-export function HeroBuilderToolOrbit({ className }: { readonly className?: string }) {
+/**
+ * Floating builder-tool marks behind the hero headline.
+ *
+ * @param props - Component props.
+ * @returns The rendered HeroBuilderToolOrbit element.
+ * @example
+ * ```tsx
+ * <HeroBuilderToolOrbit />
+ * ```
+ */
+
+export const HeroBuilderToolOrbit = ({ className }: { readonly className?: string }) => {
   const { activeIndex, cancelCascade } = useVibeHintCascade(BUILDER_TOOL_MARKS.length);
 
   return (
@@ -29,7 +39,8 @@ export function HeroBuilderToolOrbit({ className }: { readonly className?: strin
       )}
     >
       {BUILDER_TOOL_MARKS.map((mark, index) => {
-        const position = ORBIT_POSITIONS[index % ORBIT_POSITIONS.length] ?? ORBIT_POSITIONS[0];
+        const positionCandidate = ORBIT_POSITIONS[index % ORBIT_POSITIONS.length];
+        const position = positionCandidate === undefined ? ORBIT_POSITIONS[0] : positionCandidate;
         const isCascadeActive = activeIndex === index;
 
         return (
@@ -64,4 +75,4 @@ export function HeroBuilderToolOrbit({ className }: { readonly className?: strin
       })}
     </div>
   );
-}
+};

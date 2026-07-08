@@ -1,6 +1,6 @@
+import { Effect } from 'effect';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '@/lib/authTelemetry';
-import { resolveAnalyticsProvider } from '@vybekiit/analytics';
-import { observability } from '@/lib/observability';
 
 const mocks = vi.hoisted(() => ({
   captureException: vi.fn(),
@@ -9,7 +9,11 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@vybekiit/analytics', () => ({
-  resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
+  resolveAnalyticsProvider: vi.fn(() =>
+    Effect.succeed({
+      track: (event: unknown) => Effect.sync(() => mocks.track(event)),
+    }),
+  ),
 }));
 
 vi.mock('@/lib/observability', () => ({

@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -7,17 +8,21 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@vybekiit/analytics', () => ({
-  resolveAnalyticsProvider: vi.fn(() => ({ track: mocks.track })),
+  resolveAnalyticsProvider: vi.fn(() =>
+    Effect.succeed({
+      track: (event: unknown) => Effect.sync(() => mocks.track(event)),
+    }),
+  ),
 }));
 
-vi.mock('@vybekiit/observability', () => ({
+vi.mock('@vybekiit/core/observability', () => ({
   resolveObservabilityProvider: vi.fn(() => ({
     captureException: mocks.captureException,
     captureMessage: mocks.captureMessage,
   })),
 }));
 
-import { trackAuthEvent, captureAuthFailure, captureAuthRejection } from '../authTelemetry.js';
+import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from '@/lib/authTelemetry.js';
 
 describe('auth-telemetry', () => {
   beforeEach(() => {

@@ -13,7 +13,6 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
-  transpilePackages: ['@vybekiit/tokens'],
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -21,8 +20,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   webpack: (config) => {
+    const existingAlias = config.resolve.alias === undefined ? {} : config.resolve.alias;
+    const existingModules =
+      config.resolve.modules === undefined ? ['node_modules'] : config.resolve.modules;
+
     config.resolve.alias = {
-      ...(config.resolve.alias ?? {}),
+      ...existingAlias,
       '@/utils/cn': path.join(webSrc, 'lib/utils.ts'),
       '@/registry/default/ui': path.join(webSrc, 'registry/default/ui'),
       '@/registry/new-york/ui': path.join(webSrc, 'registry/new-york/ui'),
@@ -34,7 +37,7 @@ const nextConfig = {
     config.resolve.modules = [
       path.join(webRoot, 'node_modules'),
       path.join(__dirname, 'node_modules'),
-      ...(config.resolve.modules ?? ['node_modules']),
+      ...existingModules,
     ];
     return config;
   },

@@ -1,13 +1,18 @@
 import { handleWebhook } from '@vybekiit/payments/http';
-import { fulfillOrder } from '@/lib/fulfillment';
+import { fulfillOrderEffect } from '@/lib/fulfillment';
 import { NextResponse } from 'next/server';
 
 /**
- * Payment webhook: provider → fulfillment.
+ * Handle payment provider webhooks.
+ *
+ * @param request - Incoming webhook request with the raw provider body.
+ * @returns The normalized webhook response.
+ * @example
+ * const response = await POST(request);
  */
-export async function POST(request: Request): Promise<NextResponse> {
+export const POST = async (request: Request): Promise<NextResponse> => {
   const rawBody = await request.text();
   const headers = Object.fromEntries(request.headers);
-  const result = await handleWebhook(rawBody, headers, { fulfillOrder });
+  const result = await handleWebhook(rawBody, headers, { fulfillOrder: fulfillOrderEffect });
   return NextResponse.json(result.body, { status: result.status });
-}
+};

@@ -1,29 +1,39 @@
-import { renderContract } from '../contract/contract';
+import { renderContract } from '@vybekiit/agent-kit/contract/contract';
 
 export type ExtensionSkillKind = 'buyer-goal' | 'platform-wrapper' | 'agent-skills-global';
 
-export interface BuyerGoalSkillDraft {
+export type BuyerGoalSkillDraft = {
   readonly goalStem: string;
   readonly goalText: string;
   readonly steps: readonly string[];
   readonly definitionOfDone: string;
-}
+};
 
-export interface PlatformWrapperDraft {
+export type PlatformWrapperDraft = {
   readonly techStem: string;
   readonly techLabel: string;
   readonly docsUrl: string;
   readonly kitWiring: readonly string[];
   readonly verifySteps: readonly string[];
   readonly upstreamSkillsRepo?: string;
-}
+};
 
-/** Render a Layer A buyer goal skill (project-local VybeKiit format). */
-export function renderBuyerGoalExtensionSkill(draft: BuyerGoalSkillDraft): string {
+// "**Verify:** Browser shows success" -> true
+const VERIFY_MARKER_PATTERN = /\*\*Verify:\*\*/i;
+
+/**
+ * Render a Layer A buyer goal skill (project-local VybeKiit format).
+ *
+ * @param draft - draft input.
+ * @returns The rendered render buyer goal extension skill text.
+ * @example
+ * const result = renderBuyerGoalExtensionSkill(draft);
+ */
+export const renderBuyerGoalExtensionSkill = (draft: BuyerGoalSkillDraft): string => {
   const steps = draft.steps
     .map((step, i) => {
       const n = i + 1;
-      const hasVerify = /\*\*Verify:\*\*/i.test(step);
+      const hasVerify = VERIFY_MARKER_PATTERN.test(step);
       const body = hasVerify ? step : `${step}\n   **Verify:** step ${n} succeeded.`;
       return `${n}. ${body}`;
     })
@@ -51,13 +61,21 @@ export function renderBuyerGoalExtensionSkill(draft: BuyerGoalSkillDraft): strin
     '',
     '## After completing this skill',
     '',
+    // biome-ignore lint/security/noSecrets: Generated instruction text mentions a function name, not a secret.
     'Append one entry to `checklist.md` Decision log using `formatChecklistEntry({ from, to, because })`.',
     '',
   ].join('\n');
-}
+};
 
-/** Render a Layer B platform wrapper (project-local VybeKiit format). */
-export function renderPlatformWrapperExtensionSkill(draft: PlatformWrapperDraft): string {
+/**
+ * Render a Layer B platform wrapper (project-local VybeKiit format).
+ *
+ * @param draft - draft input.
+ * @returns The rendered render platform wrapper extension skill text.
+ * @example
+ * const result = renderPlatformWrapperExtensionSkill(draft);
+ */
+export const renderPlatformWrapperExtensionSkill = (draft: PlatformWrapperDraft): string => {
   const wiring = draft.kitWiring
     .map((line) => `${draft.kitWiring.length > 1 ? '' : ''}${line}`)
     .join('\n');
@@ -101,15 +119,24 @@ export function renderPlatformWrapperExtensionSkill(draft: PlatformWrapperDraft)
     'If no `@vybekiit/*` adapter exists yet, wire with minimal integration and flag for maintainer.',
     '',
   ].join('\n');
-}
+};
 
-/** Render Agent Skills SKILL.md for machine-global scope (tool-aware). */
-export function renderGlobalAgentSkill(
+/**
+ * Render Agent Skills SKILL.md for machine-global scope (tool-aware).
+ *
+ * @param skillStem - skill stem input.
+ * @param description - description input.
+ * @param bodyMarkdown - body markdown input.
+ * @returns The rendered render global agent skill text.
+ * @example
+ * const result = renderGlobalAgentSkill(skillStem, description, bodyMarkdown);
+ */
+export const renderGlobalAgentSkill = (
   skillStem: string,
   description: string,
   bodyMarkdown: string,
-): string {
-  return [
+): string =>
+  [
     '---',
     `name: ${skillStem}`,
     `description: ${description}`,
@@ -120,9 +147,12 @@ export function renderGlobalAgentSkill(
     bodyMarkdown.trimEnd(),
     '',
   ].join('\n');
-}
 
-/** Contract reference block agents can embed in global skill bodies. */
-export function renderExtensionContractReference(): string {
-  return renderContract();
-}
+/**
+ * Contract reference block agents can embed in global skill bodies.
+ *
+ * @returns The rendered render extension contract reference text.
+ * @example
+ * const result = renderExtensionContractReference();
+ */
+export const renderExtensionContractReference = (): string => renderContract();

@@ -1,5 +1,5 @@
 /**
- * VybeKiit edge security Worker — the COMPLEMENTARY layer to `@vybekiit/security`.
+ * VybeKiit edge security Worker — the COMPLEMENTARY layer to `@vybekiit/core/security`.
  *
  * The app-layer guard (`packages/security`) is a per-instance, in-memory limiter: it
  * protects one Worker/serverless instance. This Worker runs at the Cloudflare edge in
@@ -65,7 +65,7 @@ interface EdgeSecurityEnv {
 
 /**
  * The resolved edge policy — the env SSOT turned into typed values, structurally the
- * same as `@vybekiit/security`'s `SecurityPolicy` so the two layers stay in lockstep.
+ * same as `@vybekiit/core/security`'s `SecurityPolicy` so the two layers stay in lockstep.
  */
 interface EdgePolicy {
   readonly rateLimit: {
@@ -96,7 +96,7 @@ const DEFAULT_APP_ORIGIN = 'http://localhost:3000';
 
 type RouteTier = 'auth-strict' | 'public-form' | 'webhook' | 'default';
 
-/** Mirror of `@vybekiit/security`'s `classifyRoute` — kept inline (dependency-free). */
+/** Mirror of `@vybekiit/core/security`'s `classifyRoute` — kept inline (dependency-free). */
 function classifyRoutePath(pathname: string): RouteTier {
   const p = pathname.toLowerCase().replace(/\/$/, '') || '/';
   if (p === '/api/webhook' || p.startsWith('/api/webhook/')) return 'webhook';
@@ -153,7 +153,7 @@ function positiveIntOr(value: string | undefined, fallback: number): number {
 /**
  * Split `SECURITY_ALLOWED_ORIGINS` into a clean, lowercased list.
  *
- * Identical normalization to `@vybekiit/security`'s `parseAllowedOrigins`: trims and
+ * Identical normalization to `@vybekiit/core/security`'s `parseAllowedOrigins`: trims and
  * drops empties so a trailing comma or all-blank value yields `[]` (same-origin only)
  * rather than an origin that matches everything.
  */
@@ -178,7 +178,7 @@ function toOrigin(value: string): string {
 /**
  * Turn the raw Worker `env` into a normalized {@link EdgePolicy}.
  *
- * This is the edge twin of `resolveSecurityPolicy` in `@vybekiit/security`: same keys,
+ * This is the edge twin of `resolveSecurityPolicy` in `@vybekiit/core/security`: same keys,
  * same defaults, same CSV parsing — so both layers resolve identical rules from one
  * `.env`. Kept pure for easy reasoning; the handler calls it once per request.
  */
@@ -208,7 +208,7 @@ function resolveEdgePolicy(env: EdgeSecurityEnv): EdgePolicy {
 /**
  * Decide whether a request's `Origin` passes the same-origin lock.
  *
- * Same rules as `@vybekiit/security`'s `isOriginAllowed`: allow when the lock is off,
+ * Same rules as `@vybekiit/core/security`'s `isOriginAllowed`: allow when the lock is off,
  * when no `Origin` header is present (browsers omit it on top-level navigations and
  * same-origin GETs), when it equals the app's own origin, or when it's allow-listed.
  */

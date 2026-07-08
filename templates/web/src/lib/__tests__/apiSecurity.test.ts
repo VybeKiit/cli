@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
-import { SecurityGuard } from '@vybekiit/security';
+import { SecurityGuard } from '@vybekiit/core/security';
 import { evaluateApiSecurity } from '@/lib/apiSecurity';
 
 describe('evaluateApiSecurity', () => {

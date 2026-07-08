@@ -1,115 +1,62 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Bookmark, Database, FileText, Languages, Reply, Search } from 'lucide-react';
 
-const ACTIONS = ['Summarize page', 'Extract data', 'Generate reply', 'Translate'] as const;
+import { MiniBrowserChrome } from '@/components/landing/kit/MiniBrowserChrome';
+import { Card, CardContent } from '@/components/ui/card';
 
-const HISTORY = [
-  'Summarized article on pricing',
-  'Extracted 12 table rows',
-  'Drafted support reply',
+const ACTIONS = [
+  { label: 'Summarize page', icon: FileText },
+  { label: 'Extract data', icon: Database },
+  { label: 'Generate reply', icon: Reply },
+  { label: 'Translate', icon: Languages },
 ] as const;
 
-/** Browser Extension carousel slide — tabbed popup with actions and history. */
-export function ExtensionSlide() {
-  return (
-    <div className="flex h-full flex-col rounded-xl border border-white/15 bg-[#0d1117] p-4">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img
-            alt=""
-            aria-hidden={true}
-            height={16}
-            src="/brand-marks/googlechrome.webp"
-            width={16}
-          />
-          <p className="font-semibold text-sm text-white">VybeKiit Assistant</p>
-        </div>
-        <Badge
-          className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[9px] text-[var(--green)]"
-          variant="outline"
-        >
-          Online
-        </Badge>
-      </div>
+/**
+ * Browser Extension carousel slide — assistant popup docked in the browser toolbar.
+ *
+ * @returns The rendered ExtensionSlide element.
+ * @example
+ * ```tsx
+ * <ExtensionSlide />
+ * ```
+ */
 
-      <Tabs defaultValue="ask">
-        <TabsList className="mb-2 h-7 w-full">
-          <TabsTrigger className="text-[10px]" value="ask">
-            Ask
-          </TabsTrigger>
-          <TabsTrigger className="text-[10px]" value="actions">
-            Actions
-          </TabsTrigger>
-          <TabsTrigger className="text-[10px]" value="history">
-            History
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="ask">
-          <Input
-            className="h-8 border-white/15 bg-white/5 text-white text-xs placeholder:text-white/40"
-            placeholder="Ask anything..."
-            readOnly={true}
-            tabIndex={-1}
-          />
-          <div className="mt-2 space-y-1">
-            <Skeleton className="h-3 w-3/4 bg-white/10" />
-            <Skeleton className="h-3 w-1/2 bg-white/10" />
+export const ExtensionSlide = () => (
+  <MiniBrowserChrome className="h-full" dark={true} url="docs.yourproduct.com">
+    <div className="flex h-full flex-col p-3">
+      <Card className="min-h-0 flex-1 gap-0 border-white/12 bg-[#0b111b] py-0 shadow-none">
+        <CardContent className="flex h-full flex-col p-3.5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#62a1ff] to-[#1e6bff]">
+                <span className="h-2 w-2 rounded-[1px] bg-white" />
+              </span>
+              <p className="font-semibold text-[13px] text-white">VybeKit Assistant</p>
+            </div>
+            <Bookmark className="h-3.5 w-3.5 text-white/35" strokeWidth={1.8} />
           </div>
-        </TabsContent>
 
-        <TabsContent value="actions">
-          <ul className="grid grid-cols-2 gap-1.5">
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2 text-[10px] text-white/40">
+            <Search className="h-3 w-3" strokeWidth={2} />
+            Ask anything...
+          </div>
+
+          <ul className="mt-3 space-y-2">
             {ACTIONS.map((action) => (
-              <li key={action}>
-                <Button
-                  className="h-7 w-full justify-start border-white/10 bg-white/5 text-[10px] text-white hover:bg-white/10"
-                  tabIndex={-1}
-                  variant="outline"
-                >
-                  {action}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <ul className="space-y-1">
-            {HISTORY.map((item) => (
               <li
-                className="flex items-start gap-1.5 rounded-md bg-white/5 px-2 py-1 text-[10px] text-[var(--text-soft)]"
-                key={item}
+                className="flex items-center gap-2.5 rounded-lg px-1 py-1.5 text-[11px] text-white/85"
+                key={action.label}
               >
-                <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[var(--blue)]" />
-                {item === 'Extracted 12 table rows' ? (
-                  <>
-                    Extracted <AnimatedNumber value="12" /> table rows
-                  </>
-                ) : (
-                  item
-                )}
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/60">
+                  <action.icon className="h-3.5 w-3.5" strokeWidth={1.8} />
+                </span>
+                {action.label}
               </li>
             ))}
           </ul>
-        </TabsContent>
-      </Tabs>
-
-      <Separator className="my-2 bg-white/10" />
-
-      <div className="mt-auto flex items-center justify-between">
-        <span className="text-[9px] text-[var(--text-faint)]">Page: docs.yourproduct.com</span>
-        <span className="text-[9px] text-[var(--blue-soft)]">
-          <AnimatedNumber value="3" /> credits left
-        </span>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
-}
+  </MiniBrowserChrome>
+);

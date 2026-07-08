@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useReducedMotion } from '@/lib/motion';
 import { sanitizeTypewriterText } from '@/lib/sanitizeTypewriterText';
-import { useEffect, useState } from 'react';
 
 export interface UseTypewriterSequenceOptions {
   readonly start?: boolean;
@@ -11,17 +11,27 @@ export interface UseTypewriterSequenceOptions {
   readonly pauseAfterLineMs?: number;
 }
 
-/** Types each line sequentially; line N+1 starts after line N completes. */
-export function useTypewriterSequence(
+/**
+ * Types each line sequentially; line N+1 starts after line N completes.
+ *
+ * @param lines - Input value.
+ * @param options - Input value.
+ * @returns The hook result.
+ * @example
+ * const value = useTypewriterSequence(lines, options);
+ */
+
+export const useTypewriterSequence = (
   lines: readonly string[],
   options: UseTypewriterSequenceOptions = {},
-) {
+) => {
   const { start = false, msPerChar = 48, pauseAfterLineMs = 0 } = options;
   const reduced = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const [splashingIndex, setSplashingIndex] = useState<number | null>(null);
 
-  const activeLine = lines[activeIndex] ?? '';
+  const activeLineCandidate = lines[activeIndex];
+  const activeLine = activeLineCandidate === undefined ? '' : activeLineCandidate;
   const typingActive = start && !reduced && activeIndex < lines.length;
   const { displayText, isComplete } = useTypewriter(activeLine, {
     start: typingActive,
@@ -75,4 +85,4 @@ export function useTypewriterSequence(
   const sequenceComplete = start && (reduced || (activeIndex === lines.length - 1 && isComplete));
 
   return { displayLines, activeIndex, isComplete: sequenceComplete, splashingIndex };
-}
+};

@@ -10,11 +10,18 @@ export interface LabelProps {
 }
 
 /**
- * Form field label — a themed `Text` matching the web label's size/weight. Pair it
+ * Form field label.
+ *
+ * @param props - Label text and optional text style.
+ * @returns A themed label text node.
+ * @example
+ * <Label>Email</Label>
+ *
+ * A themed `Text` matching the web label's size/weight. Pair it
  * with {@link Input} inside {@link FormField}; RN has no `htmlFor`, so the label is
  * purely visual and the input carries its own `accessibilityLabel`.
  */
-export function Label({ children, style }: LabelProps) {
+export const Label = ({ children = '', style }: LabelProps) => {
   const { colors, fontSizes, fontWeights } = useTheme();
   return (
     <Text
@@ -26,4 +33,4 @@ export function Label({ children, style }: LabelProps) {
       {children}
     </Text>
   );
-}
+};

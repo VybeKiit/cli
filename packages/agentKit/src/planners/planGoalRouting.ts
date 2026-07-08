@@ -1,36 +1,36 @@
-import { GOAL_ENTRIES, type GoalCatalogEntry, type TemplateId } from '../catalogs/goalCatalog';
+import {
+  GOAL_ENTRIES,
+  type GoalCatalogEntry,
+  type TemplateId,
+} from '@vybekiit/agent-kit/catalogs/goalCatalog';
 
-export interface GoalRoutingPlan {
+export type GoalRoutingPlan = {
   readonly goalId: string;
   readonly skill: string;
   readonly skillPath: string;
   readonly available: boolean;
   readonly reason?: string;
-}
+};
 
-export interface GoalDriftIssue {
+export type GoalDriftIssue = {
   readonly goalId: string;
   readonly template: TemplateId;
   readonly skill: string;
   readonly skillPath: string;
   readonly issue: 'missing_skill' | 'unlisted_skill';
-}
+};
 
-export interface GoalDriftReport {
+export type GoalDriftReport = {
   readonly template: TemplateId;
   readonly issues: readonly GoalDriftIssue[];
   readonly ok: boolean;
-}
+};
 
-function normalizePhrase(phrase: string): string {
-  return phrase.toLowerCase().trim();
-}
+const normalizePhrase = (phrase: string): string => phrase.toLowerCase().trim();
 
-function skillPathFor(template: TemplateId, skillStem: string): string {
-  return `.vybekiit/skills/${skillStem}.md`;
-}
+const skillPathFor = (skillStem: string): string => `.vybekiit/skills/${skillStem}.md`;
 
-function matchGoal(phrase: string): GoalCatalogEntry | null {
+const matchGoal = (phrase: string): GoalCatalogEntry | null => {
   const normalized = normalizePhrase(phrase);
   for (const entry of GOAL_ENTRIES) {
     if (entry.phrases.some((p) => normalized.includes(normalizePhrase(p)))) {
@@ -38,12 +38,18 @@ function matchGoal(phrase: string): GoalCatalogEntry | null {
     }
   }
   return null;
-}
+};
 
 /**
  * Route a builder phrase to the correct skill for a template.
+ *
+ * @param template - template input.
+ * @param goalPhrase - goal phrase input.
+ * @returns The plan goal routing result.
+ * @example
+ * const result = planGoalRouting(template, goalPhrase);
  */
-export function planGoalRouting(template: TemplateId, goalPhrase: string): GoalRoutingPlan {
+export const planGoalRouting = (template: TemplateId, goalPhrase: string): GoalRoutingPlan => {
   const entry = matchGoal(goalPhrase);
   if (!entry) {
     return {
@@ -69,36 +75,40 @@ export function planGoalRouting(template: TemplateId, goalPhrase: string): GoalR
   return {
     goalId: entry.id,
     skill,
-    skillPath: skillPathFor(template, skill),
+    skillPath: skillPathFor(skill),
     available: true,
   };
-}
+};
 
 /**
  * Check that every catalogued skill for a template exists in the provided skill file list.
  *
- * @param template - template id
- * @param existingSkillPaths - paths relative to project root (e.g. `.vybekiit/skills/onboarding.md`)
+ * @param template - template input.
+ * @param existingSkillPaths - existing skill paths input.
+ * @returns The check goal drift result.
+ * @example
+ * const result = checkGoalDrift(template, existingSkillPaths);
  */
-export function checkGoalDrift(
+export const checkGoalDrift = (
   template: TemplateId,
   existingSkillPaths: readonly string[],
-): GoalDriftReport {
+): GoalDriftReport => {
   const existing = new Set(existingSkillPaths.map((p) => p.replace(/\\/g, '/')));
   const issues: GoalDriftIssue[] = [];
 
   for (const entry of GOAL_ENTRIES) {
     const skill = entry.skills[template];
-    if (!skill) continue;
-    const path = skillPathFor(template, skill);
-    if (!existing.has(path)) {
-      issues.push({
-        goalId: entry.id,
-        template,
-        skill,
-        skillPath: path,
-        issue: 'missing_skill',
-      });
+    if (typeof skill === 'string') {
+      const path = skillPathFor(skill);
+      if (!existing.has(path)) {
+        issues.push({
+          goalId: entry.id,
+          template,
+          skill,
+          skillPath: path,
+          issue: 'missing_skill',
+        });
+      }
     }
   }
 
@@ -106,18 +116,19 @@ export function checkGoalDrift(
     GOAL_ENTRIES.map((e) => e.skills[template]).filter((s): s is string => s !== null),
   );
   for (const path of existing) {
-    if (!(path.startsWith('.vybekiit/skills/') && path.endsWith('.md'))) continue;
-    const stem = path.slice('.vybekiit/skills/'.length, -'.md'.length);
-    if (!catalogSkills.has(stem)) {
-      issues.push({
-        goalId: stem,
-        template,
-        skill: stem,
-        skillPath: path,
-        issue: 'unlisted_skill',
-      });
+    if (path.startsWith('.vybekiit/skills/') && path.endsWith('.md')) {
+      const stem = path.slice('.vybekiit/skills/'.length, -'.md'.length);
+      if (!catalogSkills.has(stem)) {
+        issues.push({
+          goalId: stem,
+          template,
+          skill: stem,
+          skillPath: path,
+          issue: 'unlisted_skill',
+        });
+      }
     }
   }
 
   return { template, issues, ok: issues.length === 0 };
-}
+};

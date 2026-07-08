@@ -1,3 +1,3 @@
-export type { TenancyProvider, TenancyProviderName, OrgMember } from './types';
-export { TenancyError } from './types';
-export { resolveTenancyProvider, type ResolveTenancyInjections } from './resolve';
+export * from './config';
+export * from './resolve';
+export * from './types';

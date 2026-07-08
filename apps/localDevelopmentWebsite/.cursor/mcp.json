@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "vybekiit": {
+      "command": "node",
+      "args": ["apps/localDevelopmentWebsite/src/mcp-server/index.mjs"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-playwright"]
+    },
+    "stripe": {
+      "command": "npx",
+      "args": ["-y", "@stripe/mcp", "--tools=all"]
+    },
+    "paypal": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-paypal"]
+    }
+  }
+}

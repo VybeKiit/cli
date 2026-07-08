@@ -1,0 +1,162 @@
+{
+  "$schema": "https://vybekiit.com/schemas/mcp-servers.json",
+  "description": "MCP servers for VybeKiit local Console UI. Works with Kiro, Claude Code, Cursor, and Codex.",
+  "servers": [
+    {
+      "name": "vybekiit",
+      "description": "VybeKiit dev console — UI components, session mgmt, workflow updates",
+      "category": "core",
+      "priority": 1,
+      "command": "node apps/localDevelopmentWebsite/src/mcp-server/index.mjs",
+      "env": [],
+      "notes": "The VybeKiit MCP server. Lets agents render UI, manage sessions, update workflows."
+    },
+    {
+      "name": "context7",
+      "description": "Version-specific library docs — kills hallucinated APIs",
+      "category": "core",
+      "priority": 1,
+      "command": "npx -y @upstash/context7-mcp@latest",
+      "env": [],
+      "notes": "Most impactful single MCP. Prevents agents from writing code against outdated APIs."
+    },
+    {
+      "name": "github",
+      "description": "PR review, issue triage, repo search, code context",
+      "category": "core",
+      "priority": 1,
+      "command": "npx -y @modelcontextprotocol/server-github",
+      "env": ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+      "notes": "Start in read-only mode. Scope toolsets to avoid tool bloat."
+    },
+    {
+      "name": "playwright",
+      "description": "Browser automation, E2E verification, accessibility tree",
+      "category": "frontend",
+      "priority": 2,
+      "command": "npx -y @anthropic-ai/mcp-playwright",
+      "env": [],
+      "notes": "Uses accessibility tree (200-400 tokens) instead of screenshots."
+    },
+    {
+      "name": "supabase",
+      "description": "Database schema, auth, storage, migrations, Edge Functions",
+      "category": "backend",
+      "priority": 2,
+      "command": "npx -y supabase-mcp-server",
+      "env": ["SUPABASE_ACCESS_TOKEN"],
+      "notes": "Full Supabase management. Queries, migrations, infrastructure."
+    },
+    {
+      "name": "stripe",
+      "description": "Payments, subscriptions, customer management, webhooks",
+      "category": "payments",
+      "priority": 2,
+      "command": "npx -y @stripe/mcp --tools=all",
+      "env": ["STRIPE_SECRET_KEY"],
+      "notes": "Use test mode keys during development. Never expose live keys."
+    },
+    {
+      "name": "paypal",
+      "description": "PayPal payments, orders, subscriptions, disputes",
+      "category": "payments",
+      "priority": 3,
+      "command": "npx -y @anthropic-ai/mcp-paypal",
+      "env": ["PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET"],
+      "notes": "PayPal commerce API. Use sandbox credentials for development."
+    },
+    {
+      "name": "figma",
+      "description": "Read designs, generate code from frames, Code Connect",
+      "category": "design",
+      "priority": 3,
+      "command": "npx -y @anthropic-ai/mcp-figma",
+      "env": ["FIGMA_ACCESS_TOKEN"],
+      "notes": "Structured design data — components, variables, layout."
+    },
+    {
+      "name": "vercel",
+      "description": "Deploy, manage projects, environment variables, domains",
+      "category": "deploy",
+      "priority": 2,
+      "command": "npx -y @vercel/mcp",
+      "env": ["VERCEL_TOKEN"],
+      "notes": "Full Vercel project management."
+    },
+    {
+      "name": "cloudflare",
+      "description": "Workers, KV, R2, D1, AI, Vectorize — full platform",
+      "category": "deploy",
+      "priority": 3,
+      "command": "npx -y @anthropic-ai/mcp-cloudflare",
+      "env": ["CLOUDFLARE_API_TOKEN"],
+      "notes": "Full Cloudflare platform management."
+    },
+    {
+      "name": "sentry",
+      "description": "Production error triage, stack traces, Seer root-cause",
+      "category": "ops",
+      "priority": 3,
+      "command": "remote:https://mcp.sentry.dev/sse",
+      "env": [],
+      "notes": "OAuth-based remote MCP."
+    },
+    {
+      "name": "resend",
+      "description": "Transactional email — send, templates, domains",
+      "category": "comms",
+      "priority": 4,
+      "command": "npx -y resend-mcp",
+      "env": ["RESEND_API_KEY"],
+      "notes": "Simple email sending for auth flows, notifications."
+    },
+    {
+      "name": "upstash",
+      "description": "Redis, QStash (queues), Vector DB — serverless data",
+      "category": "backend",
+      "priority": 3,
+      "command": "npx -y @upstash/mcp-server",
+      "env": ["UPSTASH_EMAIL", "UPSTASH_API_KEY"],
+      "notes": "Serverless Redis + message queues + vector search."
+    },
+    {
+      "name": "higgsfield",
+      "description": "AI image/video generation — Kling 3, Veo 3, Sora 2",
+      "category": "media",
+      "priority": 5,
+      "command": "npx -y @anthropic-ai/mcp-higgsfield",
+      "env": ["HIGGSFIELD_API_KEY"],
+      "notes": "30+ models through single endpoint. Paid creative assets."
+    },
+    {
+      "name": "exa",
+      "description": "AI-native web search — semantic, content, neural",
+      "category": "research",
+      "priority": 4,
+      "command": "npx -y exa-mcp-server",
+      "env": ["EXA_API_KEY"],
+      "notes": "Better than web search for code examples and docs."
+    },
+    {
+      "name": "firecrawl",
+      "description": "Web scraping, crawling, structured data extraction",
+      "category": "research",
+      "priority": 5,
+      "command": "npx -y firecrawl-mcp",
+      "env": ["FIRECRAWL_API_KEY"],
+      "notes": "Scrape competitor sites, extract data, crawl docs."
+    }
+  ],
+  "categories": {
+    "core": "Essential for every project — vybekiit, context7, github",
+    "frontend": "UI development and testing",
+    "backend": "Database, APIs, infrastructure",
+    "design": "Design-to-code workflows",
+    "ops": "Production monitoring and debugging",
+    "deploy": "Deployment and hosting — Vercel, Cloudflare",
+    "payments": "Payment processing — Stripe, PayPal",
+    "comms": "Email, notifications, messaging",
+    "media": "Image/video generation",
+    "research": "Search and data extraction"
+  }
+}

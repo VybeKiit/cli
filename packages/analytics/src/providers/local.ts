@@ -1,15 +1,23 @@
-import type { AnalyticsProvider, ScriptConfig, TrackEvent } from '../types';
+import type { AnalyticsProvider, TrackEventType } from '@vybekiit/analytics/types';
+import { Effect } from 'effect';
 
-export function createLocalAnalytics(): AnalyticsProvider {
-  const events: TrackEvent[] = [];
+/**
+ * Build the local analytics adapter for offline scaffolds and tests.
+ *
+ * @returns An AnalyticsProvider whose methods complete without external network calls.
+ * @example
+ * const provider = createLocalAnalytics();
+ */
+export const createLocalAnalytics = (): AnalyticsProvider => {
+  const events: TrackEventType[] = [];
+
   return {
     name: 'local',
-    track(event: TrackEvent): void {
-      events.push(event);
-    },
-    identify(): void {},
-    getScriptConfig(): ScriptConfig | null {
-      return null;
-    },
+    track: (event) =>
+      Effect.sync(() => {
+        events.push(event);
+      }),
+    identify: () => Effect.void,
+    getScriptConfig: () => Effect.succeed(null),
   };
-}
+};

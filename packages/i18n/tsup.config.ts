@@ -1,12 +1,12 @@
 import { defineConfig } from 'tsup';
+import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
-/** Dual entry: full provider (Node) + browser-safe locale rules. */
 export default defineConfig({
-  // camelCase src file, but keep the public dist name `locale-rules` (subpath export @vybekiit/i18n/locale-rules)
-  entry: { index: 'src/index.ts', 'locale-rules': 'src/localeRules.ts' },
+  entry: ['src/**/*.ts', '!src/**/__tests__/**', '!src/**/*.test.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
   sourcemap: true,
   treeshake: true,
+  esbuildPlugins: [createWorkspaceAliasPlugin()],
 });

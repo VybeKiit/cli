@@ -1,7 +1,8 @@
+// biome-ignore-all lint/style/noExcessiveClassesPerFile: Effect service tags are intentionally colocated with resolver layers.
 import {
-  type EnvSource,
   awsConfigSchema,
   dataConfigSchema,
+  type EnvSource,
   firebaseConfigSchema,
   isBackendUnconfigured,
   mongoConfigSchema,
@@ -36,10 +37,16 @@ import type { DataProvider, StorageProvider } from './types';
  * explicit `DATA_PROVIDER` (including `supabase`) or any backend key resolves exactly
  * as before — the fallback only fills the truly-empty case.
  *
+ * @param env - Raw environment source to decode.
+ * @returns The configured data provider.
  * @throws if a configured adapter's required keys are missing (via {@link parseEnv}).
+ * @example
+ * const provider = resolveDataProvider(process.env);
  */
-export function resolveDataProvider(env: EnvSource = process.env): DataProvider {
-  if (isBackendUnconfigured(env)) return createLocalDataProvider();
+export const resolveDataProvider = (env: EnvSource = process.env): DataProvider => {
+  if (isBackendUnconfigured(env)) {
+    return createLocalDataProvider();
+  }
 
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
   return resolveEnvProvider(
@@ -56,16 +63,20 @@ export function resolveDataProvider(env: EnvSource = process.env): DataProvider 
     env,
     'supabase',
   );
-}
+};
 
 /**
  * Construct the configured storage provider from the environment. Reads
  * `STORAGE_PROVIDER` (defaults to `supabase`); `s3` reuses the same AWS region +
  * credentials as the DynamoDB data adapter.
  *
+ * @param env - Raw environment source to decode.
+ * @returns The configured storage provider.
  * @throws if the chosen adapter's required keys are missing (via {@link parseEnv}).
+ * @example
+ * const provider = resolveStorageProvider(process.env);
  */
-export function resolveStorageProvider(env: EnvSource = process.env): StorageProvider {
+export const resolveStorageProvider = (env: EnvSource = process.env): StorageProvider => {
   const { STORAGE_PROVIDER } = parseEnv(storageConfigSchema, env);
   return resolveEnvProvider(
     STORAGE_PROVIDER,
@@ -77,26 +88,38 @@ export function resolveStorageProvider(env: EnvSource = process.env): StoragePro
     env,
     'supabase',
   );
-}
+};
 
 /** The data provider as an injectable service — composition roots `Effect.provide` it (ADR-0023 DI). */
 export class Data extends Context.Tag('@vybekiit/db/Data')<Data, DataProvider>() {}
 
-/** `Live` layer building {@link Data} from the environment; config fails loud at the composition root. */
-export function makeDataLive(env: EnvSource = process.env): Layer.Layer<Data> {
-  return Layer.effect(
+/**
+ * Build the live Data service layer from an environment source.
+ *
+ * @param env - Raw environment source to decode.
+ * @returns A Layer that provides {@link Data}.
+ * @example
+ * const layer = makeDataLive(process.env);
+ */
+export const makeDataLive = (env: EnvSource = process.env): Layer.Layer<Data> =>
+  Layer.effect(
     Data,
     Effect.sync(() => resolveDataProvider(env)),
   );
-}
 
 /** The storage provider as an injectable service (ADR-0023 DI). */
 export class Storage extends Context.Tag('@vybekiit/db/Storage')<Storage, StorageProvider>() {}
 
-/** `Live` layer building {@link Storage} from the environment; config fails loud at the composition root. */
-export function makeStorageLive(env: EnvSource = process.env): Layer.Layer<Storage> {
-  return Layer.effect(
+/**
+ * Build the live Storage service layer from an environment source.
+ *
+ * @param env - Raw environment source to decode.
+ * @returns A Layer that provides {@link Storage}.
+ * @example
+ * const layer = makeStorageLive(process.env);
+ */
+export const makeStorageLive = (env: EnvSource = process.env): Layer.Layer<Storage> =>
+  Layer.effect(
     Storage,
     Effect.sync(() => resolveStorageProvider(env)),
   );
-}

@@ -1,0 +1,2295 @@
+/* Builder assistant marks — Cursor, Claude Code octopus, Codex cloud (shared UI lib). */
+
+.builder-assistant-mark__codex-svg,
+.builder-assistant-mark--codex .codex-mark,
+.codex-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  shape-rendering: geometricPrecision;
+}
+
+.builder-assistant-mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.builder-assistant-mark--size-xs {
+  width: 12px;
+  height: 12px;
+}
+
+.builder-assistant-mark--size-s {
+  width: 18px;
+  height: 18px;
+}
+
+.builder-assistant-mark--size-m {
+  width: 24px;
+  height: 24px;
+}
+
+.builder-assistant-mark--size-l {
+  width: 32px;
+  height: 32px;
+}
+
+.builder-assistant-mark--size-xl {
+  width: 48px;
+  height: 48px;
+}
+
+.builder-assistant-mark--size-xxl {
+  width: 72px;
+  height: 72px;
+}
+
+.builder-assistant-mark--claude {
+  overflow: visible;
+}
+
+.builder-assistant-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.builder-assistant-mark--cursor {
+  color: rgb(244 244 245);
+}
+
+.builder-assistant-mark--codex {
+  color: transparent;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-xs {
+  width: 14px;
+  height: 14px;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-s {
+  width: 20px;
+  height: 20px;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-m {
+  width: 26px;
+  height: 26px;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-l {
+  width: 34px;
+  height: 34px;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-xl {
+  width: 50px;
+  height: 50px;
+}
+
+.builder-assistant-mark--codex.builder-assistant-mark--size-xxl {
+  width: 76px;
+  height: 76px;
+}
+
+.builder-assistant-mark--active.builder-assistant-mark--cursor {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+
+.builder-assistant-mark--active.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 8px rgba(217, 119, 87, 0.55));
+}
+
+.builder-assistant-mark--working.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 10px rgba(217, 119, 87, 0.72));
+}
+
+.builder-assistant-mark--sad.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 10px rgba(255, 107, 99, 0.45));
+}
+
+.builder-assistant-mark--celebrate.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.65));
+}
+
+.builder-assistant-mark--love.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 11px rgba(225, 29, 72, 0.5));
+}
+
+.builder-assistant-mark--vibe.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.55));
+}
+
+.builder-assistant-mark--panic.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.65));
+}
+
+.builder-assistant-mark--deploy.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.55));
+}
+
+.builder-assistant-mark--sleep.builder-assistant-mark--claude {
+  filter: drop-shadow(0 0 6px rgba(148, 163, 184, 0.35));
+  opacity: 0.92;
+}
+
+.builder-assistant-mark--active.builder-assistant-mark--codex {
+  filter: none;
+}
+
+/* Claude Code octopus — hop, blink, wink, and work while prompts type */
+/* Official Clawd renders on a hard pixel grid — no anti-aliasing on edges. */
+.claude-octopus {
+  shape-rendering: crispEdges;
+}
+
+.claude-octopus__stage {
+  transform-origin: 50% 88%;
+  transform-box: fill-box;
+}
+
+.claude-octopus--alive .claude-octopus__stage {
+  animation: claude-octopus-hop 2.8s cubic-bezier(0.34, 1.2, 0.64, 1) infinite;
+}
+
+.claude-octopus--working .claude-octopus__stage {
+  animation: claude-octopus-work 0.42s ease-in-out infinite;
+}
+
+.claude-octopus--dancing .claude-octopus__stage {
+  animation: claude-octopus-dance 0.85s ease-in-out infinite;
+}
+
+.claude-octopus--singing .claude-octopus__stage {
+  animation: claude-octopus-sing-bob 1.1s ease-in-out infinite;
+}
+
+/* Let confetti erupt above the head without the viewBox clipping it. */
+.claude-octopus--celebrating {
+  overflow: visible;
+}
+
+.claude-octopus--celebrating .claude-octopus__stage {
+  animation: claude-octopus-celebrate 0.95s ease-in-out infinite;
+}
+
+.claude-octopus--thinking .claude-octopus__stage {
+  animation: claude-octopus-think 2.4s ease-in-out infinite;
+}
+
+.claude-octopus--coffee .claude-octopus__stage {
+  animation: claude-octopus-coffee-sway 2.2s ease-in-out infinite;
+}
+
+.claude-octopus--debugging .claude-octopus__stage {
+  animation: claude-octopus-debug-scan 1.6s ease-in-out infinite;
+}
+
+.claude-octopus--vibing .claude-octopus__stage {
+  animation: claude-octopus-vibe 2.6s ease-in-out infinite;
+}
+
+.claude-octopus--panicking .claude-octopus__stage {
+  animation: claude-octopus-panic 0.18s linear infinite;
+}
+
+.claude-octopus--loving .claude-octopus__stage {
+  animation: claude-octopus-love-pulse 1.4s ease-in-out infinite;
+}
+
+.claude-octopus--deploying .claude-octopus__stage {
+  animation: claude-octopus-deploy 1.8s ease-in-out infinite;
+}
+
+.claude-octopus--eureka .claude-octopus__stage {
+  animation: claude-octopus-eureka-pop 1.6s cubic-bezier(0.34, 1.35, 0.64, 1) infinite;
+}
+
+.claude-octopus--sleeping .claude-octopus__stage {
+  animation: claude-octopus-sleep-breathe 3.6s ease-in-out infinite;
+}
+
+.claude-octopus--tired .claude-octopus__stage {
+  animation: claude-octopus-tired-sway 4s ease-in-out infinite;
+}
+
+.claude-octopus--prompting .claude-octopus__stage {
+  animation: claude-octopus-prompt-nod 2s ease-in-out infinite;
+}
+
+.claude-octopus__eyelid {
+  --eyelid-rest: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(var(--eyelid-rest));
+  animation: claude-octopus-blink 4s ease-in-out infinite;
+}
+
+.claude-octopus__eyelid--closed {
+  --eyelid-rest: 1;
+  animation: none;
+}
+
+.claude-octopus__eyelid--squint {
+  --eyelid-rest: 0.32;
+}
+
+.claude-octopus__eyelid--droopy {
+  --eyelid-rest: 0.58;
+}
+
+/* Alive keeps playful asymmetric winks instead of the shared blink cadence. */
+.claude-octopus--alive .claude-octopus__eyelid--right {
+  animation: claude-octopus-wink-right 2.8s ease-in-out infinite;
+}
+
+.claude-octopus--alive .claude-octopus__eyelid--left {
+  animation: claude-octopus-wink-left 4.6s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-blink {
+  0%,
+  88%,
+  100% {
+    transform: scaleY(var(--eyelid-rest, 0));
+  }
+  92% {
+    transform: scaleY(1.05);
+  }
+  96% {
+    transform: scaleY(var(--eyelid-rest, 0));
+  }
+}
+
+@keyframes claude-octopus-hop {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  8% {
+    transform: translateY(-2.5px) rotate(-5deg) scale(1.05, 0.94);
+  }
+  14% {
+    transform: translateY(0.5px) rotate(3deg) scale(0.98, 1.02);
+  }
+  20% {
+    transform: translateY(-3.5px) rotate(0deg) scale(1.08, 0.92);
+  }
+  26% {
+    transform: translateY(1px) rotate(-2deg) scale(0.95, 1.04);
+  }
+  32% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  46% {
+    transform: translateY(-1.5px) rotate(4deg) scale(1.03);
+  }
+  52% {
+    transform: translateY(0) rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes claude-octopus-work {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translate(0.6px, -1.2px) rotate(-4deg) scale(1.04, 0.96);
+  }
+  40% {
+    transform: translate(-0.5px, 0.2px) rotate(4deg) scale(0.97, 1.03);
+  }
+  60% {
+    transform: translate(0.5px, -0.8px) rotate(-3deg) scale(1.03);
+  }
+  80% {
+    transform: translate(-0.4px, 0.4px) rotate(2deg) scale(0.98, 1.02);
+  }
+}
+
+@keyframes claude-octopus-wink-right {
+  0%,
+  84%,
+  100% {
+    transform: scaleY(0);
+  }
+  88% {
+    transform: scaleY(1.05);
+  }
+  92% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes claude-octopus-wink-left {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(0);
+  }
+  93% {
+    transform: scaleY(1.05);
+  }
+  96% {
+    transform: scaleY(0);
+  }
+}
+
+/* Sad Claude — droopy lids, frown, and gentle slump */
+.claude-octopus--sad .claude-octopus__stage {
+  animation:
+    claude-octopus-sad-appear 0.55s cubic-bezier(0.34, 1.25, 0.64, 1) both,
+    claude-octopus-sad-droop 3.2s ease-in-out 0.55s infinite;
+}
+
+.claude-octopus__sad-face {
+  opacity: 0;
+  animation: claude-octopus-sad-face-in 0.35s ease-out 0.28s both;
+}
+
+.claude-octopus__tear {
+  opacity: 0;
+  transform-origin: center top;
+  animation: claude-octopus-tear-drop 2.4s ease-in 0.7s infinite;
+}
+
+.claude-octopus__tear--right {
+  animation-delay: 1.1s;
+}
+
+@keyframes claude-octopus-sad-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.45) rotate(-12deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateX(2px) scale(1.08) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes claude-octopus-sad-droop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1, 1);
+  }
+  50% {
+    transform: translateY(1.5px) rotate(-2deg) scale(1, 0.96);
+  }
+}
+
+@keyframes claude-octopus-sad-face-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes claude-octopus-tear-drop {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(0) scaleY(0.4);
+  }
+  28% {
+    opacity: 0.85;
+    transform: translateY(0) scaleY(1);
+  }
+  72% {
+    opacity: 0.7;
+    transform: translateY(3px) scaleY(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px) scaleY(0.6);
+  }
+}
+
+@keyframes claude-octopus-dance {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-2px) rotate(-8deg) scale(1.02, 0.98);
+  }
+  50% {
+    transform: translateX(2px) rotate(8deg) scale(0.98, 1.02);
+  }
+  75% {
+    transform: translateX(-1px) rotate(-4deg);
+  }
+}
+
+@keyframes claude-octopus-sing-bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.03, 0.97);
+  }
+}
+
+.claude-octopus__note--a {
+  animation: claude-octopus-note-float 1.8s ease-in-out infinite;
+}
+
+.claude-octopus__note--b {
+  animation: claude-octopus-note-float 1.8s ease-in-out 0.35s infinite;
+}
+
+@keyframes claude-octopus-note-float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+@keyframes claude-octopus-celebrate {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  16% {
+    transform: translateY(0.5px) scale(1.07, 0.9);
+  }
+  42% {
+    transform: translateY(-4px) scale(0.93, 1.11);
+  }
+  60% {
+    transform: translateY(-3px) scale(1, 1);
+  }
+  82% {
+    transform: translateY(0.5px) scale(1.09, 0.88);
+  }
+}
+
+/* Confetti bits rain + spin around their own center, staggered by variant. */
+.claude-octopus__confetti-bit {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.claude-octopus__confetti-bit--a {
+  animation: claude-octopus-confetti-a 1.5s linear infinite;
+}
+
+.claude-octopus__confetti-bit--b {
+  animation: claude-octopus-confetti-b 1.7s linear 0.15s infinite;
+}
+
+.claude-octopus__confetti-bit--c {
+  animation: claude-octopus-confetti-c 1.3s linear 0.35s infinite;
+}
+
+.claude-octopus__confetti-bit--d {
+  animation: claude-octopus-confetti-d 1.9s linear 0.5s infinite;
+}
+
+@keyframes claude-octopus-confetti-a {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-5px, 20px) rotate(200deg);
+    opacity: 0;
+  }
+}
+
+@keyframes claude-octopus-confetti-b {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(5px, 21px) rotate(-200deg);
+    opacity: 0;
+  }
+}
+
+@keyframes claude-octopus-confetti-c {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-2px, 22px) rotate(260deg);
+    opacity: 0;
+  }
+}
+
+@keyframes claude-octopus-confetti-d {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(2px, 19px) rotate(-240deg);
+    opacity: 0;
+  }
+}
+
+@keyframes claude-octopus-think {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-4deg) translateY(-1px);
+  }
+}
+
+.claude-octopus__thought--1 {
+  animation: claude-octopus-thought-pulse 2s ease-in-out infinite;
+}
+
+.claude-octopus__thought--2 {
+  animation: claude-octopus-thought-pulse 2s ease-in-out 0.25s infinite;
+}
+
+.claude-octopus__thought--3 {
+  animation: claude-octopus-thought-pulse 2s ease-in-out 0.5s infinite;
+}
+
+@keyframes claude-octopus-thought-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes claude-octopus-coffee-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.claude-octopus__steam--1 {
+  animation: claude-octopus-steam 1.6s ease-in-out infinite;
+}
+
+.claude-octopus__steam--2 {
+  animation: claude-octopus-steam 1.6s ease-in-out 0.4s infinite;
+}
+
+@keyframes claude-octopus-steam {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes claude-octopus-debug-scan {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.8px);
+  }
+}
+
+.claude-octopus__debug {
+  animation: claude-octopus-debug-loupe 1.6s ease-in-out infinite;
+  transform-origin: 19.8px 7.2px;
+  transform-box: fill-box;
+}
+
+@keyframes claude-octopus-debug-loupe {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes claude-octopus-vibe {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  33% {
+    transform: rotate(-3deg) translateY(-1px);
+  }
+  66% {
+    transform: rotate(3deg) translateY(0);
+  }
+}
+
+@keyframes claude-octopus-panic {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-1.2px, 0.4px) rotate(-3deg);
+  }
+  75% {
+    transform: translate(1.2px, -0.4px) rotate(3deg);
+  }
+}
+
+.claude-octopus__sweat {
+  animation: claude-octopus-sweat-drip 0.9s ease-in infinite;
+}
+
+@keyframes claude-octopus-sweat-drip {
+  0%,
+  60% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+@keyframes claude-octopus-love-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.claude-octopus__heart--1 {
+  animation: claude-octopus-heart-float 1.6s ease-in-out infinite;
+}
+
+.claude-octopus__heart--2 {
+  animation: claude-octopus-heart-float 1.6s ease-in-out 0.3s infinite;
+}
+
+.claude-octopus__heart--3 {
+  animation: claude-octopus-heart-float 1.6s ease-in-out 0.55s infinite;
+}
+
+@keyframes claude-octopus-heart-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-2px) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes claude-octopus-deploy {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-3px);
+  }
+}
+
+.claude-octopus__rocket {
+  animation: claude-octopus-rocket-rise 1.8s ease-in-out infinite;
+  transform-box: fill-box;
+}
+
+.claude-octopus__rocket-flame {
+  animation: claude-octopus-flame-flicker 0.35s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-rocket-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+@keyframes claude-octopus-flame-flicker {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.15);
+  }
+}
+
+@keyframes claude-octopus-eureka-pop {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  20% {
+    transform: scale(1.1, 0.92) rotate(-2deg);
+  }
+  40% {
+    transform: scale(0.98, 1.04) rotate(2deg);
+  }
+}
+
+.claude-octopus__bulb-glass {
+  animation: claude-octopus-bulb-glow 1.6s ease-in-out infinite;
+}
+
+.claude-octopus__bulb-ray--1,
+.claude-octopus__bulb-ray--2,
+.claude-octopus__bulb-ray--3 {
+  animation: claude-octopus-bulb-ray 1.6s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-bulb-glow {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes claude-octopus-bulb-ray {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes claude-octopus-sleep-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.02, 0.98);
+  }
+}
+
+.claude-octopus__z--1 {
+  animation: claude-octopus-z-float 2.4s ease-in-out infinite;
+}
+
+.claude-octopus__z--2 {
+  animation: claude-octopus-z-float 2.4s ease-in-out 0.35s infinite;
+}
+
+.claude-octopus__z--3 {
+  animation: claude-octopus-z-float 2.4s ease-in-out 0.7s infinite;
+}
+
+@keyframes claude-octopus-z-float {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes claude-octopus-tired-sway {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(1px);
+  }
+}
+
+@keyframes claude-octopus-prompt-nod {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+.claude-octopus__caret {
+  animation: claude-octopus-caret-blink 1s step-end infinite;
+}
+
+@keyframes claude-octopus-caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* —— Extended vibe-coder poses —— */
+.claude-octopus--merging .claude-octopus__stage {
+  animation: claude-octopus-merge-tug 1.2s ease-in-out infinite;
+}
+
+.claude-octopus__branch--left {
+  animation: claude-octopus-branch-left 1.2s ease-in-out infinite;
+}
+
+.claude-octopus__branch--right {
+  animation: claude-octopus-branch-right 1.2s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-merge-tug {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes claude-octopus-branch-left {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+@keyframes claude-octopus-branch-right {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-1.5px);
+  }
+}
+
+.claude-octopus--reviewing .claude-octopus__stage {
+  animation: claude-octopus-review-nod 2.2s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-review-nod {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-0.5px);
+  }
+}
+
+/* Solid black square eyes. Each `__eye` group wraps the black ink rect + its
+ * blink lid; the ink rect is padded larger than the path's eye cutout, so
+ * shifting the group to gaze never exposes the cream hole beneath. */
+.claude-octopus__eye {
+  transform: translate(0, 0);
+}
+
+/* Cocky glance up-and-right toward the just-dropped mic. */
+.claude-octopus--micdrop .claude-octopus__eye {
+  transform: translate(0.38px, -0.32px);
+}
+
+/* Look down at the phone screen. */
+.claude-octopus--scrolling .claude-octopus__eye {
+  transform: translateY(0.4px);
+}
+
+/* Eyes scan the diff left↔right while reviewing. */
+.claude-octopus--reviewing .claude-octopus__eye {
+  animation: claude-octopus-eye-scan 2.1s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-eye-scan {
+  0%,
+  100% {
+    transform: translateX(-0.38px);
+  }
+  50% {
+    transform: translateX(0.38px);
+  }
+}
+
+.claude-octopus--waiting .claude-octopus__stage {
+  animation: claude-octopus-wait-tap 0.8s ease-in-out infinite;
+}
+
+.claude-octopus__clock-hand {
+  transform-origin: 19.5px 5.5px;
+  animation: claude-octopus-clock-spin 2s linear infinite;
+}
+
+@keyframes claude-octopus-wait-tap {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes claude-octopus-clock-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.claude-octopus--broke .claude-octopus__stage {
+  animation: claude-octopus-broke-shiver 0.35s ease-in-out infinite;
+}
+
+.claude-octopus__crack {
+  animation: claude-octopus-crack-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-broke-shiver {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.6px);
+  }
+}
+
+@keyframes claude-octopus-crack-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.claude-octopus--rich .claude-octopus__stage {
+  animation: claude-octopus-rich-bounce 1.1s ease-in-out infinite;
+}
+
+.claude-octopus__dollar--1,
+.claude-octopus__dollar--2,
+.claude-octopus__dollar--3 {
+  animation: claude-octopus-dollar-rise 1.8s ease-in-out infinite;
+}
+
+.claude-octopus__dollar--2 {
+  animation-delay: 0.25s;
+}
+
+.claude-octopus__dollar--3 {
+  animation-delay: 0.5s;
+}
+
+@keyframes claude-octopus-rich-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes claude-octopus-dollar-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+.claude-octopus--summoning .claude-octopus__stage {
+  animation: claude-octopus-summon-rise 2s ease-in-out infinite;
+}
+
+.claude-octopus__spark--1,
+.claude-octopus__spark--2,
+.claude-octopus__spark--3 {
+  animation: claude-octopus-spark-pulse 1.2s ease-in-out infinite;
+}
+
+.claude-octopus__summon-ring {
+  animation: claude-octopus-ring-spin 2.4s linear infinite;
+  transform-origin: 12px 3.8px;
+}
+
+@keyframes claude-octopus-summon-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes claude-octopus-spark-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes claude-octopus-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.claude-octopus--hotfix .claude-octopus__stage {
+  animation: claude-octopus-hotfix-shake 0.28s ease-in-out infinite;
+}
+
+.claude-octopus__flame--1,
+.claude-octopus__flame--2 {
+  animation: claude-octopus-flame-flicker 0.4s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-hotfix-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-1px);
+  }
+}
+
+.claude-octopus--facepalm .claude-octopus__stage {
+  animation: claude-octopus-facepalm-drop 2.4s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-facepalm-drop {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(1px) rotate(-2deg);
+  }
+}
+
+.claude-octopus--micdrop .claude-octopus__stage {
+  animation: claude-octopus-micdrop-pop 1.9s cubic-bezier(0.34, 1.3, 0.64, 1) infinite;
+}
+
+.claude-octopus__mic {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-mic-fall 1.9s cubic-bezier(0.5, 0, 0.85, 0.4) infinite;
+}
+
+/* Cocky lean-back the instant the mic leaves the hand. */
+@keyframes claude-octopus-micdrop-pop {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  16% {
+    transform: rotate(-5deg) scale(1.06, 0.95);
+  }
+  45% {
+    transform: rotate(-3deg) scale(1);
+  }
+}
+
+/* Held high (0–16%), released, then falls past the body and out of frame. */
+@keyframes claude-octopus-mic-fall {
+  0%,
+  16% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  22% {
+    transform: translateY(0) rotate(-8deg);
+    opacity: 1;
+  }
+  72% {
+    transform: translateY(12px) rotate(40deg);
+    opacity: 1;
+  }
+  86%,
+  100% {
+    transform: translateY(13.5px) rotate(52deg);
+    opacity: 0;
+  }
+}
+
+.claude-octopus--manifesting .claude-octopus__stage {
+  animation: claude-octopus-manifest-float 3.2s ease-in-out infinite;
+}
+
+.claude-octopus__star--1,
+.claude-octopus__star--2,
+.claude-octopus__star--3 {
+  animation: claude-octopus-star-rise 2.4s ease-in-out infinite;
+}
+
+.claude-octopus__star--2 {
+  animation-delay: 0.35s;
+}
+
+.claude-octopus__star--3 {
+  animation-delay: 0.7s;
+}
+
+@keyframes claude-octopus-manifest-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+@keyframes claude-octopus-star-rise {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+.claude-octopus--unhinged .claude-octopus__stage {
+  animation: claude-octopus-unhinged-spin 0.55s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-unhinged-spin {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-10deg) scale(1.05, 0.95);
+  }
+  75% {
+    transform: rotate(10deg) scale(0.95, 1.05);
+  }
+}
+
+.claude-octopus--snacking .claude-octopus__stage {
+  animation: claude-octopus-snack-chew 0.9s ease-in-out infinite;
+}
+
+.claude-octopus__chip-bag {
+  animation: claude-octopus-bag-rustle 0.9s ease-in-out infinite;
+}
+
+.claude-octopus__crumb--1 {
+  animation: claude-octopus-crumb-fall 1.2s ease-in infinite;
+}
+
+@keyframes claude-octopus-snack-chew {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.02, 0.98);
+  }
+}
+
+@keyframes claude-octopus-bag-rustle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes claude-octopus-crumb-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+.claude-octopus--typing .claude-octopus__stage {
+  animation: claude-octopus-typing-bounce 0.35s ease-in-out infinite;
+}
+
+.claude-octopus__key--1,
+.claude-octopus__key--3 {
+  animation: claude-octopus-key-press 0.35s ease-in-out infinite;
+}
+
+.claude-octopus__key--2,
+.claude-octopus__key--4 {
+  animation: claude-octopus-key-press 0.35s ease-in-out 0.12s infinite;
+}
+
+@keyframes claude-octopus-typing-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes claude-octopus-key-press {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0.15px);
+  }
+}
+
+.claude-octopus--scrolling .claude-octopus__stage {
+  animation: claude-octopus-scroll-hunch 2.4s ease-in-out infinite;
+}
+
+.claude-octopus__phone-feed {
+  transform-box: fill-box;
+  animation: claude-octopus-feed-scroll 1.1s linear infinite;
+}
+
+/* Hunch over the phone. */
+@keyframes claude-octopus-scroll-hunch {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(0.4px);
+  }
+}
+
+/* Feed creeps upward like a thumb-flick refresh. */
+@keyframes claude-octopus-feed-scroll {
+  0% {
+    transform: translateY(0.5px);
+  }
+  100% {
+    transform: translateY(-0.7px);
+  }
+}
+
+.claude-octopus--rubberduck .claude-octopus__stage {
+  animation: claude-octopus-duck-talk 1.1s ease-in-out infinite;
+}
+
+.claude-octopus__duck-body {
+  animation: claude-octopus-duck-bob 1.1s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-duck-talk {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes claude-octopus-duck-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.6px);
+  }
+}
+
+.claude-octopus--gaming .claude-octopus__stage {
+  animation: claude-octopus-game-wobble 0.7s ease-in-out infinite;
+}
+
+.claude-octopus__pad-btn--a {
+  animation: claude-octopus-btn-pulse 0.7s ease-in-out infinite;
+}
+
+.claude-octopus__pad-btn--b {
+  animation: claude-octopus-btn-pulse 0.7s ease-in-out 0.2s infinite;
+}
+
+@keyframes claude-octopus-game-wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes claude-octopus-btn-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.claude-octopus--streaking .claude-octopus__stage {
+  animation: claude-octopus-run-lean 0.5s ease-in-out infinite;
+}
+
+.claude-octopus__streak-fire {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: claude-octopus-flame-flicker 0.45s ease-in-out infinite alternate;
+}
+
+.claude-octopus__streak-num {
+  animation: claude-octopus-streak-pop 0.9s ease-in-out infinite;
+}
+
+.claude-octopus__speed {
+  animation: claude-octopus-speed-flick 0.5s linear infinite;
+}
+
+/* Lean into the run and bob as the body drives forward. */
+@keyframes claude-octopus-run-lean {
+  0%,
+  100% {
+    transform: rotate(6deg) translateY(0);
+  }
+  50% {
+    transform: rotate(9deg) translateY(-0.6px);
+  }
+}
+
+@keyframes claude-octopus-speed-flick {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(0.6px);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateX(-0.6px);
+  }
+}
+
+@keyframes claude-octopus-flame-flicker {
+  from {
+    opacity: 0.75;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes claude-octopus-streak-pop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+.claude-octopus--hoarding .claude-octopus__stage {
+  animation: claude-octopus-hoard-shake 1.6s ease-in-out infinite;
+}
+
+.claude-octopus__tab--1 {
+  animation: claude-octopus-tab-shift 1.6s ease-in-out infinite;
+}
+
+.claude-octopus__tab--2 {
+  animation: claude-octopus-tab-shift 1.6s ease-in-out 0.15s infinite;
+}
+
+.claude-octopus__tab--3 {
+  animation: claude-octopus-tab-shift 1.6s ease-in-out 0.3s infinite;
+}
+
+@keyframes claude-octopus-hoard-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+@keyframes claude-octopus-tab-shift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.4px);
+  }
+}
+
+.claude-octopus--preaching .claude-octopus__stage {
+  animation: claude-octopus-preach-bounce 0.85s ease-in-out infinite;
+}
+
+.claude-octopus__sound--1,
+.claude-octopus__sound--2 {
+  animation: claude-octopus-sound-wave 0.85s ease-out infinite;
+}
+
+@keyframes claude-octopus-preach-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes claude-octopus-sound-wave {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+.claude-octopus--nesting .claude-octopus__stage {
+  animation: claude-octopus-nest-sway 2.4s ease-in-out infinite;
+}
+
+.claude-octopus__blanket {
+  animation: claude-octopus-blanket-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-nest-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+@keyframes claude-octopus-blanket-pulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.claude-octopus--ghosting .claude-octopus__stage {
+  animation: claude-octopus-ghost-fade 1.8s ease-in-out infinite;
+}
+
+.claude-octopus__ghost-aura {
+  animation: claude-octopus-ghost-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-ghost-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes claude-octopus-ghost-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.claude-octopus--flexing .claude-octopus__stage {
+  animation: claude-octopus-flex-pop 0.75s ease-in-out infinite;
+}
+
+.claude-octopus__bicep--left {
+  animation: claude-octopus-flex-left 0.75s ease-in-out infinite;
+}
+
+.claude-octopus__bicep--right {
+  animation: claude-octopus-flex-right 0.75s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-flex-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes claude-octopus-flex-left {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes claude-octopus-flex-right {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+.claude-octopus--meditating .claude-octopus__stage {
+  animation: claude-octopus-meditate-float 2.8s ease-in-out infinite;
+}
+
+.claude-octopus__halo {
+  animation: claude-octopus-halo-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-meditate-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes claude-octopus-halo-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.claude-octopus--rewinding .claude-octopus__stage {
+  animation: claude-octopus-rewind-spin 0.9s ease-in-out infinite;
+}
+
+.claude-octopus__rewind-arrow--1,
+.claude-octopus__rewind-arrow--2 {
+  animation: claude-octopus-rewind-blink 0.9s ease-in-out infinite;
+}
+
+.claude-octopus__undo {
+  animation: claude-octopus-undo-flash 0.9s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-rewind-spin {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes claude-octopus-rewind-blink {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes claude-octopus-undo-flash {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Extended poses — shared animation variants */
+.claude-octopus--anim-bounce .claude-octopus__stage {
+  animation: claude-octopus-anim-bounce 1s ease-in-out infinite;
+}
+
+.claude-octopus--anim-wobble .claude-octopus__stage {
+  animation: claude-octopus-anim-wobble 0.85s ease-in-out infinite;
+}
+
+.claude-octopus--anim-pulse .claude-octopus__stage {
+  animation: claude-octopus-anim-pulse 1.1s ease-in-out infinite;
+}
+
+.claude-octopus--anim-spin .claude-octopus__stage {
+  animation: claude-octopus-anim-spin 2s ease-in-out infinite;
+}
+
+.claude-octopus--anim-sway .claude-octopus__stage {
+  animation: claude-octopus-anim-sway 1.6s ease-in-out infinite;
+}
+
+.claude-octopus--anim-shake .claude-octopus__stage {
+  animation: claude-octopus-anim-shake 0.45s ease-in-out infinite;
+}
+
+.claude-octopus--anim-float .claude-octopus__stage {
+  animation: claude-octopus-anim-float 2.2s ease-in-out infinite;
+}
+
+.claude-octopus--anim-tilt .claude-octopus__stage {
+  animation: claude-octopus-anim-tilt 1.2s ease-in-out infinite;
+}
+
+.claude-octopus__glyph-text {
+  animation: claude-octopus-glyph-pop 1.1s ease-in-out infinite;
+}
+
+@keyframes claude-octopus-anim-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes claude-octopus-anim-wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes claude-octopus-anim-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes claude-octopus-anim-spin {
+  0%,
+  10% {
+    transform: rotate(0deg);
+  }
+  70%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes claude-octopus-anim-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes claude-octopus-anim-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px);
+  }
+  75% {
+    transform: translateX(1px);
+  }
+}
+
+@keyframes claude-octopus-anim-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes claude-octopus-anim-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes claude-octopus-glyph-pop {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* ————————————————————————————————————————————————————————————————
+ * Extended-pose bespoke overlays (`claude-octopus__x-*`). Each animated
+ * element sits inside a translate-positioned parent, so it carries no
+ * positioning transform of its own — CSS transforms here never clobber
+ * placement. transform-box: fill-box keeps every origin local.
+ * ———————————————————————————————————————————————————————————————— */
+.claude-octopus__x-bulb {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-glow 1.8s ease-in-out infinite;
+}
+.claude-octopus__x-rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-rays 1.8s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-glow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+@keyframes claude-octopus-x-rays {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.claude-octopus__x-gear {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-spin 3.2s linear infinite;
+}
+@keyframes claude-octopus-x-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.claude-octopus__x-flame {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: claude-octopus-x-flicker 0.5s ease-in-out infinite;
+}
+.claude-octopus__x-flame--1 {
+  animation-delay: 0.15s;
+}
+@keyframes claude-octopus-x-flicker {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scaleY(1) scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.25) scaleX(0.9);
+  }
+}
+
+.claude-octopus__x-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.claude-octopus__x-bar--1 {
+  animation: claude-octopus-x-grow 1.9s ease-in-out infinite;
+}
+.claude-octopus__x-bar--2 {
+  animation: claude-octopus-x-grow 1.9s ease-in-out 0.25s infinite;
+}
+.claude-octopus__x-bar--3 {
+  animation: claude-octopus-x-grow 1.9s ease-in-out 0.5s infinite;
+}
+@keyframes claude-octopus-x-grow {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.claude-octopus__x-loupe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-scan 3s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-scan {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-1px, -0.6px);
+  }
+}
+
+.claude-octopus__x-writeline {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: claude-octopus-x-write 1.4s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-write {
+  0%,
+  100% {
+    transform: scaleX(0.2);
+  }
+  55% {
+    transform: scaleX(1);
+  }
+}
+
+.claude-octopus__x-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.claude-octopus__x-ping--1 {
+  animation: claude-octopus-x-ping 2s ease-out infinite;
+}
+.claude-octopus__x-ping--2 {
+  animation: claude-octopus-x-ping 2s ease-out 1s infinite;
+}
+@keyframes claude-octopus-x-ping {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+.claude-octopus__x-siren {
+  animation: claude-octopus-x-blink 0.9s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-blink {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.claude-octopus__x-bubble {
+  transform-box: fill-box;
+  opacity: 0;
+}
+.claude-octopus__x-bubble--1 {
+  animation: claude-octopus-x-bubble 1.8s ease-in infinite;
+}
+.claude-octopus__x-bubble--2 {
+  animation: claude-octopus-x-bubble 1.8s ease-in 0.6s infinite;
+}
+@keyframes claude-octopus-x-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(0.6px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-1.6px);
+  }
+}
+
+.claude-octopus__x-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.claude-octopus__x-spark--1 {
+  animation: claude-octopus-x-twinkle 1.6s ease-in-out infinite;
+}
+.claude-octopus__x-spark--2 {
+  animation: claude-octopus-x-twinkle 1.6s ease-in-out 0.4s infinite;
+}
+.claude-octopus__x-spark--3 {
+  animation: claude-octopus-x-twinkle 1.6s ease-in-out 0.8s infinite;
+}
+@keyframes claude-octopus-x-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.claude-octopus__x-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-star 2s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-star {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(8deg);
+  }
+}
+
+.claude-octopus__x-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: claude-octopus-x-node 1.8s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-node {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+}
+
+.claude-octopus__x-bolt {
+  animation: claude-octopus-x-flash 1.1s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-flash {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.claude-octopus__x-trend {
+  animation: claude-octopus-x-flash 2s ease-in-out infinite;
+}
+
+.claude-octopus__x-flag {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: claude-octopus-x-wave 1.4s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-wave {
+  0%,
+  100% {
+    transform: skewX(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewX(-8deg) scaleX(0.94);
+  }
+}
+
+.claude-octopus__x-swing {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: claude-octopus-x-swing 2.4s ease-in-out infinite;
+}
+@keyframes claude-octopus-x-swing {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+.claude-octopus__x-dot {
+  transform-box: fill-box;
+}
+.claude-octopus__x-dot--1 {
+  animation: claude-octopus-x-dot 1.2s ease-in-out infinite;
+}
+.claude-octopus__x-dot--2 {
+  animation: claude-octopus-x-dot 1.2s ease-in-out 0.2s infinite;
+}
+.claude-octopus__x-dot--3 {
+  animation: claude-octopus-x-dot 1.2s ease-in-out 0.4s infinite;
+}
+@keyframes claude-octopus-x-dot {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-0.4px);
+  }
+}
+
+.claude-octopus__x-drip {
+  transform-box: fill-box;
+  opacity: 0;
+  animation: claude-octopus-x-drip 1.8s ease-in infinite;
+}
+@keyframes claude-octopus-x-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.6px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(1.8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claude-octopus--alive .claude-octopus__stage,
+  .claude-octopus--working .claude-octopus__stage,
+  .claude-octopus__eyelid,
+  .claude-octopus--dancing .claude-octopus__stage,
+  .claude-octopus--singing .claude-octopus__stage,
+  .claude-octopus--celebrating .claude-octopus__stage,
+  .claude-octopus--thinking .claude-octopus__stage,
+  .claude-octopus--coffee .claude-octopus__stage,
+  .claude-octopus--debugging .claude-octopus__stage,
+  .claude-octopus--vibing .claude-octopus__stage,
+  .claude-octopus--panicking .claude-octopus__stage,
+  .claude-octopus--loving .claude-octopus__stage,
+  .claude-octopus--deploying .claude-octopus__stage,
+  .claude-octopus--eureka .claude-octopus__stage,
+  .claude-octopus--sleeping .claude-octopus__stage,
+  .claude-octopus--tired .claude-octopus__stage,
+  .claude-octopus--prompting .claude-octopus__stage,
+  .claude-octopus__note--a,
+  .claude-octopus__note--b,
+  .claude-octopus__confetti-bit,
+  .claude-octopus__thought--1,
+  .claude-octopus__thought--2,
+  .claude-octopus__thought--3,
+  .claude-octopus__steam--1,
+  .claude-octopus__steam--2,
+  .claude-octopus__debug,
+  .claude-octopus__sweat,
+  .claude-octopus__heart--1,
+  .claude-octopus__heart--2,
+  .claude-octopus__heart--3,
+  .claude-octopus__rocket,
+  .claude-octopus__rocket-flame,
+  .claude-octopus__bulb-glass,
+  .claude-octopus__bulb-ray--1,
+  .claude-octopus__bulb-ray--2,
+  .claude-octopus__bulb-ray--3,
+  .claude-octopus__z--1,
+  .claude-octopus__z--2,
+  .claude-octopus__z--3,
+  .claude-octopus__caret {
+    animation: none;
+  }
+
+  .claude-octopus--anim-bounce .claude-octopus__stage,
+  .claude-octopus--anim-wobble .claude-octopus__stage,
+  .claude-octopus--anim-pulse .claude-octopus__stage,
+  .claude-octopus--anim-spin .claude-octopus__stage,
+  .claude-octopus--anim-sway .claude-octopus__stage,
+  .claude-octopus--anim-shake .claude-octopus__stage,
+  .claude-octopus--anim-float .claude-octopus__stage,
+  .claude-octopus--anim-tilt .claude-octopus__stage,
+  .claude-octopus__glyph-text {
+    animation: none;
+  }
+
+  .claude-octopus--sad .claude-octopus__stage {
+    animation: none;
+  }
+
+  .claude-octopus__sad-face {
+    opacity: 1;
+    animation: none;
+  }
+
+  .claude-octopus__tear {
+    opacity: 0.75;
+    animation: none;
+  }
+
+  /* All extended-pose overlay parts (any `claude-octopus__x-*` class). */
+  [class*="claude-octopus__x-"] {
+    animation: none;
+  }
+
+  /* Acting kit — held-prop arms, scanning gaze, streak fire, and the four acting bodies. */
+  .claude-octopus--micdrop .claude-octopus__stage,
+  .claude-octopus--reviewing .claude-octopus__stage,
+  .claude-octopus--scrolling .claude-octopus__stage,
+  .claude-octopus--streaking .claude-octopus__stage,
+  .claude-octopus--reviewing .claude-octopus__eye,
+  .claude-octopus__mic,
+  .claude-octopus__phone-feed,
+  .claude-octopus__streak-fire,
+  .claude-octopus__speed {
+    animation: none;
+  }
+
+  .claude-octopus__x-ping,
+  .claude-octopus__x-bubble,
+  .claude-octopus__x-drip {
+    opacity: 0.7;
+  }
+
+  .claude-octopus__x-bar {
+    transform: none;
+  }
+}

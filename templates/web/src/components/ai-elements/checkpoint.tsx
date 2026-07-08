@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@vybekiit/ui/button';
+import { Separator } from '@vybekiit/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { LucideProps } from 'lucide-react';
 import { BookmarkIcon } from 'lucide-react';

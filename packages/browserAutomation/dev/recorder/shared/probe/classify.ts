@@ -1,9 +1,9 @@
-import type { ParsedEntry } from '../draft';
-import { LS_DRAFT_FIELDS } from '../../../../src/domains/payments/ls/selectors/fields';
+import { LS_DRAFT_FIELDS } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 import {
   LS_FIELD_HINTS,
   type LsFieldHint,
-} from '../../../../src/domains/payments/ls/selectors/hints';
+} from '@vybekiit/browser-automation/domains/payments/ls/selectors/hints';
+import type { ParsedEntry } from '../draft';
 import type { ClassifiedMatch, DomCandidate, PageSnapshot } from './types';
 
 function matchesPattern(value: string | null | undefined, pattern: RegExp | undefined): boolean {

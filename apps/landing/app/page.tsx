@@ -8,18 +8,18 @@ import { ShowcaseCarousel } from '@/components/landing/ShowcaseCarousel';
 import { ZigZagSection } from '@/components/landing/ZigZagSection';
 
 /** VybeKiit cinematic store homepage — dark premium landing at `/`. */
-export default function HomePage() {
-  return (
-    <LandingShell>
-      <Header />
-      <main>
-        <Hero />
-        <FeatureStrip />
-        <ShowcaseCarousel />
-        <ZigZagSection />
-        <PricingCTA />
-      </main>
-      <Footer />
-    </LandingShell>
-  );
-}
+const HomePage = () => (
+  <LandingShell>
+    <Header />
+    <main>
+      <Hero />
+      <FeatureStrip />
+      <ShowcaseCarousel />
+      <ZigZagSection />
+      <PricingCTA />
+    </main>
+    <Footer />
+  </LandingShell>
+);
+
+export default HomePage;

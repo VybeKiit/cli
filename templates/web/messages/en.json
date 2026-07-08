@@ -9,6 +9,10 @@
   "common.brandShort": "My App",
 
   "common.nav.pricing": "Pricing",
+  "common.nav.products": "Products",
+  "common.nav.support": "Support",
+  "common.nav.status": "Status",
+  "common.nav.changelog": "Changelog",
   "common.nav.signIn": "Sign in",
   "common.nav.terms": "Terms",
   "common.nav.privacy": "Privacy",
@@ -133,6 +137,9 @@
   "pricing.checkout.complete": "Complete practice purchase",
   "pricing.checkout.completing": "Completing...",
   "pricing.checkout.successToast": "Purchase complete (practice mode).",
+  "pricing.checkout.missingProductId": "No plan was selected. Go back to pricing and choose a plan first.",
+  "pricing.checkout.unknownProductId": "The plan \"{planId}\" is not available. Go back to pricing and choose a plan.",
+  "pricing.checkout.backToPricing": "Back to pricing",
 
   "dashboard.badge": "Signed in",
   "dashboard.title": "Dashboard",

@@ -1,7 +1,7 @@
 {
   "name": "@vybekiit/jobs",
   "version": "0.3.0",
-  "description": "Background jobs and scheduled tasks for VybeKiit.",
+  "description": "Background jobs provider adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -12,6 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "require": "./dist/*.cjs"
     }
   },
   "files": [
@@ -24,14 +29,17 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vybekiit/core": "workspace:*"
+    "@vybekiit/core": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^3.2.6"
+    "@effect/vitest": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
-  "publishConfig": {
-    "access": "public"
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
   }
 }

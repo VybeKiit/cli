@@ -4,7 +4,7 @@
  * {@link DOCS_ONLY_PLATFORM_PROVIDERS} must never appear in the base manifest.
  */
 
-export interface PlatformSkillsAuditProvider {
+export type PlatformSkillsAuditProvider = {
   readonly id: string;
   /** GitHub `owner/repo` or full skills source URL — used in manifest. */
   readonly skillsRepo: string;
@@ -12,7 +12,7 @@ export interface PlatformSkillsAuditProvider {
   readonly activityRepo?: string;
   /** npm package to check for SDK freshness; omit when no direct SDK dependency. */
   readonly npmPackage?: string;
-}
+};
 
 /** Max days since last GitHub commit before strict CI blocks a pin. */
 export const PLATFORM_SKILLS_REPO_MAX_AGE_DAYS = 90;
@@ -67,83 +67,160 @@ export const DOCS_ONLY_PLATFORM_PROVIDERS: readonly {
 
 export type PlatformSkillsAuditStatus = 'pass' | 'warn' | 'block';
 
-export interface PlatformSkillsAuditResult {
+export type PlatformSkillsAuditResult = {
   readonly provider: string;
   readonly status: PlatformSkillsAuditStatus;
   readonly reasons: readonly string[];
-}
+};
 
-export interface PlatformSkillsAuditInput {
+export type PlatformSkillsAuditInput = {
   readonly now: Date;
   readonly repoCommitDates: Readonly<Record<string, Date | null>>;
   readonly npmPublishDates: Readonly<Record<string, Date | null>>;
-}
+};
 
-/** Normalize repo keys for lookup (`https://docs.stripe.com` → `docs.stripe.com`). */
-export function normalizeSkillsRepoKey(repo: string): string {
-  return repo.replace(/^https:\/\//, '').replace(/\/$/, '');
-}
+type ProviderFreshnessEvaluation = {
+  readonly status: PlatformSkillsAuditStatus;
+  readonly reasons: readonly string[];
+};
 
-function daysBetween(older: Date, newer: Date): number {
-  return (newer.getTime() - older.getTime()) / (1000 * 60 * 60 * 24);
-}
+// "https://docs.stripe.com" -> "docs.stripe.com"
+const HTTPS_PREFIX_PATTERN = /^https:\/\//;
+
+// "cloudflare/skills/" -> "cloudflare/skills"
+const TRAILING_SLASH_PATTERN = /\/$/;
+
+/**
+ * Normalize repo keys for lookup (`https://docs.stripe.com` → `docs.stripe.com`).
+ *
+ * @param repo - repo input.
+ * @returns The rendered normalize skills repo key text.
+ * @example
+ * const result = normalizeSkillsRepoKey(repo);
+ */
+export const normalizeSkillsRepoKey = (repo: string): string =>
+  repo.replace(HTTPS_PREFIX_PATTERN, '').replace(TRAILING_SLASH_PATTERN, '');
+
+const daysBetween = (older: Date, newer: Date): number =>
+  (newer.getTime() - older.getTime()) / (1000 * 60 * 60 * 24);
+
+const resolveAuditRepoDate = (
+  input: PlatformSkillsAuditInput,
+  provider: PlatformSkillsAuditProvider,
+): Date | null | undefined => {
+  const activityRepo =
+    provider.activityRepo === undefined ? provider.skillsRepo : provider.activityRepo;
+  const repoKey = normalizeSkillsRepoKey(activityRepo);
+  const commitDate = input.repoCommitDates[repoKey];
+  if (commitDate !== undefined) {
+    return commitDate;
+  }
+  return input.repoCommitDates[provider.skillsRepo];
+};
+
+const evaluateRepoFreshness = (
+  input: PlatformSkillsAuditInput,
+  provider: PlatformSkillsAuditProvider,
+): ProviderFreshnessEvaluation => {
+  const commitDate = resolveAuditRepoDate(input, provider);
+  if (commitDate === null || commitDate === undefined) {
+    return {
+      status: 'block',
+      reasons: [`Could not resolve last commit for ${provider.skillsRepo}`],
+    };
+  }
+
+  const repoAge = daysBetween(commitDate, input.now);
+  if (repoAge > PLATFORM_SKILLS_REPO_MAX_AGE_DAYS) {
+    return {
+      status: 'block',
+      reasons: [
+        `Vendor repo inactive ${Math.floor(repoAge)}d (max ${PLATFORM_SKILLS_REPO_MAX_AGE_DAYS}d)`,
+      ],
+    };
+  }
+
+  return { status: 'pass', reasons: [] };
+};
+
+const evaluateNpmFreshness = (
+  input: PlatformSkillsAuditInput,
+  provider: PlatformSkillsAuditProvider,
+): ProviderFreshnessEvaluation => {
+  if (provider.npmPackage === undefined) {
+    return { status: 'pass', reasons: [] };
+  }
+
+  const publishDate = input.npmPublishDates[provider.npmPackage];
+  if (publishDate === null || publishDate === undefined) {
+    return {
+      status: 'warn',
+      reasons: [`Could not resolve npm publish date for ${provider.npmPackage}`],
+    };
+  }
+
+  const npmAge = daysBetween(publishDate, input.now);
+  if (npmAge > PLATFORM_SKILLS_NPM_MAX_AGE_DAYS) {
+    return {
+      status: 'block',
+      reasons: [
+        `npm ${provider.npmPackage} stale ${Math.floor(npmAge)}d (max ${PLATFORM_SKILLS_NPM_MAX_AGE_DAYS}d)`,
+      ],
+    };
+  }
+
+  return { status: 'pass', reasons: [] };
+};
+
+const mergeAuditStatus = (
+  left: PlatformSkillsAuditStatus,
+  right: PlatformSkillsAuditStatus,
+): PlatformSkillsAuditStatus => {
+  if (left === 'block' || right === 'block') {
+    return 'block';
+  }
+  if (left === 'warn' || right === 'warn') {
+    return 'warn';
+  }
+  return 'pass';
+};
 
 /**
  * Pure freshness evaluation — network I/O lives in scripts/auditPlatformSkills.mjs.
+ *
+ * @param input - input input.
+ * @returns The evaluate platform skills audit entries.
+ * @example
+ * const result = evaluatePlatformSkillsAudit(input);
  */
-export function evaluatePlatformSkillsAudit(
+export const evaluatePlatformSkillsAudit = (
   input: PlatformSkillsAuditInput,
-): PlatformSkillsAuditResult[] {
+): PlatformSkillsAuditResult[] => {
   const results: PlatformSkillsAuditResult[] = [];
 
   for (const provider of PLATFORM_SKILLS_AUDIT_PROVIDERS) {
-    const reasons: string[] = [];
-    let status: PlatformSkillsAuditStatus = 'pass';
+    const repoEvaluation = evaluateRepoFreshness(input, provider);
+    const npmEvaluation = evaluateNpmFreshness(input, provider);
+    const reasons = [...repoEvaluation.reasons, ...npmEvaluation.reasons];
 
-    const repoKey = normalizeSkillsRepoKey(provider.activityRepo ?? provider.skillsRepo);
-    const commitDate = input.repoCommitDates[repoKey] ?? input.repoCommitDates[provider.skillsRepo];
-    if (commitDate === null || commitDate === undefined) {
-      reasons.push(`Could not resolve last commit for ${provider.skillsRepo}`);
-      status = 'block';
-    } else {
-      const repoAge = daysBetween(commitDate, input.now);
-      if (repoAge > PLATFORM_SKILLS_REPO_MAX_AGE_DAYS) {
-        reasons.push(
-          `Vendor repo inactive ${Math.floor(repoAge)}d (max ${PLATFORM_SKILLS_REPO_MAX_AGE_DAYS}d)`,
-        );
-        status = 'block';
-      }
-    }
-
-    if (provider.npmPackage) {
-      const publishDate = input.npmPublishDates[provider.npmPackage];
-      if (publishDate === null || publishDate === undefined) {
-        reasons.push(`Could not resolve npm publish date for ${provider.npmPackage}`);
-        if (status !== 'block') status = 'warn';
-      } else {
-        const npmAge = daysBetween(publishDate, input.now);
-        if (npmAge > PLATFORM_SKILLS_NPM_MAX_AGE_DAYS) {
-          reasons.push(
-            `npm ${provider.npmPackage} stale ${Math.floor(npmAge)}d (max ${PLATFORM_SKILLS_NPM_MAX_AGE_DAYS}d)`,
-          );
-          status = 'block';
-        }
-      }
-    }
-
-    if (reasons.length === 0) {
-      reasons.push('Freshness checks passed');
-    }
-
-    results.push({ provider: provider.id, status, reasons });
+    results.push({
+      provider: provider.id,
+      status: mergeAuditStatus(repoEvaluation.status, npmEvaluation.status),
+      reasons: reasons.length === 0 ? ['Freshness checks passed'] : reasons,
+    });
   }
 
   return results;
-}
+};
 
-/** True when any audited provider is blocked. */
-export function isPlatformSkillsAuditBlocking(
+/**
+ * True when any audited provider is blocked.
+ *
+ * @param results - results input.
+ * @returns Whether is platform skills audit blocking succeeds.
+ * @example
+ * const result = isPlatformSkillsAuditBlocking(results);
+ */
+export const isPlatformSkillsAuditBlocking = (
   results: readonly PlatformSkillsAuditResult[],
-): boolean {
-  return results.some((r) => r.status === 'block');
-}
+): boolean => results.some((r) => r.status === 'block');

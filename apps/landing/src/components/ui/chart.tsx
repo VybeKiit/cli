@@ -24,13 +24,13 @@ interface ChartContextProps {
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
-function useChart() {
+const useChart = () => {
   const context = React.useContext(ChartContext);
   if (!context) {
     throw new Error('useChart must be used within a <ChartContainer />');
   }
   return context;
-}
+};
 
 const ChartContainer = ({
   id,
@@ -44,7 +44,8 @@ const ChartContainer = ({
   children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>['children'];
 }) & { ref?: React.RefObject<HTMLDivElement | null> }) => {
   const uniqueId = React.useId();
-  const chartId = `chart-${id ?? uniqueId.replace(/:/g, '')}`;
+  const chartSourceId = id === undefined ? uniqueId.replace(/:/g, '') : id;
+  const chartId = `chart-${chartSourceId}`;
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -83,7 +84,11 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ?? itemConfig.color;
+    const themeColor =
+      itemConfig.theme === undefined
+        ? undefined
+        : itemConfig.theme[theme as keyof typeof itemConfig.theme];
+    const color = themeColor === undefined ? itemConfig.color : themeColor;
     return color ? `  --color-${key}: ${color};` : null;
   })
   .join('\n')}
@@ -97,6 +102,22 @@ ${colorConfig
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
+
+/**
+ * Resolve the best available chart payload key.
+ *
+ * @param item - Tooltip payload item.
+ * @returns Data key, name, or a generic value key.
+ * @example
+ * const key = dataKeyOrName(item);
+ */
+const dataKeyOrName = (item: { dataKey?: string | number; name?: string }): string | number => {
+  if (item.dataKey !== undefined) {
+    return item.dataKey;
+  }
+
+  return item.name === undefined ? 'value' : item.name;
+};
 
 const ChartTooltipContent = ({
   active,
@@ -142,17 +163,24 @@ const ChartTooltipContent = ({
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
-    if (hideLabel || !payload?.length) {
+    const hasPayload = payload !== undefined && payload.length > 0;
+    if (hideLabel || !hasPayload) {
       return null;
     }
 
-    const item = payload[0];
-    const key = `${labelKey ?? item?.dataKey ?? item?.name ?? 'value'}`;
+    const [item] = payload;
+    if (item === undefined) {
+      return null;
+    }
+    const labelSource = labelKey === undefined ? dataKeyOrName(item) : labelKey;
+    const key = `${labelSource}`;
     const itemConfig = config[key as keyof typeof config];
-    const value =
-      !labelKey && typeof label === 'string'
-        ? (config[label as keyof typeof config]?.label ?? label)
-        : itemConfig?.label;
+    const labelConfig =
+      typeof label === 'string' ? config[label as keyof typeof config] : undefined;
+    let value = itemConfig?.label;
+    if (!labelKey && typeof label === 'string') {
+      value = labelConfig?.label === undefined ? label : labelConfig.label;
+    }
 
     if (labelFormatter) {
       return (
@@ -167,7 +195,7 @@ const ChartTooltipContent = ({
     return <div className={cn('font-medium', labelClassName)}>{value}</div>;
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
-  if (!(active && payload?.length)) {
+  if (!(active && payload !== undefined && payload.length > 0)) {
     return null;
   }
 
@@ -182,14 +210,21 @@ const ChartTooltipContent = ({
       {hideLabel ? null : tooltipLabel}
       <div className="grid gap-1.5">
         {payload.map((item, index) => {
-          const key = `${nameKey ?? item.name ?? item.dataKey ?? 'value'}`;
+          const itemKey = dataKeyOrName(item);
+          const key = `${nameKey === undefined ? itemKey : nameKey}`;
           const itemConfig = config[key as keyof typeof config];
-          const indicatorColor = color ?? item.payload?.fill ?? item.color;
+          const payloadFill = item.payload === undefined ? undefined : item.payload.fill;
+          let indicatorColor = color;
+          if (indicatorColor === undefined) {
+            indicatorColor = payloadFill === undefined ? item.color : payloadFill;
+          }
+          const dataKey = item.dataKey === undefined ? index : item.dataKey;
+          const itemLabel = itemConfig?.label === undefined ? item.name : itemConfig.label;
 
           return (
             <div
               className="flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground"
-              key={item.dataKey ?? index}
+              key={dataKey}
             >
               {formatter && item?.value !== undefined && item.name ? (
                 formatter(item.value, item.name, item, index, item.payload)
@@ -214,7 +249,7 @@ const ChartTooltipContent = ({
                     />
                   )}
                   <div className="flex flex-1 justify-between leading-none">
-                    <span className="text-muted-foreground">{itemConfig?.label ?? item.name}</span>
+                    <span className="text-muted-foreground">{itemLabel}</span>
                     {item.value ? (
                       <span className="font-medium font-mono text-foreground tabular-nums">
                         {item.value.toLocaleString()}
@@ -232,4 +267,4 @@ const ChartTooltipContent = ({
 };
 ChartTooltipContent.displayName = 'ChartTooltipContent';
 
-export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartStyle };
+export { ChartContainer, ChartStyle, ChartTooltip, ChartTooltipContent };

@@ -1,21 +1,29 @@
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToCwsChrome } from '@vybekiit/browser-automation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browser-automation/domains/extension/errors';
+import { buildAndFindZip } from '@vybekiit/browser-automation/domains/extension/packageZip';
+import { safeClick } from '@vybekiit/browser-automation/domains/extension/safeClick';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  packageUrl,
+} from '@vybekiit/browser-automation/domains/extension/urls';
+import { runVerifyGate } from '@vybekiit/browser-automation/domains/extension/verifyGate';
 import type { Page } from 'playwright';
-
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { buildAndFindZip } from '../packageZip';
-import { safeClick } from '../safeClick';
-import { discoverDeveloperGroupId, packageUrl } from '../urls';
-import { runVerifyGate } from '../verifyGate';
 
 /**
  * Public contract for upload package result at the Chrome Web Store automation module boundary.
  */
 export type UploadPackageResult = {
-  packageText: string;
-  zipPath: string;
+  readonly packageText: string;
+  readonly zipPath: string;
 };
+
+// package summary panel: "Package ... Useful Resources" -> "Package ..."
+const PACKAGE_SUMMARY_PATTERN = /Package[\s\S]*?Useful Resources/;
+
+// upload package button: "Upload new package" -> match
+const UPLOAD_NEW_PACKAGE_BUTTON_PATTERN = /Upload new package/i;
 
 /**
  * Upload a new package zip for an existing CWS item via the package tab.
@@ -24,8 +32,13 @@ export type UploadPackageResult = {
  * credentials are available, but this verb gives the CDP automation a
  * repeatable fallback for the common "listing automation is authenticated,
  * upload the same release artifact" case.
+ *
+ * @param ctx - Extension automation context with repo paths, auth state, and logging.
+ * @returns The uploaded zip path and package-tab summary text.
+ * @example
+ * const result = await uploadPackage(ctx);
  */
-export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResult> {
+export const uploadPackage = async (ctx: VerbContext): Promise<UploadPackageResult> => {
   if (!ctx.extension.chromeWebStoreId) {
     throw new MissingItemIdError(ctx.extension.key, 'uploadPackage');
   }
@@ -35,7 +48,7 @@ export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResu
 
   const session = await connectToCwsChrome(ctx);
   try {
-    const log = ctx.log ?? console;
+    const log = resolveVerbLogger(ctx);
     log.log(`[cws] uploading package for ${ctx.extension.name}: ${zipPath}`);
 
     const groupId = await discoverDeveloperGroupId(session.page);
@@ -48,7 +61,7 @@ export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResu
       .waitForEvent('filechooser', { timeout: 30_000 })
       .catch(() => null);
     await safeClick(
-      session.page.getByRole('button', { name: /Upload new package/i }).first(),
+      session.page.getByRole('button', { name: UPLOAD_NEW_PACKAGE_BUTTON_PATTERN }).first(),
       'uploadPackage',
     );
     const fileChooser = await fileChooserPromise;
@@ -75,9 +88,21 @@ export async function uploadPackage(ctx: VerbContext): Promise<UploadPackageResu
   } finally {
     await session.dispose();
   }
-}
+};
 
-async function readPackageSummary(page: Page): Promise<string> {
+/**
+ * Read the package tab summary after an upload attempt.
+ *
+ * @param page - Chrome Web Store package page.
+ * @returns The package summary panel text, capped to the page body prefix when the panel is absent.
+ * @example
+ * const packageText = await readPackageSummary(page);
+ */
+const readPackageSummary = async (page: Page): Promise<string> => {
   const text = await page.locator('body').innerText();
-  return text.match(/Package[\s\S]*?Useful Resources/)?.[0] ?? text.slice(0, 5000);
-}
+  const match = text.match(PACKAGE_SUMMARY_PATTERN);
+  if (match !== null && match[0] !== undefined) {
+    return match[0];
+  }
+  return text.slice(0, 5000);
+};

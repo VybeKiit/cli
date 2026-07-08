@@ -1,4 +1,5 @@
 import { useTheme } from '@/theme/useTheme';
+import { useCallback } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -15,13 +16,15 @@ export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' 
 export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
 /**
- * Props for {@link Button}. Extends the native `Pressable` props (so callers pass
+ * Props for {@link Button}. Extends the native `Pressable` props so callers pass
  * `onPress`, `accessibilityLabel`, etc.) with the kit's variant/size system and a
  * `loading` flag that disables the press and swaps the label for a spinner.
  */
 export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> {
   /** Button label text. */
   title: string;
+  /** Optional compact icon text rendered before the label. */
+  icon?: string;
   /** Visual variant. Defaults to `default`. */
   variant?: ButtonVariant;
   /** Size preset. Defaults to `default`. */
@@ -30,23 +33,33 @@ export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> 
   loading?: boolean;
 }
 
+const resolveButtonOpacity = (isDisabled: boolean, pressed: boolean): number => {
+  if (isDisabled) {
+    return 0.5;
+  }
+  if (pressed) {
+    return 0.9;
+  }
+  return 1;
+};
+
 /**
  * The shared pressable button every screen uses.
  *
- * A plain RN `Pressable` styled from {@link useTheme} so it reads the same shared
- * `@vybekiit/tokens` palette as the web button — keeping the two platforms visually
- * in sync (ADR-0004). `loading` and `disabled` both block the press and dim the
- * control; `loading` also replaces the label with an `ActivityIndicator`. The
- * `link` variant renders text-only (no background) to match web.
+ * @param props - Native pressable props plus title, variant, size, and loading state.
+ * @returns A themed button.
+ * @example
+ * <Button title="Continue" onPress={handleContinue} />
  */
-export function Button({
-  title,
+export const Button = ({
+  title = '',
+  icon,
   variant = 'default',
   size = 'default',
   loading = false,
   disabled,
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   const { colors, radius, spacing, fontSizes, fontWeights } = useTheme();
   const isDisabled = disabled === true || loading;
 
@@ -76,42 +89,59 @@ export function Button({
   }[variant];
 
   const borderColor = variant === 'outline' ? colors.input : 'transparent';
+  const pressableStyle = useCallback(
+    ({ pressed }: { pressed: boolean }) => [
+      styles.base,
+      sizeStyle,
+      {
+        backgroundColor,
+        borderColor,
+        borderWidth: variant === 'outline' ? StyleSheet.hairlineWidth : 0,
+        borderRadius: radius,
+        opacity: resolveButtonOpacity(isDisabled, pressed),
+      },
+    ],
+    [backgroundColor, borderColor, isDisabled, radius, sizeStyle, variant],
+  );
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
-      style={({ pressed }) => [
-        styles.base,
-        sizeStyle,
-        {
-          backgroundColor,
-          borderColor,
-          borderWidth: variant === 'outline' ? StyleSheet.hairlineWidth : 0,
-          borderRadius: radius,
-          opacity: isDisabled ? 0.5 : pressed ? 0.9 : 1,
-        },
-      ]}
+      style={pressableStyle}
       {...props}
     >
       {loading ? (
         <ActivityIndicator color={textColor} size="small" />
       ) : (
-        <Text
-          style={{
-            color: textColor,
-            fontSize: fontSizes.sm,
-            fontWeight: fontWeights.medium,
-            textDecorationLine: variant === 'link' ? 'underline' : 'none',
-          }}
-        >
-          {title}
-        </Text>
+        <>
+          {icon === undefined ? null : (
+            <Text
+              style={{
+                color: textColor,
+                fontSize: fontSizes.sm,
+                fontWeight: fontWeights.semibold,
+              }}
+            >
+              {icon}
+            </Text>
+          )}
+          <Text
+            style={{
+              color: textColor,
+              fontSize: fontSizes.sm,
+              fontWeight: fontWeights.medium,
+              textDecorationLine: variant === 'link' ? 'underline' : 'none',
+            }}
+          >
+            {title}
+          </Text>
+        </>
       )}
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create({
   base: {

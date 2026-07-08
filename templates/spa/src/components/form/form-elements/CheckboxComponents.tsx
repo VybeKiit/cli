@@ -1,8 +1,8 @@
-import { useState } from "react";
-import ComponentCard from "../../common/ComponentCard";
-import Checkbox from "../input/Checkbox";
+import { useState } from 'react';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Checkbox } from '@/components/form/input/Checkbox';
 
-export default function CheckboxComponents() {
+export const CheckboxComponents = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedTwo, setIsCheckedTwo] = useState(true);
   const [isCheckedDisabled, setIsCheckedDisabled] = useState(false);
@@ -16,21 +16,17 @@ export default function CheckboxComponents() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Checkbox
-            checked={isCheckedTwo}
-            onChange={setIsCheckedTwo}
-            label="Checked"
-          />
+          <Checkbox checked={isCheckedTwo} onChange={setIsCheckedTwo} label="Checked" />
         </div>
         <div className="flex items-center gap-3">
           <Checkbox
             checked={isCheckedDisabled}
             onChange={setIsCheckedDisabled}
-            disabled
+            disabled={true}
             label="Disabled"
           />
         </div>
       </div>
     </ComponentCard>
   );
-}
+};

@@ -1,1 +1,1 @@
-export * from '@/components/ui/spinner';
+export * from '@vybekiit/ui/spinner';

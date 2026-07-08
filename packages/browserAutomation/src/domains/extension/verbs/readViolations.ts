@@ -1,8 +1,11 @@
-import type { VerbContext } from '../types';
-
-import { connectToCwsChrome } from '../connect';
-import { MissingItemIdError } from '../errors';
-import { discoverDeveloperGroupId, statusUrl } from '../urls';
+import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import { connectToCwsChrome } from '@vybekiit/browser-automation/domains/extension/connect';
+import { MissingItemIdError } from '@vybekiit/browser-automation/domains/extension/errors';
+import type { VerbContext } from '@vybekiit/browser-automation/domains/extension/types';
+import {
+  discoverDeveloperGroupId,
+  statusUrl,
+} from '@vybekiit/browser-automation/domains/extension/urls';
 
 /**
  * Shape of one violation as scraped from the dev console issues panel.
@@ -12,11 +15,11 @@ import { discoverDeveloperGroupId, statusUrl } from '../urls';
  */
 export type CwsViolation = {
   /** Detail text the panel renders below the title. Empty string when none. */
-  detail: string;
+  readonly detail: string;
   /** Severity label as shown on the page (e.g. "Error", "Warning"). */
-  severity: string;
+  readonly severity: string;
   /** Short title, e.g. "Permissions justification missing for `tabs`". */
-  title: string;
+  readonly title: string;
 };
 
 /**
@@ -30,15 +33,20 @@ export type CwsViolation = {
  *
  * Returns rows in the order the page rendered them so callers can show
  * them faithfully without re-sorting.
+ *
+ * @param ctx - Extension automation context with repo paths, auth state, and logging.
+ * @returns Chrome Web Store violation rows in page-rendered order.
+ * @example
+ * const violations = await readViolations(ctx);
  */
-export async function readViolations(ctx: VerbContext): Promise<CwsViolation[]> {
+export const readViolations = async (ctx: VerbContext): Promise<CwsViolation[]> => {
   if (!ctx.extension.chromeWebStoreId) {
     throw new MissingItemIdError(ctx.extension.key, 'readViolations');
   }
 
   const session = await connectToCwsChrome(ctx);
   try {
-    const log = ctx.log ?? console;
+    const log = resolveVerbLogger(ctx);
     log.log(`[cws] reading violations for ${ctx.extension.name}`);
 
     const groupId = await discoverDeveloperGroupId(session.page);
@@ -57,13 +65,14 @@ export async function readViolations(ctx: VerbContext): Promise<CwsViolation[]> 
       const out = [];
       for (const row of rows) {
         const t = text(row);
-        if (!t) continue;
-        const segments = t.split(/\\s—\\s|: /);
-        out.push({
-          severity: segments[0] || '',
-          title: segments[1] || segments[0] || '',
-          detail: segments.slice(2).join(': '),
-        });
+        if (t) {
+          const segments = t.split(/\\s—\\s|: /);
+          out.push({
+            severity: segments[0] || '',
+            title: segments[1] || segments[0] || '',
+            detail: segments.slice(2).join(': '),
+          });
+        }
       }
       return out;
     })()`)) as CwsViolation[];
@@ -72,4 +81,4 @@ export async function readViolations(ctx: VerbContext): Promise<CwsViolation[]> 
   } finally {
     await session.dispose();
   }
-}
+};

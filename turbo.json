@@ -1,6 +1,24 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "stream",
+  "globalPassThroughEnv": [
+    "APP_URL",
+    "CI",
+    "CODEX_HOME",
+    "CORS_ORIGIN",
+    "FRONTEND_URL",
+    "NEXT_RUNTIME",
+    "PLAYWRIGHT_BASE_URL",
+    "PLAYWRIGHT_ENABLED",
+    "PLAYWRIGHT_PORT",
+    "PORT",
+    "SESSION_SECRET",
+    "VYBEKIIT_GATE_ORG",
+    "VYBEKIIT_GATE_REPOS",
+    "VYBEKIIT_SITE_URL",
+    "VYBEKIIT_SKIP_GATE",
+    "VYBEKIIT_UI_CATALOG_PATH"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

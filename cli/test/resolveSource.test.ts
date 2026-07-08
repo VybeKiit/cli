@@ -11,7 +11,7 @@ import { ScaffoldError } from '../src/lib/scaffold';
  * `vi.stubEnv` controls (and restores) `VYBEKIIT_TEMPLATES_DIR` so cases stay isolated
  * without mutating `process.env` directly.
  */
-describe('resolveTemplatesSource', () => {
+describe('resolveTemplatesSource overrides', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -20,10 +20,11 @@ describe('resolveTemplatesSource', () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '/tmp/override-templates');
     let cloneCalls = 0;
     const deps: ResolveDeps = {
-      clone: async () => {
+      clone: () => {
         cloneCalls += 1;
+        return Promise.resolve();
       },
-      exists: async () => false,
+      exists: () => Promise.resolve(false),
     };
 
     const resolved = await resolveTemplatesSource('web', deps);
@@ -37,10 +38,11 @@ describe('resolveTemplatesSource', () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     let cloneCalls = 0;
     const deps: ResolveDeps = {
-      clone: async () => {
+      clone: () => {
         cloneCalls += 1;
+        return Promise.resolve();
       },
-      exists: async () => true,
+      exists: () => Promise.resolve(true),
     };
 
     const resolved = await resolveTemplatesSource('web', deps);
@@ -49,15 +51,22 @@ describe('resolveTemplatesSource', () => {
     expect(resolved.cleanup).toBeUndefined();
     expect(cloneCalls).toBe(0);
   });
+});
+
+describe('resolveTemplatesSource mirror clone', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
 
   it('clones the mirror into a temp dir when published, exposing a cleanup', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     const cloned: Array<{ template: string; targetDir: string }> = [];
     const deps: ResolveDeps = {
-      clone: async (template, targetDir) => {
+      clone: (template, targetDir) => {
         cloned.push({ template, targetDir });
+        return Promise.resolve();
       },
-      exists: async () => false,
+      exists: () => Promise.resolve(false),
     };
 
     const resolved = await resolveTemplatesSource('web', deps);
@@ -77,10 +86,8 @@ describe('resolveTemplatesSource', () => {
   it('propagates the clone failure as a ScaffoldError, leaving no temp dir behind', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     const deps: ResolveDeps = {
-      clone: async () => {
-        throw new ScaffoldError('Couldn’t download the web template. ...');
-      },
-      exists: async () => false,
+      clone: () => Promise.reject(new ScaffoldError('Couldn’t download the web template. ...')),
+      exists: () => Promise.resolve(false),
     };
 
     await expect(resolveTemplatesSource('web', deps)).rejects.toBeInstanceOf(ScaffoldError);

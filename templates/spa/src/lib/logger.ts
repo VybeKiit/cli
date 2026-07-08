@@ -1,12 +1,7 @@
-import { appConfigSchema, createLogger, parseEnv, resolveDefaultLogLevel } from '@vybekiit/core';
+import { createLogger, resolveDefaultLogLevel } from '@vybekiit/core';
+import { runtimeConfig } from '@/lib/runtimeConfig';
 
-const app = parseEnv(appConfigSchema, {
-  APP_URL: import.meta.env.VITE_PUBLIC_APP_URL ?? 'http://localhost:4000',
-  NODE_ENV: import.meta.env.MODE === 'production' ? 'production' : 'development',
-  LOG_LEVEL: import.meta.env.VITE_PUBLIC_LOG_LEVEL,
-});
-
-const level = resolveDefaultLogLevel(app.NODE_ENV, app.LOG_LEVEL);
+const level = resolveDefaultLogLevel(runtimeConfig.NODE_ENV, runtimeConfig.LOG_LEVEL);
 
 /** App-wide logger — verbose in development, quiet in production automatically. */
 export const log = createLogger('spa', level);

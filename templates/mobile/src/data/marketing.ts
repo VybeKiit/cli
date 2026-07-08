@@ -1,8 +1,8 @@
-/** Feature highlight cards on the home screen — keys into `messages/en.json`. */
-export interface HomeFeature {
+/** Feature highlight cards on the home screen keyed into `messages/en.json`. */
+export type HomeFeature = Readonly<{
   readonly titleKey: string;
   readonly bodyKey: string;
-}
+}>;
 
 /** The three feature highlights on the home screen. */
 export const HOME_FEATURES: readonly HomeFeature[] = [

@@ -1,26 +1,50 @@
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 
-const FEATURES_BLOCK = '[features]\nskills = true';
+const FEATURES_BLOCK = ['[features]', 'skills = true'].join('\n');
+// "[features]\nskills = true" -> already enabled.
+const FEATURES_SKILLS_ENABLED_PATTERN = /\[features\][\s\S]*?\bskills\s*=\s*true\b/m;
+// "[features]\nskills = false\n[other]" -> captures the features block only.
+const FEATURES_BLOCK_PATTERN = /(\[features\][^[]*)/m;
+// "skills = false" -> feature key exists.
+const SKILLS_KEY_PATTERN = /\bskills\s*=/m;
+// "skills = false" -> "skills = true".
+const SKILLS_LINE_PATTERN = /\bskills\s*=\s*.*/m;
 
-function codexConfigPath(): string {
-  const home = process.env.CODEX_HOME?.trim() || join(homedir(), '.codex');
+/**
+ * Resolve the Codex config path.
+ *
+ * @returns Absolute path to `config.toml`.
+ * @example
+ * const path = codexConfigPath();
+ */
+const codexConfigPath = (): string => {
+  const configuredHome = process.env.CODEX_HOME;
+  if (configuredHome !== undefined && configuredHome.trim() !== '') {
+    return join(configuredHome.trim(), 'config.toml');
+  }
+  const home = join(homedir(), '.codex');
   return join(home, 'config.toml');
-}
+};
 
-function upsertFeaturesSkills(content: string): string {
-  // already enabled? matches a [features] block that already contains "skills = true"
-  if (/\[features\][\s\S]*?\bskills\s*=\s*true\b/m.test(content)) {
+/**
+ * Enable the Codex skills feature inside config content.
+ *
+ * @param content - Existing TOML content.
+ * @returns Updated TOML content.
+ * @example
+ * const next = upsertFeaturesSkills('[features]\\nskills = false\\n');
+ */
+const upsertFeaturesSkills = (content: string): string => {
+  if (FEATURES_SKILLS_ENABLED_PATTERN.test(content)) {
     return content;
   }
 
   if (content.includes('[features]')) {
-    // rewrite the [features] block (its text up to the next "[section]"), forcing skills = true
-    return content.replace(/(\[features\][^[]*)/m, (block) =>
-      // block already has a skills line? "skills = false" → "skills = true"; else append it
-      /\bskills\s*=/m.test(block)
-        ? block.replace(/\bskills\s*=\s*.*/m, 'skills = true')
+    return content.replace(FEATURES_BLOCK_PATTERN, (block) =>
+      SKILLS_KEY_PATTERN.test(block)
+        ? block.replace(SKILLS_LINE_PATTERN, 'skills = true')
         : `${block.trimEnd()}\nskills = true\n`,
     );
   }
@@ -30,13 +54,19 @@ function upsertFeaturesSkills(content: string): string {
     return `${FEATURES_BLOCK}\n`;
   }
   return `${trimmed}\n\n${FEATURES_BLOCK}\n`;
-}
+};
 
-/** Enable Codex Agent Skills discovery in ~/.codex/config.toml (idempotent). */
-export async function ensureCodexSkillsEnabled(): Promise<{
+/**
+ * Enable Codex Agent Skills discovery in ~/.codex/config.toml.
+ *
+ * @returns Update status and config path.
+ * @example
+ * const result = await ensureCodexSkillsEnabled();
+ */
+export const ensureCodexSkillsEnabled = async (): Promise<{
   readonly updated: boolean;
   readonly path: string;
-}> {
+}> => {
   const path = codexConfigPath();
   await mkdir(join(path, '..'), { recursive: true });
 
@@ -44,7 +74,7 @@ export async function ensureCodexSkillsEnabled(): Promise<{
   try {
     previous = await readFile(path, 'utf8');
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    if (!(error instanceof Error && 'code' in error) || error.code !== 'ENOENT') {
       throw error;
     }
   }
@@ -56,17 +86,22 @@ export async function ensureCodexSkillsEnabled(): Promise<{
 
   await writeFile(path, next, 'utf8');
   return { updated: true, path };
-}
+};
 
-/** True when Codex skills feature is enabled in config (best-effort read). */
-export async function isCodexSkillsEnabled(): Promise<boolean> {
+/**
+ * Check whether Codex skills discovery is enabled.
+ *
+ * @returns True when config contains `skills = true`.
+ * @example
+ * const enabled = await isCodexSkillsEnabled();
+ */
+export const isCodexSkillsEnabled = async (): Promise<boolean> => {
   const path = codexConfigPath();
   try {
     await access(path);
     const content = await readFile(path, 'utf8');
-    // skills feature on? matches "skills = true", not "skills = false"
-    return /\bskills\s*=\s*true\b/m.test(content);
+    return FEATURES_SKILLS_ENABLED_PATTERN.test(content);
   } catch {
     return false;
   }
-}
+};

@@ -13,7 +13,15 @@ const queryPersister = resolved.persistEnabled
   ? createMmkvQueryPersister(new MMKV({ id: 'vybekiit-query-cache' }))
   : null;
 
-export function ClientStateProvider({ children }: { children: ReactNode }) {
+/**
+ * Provide the mobile React Query client and persisted cache.
+ *
+ * @param props - Provider props containing the app tree.
+ * @returns A React Query provider for mobile screens.
+ * @example
+ * <ClientStateProvider>{children}</ClientStateProvider>
+ */
+export const ClientStateProvider = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => resolved.queryClient);
 
   if (queryPersister) {
@@ -28,6 +36,6 @@ export function ClientStateProvider({ children }: { children: ReactNode }) {
   }
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-}
+};
 
 export { resolved as clientState };

@@ -42,13 +42,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@vybekiit/ui/card';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@vybekiit/ui/context-menu';
 import { cn } from '@/lib/utils';
 
 const draggingAtom = atom(false);

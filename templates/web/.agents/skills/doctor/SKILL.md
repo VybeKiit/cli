@@ -32,12 +32,15 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
      Google sign-in). It also checks official platform skills are present. If it reports "not signed
      in yet," walk the builder through the one sign-in command it prints (a browser window opens;
      they click approve). Then make sure the project's dependencies are installed.
-   - **Code health:** run `pnpm quality` (format, lint, typecheck, tests). Read the first real error (not the noise).
+   - **Code health:** run `pnpm verify` (format, lint, typecheck, tests). Read the first real error (not the noise).
    - **Platform instructions stale?** If symptoms match outdated framework patterns (old routing,
      deprecated APIs), suggest running `update-kit` before deep debugging — say *"I'll refresh my
      instructions first"* in plain words, never name upstream tools.
    - **Services reachable:** if it's data-related, check the database is reachable
      (`@vybekiit/db`'s `pingDatabase`). If payments, re-check payment secret values.
+   - **Memory structure current?** If data-related errors (500, "column not found", "table missing"),
+     check migration status first — a migration file that was never applied to the live database is
+     the #1 silent killer after deploy. Run `checkMigrationStatus()` and apply pending migrations.
    - **MCP / integration stuck once?** Run `vybekiit doc-fallback <tech-id>` (see
      `.vybekiit/agent/tech-references.md`). Tell the builder you're checking the official setup
      guide — use the plain phrase from `formatBuilderStuckMessage()`, never say MCP.
@@ -50,6 +53,8 @@ Work through these in order. Stop as soon as you find and fix the problem, then 
    equivalent) — never expose that skill name to the builder. Translate the outcome to one plain fix.
 
 5. **Verify the fix.** Re-run the thing that was broken. Confirm it works now.
+   If the app is already online, ask: *"Want me to put this fix online now?"* (contract rule ⑧).
+   Don't say "fixed" until the live URL reflects the change — or the builder said to wait.
    🎉 *Celebrate* — and tell them in one sentence what it was, in plain words.
 
 ## Report Mode handoff

@@ -1,25 +1,46 @@
-export interface CatalogComponent {
-  source: string;
-  name: string;
-  paths: string[];
-  dependencies: string[];
-  tags: string[];
-  portable: boolean;
-  category: string;
-}
+import { Either, Schema } from 'effect';
 
-export interface UiCatalogIndex {
-  version: number;
-  generatedAt: string;
-  componentCount: number;
-  sources: Record<string, number>;
-  components: CatalogComponent[];
-}
+const CatalogComponentSchema = Schema.Struct({
+  source: Schema.String,
+  name: Schema.String,
+  paths: Schema.Array(Schema.String),
+  dependencies: Schema.Array(Schema.String),
+  tags: Schema.Array(Schema.String),
+  portable: Schema.Boolean,
+  category: Schema.String,
+});
+
+/** Schema for the generated mirrored UI catalog index. */
+export const UiCatalogIndexSchema = Schema.Struct({
+  version: Schema.Number,
+  generatedAt: Schema.String,
+  componentCount: Schema.Number,
+  sources: Schema.Record({ key: Schema.String, value: Schema.Number }),
+  components: Schema.Array(CatalogComponentSchema),
+});
+
+/** Mirrored UI component entry decoded from the generated catalog index. */
+export type CatalogComponent = typeof CatalogComponentSchema.Type;
+
+/** Generated UI catalog index decoded from `ui-catalog-index.json`. */
+export type UiCatalogIndex = typeof UiCatalogIndexSchema.Type;
+
+type SearchComponentOptions = {
+  readonly source?: string;
+  readonly category?: string;
+  readonly limit?: number;
+};
+
+const decodeCatalogIndex = Schema.decodeUnknownEither(UiCatalogIndexSchema);
+const defaultSearchLimit = 20;
+const defaultSuggestionLimit = 10;
+// split on whitespace: "hero   bento" -> ["hero", "bento"]
+const searchTermPattern = /\s+/;
 
 const INTENT_ROUTING: ReadonlyArray<{
-  keywords: string[];
-  sources: string[];
-  category?: string;
+  readonly keywords: readonly string[];
+  readonly sources: readonly string[];
+  readonly category?: string;
 }> = [
   {
     keywords: ['hero', 'landing', 'wow', 'parallax'],
@@ -43,22 +64,63 @@ const INTENT_ROUTING: ReadonlyArray<{
   },
 ];
 
-export function loadCatalog(json: string): UiCatalogIndex {
-  return JSON.parse(json) as UiCatalogIndex;
-}
+/**
+ * Resolve the component search result limit.
+ *
+ * @param options - Optional search filters and limit.
+ * @returns The explicit limit, or the package default.
+ * @example
+ * resolveSearchLimit({ limit: 5 }) === 5;
+ */
+const resolveSearchLimit = (options: SearchComponentOptions | undefined): number => {
+  if (options?.limit !== undefined) {
+    return options.limit;
+  }
+  return defaultSearchLimit;
+};
 
-export function searchComponents(
+/**
+ * Decode a generated UI catalog JSON string.
+ *
+ * @param json - Serialized catalog index content.
+ * @returns The validated catalog index.
+ * @example
+ * const catalog = loadCatalog(await readFile(catalogPath, 'utf8'));
+ */
+export const loadCatalog = (json: string): UiCatalogIndex => {
+  const parsed = decodeCatalogIndex(JSON.parse(json));
+  if (Either.isLeft(parsed)) {
+    throw new Error('Invalid UI catalog index JSON.');
+  }
+  return parsed.right;
+};
+
+/**
+ * Search catalog components by text, source, and category.
+ *
+ * @param catalog - Validated catalog index to search.
+ * @param query - Keyword string matched against names, sources, categories, tags, and paths.
+ * @param options - Optional source/category filters and result limit.
+ * @returns Components ranked by text-match score.
+ * @example
+ * const heroComponents = searchComponents(catalog, 'animated hero', { category: 'hero' });
+ */
+export const searchComponents = (
   catalog: UiCatalogIndex,
   query: string,
-  options?: { source?: string; category?: string; limit?: number },
-): CatalogComponent[] {
-  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const limit = options?.limit ?? 20;
+  options?: SearchComponentOptions,
+): CatalogComponent[] => {
+  const terms = query.toLowerCase().split(searchTermPattern).filter(Boolean);
+  const limit = resolveSearchLimit(options);
 
   const scored = catalog.components
     .filter((component) => {
-      if (options?.source && component.source !== options.source) return false;
-      if (options?.category && component.category !== options.category) return false;
+      if (options?.source !== undefined && component.source !== options.source) {
+        return false;
+      }
+      if (options?.category !== undefined && component.category !== options.category) {
+        return false;
+      }
       return true;
     })
     .map((component) => {
@@ -78,27 +140,50 @@ export function searchComponents(
     .sort((a, b) => b.score - a.score);
 
   return scored.slice(0, limit).map(({ component }) => component);
-}
+};
 
-export function getComponent(
+/**
+ * Find one component by source namespace and slug.
+ *
+ * @param catalog - Validated catalog index to search.
+ * @param source - Component source namespace.
+ * @param name - Component slug within the source namespace.
+ * @returns The matching component, or undefined when no exact match exists.
+ * @example
+ * const marquee = getComponent(catalog, 'magicui', 'marquee');
+ */
+export const getComponent = (
   catalog: UiCatalogIndex,
   source: string,
   name: string,
-): CatalogComponent | undefined {
-  return catalog.components.find(
-    (component) => component.source === source && component.name === name,
-  );
-}
+): CatalogComponent | undefined =>
+  catalog.components.find((component) => component.source === source && component.name === name);
 
-export function listSources(catalog: UiCatalogIndex): Record<string, number> {
-  return catalog.sources;
-}
+/**
+ * Return component counts by source namespace.
+ *
+ * @param catalog - Validated catalog index to summarize.
+ * @returns A source-name to component-count record.
+ * @example
+ * const sources = listSources(catalog);
+ */
+export const listSources = (catalog: UiCatalogIndex): Record<string, number> => catalog.sources;
 
-export function suggestBlend(
+/**
+ * Rank components for a natural-language UI intent.
+ *
+ * @param catalog - Validated catalog index to search.
+ * @param intent - Natural-language UI request from the builder or agent.
+ * @param limit - Maximum number of suggestions to return.
+ * @returns Ranked component suggestions with source, name, score, and file paths.
+ * @example
+ * const suggestions = suggestBlend(catalog, 'animated pricing hero', 5);
+ */
+export const suggestBlend = (
   catalog: UiCatalogIndex,
   intent: string,
-  limit = 10,
-): Array<{ source: string; name: string; score: number; paths: string[] }> {
+  limit = defaultSuggestionLimit,
+): Array<{ source: string; name: string; score: number; paths: readonly string[] }> => {
   const lower = intent.toLowerCase();
   const matchedRoutes = INTENT_ROUTING.filter((route) =>
     route.keywords.some((keyword) => lower.includes(keyword)),
@@ -112,13 +197,19 @@ export function suggestBlend(
   const ranked = results
     .map((component) => {
       let score = 1;
-      if (preferredSources.includes(component.source)) score += 3;
-      if (preferredCategories.includes(component.category)) score += 2;
-      if (component.tags.some((tag) => lower.includes(tag))) score += 1;
+      if (preferredSources.includes(component.source)) {
+        score += 3;
+      }
+      if (preferredCategories.includes(component.category)) {
+        score += 2;
+      }
+      if (component.tags.some((tag) => lower.includes(tag))) {
+        score += 1;
+      }
       return { source: component.source, name: component.name, score, paths: component.paths };
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 
   return ranked;
-}
+};

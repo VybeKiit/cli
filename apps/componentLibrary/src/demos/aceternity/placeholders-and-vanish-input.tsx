@@ -1,19 +1,11 @@
 'use client';
 
-import type { ComponentType } from 'react';
-import * as Mirror from '@/components/aceternity/placeholders-and-vanish-input';
-
-const Component = Object.values(Mirror).find(
-  (value): value is ComponentType<object> => typeof value === 'function',
-);
+import { PlaceholdersAndVanishInput } from '@/components/aceternity/placeholders-and-vanish-input';
 
 export default function PlaceholdersAndVanishInputPreview() {
-  if (!Component) {
-    return null;
-  }
   return (
-    <div className="flex min-h-[200px] items-center justify-center p-6">
-      <Component />
+    <div className="flex min-h-[200px] items-center justify-center overflow-hidden p-6">
+      <PlaceholdersAndVanishInput />
     </div>
   );
 }

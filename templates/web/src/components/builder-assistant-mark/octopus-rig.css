@@ -1,0 +1,391 @@
+/* Sharp integer-grid Clawd rig — discrete frame-swap, no CSS interpolation.
+   The blur we're removing came from sub-pixel tweening; here each body frame is
+   shown whole for its 1/N slice then hard-cut to the next (classic ~8fps sprite).
+   Frame count drives the `--n{N}` class; per-frame `--rig-i` staggers the swap. */
+
+.octo-rig {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+
+/* Body frames stack; exactly one paints at a time via staggered delay + a
+   keyframe that holds opaque for its 1/N window then hides for the remainder. */
+.octo-rig__frame {
+  opacity: 0;
+  animation-duration: var(--rig-loop, 750ms);
+  animation-timing-function: steps(1, end);
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--rig-loop, 750ms) * var(--rig-i, 0) / var(--rig-n, 1));
+}
+
+/* Single-frame poses are static — no swap, always visible. */
+.octo-rig--n1 .octo-rig__frame {
+  opacity: 1;
+  animation: none;
+}
+
+.octo-rig--n2 {
+  --rig-n: 2;
+}
+.octo-rig--n2 .octo-rig__frame {
+  animation-name: octo-rig-show-2;
+}
+.octo-rig--n3 {
+  --rig-n: 3;
+}
+.octo-rig--n3 .octo-rig__frame {
+  animation-name: octo-rig-show-3;
+}
+.octo-rig--n4 {
+  --rig-n: 4;
+}
+.octo-rig--n4 .octo-rig__frame {
+  animation-name: octo-rig-show-4;
+}
+.octo-rig--n5 {
+  --rig-n: 5;
+}
+.octo-rig--n5 .octo-rig__frame {
+  animation-name: octo-rig-show-5;
+}
+.octo-rig--n6 {
+  --rig-n: 6;
+}
+.octo-rig--n6 .octo-rig__frame {
+  animation-name: octo-rig-show-6;
+}
+.octo-rig--n7 {
+  --rig-n: 7;
+}
+.octo-rig--n7 .octo-rig__frame {
+  animation-name: octo-rig-show-7;
+}
+.octo-rig--n8 {
+  --rig-n: 8;
+}
+.octo-rig--n8 .octo-rig__frame {
+  animation-name: octo-rig-show-8;
+}
+
+/* One frame's visible window = 100/N %; opaque up to the cut, hidden after. */
+@keyframes octo-rig-show-2 {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-3 {
+  0% {
+    opacity: 1;
+  }
+  33.34% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-4 {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-5 {
+  0% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-6 {
+  0% {
+    opacity: 1;
+  }
+  16.67% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-7 {
+  0% {
+    opacity: 1;
+  }
+  14.29% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-show-8 {
+  0% {
+    opacity: 1;
+  }
+  12.5% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --- Prop accents (confetti, hearts, Zzz, thought dots) ------------------- */
+.octo-rig__accent {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.octo-rig__accent--float {
+  animation: octo-rig-float 2.4s ease-in-out infinite;
+}
+.octo-rig__accent--rise {
+  animation: octo-rig-rise 2.8s ease-out infinite;
+}
+.octo-rig__accent--blink {
+  animation: octo-rig-accent-blink 1.8s steps(1, end) infinite;
+}
+.octo-rig__accent--confetti {
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in;
+}
+.octo-rig__accent--c1 {
+  animation-name: octo-rig-confetti-1;
+  animation-duration: 1.5s;
+}
+.octo-rig__accent--c2 {
+  animation-name: octo-rig-confetti-2;
+  animation-duration: 1.7s;
+}
+.octo-rig__accent--c3 {
+  animation-name: octo-rig-confetti-3;
+  animation-duration: 1.3s;
+}
+.octo-rig__accent--c4 {
+  animation-name: octo-rig-confetti-4;
+  animation-duration: 1.9s;
+}
+
+/* Prop motions — kept BEFORE the delay helpers so the shorthand (which resets
+   animation-delay) doesn't clobber the staggered --delay1/--delay2 longhands. */
+.octo-rig__accent--spin {
+  animation: octo-rig-spin 2.4s steps(8, end) infinite;
+}
+.octo-rig__accent--twinkle {
+  animation: octo-rig-twinkle 1.6s ease-in-out infinite;
+}
+.octo-rig__accent--shake {
+  animation: octo-rig-accent-shake 0.5s ease-in-out infinite;
+}
+.octo-rig__accent--swing {
+  animation: octo-rig-swing 2.2s ease-in-out infinite;
+}
+.octo-rig__accent--drop {
+  animation: octo-rig-drop 2.2s ease-in infinite;
+}
+.octo-rig__accent--pop {
+  animation: octo-rig-pop 1.8s ease-out infinite;
+}
+
+/* Stagger helpers — declared after the motion rules so the delay wins. */
+.octo-rig__accent--delay1 {
+  animation-delay: 0.5s;
+}
+.octo-rig__accent--delay2 {
+  animation-delay: 1s;
+}
+
+@keyframes octo-rig-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes octo-rig-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px);
+  }
+}
+@keyframes octo-rig-accent-blink {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  61%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes octo-rig-confetti-1 {
+  0% {
+    opacity: 0;
+    transform: translate(0, -4px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-5px, 26px) rotate(40deg);
+  }
+}
+@keyframes octo-rig-confetti-2 {
+  0% {
+    opacity: 0;
+    transform: translate(0, -4px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(5px, 27px) rotate(-38deg);
+  }
+}
+@keyframes octo-rig-confetti-3 {
+  0% {
+    opacity: 0;
+    transform: translate(0, -4px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-2px, 28px) rotate(24deg);
+  }
+}
+@keyframes octo-rig-confetti-4 {
+  0% {
+    opacity: 0;
+    transform: translate(0, -4px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(2px, 25px) rotate(-20deg);
+  }
+}
+
+@keyframes octo-rig-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes octo-rig-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.82);
+  }
+}
+@keyframes octo-rig-accent-shake {
+  0%,
+  100% {
+    transform: translateX(-1px);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+}
+@keyframes octo-rig-swing {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(12deg);
+  }
+}
+@keyframes octo-rig-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes octo-rig-pop {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .octo-rig__frame {
+    animation: none;
+    opacity: 0;
+  }
+  /* Freeze on the first (neutral) frame. */
+  .octo-rig__frame:first-child {
+    opacity: 1;
+  }
+  .octo-rig__accent {
+    animation: none;
+  }
+}

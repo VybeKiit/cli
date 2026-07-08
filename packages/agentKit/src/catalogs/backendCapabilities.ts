@@ -2,12 +2,12 @@
  * Express backend scaffold capabilities the agent can append via CLI + skills.
  */
 
-export interface BackendCapability {
+export type BackendCapability = {
   readonly id: string;
   readonly description: string;
   readonly cliCommand: string;
   readonly skill: string;
-}
+};
 
 /** Built-in backend features shipped in the template. */
 export const BACKEND_CAPABILITIES: readonly BackendCapability[] = [

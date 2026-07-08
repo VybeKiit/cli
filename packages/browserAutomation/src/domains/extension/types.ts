@@ -1,6 +1,5 @@
+import type { VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
 import type { Browser, BrowserContext, Page } from 'playwright';
-
-import type { CwsListing } from './schema';
 
 /**
  * What `connectToCwsChrome` returns. The caller is responsible for
@@ -9,10 +8,10 @@ import type { CwsListing } from './schema';
  * ADR-0011; verbs own only their page and CDP handle.
  */
 export type AttachedSession = {
-  browser: Browser;
-  context: BrowserContext;
-  dispose: () => Promise<void>;
-  page: Page;
+  readonly browser: Browser;
+  readonly context: BrowserContext;
+  readonly dispose: () => Promise<void>;
+  readonly page: Page;
 };
 
 /**
@@ -29,22 +28,24 @@ export type ExtensionConfig = {
    * been created on the dev console — `createNewItem` is the only verb that
    * accepts an empty string here; every other verb errors immediately.
    */
-  chromeWebStoreId: string;
+  readonly chromeWebStoreId: string;
   /**
    * Repo-relative path to the extension's workspace dir (e.g.
    * `extensions/wavey-audio-transcriber`). Used to locate `cws-listing.ts` and
    * resolve the pnpm filter target for the verify gate.
    */
-  dir: string;
+  readonly dir: string;
   /**
    * Stable internal key (e.g. `wavey-audio-transcriber`). Used as the argument the
    * developer types: `pnpm cws update-listing wavey-audio-transcriber`.
    */
-  key: string;
+  readonly key: string;
   /**
    * Human-readable name shown in logs (e.g. `Audio Transcriber`).
    */
-  name: string;
+  readonly name: string;
+  /** Optional package version surfaced from the CWS store file. */
+  readonly version?: string;
 };
 
 /**
@@ -58,16 +59,16 @@ export type VerbContext = {
    * CDP endpoint the verb should attach to (e.g. `http://localhost:9222`).
    * Defaults to `http://localhost:9222` if not provided.
    */
-  cdpEndpoint?: string;
+  readonly cdpEndpoint?: string;
   /** Target extension. */
-  extension: ExtensionConfig;
+  readonly extension: ExtensionConfig;
   /**
    * Optional logger. Defaults to `console`. Verbs only ever log progress
    * lines — never secrets, never raw page contents.
    */
-  log?: Pick<Console, 'error' | 'log' | 'warn'>;
+  readonly log?: Pick<VerbLogger, 'error' | 'log' | 'warn'>;
   /** Absolute path to the monorepo root. */
-  repoRoot: string;
+  readonly repoRoot: string;
 };
 
-export type { CwsListing };
+export type { CwsListing } from './schema';

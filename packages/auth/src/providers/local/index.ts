@@ -1,8 +1,7 @@
-import { type Result, fail, ok } from '@vybekiit/core';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import type { AuthProvider } from '../../types';
-import type { AuthUser } from '../../user';
-import { LOCAL_DEV_SESSION_TOKEN, type AuthSession, toSessionResult } from '../../session';
+import { type AuthSession, failAuth, LOCAL_DEV_SESSION_TOKEN } from '@vybekiit/auth/session';
+import type { AuthError, AuthProvider } from '@vybekiit/auth/types';
+import type { AuthUser } from '@vybekiit/auth/user';
+import { Effect } from 'effect';
 
 const DEV_USER: AuthUser = { id: 'local-dev-user', email: 'you@local.dev' };
 const resetTokens = new Map<string, string>();
@@ -15,67 +14,51 @@ const LOCAL_CAPABILITIES = {
   sms: true,
 } as const;
 
-function okSession(): Promise<Result<AuthSession>> {
-  return Promise.resolve(ok({ user: DEV_USER, sessionToken: LOCAL_DEV_SESSION_TOKEN }));
-}
+const okSession = (): Effect.Effect<AuthSession, AuthError> =>
+  Effect.succeed({ user: DEV_USER, sessionToken: LOCAL_DEV_SESSION_TOKEN });
 
-export function createLocalAuthProvider(): AuthProvider {
-  const impl: AuthProviderResult = {
-    name: 'local',
-    capabilities: LOCAL_CAPABILITIES,
-
-    signUpWithPassword(): Promise<Result<AuthSession>> {
-      return okSession();
-    },
-
-    signInWithPassword(): Promise<Result<AuthSession>> {
-      return okSession();
-    },
-
-    sendEmailCode(): Promise<Result<true>> {
-      return Promise.resolve(ok(true));
-    },
-
-    verifyEmailCode(): Promise<Result<AuthSession>> {
-      return okSession();
-    },
-
-    requestPasswordReset(email: string): Promise<Result<true>> {
+/**
+ * Create the local development auth provider.
+ *
+ * @returns An AuthProvider backed by deterministic local sessions.
+ * @example
+ * const provider = createLocalAuthProvider();
+ */
+export const createLocalAuthProvider = (): AuthProvider => ({
+  name: 'local',
+  capabilities: LOCAL_CAPABILITIES,
+  signUpWithPassword: () => okSession(),
+  signInWithPassword: () => okSession(),
+  sendEmailCode: () => Effect.succeed(true),
+  verifyEmailCode: () => okSession(),
+  requestPasswordReset: (email) =>
+    Effect.sync(() => {
       resetTokens.set('local-reset-token', email);
-      return Promise.resolve(ok(true));
-    },
-
-    resetPassword(token: string, _newPassword: string): Promise<Result<AuthSession>> {
-      if (token !== 'local-reset-token' && !resetTokens.has(token)) {
-        return Promise.resolve(fail('reset_failed', 'That reset link is not valid.'));
-      }
-      return okSession();
-    },
-
-    sendMagicLink(email: string): Promise<Result<true>> {
+      return true as const;
+    }),
+  resetPassword: (token) => {
+    if (token !== 'local-reset-token' && !resetTokens.has(token)) {
+      return failAuth('reset_failed', 'That reset link is not valid.');
+    }
+    return okSession();
+  },
+  sendMagicLink: (email) =>
+    Effect.sync(() => {
       magicTokens.set('local-magic-token', email);
-      return Promise.resolve(ok(true));
-    },
-
-    verifyMagicLink(token: string): Promise<Result<AuthSession>> {
-      if (token !== 'local-magic-token' && !magicTokens.has(token)) {
-        return Promise.resolve(fail('magic_link_failed', 'That sign-in link is not valid.'));
-      }
-      return okSession();
-    },
-
-    sendSmsCode(_phone: string): Promise<Result<true>> {
-      return Promise.resolve(ok(true));
-    },
-
-    verifySmsCode(_phone: string, _code: string): Promise<Result<AuthSession>> {
-      return okSession();
-    },
-
-    getUser(sessionToken: string): Promise<Result<AuthUser>> {
-      if (!sessionToken) return Promise.resolve(fail('no_user', 'No session token provided.'));
-      return Promise.resolve(ok(DEV_USER));
-    },
-  };
-  return toEffectAuthProvider(impl);
-}
+      return true as const;
+    }),
+  verifyMagicLink: (token) => {
+    if (token !== 'local-magic-token' && !magicTokens.has(token)) {
+      return failAuth('magic_link_failed', 'That sign-in link is not valid.');
+    }
+    return okSession();
+  },
+  sendSmsCode: () => Effect.succeed(true),
+  verifySmsCode: () => okSession(),
+  getUser: (sessionToken) => {
+    if (sessionToken.length === 0) {
+      return failAuth('no_user', 'No session token provided.');
+    }
+    return Effect.succeed(DEV_USER);
+  },
+});

@@ -1,3 +1,4 @@
+// biome-ignore-all lint/style/noExcessiveLinesPerFile: core config is the legacy env bridge until every concern owns its slice.
 import { Schema } from 'effect';
 import { DEFAULT_APP_URL } from './constants';
 
@@ -26,9 +27,12 @@ const UrlString = Schema.String.pipe(
   Schema.filter((value) => URL.canParse(value), { message: () => 'must be a valid URL' }),
 );
 
+// "a@b.co" -> match, "a@b" / "a b@c.co" -> no match
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 /** A string shaped like an email address — the Schema equivalent of zod `.email()`. */
 const EmailString = Schema.String.pipe(
-  Schema.filter((value) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value), {
+  Schema.filter((value) => EMAIL_PATTERN.test(value), {
     message: () => 'must be a valid email',
   }),
 );
@@ -46,6 +50,11 @@ export const onOff = Schema.Literal('on', 'off');
  * coerce to `0` and trip the `positive` guard. Mapping `''` to the default (and absent
  * to the `optionalWith` default) means a blank line means "use the safe default"
  * rather than "fail to boot" — important when the consumer is a non-coder.
+ *
+ * @param fallback - Positive integer used when the env value is absent or blank.
+ * @returns A Schema that decodes a positive integer env value.
+ * @example
+ * const rateLimitMax = positiveIntEnv(60);
  */
 export const positiveIntEnv = (fallback: number) =>
   Schema.optionalWith(
@@ -78,7 +87,7 @@ export const appConfigSchema = Schema.Struct({
 
 /**
  * Secure-by-default app-layer limits (rate limit, origin lock) — shipped on so a
- * non-coder never has to ask for them. Read by `@vybekiit/security`, the web
+ * non-coder never has to ask for them. Read by `@vybekiit/core/security`, the web
  * `middleware.ts`, and the Cloudflare edge config: one source, three enforcement
  * points. Rationale + threat model: ADR-0009.
  */
@@ -197,8 +206,8 @@ export const hostingConfigSchema = Schema.Struct({
 });
 
 /**
- * Which email adapter `@vybekiit/email` constructs. Cloudflare is the default (reuses
- * {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in (ADR-0002).
+ * Which email adapter the templates' email delivery constructs. Cloudflare is the default
+ * (reuses {@link cloudflareConfigSchema} creds); `ses` and `resend` are opt-in (ADR-0002).
  */
 export const emailConfigSchema = Schema.Struct({
   EMAIL_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'ses', 'resend'), {
@@ -239,8 +248,8 @@ export const awsHostingConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and `@vybekiit/assets`
- * (CDN delivery). `R2_PUBLIC_URL` is the public bucket origin for readable object URLs.
+ * Cloudflare R2 credentials — used by `@vybekiit/db` (r2 adapter) and the templates'
+ * asset delivery (CDN). `R2_PUBLIC_URL` is the public bucket origin for readable object URLs.
  */
 export const r2ConfigSchema = Schema.Struct({
   R2_ACCOUNT_ID: NonEmpty,
@@ -325,8 +334,8 @@ export const cognitoConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by
- * `@vybekiit/email`. `CLOUDFLARE_EMAIL_ENDPOINT` is optional (transactional sends run
+ * Cloudflare credentials — used at deploy time (`@vybekiit/deploy`) and by the templates'
+ * email delivery. `CLOUDFLARE_EMAIL_ENDPOINT` is optional (transactional sends run
  * from the deployed Worker/Pages context, which exposes its own send route).
  */
 export const cloudflareConfigSchema = Schema.Struct({
@@ -336,7 +345,7 @@ export const cloudflareConfigSchema = Schema.Struct({
 });
 
 /**
- * Cloudflare email worker credentials — used by `@vybekiit/email` (cloudflare adapter).
+ * Cloudflare email worker credentials — used by the templates' cloudflare email adapter.
  * Separate from deploy creds so sending does not require a full CF API token at runtime.
  */
 export const cloudflareEmailConfigSchema = Schema.Struct({
@@ -375,16 +384,24 @@ export const godaddyConfigSchema = Schema.Struct({
 /**
  * Enforce an all-or-none group of required keys: pass when none or all are present,
  * else fail with the first missing key named (so the message is actionable + greppable).
+ *
+ * @param value - Partial config object to inspect.
+ * @param keys - Related keys that must be present together.
+ * @returns `true` when the group is valid, otherwise a Schema failure message.
+ * @example
+ * const result = allOrNone(env, ['NAMECHEAP_API_USER', 'NAMECHEAP_API_KEY']);
  */
-function allOrNone<K extends string>(
+const allOrNone = <K extends string>(
   value: Partial<Record<K, unknown>>,
   keys: readonly K[],
-): true | string {
+): true | string => {
   const present = keys.filter((key) => Boolean(value[key]));
-  if (present.length === 0 || present.length === keys.length) return true;
+  if (present.length === 0 || present.length === keys.length) {
+    return true;
+  }
   const missing = keys.find((key) => !value[key]);
   return `${missing} is required when any related registrar var is set`;
-}
+};
 
 /**
  * Vercel credentials — used by `@vybekiit/deploy` (vercel adapter, ADR-0006).
@@ -425,7 +442,7 @@ export const storeConfigSchema = Schema.Struct({
 });
 
 /**
- * Which observability adapter `@vybekiit/observability` constructs. `local` is the
+ * Which observability adapter `@vybekiit/core/observability` constructs. `local` is the
  * no-op default; `sentry` sends errors when `SENTRY_DSN` is set (track-errors skill).
  */
 export const observabilityConfigSchema = Schema.Struct({
@@ -434,7 +451,7 @@ export const observabilityConfigSchema = Schema.Struct({
   }),
 });
 
-/** Sentry credentials — used by `@vybekiit/observability` (sentry adapter). */
+/** Sentry credentials — used by `@vybekiit/core/observability` (sentry adapter). */
 export const sentryConfigSchema = Schema.Struct({
   SENTRY_DSN: Schema.optional(NonEmpty),
 });
@@ -469,7 +486,7 @@ export const posthogConfigSchema = Schema.Struct({
   POSTHOG_HOST: Schema.optional(UrlString),
 });
 
-/** Which notifications adapter `@vybekiit/notifications` constructs. */
+/** Which notifications adapter the templates' notifications delivery constructs. */
 export const notificationsConfigSchema = Schema.Struct({
   NOTIFICATIONS_PROVIDER: Schema.optionalWith(Schema.Literal('expo', 'twilio', 'email', 'local'), {
     default: () => 'expo' as const,
@@ -596,7 +613,7 @@ export const i18nConfigSchema = Schema.Struct({
   MESSAGES_DIR: Schema.optionalWith(NonEmpty, { default: () => 'messages' }),
 });
 
-/** Resend transactional email — `@vybekiit/email` (resend adapter). */
+/** Resend transactional email — the templates' resend email adapter. */
 export const resendConfigSchema = Schema.Struct({
   RESEND_API_KEY: NonEmpty,
 });
@@ -665,12 +682,19 @@ export type ResendConfig = Schema.Schema.Type<typeof resendConfigSchema>;
  * Parse + validate one config slice from the environment, failing loud with a single
  * actionable message (ADR-0023). `errors: 'all'` accumulates every missing/invalid key
  * so a misconfigured deploy sees them together; excess env keys are ignored by default.
+ *
+ * @param schema - Effect Schema for the concern's config slice.
+ * @param env - Environment source to decode.
+ * @returns The decoded config slice.
+ * @throws When Schema validation fails.
+ * @example
+ * const config = parseEnv(paymentsConfigSchema, process.env);
  */
-export function parseEnv<A, I>(schema: Schema.Schema<A, I>, env: EnvSource = process.env): A {
+export const parseEnv = <A, I>(schema: Schema.Schema<A, I>, env: EnvSource = process.env): A => {
   try {
     return Schema.decodeUnknownSync(schema, { errors: 'all' })(env);
   } catch (caught) {
     const detail = caught instanceof Error ? caught.message : String(caught);
-    throw new Error(`Invalid VybeKiit configuration:\n${detail}`);
+    throw new Error(`Invalid VybeKiit configuration:\n${detail}`, { cause: caught });
   }
-}
+};

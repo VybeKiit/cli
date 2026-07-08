@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { createWorkspaceAliasPlugin } from '../../scripts/lib/tsupWorkspaceAliases.mjs';
 
 export default defineConfig({
   entry: {
@@ -6,11 +7,12 @@ export default defineConfig({
     regions: 'src/regions.ts',
     schema: 'src/schema.ts',
     types: 'src/types.ts',
-    'cli/index': 'src/cli/index.ts',
+    'cli/index': 'src/cli/main.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
   sourcemap: true,
   treeshake: true,
+  esbuildPlugins: [createWorkspaceAliasPlugin()],
 });

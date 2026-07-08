@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { DropdownItem } from "../tailadmin-ui/dropdown/DropdownItem";
-import { Dropdown } from "../tailadmin-ui/dropdown/Dropdown";
-import { Link } from "@tanstack/react-router";
+import { useState } from 'react';
+import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
+import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
+import { Link } from '@tanstack/react-router';
 
-export default function UserDropdown() {
+export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  function toggleDropdown() {
-    setIsOpen(!isOpen);
-  }
+  const toggleDropdown = () => {
+    setIsOpen((value) => !value);
+  };
 
-  function closeDropdown() {
+  const closeDropdown = () => {
     setIsOpen(false);
-  }
+  };
   return (
     <div className="relative">
       <button
@@ -26,7 +26,7 @@ export default function UserDropdown() {
         <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
+            isOpen ? 'rotate-180' : ''
           }`}
           width="18"
           height="20"
@@ -159,4 +159,4 @@ export default function UserDropdown() {
       </Dropdown>
     </div>
   );
-}
+};

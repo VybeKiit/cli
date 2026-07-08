@@ -1,13 +1,11 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-
-import type { Page } from 'playwright';
-
 import {
   LS_FIELD_FALLBACKS,
   locatorFromFallback,
-} from '../../../../src/domains/payments/ls/dashboard/fieldFallbacks';
-import { LS_E2E_PREFIX, matchesE2ePrefix, type LsE2eArtifacts } from './e2eNames';
+} from '@vybekiit/browser-automation/domains/payments/ls/dashboard/fieldFallbacks';
+import type { Page } from 'playwright';
+import { LS_E2E_PREFIX, type LsE2eArtifacts, matchesE2ePrefix } from './e2eNames';
 
 const ORIGIN = 'https://app.lemonsqueezy.com';
 

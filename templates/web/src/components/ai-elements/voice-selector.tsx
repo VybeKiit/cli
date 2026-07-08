@@ -1,7 +1,7 @@
 'use client';
 
 import { useControllableState } from '@radix-ui/react-use-controllable-state';
-import { Button } from '@/components/ui/button';
+import { Button } from '@vybekiit/ui/button';
 import {
   Command,
   CommandDialog,
@@ -12,20 +12,17 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/components/ui/command';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Spinner } from '@/components/ui/spinner';
+} from '@vybekiit/ui/command';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@vybekiit/ui/dialog';
+import { Spinner } from '@vybekiit/ui/spinner';
 import { cn } from '@/lib/utils';
 import {
-  CircleSmallIcon,
-  MarsIcon,
-  MarsStrokeIcon,
-  NonBinaryIcon,
+  CircleIcon,
   PauseIcon,
   PlayIcon,
-  TransgenderIcon,
-  VenusAndMarsIcon,
-  VenusIcon,
+  UserIcon,
+  UserRoundIcon,
+  UsersIcon,
 } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
@@ -167,31 +164,31 @@ export const VoiceSelectorGender = ({
 
   switch (value) {
     case 'male': {
-      icon = <MarsIcon className="size-4" />;
+      icon = <UserIcon className="size-4" />;
       break;
     }
     case 'female': {
-      icon = <VenusIcon className="size-4" />;
+      icon = <UserRoundIcon className="size-4" />;
       break;
     }
     case 'transgender': {
-      icon = <TransgenderIcon className="size-4" />;
+      icon = <UsersIcon className="size-4" />;
       break;
     }
     case 'androgyne': {
-      icon = <MarsStrokeIcon className="size-4" />;
+      icon = <UsersIcon className="size-4" />;
       break;
     }
     case 'non-binary': {
-      icon = <NonBinaryIcon className="size-4" />;
+      icon = <UsersIcon className="size-4" />;
       break;
     }
     case 'intersex': {
-      icon = <VenusAndMarsIcon className="size-4" />;
+      icon = <UsersIcon className="size-4" />;
       break;
     }
     default: {
-      icon = <CircleSmallIcon className="size-4" />;
+      icon = <CircleIcon className="size-4" />;
     }
   }
 

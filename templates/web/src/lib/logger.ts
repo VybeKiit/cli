@@ -1,7 +1,7 @@
 import { appConfigSchema, createLogger, parseEnv, resolveDefaultLogLevel } from '@vybekiit/core';
-import process from 'node:process';
+import { readNodeEnv } from '@/lib/nodeEnv';
 
-const app = parseEnv(appConfigSchema, process.env);
+const app = parseEnv(appConfigSchema, readNodeEnv());
 const level = resolveDefaultLogLevel(app.NODE_ENV, app.LOG_LEVEL);
 
 /** App-wide logger — verbose in development, quiet in production automatically. */

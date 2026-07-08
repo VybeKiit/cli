@@ -11,18 +11,26 @@ interface GlowCardProps {
   light?: boolean;
 }
 
-/** Rounded card with optional cinematic glow or light mockup styling. */
-export function GlowCard({ children, className, glow = false, light = false }: GlowCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-3xl border transition-all duration-300',
-        light ? 'light-ui-card' : 'glass-border bg-[var(--bg-card)]',
-        glow && 'blue-border-glow',
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
+/**
+ * Rounded card with optional cinematic glow or light mockup styling.
+ *
+ * @param props - Component props.
+ * @returns The rendered GlowCard element.
+ * @example
+ * ```tsx
+ * <GlowCard />
+ * ```
+ */
+
+export const GlowCard = ({ children, className, glow = false, light = false }: GlowCardProps) => (
+  <div
+    className={cn(
+      'rounded-3xl border transition-all duration-300',
+      light ? 'light-ui-card' : 'glass-border bg-[var(--bg-card)]',
+      glow && 'blue-border-glow',
+      className,
+    )}
+  >
+    {children}
+  </div>
+);

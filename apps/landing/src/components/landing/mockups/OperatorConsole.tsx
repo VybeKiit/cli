@@ -1,97 +1,107 @@
 'use client';
 
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { Badge } from '@/components/ui/badge';
+import type { LucideIcon } from 'lucide-react';
+import {
+  BarChart3,
+  Check,
+  Clock,
+  CreditCard,
+  Database,
+  FileText,
+  Lock,
+  Mail,
+  UserPlus,
+} from 'lucide-react';
 
-const SYSTEMS = ['Auth', 'Database', 'Payments', 'Emails', 'Analytics', 'Cron Jobs'] as const;
+import { LightPanel } from '@/components/landing/kit/LightPanel';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
-const FEED = [
-  'New user registered — 2m ago',
-  'Payment received — 7m ago',
-  'Email sent — 12m ago',
-  'Report generated — 18m ago',
-  'Webhook delivered — 24m ago',
-  'Backup completed — 31m ago',
-] as const;
+interface SystemRow {
+  readonly name: string;
+  readonly icon: LucideIcon;
+}
 
-/** Operator Console zig-zag mockup — visual-only light card. */
-export function OperatorConsoleMock() {
-  return (
-    <div className="light-ui-card w-full rounded-2xl">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <h3 className="font-bold text-[var(--light-text)] text-xl">Operator Console</h3>
-            <Badge
-              className="border-[var(--blue)]/30 bg-[var(--blue)]/10 text-[10px] text-[var(--blue-strong)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
+const SYSTEMS: readonly SystemRow[] = [
+  { name: 'Auth', icon: Lock },
+  { name: 'Database', icon: Database },
+  { name: 'Payments', icon: CreditCard },
+  { name: 'Emails', icon: Mail },
+  { name: 'Analytics', icon: BarChart3 },
+  { name: 'Cron Jobs', icon: Clock },
+];
+
+interface FeedRow {
+  readonly text: string;
+  readonly time?: string;
+  readonly icon: LucideIcon;
+}
+
+const FEED: readonly FeedRow[] = [
+  { text: 'All systems operational', icon: Check },
+  { text: 'New user registered', time: '2m ago', icon: UserPlus },
+  { text: 'Payment received', time: '7m ago', icon: CreditCard },
+  { text: 'Email sent', time: '12m ago', icon: Mail },
+  { text: 'Report generated', time: '18m ago', icon: FileText },
+];
+
+/**
+ * Operator Console zig-zag mockup — services list + live activity feed, visual only.
+ *
+ * @returns The rendered OperatorConsoleMock element.
+ * @example
+ * ```tsx
+ * <OperatorConsoleMock />
+ * ```
+ */
+
+export const OperatorConsoleMock = () => (
+  <LightPanel
+    contentClassName="grid gap-4 md:grid-cols-2"
+    description="Everything running. Automatically."
+    title="Operator Console"
+  >
+    <Card className="gap-0 border-black/6 bg-white py-0 shadow-none">
+      <CardContent className="space-y-2 p-4">
+        {SYSTEMS.map((system) => (
+          <div
+            className="flex items-center gap-3 rounded-lg border border-black/5 bg-[#f8fafc] px-3 py-2.5"
+            key={system.name}
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#23b26d] text-white">
+              <system.icon className="h-4 w-4" strokeWidth={2.2} />
+            </span>
+            <span className="font-medium text-[var(--light-text)] text-sm">{system.name}</span>
+            <span className="ms-auto inline-flex items-center gap-1.5 font-medium text-emerald-700 text-sm">
+              <span className="h-2 w-2 rounded-full bg-[#23b26d]" />
+              Active
+            </span>
           </div>
-          <p className="text-[var(--light-muted)] text-sm">Everything running. Automatically.</p>
+        ))}
+      </CardContent>
+    </Card>
+
+    <Card className="gap-0 border-black/6 bg-white py-0 shadow-none">
+      <CardContent className="p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="font-semibold text-[var(--light-text)] text-sm">Activity Feed</p>
+          <span className="font-medium text-[var(--blue-strong)] text-xs">View all</span>
         </div>
-        <Badge
-          className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[var(--green)]"
-          variant="outline"
-        >
-          All healthy
-        </Badge>
-      </div>
-      <div className="grid gap-6 md:grid-cols-2">
+        <Separator className="mb-3 bg-black/6" />
         <ul className="space-y-3">
-          {SYSTEMS.map((name) => (
-            <li
-              className="flex items-center justify-between rounded-lg border border-black/5 bg-white/60 px-3 py-2 text-sm"
-              key={name}
-            >
-              <span className="font-medium text-[var(--light-text)]">{name}</span>
-              <Badge
-                className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[10px] text-[var(--green)]"
-                variant="outline"
-              >
-                Active
-              </Badge>
+          {FEED.map((row) => (
+            <li className="flex items-center gap-2.5" key={row.text}>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#eef4ff] text-[var(--blue-strong)]">
+                <row.icon className="h-3.5 w-3.5" strokeWidth={2.2} />
+              </span>
+              <span className="text-[var(--light-text)] text-xs">{row.text}</span>
+              {row.time ? (
+                <span className="ms-auto text-[10px] text-[var(--light-muted)]">{row.time}</span>
+              ) : null}
             </li>
           ))}
         </ul>
-        <div>
-          <div className="mb-3 flex items-center justify-between">
-            <p className="font-semibold text-[var(--light-text)] text-sm">Activity Feed</p>
-            <Badge
-              className="border-[var(--green)]/30 bg-[var(--green-soft)] text-[10px] text-[var(--green)]"
-              variant="outline"
-            >
-              Live
-            </Badge>
-          </div>
-          <p className="mb-2 text-[var(--green)] text-xs">All systems operational</p>
-          <ul className="space-y-2">
-            {FEED.map((item) => (
-              <li className="flex items-start gap-2 text-[var(--light-muted)] text-xs" key={item}>
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--blue)]" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-black/6 bg-[var(--light-card-muted)] p-3">
-              <p className="text-[10px] text-[var(--light-muted)] uppercase tracking-wide">
-                Uptime
-              </p>
-              <p className="font-bold text-2xl text-[var(--light-text)]">
-                <AnimatedNumber value="99.98%" />
-              </p>
-            </div>
-            <div className="rounded-lg border border-black/6 bg-[var(--light-card-muted)] p-3">
-              <p className="text-[10px] text-[var(--light-muted)] uppercase tracking-wide">Tasks</p>
-              <p className="font-bold text-2xl text-[var(--light-text)]">
-                <AnimatedNumber value="24" />
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+      </CardContent>
+    </Card>
+  </LightPanel>
+);

@@ -1,12 +1,5 @@
 {
   "files": {
-    "icon.avif": {
-      "source": "icon.avif",
-      "optimized": "icon.webp",
-      "variants": {
-        "webp": "icon.webp"
-      }
-    },
     "icon.png": {
       "source": "icon.png",
       "optimized": "icon.webp",
@@ -21,20 +14,6 @@
       "optimized": "icon.svg",
       "variants": {}
     },
-    "icon.webp": {
-      "source": "icon.webp",
-      "optimized": "icon.webp",
-      "variants": {
-        "avif": "icon.avif"
-      }
-    },
-    "splash.avif": {
-      "source": "splash.avif",
-      "optimized": "splash.webp",
-      "variants": {
-        "webp": "splash.webp"
-      }
-    },
     "splash.png": {
       "source": "splash.png",
       "optimized": "splash.webp",
@@ -42,13 +21,6 @@
         "webp": "splash.webp",
         "avif": "splash.avif",
         "png": "splash.png"
-      }
-    },
-    "splash.webp": {
-      "source": "splash.webp",
-      "optimized": "splash.webp",
-      "variants": {
-        "avif": "splash.avif"
       }
     }
   }

@@ -4,11 +4,14 @@
  * authoritative home (per the repo's "separate data from UI" rule).
  */
 
-/** The product's one-time price, in whole US dollars. */
+/** The product's one-time price, in US dollars. */
 const PRICE_USD = 29;
 
 /** Post-launch-week price (early bird ends after launch week). */
 const PRICE_AFTER_LAUNCH_USD = 49;
+
+/** ShipFast $199 + useSAASkit mobile $249 + Shipped.club extension $207 — see comparison-matrix. */
+const VALUE_STACK_USD = 655;
 
 /**
  * Single source of truth for the displayed price. Early-bird $29 during launch week,
@@ -25,6 +28,19 @@ export const PRICE = {
   refundDays: 14,
   /** Early-bird messaging for launch week. */
   earlyBirdNote: `$${PRICE_USD} launch week → $${PRICE_AFTER_LAUNCH_USD} after`,
+} as const;
+
+/**
+ * Competitor-backed value stack for the pricing hero animation. Buying web + mobile +
+ * extension separately from rival kits sums to $655; VybeKiit bundles all three for $29.
+ */
+export const PRICE_VALUE_STACK = {
+  compareAtUsd: VALUE_STACK_USD,
+  compareAtDisplay: `$${VALUE_STACK_USD}`,
+  savingsUsd: VALUE_STACK_USD - PRICE_USD,
+  savingsPercent: Math.ceil(((VALUE_STACK_USD - PRICE_USD) / VALUE_STACK_USD) * 100),
+  basisNote:
+    'Web + mobile + extension bought separately (ShipFast, useSAASkit, Shipped.club — verified 2026-06-27).',
 } as const;
 
 /** Brand identity strings shown in the header, footer, and metadata. */
@@ -80,5 +96,5 @@ export const SUPPORT: {
   /** Discord invite URL — set before launch. */
   discordUrl: '',
   /** Kit bug email — from root EMAIL_FROM when set. */
-  kitEmail: process.env.EMAIL_FROM ?? 'support@vybekiit.com',
+  kitEmail: process.env.EMAIL_FROM === undefined ? 'support@vybekiit.com' : process.env.EMAIL_FROM,
 };

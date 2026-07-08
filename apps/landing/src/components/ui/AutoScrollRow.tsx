@@ -1,12 +1,21 @@
-import { cn } from '@/lib/utils';
+'use client';
+
 import {
   Children,
+  type CSSProperties,
   cloneElement,
   isValidElement,
-  type CSSProperties,
   type ReactElement,
   type ReactNode,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
+import { parseDurationSeconds, useMarqueeLoop } from '@/hooks/useMarqueeLoop';
+import { useReducedMotion } from '@/lib/motion';
+import { cn } from '@/lib/utils';
+
+type HoverBehavior = 'pause' | 'accelerate-reverse' | 'none';
 
 interface AutoScrollRowProps {
   readonly children: ReactNode;
@@ -14,16 +23,18 @@ interface AutoScrollRowProps {
   readonly durationDesktop?: string;
   readonly durationMobile?: string;
   readonly pauseOnHover?: boolean;
+  readonly hoverBehavior?: HoverBehavior;
   readonly className?: string;
   readonly trackClassName?: string;
   readonly rowClassName?: string;
 }
 
-function cloneForLoop(children: ReactNode) {
+const cloneForLoop = (children: ReactNode) => {
   if (isValidElement(children)) {
+    const keySource = children.key === null ? 'row' : children.key;
     return cloneElement(children as ReactElement<{ 'aria-hidden'?: boolean }>, {
       'aria-hidden': true,
-      key: `${children.key ?? 'row'}-clone`,
+      key: `${keySource}-clone`,
     });
   }
 
@@ -31,23 +42,74 @@ function cloneForLoop(children: ReactNode) {
     if (!isValidElement(child)) {
       return child;
     }
+    const keySource = child.key === null ? index : child.key;
     return cloneElement(child as ReactElement, {
-      key: `${child.key ?? index}-clone`,
+      key: `${keySource}-clone`,
     });
   });
-}
+};
 
-/** Horizontal row that scrolls on its own and loops seamlessly (edge fade included). */
-export function AutoScrollRow({
+const resolveHoverBehavior = (
+  hoverBehavior: HoverBehavior | undefined,
+  pauseOnHover: boolean,
+): HoverBehavior => {
+  if (hoverBehavior !== undefined) {
+    return hoverBehavior;
+  }
+  return pauseOnHover ? 'pause' : 'none';
+};
+
+/**
+ * Horizontal row that scrolls on its own and loops seamlessly (edge fade included).
+ *
+ * @param props - Component props.
+ * @returns The rendered AutoScrollRow element.
+ * @example
+ * ```tsx
+ * <AutoScrollRow />
+ * ```
+ */
+
+export const AutoScrollRow = ({
   children,
   ariaLabel,
   durationDesktop = '80s',
   durationMobile = '55s',
   pauseOnHover = true,
+  hoverBehavior,
   className,
   trackClassName,
   rowClassName,
-}: AutoScrollRowProps) {
+}: AutoScrollRowProps) => {
+  const reduced = useReducedMotion();
+  const regionRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+
+  const resolvedHover = resolveHoverBehavior(hoverBehavior, pauseOnHover);
+  const useJsMarquee = resolvedHover === 'accelerate-reverse' && !reduced;
+  const [durationSeconds, setDurationSeconds] = useState(() =>
+    parseDurationSeconds(durationMobile),
+  );
+
+  useEffect(() => {
+    if (!useJsMarquee) {
+      return;
+    }
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => {
+      setDurationSeconds(parseDurationSeconds(mq.matches ? durationDesktop : durationMobile));
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, [durationDesktop, durationMobile, useJsMarquee]);
+
+  useMarqueeLoop(trackRef, copyRef, regionRef, {
+    durationSeconds,
+    enabled: useJsMarquee,
+  });
+
   const style = {
     ['--auto-scroll-duration-desktop' as string]: durationDesktop,
     ['--auto-scroll-duration-mobile' as string]: durationMobile,
@@ -55,15 +117,23 @@ export function AutoScrollRow({
 
   return (
     <div
+      ref={regionRef}
       aria-label={ariaLabel}
-      className={cn('auto-scroll-row', pauseOnHover && 'auto-scroll-row--pause-hover', className)}
+      className={cn(
+        'auto-scroll-row',
+        resolvedHover === 'pause' && 'auto-scroll-row--pause-hover',
+        useJsMarquee && 'auto-scroll-row--js-marquee',
+        className,
+      )}
       role="region"
       style={style}
     >
-      <div className={cn('auto-scroll-row-track', trackClassName)}>
-        <div className={cn('auto-scroll-row-copy', rowClassName)}>{children}</div>
+      <div ref={trackRef} className={cn('auto-scroll-row-track', trackClassName)}>
+        <div ref={copyRef} className={cn('auto-scroll-row-copy', rowClassName)}>
+          {children}
+        </div>
         <div className={cn('auto-scroll-row-copy', rowClassName)}>{cloneForLoop(children)}</div>
       </div>
     </div>
   );
-}
+};

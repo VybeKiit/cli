@@ -14,7 +14,11 @@ export interface NavLink {
 
 /** Primary marketing nav links shown in the header. */
 export const HEADER_LINKS: readonly NavLink[] = [
+  { href: '/products', labelKey: 'common.nav.products' },
   { href: '/pricing', labelKey: 'common.nav.pricing' },
+  { href: '/support', labelKey: 'common.nav.support' },
+  { href: '/status', labelKey: 'common.nav.status' },
+  { href: '/changelog', labelKey: 'common.nav.changelog' },
 ];
 
 /** Legal links shown in the footer — every product needs these. */

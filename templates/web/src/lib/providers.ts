@@ -10,59 +10,104 @@ import { resolveSearchProvider } from '@vybekiit/search';
 import { resolveTenancyProvider } from '@vybekiit/tenancy';
 
 /**
- * Utility provider registry — the ONE place server modules resolve kit providers.
+ * Resolve the analytics provider from the template environment.
  *
- * Skills point agents here instead of scattering one-line `get*()` files across
- * `src/lib/`. Buyer-facing wire points (`auth-client.ts`, `billing-client.ts`)
- * stay separate because those are client-side API calls, not provider resolution.
+ * @returns An analytics service effect for visitor stats.
+ * @example
+ * const analytics = await Effect.runPromise(getAnalytics());
  */
+const getAnalytics = () => resolveAnalyticsProvider();
 
-/** Server/client wire point for visitor stats — skill: add-analytics */
-export function getAnalytics() {
-  return resolveAnalyticsProvider();
-}
+/**
+ * Resolve the background jobs provider from the template environment.
+ *
+ * @returns A jobs service backed by the selected adapter.
+ * @example
+ * const jobs = getJobs();
+ */
+const getJobs = () => resolveJobsProvider();
 
-/** Background jobs wire point */
-export function getJobs() {
-  return resolveJobsProvider();
-}
+/**
+ * Resolve the CMS provider used by buyer blog and content routes.
+ *
+ * @returns A CMS service backed by MDX until the buyer adds another adapter.
+ * @example
+ * const cms = getCms();
+ */
+const getCms = () => createCmsFromEnv();
 
-/** Blog/content wire point — skill: add-blog */
-export function getCms() {
-  return createCmsFromEnv();
-}
+/**
+ * Resolve the compliance provider used by cookie and privacy features.
+ *
+ * @returns A compliance service backed by the selected adapter.
+ * @example
+ * const compliance = getCompliance();
+ */
+const getCompliance = () => resolveComplianceProvider();
 
-/** Cookie consent wire point */
-export function getCompliance() {
-  return resolveComplianceProvider();
-}
+/**
+ * Resolve the notification provider for outbound messages.
+ *
+ * @returns A notification service backed by the selected adapter.
+ * @example
+ * const notifications = getNotifications();
+ */
+const getNotifications = () => resolveNotificationsProvider();
 
-/** Notification delivery wire point — skill: add-notifications */
-export function getNotifications() {
-  return resolveNotificationsProvider();
-}
+/**
+ * Resolve the search provider used by buyer content search.
+ *
+ * @returns A search service backed by the selected adapter.
+ * @example
+ * const search = getSearch();
+ */
+const getSearch = () => resolveSearchProvider();
 
-/** Search wire point — skill: add-search */
-export function getSearch() {
-  return resolveSearchProvider();
-}
+/**
+ * Resolve the server-only AI runtime provider.
+ *
+ * @returns An AI service effect backed by the selected adapter.
+ * @example
+ * const ai = await Effect.runPromise(getAi());
+ */
+const getAi = () => resolveAiProvider();
 
-/** Server-only AI runtime wire point — skill: add-ai */
-export function getAi() {
-  return resolveAiProvider();
-}
+/**
+ * Resolve the realtime provider for live buyer app updates.
+ *
+ * @returns A realtime service backed by the selected adapter.
+ * @example
+ * const realtime = getRealtime();
+ */
+const getRealtime = () => resolveRealtimeProvider();
 
-/** Live updates wire point */
-export function getRealtime() {
-  return resolveRealtimeProvider();
-}
+/**
+ * Resolve the key-value storage provider for fast reads and writes.
+ *
+ * @returns A KV service backed by the selected adapter.
+ * @example
+ * const kv = getKv();
+ */
+const getKv = () => resolveKvProvider();
 
-/** Fast storage wire point */
-export function getKv() {
-  return resolveKvProvider();
-}
+/**
+ * Resolve the tenancy provider for team workspace features.
+ *
+ * @returns A tenancy service backed by the selected adapter.
+ * @example
+ * const tenancy = getTenancy();
+ */
+const getTenancy = () => resolveTenancyProvider();
 
-/** Team workspace wire point — skill: add-teams */
-export function getTenancy() {
-  return resolveTenancyProvider();
-}
+export {
+  getAi,
+  getAnalytics,
+  getCms,
+  getCompliance,
+  getJobs,
+  getKv,
+  getNotifications,
+  getRealtime,
+  getSearch,
+  getTenancy,
+};

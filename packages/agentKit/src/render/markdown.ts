@@ -24,23 +24,33 @@ export const GENERATED_SECTION_MARKERS = {
 
 /**
  * Wrap content in HTML comment markers so sync can replace in-place without clobbering prose.
+ *
+ * @param id - id input.
+ * @param content - content input.
+ * @returns The rendered wrap generated section text.
+ * @example
+ * const result = wrapGeneratedSection(id, content);
  */
-export function wrapGeneratedSection(id: GeneratedSectionId, content: string): string {
-  return [
-    GENERATED_SECTION_MARKERS.start(id),
-    content.trim(),
-    GENERATED_SECTION_MARKERS.end(id),
-  ].join('\n');
-}
+export const wrapGeneratedSection = (id: GeneratedSectionId, content: string): string =>
+  [GENERATED_SECTION_MARKERS.start(id), content.trim(), GENERATED_SECTION_MARKERS.end(id)].join(
+    '\n',
+  );
 
 /**
  * Replace or append a generated section inside a markdown file.
+ *
+ * @param fileContent - file content input.
+ * @param id - id input.
+ * @param newContent - new content input.
+ * @returns The rendered replace generated section text.
+ * @example
+ * const result = replaceGeneratedSection(fileContent, id, newContent);
  */
-export function replaceGeneratedSection(
+export const replaceGeneratedSection = (
   fileContent: string,
   id: GeneratedSectionId,
   newContent: string,
-): string {
+): string => {
   const wrapped = wrapGeneratedSection(id, newContent);
   const start = GENERATED_SECTION_MARKERS.start(id);
   const end = GENERATED_SECTION_MARKERS.end(id);
@@ -54,4 +64,4 @@ export function replaceGeneratedSection(
   }
 
   return `${fileContent.trimEnd()}\n\n${wrapped}\n`;
-}
+};

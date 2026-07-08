@@ -2,8 +2,15 @@ import type { Page } from 'playwright';
 
 import { isNcAuthenticatedUrl } from './authUrl';
 
-/** Login / signup surface — sign-in controls visible. */
-export async function isNcAuthGateDom(page: Page): Promise<boolean> {
+/**
+ * Login / signup surface — sign-in controls visible.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @returns Whether the inspected value matches the expected state.
+ * @example
+ * const result = await isNcAuthGateDom(page);
+ */
+export const isNcAuthGateDom = async (page: Page): Promise<boolean> => {
   const hostPath = page.url();
   if (/\/myaccount\/(?:login|sign)/i.test(hostPath)) return true;
 
@@ -20,10 +27,17 @@ export async function isNcAuthGateDom(page: Page): Promise<boolean> {
 
   const loginForm = page.locator('form[action*="login" i], #loginForm, [data-test="login-form"]');
   return (await loginForm.count()) > 0;
-}
+};
 
-/** Signed-in API access dashboard — no login gate in DOM. */
-export async function isNcAuthenticatedDom(page: Page): Promise<boolean> {
+/**
+ * Signed-in API access dashboard — no login gate in DOM.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @returns Whether the inspected value matches the expected state.
+ * @example
+ * const result = await isNcAuthenticatedDom(page);
+ */
+export const isNcAuthenticatedDom = async (page: Page): Promise<boolean> => {
   if (!page.url().includes('namecheap.com')) return false;
   if (await isNcAuthGateDom(page)) return false;
 
@@ -40,4 +54,4 @@ export async function isNcAuthenticatedDom(page: Page): Promise<boolean> {
   if ((await enableBtn.count()) > 0) return true;
 
   return isNcAuthenticatedUrl(page.url());
-}
+};

@@ -17,7 +17,7 @@ export type PaymentProviderName = 'lemon-squeezy' | 'stripe' | 'paypal';
  * webhook as order metadata so the gate can invite that exact account; this is how
  * a payment links to the right GitHub user with no account system of our own.
  */
-export interface CheckoutParams {
+export type CheckoutParams = {
   /** Provider-specific purchasable id (LS variant / Stripe price / PayPal amount). */
   readonly productId: string;
   /** Buyer's GitHub username — carried to the webhook as order metadata. */
@@ -28,20 +28,20 @@ export interface CheckoutParams {
   readonly successUrl?: string;
   /** Where the provider sends the buyer if they cancel (Stripe/PayPal). */
   readonly cancelUrl?: string;
-}
+};
 
 /** A created checkout the caller redirects the buyer to. */
-export interface CheckoutResult {
+export type CheckoutResult = {
   /** Hosted checkout / approval URL. */
   readonly url: string;
-}
+};
 
 /**
  * The normalized order event every provider maps its raw webhook into — the stable
  * internal shape the gate, fulfillment, and skills consume, decoupled from each
  * vendor's envelope. Swapping providers never changes this shape.
  */
-export interface OrderEvent {
+export type OrderEvent = {
   /** Which adapter produced this event. */
   readonly provider: PaymentProviderName;
   /** Vendor event name, e.g. `order_created`, `checkout.session.completed`. */
@@ -54,7 +54,7 @@ export interface OrderEvent {
   readonly githubUsername: string | null;
   /** True when this event should *revoke* access (a refund). */
   readonly isRefund: boolean;
-}
+};
 
 /**
  * Incoming webhook request headers (lower-cased keys), passed through so an adapter
@@ -79,11 +79,14 @@ export class PaymentError extends Data.TaggedError('PaymentError')<{
  * methods are credential-free at the call site and uniform across vendors. Both
  * return an `Effect` that fails with a {@link PaymentError} (ADR-0023).
  */
-export interface PaymentProvider {
+export type PaymentProvider = {
   /** Which vendor this instance talks to. */
   readonly name: PaymentProviderName;
   /** Create a hosted checkout and return its redirect URL. */
-  createCheckout(params: CheckoutParams): Effect.Effect<CheckoutResult, PaymentError>;
+  readonly createCheckout: (params: CheckoutParams) => Effect.Effect<CheckoutResult, PaymentError>;
   /** Verify + parse a raw webhook body into a normalized {@link OrderEvent}. */
-  parseWebhook(rawBody: string, headers: WebhookHeaders): Effect.Effect<OrderEvent, PaymentError>;
-}
+  readonly parseWebhook: (
+    rawBody: string,
+    headers: WebhookHeaders,
+  ) => Effect.Effect<OrderEvent, PaymentError>;
+};

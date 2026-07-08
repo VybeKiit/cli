@@ -15,16 +15,19 @@ export interface Toast {
  *
  * Call `toast('Saved!')` from anywhere; the root `<Toaster />` in `app/layout.tsx`
  * renders it. Destructive toasts use Sonner's error styling.
+ *
+ * @returns Toast helpers compatible with the legacy toast store shape.
+ * @example
+ * const { toast } = useToast();
+ * toast('Saved');
  */
-export function useToast(): {
+export const useToast = (): {
   toast: (message: string, variant?: ToastVariant) => void;
   toasts: Toast[];
-} {
-  return {
-    toast: (message, variant = 'default') => {
-      if (variant === 'destructive') sonnerToast.error(message);
-      else sonnerToast(message);
-    },
-    toasts: [],
-  };
-}
+} => ({
+  toast: (message, variant = 'default') => {
+    if (variant === 'destructive') sonnerToast.error(message);
+    else sonnerToast(message);
+  },
+  toasts: [],
+});

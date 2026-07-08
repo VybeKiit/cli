@@ -1,8 +1,9 @@
-export type {
-  NotificationsProvider,
-  NotificationsProviderName,
-  NotificationChannel,
-  SendNotificationParams,
-} from './types';
-export { resolveNotificationsProvider, type ResolveNotificationsInjections } from './resolve';
-export { sendTwilioSmsOtp, verifyTwilioSmsOtp, sendTwilioWhatsApp } from './providers/twilio';
+export * from './config';
+export * from './notificationSubject';
+export * from './providers/emailBridge';
+export * from './providers/expo';
+export * from './providers/local';
+export * from './providers/twilio';
+export * from './providers/twilioNotifications';
+export * from './resolve';
+export * from './types';

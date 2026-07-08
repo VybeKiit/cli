@@ -4,20 +4,29 @@ import { useTheme } from '@/theme/useTheme';
 import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-/** Modal dialog — mirrors web Dialog for confirmations. */
-export function Dialog({
+export interface DialogProps {
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly title: string;
+  readonly description?: string;
+  readonly children?: ReactNode;
+}
+
+/**
+ * Modal dialog for confirmations and short forms.
+ *
+ * @param props - Dialog visibility, copy, close callback, and optional body.
+ * @returns A themed modal dialog.
+ * @example
+ * <Dialog open={open} onOpenChange={setOpen} title="Confirm" />
+ */
+export const Dialog = ({
   open,
   onOpenChange,
-  title,
-  description,
-  children,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description?: string;
-  children?: ReactNode;
-}) {
+  title = '',
+  description = '',
+  children = null,
+}: DialogProps) => {
   const { colors, radius, spacing, fontSizes, fontWeights } = useTheme();
   return (
     <Modal
@@ -49,7 +58,7 @@ export function Dialog({
           >
             {title}
           </Text>
-          {description ? (
+          {description.length > 0 ? (
             <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.sm }}>
               {description}
             </Text>
@@ -60,7 +69,7 @@ export function Dialog({
       </Pressable>
     </Modal>
   );
-}
+};
 
 const styles = StyleSheet.create({
   overlay: {

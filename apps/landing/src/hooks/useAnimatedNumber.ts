@@ -1,10 +1,19 @@
 'use client';
 
-import { useReducedMotion } from '@/lib/motion';
 import { useEffect, useState } from 'react';
+import { useReducedMotion } from '@/lib/motion';
 
-/** Rolls from zero to target when `start` becomes true. */
-export function useAnimatedNumber(target: number, start: boolean): number {
+/**
+ * Rolls from zero to target when `start` becomes true.
+ *
+ * @param target - Input value.
+ * @param start - Input value.
+ * @returns The hook result.
+ * @example
+ * const value = useAnimatedNumber(target, start);
+ */
+
+export const useAnimatedNumber = (target: number, start: boolean): number => {
   const reduced = useReducedMotion();
   const [value, setValue] = useState(0);
 
@@ -22,4 +31,4 @@ export function useAnimatedNumber(target: number, start: boolean): number {
   }, [start, target, reduced]);
 
   return value;
-}
+};

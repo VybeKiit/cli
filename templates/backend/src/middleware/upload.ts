@@ -1,5 +1,5 @@
-import multer from 'multer';
 import { join } from 'node:path';
+import multer from 'multer';
 
 const ALLOWED_TYPES = new Set([
   'image/jpeg',
@@ -16,6 +16,13 @@ const storage = multer.diskStorage({
   },
 });
 
+/**
+ * Parse and validate a single uploaded file.
+ *
+ * @returns Express middleware that stores one file under `req.file`.
+ * @example
+ * app.post('/upload', uploadSingle, uploadFile);
+ */
 export const uploadSingle = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },

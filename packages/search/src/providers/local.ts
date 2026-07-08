@@ -1,28 +1,37 @@
+import type { SearchDocument, SearchHit, SearchProvider } from '@vybekiit/search/types';
 import { Effect } from 'effect';
-import type { SearchDocument, SearchHit, SearchProvider } from '../types';
 
+const defaultSearchLimit = 10;
+const snippetLength = 120;
 const docs = new Map<string, SearchDocument>();
 
-export function createLocalSearch(): SearchProvider {
-  return {
-    name: 'local',
-    index(doc: SearchDocument) {
-      docs.set(doc.id, doc);
-      return Effect.succeed(true as const);
-    },
-    search(query: string, limit = 10) {
-      const hits: SearchHit[] = [];
-      for (const doc of docs.values()) {
-        if (doc.content.toLowerCase().includes(query.toLowerCase())) {
-          hits.push({ id: doc.id, score: 1, snippet: doc.content.slice(0, 120) });
-        }
-        if (hits.length >= limit) break;
+/**
+ * Build the in-memory search adapter for tests and local development.
+ *
+ * @returns A search provider backed by a process-local document map.
+ * @example
+ * const search = createLocalSearch();
+ */
+export const createLocalSearch = (): SearchProvider => ({
+  name: 'local',
+  index: (doc: SearchDocument) => {
+    docs.set(doc.id, doc);
+    return Effect.succeed(true as const);
+  },
+  search: (query: string, limit = defaultSearchLimit) => {
+    const hits: SearchHit[] = [];
+    for (const doc of docs.values()) {
+      if (doc.content.toLowerCase().includes(query.toLowerCase())) {
+        hits.push({ id: doc.id, score: 1, snippet: doc.content.slice(0, snippetLength) });
       }
-      return Effect.succeed(hits as readonly SearchHit[]);
-    },
-    remove(id: string) {
-      docs.delete(id);
-      return Effect.succeed(true as const);
-    },
-  };
-}
+      if (hits.length >= limit) {
+        break;
+      }
+    }
+    return Effect.succeed(hits as readonly SearchHit[]);
+  },
+  remove: (id: string) => {
+    docs.delete(id);
+    return Effect.succeed(true as const);
+  },
+});

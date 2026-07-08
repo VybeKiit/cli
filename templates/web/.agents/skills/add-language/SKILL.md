@@ -21,7 +21,7 @@ celebrate. Follow `i18n-vybekiit.md` for all technical steps.
 2. **Duplicate the catalog** — copy `messages/en.json` → `messages/{locale}.json`; translate every value.
 3. **Register the locale** — update `src/i18n/routing.ts` and `middleware.ts` (keep both in sync).
 4. **Wire RTL if needed** — for `ar`, `he`, `fa`, `ur`: confirm `<html dir="rtl">` on a page in the new locale.
-5. **Verify** — run `pnpm quality`. Open `/{locale}` in dev (e.g. `/he`) and confirm copy + layout.
+5. **Verify** — run `pnpm verify`. Open `/{locale}` in dev (e.g. `/he`) and confirm copy + layout.
 6. **Celebrate** — show the builder one screen in their language; offer the next goal from `goal-index.md`.
 
 ## Definition of done

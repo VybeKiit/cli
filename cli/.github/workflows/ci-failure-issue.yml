@@ -59,7 +59,7 @@ jobs:
               '',
               '## Agent instructions',
               `1. Check out \`${run.head_sha}\` locally`,
-              '2. Reproduce: `pnpm lint && pnpm typecheck && pnpm test && pnpm test:scripts && pnpm build` (monorepo) or `pnpm quality` (templates)',
+              '2. Reproduce: `pnpm lint && pnpm typecheck && pnpm test && pnpm test:scripts && pnpm build` (monorepo) or `pnpm verify` (templates)',
               '3. Fix the failure; open a PR — do NOT push to main',
               '4. Close this issue when CI is green on the merge commit',
               '',

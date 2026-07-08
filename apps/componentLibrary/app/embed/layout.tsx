@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
 
-export default function EmbedLayout({ children }: { children: ReactNode }) {
-  return children;
-}
+const EmbedLayout = ({ children }: { children: ReactNode }) => children;
+
+export default EmbedLayout;

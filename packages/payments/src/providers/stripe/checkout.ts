@@ -1,38 +1,72 @@
-import { type Result, type StripeConfig, fail, ok } from '@vybekiit/core';
+import type { StripeConfig } from '@vybekiit/payments/config';
+import { caughtMessage, failPayment, paymentError } from '@vybekiit/payments/paymentEffect';
+import type { CheckoutParams, CheckoutResult, PaymentError } from '@vybekiit/payments/types';
+import { Effect } from 'effect';
 import Stripe from 'stripe';
-import type { CheckoutParams, CheckoutResult } from '../../types';
+
+/**
+ * Resolve the Stripe cancel URL from checkout params.
+ *
+ * @param params - Normalized checkout parameters.
+ * @returns The explicit cancel URL, or the success URL when no cancel URL was supplied.
+ * @example
+ * const cancelUrl = resolveStripeCancelUrl(params);
+ */
+const resolveStripeCancelUrl = (params: CheckoutParams): string => {
+  if (params.cancelUrl !== undefined && params.cancelUrl.length > 0) {
+    return params.cancelUrl;
+  }
+
+  if (params.successUrl !== undefined && params.successUrl.length > 0) {
+    return params.successUrl;
+  }
+
+  return '';
+};
 
 /**
  * Create a Stripe Checkout Session and return its hosted URL.
  *
- * `productId` is a Stripe **price** id (`price_…`). `githubUsername` rides along in
- * session `metadata` so the `checkout.session.completed` webhook can read it back
- * for the gate. Stripe requires a `success_url`; the buyer's app passes its origin.
+ * @param config - Validated Stripe secret key and webhook secret.
+ * @param params - Normalized checkout creation parameters.
+ * @returns An Effect containing the hosted checkout URL.
+ * @example
+ * const checkout = await Effect.runPromise(createStripeCheckout(config, params));
  */
-export async function createStripeCheckout(
+export const createStripeCheckout = (
   config: StripeConfig,
   params: CheckoutParams,
-): Promise<Result<CheckoutResult>> {
-  const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+): Effect.Effect<CheckoutResult, PaymentError> =>
+  Effect.gen(function* () {
+    if (params.successUrl === undefined || params.successUrl.length === 0) {
+      return yield* failPayment('config_missing', 'Stripe checkout requires a success URL.');
+    }
 
-  let url: string | null = null;
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: [{ price: params.productId, quantity: 1 }],
-      success_url: params.successUrl ?? '',
-      cancel_url: params.cancelUrl ?? params.successUrl ?? '',
-      ...(params.email ? { customer_email: params.email } : {}),
-      ...(params.githubUsername ? { metadata: { github_username: params.githubUsername } } : {}),
+    const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+    const { successUrl } = params;
+
+    const session = yield* Effect.tryPromise({
+      try: () =>
+        stripe.checkout.sessions.create({
+          mode: 'payment',
+          line_items: [{ price: params.productId, quantity: 1 }],
+          success_url: successUrl,
+          cancel_url: resolveStripeCancelUrl(params),
+          ...(params.email ? { customer_email: params.email } : {}),
+          ...(params.githubUsername
+            ? { metadata: { github_username: params.githubUsername } }
+            : {}),
+        }),
+      catch: (caught) =>
+        paymentError(
+          'api_error',
+          `Stripe could not create a checkout: ${caughtMessage(caught, 'unknown error')}`,
+        ),
     });
-    url = session.url;
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : 'unknown error';
-    return fail('api_error', `Stripe could not create a checkout: ${detail}`);
-  }
 
-  if (!url) {
-    return fail('invalid_response', 'Stripe did not return a checkout URL.');
-  }
-  return ok({ url });
-}
+    const { url } = session;
+    if (url === null || url.length === 0) {
+      return yield* failPayment('invalid_response', 'Stripe did not return a checkout URL.');
+    }
+    return { url };
+  });

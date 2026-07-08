@@ -49,7 +49,7 @@ Read: `react-patterns-vybekiit.md`, `nextjs-vybekiit.md`.
 ## Quality loop
 
 - Add/update tests with every feature; `pnpm test` green before saying done.
-- After substantive edits: `pnpm format && pnpm lint` (or `pnpm quality` before ship).
+- After substantive edits: `pnpm format && pnpm lint` (or `pnpm verify` before ship).
 - Pre-push hook runs quality when the agent pushes — builder never hits it.
 
 Read: `testing-vybekiit.md`, `format-lint-vybekiit.md`.

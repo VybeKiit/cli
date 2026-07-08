@@ -1,0 +1,140 @@
+.vybe-walkthrough {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+/* Cutout dim — box-shadow spread creates the hole; no separate scrim (that would block the glow). */
+.vybe-walkthrough-hole {
+  position: fixed;
+  z-index: 1;
+  border-radius: 0.65rem;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.78);
+  pointer-events: none;
+}
+
+.vybe-walkthrough-ring {
+  position: fixed;
+  z-index: 2;
+  border-radius: 0.65rem;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 18px 3px rgba(255, 255, 255, 0.22),
+    0 0 36px 8px rgba(255, 255, 255, 0.12),
+    0 0 56px 14px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  animation: vybe-walkthrough-ring-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes vybe-walkthrough-ring-pulse {
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.18),
+      0 0 16px 3px rgba(255, 255, 255, 0.18),
+      0 0 32px 8px rgba(255, 255, 255, 0.1),
+      0 0 48px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  50% {
+    border-color: rgba(255, 255, 255, 0.72);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.28),
+      0 0 24px 5px rgba(255, 255, 255, 0.28),
+      0 0 44px 12px rgba(255, 255, 255, 0.14),
+      0 0 64px 18px rgba(0, 0, 0, 0.38);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vybe-walkthrough-ring {
+    animation: none;
+  }
+}
+
+.vybe-walkthrough-card {
+  position: fixed;
+  z-index: 3;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 22rem);
+  padding: 1rem 1.1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(8, 11, 18, 0.98);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.vybe-walkthrough-step {
+  margin: 0 0 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.vybe-walkthrough-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgb(255 255 255);
+}
+
+.vybe-walkthrough-body {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.vybe-walkthrough-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.vybe-walkthrough-skip,
+.vybe-walkthrough-next {
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vybe-walkthrough-skip {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.vybe-walkthrough-next {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dialog preset — backdrop behind the shadcn Dialog + a soft highlight ring on the target. */
+.vybe-walkthrough-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+[data-walkthrough-highlight] {
+  position: relative;
+  z-index: 65;
+  outline: 2px solid var(--primary, rgb(59 130 246));
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+  transition: outline-offset 0.2s ease;
+}

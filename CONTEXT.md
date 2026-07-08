@@ -7,7 +7,7 @@
 > and the multi-provider widening below).
 > **Status: v1.0 scaffold built + green + pushed; templates-first production readiness
 > shipped (expanded shadcn kit, dashboard guard, practice checkout, mobile parity,
-> extension WXT scaffold). Money pipeline (#4–#8) and npm publish (#17) remain parked.**
+> extension WXT scaffold). Money pipeline (#4–#8) and CLI publish (#17) remain parked.**
 
 ## Template production readiness scorecard (2026-06-29)
 
@@ -50,63 +50,100 @@ tension — "maintained updates" for "an audience that can't read a diff."
 | | **MAINTAINED** | **OWNED** |
 |---|---|---|
 | What | headless logic | app shell + ALL UI + the agent layer |
-| Lives as | public npm `@vybekiit/*` packages | files copied into the buyer's scaffolded repo |
+| Lives as | private workspace packages in the gated monorepo mirror; bundled into the public CLI when the CLI needs them | files copied into the buyer's scaffolded repo |
 | Buyer edits? | never | freely |
-| Updates | flow as **npm version bumps** (conflict-free) | frozen — never auto-clobbered |
-| Examples | `core/config`, `pay-*`, `auth`, `email`, `db`, `agent-kit` | `templates/web`, UI components, screens, skills |
+| Updates | flow by pulling the gated mirror / kit release line | frozen — never auto-clobbered |
+| Examples | `core` (+`/http`), `payments`, `auth`, `db`, `client-state` (private packages, ADR-0033) | `templates/web`, UI components, screens, skills, `tokens`, `report-mode` |
 
-Updates are **version bumps, not git merges** — the only kind of update a non-coder's agent can
-apply safely every time.
+Updates are mirror pulls handled by the agent, not public npm package bumps. The buyer gets the
+maintained logic because checkout grants access to the private delivery mirror, not because the
+logic is free on npm.
+
+### Template surface language
+
+**Surface recipe**:
+A platform-neutral description of a starter app screen or flow.
+_Avoid_: React-to-native compiler, UI compiler
+
+**Starter surface**:
+A buyer-owned screen or flow generated into a template from a surface recipe.
+_Avoid_: Shared screen package, maintained UI screen
+
+**Platform renderer**:
+The web, extension, or mobile implementation that turns a surface recipe into template-owned files.
+_Avoid_: Cross-platform component compiler
+
+**Surface target**:
+An explicit recipe manifest entry for one platform output, such as `web`, `extension.popup`,
+`extension.sidepanel`, or `mobile`. Its first-party component source file uses a PascalCase
+filename that matches the exported component.
+_Avoid_: Inferred filename convention
+
+**Buyer onboarding**:
+The agent-guided setup flow that takes a customer from purchased kit to live app.
+_Avoid_: App onboarding
+
+**App onboarding**:
+The end-user flow after sign-up and before the first dashboard visit.
+_Avoid_: Buyer onboarding, walkthrough
+
+**Dashboard walkthrough**:
+The end-user tutorial shown after the dashboard is reachable.
+_Avoid_: Onboarding
+
+Relationships:
+
+- A **surface recipe** produces one **starter surface** per supported template.
+- The page recipe pipeline is the **surface recipe** source of truth: each baseline recipe declares
+  the web, extension, and mobile targets it supports, and the recipe check fails when a required
+  target is missing source, route, acceptance checks, or install notes.
+- A **surface recipe** declares **surface targets** explicitly; target source paths, exports, and
+  routes are never inferred from the recipe id or filename.
+- A **starter surface** stays **OWNED** after scaffolding; maintained updates flow through new recipes and agent-guided changes, not silent screen replacement.
+- A **platform renderer** may reuse maintained primitives, but it does not make buyer-facing screens MAINTAINED.
+- **Buyer onboarding**, **app onboarding**, and the **dashboard walkthrough** are separate flows with separate audiences.
 
 ## Repo structure
 
+> **Target shape (ADR-0033 — supersedes ADR-0025's five-package spine).** Nothing under `packages/`
+> publishes to npm. The module-per-concern *design* is kept, but every package is private workspace
+> code and the `vybekiit` CLI is the only public npm artifact. `core` absorbs foundation plumbing;
+> the thin long tail folds into templates as OWNED code or stays private tooling. There is **no
+> public package tier** and **no `shared/` tier**.
+
 ```
 vybekiit/                      private monorepo · pnpm + Turborepo
-├─ packages/                  MAINTAINED · public npm @vybekiit/* · headless · updates flow
-│  ├─ core/                   env+config loader (the single .env source of truth), types, utils
-│  ├─ payments/               one PaymentProvider interface · providers/{lemon-squeezy,stripe,
-│  │                          paypal} (official SDKs) · LS is the v1 default (MoR) · no UI
-│  ├─ auth/                   one AuthProvider interface · better-auth bound to the chosen DB
-│  │                          (Postgres/Mongo) · Cognito for AWS — multi-DB, no UI (ADR-0003)
-│  ├─ db/                     one DataProvider interface · providers/{supabase,mongodb,aws} +
+├─ packages/                  headless TS · private workspace packages, never npm-published (ADR-0033)
+│  ├─ core/                   MAINTAINED · env+config loader (.env SSOT) + types + utils, AND the
+│  │                          absorbed foundation subpaths — @vybekiit/core/http (client·express·next),
+│  │                          /observability (createLogger), /security (rate limit, origin lock)
+│  ├─ payments/               MAINTAINED · one PaymentProvider · providers/{lemonSqueezy,stripe,paypal}
+│  │                          (official SDKs) · LS is the v1 default (MoR) · no UI (ADR-0018)
+│  ├─ auth/                   MAINTAINED · one AuthProvider · better-auth bound to the chosen DB;
+│  │                          absorbs the Twilio SMS-OTP helper (severs auth → notifications) (ADR-0003)
+│  ├─ db/                     MAINTAINED · one DataProvider · providers/{supabase,mongodb,aws} +
 │  │                          StorageProvider {supabase/R2,s3} — provider-agnostic (ADR-0002)
-│  ├─ deploy/                 NEW · one Hosting interface · providers/{cloudflare,vercel,aws,railway}
-│  │                          — hosting/deploy behind one contract (ADR-0002/0006)
-│  ├─ assets/                 NEW · AssetDeliveryProvider — build-time optimize + CDN URLs
-│  │                          derived from HOSTING + STORAGE (ADR-0010)
-│  ├─ analytics/             visitor stats — Plausible default (ADR-0012)
-│  ├─ jobs/                  background jobs — Cloudflare Cron/Queues default
-│  ├─ notifications/         push/SMS/email alerts — Expo default
-│  ├─ ai/                    runtime LLM — OpenAI default
-│  ├─ search/                full-text search — Supabase default
-│  ├─ realtime/              live channels — Supabase default
-│  ├─ cms/                   MDX content pages
-│  ├─ compliance/            cookie consent + export hooks
-│  ├─ seo/                   sitemap, robots, metadata
-│  ├─ tenancy/               team workspaces — better-auth + db
-│  ├─ kv/                    fast KV — Cloudflare default
-│  ├─ i18n/                   shared locale + catalog loader
-│  ├─ observability/          NEW · one ObservabilityProvider · sentry + local no-op default
-│  ├─ tokens/                 NEW · shared design tokens (colors/spacing/radius/type) — web consumes
-│  │                          as CSS vars, mobile as StyleSheet values (ADR-0004)
-│  ├─ client-state/             TanStack Query + Zustand/MMKV via resolveClientState() — ADR-0014
-│  ├─ browser-automation/       unified Playwright CLI — domains: extension/, payments/ls, registrars/, dbs/, infra/ — ADR-0015/0021
-│  ├─ report-mode/            dev-only Report Mode — structured reports + assistant deeplink handoff
-│  ├─ email/                  one EmailProvider interface · providers/{cloudflare,ses,resend}  ← later
-│  └─ agent-kit/              shared agent-layer source — the skill contract, language.md vocabulary,
-│                             goal-index format, update-kit logic (templates embed the rest)  ← Wave A
-├─ templates/                 OWNED · NOT published · delivered via private mirrors (ADR-0005) · frozen
-│  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer    ← v1.0
-│  ├─ mobile/                 Expo + plain StyleSheet primitives + shared tokens (NativeWind
-│  │                          dropped) — full web parity                     ← pulled forward
-│  ├─ extension/              WXT + shadcn popup scaffold + agent layer       ← v3
-│  ├─ backend/                Express MVC API for mobile/extension clients      ← new
-│  └─ spa/                    Vite admin SPA + agent layer                      ← new
+│  ├─ clientState/            MAINTAINED · TanStack Query + Zustand/MMKV via resolveClientState() (ADR-0014)
+│  ├─ browserAutomation/      PRIVATE tooling · unified Playwright CLI — agent-only, no buyer runtime import
+│  ├─ agentKit/               PRIVATE tooling · shared agent-layer source, bundled into the CLI via tsup
+│  ├─ uiCatalogMcp/           PRIVATE tooling · UI catalog MCP server (maintainer/agent-only)
+│  └─ deploy/                 PRIVATE tooling · Hosting + registrar automation (CLI-only)
+├─ templates/                 OWNED · NOT published · cloned from private mirrors (ADR-0005) · frozen.
+│  │                          Also home to the folded concerns as OWNED code (kept in sync by
+│  │                          check:templates): tokens · reportMode · analytics · seo · cms ·
+│  │                          compliance · realtime · i18n · jobs · kv · search · ai · email ·
+│  │                          assets · notifications · tenancy
+│  ├─ web/                    Next.js + shadcn (RTL-ready) + agent layer               ← v1.0
+│  ├─ mobile/                 Expo + StyleSheet primitives + owned design tokens (full web parity)
+│  ├─ extension/              WXT + shadcn popup scaffold + agent layer                 ← v3
+│  ├─ backend/                Express MVC API for mobile/extension clients
+│  └─ spa/                    Vite admin SPA + agent layer
 ├─ apps/landing/              marketing site — built WITH templates/web (dogfood) · CF Pages ·
 │                             ships from the monorepo, NOT a delivery mirror (ADR-0005)
+├─ apps/componentLibrary/     public UI gallery (ui.vybekiit.com) — maintainer app, not shipped to buyers
 ├─ cli/                       npx vybekiit — clones a template mirror into the buyer's repo · itself
 │                             a PUBLIC delivery mirror (VybeKiit/cli — no templates/secrets) (ADR-0005)
-└─ AGENTS.md CLAUDE.md CONTEXT.md   ← MAINTAINER agent layer (this repo, technical voice)
+└─ PROJECT.md AGENTS.md CLAUDE.md CONTEXT.md CODE-STYLE.md LANGUAGE.md   ← MAINTAINER docs (this repo)
 ```
 
 Two agent layers, same filenames, different audiences: the **maintainer** layer (repo root,
@@ -123,6 +160,11 @@ Each template ships thin **redirect configs** so any supported agent tool loads 
 shape applied to every concern. Defaults below are unchanged (Supabase + Cloudflare); the other
 adapters are opt-in escape hatches the builder never picks (the agent routes via one `.env` setting).
 See ADR-0002/0003/0004.
+
+> The `@vybekiit/*` names below name each **concern's interface**, not a public npm package. Per
+> [ADR-0033](./docs/adr/0033-cli-single-published-artifact-and-access-gate.md), only the
+> `vybekiit` CLI publishes; packages stay private workspace code and are consumed through the gated
+> monorepo mirror / bundled CLI. The interface-per-concern *design* here is unchanged.
 
 | Concern | Choice (default ⭐ · adapters) | Dropped / why |
 |---|---|---|
@@ -176,13 +218,13 @@ See ADR-0002/0003/0004.
 
 | Term | Meaning |
 |------|---------|
-| **Quality gate** | `pnpm quality` — lint, typecheck, test, script tests, and build; enforced on maintainer pre-push and CI. |
+| **Quality gate** | `pnpm verify` — lint, typecheck, test, script tests, and build; enforced on maintainer pre-push and CI. |
 | **Lenient pre-commit** | Format-only hook; never blocks on failing tests (safe for buyer repos). |
 
 Agent writes **tests-first** (that loop is the real "no bugs" gate, and what makes `update-kit`
 safe). Buyer templates ship **Biome** (warn mode for style rules like function length); the agent runs
-the **quality smoke** loop (`pnpm quality`) after edits and at onboarding. Buyer repos also ship an
-**agent-only pre-push** hook (same `pnpm quality` gate) and **online checker** (GitHub Actions on
+the **quality smoke** loop (`pnpm verify`) after edits and at onboarding. Buyer repos also ship an
+**agent-only pre-push** hook (same `pnpm verify` gate) and **online checker** (GitHub Actions on
 ubuntu/macOS/Windows) — the vibe coder never runs `git push`; only the agent does, so these gates
 catch problems before code lands without trapping the builder. **Pre-commit stays off** in buyer repos
 (lenient local commits). In the **maintainer monorepo**, husky **pre-push** runs the same **quality gate**
@@ -193,10 +235,10 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
 
 ## Distribution, gating & updates
 
-- Packages are **public** (free updates via npm, double as marketing). The wall is the **private
-  template mirrors**: Lemon Squeezy checkout collects the buyer's GitHub username → webhook →
-  **invite to the per-template mirrors** (`web` + `mobile` + `extension`, one bundle) = the single
-  gate. Refund → access removed. The buyer is **never** invited to the maintainer monorepo.
+- Packages are **private workspace code** (ADR-0033). The wall is the **private delivery mirror**:
+  Lemon Squeezy checkout collects the buyer's GitHub username → webhook → **invite to the gated
+  mirror** = the single gate. Refund → access removed. The buyer is **never** invited to the
+  maintainer monorepo.
 - **Templates reach the buyer via private per-template mirror repos, not the npm CLI** (ADR-0005).
   A **delivery mirror** is one `VybeKiit/<repo>` that a monorepo job force-pushes from a mapped
   source path (one-way subtree split). There are **five**: the three template mirrors
@@ -206,8 +248,8 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   local push; GitHub Actions `workflow_dispatch` is the manual fallback (ADR-0005).
   `npx vybekiit <name>` clones the matching template mirror with the buyer's `gh` device-flow login
   (so the proprietary OWNED code never ships inside the public npm package — the gate holds). The
-  scaffold keeps its `.git`, so `update-kit` can `git pull` the mirror in addition to npm version
-  bumps for `@vybekiit/*`.
+  scaffold keeps its `.git`, so `update-kit` pulls the mirror / kit release line instead of bumping
+  public `@vybekiit/*` npm packages.
 - **The landing site is not a mirror.** `apps/landing` is the store; it ships from the monorepo via
   its own deploy (issue #7), not through a delivery mirror — it is never scaffolded into a buyer repo.
 - **The "skills-bag" is not a mirror either.** Official upstream platform skills are *pinned into* the
@@ -340,7 +382,7 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 `resolve*Provider()`, `TODO(vybekiit)` markers, and verify-before-advance. Shared base manifest at
 `packages/agentKit/src/catalogs/platform-skills-base.manifest.json`; each template's
 `platform-skills.manifest.json` extends it (mobile adds `expo/skills`). Maintainer CI re-pins via
-`scripts/pinPlatformSkills.mjs` after `scripts/auditPlatformSkills.mjs` (strict 90d repo / 180d npm gate).
+`scripts/pinPlatformSkills.mjs` after `scripts/dev/checks/auditPlatformSkills.mjs` (strict 90d repo / 180d npm gate).
 
 ### Three-channel update (buyer `update-kit`)
 
@@ -436,510 +478,9 @@ Install details and wrapper contents live in each template's
 
 ## Language
 
-**Vibe coder**:
-The canonical buyer-facing identity — semi-technical, describes the product in plain language, never
-reads diffs or operates git/deploy plumbing. Agents address them as "you" in speech and use this term
-in maintainer docs when naming the human audience.
-_Avoid_: builder (deprecated synonym — migrate to vibe coder), buyer in agent speech.
-
-**Builder**:
-Deprecated synonym for **Vibe coder**. Legacy templates and skills may still say "builder"; migrate
-to vibe coder in buyer-facing copy. Do not use in new `language.md` or `AGENTS.md` prose.
-_Avoid_: treating builder as a distinct role from vibe coder.
-
-**Buyer**:
-Commerce and legal identity — purchase, gate, refund, template delivery. Never spoken aloud by the
-agent to the vibe coder; use "you" instead.
-_Avoid_: calling the vibe coder "buyer" in chat.
-
-**Owned**:
-App shell, all UI, and the buyer agent layer — files copied into the buyer's scaffolded repo. The
-buyer edits freely; updates are frozen and never auto-clobbered. Examples: web/mobile/extension
-templates, UI components, screens, buyer skills.
-_Avoid_: maintained (see **Maintained**).
-
-**Maintained**:
-Headless logic shipped as public npm packages. The buyer never edits these directly; updates flow as
-version bumps (conflict-free). Examples: core config, payments, auth, email, db, observability, agent-kit.
-_Avoid_: owned (see **Owned**).
-
-**Agent layer**:
-The skills, docs, and contracts that let Claude/Codex carry a vibe coder from purchase to a live,
-money-making app — making every technical decision for them and translating manual steps into plain
-language. Two layers, same filenames, different audiences: the **maintainer** layer (repo root,
-technical voice) vs the **buyer** layer (inside templates, jargon-free, ships to buyers).
-
-**Buyer layer**:
-The agent-facing docs and skills inside each template — goal-named skills, `AGENTS.md`, and
-`language.md` for plain-language rules. Never speaks jargon to the vibe coder.
-
-**Goal-named skill**:
-A buyer skill named for what the vibe coder wants ("go live", "save my data"), never for the tech
-("deploy to Cloudflare", "set up MongoDB"). Routes to the right adapter underneath; the vibe coder
-never hears backend names. Adding a provider never adds a skill — skills are written once against
-the interface.
-_Avoid_: tech-named skill, platform skill (Layer B names are agent-only).
-
-**Decide + Guide**:
-The agent contract — make all technical decisions, guide the few steps only the vibe coder can do (paste a
-key, approve a store submission) in exact plain-language one-step-at-a-time instructions. Promise:
-you never have to understand or decide; just follow simple steps.
-
-**Backend template**:
-Express MVC API server for mobile and extension clients — distinct from the Next.js web template.
-Buyers scaffold it with `vybekiit scaffold backend` when a phone app or extension needs sign-in,
-payments, or data without a full marketing website.
-
-**Feature readiness**:
-A planner (`planFeatureReadiness`) that detects missing cross-template dependencies and returns
-orchestration steps instead of blocking the builder with "you need a website first."
-
-**Orchestration step**:
-A single agent action (scaffold backend, run a skill, set a secret setting) the agent executes
-without asking the builder to choose between technical options.
-
-**Official source fallback**:
-When MCP or the first debug attempt fails, the agent consults the tech-references catalog
-(`vybekiit doc-fallback <tech-id>`) and tells the builder they are checking the official setup
-guide — plain words only, never MCP or provider jargon.
-
-**Tech reference**:
-An agent-kit catalog entry mapping a provider (Twilio, Supabase, better-auth, etc.) to its official
-docs URL, optional MCP endpoint, and related secret-setting keys. Rendered into
-`.vybekiit/agent/tech-references.md` for agents only.
-
-**MongoDB (agent path)**:
-Opt-in data store when `DATA_PROVIDER=mongodb`. Official MCP and pinned agent-skills support
-maintainers and agents only — not a buyer-facing data tier. Buyers still use plain-language skills;
-agents follow `mongodb-vybekiit.md` when the env is already set.
-_Avoid_: offering Mongo as a default or buyer-facing choice alongside Supabase, Neon, or Firebase.
-
-**Production checklist**:
-An owned `checklist.md` per template tracking go-live gates (generated block) plus an append-only
-decision log the agent updates after each completing skill.
-
-**Decision log**:
-The append-only section at the bottom of `checklist.md` recording what changed, from what, to what,
-and why — never deleted or regenerated by sync.
-
-**Session bootstrap**:
-Agent-only read order file (`.vybekiit/agent/session-bootstrap.md`) listing AGENTS → goal-index → skill → language → checklist append.
-
-**Agent layer compliance**:
-Mechanical checks (`vybekiit check-agent-layer`, pattern greps) that keep skills, generated sections, and checklist structure aligned with the catalog.
-
-**Generated section**:
-A markdown block rendered from `@vybekiit/agent-kit` on sync — bounded by
-`<!-- vybekiit:generated:start … -->` markers so hand-authored prose is never clobbered.
-_Avoid_: "you never see anything technical" (impossible and breeds refunds).
-
-**Verify-before-advance**:
-Every skill tests that a step worked before continuing. Prevents the silent-stuck → refund death
-spiral.
-
-**Reading-speed reveal**:
-Store homepage copy that appears character-by-character at natural reading pace when a section enters
-view; runs once per page load.
-_Avoid_: instant fade-in for marketing headlines and body copy on the store homepage.
-
-**Rolling stat**:
-A numeric value on the store homepage that animates from zero to its displayed value when visible
-(e.g. price, dashboard mockup figures).
-
-**Auto-scroll row**:
-A horizontal row of items that moves continuously on its own and loops (e.g. tech logos, product demo
-cards). Builders customize content inside the row, not the motion name “marquee.”
-_Avoid_: saying “marquee” or “carousel” when you mean this always-on horizontal loop.
-
-**Report Mode**:
-Dev-only overlay on the localhost preview (web, mobile, extension). The builder toggles inspect
-mode (Option+Shift+R on web/extension; **R** FAB on mobile), clicks or taps what looks wrong, types
-a one-line note, and the kit fires a native assistant deeplink with structured context. Never ships
-in production builds. In buyer voice: use **Point & fix** — never "Report Mode" unless they ask
-about the hotkey.
-_Avoid_: exposing deeplinks, URI schemes, or DOM selectors to the builder.
-
-**Hold confirm**:
-Hover a dock menu option for ~2 seconds until a rounded border fills; the choice then locks in
-(position, chat target). Plain-language only — never "hold confirm" to the builder.
-_Avoid_: requiring a click when the UI is designed for hover-and-hold.
-
-**Report walkthrough**:
-First-visit guided tour of the localhost feedback bar. Skippable; celebrates completion so new
-builders know how to point at what's wrong.
-_Avoid_: calling it onboarding or a tutorial in buyer-facing copy.
-
-**Control hint**:
-Short plain-language tooltip after ~half a second hover on a dock control. Explains what it does and
-what to do next.
-_Avoid_: jargon (deeplink, selector, handoff target).
-
-**Spot label**:
-After the builder clicks what looks wrong, the kit shows a plain-language name for what they
-pointed at — starting from that element and its immediate text, not unrelated headings elsewhere on
-the page (e.g. the hero bundle label, not a showcase headline).
-_Avoid_: DOM, selector, shortest text node anywhere on the page.
-
-**Inspect highlight**:
-The colored ring around the element the builder is pointing at during pick mode. Builders can change
-its color from the dock; the pick-mode banner stays fixed.
-_Avoid_: calling it hover color or tinting the banner when you mean the ring only.
-
-**Builder tools**:
-Assistants and dev tools the vibe coder already uses (Cursor, Claude Code, Codex, GitHub, Figma,
-TypeScript, Node.js, Playwright). Shown in the hero orbit only.
-_Avoid_: mixing product adapters (Cloudflare, Lemon Squeezy, Supabase) into the hero orbit.
-
-**Product stack**:
-Services and frameworks the shipped app runs on (Next.js, Supabase, Cloudflare, Lemon Squeezy,
-shadcn/ui, etc.). Shown in the pricing tech row only.
-_Avoid_: calling both lists "tech stack" or duplicating builder tools in the product row.
-
-**Brand mark**:
-The small official logo beside a builder-tool or product-stack name on the landing page — full-color
-at rest on the dark row, not a hand-drawn stand-in.
-_Avoid_: placeholder icons, monochrome fake paths, or calling Codex a different mark than OpenAI.
-
-**Vibe hint**:
-Plain-English, cheeky explanation on a landing-page brand mark — what the tool/service is plus
-reassurance the vibe coder never touches it. Desktop: hover tooltip on the whole mark. Mobile
-(product-stack row only): always-visible subtitle under the technical label. Hero orbit hints are
-desktop-only.
-_Avoid_: control hint (Report Mode dock only), jargon definitions, or duplicating the technical label.
-
-**Domino cascade**:
-One-time on-mount intro on the hero builder-tool orbit (desktop only): each vibe hint tooltip
-auto-opens in sequence (~1.2s apart, domino-style), then closes; hover works anytime after to
-re-read. Product-stack row does not cascade.
-_Avoid_: calling it a tutorial or onboarding; it is ambient store-page personality, not buyer-layer
-guidance.
-
-**Proceed animation**:
-When the builder clicks Get VybeKiit, a cart icon flies toward the checkout direction as visual
-feedback before navigation — RTL-aware on the landing page.
-_Avoid_: static lock icon with no motion feedback.
-
-**Vibe coder report**:
-The structured handoff payload (route, element selector or tap coordinates, console errors, builder
-note) prefixed with `[VybeKiit Report]`. Agent-internal — the builder never sees this term; `doctor`
-reads it and skips the reproduce question.
-_Avoid_: asking the builder to craft a prompt when Report Mode already captured context.
-
-**SEO**:
-Discoverability metadata — titles, descriptions, sitemaps, Open Graph — so search engines find the
-buyer's app. Wired via `@vybekiit/seo` and buyer skills; agent-handled. In buyer voice: "how
-search engines find you".
-_Avoid_: saying "SEO" to the builder.
-
-**Adapter**:
-One concrete backend behind a concern's interface — the proven payments shape applied everywhere:
-one interface, swappable backends, one default. The builder never picks one; the agent routes via
-one secret setting.
-_Avoid_: provider (in buyer voice — say "the service your app uses" not "the MongoDB adapter").
-
-**Local dev adapter**:
-The zero-config, in-memory `local` adapter for `@vybekiit/db` and `@vybekiit/auth` that resolves
-**only when no backend is configured**, so a freshly scaffolded app runs on the first `pnpm dev`
-(fake dev user, session-scoped data) — making the **keystone** (live in session #1) real before any
-account exists. An explicit provider always wins; data resets on restart by design (ADR-0008). In
-buyer voice it is "practice data" / "a starter sign-in", never "the local adapter".
-_Avoid_: calling it a backend the buyer chooses (it is an invisible fallback, swapped out by
-[[add-signin]] / [[save-data]]).
-
-**Provider interface**:
-The per-concern contract (data, auth, hosting/deploy, storage, email, payments) with swappable
-adapters and one default. Skills are written once against the interface, so a new adapter never adds
-a skill.
-
-**Design tokens**:
-The one shared map of colors, spacing, radius, and type that web (as CSS vars) and mobile (as
-StyleSheet values) both consume, so the two platforms look consistent.
-
-**GEO / answer-engine optimization**:
-Structured metadata so AI answer engines (ChatGPT, Perplexity, Claude, Google AI Mode) can discover
-and cite the buyer's app — JSON-LD (FAQ, Article), `/llms.txt`, Open Graph, and hub-spoke internal
-links. Wired via `@vybekiit/seo` and buyer skills (`add-blog`, `go-live`); not a separate package or
-buyer choice.
-_Avoid_: exposing "GEO" or "AEO" jargon to the builder — say "so AI search can find your site".
-
-**Code hygiene guardrails**:
-Invisible agent rules (AGENTS.md + Layer B) that prevent AI coding anti-patterns — check-before-create,
-one lib file per concern, kit logger instead of `console.log`, zod at API boundaries. Enforced at
-`check-safety` / `go-live` without a buyer-facing skill.
-
-**SDLC guardrails**:
-The invisible agent quality loop — tests with every feature, Biome format/lint after edits, kit hooks
-and React patterns, mobile-first web layout. Layer B skills (`testing-vybekiit`, `format-lint-vybekiit`,
-`react-patterns-vybekiit`, `responsive-vybekiit`) plus `pnpm quality` at onboarding and ship checks.
-The builder never runs vitest or the linter.
-
-**Quality smoke**:
-Agent-run `pnpm quality` (format → lint → typecheck → test) after first install and before calling
-work done or shipping. Failures are fixed by the agent; Biome style warnings are soft.
-
-**Mobile-first** (web):
-Default layouts for narrow/phone width first, then scale up with `md:`/`lg:` breakpoints. Preview at
-375px before telling the builder a page is done.
-
-**Agent push gate**:
-Husky **pre-push** in buyer templates — runs `pnpm quality` (and optional UI walkthrough tests) when
-the **agent** pushes. The builder never hits it; it stops bad code before it reaches the remote.
-
-**Online checker**:
-Buyer `.github/workflows/ci.yml` — the automatic checker on ubuntu/macOS/Windows. Builder hears
-*"the automatic checker online"*, never CI/CD or GitHub Actions.
-
-**Utility registry**:
-`src/lib/README.md` in each template — the agent-only map of which file owns auth, billing, logging,
-etc. Read before adding helpers.
-
-**Production-silent logging**:
-`@vybekiit/core` `createLogger` — verbose in development, quiet in production automatically via
-`NODE_ENV`; optional `LOG_LEVEL` override for agents only.
-
-**UI source catalog**:
-Agent-only list of approved shadcn-compatible block libraries (BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack, AI Elements, Kibo UI, 21st.dev, …) in
-`.vybekiit/agent/ui-sources.md`. The builder never picks; the agent normalizes every import.
-
-**AI Elements namespace**:
-Mirrored Vercel AI Elements blocks under `src/components/ai-elements/` — chat, agent, streaming, tool-call UI built for the AI SDK. Includes core components and `example-*` demo compositions.
-
-**Kibo namespace**:
-Mirrored Kibo UI blocks under `src/components/kibo/` — application-grade components (kanban, editor, gantt, etc.) from the shadcnblocks registry.
-
-**Component library app**:
-Public browsable gallery at `ui.vybekiit.com` (`apps/componentLibrary`) — catalog of mirrored blocks with Primary Previews (demo wrappers) and a separate Examples tab for upstream demos; maintainer monorepo app, not shipped to buyers.
-
-**Primary preview**:
-Live render on a component detail page via a demo wrapper (`apps/componentLibrary/src/demos/{namespace}/{name}.tsx`) — required for component entries to show a live preview.
-
-**Example entry**:
-Upstream demo synced as its own catalog item (`kind: example`, e.g. Magic UI `magic-card-demo`, AI Elements `example-message`) — browsable on the global Examples tab, separate from the component's Primary Preview.
-
-**UI namespace**:
-Per-source folder under `src/components/` (`bundui/`, `magicui/`, …) holding mirrored upstream components — not merged into kit `ui/`.
-
-**UI catalog index**:
-Machine-readable manifest (`.vybekiit/agent/ui-catalog-index.json`) agents and the VybeKiit UI catalog MCP search against.
-
-**Registry sync**:
-Maintainer script (`pnpm sync:ui`) that refreshes mirrored components from upstream registries; lock file at `scripts/ui-registry-lock.json`.
-
-**SaaS showcase bundle**:
-Curated subset of mirrored UI blocks (`scripts/saas-showcase-manifest.json`) rendered on the landing hero carousel — representative, not exhaustive.
-
-**Component preview card**:
-Landing hero frame showing source badge + block name for one mirrored component; live mount only when `renderMode: live`.
-
-**Platform MCP bundle**:
-Per-provider MCP configs under `.vybekiit/agent/` (`mcp-ui-catalog.json`, `mcp-neon.json`, `mcp-firebase.json`) merged into buyer `.cursor/mcp.json`.
-
-**Neon branching (dev)**:
-Neon MCP/CLI feature for safe schema experiments on disposable branches — dev/IDE only, never production.
-
-**Firebase agent skills**:
-Official `firebase/agent-skills` packages teaching agents Firebase CLI + MCP workflows alongside `@vybekiit/db` Firestore adapter.
-
-**Normalize-on-import**:
-When copying a third-party UI block, swap to kit `Button`/`Input`, map colors to `@vybekiit/tokens`,
-and strip custom sizes before shipping.
-
-**Primitive-first**:
-Use `src/components/ui/*` for standard controls — never raw `<button>` / one-off styled inputs.
-
-**Agent-kit**:
-The maintained package holding the shared agent-layer source — skill contract, `language.md`
-vocabulary tables, goal-index format, update-kit logic. Template-specific skills stay embedded per template.
-
-**Skill gap**:
-A builder request with no matching `goal-index` row and no platform wrapper or `@vybekiit/*` adapter
-that covers it. The agent fills gaps via `extend-capabilities-vybekiit` (silent, agent-only).
-
-**Extension skill**:
-An agent-authored skill created at runtime to fill a skill gap — stored project-local under
-`.vybekiit/extensions/` or machine-global in the builder's tool-specific skills folder.
-
-**Machine-global skill**:
-A skill saved on the builder's computer, available across all their projects on that machine — not
-VybeKiit-wide and not shared with other buyers.
-
-**The gate**:
-The private-repo GitHub invite that grants paid access after Lemon Squeezy checkout collects the
-buyer's username. Refund → access removed. The buyer is never invited to the maintainer monorepo.
-
-**Template mirror**:
-A private per-template org repo the CLI clones to deliver a template — a derived, force-pushed copy
-of the template folder, never hand-edited (ADR-0005).
-
-**Mirror sync**:
-Maintainer pre-push hook that force-pushes all delivery mirrors after the local quality gate;
-GitHub Actions `workflow_dispatch` is the manual fallback. The monorepo is the single source of truth.
-
-**Tracer bullet**:
-The v1.0 thin end-to-end slice through every layer that proves the whole machine — a stranger pays,
-gets invited, scaffolds a web app, wires payments, deploys live.
-
-**Project asset**:
-A file in the repo the builder ships with the app (`public/`, `assets/`, extension icons) —
-optimized automatically at build time.
-
-**User upload**:
-A file a user adds at runtime (avatar, attachment) — stored via `StorageProvider` and served through
-CDN transform URLs, not raw bucket links.
-
-**Asset delivery**:
-The kit's automatic optimize + CDN layer (`@vybekiit/assets`). The builder never picks a CDN;
-it follows hosting + storage settings (ADR-0010).
-
-**Background job**:
-Work the app runs later or on a schedule (cleanup, reminders) — `@vybekiit/jobs`; buyer skill: go-live
-checks bindings; agent wires cron/queue.
-
-**Visitor stats**:
-Plain-language analytics — `@vybekiit/analytics`; buyer skill: `add-analytics`.
-
-**Push notification**:
-Alert on phone — `@vybekiit/notifications` (Expo default); buyer skill: `add-notifications`.
-
-**AI feature**:
-Server-side smart replies or helpers — `@vybekiit/ai`; buyer skill: `add-ai` (not pre-built demo apps).
-
-**Search index**:
-Find-in-app data — `@vybekiit/search`; buyer skill: `add-search`.
-
-**Live update**:
-Real-time channels — `@vybekiit/realtime` (Supabase default).
-
-**Blog page**:
-Content from repo files — `@vybekiit/cms` + `@vybekiit/seo`; buyer skill: `add-blog`.
-
-**Cookie consent**:
-Banner + export hooks — `@vybekiit/compliance`.
-
-**Team workspace**:
-Orgs and invites — `@vybekiit/tenancy`; buyer skill: `add-teams`.
-
-**Fast storage**:
-KV cache — `@vybekiit/kv` (Cloudflare default). **Agent-only / harden** — not a buyer onboarding path. Redis is not a VybeKiit buyer path; use TanStack Query for client cache (ADR-0014).
-
-**Web stack**:
-The default buyer path — **web** template serves API + UI on one origin (`:3000`). **Mobile** and
-**extension** clients call the web backend for auth, billing, and data. Practice auth + checkout
-work with blank secrets.
-_Avoid_: telling the builder to run a separate API server unless they chose the SPA stack.
-
-**SPA stack**:
-Alternate buyer path — **spa** (Vite admin UI, `:5173`) always pairs with **backend** (Express API,
-`:4000`). SPA never calls the web template; auth + billing wire through `@vybekiit/auth` and
-`@vybekiit/payments` on the backend. Practice checkout completes on SPA `/checkout/practice`.
-_Avoid_: conflating SPA stack with web stack — they are separate scaffolds.
-
-**Maintained package reuse**:
-Every template imports SaaS logic from `@vybekiit/*` packages — auth, payments, http, db, etc.
-Template-owned files are thin wire points (`auth-client.ts`, `billing-client.ts`) the agent skills
-touch once. No duplicated provider logic in templates.
-_Avoid_: custom fetch/auth code that bypasses the packages.
-
-**DB preset**:
-A composable SaaS table bundle (schema + indexes + RLS) for one kit feature — e.g. `orders`, `organizations`.
-Applied via `vybekiit apply-preset`; verified by doctor and goal skills. Agent-only term; buyer hears
-"setting up your app's data for [feature]."
-_Avoid_: migration, DDL, or preset jargon in buyer speech.
-
-**Feature module**:
-Synonym for a single DB preset entry in the catalog — one feature, one manifest, one apply command.
-_Avoid_: conflating with npm packages (packages consume feature modules).
-
-**Preset manifest**:
-The JSON SSOT for a feature module — entities, relations, indexes with `reason`, RLS mode, capabilities.
-Lives at `packages/db/presets/<feature>/preset.manifest.json`. Agent-only.
-
-**Capability flag**:
-A boolean on `DataProvider.capabilities` declaring optional ops (`upsert`, `fullTextSearch`, etc.).
-Callers check before using extended methods. Agent-only.
-
-**Client cache**:
-What the app remembers from the server while browsing — TanStack Query via `@vybekiit/client-state` (never say the name to the builder).
-
-**Browser automation**:
-Agent-only Playwright CLI for dashboards without API/MCP (`@vybekiit/browser-automation`). Never say to the builder.
-
-**Fresh-squeezy**:
-Agent codename for the Lemon Squeezy `ls` target inside browser-automation.
-
-**Registrar credential setup**:
-Agent-only browser step to mint Namecheap or GoDaddy API keys (`vybekiit-automate nc|gd setup`) when OAuth is unavailable. Distinct from **Nameserver delegation**, which uses `@vybekiit/deploy` REST after keys exist.
-_Avoid_: conflating with domain purchase — the builder still registers and pays at the registrar manually in v1.
-
-**Nameserver delegation**:
-Pointing registrar nameserver records at Cloudflare (or another host). Automated via `@vybekiit/deploy` when registrar API env vars are set — not via browser automation.
-
-**Payment MCP tier**:
-Stripe and PayPal via hosted MCP; Lemon Squeezy via browser-automation CLI.
-
-**MCP merge snippet**:
-Provider JSON under buyer `.vybekiit/agent/mcp-*.json` merged into Cursor, Claude Desktop, or Codex config — see `mcp-setup.md` in web template.
-
-**MCP tier (data)**:
-Supabase, Neon, Firebase — login-once agent tooling for database onboarding.
-
-**Message catalog loader**:
-Shared locale + RTL — `@vybekiit/i18n` with template JSON catalogs. Browser templates import
-`@vybekiit/i18n/locale-rules` for RTL + default locale; Node servers use `resolveI18nProvider()`.
-
-**Project surface inference**:
-Single CLI rule set that answers "which template is this cwd?" (web, mobile, extension, spa, backend)
-and whether mobile/extension toolchain flags apply. Used by doctor, platform-skills, and agent-layer
-commands — one module, not parallel heuristics.
-_Avoid_: duplicating `isMobileProject` / `detectTemplateName` logic in new call sites.
-
-**JSON client**:
-Maintained `@vybekiit/http/client` — Result-typed fetch helpers that preserve semantic HTTP outcome codes. Templates keep a thin origin seam (same-origin web vs absolute URL on mobile/spa).
-
-**HTTP outcome**:
-Stable semantic code on API error responses (`bad_input`, `unauthorized`, `forbidden`, …) paired with a plain `error` message. Agents branch on `code`; vibe coders see only the message. Shipped by `@vybekiit/http`; agent-internal on the wire.
-_Avoid_: saying status codes or outcome names to the vibe coder.
-
-**Agentic toolchain**:
-The CLIs the agent must have to act (supabase, wrangler, Expo/EAS, etc.), provisioned globally by
-`vybekiit doctor` so the buyer never configures tooling. Nothing is wired before the template or
-adapter that drives it is selected.
-
-**Doctor**:
-The maintained CLI subcommand that installs and verifies the toolchain (OS-aware, idempotent) and
-diagnoses a broken project. The human-facing doctor *skill* wraps it for the buyer.
-
-**Setup** (CLI):
-The post-purchase welcome command — brand banner then toolchain provisioning via doctor. Distinct
-from the doctor *skill* and the **setup-payments** skill.
-_Avoid_: conflating with `plan-setup` (domain checklist JSON) or buyer goal "set up my app".
-
-**Brand motto**:
-*Ship SaaS and projects like a software engineer — without becoming one.* — shown on the CLI welcome
-banner. The landing **tagline** (*The SaaS kit that ships itself.*) stays separate marketing copy.
-
-**Platform skill**:
-Layer B execution knowledge — official upstream docs/skills plus thin VybeKiit wrappers that wire
-provider resolution and verify-before-advance. Never shown to the builder.
-_Avoid_: goal-named skill (Layer A is what the buyer asks for).
-
-**Supported agent tools**:
-Claude Code, Codex, Cursor. Each loads the same buyer `AGENTS.md` via a thin redirect; Copilot is
-out of scope.
-
-**Kit release**:
-A unified `vX.Y.Z` tag cut on the monorepo and stamped on every delivery mirror after sync.
-Maintainer-facing release line — not shown to buyers. See ADR-0013.
-_Avoid_: exposing git tags to vibe coders (they track npm semver via `update-kit`).
-
-**Release line**:
-The ordered sequence of kit releases on `VybeKiit/vybekiit` GitHub Releases — the canonical
-changelog for features, fixes, and implementations.
-_Avoid_: duplicate Release pages on mirror repos (mirrors get git tags only).
-
-**npm semver**:
-Per-package version on `@vybekiit/*` — what buyers' `update-kit` compares via `planKitUpdate()`.
-Bumped in lockstep with kit releases; may diverge on breaking adapter changes (major bump).
+The full human↔agent glossary — every term, its definition, and the aliases to avoid — lives in
+**[LANGUAGE.md](./LANGUAGE.md)**. Names only; edit there. Use its exact terms in code, commits, and
+PRs. This file keeps the *shape* and *decisions*; LANGUAGE.md keeps the *names*.
 
 ## Open / parked
 

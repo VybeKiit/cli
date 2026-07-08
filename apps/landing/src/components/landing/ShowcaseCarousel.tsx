@@ -1,24 +1,13 @@
 'use client';
 
-import { BlueFlare } from '@/components/landing/BlueFlare';
+import type { ReactNode } from 'react';
 import { AIOperatorSlide } from '@/components/landing/showcase-slides/AIOperatorSlide';
 import { ExtensionSlide } from '@/components/landing/showcase-slides/ExtensionSlide';
 import { MarketingBlocksSlide } from '@/components/landing/showcase-slides/MarketingBlocksSlide';
 import { MobileAppSlide } from '@/components/landing/showcase-slides/MobileAppSlide';
-import { PricingPlanSlide } from '@/components/landing/showcase-slides/PricingPlanSlide';
 import { WebAppSlide } from '@/components/landing/showcase-slides/WebAppSlide';
-import { AutoScrollRow } from '@/components/ui/AutoScrollRow';
-import { TypewriterSequence } from '@/components/ui/TypewriterSequence';
-import { GlowCard } from '@/components/ui/GlowCard';
-import {
-  LANDING_EASE,
-  SHOWCASE_SECTION,
-  SHOWCASE_SLIDES,
-  type ShowcaseSlideMeta,
-} from '@/data/landing';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { ChevronIcon } from '@/components/ui/CustomIcons';
+import { SHOWCASE_SLIDES, type ShowcaseSlideMeta } from '@/data/landing';
 
 const SLIDE_COMPONENTS: Record<string, () => ReactNode> = {
   operator: () => <AIOperatorSlide />,
@@ -26,81 +15,115 @@ const SLIDE_COMPONENTS: Record<string, () => ReactNode> = {
   mobile: () => <MobileAppSlide />,
   extension: () => <ExtensionSlide />,
   marketing: () => <MarketingBlocksSlide />,
-  'pricing-plan': () => <PricingPlanSlide />,
 };
 
-function ShowcaseCard({ slide, className }: { slide: ShowcaseSlideMeta; className?: string }) {
+const ShowcaseCard = ({ slide }: { slide: ShowcaseSlideMeta }) => {
   const SlideContent = SLIDE_COMPONENTS[slide.id];
 
   return (
-    <GlowCard
-      className={cn(
-        'showcase-card flex h-[500px] shrink-0 flex-col overflow-hidden lg:h-[520px] lg:p-7',
-        className,
-      )}
+    <div
+      className="showcase-card flex w-full shrink-0 flex-col overflow-hidden rounded-[16px] border border-[rgba(47,137,255,0.38)] p-[24px_22px_28px]"
+      style={{
+        background:
+          'radial-gradient(75% 55% at 50% 0%, rgba(24, 105, 230, 0.22) 0%, rgba(5, 18, 38, 0.94) 48%, rgba(2, 7, 15, 0.98) 100%)',
+        boxShadow:
+          '0 0 0 1px rgba(60, 150, 255, 0.12), 0 0 12px rgba(47, 137, 255, 0.32), 0 0 34px rgba(22, 102, 220, 0.16), inset 0 0 32px rgba(35, 118, 255, 0.06)',
+      }}
     >
-      <div className="mb-3 shrink-0 lg:mb-4">
-        <h3 className="font-bold text-base text-white lg:text-lg">{slide.title}</h3>
-        <p className="text-[var(--text-muted)] text-xs lg:text-sm">{slide.subtitle}</p>
+      <div className="mb-[18px] shrink-0">
+        <h3 className="text-[18px] font-extrabold leading-[1.1] tracking-[-0.03em] text-[#f8fafc]">
+          {slide.title}
+        </h3>
+        <p className="mt-1.5 text-[13px] font-medium leading-[1.3] text-[rgba(226,232,240,0.7)]">
+          {slide.subtitle}
+        </p>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-white/8">
+      <div
+        className="min-h-[260px] flex-1 overflow-hidden rounded-[12px] border-[3px] border-[rgba(20,35,58,0.95)] bg-[rgba(2,8,18,0.96)]"
+        style={{
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.04)',
+        }}
+      >
         {SlideContent?.()}
       </div>
-    </GlowCard>
+    </div>
   );
-}
+};
 
-/** Product demo cards in a continuous auto-scroll row. */
-export function ShowcaseCarousel() {
+/**
+ * Product-showcase carousel — all 5 cards visible in a horizontal row.
+ *
+ * @returns The rendered ShowcaseCarousel element.
+ * @example
+ * ```tsx
+ * <ShowcaseCarousel />
+ * ```
+ */
+
+export const ShowcaseCarousel = () => {
   return (
-    <section className="blue-top-glow relative py-16 md:py-24" id="showcase">
-      <div className="relative mx-auto w-[calc(100%-48px)] max-w-[1520px]">
-        <BlueFlare
-          className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          variant="carousel"
-        />
-
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="relative"
-          initial={{ opacity: 0, y: 24 }}
-          transition={{ duration: 0.9, delay: 0.75, ease: LANDING_EASE }}
-        >
-          <div className="mb-8">
-            <p className="landing-label">Component showroom</p>
-            <TypewriterSequence
-              lines={[
-                {
-                  text: SHOWCASE_SECTION.heading,
-                  as: 'h2',
-                  className: 'mt-2 text-3xl font-[800] tracking-[-0.04em] text-white md:text-5xl',
-                },
-                {
-                  text: SHOWCASE_SECTION.subtext,
-                  as: 'p',
-                  className: 'mt-3 max-w-2xl text-base text-[var(--text-muted)] md:text-lg',
-                },
-              ]}
+    <section
+      className="relative pt-0 pb-[67px]"
+      id="showcase"
+      style={{
+        background:
+          'radial-gradient(ellipse 70% 46% at 50% 36%, rgba(0, 73, 170, 0.36), transparent 68%), radial-gradient(ellipse 44% 38% at 50% 54%, rgba(0, 32, 92, 0.38), transparent 72%), #000',
+      }}
+    >
+      <div className="relative mx-auto w-full max-w-none px-[44px]">
+        <div className="relative flex items-center">
+          {/* Left Arrow */}
+          <div
+            aria-hidden="true"
+            className="absolute -left-[26px] top-1/2 z-10 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(255,255,255,0.24)] bg-[rgba(3,6,10,0.82)]"
+            style={{
+              boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+            }}
+          >
+            <ChevronIcon
+              className="h-[18px] w-[18px] text-[rgba(255,255,255,0.5)]"
+              direction="left"
             />
           </div>
 
-          <AutoScrollRow
-            ariaLabel="Product showcase"
-            durationDesktop="80s"
-            durationMobile="55s"
-            pauseOnHover={false}
-            rowClassName="auto-scroll-row-showcase"
-          >
+          {/* Cards Row — all 5 visible */}
+          <div className="grid w-full grid-cols-5 gap-0">
             {SHOWCASE_SLIDES.map((slide) => (
-              <ShowcaseCard
-                className="w-[min(85vw,420px)] p-4 lg:p-7"
-                key={slide.id}
-                slide={slide}
-              />
+              <ShowcaseCard key={slide.id} slide={slide} />
             ))}
-          </AutoScrollRow>
-        </motion.div>
+          </div>
+
+          {/* Right Arrow */}
+          <div
+            aria-hidden="true"
+            className="absolute -right-[26px] top-1/2 z-10 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(255,255,255,0.24)] bg-[rgba(3,6,10,0.82)]"
+            style={{
+              boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+            }}
+          >
+            <ChevronIcon
+              className="h-[18px] w-[18px] text-[rgba(255,255,255,0.5)]"
+              direction="right"
+            />
+          </div>
+        </div>
+
+        {/* Pagination */}
+        <div
+          aria-hidden="true"
+          className="mt-[28px] flex h-[24px] items-center justify-center gap-[14px]"
+        >
+          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
+          <div className="flex w-[280px] items-center gap-[5px]">
+            <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[5px] flex-1 rounded-full bg-[#f8fbff] shadow-[0_0_10px_rgba(255,255,255,0.55)]" />
+            <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+            <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
+          </div>
+          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
+        </div>
       </div>
     </section>
   );
-}
+};

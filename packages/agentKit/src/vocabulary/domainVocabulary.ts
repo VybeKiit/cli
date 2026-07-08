@@ -5,11 +5,11 @@
  * {@link renderServiceNameBanList} into `language.md` so web/mobile/extension stay in sync.
  */
 
-export interface DomainVocabularyEntry {
+export type DomainVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why?: string;
-}
+};
 
 /** Payment and tax terms the builder must never hear raw. */
 export const PAYMENTS_VOCABULARY: readonly DomainVocabularyEntry[] = [
@@ -48,23 +48,34 @@ export const EXTENDED_SERVICE_NAME_BANS: readonly string[] = [
   'GitHub',
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-/** Render {@link PAYMENTS_VOCABULARY} as a markdown table for `language.md`. */
-export function renderPaymentsVocabularyTable(): string {
+/**
+ * Render {@link PAYMENTS_VOCABULARY} as a markdown table for `language.md`.
+ *
+ * @returns The rendered render payments vocabulary table text.
+ * @example
+ * const result = renderPaymentsVocabularyTable();
+ */
+export const renderPaymentsVocabularyTable = (): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
-  const rows = PAYMENTS_VOCABULARY.map(
-    (entry) =>
-      `| ${escapeCell(entry.jargon)} | ${escapeCell(entry.say)} | ${escapeCell(entry.why ?? '')} |`,
-  );
+  const rows = PAYMENTS_VOCABULARY.map((entry) => {
+    const why = entry.why === undefined ? '' : entry.why;
+    return `| ${escapeCell(entry.jargon)} | ${escapeCell(entry.say)} | ${escapeCell(why)} |`;
+  });
   return [header, divider, ...rows].join('\n');
-}
+};
 
-/** Bullet list of extra banned service names for the "Service names" section. */
-export function renderServiceNameBanList(existingBans: readonly string[]): string {
+/**
+ * Bullet list of extra banned service names for the "Service names" section.
+ *
+ * @param existingBans - existing bans input.
+ * @returns The rendered render service name ban list text.
+ * @example
+ * const result = renderServiceNameBanList(existingBans);
+ */
+export const renderServiceNameBanList = (existingBans: readonly string[]): string => {
   const combined = [...new Set([...existingBans, ...EXTENDED_SERVICE_NAME_BANS])];
   return combined.map((name) => `- Never say **${name}**`).join('\n');
-}
+};

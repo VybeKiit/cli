@@ -1,7 +1,3 @@
-export type {
-  AiProvider,
-  AiProviderName,
-  CompleteParams,
-  CompleteResult,
-} from './types';
-export { resolveAiProvider } from './resolve';
+export * from './config';
+export * from './resolve';
+export * from './types';

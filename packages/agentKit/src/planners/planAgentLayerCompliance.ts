@@ -1,16 +1,22 @@
-import type { TemplateId } from '../catalogs/goalCatalog';
+import type { TemplateId } from '@vybekiit/agent-kit/catalogs/goalCatalog';
 import {
   checkBaseManifestParity,
   mergePlatformSkillsManifests,
   type PlatformSkillsTemplateManifest,
-} from '../catalogs/platformSkillsMerge';
-import { checkAgentSkillSymlinks, checkBuyerSkillStubDrift } from '../render/buyerSkillStubs';
-import { checkGoalDrift } from './planGoalRouting';
+} from '@vybekiit/agent-kit/catalogs/platformSkillsMerge';
 import {
-  planAgentRuntimeCompliance,
+  checkAgentSkillSymlinks,
+  checkBuyerSkillStubDrift,
+} from '@vybekiit/agent-kit/render/buyerSkillStubs';
+import {
+  GENERATED_SECTION_MARKERS,
+  type GeneratedSectionId,
+} from '@vybekiit/agent-kit/render/markdown';
+import {
   type AgentRuntimeComplianceInput,
+  planAgentRuntimeCompliance,
 } from './planAgentRuntimeCompliance';
-import { GENERATED_SECTION_MARKERS, type GeneratedSectionId } from '../render/markdown';
+import { checkGoalDrift } from './planGoalRouting';
 
 export type AgentLayerComplianceCheckId =
   | 'generated-markers'
@@ -24,13 +30,13 @@ export type AgentLayerComplianceCheckId =
   | 'platform-skills-manifest-parity'
   | import('./planAgentRuntimeCompliance').AgentRuntimeComplianceCheckId;
 
-export interface AgentLayerComplianceIssue {
+export type AgentLayerComplianceIssue = {
   readonly check: AgentLayerComplianceCheckId;
   readonly message: string;
   readonly file?: string;
-}
+};
 
-export interface AgentLayerComplianceInput {
+export type AgentLayerComplianceInput = {
   readonly template: TemplateId;
   readonly files: Readonly<Record<string, string>>;
   readonly skillPaths: readonly string[];
@@ -42,13 +48,13 @@ export interface AgentLayerComplianceInput {
   readonly platformSkillContents?: Readonly<Record<string, string>>;
   readonly platformSkillsManifest?: PlatformSkillsTemplateManifest;
   readonly liveDocs?: Readonly<Record<string, string>>;
-}
+};
 
-export interface AgentLayerComplianceReport {
+export type AgentLayerComplianceReport = {
   readonly template: TemplateId;
   readonly issues: readonly AgentLayerComplianceIssue[];
   readonly ok: boolean;
-}
+};
 
 const MARKER_REQUIREMENTS: readonly { file: string; sectionId: GeneratedSectionId }[] = [
   { file: 'checklist.md', sectionId: 'production-gates' },
@@ -56,16 +62,22 @@ const MARKER_REQUIREMENTS: readonly { file: string; sectionId: GeneratedSectionI
   { file: '.vybekiit/agent/session-bootstrap.md', sectionId: 'session-bootstrap' },
 ];
 
-function hasMarker(content: string, sectionId: GeneratedSectionId): boolean {
-  return content.includes(GENERATED_SECTION_MARKERS.start(sectionId));
-}
+const hasMarker = (content: string, sectionId: GeneratedSectionId): boolean =>
+  content.includes(GENERATED_SECTION_MARKERS.start(sectionId));
 
 /**
  * Validate buyer agent-layer structure — pure; CLI reads disk and passes contents.
+ *
+ * @param input - input input.
+ * @returns The plan agent layer compliance result.
+ * @example
+ * const result = planAgentLayerCompliance(input);
  */
-export function planAgentLayerCompliance(
+// biome-ignore-start lint/complexity/noExcessiveCognitiveComplexity: This coordinator preserves report ordering across independent compliance checks.
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: This coordinator keeps the ordered compliance surface in one entrypoint.
+export const planAgentLayerCompliance = (
   input: AgentLayerComplianceInput,
-): AgentLayerComplianceReport {
+): AgentLayerComplianceReport => {
   const issues: AgentLayerComplianceIssue[] = [];
   const { template, files, skillPaths } = input;
 
@@ -77,9 +89,7 @@ export function planAgentLayerCompliance(
         message: `Missing required file: ${req.file}`,
         file: req.file,
       });
-      continue;
-    }
-    if (!hasMarker(content, req.sectionId)) {
+    } else if (!hasMarker(content, req.sectionId)) {
       issues.push({
         check: 'generated-markers',
         message: `Missing generated marker for ${req.sectionId} in ${req.file}`,
@@ -169,13 +179,11 @@ export function planAgentLayerCompliance(
     }
   }
 
-  const skillContents = input.skillContents ?? {};
+  const skillContents = input.skillContents === undefined ? {} : input.skillContents;
   if (Object.keys(skillContents).length > 0) {
-    const stubDrift = checkBuyerSkillStubDrift(
-      template,
-      skillContents,
-      input.buyerSkillStubContents ?? {},
-    );
+    const buyerSkillStubContents =
+      input.buyerSkillStubContents === undefined ? {} : input.buyerSkillStubContents;
+    const stubDrift = checkBuyerSkillStubDrift(template, skillContents, buyerSkillStubContents);
     for (const issue of stubDrift.issues) {
       issues.push({
         check: 'buyer-skill-stub-drift',
@@ -213,7 +221,8 @@ export function planAgentLayerCompliance(
   const runtimeInput: AgentRuntimeComplianceInput = {
     files,
     skillContents,
-    platformSkillContents: input.platformSkillContents ?? {},
+    platformSkillContents:
+      input.platformSkillContents === undefined ? {} : input.platformSkillContents,
     ...(input.liveDocs === undefined ? {} : { liveDocs: input.liveDocs }),
   };
   const runtime = planAgentRuntimeCompliance(runtimeInput);
@@ -226,4 +235,5 @@ export function planAgentLayerCompliance(
   }
 
   return { template, issues, ok: issues.length === 0 };
-}
+};
+// biome-ignore-end lint/complexity/noExcessiveCognitiveComplexity: end coordinator suppression.

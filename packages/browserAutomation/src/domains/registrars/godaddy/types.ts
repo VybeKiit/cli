@@ -1,4 +1,4 @@
-import type { BaseVerbContext } from '../../../core/types';
+import type { BaseVerbContext } from '@vybekiit/browser-automation/core/types';
 
 export type GdVerbContext = BaseVerbContext;
 
@@ -22,7 +22,15 @@ export type GdEnvBlock = {
   GODADDY_OTE?: string;
 };
 
-export function gdSetupEnvBlock(result: GdSetupResult): GdEnvBlock {
+/**
+ * Gd Setup Env Block.
+ *
+ * @param result - Operation result to convert.
+ * @returns Computed value for downstream automation.
+ * @example
+ * const result = gdSetupEnvBlock(result);
+ */
+export const gdSetupEnvBlock = (result: GdSetupResult): GdEnvBlock => {
   const env: GdEnvBlock = {
     GODADDY_API_KEY: result.apiKey,
     GODADDY_API_SECRET: result.apiSecret,
@@ -31,4 +39,4 @@ export function gdSetupEnvBlock(result: GdSetupResult): GdEnvBlock {
     env.GODADDY_OTE = '1';
   }
   return env;
-}
+};

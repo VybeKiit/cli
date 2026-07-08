@@ -5,12 +5,25 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { useUser } from '@/hooks/useUser';
 import type { ReactNode } from 'react';
 
-/** Protects dashboard routes and wraps them in signed-in chrome. */
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+interface DashboardLayoutProps {
+  readonly children?: ReactNode;
+}
+
+/**
+ * Protect dashboard routes and wrap them in signed-in chrome.
+ *
+ * @param props - Optional dashboard route content.
+ * @returns Guarded dashboard layout.
+ * @example
+ * <DashboardLayout><Page /></DashboardLayout>
+ */
+const DashboardLayout = ({ children = null }: DashboardLayoutProps) => {
   const { user } = useUser();
   return (
     <DashboardGuard>
       {user ? <DashboardShell user={user}>{children}</DashboardShell> : null}
     </DashboardGuard>
   );
-}
+};
+
+export default DashboardLayout;

@@ -1,5 +1,5 @@
 import { useTheme } from '@/theme/useTheme';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, TextInput, type TextInputProps } from 'react-native';
 
 /**
@@ -12,31 +12,53 @@ export interface InputProps extends TextInputProps {
   invalid?: boolean;
 }
 
+const resolveBorderColor = (
+  invalid: boolean,
+  focused: boolean,
+  colors: ReturnType<typeof useTheme>['colors'],
+): string => {
+  if (invalid) {
+    return colors.destructive;
+  }
+  if (focused) {
+    return colors.ring;
+  }
+  return colors.input;
+};
+
 /**
  * The shared single-line text field.
  *
- * A plain RN `TextInput` styled from {@link useTheme} so it matches the web input
- * (same border/radius/placeholder colors from `@vybekiit/tokens`). It tracks focus
- * locally to swap the border to the theme `ring` color, mirroring web's
- * `focus-visible:ring`. Placeholder color comes from `mutedForeground`.
+ * @param props - Native text input props plus the validation state.
+ * @returns A themed text input.
+ * @example
+ * <Input value={email} onChangeText={setEmail} />
  */
-export function Input({ invalid = false, style, onFocus, onBlur, ...props }: InputProps) {
+export const Input = ({ invalid = false, style, onFocus, onBlur, ...props }: InputProps) => {
   const { colors, radius, spacing, fontSizes } = useTheme();
   const [focused, setFocused] = useState(false);
 
-  const borderColor = invalid ? colors.destructive : focused ? colors.ring : colors.input;
+  const borderColor = resolveBorderColor(invalid, focused, colors);
+  const handleFocus = useCallback<NonNullable<TextInputProps['onFocus']>>(
+    (event) => {
+      setFocused(true);
+      onFocus?.(event);
+    },
+    [onFocus],
+  );
+  const handleBlur = useCallback<NonNullable<TextInputProps['onBlur']>>(
+    (event) => {
+      setFocused(false);
+      onBlur?.(event);
+    },
+    [onBlur],
+  );
 
   return (
     <TextInput
       placeholderTextColor={colors.mutedForeground}
-      onFocus={(event) => {
-        setFocused(true);
-        onFocus?.(event);
-      }}
-      onBlur={(event) => {
-        setFocused(false);
-        onBlur?.(event);
-      }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       style={[
         styles.base,
         {
@@ -52,7 +74,7 @@ export function Input({ invalid = false, style, onFocus, onBlur, ...props }: Inp
       {...props}
     />
   );
-}
+};
 
 const styles = StyleSheet.create({
   base: {

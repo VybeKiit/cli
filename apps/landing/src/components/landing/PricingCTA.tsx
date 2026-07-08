@@ -1,99 +1,90 @@
-'use client';
-
+import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
+import { PricingHeroPrice } from '@/components/landing/PricingHeroPrice';
+import { PricingOfferPeek } from '@/components/landing/PricingOfferPeek';
 import { TestimonialsBlock } from '@/components/landing/TestimonialsBlock';
 import { CheckoutCTA } from '@/components/ui/CheckoutCTA';
-import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { CheckCircleIcon, ClockIcon, ShieldCheckIcon } from '@/components/ui/CustomIcons';
-import { SectionShell } from '@/components/ui/SectionShell';
-import { TypewriterText } from '@/components/ui/TypewriterText';
-import { useInViewOnce } from '@/hooks/useInViewOnce';
-import { useTypewriterSequence } from '@/hooks/useTypewriterSequence';
-import { PRICING_BULLETS } from '@/data/landing';
-import { PRICE } from '@/data/site';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { CheckCircleIcon, ShieldCheckIcon } from '@/components/ui/CustomIcons';
+import { PRICING_BULLETS, SOCIAL_PROOF } from '@/data/landing';
 
-const REFUND_COPY = '14-day refund no questions asked';
-const CHECK_SPLASH_MS = 320;
+const REFUND_COPY = '14-day refund, no questions asked.';
+const STARS = Array.from({ length: 5 });
+const PRICING_STACK_LOGOS = [
+  { slug: 'nextdotjs', label: 'NEXT.js' },
+  { slug: 'tailwindcss', label: 'tailwindcss' },
+  { slug: 'supabase', label: 'supabase' },
+  { slug: 'stripe', label: 'stripe' },
+  { slug: 'openai', label: 'OpenAI' },
+  { slug: 'resend', label: 'resend' },
+  { slug: 'vercel', label: 'Vercel' },
+] as const;
 
-function PricingBullets() {
-  const { ref, inView } = useInViewOnce();
-  const { displayLines, activeIndex, isComplete, splashingIndex } = useTypewriterSequence(
-    PRICING_BULLETS,
-    {
-      start: inView,
-      pauseAfterLineMs: CHECK_SPLASH_MS,
-    },
-  );
+/**
+ * Pricing CTA section with $29 offer; testimonials block sits below the panel.
+ *
+ * @returns The rendered PricingCTA element.
+ * @example
+ * ```tsx
+ * <PricingCTA />
+ * ```
+ */
 
-  return (
-    <ul className="mt-8 space-y-4" ref={ref as never}>
-      {PRICING_BULLETS.map((bullet, index) => (
-        <li className="flex items-start gap-3 text-[var(--text-soft)]" key={bullet}>
-          <span
-            className={cn(
-              'landing-check-icon shrink-0',
-              splashingIndex === index && 'landing-check-splash',
-            )}
-          >
-            <CheckCircleIcon className="h-5 w-5 text-emerald-400" />
-          </span>
-          <span
-            className={cn(index === activeIndex && inView && !isComplete && 'typewriter-cursor')}
-          >
-            {displayLines[index]}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
+export const PricingCTA = () => (
+  <section className="relative w-full pt-[132px] pb-[110px]" id="pricing">
+    <div className="pricing-panel blue-top-glow overflow-hidden">
+      <div className="grid gap-10 lg:grid-cols-[640px_1fr] lg:gap-[40px]">
+        <div>
+          <PricingOfferPeek />
+          <PricingHeroPrice />
+          <ul className="mt-8 space-y-[22px]">
+            {PRICING_BULLETS.map((bullet) => (
+              <li
+                className="flex items-start gap-6 text-[29px] leading-[1.25] text-[rgba(226,232,240,0.88)]"
+                key={bullet}
+              >
+                <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#60a5fa] text-[#06101e]">
+                  <CheckCircleIcon className="h-5 w-5" />
+                </span>
+                <span>{bullet}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-/** Pricing CTA section with $29 offer; testimonials block sits below the panel. */
-export function PricingCTA() {
-  return (
-    <SectionShell className="py-16 md:py-24" id="pricing">
-      <div className="pricing-panel blue-top-glow overflow-hidden">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-24">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.75 }}
-            viewport={{ once: true, amount: 0.2 }}
-            whileInView={{ opacity: 1, y: 0 }}
-          >
-            <p className="landing-label flex items-center gap-2">
-              <ClockIcon className="h-4 w-4" />
-              LIMITED TIME OFFER
-            </p>
-            <p className="pricing-price mt-6 text-white">
-              <AnimatedNumber value={PRICE.display} />
-            </p>
-            <p className="mt-2 text-[var(--text-soft)] text-xl">One-time</p>
-            <PricingBullets />
-          </motion.div>
-
-          <motion.div
-            className="flex flex-col justify-center"
-            initial={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.75, delay: 0.1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            whileInView={{ opacity: 1, y: 0 }}
-          >
-            <CheckoutCTA size="pricing">Get VybeKiit Now</CheckoutCTA>
-            <p className="mt-4 text-center text-[var(--text-muted)] text-sm">
-              One payment Lifetime access
-            </p>
-            <p className="mt-3 flex items-center justify-center gap-2 text-[var(--text-soft)] text-sm">
-              <span className="landing-trust-shimmer inline-flex shrink-0 rounded-full">
-                <ShieldCheckIcon className="h-4 w-4 text-[var(--blue-soft)]" />
-              </span>
-              <TypewriterText as="span" text={REFUND_COPY} />
-            </p>
-          </motion.div>
+        <div className="flex flex-col justify-start pt-[24px]">
+          <CheckoutCTA icon="lock" size="pricing">
+            Get VybeKiit Now
+          </CheckoutCTA>
+          <p className="mt-[76px] text-center text-[32px] font-medium leading-[1.25] text-white">
+            One payment. Lifetime access.
+          </p>
+          <p className="mt-[84px] flex items-center justify-center gap-7 text-[32px] leading-[1.2] text-white">
+            <span className="landing-trust-shimmer inline-flex shrink-0 rounded-full">
+              <ShieldCheckIcon className="h-[46px] w-[46px] text-[var(--blue-soft)]" />
+            </span>
+            {REFUND_COPY}
+          </p>
         </div>
       </div>
 
-      <TestimonialsBlock />
-    </SectionShell>
-  );
-}
+      <div className="pricing-panel-proof">
+        <div className="pricing-panel-proof-stars" aria-hidden="true">
+          {STARS.map((_, index) => (
+            <span key={index}>★</span>
+          ))}
+        </div>
+        <p>{SOCIAL_PROOF.tagline}</p>
+        <p>{SOCIAL_PROOF.subtagline}</p>
+        <ul className="pricing-panel-logo-row" aria-label="Built with">
+          {PRICING_STACK_LOGOS.map((logo) => (
+            <li key={logo.slug}>
+              <LogoMarkIcon className="h-[28px] w-[28px] shrink-0" mono={true} slug={logo.slug} />
+              <span>{logo.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <TestimonialsBlock />
+  </section>
+);

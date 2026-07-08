@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /** One-shot DOM probe for LS dashboard — maintainer diagnostic only. */
-import { writeFile, mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
 import {
@@ -6,44 +6,81 @@ import {
   planBuyerSkillStubOutputs,
   type TemplateId,
 } from '@vybekiit/agent-kit';
-import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import {
   listBuyerSkillContents,
   loadAgentLayerRenderInputs,
   resolveTemplateArg,
   writeAgentLayerRenderOutputs,
 } from '../lib/agentLayerIo';
+import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import { isTemplateName } from '../lib/scaffold';
 
-async function writeBuyerSkillStubs(
+/**
+ * Write generated buyer skill stubs for the selected template.
+ *
+ * @param cwd - Project directory containing the buyer agent layer.
+ * @param template - Template id used to plan the stubs.
+ * @param skillContents - Buyer skill contents keyed by path.
+ * @returns Stub paths written by this call.
+ * @example
+ * const written = await writeBuyerSkillStubs(cwd, 'web', skillContents);
+ */
+const writeBuyerSkillStubs = async (
   cwd: string,
   template: TemplateId,
   skillContents: Readonly<Record<string, string>>,
-): Promise<string[]> {
-  const written: string[] = [];
-  for (const stub of planBuyerSkillStubOutputs(template, skillContents)) {
-    const absolute = join(cwd, stub.stubPath);
-    await mkdir(dirname(absolute), { recursive: true });
-    await writeFile(absolute, stub.content, 'utf8');
-    written.push(stub.stubPath);
+): Promise<string[]> => {
+  const stubs = planBuyerSkillStubOutputs(template, skillContents);
+  await Promise.all(
+    stubs.map(async (stub) => {
+      const absolute = join(cwd, stub.stubPath);
+      await mkdir(dirname(absolute), { recursive: true });
+      await writeFile(absolute, stub.content, 'utf8');
+    }),
+  );
+
+  return stubs.map((stub) => stub.stubPath);
+};
+
+/**
+ * Resolve the template used by the render command.
+ *
+ * @param cwd - Project directory used for template inference.
+ * @param templateArg - Optional template argument passed by the caller.
+ * @returns Explicit, inferred, or bootstrap-default template id.
+ * @example
+ * const template = await resolveRenderTemplate(process.cwd(), 'web');
+ */
+const resolveRenderTemplate = async (cwd: string, templateArg?: string): Promise<TemplateId> => {
+  if (templateArg !== undefined && templateArg !== '' && isTemplateName(templateArg)) {
+    return templateArg;
   }
-  return written;
-}
+
+  const detected = await resolveTemplateArg(undefined, cwd);
+  if (detected !== null) {
+    return detected;
+  }
+
+  return 'web';
+};
 
 /**
  * Regenerate marked agent-layer sections, buyer Agent Skills stubs, and per-agent symlinks.
+ *
+ * @param cwd - Project directory containing the agent layer.
+ * @param templateArg - Optional template override.
+ * @returns Files updated plus the process exit code.
+ * @example
+ * const result = await runRenderAgentLayer(process.cwd(), 'web');
  */
-export async function runRenderAgentLayer(
+export const runRenderAgentLayer = async (
   cwd: string = process.cwd(),
   templateArg?: string,
 ): Promise<{
   readonly filesUpdated: readonly string[];
   readonly exitCode: number;
-}> {
-  const template: TemplateId =
-    (templateArg && isTemplateName(templateArg) ? templateArg : null) ??
-    (await resolveTemplateArg(undefined, cwd)) ??
-    'web';
+}> => {
+  const template = await resolveRenderTemplate(cwd, templateArg);
 
   const { contents, present } = await loadAgentLayerRenderInputs(cwd);
   const skillContents = await listBuyerSkillContents(cwd);
@@ -68,4 +105,4 @@ export async function runRenderAgentLayer(
   }
 
   return { filesUpdated, exitCode: 0 };
-}
+};

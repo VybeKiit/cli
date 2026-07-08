@@ -16,4 +16,4 @@ Read this **before** adding a helper. Extend an existing file when it already co
 | `utils.ts` | UI helpers only (`cn`) — not business logic |
 | `direction.ts` | RTL / locale direction helpers |
 
-**Rules:** one home per concern · no duplicate wrappers · no `console.log` in app code (use `logger.ts`).
+**Rules:** one home per concern · no duplicate wrappers · no direct debug output in app code (use `logger.ts`).

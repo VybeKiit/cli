@@ -5,11 +5,11 @@
  * {@link renderAgentInternalVocabularyTable} (DRY with {@link sdlc-vocabulary.ts}).
  */
 
-export interface UiVocabularyEntry {
+export type UiVocabularyEntry = {
   readonly jargon: string;
   readonly say: string;
   readonly why: string;
-}
+};
 
 /** Layout, hosting, analytics, and AI-surface terms the builder may point at or overhear. */
 export const UI_VOCABULARY: readonly UiVocabularyEntry[] = [
@@ -198,11 +198,9 @@ export const AGENT_INTERNAL_VOCABULARY: readonly UiVocabularyEntry[] = [
   },
 ];
 
-function escapeCell(text: string): string {
-  return text.replace(/\|/g, '\\|');
-}
+const escapeCell = (text: string): string => text.replace(/\|/g, '\\|');
 
-function renderVocabularyTable(entries: readonly UiVocabularyEntry[]): string {
+const renderVocabularyTable = (entries: readonly UiVocabularyEntry[]): string => {
   const header = "| Don't say (jargon) | Say instead (plain) | Why it matters to them |";
   const divider = '|---|---|---|';
   const rows = entries.map((entry) => {
@@ -210,19 +208,32 @@ function renderVocabularyTable(entries: readonly UiVocabularyEntry[]): string {
     return `| ${escapeCell(entry.jargon)} | ${escapeCell(say)} | ${escapeCell(entry.why)} |`;
   });
   return [header, divider, ...rows].join('\n');
-}
+};
 
-/** Render layout + product surface rows for `language.md` → "Your app's layout". */
-export function renderUiVocabularyTable(): string {
-  return renderVocabularyTable(UI_VOCABULARY);
-}
+/**
+ * Render layout + product surface rows for `language.md` → "Your app's layout".
+ *
+ * @returns The rendered render ui vocabulary table text.
+ * @example
+ * const result = renderUiVocabularyTable();
+ */
+export const renderUiVocabularyTable = (): string => renderVocabularyTable(UI_VOCABULARY);
 
-/** Render failure rows for `language.md` → "When something breaks". */
-export function renderFailureVocabularyTable(): string {
-  return renderVocabularyTable(FAILURE_VOCABULARY);
-}
+/**
+ * Render failure rows for `language.md` → "When something breaks".
+ *
+ * @returns The rendered render failure vocabulary table text.
+ * @example
+ * const result = renderFailureVocabularyTable();
+ */
+export const renderFailureVocabularyTable = (): string => renderVocabularyTable(FAILURE_VOCABULARY);
 
-/** Render agent-internal rows for `language.md` → "Agent-internal — never say". */
-export function renderAgentInternalVocabularyTable(): string {
-  return renderVocabularyTable(AGENT_INTERNAL_VOCABULARY);
-}
+/**
+ * Render agent-internal rows for `language.md` → "Agent-internal — never say".
+ *
+ * @returns The rendered render agent internal vocabulary table text.
+ * @example
+ * const result = renderAgentInternalVocabularyTable();
+ */
+export const renderAgentInternalVocabularyTable = (): string =>
+  renderVocabularyTable(AGENT_INTERNAL_VOCABULARY);

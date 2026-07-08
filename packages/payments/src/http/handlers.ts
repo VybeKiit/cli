@@ -1,60 +1,125 @@
-import type { Result } from '@vybekiit/core';
-import { badInput, ok, upstreamFailed, type HttpResponse } from '@vybekiit/http';
+import { badInput, type HttpResponse, ok as okResponse, upstreamFailed } from '@vybekiit/core/http';
+import { isPaymentsUnconfigured } from '@vybekiit/payments/practice';
+import { Payments, resolvePaymentProvider } from '@vybekiit/payments/resolve';
+import type { OrderEvent, PaymentError } from '@vybekiit/payments/types';
 import { Cause, Effect, Exit, Option } from 'effect';
-import { isPaymentsUnconfigured } from '../practice';
-import { Payments, resolvePaymentProvider } from '../resolve';
-import type { OrderEvent, PaymentError } from '../types';
+import type { CheckoutBody, PracticeCompleteBody } from './schemas';
 
-export interface CheckoutBody {
-  productId?: string;
-  githubUsername?: string;
-  email?: string;
-}
+const practiceCheckoutFallbackUrl = 'http://localhost:3000';
 
-export interface CheckoutHttpDeps {
-  env?: Record<string, string | undefined>;
+/** Dependencies required by the provider-agnostic checkout handler. */
+export type CheckoutHttpDeps = {
+  readonly env?: Record<string, string | undefined>;
   /** Server origin (API base). Used for real provider success URLs. */
-  appUrl?: string | undefined;
+  readonly appUrl?: string | undefined;
   /** Buyer-facing origin for practice checkout redirects (SPA/web). */
-  frontendUrl?: string | undefined;
-  requestOrigin?: string | null;
-}
+  readonly frontendUrl?: string | undefined;
+  readonly requestOrigin?: string | null;
+};
 
-export interface PracticeCompleteHttpDeps {
-  fulfillOrder: (event: OrderEvent) => Promise<Result<true>>;
-}
+type FulfillOrderEffect = (event: OrderEvent) => Effect.Effect<true, { readonly message: string }>;
 
-export interface WebhookHttpDeps {
-  fulfillOrder: (event: OrderEvent) => Promise<Result<true>>;
-  env?: Record<string, string | undefined>;
-}
+/** Dependencies required by the practice-mode completion handler. */
+export type PracticeCompleteHttpDeps = {
+  readonly fulfillOrder: FulfillOrderEffect;
+};
 
+/** Dependencies required by the payment webhook handler. */
+export type WebhookHttpDeps = {
+  readonly fulfillOrder: FulfillOrderEffect;
+  readonly env?: Record<string, string | undefined>;
+};
+
+/** HTTP response body returned by the shared payment handlers. */
 export type PaymentsHttpResponse = HttpResponse<
   { readonly url: string } | { readonly ok: true; readonly orderId?: string }
 >;
 
-/** Pull the {@link PaymentError} message from a failed run's cause; a defect falls back to a generic line. */
-function paymentErrorMessage(cause: Cause.Cause<PaymentError>): string {
-  return (
-    Option.getOrNull(Cause.failureOption(cause))?.message ?? 'Payment provider request failed.'
-  );
-}
-
-/** Start a purchase — provider-agnostic checkout handler shared by Next and Express. */
-export async function handleCheckout(
-  body: CheckoutBody,
-  deps: CheckoutHttpDeps = {},
-): Promise<PaymentsHttpResponse> {
-  const { productId, githubUsername, email } = body;
-  if (!productId) {
-    return badInput('productId is required.');
+/**
+ * Resolve the environment source used by checkout handling.
+ *
+ * @param deps - Checkout handler dependencies that may include an env override.
+ * @returns The provided env source, or `process.env` at the composition boundary.
+ * @example
+ * const env = resolveCheckoutEnv({ env: process.env });
+ */
+const resolveCheckoutEnv = (deps: CheckoutHttpDeps): Record<string, string | undefined> => {
+  if (deps.env !== undefined) {
+    return deps.env;
   }
 
-  const env = deps.env ?? process.env;
+  return process.env;
+};
+
+/**
+ * Resolve the base URL used by practice checkout redirects.
+ *
+ * @param deps - Checkout dependencies containing possible frontend or app origins.
+ * @returns The first configured origin, or the local development fallback.
+ * @example
+ * const baseUrl = resolvePracticeBaseUrl({ frontendUrl: 'http://localhost:5173' });
+ */
+const resolvePracticeBaseUrl = (deps: CheckoutHttpDeps): string => {
+  if (deps.frontendUrl !== undefined && deps.frontendUrl.length > 0) {
+    return deps.frontendUrl;
+  }
+
+  if (
+    deps.requestOrigin !== undefined &&
+    deps.requestOrigin !== null &&
+    deps.requestOrigin.length > 0
+  ) {
+    return deps.requestOrigin;
+  }
+
+  if (deps.appUrl !== undefined && deps.appUrl.length > 0) {
+    return deps.appUrl;
+  }
+
+  return practiceCheckoutFallbackUrl;
+};
+
+/**
+ * Pull a tagged error message from a failed Effect cause.
+ *
+ * @param cause - Failed Effect cause from a payment or fulfillment run.
+ * @param fallback - Message used when the cause is a defect.
+ * @returns Tagged error message, or a generic line for defects.
+ * @example
+ * const message = effectErrorMessage(exit.cause, 'Payment provider request failed.');
+ */
+const effectErrorMessage = <E extends { readonly message: string }>(
+  cause: Cause.Cause<E>,
+  fallback: string,
+): string => {
+  const failure = Option.getOrNull(Cause.failureOption(cause));
+  if (failure !== null) {
+    return failure.message;
+  }
+
+  return fallback;
+};
+
+/**
+ * Start a purchase through the configured payment provider.
+ *
+ * @param body - Validated checkout request body.
+ * @param deps - Optional handler dependencies supplied by the framework adapter.
+ * @returns A normalized HTTP response containing the hosted checkout URL or an error.
+ * @example
+ * const response = await handleCheckout(body, { env: process.env, appUrl });
+ */
+export const handleCheckout = async (
+  body: CheckoutBody,
+  deps: CheckoutHttpDeps = {},
+): Promise<PaymentsHttpResponse> => {
+  const { productId, githubUsername, email } = body;
+
+  const env = resolveCheckoutEnv(deps);
   if (isPaymentsUnconfigured(env)) {
-    const base = deps.frontendUrl ?? deps.requestOrigin ?? deps.appUrl ?? 'http://localhost:3000';
+    const base = resolvePracticeBaseUrl(deps);
     const url = `${base}/checkout/practice?productId=${encodeURIComponent(productId)}`;
-    return ok({ url });
+    return okResponse({ url });
   }
 
   const provider = resolvePaymentProvider(env);
@@ -69,17 +134,28 @@ export async function handleCheckout(
   });
   const exit = await Effect.runPromiseExit(Effect.provideService(program, Payments, provider));
   if (Exit.isFailure(exit)) {
-    return upstreamFailed(paymentErrorMessage(exit.cause));
+    return upstreamFailed(
+      effectErrorMessage<PaymentError>(exit.cause, 'Payment provider request failed.'),
+    );
   }
-  return ok({ url: exit.value.url });
-}
+  return okResponse({ url: exit.value.url });
+};
 
-/** Verify a provider webhook and run fulfillment. */
-export async function handleWebhook(
+/**
+ * Verify a provider webhook and run fulfillment.
+ *
+ * @param rawBody - Raw webhook body string exactly as received.
+ * @param headers - Lower-case webhook request headers.
+ * @param deps - Fulfillment callback and optional provider env override.
+ * @returns A normalized HTTP response for the webhook route.
+ * @example
+ * const response = await handleWebhook(rawBody, headers, { fulfillOrder, env });
+ */
+export const handleWebhook = async (
   rawBody: string,
   headers: Record<string, string>,
   deps: WebhookHttpDeps,
-): Promise<PaymentsHttpResponse> {
+): Promise<PaymentsHttpResponse> => {
   const provider = resolvePaymentProvider(deps.env);
   const program = Effect.gen(function* () {
     const payments = yield* Payments;
@@ -87,45 +163,68 @@ export async function handleWebhook(
   });
   const exit = await Effect.runPromiseExit(Effect.provideService(program, Payments, provider));
   if (Exit.isFailure(exit)) {
-    return badInput(paymentErrorMessage(exit.cause));
+    return badInput(
+      effectErrorMessage<PaymentError>(exit.cause, 'Payment provider request failed.'),
+    );
   }
 
-  const fulfilled = await deps.fulfillOrder(exit.value);
-  if (!fulfilled.ok) {
-    return upstreamFailed(fulfilled.error.message);
+  const fulfilled = await Effect.runPromiseExit(deps.fulfillOrder(exit.value));
+  if (Exit.isFailure(fulfilled)) {
+    return upstreamFailed(effectErrorMessage(fulfilled.cause, 'Order fulfillment failed.'));
   }
-  return ok({ ok: true });
-}
+  return okResponse({ ok: true });
+};
 
-/** Complete a practice-mode checkout — simulates provider success + fulfillment. */
-export async function handlePracticeComplete(
-  body: { productId?: string },
+/**
+ * Complete a practice-mode checkout by simulating provider success and fulfillment.
+ *
+ * @param body - Validated practice completion request body.
+ * @param deps - Fulfillment callback used by the practice flow.
+ * @returns A normalized HTTP response containing the synthetic practice order id.
+ * @example
+ * const response = await handlePracticeComplete(body, { fulfillOrder });
+ */
+export const handlePracticeComplete = async (
+  body: PracticeCompleteBody,
   deps: PracticeCompleteHttpDeps,
-): Promise<PaymentsHttpResponse> {
+): Promise<PaymentsHttpResponse> => {
   const { productId } = body;
-  if (!productId) {
-    return badInput('productId is required.');
-  }
 
   const orderId = `practice_${productId}_${Date.now()}`;
-  const result = await deps.fulfillOrder({
-    provider: 'lemon-squeezy',
-    eventName: 'practice_checkout_completed',
-    orderId,
-    customerEmail: 'practice@example.com',
-    githubUsername: null,
-    isRefund: false,
-  });
+  const result = await Effect.runPromiseExit(
+    deps.fulfillOrder({
+      provider: 'lemon-squeezy',
+      eventName: 'practice_checkout_completed',
+      orderId,
+      customerEmail: 'practice@example.com',
+      githubUsername: null,
+      isRefund: false,
+    }),
+  );
 
-  if (!result.ok) {
-    return upstreamFailed(result.error.message);
+  if (Exit.isFailure(result)) {
+    return upstreamFailed(effectErrorMessage(result.cause, 'Order fulfillment failed.'));
   }
-  return ok({ ok: true, orderId });
-}
+  return okResponse({ ok: true, orderId });
+};
 
-/** Read a raw webhook body from Express when `express.raw()` is mounted. */
-export function readWebhookRawBody(body: unknown): string {
-  if (typeof body === 'string') return body;
-  if (Buffer.isBuffer(body)) return body.toString('utf8');
+/**
+ * Read a raw webhook body from Express when `express.raw()` is mounted.
+ *
+ * @param body - Raw body value provided by Express.
+ * @returns The webhook body as a UTF-8 string.
+ * @throws When the body is not a string or Buffer.
+ * @example
+ * const rawBody = readWebhookRawBody(req.body);
+ */
+export const readWebhookRawBody = (body: unknown): string => {
+  if (typeof body === 'string') {
+    return body;
+  }
+
+  if (Buffer.isBuffer(body)) {
+    return body.toString('utf8');
+  }
+
   throw new Error('Webhook body must be raw bytes.');
-}
+};

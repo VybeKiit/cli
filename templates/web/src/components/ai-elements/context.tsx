@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@vybekiit/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@vybekiit/ui/hover-card';
+import { Progress } from '@vybekiit/ui/progress';
 import { cn } from '@/lib/utils';
 import type { LanguageModelUsage } from 'ai';
 import type { ComponentProps } from 'react';

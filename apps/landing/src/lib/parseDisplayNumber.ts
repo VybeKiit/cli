@@ -7,15 +7,21 @@ export interface ParsedDisplayNumber {
   readonly format?: Format;
 }
 
-function withFormat(
+const withFormat = (
   base: Omit<ParsedDisplayNumber, 'format'>,
   format?: Format,
-): ParsedDisplayNumber {
-  return format ? { ...base, format } : base;
-}
+): ParsedDisplayNumber => (format ? { ...base, format } : base);
 
-/** Parse a display string into NumberFlow props (prefix / numeric value / suffix). */
-export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
+/**
+ * Parse a display string into NumberFlow props (prefix / numeric value / suffix). const parsed = parseDisplayNumber('$1,200k');
+ *
+ * @param input - Input value.
+ * @returns The computed result.
+ * @example
+ * const result = parseDisplayNumber(input);
+ */
+
+export const parseDisplayNumber = (input: string): ParsedDisplayNumber | null => {
   const trimmed = input.trim();
   if (!trimmed) {
     return null;
@@ -24,14 +30,24 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
   // "$1,200k" → ["", "$", "1,200", "k"]; optional +/$ sign, then $, grouped number, optional k/+
   const currencyMatch = trimmed.match(/^([+$]?)(\$)([\d,]+(?:\.\d+)?)(k|\+)?$/i);
   if (currencyMatch) {
-    const sign = currencyMatch[1] ?? '';
-    const numPart = currencyMatch[3] ?? '';
-    const unit = currencyMatch[4] ?? '';
+    const sign = currencyMatch[1];
+    const numPart = currencyMatch[3];
+    if (sign === undefined || numPart === undefined) {
+      return null;
+    }
+    const unit = currencyMatch[4] === undefined ? '' : currencyMatch[4];
     const numeric = Number(numPart.replaceAll(',', ''));
     if (Number.isNaN(numeric)) {
       return null;
     }
-    const decimals = numPart.includes('.') ? (numPart.split('.')[1]?.length ?? 2) : 0;
+    let decimals = 0;
+    if (numPart.includes('.')) {
+      const decimalPart = numPart.split('.')[1];
+      if (decimalPart === undefined) {
+        return null;
+      }
+      decimals = decimalPart.length;
+    }
     return withFormat(
       { value: numeric, prefix: `${sign}$`, suffix: unit },
       decimals > 0
@@ -43,8 +59,11 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
   // "+12.5%" → ["+12.5", "%"]; optional leading +, a number, required trailing %
   const percentMatch = trimmed.match(/^([+]?\d+(?:\.\d+)?)(%)$/);
   if (percentMatch) {
-    const numPart = percentMatch[1] ?? '';
-    const pct = percentMatch[2] ?? '';
+    const numPart = percentMatch[1];
+    const pct = percentMatch[2];
+    if (numPart === undefined || pct === undefined) {
+      return null;
+    }
     const numeric = Number(numPart.replace('+', ''));
     if (Number.isNaN(numeric)) {
       return null;
@@ -62,14 +81,22 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
   // "500+" → ["500", "+"]; digits then a trailing +
   const plusSuffixMatch = trimmed.match(/^(\d+)(\+)$/);
   if (plusSuffixMatch) {
-    return { value: Number(plusSuffixMatch[1]), prefix: '', suffix: plusSuffixMatch[2] ?? '' };
+    const value = plusSuffixMatch[1];
+    const suffix = plusSuffixMatch[2];
+    if (value === undefined || suffix === undefined) {
+      return null;
+    }
+    return { value: Number(value), prefix: '', suffix };
   }
 
   // "1,200 users" → ["1,200", " users"]; optional +, grouped/decimal number, then any suffix
   const plainNumberMatch = trimmed.match(/^([+]?\d[\d,]*(?:\.\d+)?)(.*)$/);
   if (plainNumberMatch) {
-    const numPart = plainNumberMatch[1] ?? '';
-    const rest = plainNumberMatch[2] ?? '';
+    const numPart = plainNumberMatch[1];
+    const rest = plainNumberMatch[2];
+    if (numPart === undefined || rest === undefined) {
+      return null;
+    }
     // strip a leading "+" then thousands separators: "+1,200" → "1200"
     const normalizedNum = numPart.replace(/^\+/, '').replaceAll(',', '');
     const numeric = Number(normalizedNum);
@@ -79,8 +106,12 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
     const hadGrouping = numPart.includes(',');
     let format: Format | undefined;
     if (normalizedNum.includes('.')) {
+      const decimalPart = normalizedNum.split('.')[1];
+      if (decimalPart === undefined) {
+        return null;
+      }
       format = {
-        minimumFractionDigits: normalizedNum.split('.')[1]?.length ?? 1,
+        minimumFractionDigits: decimalPart.length,
         maximumFractionDigits: 2,
         useGrouping: hadGrouping,
       };
@@ -98,4 +129,4 @@ export function parseDisplayNumber(input: string): ParsedDisplayNumber | null {
   }
 
   return null;
-}
+};

@@ -8,14 +8,14 @@ interface RadioProps {
   className?: string; // Optional custom classes for styling
 }
 
-const RadioSm: React.FC<RadioProps> = ({
+export const RadioSm: React.FC<RadioProps> = ({
   id,
   name,
   value,
   checked,
   label,
   onChange,
-  className = "",
+  className = '',
 }) => {
   return (
     <label
@@ -37,21 +37,19 @@ const RadioSm: React.FC<RadioProps> = ({
         <span
           className={`mr-2 flex h-4 w-4 items-center justify-center rounded-full border ${
             checked
-              ? "border-brand-500 bg-brand-500"
-              : "bg-transparent border-gray-300 dark:border-gray-700"
+              ? 'border-brand-500 bg-brand-500'
+              : 'bg-transparent border-gray-300 dark:border-gray-700'
           }`}
         >
           {/* Inner Dot */}
           <span
             className={`h-1.5 w-1.5 rounded-full ${
-              checked ? "bg-white" : "bg-white dark:bg-[#1e2636]"
+              checked ? 'bg-white' : 'bg-white dark:bg-[#1e2636]'
             }`}
-          ></span>
+          />
         </span>
       </span>
       {label}
     </label>
   );
 };
-
-export default RadioSm;

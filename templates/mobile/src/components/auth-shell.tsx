@@ -10,12 +10,24 @@ export interface AuthShellProps {
   titleKey: string;
   /** Message key for the supporting line under the title. */
   descriptionKey: string;
-  children: ReactNode;
+  children?: ReactNode;
   footer?: ReactNode;
 }
 
-/** Centered card layout shared by sign-in, sign-up, and verify screens. */
-export function AuthShell({ titleKey, descriptionKey, children, footer }: AuthShellProps) {
+/**
+ * Centered card layout shared by sign-in, sign-up, and verify screens.
+ *
+ * @param props - Title/description keys, form body, and optional footer.
+ * @returns A themed auth page shell.
+ * @example
+ * <AuthShell titleKey="auth.login.title" descriptionKey="auth.login.description" />
+ */
+export const AuthShell = ({
+  titleKey,
+  descriptionKey,
+  children = null,
+  footer = null,
+}: AuthShellProps) => {
   const { colors, spacing } = useTheme();
   return (
     <ScrollView
@@ -35,7 +47,7 @@ export function AuthShell({ titleKey, descriptionKey, children, footer }: AuthSh
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   content: {

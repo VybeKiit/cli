@@ -1,5 +1,5 @@
 # Maintainer-only guard. We have no branch protection (GitHub Pro/Team-gated on private repos),
-# so this hook is the stand-in: it runs `pnpm quality` (lint, typecheck, test, build,
+# so this hook is the stand-in: it runs `pnpm verify` (lint, typecheck, test, build,
 # agnix agent-config lint, template agent-layer checks), syncs all delivery mirrors
 # (pin-platform-skills → pnpm mirror), and blocks the push if any step fails.
 # Turbo caches typecheck/test/build, so unchanged packages are near-instant.
@@ -18,9 +18,9 @@ case "$remote_url" in
     ;;
 esac
 
-pnpm quality
+pnpm verify
 
-node scripts/pinPlatformSkills.mjs
+node scripts/dev/sync/pinPlatformSkills.mjs
 # subtree split publishes committed history only — abort if pin left uncommitted changes
 if ! git diff --quiet; then
   echo "pre-push: pin-platform-skills changed files — commit them, then push again." >&2

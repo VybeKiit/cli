@@ -4,19 +4,20 @@
 // (Supabase stacks use Supabase Auth, ADR-0024): a `pg` Pool for Neon/Railway Postgres
 // or `mongodbAdapter` (over the official `mongodb` driver) for Mongo. Chosen over Lucia
 // because it ships the email/password + email-OTP + bearer plugins we need.
-import { parseEnv, twilioConfigSchema, type Result, fail, ok } from '@vybekiit/core';
-import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/notifications';
+
+import type { BetterAuthConfig, MongoConfig } from '@vybekiit/auth/config';
+import type { SmsGateway } from '@vybekiit/auth/gateways';
+import { authError, failAuth, toAuthSession } from '@vybekiit/auth/session';
+import { sendTwilioSmsOtp, verifyTwilioSmsOtp } from '@vybekiit/auth/smsOtp';
+import type { AuthError, AuthProvider } from '@vybekiit/auth/types';
+import { type AuthUser, normalizeAuthUser } from '@vybekiit/auth/user';
+import { parseEnv, twilioConfigSchema } from '@vybekiit/core';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { bearer, emailOTP } from 'better-auth/plugins';
+import { Effect } from 'effect';
 import { type Db, MongoClient } from 'mongodb';
 import { Pool } from 'pg';
-import type { BetterAuthConfig, MongoConfig } from '../../config';
-import { type AuthProviderResult, toEffectAuthProvider } from '../../effectBridge';
-import type { SmsGateway } from '../../gateways';
-import { toSessionResult } from '../../session';
-import type { AuthProvider } from '../../types';
-import { type AuthUser, normalizeAuthUser } from '../../user';
 
 /**
  * The narrow slice of a better-auth instance this adapter calls. We type the seam
@@ -25,25 +26,27 @@ import { type AuthUser, normalizeAuthUser } from '../../user';
  * unit test can supply a tiny fake `{ api: {...} }` so the suite runs with NO live
  * DB connection. Each method's shape mirrors better-auth's verified v1.6 server API:
  * the success payloads carry `{ user, token }`, and failures throw an `APIError`
- * (caught + narrated as a {@link Result} here).
+ * (caught + narrated as tagged {@link AuthError} failures here).
  */
-export interface BetterAuthInstance {
+export type BetterAuthInstance = {
   readonly api: {
-    signUpEmail(args: {
+    readonly signUpEmail: (args: {
       body: { email: string; password: string; name: string };
-    }): Promise<{ token: string | null; user: { id: string; email: string } }>;
-    signInEmail(args: {
+    }) => Promise<{ token: string | null; user: { id: string; email: string } }>;
+    readonly signInEmail: (args: {
       body: { email: string; password: string };
-    }): Promise<{ token?: string; user?: { id: string; email: string } }>;
-    sendVerificationOTP(args: {
+    }) => Promise<{ token?: string; user?: { id: string; email: string } }>;
+    readonly sendVerificationOTP: (args: {
       body: { email: string; type: 'sign-in' };
-    }): Promise<{ success: boolean }>;
-    signInEmailOTP(args: {
+    }) => Promise<{ success: boolean }>;
+    readonly signInEmailOTP: (args: {
       body: { email: string; otp: string };
-    }): Promise<{ token: string; user: { id: string; email: string } }>;
-    getSession(args: { headers: Headers }): Promise<{ user: { id: string; email: string } } | null>;
+    }) => Promise<{ token: string; user: { id: string; email: string } }>;
+    readonly getSession: (args: {
+      headers: Headers;
+    }) => Promise<{ user: { id: string; email: string } } | null>;
   };
-}
+};
 
 /**
  * Settings for {@link createBetterAuthProvider}: the validated better-auth config
@@ -52,7 +55,7 @@ export interface BetterAuthInstance {
  * `config.DATABASE_URL`. Keeping the binding explicit (instead of re-reading env
  * here) lets {@link import('../../resolve').resolveAuthProvider} decide once.
  */
-export interface BetterAuthProviderOptions {
+export type BetterAuthProviderOptions = {
   /** Validated better-auth secret + base URL (+ optional `DATABASE_URL`). */
   readonly config: BetterAuthConfig;
   /** Mongo binding when the active data backend is MongoDB; omit for Postgres. */
@@ -65,7 +68,7 @@ export interface BetterAuthProviderOptions {
   readonly instance?: BetterAuthInstance;
   /** Injectable SMS seam — defaults to Twilio via env when omitted. */
   readonly smsGateway?: SmsGateway;
-}
+};
 
 const BETTER_AUTH_CAPABILITIES = {
   emailCode: true,
@@ -78,158 +81,169 @@ const BETTER_AUTH_CAPABILITIES = {
 const resetTokens = new Map<string, string>();
 const magicTokens = new Map<string, string>();
 
-function createDefaultSmsGateway(): SmsGateway {
-  return {
-    async sendOtp(phone: string): Promise<Result<true>> {
-      try {
-        const config = parseEnv(twilioConfigSchema, process.env);
-        return sendTwilioSmsOtp(phone, config);
-      } catch {
-        return ok(true);
-      }
-    },
-    async verifyOtp(phone: string, code: string): Promise<Result<true>> {
-      try {
-        const config = parseEnv(twilioConfigSchema, process.env);
-        return verifyTwilioSmsOtp(phone, code, config);
-      } catch {
-        if (code === '000000') return ok(true);
-        return fail('sms_verify_failed', 'SMS is not configured.');
-      }
-    },
-  };
-}
+// "+1 (555) 123-4567" -> "15551234567"
+const NON_DIGIT_PATTERN = /\D/g;
 
-export function createBetterAuthProvider(options: BetterAuthProviderOptions): AuthProvider {
+const createDefaultSmsGateway = (): SmsGateway => ({
+  sendOtp: (phone) =>
+    Effect.gen(function* () {
+      const config = yield* readTwilioConfig();
+      if (config === null) {
+        return true as const;
+      }
+      return yield* sendTwilioSmsOtp(phone, config);
+    }),
+  verifyOtp: (phone, code) =>
+    Effect.gen(function* () {
+      const config = yield* readTwilioConfig();
+      if (config === null) {
+        if (code === '000000') {
+          return true as const;
+        }
+        return yield* failAuth('sms_verify_failed', 'SMS is not configured.');
+      }
+      return yield* verifyTwilioSmsOtp(phone, code, config);
+    }),
+});
+
+/**
+ * Create the better-auth provider.
+ *
+ * @param options - Validated better-auth config plus optional database/test seams.
+ * @returns The better-auth AuthProvider.
+ * @example
+ * const provider = createBetterAuthProvider({ config });
+ */
+export const createBetterAuthProvider = (options: BetterAuthProviderOptions): AuthProvider => {
   let instance: BetterAuthInstance | undefined = options.instance;
-  const sms = options.smsGateway ?? createDefaultSmsGateway();
+  const sms = options.smsGateway === undefined ? createDefaultSmsGateway() : options.smsGateway;
 
   /** Construct (once) the real better-auth instance bound to the chosen database. */
   const auth = (): BetterAuthInstance => {
-    if (instance) return instance;
+    if (instance !== undefined) {
+      return instance;
+    }
     instance = buildBetterAuth(options);
     return instance;
   };
 
-  const impl: AuthProviderResult = {
+  return {
     name: 'better-auth',
     capabilities: BETTER_AUTH_CAPABILITIES,
 
-    async signUpWithPassword(email: string, password: string) {
-      try {
-        const { user, token } = await auth().api.signUpEmail({
-          body: { email, password, name: email.split('@')[0] ?? email },
-        });
-        return toSessionResult(user, token, 'Sign up succeeded but returned no session.');
-      } catch (error) {
-        return fail('signup_failed', errorMessage(error));
-      }
-    },
+    signUpWithPassword: (email, password) =>
+      Effect.gen(function* () {
+        const { user, token } = yield* tryBetterAuth('signup_failed', () =>
+          auth().api.signUpEmail({
+            body: { email, password, name: nameFromEmail(email) },
+          }),
+        );
+        return yield* toAuthSession(user, token, 'Sign up succeeded but returned no session.');
+      }),
 
-    async signInWithPassword(email: string, password: string) {
-      try {
-        const { user, token } = await auth().api.signInEmail({ body: { email, password } });
-        return toSessionResult(user, token, 'Sign in returned no session.');
-      } catch (error) {
-        return fail('signin_failed', errorMessage(error));
-      }
-    },
+    signInWithPassword: (email, password) =>
+      Effect.gen(function* () {
+        const { user, token } = yield* tryBetterAuth('signin_failed', () =>
+          auth().api.signInEmail({ body: { email, password } }),
+        );
+        return yield* toAuthSession(
+          user === undefined ? null : user,
+          token === undefined ? null : token,
+          'Sign in returned no session.',
+        );
+      }),
 
-    async sendEmailCode(email: string): Promise<Result<true>> {
-      try {
-        await auth().api.sendVerificationOTP({ body: { email, type: 'sign-in' } });
-        return ok(true);
-      } catch (error) {
-        return fail('otp_send_failed', errorMessage(error));
-      }
-    },
+    sendEmailCode: (email) =>
+      Effect.gen(function* () {
+        yield* tryBetterAuth('otp_send_failed', () =>
+          auth().api.sendVerificationOTP({ body: { email, type: 'sign-in' } }),
+        );
+        return true as const;
+      }),
 
-    async verifyEmailCode(email: string, code: string) {
-      try {
-        const { user, token } = await auth().api.signInEmailOTP({ body: { email, otp: code } });
-        return toSessionResult(user, token, 'Code verified but returned no session.');
-      } catch (error) {
-        return fail('otp_verify_failed', errorMessage(error));
-      }
-    },
+    verifyEmailCode: (email, code) =>
+      Effect.gen(function* () {
+        const { user, token } = yield* tryBetterAuth('otp_verify_failed', () =>
+          auth().api.signInEmailOTP({ body: { email, otp: code } }),
+        );
+        return yield* toAuthSession(user, token, 'Code verified but returned no session.');
+      }),
 
-    async requestPasswordReset(email: string): Promise<Result<true>> {
-      resetTokens.set(`reset:${email}`, email);
-      return ok(true);
-    },
+    requestPasswordReset: (email) =>
+      Effect.sync(() => {
+        resetTokens.set(`reset:${email}`, email);
+        return true as const;
+      }),
 
-    async resetPassword(token: string, newPassword: string) {
-      const email = resetTokens.get(token) ?? resetTokens.get(`reset:${token}`);
-      if (!email) {
-        return fail('reset_failed', 'That reset link is not valid or has expired.');
-      }
-      resetTokens.delete(token);
-      try {
-        const { user, token: sessionToken } = await auth().api.signUpEmail({
-          body: { email, password: newPassword, name: email.split('@')[0] ?? email },
-        });
-        return toSessionResult(
+    resetPassword: (token, newPassword) =>
+      Effect.gen(function* () {
+        const email = resolveResetEmail(token);
+        if (email === undefined) {
+          return yield* failAuth('reset_failed', 'That reset link is not valid or has expired.');
+        }
+        resetTokens.delete(token);
+        const { user, token: sessionToken } = yield* tryBetterAuth('reset_failed', () =>
+          auth().api.signUpEmail({
+            body: { email, password: newPassword, name: nameFromEmail(email) },
+          }),
+        );
+        return yield* toAuthSession(
           user,
           sessionToken,
           'Password reset succeeded but returned no session.',
         );
-      } catch (error) {
-        return fail('reset_failed', errorMessage(error));
-      }
-    },
+      }),
 
-    async sendMagicLink(email: string): Promise<Result<true>> {
-      magicTokens.set(`magic:${email}`, email);
-      return ok(true);
-    },
+    sendMagicLink: (email) =>
+      Effect.sync(() => {
+        magicTokens.set(`magic:${email}`, email);
+        return true as const;
+      }),
 
-    async verifyMagicLink(token: string) {
+    verifyMagicLink: (token) => {
       const email = magicTokens.get(token);
-      if (!email) {
-        return fail('magic_link_failed', 'That sign-in link is not valid or has expired.');
+      if (email === undefined) {
+        return failAuth('magic_link_failed', 'That sign-in link is not valid or has expired.');
       }
       magicTokens.delete(token);
-      return toSessionResult(
+      return toAuthSession(
         { id: email, email },
         `magic:${token}`,
         'Magic link verified but returned no session.',
       );
     },
 
-    async sendSmsCode(phone: string): Promise<Result<true>> {
-      return sms.sendOtp(phone);
-    },
+    sendSmsCode: (phone) => sms.sendOtp(phone),
 
-    async verifySmsCode(phone: string, code: string) {
-      const verified = await sms.verifyOtp(phone, code);
-      if (!verified.ok) return fail(verified.error.code, verified.error.message);
-      return toSessionResult(
-        { id: `sms-${phone}`, email: `${phone.replace(/\D/g, '')}@sms.local` },
-        `sms:${phone}:${code}`,
-        'SMS verified but returned no session.',
-      );
-    },
+    verifySmsCode: (phone, code) =>
+      Effect.gen(function* () {
+        yield* sms.verifyOtp(phone, code);
+        return yield* toAuthSession(
+          { id: `sms-${phone}`, email: `${phone.replace(NON_DIGIT_PATTERN, '')}@sms.local` },
+          `sms:${phone}:${code}`,
+          'SMS verified but returned no session.',
+        );
+      }),
 
-    async getUser(sessionToken: string): Promise<Result<AuthUser>> {
-      try {
-        const session = await auth().api.getSession({
-          headers: new Headers({ authorization: `Bearer ${sessionToken}` }),
-        });
-        return toUserResult(session?.user, 'No user for the given session token.');
-      } catch (error) {
-        return fail('get_user_failed', errorMessage(error));
-      }
-    },
+    getUser: (sessionToken) =>
+      Effect.gen(function* () {
+        const session = yield* tryBetterAuth('get_user_failed', () =>
+          auth().api.getSession({
+            headers: new Headers({ authorization: `Bearer ${sessionToken}` }),
+          }),
+        );
+        const user = session === null ? null : session.user;
+        return yield* toUserEffect(user, 'No user for the given session token.');
+      }),
   };
-  return toEffectAuthProvider(impl);
-}
+};
 
 /** Construct the real better-auth instance bound to Postgres or Mongo. */
-function buildBetterAuth(options: BetterAuthProviderOptions): BetterAuthInstance {
+const buildBetterAuth = (options: BetterAuthProviderOptions): BetterAuthInstance => {
   const { config, mongo } = options;
   const plugins = [emailOTP({ sendVerificationOTP }), bearer()];
 
-  if (mongo) {
+  if (mongo !== undefined) {
     const db: Db = new MongoClient(mongo.MONGODB_URI).db(mongo.MONGODB_DB);
     return betterAuth({
       secret: config.BETTER_AUTH_SECRET,
@@ -240,7 +254,7 @@ function buildBetterAuth(options: BetterAuthProviderOptions): BetterAuthInstance
     });
   }
 
-  if (!config.DATABASE_URL) {
+  if (config.DATABASE_URL === undefined || config.DATABASE_URL.length === 0) {
     throw new Error(
       'DATABASE_URL is required for the better-auth Postgres binding (Supabase exposes it in Project Settings → Database).',
     );
@@ -252,18 +266,48 @@ function buildBetterAuth(options: BetterAuthProviderOptions): BetterAuthInstance
     database: new Pool({ connectionString: config.DATABASE_URL }),
     plugins,
   });
-}
+};
 
-async function sendVerificationOTP(): Promise<void> {}
+const sendVerificationOTP = (): Promise<void> => Promise.resolve();
 
-function toUserResult(
+const toUserEffect = (
   raw: { id: string; email: string } | null | undefined,
   noUserMessage: string,
-): Result<AuthUser> {
+): Effect.Effect<AuthUser, AuthError> => {
   const user = normalizeAuthUser(raw);
-  return user ? ok(user) : fail('no_user', noUserMessage);
-}
+  if (user === null) {
+    return failAuth('no_user', noUserMessage);
+  }
+  return Effect.succeed(user);
+};
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'unknown better-auth error';
-}
+const readTwilioConfig = () =>
+  Effect.try({
+    try: () => parseEnv(twilioConfigSchema, process.env),
+    catch: () => null,
+  }).pipe(Effect.catchAll(() => Effect.succeed(null)));
+
+const tryBetterAuth = <A>(code: string, run: () => Promise<A>): Effect.Effect<A, AuthError> =>
+  Effect.tryPromise({
+    try: run,
+    catch: (caught) => authError(code, errorMessage(caught)),
+  });
+
+const nameFromEmail = (email: string): string => {
+  const [name] = email.split('@');
+  if (name === undefined || name.length === 0) {
+    return email;
+  }
+  return name;
+};
+
+const resolveResetEmail = (token: string): string | undefined => {
+  const direct = resetTokens.get(token);
+  if (direct !== undefined) {
+    return direct;
+  }
+  return resetTokens.get(`reset:${token}`);
+};
+
+const errorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : 'unknown better-auth error';
