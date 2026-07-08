@@ -15,7 +15,7 @@
  * const result = scrapeCfTokenFromHtml(html);
  */
 export const scrapeCfTokenFromHtml = (html: string): string | null => {
-  const match = html.match(/cfat_[A-Za-z0-9]{20,}/);
+  const match = html.match(/cfat_[A-Za-z0-9_-]{20,}/);
   return match === null ? null : match[0];
 };
 

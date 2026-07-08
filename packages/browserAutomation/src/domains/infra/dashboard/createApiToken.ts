@@ -4,39 +4,6 @@ import { scrapeCfAccountIdFromUrl, scrapeCfTokenFromHtml } from './scrape';
 
 const DASH_ORIGIN = CLOUDFLARE_DASHBOARD_URL;
 
-/**
- * Grant full access by ticking every permission-group access level, run in the page context.
- *
- * Cloudflare's account-owned token editor lists ~130 permission groups as `<li>` rows, each
- * exposing one or more access checkboxes (`Read`/`Edit`/`Run`/`Revoke`/`Send`/`Evaluate`/
- * `Admin`/…). The levels are ADDITIVE (independent checkboxes, not a single-select), so full
- * access means checking every box in every row. Returns the number newly checked so the caller
- * can assert progress. Native `.click()` toggles rows even inside collapsed category accordions.
- *
- * Kept as a string-body `page.evaluate` (not a typed import) because it touches the live
- * Cloudflare DOM (`role="checkbox"` Kumo controls) which has no types on our side.
- */
-const selectAllPermissions = async (page: Page): Promise<number> => {
-  return page.evaluate(async () => {
-    const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
-    const isChecked = (el: Element): boolean => el.getAttribute('aria-checked') === 'true';
-    // Access checkboxes live inside the permission-group <li> rows (skip any stray checkboxes
-    // elsewhere on the page such as cookie/consent toggles).
-    const boxes = Array.from(document.querySelectorAll('li [role="checkbox"]'));
-
-    let selected = 0;
-    for (const box of boxes) {
-      if (!isChecked(box)) {
-        box.scrollIntoView({ block: 'center', inline: 'center' });
-        (box as HTMLElement).click();
-        await sleep(20);
-        if (isChecked(box)) selected++;
-      }
-    }
-    return selected;
-  });
-};
-
 export type CreateCfTokenResult = {
   token: string;
   accountId: string;
@@ -44,93 +11,116 @@ export type CreateCfTokenResult = {
 };
 
 /**
- * Mint a full-access Cloudflare API token via the dashboard (browser fallback — wrangler can't create arbitrary scoped tokens). Navigates straight to the custom-token editor, fills the name, grants every permission group, then reviews + creates and scrapes the one-time value.
+ * Resolve the Cloudflare account id, preferring the caller's value, then the current
+ * dashboard URL, then a fresh dashboard visit (an authenticated dashboard always
+ * redirects to `/{accountId}/…`, so the id is in the URL once signed in).
  *
- * @param page - Playwright page to inspect or mutate.
- * @param name - Input value for name.
- * @param accountId - Cloudflare account id used for verification.
- * @returns Promise resolving with the automation result.
+ * @param page - Playwright page attached to an authenticated Cloudflare dashboard.
+ * @param accountId - Optional account id supplied by the caller (e.g. from wrangler).
+ * @returns The resolved 32-hex account id.
+ */
+const resolveAccountId = async (page: Page, accountId?: string): Promise<string> => {
+  let resolved = accountId ?? scrapeCfAccountIdFromUrl(page.url()) ?? undefined;
+  if (resolved === undefined) {
+    await page.goto(DASH_ORIGIN, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+    await page.waitForTimeout(2500);
+    resolved = scrapeCfAccountIdFromUrl(page.url()) ?? undefined;
+  }
+  if (resolved === undefined) {
+    throw new Error(
+      'Cloudflare account id could not be resolved; cannot open the account-scoped token editor.',
+    );
+  }
+  return resolved;
+};
+
+/**
+ * Grant "Workers Scripts: Edit" — the scope an OpenNext/wrangler deploy needs — through
+ * Cloudflare's 2026-07 permission-group picker: type the group name into the search box,
+ * then click the matching row's `Edit` toggle. (Cloudflare replaced the old
+ * `li [role="checkbox"]` list with this search + Read/Edit toggle model.) Add further
+ * groups the same way (search + toggle) if a deploy needs KV/R2/D1/Pages scopes.
+ *
+ * @param page - Playwright page on the account-scoped token editor.
+ * @returns Nothing; mutates the open policy in place.
+ */
+const grantWorkersScriptsEdit = async (page: Page): Promise<void> => {
+  const search = page.getByPlaceholder(/search for permission groups/i).first();
+  await search.waitFor({ state: 'visible', timeout: 25_000 });
+  await search.click();
+  await search.fill('Workers Scripts');
+  await page.waitForTimeout(1800);
+  await page
+    .getByText('Workers Scripts', { exact: true })
+    .first()
+    .locator('xpath=following::*[normalize-space()="Edit"][1]')
+    .click({ timeout: 8000 });
+  await page.waitForTimeout(800);
+};
+
+/**
+ * Mint a Workers-scoped Cloudflare API token via the dashboard (browser fallback —
+ * wrangler cannot create arbitrary scoped tokens) and scrape the one-time value.
+ *
+ * MUST open the ACCOUNT-scoped editor `/{accountId}/api-tokens/create`. The user-scoped
+ * `/profile/api-tokens/create` route forces an "Account Resources" React-Select that stalls
+ * headless automation — going to that wrong URL was the historical failure mode. See the
+ * infra README and issue #66 for the full 2026-07 UI-drift context (unlabeled name field,
+ * search + Read/Edit permission toggles, "Review token" instead of "Continue to summary").
+ *
+ * @param page - Playwright page attached to an authenticated Cloudflare dashboard.
+ * @param name - Desired token name (Cloudflare pre-fills a random one; overwritten best-effort).
+ * @param accountId - Optional account id; resolved from the dashboard URL when omitted.
+ * @returns The minted token, its account id, and the name.
  * @example
- * const result = await createApiToken(page, name, 'example-account');
+ * const result = await createApiToken(page, 'vybekiit-deploy', 'b0ba…');
  */
 export const createApiToken = async (
   page: Page,
   name: string,
   accountId?: string,
 ): Promise<CreateCfTokenResult> => {
-  let resolvedAccountId = accountId;
-  if (resolvedAccountId === undefined) {
-    const accountIdFromUrl = scrapeCfAccountIdFromUrl(page.url());
-    if (accountIdFromUrl !== null) {
-      resolvedAccountId = accountIdFromUrl;
-    }
-  }
+  const resolvedAccountId = await resolveAccountId(page, accountId);
 
-  // The custom-token editor is a dedicated route; visiting it directly avoids the tokens-list
-  // "Create Token" control (which is a link, not a button) and lands in the editor.
-  const createUrl = resolvedAccountId
-    ? `${DASH_ORIGIN}/${resolvedAccountId}/api-tokens/create`
-    : `${DASH_ORIGIN}/profile/api-tokens/create`;
-  await page.goto(createUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  await page.goto(`${DASH_ORIGIN}/${resolvedAccountId}/api-tokens/create`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 60_000,
+  });
 
-  // Token name field — accessible name / placeholder first.
-  const nameField = page
-    .getByRole('textbox', { name: /token name/i })
-    .or(page.getByPlaceholder(/token name/i))
-    .first();
-  await nameField.waitFor({ state: 'visible', timeout: 20_000 });
-  await nameField.fill(name);
-
-  // Wait for the async permission-group rows to render before selecting.
+  // Token name is an unlabeled input that Cloudflare pre-fills with a random name; overwrite
+  // it best-effort (never fail the mint if this selector drifts).
   await page
-    .waitForFunction('document.querySelectorAll(\'li [role="checkbox"]\').length > 20', undefined, {
-      timeout: 30_000,
-    })
+    .getByText(/^token name$/i)
+    .locator('xpath=following::input[1]')
+    .first()
+    .fill(name, { timeout: 20_000 })
     .catch(() => undefined);
 
-  const selected = await selectAllPermissions(page);
-  if (selected === 0) {
-    throw new Error(
-      'Cloudflare token editor loaded but no permission checkboxes were selected (DOM may have changed).',
-    );
-  }
+  await grantWorkersScriptsEdit(page);
 
-  // Continue to the summary screen.
+  // The account-scoped editor's action is "Review token" (the older user-scoped flow said
+  // "Continue to summary" — accept either).
   const reviewButton = page
     .getByRole('button', { name: /review token|continue to summary/i })
     .first();
   await reviewButton.waitFor({ state: 'visible', timeout: 15_000 });
   await reviewButton.click({ timeout: 8000 });
 
-  // Create Token on the summary screen.
-  const confirmButton = page.getByRole('button', { name: /create token/i }).first();
+  const confirmButton = page.getByRole('button', { name: /create token/i }).last();
   await confirmButton.waitFor({ state: 'visible', timeout: 15_000 });
   await confirmButton.click({ timeout: 8000 });
 
-  // "Token created successfully" dialog reveals the token value once.
+  // The success screen reveals the `cfat_…` value once.
   await page
-    .waitForFunction('/cfat_[A-Za-z0-9]{20,}/.test(document.body.innerHTML)', undefined, {
+    .waitForFunction('/cfat_[A-Za-z0-9_-]{20,}/.test(document.body.innerHTML)', undefined, {
       timeout: 15_000,
     })
     .catch(() => undefined);
-  const html = await page.content();
-  const token = scrapeCfTokenFromHtml(html);
+  const token = scrapeCfTokenFromHtml(await page.content());
   if (!token) {
     throw new Error(
-      'Cloudflare token was created but could not be read from the success dialog (copy it manually).',
+      'Cloudflare token was created but could not be read from the success screen (copy it manually).',
     );
   }
-  let finalAccountId = resolvedAccountId;
-  if (finalAccountId === undefined) {
-    const accountIdFromHtml = scrapeCfAccountIdFromUrl(html);
-    if (accountIdFromHtml !== null) {
-      finalAccountId = accountIdFromHtml;
-    }
-  }
-  if (finalAccountId === undefined) {
-    throw new Error(
-      'Cloudflare token was created but the account id could not be read from the dashboard.',
-    );
-  }
-  return { token, accountId: finalAccountId, name };
+  return { token, accountId: resolvedAccountId, name };
 };

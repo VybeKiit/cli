@@ -11,3 +11,12 @@ Credential onboarding here is **CLI-first, browser-fallback** (see [ADR-0032](..
 Each `setup` ensures its CLI via `vybekiit doctor --ensure <tool>` first (`core/ensureCli.ts`), verifies live, and — where a value belongs in `.env` — writes it via `core/writeEnvBlock.ts` so the agent only ever sees `keysWritten`, never the secret.
 
 Deploy/runtime still use the `doctor`, `deploy`, and `wrangler` platform skills. Only add new DOM automation when the provider has no headless CLI/API path (record it against ADR-0032).
+
+> **Cloudflare token minting must use the account-scoped editor** —
+> `dash.cloudflare.com/{accountId}/api-tokens/create`, **never** the user-scoped
+> `/profile/api-tokens/create`. The user-scoped route forces an "Account Resources"
+> React-Select that stalls headless automation; the account-scoped route fixes the account,
+> so no picker. `createApiToken.ts` resolves the account id (from wrangler, the dashboard URL,
+> or a dashboard visit) and always opens the account-scoped editor. As of the 2026-07 Cloudflare
+> UI the editor uses an unlabeled name field, a permission-group **search + Read/Edit toggle**
+> (not the old `li [role="checkbox"]` list), and a **"Review token"** button. See issue #66.
