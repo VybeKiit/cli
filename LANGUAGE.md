@@ -29,10 +29,12 @@ repo. The buyer edits freely; updates are frozen and never auto-clobbered. Examp
 extension templates, UI components, screens, buyer skills.
 _Avoid_: maintained (see **Maintained**).
 
-**Maintained** — headless logic shipped as public npm packages. The buyer never edits these
-directly; updates flow as version bumps (conflict-free). Examples: core config, payments, auth, db,
-client-state.
-_Avoid_: owned (see **Owned**).
+**Maintained** — headless logic in **private workspace packages** (never published to npm; ADR-0033).
+The buyer never edits these directly; they receive them bundled inside the `vybekiit` CLI and via the
+gated monorepo mirror, and updates flow by pulling that mirror / kit release line. Examples: core
+config, payments, auth, db, client-state.
+_Avoid_: owned (see **Owned**); "public npm packages" (superseded by ADR-0033 — the CLI is the only
+published artifact).
 
 **Agent layer** — the skills, docs, and contracts that let Claude/Codex carry a vibe coder from
 purchase to a live, money-making app — making every technical decision for them and translating

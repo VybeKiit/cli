@@ -2,6 +2,9 @@
   "name": "@vybekiit/ui",
   "version": "0.3.0",
   "private": true,
+  "vybekiit": {
+    "kind": "owned"
+  },
   "description": "Shared shadcn/ui component library for all VybeKiit apps.",
   "license": "MIT",
   "type": "module",

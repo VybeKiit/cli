@@ -170,6 +170,24 @@ const exit = await Effect.runPromiseExit(program.pipe(Effect.provide(PaymentsLiv
 _Why:_ one wiring shape; adding an adapter or swapping a provider is a Layer change, not a call-site
 edit, and tests inject a fake `Payments` Layer instead of mocking modules.
 
+### Effect async: run at the edge, parallelize with `Effect.all`, never fire-and-forget · [lint: noFloatingPromises]
+Programs stay `Effect` until a composition root; the edge runs them once with `Effect.runPromiseExit`
+(servers) or one `ManagedRuntime` (clients) — never `runPromise` mid-pipeline or a `new` runtime per
+call. Parallel work uses `Effect.all(..., { concurrency })` / `Effect.forEach`, not a bare
+`Promise.all` of un-run effects. Every serverless side-effect (log, track, send, enqueue) is
+**awaited** — or `ctx.waitUntil()`ed in a real Worker handler; a fire-and-forget promise is killed
+when the response returns and the work silently never happens.
+```ts
+// ✓ apps/landing/src/lib/gate.ts — bounded fan-out inside one Effect
+Effect.all(repos.map((repo) => Effect.either(invite(repo, user))), { concurrency: 'unbounded' });
+// ✓ packages/payments/src/http/handlers.ts — run once at the edge
+const exit = await Effect.runPromiseExit(Effect.provideService(program, Payments, provider));
+// ✗ fire-and-forget in an API route — dies when the response is sent
+trackEvent('checkout');           // no await, no waitUntil → lost
+```
+_Why:_ Effect composes the whole program before it runs, so effects are lazy — an un-awaited effect
+in serverless is a dropped side-effect, and running mid-pipeline forfeits the typed error channel.
+
 ### Schema-first contracts; interfaces mainly for component props
 DTOs, config, and wire payloads start as `Schema.Struct`; exported static types are
 `Schema.Schema.Type<typeof X>` aliases named `XType`. Service seams use `Context.Tag` service types,
@@ -210,6 +228,45 @@ export const EmptyState = ({ title = 'Nothing here yet', children = null }: Empt
 ```
 _Why:_ callers should not need defensive prop plumbing; defaults are deliberate at the UI boundary,
 not hidden in business logic.
+
+### UI: compose kit primitives; style with `cn()` + tokens, never raw elements · [taste]
+Build on the shadcn primitives (`@vybekiit/ui` `Button`/`Input`/`Card`, or the template's
+`@/components/ui/*`) — never a raw `<button>`/`<input>` or a one-off styled control. Variants come
+from `cva()`; classes merge through `cn()`; colours/spacing/radius/type read from the design tokens
+(web as CSS vars `hsl(var(--primary))`, mobile as `@vybekiit/tokens` via `useTheme()`), never
+hardcoded hexes or `red`. `'use client'` sits on interactive leaves, not page roots.
+```tsx
+// ✓ templates/web/src/components/site-header.tsx — kit primitive + token classes
+import { Button } from '@vybekiit/ui/button';
+<Button asChild size="sm" className={cn('gap-2', active && 'bg-primary/90')}>…</Button>
+// ✗ raw element + hardcoded colour
+<button style={{ background: '#7c3aed' }}>…</button>
+```
+_Why:_ the whole kit reads as one design system, token edits ripple everywhere at once, and the
+buyer's agent normalizes every imported block to the same primitives instead of styling drift.
+
+### UI: `@/lib/fetchJson` is the fetch SSOT; render loading, error, and empty · [taste]
+Component data goes through `@/lib/fetchJson` (Effect-based, typed) and TanStack Query — never a
+hand-rolled `fetch` + `useState` loading flag. Every query renders all three branches: loading,
+error, and empty. No silent empty state.
+```tsx
+// ✓ apps/landing/src/components/checkout-form.tsx — the fetch SSOT
+const result = await Effect.runPromise(Effect.either(postJson<CheckoutResponse>('/api/checkout', body)));
+// ✗ bespoke fetch + boolean flag scattered per component
+const [data, setData] = useState(); useEffect(() => { fetch(url).then(r => r.json()).then(setData); }, []);
+```
+_Why:_ one fetch seam the agent can wire auth/headers/outcomes into once; no per-screen loading bugs.
+
+### UI: forms use the `FormField` primitive; no inline label/error markup · [taste]
+A labelled input is the `FormField` primitive (`label` + `Input` + inline error + `aria-invalid`/
+`aria-describedby` wiring) — no screen hand-rolls its own field markup or a11y attributes.
+```tsx
+// ✓ templates/web/src/components/FormField.tsx is the one field primitive
+<FormField id={emailId} label="Email" type="email" error={emailError} />
+// ✗ inline label + input + error span, a11y forgotten
+<label>Email</label><input /> {err && <span style={{ color: 'red' }}>{err}</span>}
+```
+_Why:_ every form is accessible and consistent by construction; error/aria logic lives in one place.
 
 ### Function TSDoc is complete; durable why lives in docs
 Every exported function gets a summary, `@param` for every parameter, `@returns`, and `@example`.
@@ -258,10 +315,13 @@ preset identity folders (`presets/auth-bridge`, folder = preset id), and public 
 Files are **camelCase** too — everything we author and import by relative/`@/` path
 (`providerDispatch.ts`, `envSource.ts`, `useAsync.ts`, our `.mjs` scripts like `mirrorRepos.mjs`) — with
 the fixed single-word role names kept as-is: `types.ts`, `config.ts`, `resolve.ts`, `index.ts`,
-`client.ts`. **Kept on their framework/ecosystem convention (never camelCased):** every UI component file
-(`.tsx` and anything under a `components/` tree — `dropdown-menu.tsx`, `hero-section.tsx`), mirrored
-registry blocks, Next.js reserved files (`global-error.tsx`), `*.config.ts`/`*.d.ts` contracts, pinned
-`.agents/skills/**` payloads, and `.py`/`.sh` files. **A public subpath export keeps its kebab identity
+`client.ts`. **Every first-party React component file is PascalCase and matches its export** — recipe/screen
+pages, feature components, and primitives alike (`DashboardPage.tsx`, `CheckoutForm.tsx`,
+`FormField.tsx`, `SiteHeader.tsx`). If you authored the component, the filename is its name. **Kept on
+their framework/ecosystem convention (never PascalCased or camelCased):** shadcn/Radix component files and mirrored
+registry blocks (`dropdown-menu.tsx`, `hero-section.tsx`), Next.js reserved files (`global-error.tsx`),
+`*.config.ts`/`*.d.ts` contracts, pinned `.agents/skills/**` payloads, and `.py`/`.sh` files.
+**A public subpath export keeps its kebab identity
 even when the file is camelCase:** src `localeRules.ts` → `@vybekiit/i18n/locale-rules`, bridged by the
 tsup entry map. Functions are verb-first (`resolve*`,
 `parse*`, `create*`, `is*`); types use `*Provider`/`*Config`/`*Options`/`*Result` suffixes; tagged
@@ -269,7 +329,8 @@ errors are `*Error`; service Tags + `Live` Layers share the concern's name (`Pay
 Everything else we author — including private tooling like `browserAutomation` — is camelCase; match the nearest sibling.
 ```ts
 // packages/core/src/envSource.ts   (renames: provider-dispatch.ts → providerDispatch.ts · use-async.ts → useAsync.ts)
-// unchanged: templates/web/src/components/hero-section.tsx (UI component keeps framework convention)
+// unchanged: templates/web/src/components/ui/dropdown-menu.tsx (shadcn keeps ecosystem convention)
+// first-party recipe component: apps/componentLibrary/src/pageRecipes/DashboardPage.tsx
 export const resolveEnvProvider = <P>(/* … */) => { /* … */ };
 ```
 
@@ -291,9 +352,9 @@ _Why:_ half the kit's regexes are really a `startsWith`; the rest are opaque, an
 ### Named exports only; `index.ts` is a pure wildcard barrel · [lint+taste]
 Package `index.ts` files are import surfaces only: wildcard re-exports and no implementation code,
 constants, service wiring, side effects, conditionals, or runtime fallback logic. No `export default`
-except a framework requirement (Cloudflare Worker handler, `tsup.config.ts`). Target enforcement:
-promote `noDefaultExport` under `packages/**` once existing framework/config exceptions are carved
-out cleanly.
+except a framework requirement (Cloudflare Worker handler, `tsup.config.ts`). **Enforced:**
+`noDefaultExport` is `error` under `packages/**`, with the Worker-handler / `tsup.config.ts`
+exceptions carved out in `biome.json`.
 ```ts
 // packages/payments/src/index.ts
 export * from './config';
@@ -323,9 +384,10 @@ asserts on the typed success/failure channel instead of unwrapping by hand.
 
 ### No bare `console.*` in maintained packages · [lint: noConsole]
 Headless packages return an `Effect` (log via `Effect.log*`) or use `createLogger`
-(production-silent). `console` is for `cli/`, template-owned `report-mode`, and private tooling —
-code whose job is terminal/agent output. Target enforcement: promote `noConsole` under maintained
-packages once the existing CLI/tooling subpaths are carved out cleanly.
+(production-silent). `console` is for `cli/`, template-owned `report-mode`, and `tooling`-kind
+packages — code whose job is terminal/agent output. **Enforced:** `noConsole` is `error` under
+`packages/**`, with the `tooling`-kind paths (`agentKit`, `browserAutomation`, `uiCatalogMcp`,
+`deploy`) exempted in `biome.json`.
 _Why:_ a stray `console.log` in a buyer's `node_modules` is noise they can't turn off.
 
 ### Deduplication gate — run before creating · [lint: dedup]
@@ -364,6 +426,48 @@ shell out via `execFile` + `promisify` (not `execSync`), and **scrub secrets/tok
 /** @type {readonly MirrorTarget[]} */
 const MIRRORS = [ /* … */ ];
 ```
+
+## Package kinds — `vybekiit.kind` drives which rules apply
+
+Not every `packages/*` obeys the same rules. Each declares its kind in `package.json` under the
+`vybekiit` key, and `check:packages` enforces the per-kind expectations. The label travels with the
+package through the ADR-0033 reorg, so a moved package carries its own rules.
+
+```jsonc
+// packages/payments/package.json
+{ "name": "@vybekiit/payments", "private": true, "vybekiit": { "kind": "concern" } }
+```
+
+| kind | what it is | skeleton required | `console`? | wildcard barrel | examples |
+|---|---|---|---|---|---|
+| **concern** | one provider seam, swappable adapters | yes — `types`/`config`/`resolve`/`providers`/`index` | no (Effect.log/createLogger) | yes | `payments`, `auth`, `db`, `email`, `ai`, `seo`, … |
+| **library** | foundation, no provider seam | no | no | yes | `core`, `i18n` |
+| **owned** | buyer-facing UI, folds into templates | no | discouraged | n/a | `ui`, `tokens`, `reportMode`, `walkthrough` |
+| **tooling** | agent/maintainer-only (CLI, MCP, automation) | no | **yes** — its job is terminal output | n/a | `agentKit`, `browserAutomation`, `uiCatalogMcp`, `deploy` |
+
+The kind is the SSOT the biome `console` carve-out and the concern-skeleton check both read: a
+`concern` with no `resolve.ts`, or a bare `console.*` outside a `tooling` package, fails
+`check:packages` (ADR-0035). Adding a package means picking its kind first.
+
+## CLI — one interactive front door, same functions for flags and menu
+
+The `vybekiit` CLI is the only public artifact and follows the dual-mode contract (ADR-0036; ADR-0011 shape):
+a bare invocation in a TTY opens a `@clack/prompts` menu; flags or a non-TTY defer to the same
+handler and **never hang**; both routes call the same functions. Verbs register in the
+`COMMAND_HANDLERS` map in `cli/src/cliRunner.ts` (kebab names: `sync-agent-layer`, `apply-preset`);
+sub-nouns dispatch inside their handler (`scaffold backend`, `add bridge`). Prompts use
+`@clack/prompts` and handle `isCancel()`; `@inquirer/prompts` is banned (ADR-0034). Flags accept both
+`--ensure=x` and `--ensure x`. `console` is never used — write through `process.stdout`/`stderr`.
+```ts
+// cli/src/prompts/tty.ts — the dual-mode gate
+export const isInteractive = (): boolean => Boolean(process.stdout.isTTY && process.stdin.isTTY);
+// cli/src/commands/dropInput.ts — flags win; non-TTY defers, never prompts
+if (parsed.template !== undefined) return { …parsed };      // flag path
+if (!isInteractive()) { writeTemplateRequired(parsed.flags); return null; }  // non-TTY: print + exit
+return await promptForDropInputs(parsed);                   // TTY: same result via menu
+```
+_Why:_ agents drive the CLI with flags in CI; humans drive the same commands by menu — one code path,
+no hangs, no second implementation to drift.
 
 ## Canonical example
 
@@ -531,6 +635,24 @@ and headless.
    `// dedup-bypass: <one-line reason>` above the export and proceed.
 6. Never paginate past the first 3 results — if none fit, the intent is unique enough.
 
+### Add a package — pick its `kind` first
+1. Run `vybekiit dedup` — is this really a new home, or an extension of an existing one?
+2. Decide the **kind**: `concern` (a provider seam) · `library` (foundation) · `owned` (buyer UI) ·
+   `tooling` (agent-only). If it's a `concern`, it earns the full skeleton; otherwise it does not.
+3. Create `package.json` with `"private": true` and `"vybekiit": { "kind": "<kind>" }` — no `publishConfig`.
+4. For a `concern`: scaffold `types.ts` / `config.ts` / `resolve.ts` / `providers/<name>/index.ts` /
+   pure `index.ts` barrel (shape it like `packages/email`).
+5. Colocate `*.test.ts`; run `pnpm check:packages` — it fails if the shape contradicts the kind.
+
+### Add a first-party UI component (template-owned)
+1. `PascalCase` filename that matches the export (`PricingCard.tsx`), under the template's `components/`.
+2. Compose kit primitives (`@/components/ui/*` or `@vybekiit/ui`) — never raw elements; classes via
+   `cn()`, colours/spacing from tokens.
+3. Props are a `readonly` `interface`; optional props default at the boundary. `'use client'` only if
+   it's interactive.
+4. Data via `@/lib/fetchJson` + TanStack Query; render loading, error, and empty. Forms use `FormField`.
+5. Localize copy through the message catalog (no inline strings); colocate a `*.test.ts`.
+
 ## Exemplars
 
 Write new code like these:
@@ -539,6 +661,9 @@ Write new code like these:
 - `packages/core/src/config.ts` — `parseEnv` over `Schema.decodeUnknownSync`.
 - `packages/payments/src/resolve.ts` after conversion — a service `Tag` + `Live` `Layer`.
 - `scripts/mirrorRepos.mjs` — a typed `.mjs` maintainer script.
+- `templates/web/src/components/FormField.tsx` — the UI field primitive: `cn()` + tokens + `aria-*` wiring.
+- `cli/src/cliRunner.ts` — the CLI `COMMAND_HANDLERS` dispatch + the `isInteractive()` dual-mode front door.
+- `apps/landing/src/lib/gate.ts` — `Effect.all({ concurrency })` bounded fan-out, run at the edge.
 
 ## Never
 
@@ -549,7 +674,7 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - `Result`/`ok`/`err`/`fail` or `Promise<Result<…>>` — return `Effect<A, E>` with a tagged error · `packages/core/src/result.ts` (retires with the Effect migration) · [taste] (ADR-0023).
 - Raw `try/catch` across an Effect seam — wrap IO with `Effect.try` / `Effect.tryPromise`, then recover with `Effect.catchTag`/`catchAll` · [taste].
 - Runtime map fallback (`adapters[key] ?? adapters.default`) — Schema owns defaults; missing maps return typed errors before construction · [taste].
-- `zod` in maintained code or authored starter paths — validate with Effect `Schema` · pre-Effect manifests (ADR-0023) · [lint: noRestrictedImports].
+- `zod` in maintained code or authored starter paths — validate with Effect `Schema` · [lint: noRestrictedImports] (`packages/agentKit` is grandfathered to `warn` until its Effect slice; ADR-0023).
 - `@inquirer/prompts` — the CLI standardizes on `@clack/prompts` · `cli/src/prompts/envWizard.ts` · [lint: noRestrictedImports] (ADR-0034).
 - A regex where a plain string method reads as clearly, or a kept regex with **no one-line example comment** above it · [taste].
 - `new`-ing a provider at a call site — resolve it from its `Layer` · [taste].
@@ -557,7 +682,12 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - `function` declarations in authored TypeScript — export const-arrow functions; `function*` only inside `Effect.gen` · [lint+taste].
 - Implementation code in `index.ts` — barrels are wildcard re-exports only; no constants, helpers, side effects, or wiring · [lint+taste].
 - `export default` in package source (except Worker handler / `tsup.config.ts`) · [lint: noDefaultExport under `packages/**`].
-- Bare `console.*` in a maintained package — return an `Effect` or use `createLogger` · [lint: noConsole under `packages/**`].
+- Bare `console.*` in a `concern`/`library`/`owned` package — return an `Effect` or use `createLogger`; only `tooling`-kind packages may `console` · [lint: noConsole under `packages/**`].
+- A raw `<button>`/`<input>` or a hardcoded colour/size where a kit primitive + design token belongs · [taste].
+- Inline label/input/error markup in a form instead of the `FormField` primitive · [taste].
+- A hand-rolled `fetch` + `useState` loading flag instead of `@/lib/fetchJson` + TanStack Query with loading/error/empty · [taste].
+- A kebab-case filename on a first-party React component — authored components are PascalCase matching the export (`FormField.tsx`); kebab is only for shadcn/registry mirrors + framework-reserved files · [taste].
+- A `packages/*` with no `vybekiit.kind`, or one whose shape contradicts its kind (a `concern` with no `resolve.ts`) · [lint: check:packages].
 - `any`, or a cast except at a vendor-type seam (e.g. Supabase dynamic tables) · [lint: noExplicitAny].
 - Exported functions without summary, `@param`, `@returns`, and `@example` · [lint+taste].
 - `isRecord`/`isObject`/`isDefined`/`noop`/`assertNever` and one-row predicates like `isName`/`isKey` unless they are domain-specific and reused · [lint+taste].

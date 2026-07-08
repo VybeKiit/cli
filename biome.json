@@ -81,7 +81,8 @@
           "level": "error",
           "options": {
             "paths": {
-              "@inquirer/prompts": "Use @clack/prompts — the CLI standardizes on one prompt library (ADR-0025)."
+              "@inquirer/prompts": "Use @clack/prompts — the CLI standardizes on one prompt library (ADR-0034).",
+              "zod": "Validate with Effect Schema — zod is banned in authored code (ADR-0023)."
             }
           }
         }
@@ -232,6 +233,51 @@
           "suspicious": {
             "noReactForwardRef": "off"
           }
+        }
+      }
+    },
+    {
+      "includes": ["packages/**"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noConsole": "error" },
+          "style": { "noDefaultExport": "error" }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/agentKit/**",
+        "packages/browserAutomation/**",
+        "packages/uiCatalogMcp/**",
+        "packages/deploy/**",
+        "packages/**/*.test.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": { "noConsole": "off", "noMisplacedAssertion": "off" }
+        }
+      }
+    },
+    {
+      "includes": ["packages/**/vitest.config.ts", "packages/**/tsup.config.ts", "**/*.worker.ts"],
+      "linter": {
+        "rules": {
+          "style": { "noDefaultExport": "off" }
+        }
+      }
+    },
+    {
+      "includes": [
+        "templates/*/app/api/**/route.ts",
+        "templates/*/src/app/api/**/route.ts",
+        "apps/*/app/api/**/route.ts",
+        "apps/*/src/app/api/**/route.ts",
+        "**/*.worker.ts"
+      ],
+      "linter": {
+        "rules": {
+          "nursery": { "noFloatingPromises": "error" }
         }
       }
     }

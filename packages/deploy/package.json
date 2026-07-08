@@ -2,6 +2,9 @@
   "name": "@vybekiit/deploy",
   "version": "0.3.0",
   "private": true,
+  "vybekiit": {
+    "kind": "tooling"
+  },
   "description": "Headless, provider-agnostic hosting for VybeKiit — one Hosting interface with a Cloudflare adapter (deploy + status). No UI. Private maintainer/CLI tooling (ADR-0025).",
   "license": "MIT",
   "type": "module",

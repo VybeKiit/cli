@@ -106,5 +106,8 @@
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
-  "private": true
+  "private": true,
+  "vybekiit": {
+    "kind": "concern"
+  }
 }

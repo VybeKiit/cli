@@ -73,11 +73,25 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   `Effect.provide` them and run at the edge (`runPromiseExit` on servers, one `ManagedRuntime` on clients).
 - **Naming:** first-party module **folders and files are camelCase** — everything we author + import by
   path (`providerDispatch.ts`, `useAsync.ts`, `mirrorRepos.mjs`); canonical role files keep fixed names
-  (`types.ts`/`config.ts`/`resolve.ts`/`index.ts`). **Kept on framework/ecosystem convention:** UI
-  components (`.tsx` + anything under `components/`, `dropdown-menu.tsx`), mirrored registry blocks, Next.js
-  reserved files, `*.config.ts`/`*.d.ts`, `.agents/skills/**`, `.py`/`.sh`. **Identity stays kebab:** the
-  `@vybekiit/*` name, public subpath exports, config values, route segments (`agentKit` →
-  `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
+  (`types.ts`/`config.ts`/`resolve.ts`/`index.ts`). **First-party React components are PascalCase
+  matching the export** (`FormField.tsx`, `DashboardPage.tsx`) — recipes, features, and primitives alike.
+  **Kept on framework/ecosystem convention (kebab):** shadcn/Radix + mirrored registry blocks
+  (`dropdown-menu.tsx`), Next.js reserved files, `*.config.ts`/`*.d.ts`, `.agents/skills/**`, `.py`/`.sh`.
+  **Identity stays kebab:** the `@vybekiit/*` name, public subpath exports, config values, route segments
+  (`agentKit` → `@vybekiit/agent-kit`; src `localeRules.ts` → public `@vybekiit/i18n/locale-rules`).
+- **Package kinds:** every `packages/*` declares `vybekiit.kind` = `concern` | `library` | `owned` |
+  `tooling` in its `package.json`. Kind drives the rules — only `concern` earns the full provider
+  skeleton, only `tooling` may `console`. `pnpm check:packages` fails when shape contradicts kind.
+- **UI & styling:** compose kit primitives (`@vybekiit/ui` / `@/components/ui/*`), never raw elements;
+  variants via `cva()`, classes via `cn()`, colours/spacing from design tokens (web CSS vars, mobile
+  `@vybekiit/tokens`). Fetch through `@/lib/fetchJson` + TanStack Query, always rendering loading/error/
+  empty; forms use the `FormField` primitive; `'use client'` on interactive leaves only.
+- **Effect async:** stay `Effect` until a composition root, then run once (`runPromiseExit` on servers,
+  one `ManagedRuntime` on clients); parallelize with `Effect.all(..., { concurrency })`; never
+  fire-and-forget a serverless side-effect (await it, or `waitUntil` in a Worker).
+- **CLI:** verbs register in `COMMAND_HANDLERS` (`cli/src/cliRunner.ts`); dual-mode — bare+TTY opens a
+  `@clack/prompts` menu, flags/non-TTY defer to the same functions and never hang; handle `isCancel()`;
+  `@inquirer/prompts` banned (ADR-0034); write via `process.stdout`, not `console`.
 - **Regex:** prefer a plain string method when it's as clear (`.replaceAll('x', y)` over `/x/g`); a kept
   regex gets a one-line example comment above it (`input → output` or match/no-match). Full rule in CODE-STYLE.
 - **Import aliases (ADR-0026):** templates `@/*` → `./src/*`; packages `@vybekiit/<pkg>/*` everywhere

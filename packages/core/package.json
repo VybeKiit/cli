@@ -126,6 +126,9 @@
     "express": "^4.21.2"
   },
   "private": true,
+  "vybekiit": {
+    "kind": "library"
+  },
   "peerDependencies": {
     "express": ">=4"
   },
