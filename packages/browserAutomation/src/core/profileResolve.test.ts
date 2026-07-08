@@ -21,7 +21,7 @@ describe('resolveProfilePath', () => {
       const actual = await vi.importActual<typeof import('node:os')>('node:os');
       return { ...actual, homedir: () => tempHome };
     });
-    return import('../../src/core/profileResolve');
+    return import('./profileResolve');
   };
 
   it('uses explicit --profile path', async () => {

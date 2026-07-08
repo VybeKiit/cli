@@ -1,24 +1,24 @@
 // biome-ignore-all lint/style/noExcessiveLinesPerFile: package regression matrix is intentionally grouped.
 
 import { describe, expect, it } from 'vitest';
-import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from '../src/deeplink';
-import { formatReportPrompt } from '../src/formatPrompt';
-import { loadReportHandoffTarget, saveReportHandoffTarget } from '../src/handoffTarget';
+import { buildAssistantDeepLink, inferVybeAssistant, resolveVybeAssistant } from './deeplink';
+import { formatReportPrompt } from './formatPrompt';
+import { loadReportHandoffTarget, saveReportHandoffTarget } from './handoffTarget';
 import {
   DEFAULT_INSPECT_HIGHLIGHT_COLOR,
   hexToRgba,
   INSPECT_HIGHLIGHT_PRESETS,
   loadInspectHighlightColor,
   saveInspectHighlightColor,
-} from '../src/inspectHighlightColor';
+} from './inspectHighlightColor';
 import {
   computeFlyoutPlacement,
   type FlyoutRect,
   getDockInsetStyle,
   loadDockCornerOnly,
   snapDockToNearestCorner,
-} from '../src/position';
-import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from '../src/types';
+} from './position';
+import { ConsoleErrorBuffer, REPORT_PROMPT_PREFIX } from './types';
 
 // cursor://anysphere.cursor-deeplink/prompt?text=hello -> match
 const cursorDeepLinkPattern = /^cursor:\/\/anysphere\.cursor-deeplink\/prompt\?/;
@@ -369,7 +369,7 @@ describe('loadDockCornerOnly', () => {
 
 describe('devTools', () => {
   it('gates report mode to local dev with opt-in flag', async () => {
-    const { shouldShowReportMode } = await import('../src/devTools');
+    const { shouldShowReportMode } = await import('./devTools');
     expect(shouldShowReportMode({ NODE_ENV: 'development', VYBE_REPORT_MODE: '1' })).toBe(true);
     expect(shouldShowReportMode({ NODE_ENV: 'production', VYBE_REPORT_MODE: '1' })).toBe(false);
     expect(shouldShowReportMode({ NODE_ENV: 'development' })).toBe(false);

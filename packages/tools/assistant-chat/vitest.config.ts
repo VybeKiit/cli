@@ -3,5 +3,5 @@ import { createViteWorkspaceAliasPlugin } from '../../../scripts/lib/tsupWorkspa
 
 export default defineConfig({
   plugins: [createViteWorkspaceAliasPlugin()],
-  test: { include: ['test/**/*.test.ts'] },
+  test: { include: ['src/**/*.test.ts'] },
 });
