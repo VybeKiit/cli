@@ -4,7 +4,7 @@
  * Generate component library catalog + preview loaders for apps/componentLibrary
  */
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { access, mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve as pathResolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1352,6 +1352,15 @@ function serverLoadCase(entry) {
 }
 
 async function main() {
+  // The raw catalog index is a gitignored artifact produced by `pnpm sync:ui`
+  // (network registry sync). It is absent in a cold checkout (CI, fresh clone), so
+  // fall back to the committed generated catalog rather than crashing the build.
+  if (!existsSync(CATALOG_PATH)) {
+    console.log(
+      '[build-component-library-index] ui-catalog-index.json not found (sync:ui artifact) — using the committed catalog and skipping rebuild. Run `pnpm sync:ui` to refresh it.',
+    );
+    return;
+  }
   const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
   const iconEntries = KOKONUT_LOGO_ICONS.map((name) => ({
     namespace: 'kokonutui',
