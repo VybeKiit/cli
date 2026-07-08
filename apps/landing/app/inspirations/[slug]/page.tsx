@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { INSPIRATION_LAYOUTS } from '@/components/inspirations/layout-registry';
+import { INSPIRATION_LAYOUTS } from '@/components/inspirations/LayoutRegistry';
 import { getInspirationBySlug, INSPIRATION_DIRECTIONS } from '@/data/inspirations';
 
 interface PageProps {

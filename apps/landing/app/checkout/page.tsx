@@ -1,5 +1,5 @@
-import { CheckoutForm } from '@/components/checkout-form';
-import { CheckoutShell } from '@/components/checkout-shell';
+import { CheckoutForm } from '@/components/CheckoutForm';
+import { CheckoutShell } from '@/components/CheckoutShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PRICE } from '@/data/site';
 

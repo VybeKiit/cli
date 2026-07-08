@@ -1,4 +1,4 @@
-import { CheckoutShell } from '@/components/checkout-shell';
+import { CheckoutShell } from '@/components/CheckoutShell';
 import { SupabaseDocBrand, SupabaseDocContent } from '@/components/docs/SupabaseDocContent';
 
 export const metadata = {

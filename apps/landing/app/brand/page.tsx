@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { CheckoutShell } from '@/components/checkout-shell';
+import { CheckoutShell } from '@/components/CheckoutShell';
 import { BRAND } from '@/data/site';
 
 export const metadata = {

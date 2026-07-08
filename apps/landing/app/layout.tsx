@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
-import { ReportModeDevShell } from '@/components/report-mode/report-mode-shell';
-import { AssistantChatDevShell } from '@/components/tools/assistant-chat/assistant-chat-shell';
+import { ReportModeDevShell } from '@/components/report-mode/ReportModeShell';
+import { AssistantChatDevShell } from '@/components/tools/assistant-chat/AssistantChatShell';
 import { BRAND } from '@/data/site';
 import { resolveDirection } from '@/lib/direction';
 import './globals.css';

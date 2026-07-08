@@ -1,4 +1,4 @@
-import { CheckoutShell } from '@/components/checkout-shell';
+import { CheckoutShell } from '@/components/CheckoutShell';
 import { TERMS_SECTIONS } from '@/data/legal';
 
 export const metadata = {

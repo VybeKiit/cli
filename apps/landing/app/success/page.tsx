@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CheckoutShell } from '@/components/checkout-shell';
+import { CheckoutShell } from '@/components/CheckoutShell';
 import { Button } from '@/components/ui/button';
 import { SUPPORT } from '@/data/site';
 
