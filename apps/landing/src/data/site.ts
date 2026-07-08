@@ -48,7 +48,29 @@ export const BRAND = {
   name: 'VybeKiit',
   /** Meta-description / hero-adjacent tagline, drawn from the one-liner library. */
   tagline: 'The SaaS kit that ships itself.',
+  /** Canonical production origin — the SSOT for metadataBase, canonical URLs, sitemap, robots, and OG. */
+  url: 'https://vybekiit.com',
+  /** One authoritative meta description, shared by the layout, Open Graph, and JSON-LD. */
+  description:
+    'VybeKiit is the SaaS kit that ships itself. You describe the product in plain language; the agent builds it, deploys it, takes payments, and keeps it updated. Web, mobile, and a browser extension in one purchase.',
 } as const;
+
+/**
+ * Search keywords for the landing metadata — the competitor + intent terms from
+ * `docs/positioning/seo-geo-plan.md` that the FAQ answers target.
+ */
+export const SEO_KEYWORDS: readonly string[] = [
+  'SaaS boilerplate',
+  'SaaS starter kit',
+  'AI SaaS boilerplate',
+  'non-technical founder',
+  'Next.js SaaS starter',
+  'ship a SaaS with AI',
+  'Claude Code SaaS',
+  'Cursor SaaS boilerplate',
+  'web mobile extension kit',
+  'Lemon Squeezy merchant of record',
+];
 
 /** One marketing nav link: where it points and the text shown. */
 export interface NavLink {

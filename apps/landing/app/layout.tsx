@@ -1,16 +1,56 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
+import { JsonLd } from '@/components/JsonLd';
 import { ReportModeDevShell } from '@/components/report-mode/ReportModeShell';
 import { AssistantChatDevShell } from '@/components/tools/assistant-chat/AssistantChatShell';
-import { BRAND } from '@/data/site';
+import { BRAND, SEO_KEYWORDS } from '@/data/site';
+import { organizationJsonLd, websiteJsonLd } from '@/data/structuredData';
 import { resolveDirection } from '@/lib/direction';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} — ${BRAND.tagline}`,
-  description:
-    'VybeKiit is the SaaS kit that ships itself. You describe the product in plain language; the agent builds it, deploys it, takes payments, and keeps it updated. Web, mobile, and a browser extension in one purchase.',
+  metadataBase: new URL(BRAND.url),
+  title: {
+    default: `${BRAND.name} — ${BRAND.tagline}`,
+    template: `%s | ${BRAND.name}`,
+  },
+  description: BRAND.description,
+  keywords: [...SEO_KEYWORDS],
+  applicationName: BRAND.name,
+  authors: [{ name: BRAND.name, url: BRAND.url }],
+  creator: BRAND.name,
+  publisher: BRAND.name,
+  category: 'technology',
+  openGraph: {
+    type: 'website',
+    siteName: BRAND.name,
+    title: `${BRAND.name} — ${BRAND.tagline}`,
+    description: BRAND.description,
+    url: BRAND.url,
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${BRAND.name} — ${BRAND.tagline}`,
+    description: BRAND.description,
+  },
+  icons: {
+    icon: '/vybekiit-logo.svg',
+    shortcut: '/vybekiit-logo.svg',
+    apple: '/vybekiit-logo.svg',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+      'max-snippet': -1,
+    },
+  },
 };
 
 /**
@@ -23,6 +63,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <html lang={lang} dir={dir}>
       <body>
+        <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
         {children}
         <ReportModeDevShell />
         <AssistantChatDevShell />
