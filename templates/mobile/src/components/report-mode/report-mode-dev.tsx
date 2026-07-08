@@ -1,5 +1,5 @@
 import { submitMobileReport } from '@/lib/report-mode/submitReport';
-import { useReportDockMobile } from '@/components/report-mode/use-report-dock-mobile';
+import { useReportDockMobile } from '@/components/report-mode/useReportDockMobile';
 import { DOCK_CORNER_LABELS, DOCK_CORNER_PRESETS, getDockInsetStyle } from '@vybekiit/report-mode';
 import { usePathname } from 'expo-router';
 import { useState } from 'react';

@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/ui/button';
 import { ReportModeNotePanel } from '@/components/report-mode/inspect/report-mode-note-panel';
-import { useConsoleErrorBuffer } from '@/components/report-mode/use-console-errors';
-import { useReportDockPosition } from '@/components/report-mode/use-report-dock';
-import { useReportInspectHighlightColor } from '@/components/report-mode/use-report-inspect-highlight-color';
+import { useConsoleErrorBuffer } from '@/components/report-mode/useConsoleErrors';
+import { useReportDockPosition } from '@/components/report-mode/useReportDock';
+import { useReportInspectHighlightColor } from '@/components/report-mode/useReportInspectHighlightColor';
 import {
   getAccessibleName,
   getCssPath,
