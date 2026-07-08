@@ -82,15 +82,13 @@ export const PricingCheckoutTerminal = () => {
     if (!animate) {
       return;
     }
+    let pendingTimer: ReturnType<typeof globalThis.setTimeout> | undefined;
     if (typedChars < PROMPT.length) {
-      const timer = globalThis.setTimeout(() => setTypedChars((count) => count + 1), 42);
-      return () => globalThis.clearTimeout(timer);
+      pendingTimer = globalThis.setTimeout(() => setTypedChars((count) => count + 1), 42);
+    } else if (visibleLines < OUTPUT_LINES.length) {
+      pendingTimer = globalThis.setTimeout(() => setVisibleLines((count) => count + 1), 520);
     }
-    if (visibleLines < OUTPUT_LINES.length) {
-      const timer = globalThis.setTimeout(() => setVisibleLines((count) => count + 1), 520);
-      return () => globalThis.clearTimeout(timer);
-    }
-    return undefined;
+    return pendingTimer === undefined ? undefined : () => globalThis.clearTimeout(pendingTimer);
   }, [animate, typedChars, visibleLines]);
 
   useEffect(() => {

@@ -75,10 +75,7 @@ const getAccessibleName = (element: Element): string | undefined => {
     return ariaLabel;
   }
   const text = element.textContent?.trim();
-  if (text !== undefined && text.length > 0) {
-    return text.slice(0, 120);
-  }
-  return undefined;
+  return text !== undefined && text.length > 0 ? text.slice(0, 120) : undefined;
 };
 
 /**
