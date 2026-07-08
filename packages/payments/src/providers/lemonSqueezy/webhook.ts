@@ -12,6 +12,7 @@ const webhookSchema = Schema.Struct({
     id: Schema.String,
     attributes: Schema.Struct({
       user_email: Schema.optional(Schema.String),
+      user_name: Schema.optional(Schema.String),
       refunded: Schema.optional(Schema.Boolean),
     }),
   }),
@@ -112,6 +113,7 @@ export const parseLemonSqueezyWebhook = (
       eventName: meta.event_name,
       orderId: data.id,
       customerEmail: optionalStringToNull(data.attributes.user_email),
+      customerName: optionalStringToNull(data.attributes.user_name),
       githubUsername: readLemonSqueezyGithubUsername(meta.custom_data),
       isRefund: meta.event_name === 'order_refunded' || data.attributes.refunded === true,
     };

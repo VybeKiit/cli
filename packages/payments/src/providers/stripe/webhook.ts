@@ -97,6 +97,7 @@ export const mapStripeEvent = (event: Stripe.Event): Effect.Effect<OrderEvent, P
       eventName: eventType,
       orderId: session.id,
       customerEmail: readStripeSessionEmail(session),
+      customerName: stripeStringToNull(session.customer_details?.name),
       githubUsername: readStripeGithubUsername(session.metadata),
       isRefund: false,
     });
@@ -111,6 +112,9 @@ export const mapStripeEvent = (event: Stripe.Event): Effect.Effect<OrderEvent, P
       eventName: eventType,
       orderId: paymentIntentId,
       customerEmail: readStripeChargeEmail(charge),
+      customerName: stripeStringToNull(
+        (charge as StripeChargeWithOptionalBillingDetails).billing_details?.name,
+      ),
       githubUsername: readStripeGithubUsername(charge.metadata),
       isRefund: true,
     });

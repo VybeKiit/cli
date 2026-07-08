@@ -20,7 +20,10 @@ const sign = (body: string): string => createHmac('sha256', SECRET).update(body)
 
 const orderCreated = JSON.stringify({
   meta: { event_name: 'order_created', custom_data: { github_username: 'octocat' } },
-  data: { id: 'order_1', attributes: { user_email: 'buyer@example.com' } },
+  data: {
+    id: 'order_1',
+    attributes: { user_email: 'buyer@example.com', user_name: 'Ada Lovelace' },
+  },
 });
 
 describe('verifyLemonSqueezySignature', () => {
@@ -42,6 +45,7 @@ describe('lemon webhook parser', () => {
     expect(result.provider).toBe('lemon-squeezy');
     expect(result.githubUsername).toBe('octocat');
     expect(result.customerEmail).toBe('buyer@example.com');
+    expect(result.customerName).toBe('Ada Lovelace');
     expect(result.isRefund).toBe(false);
   });
 

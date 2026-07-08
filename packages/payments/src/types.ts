@@ -50,6 +50,8 @@ export type OrderEvent = {
   readonly orderId: string;
   /** Buyer email, if present on the order. */
   readonly customerEmail: string | null;
+  /** Buyer's full name as the provider captured it at checkout, if present. */
+  readonly customerName: string | null;
   /** GitHub username carried through checkout metadata — the gate's key input. */
   readonly githubUsername: string | null;
   /** True when this event should *revoke* access (a refund). */

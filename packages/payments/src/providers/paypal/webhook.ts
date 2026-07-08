@@ -9,7 +9,17 @@ const eventSchema = Schema.Struct({
   resource: Schema.Struct({
     id: Schema.optional(Schema.String),
     custom_id: Schema.optional(Schema.String),
-    payer: Schema.optional(Schema.Struct({ email_address: Schema.optional(Schema.String) })),
+    payer: Schema.optional(
+      Schema.Struct({
+        email_address: Schema.optional(Schema.String),
+        name: Schema.optional(
+          Schema.Struct({
+            given_name: Schema.optional(Schema.String),
+            surname: Schema.optional(Schema.String),
+          }),
+        ),
+      }),
+    ),
     purchase_units: Schema.optional(
       Schema.Array(Schema.Struct({ custom_id: Schema.optional(Schema.String) })),
     ),
@@ -93,6 +103,26 @@ const readPayPalGithubUsername = (event: PayPalEvent): string | null => {
 };
 
 /**
+ * Read the buyer's full name from a PayPal payer, joining the given name and surname.
+ *
+ * @param event - Decoded PayPal webhook event.
+ * @returns The buyer's full name, or `null` when PayPal omitted it.
+ * @example
+ * const name = readPayPalCustomerName(event);
+ */
+const readPayPalCustomerName = (event: PayPalEvent): string | null => {
+  const name = event.resource.payer?.name;
+  if (name === undefined) {
+    return null;
+  }
+
+  const parts = [name.given_name, name.surname].filter(
+    (part): part is string => part !== undefined && part.length > 0,
+  );
+  return parts.length > 0 ? parts.join(' ') : null;
+};
+
+/**
  * Read one required PayPal verification header.
  *
  * @param headers - Lower-case webhook request headers.
@@ -157,6 +187,7 @@ export const mapPayPalEvent = (event: PayPalEvent): Effect.Effect<OrderEvent, Pa
       eventName: event.event_type,
       orderId,
       customerEmail: paypalStringToNull(event.resource.payer?.email_address),
+      customerName: readPayPalCustomerName(event),
       githubUsername: readPayPalGithubUsername(event),
       isRefund: event.event_type.includes('REFUND'),
     };

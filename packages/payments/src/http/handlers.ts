@@ -197,6 +197,7 @@ export const handlePracticeComplete = async (
       eventName: 'practice_checkout_completed',
       orderId,
       customerEmail: 'practice@example.com',
+      customerName: null,
       githubUsername: null,
       isRefund: false,
     }),

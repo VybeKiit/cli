@@ -11,5 +11,13 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vybekiit",
+      "database_id": "40ddaa57-58e5-4f25-9c1a-86fb6efcb3d4"
+    }
+  ],
+  "migrations_dir": "migrations"
 }
