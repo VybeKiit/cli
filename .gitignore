@@ -19,8 +19,8 @@ test-results/
 .kimi-code/
 .kiro/
 
-# wrangler local state (config is tracked; state is not)
-.wrangler/state/
+# wrangler local state (config is tracked; state is not) — recursive: apps/*, infra/* each have one
+**/.wrangler/state/
 
 # env / secrets — NEVER commit real values (only .env.example is tracked)
 .env
