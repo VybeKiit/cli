@@ -9,7 +9,7 @@ interface AlertProps {
   linkText?: string; // Link text
 }
 
-const Alert: React.FC<AlertProps> = ({
+export const Alert: React.FC<AlertProps> = ({
   variant,
   title,
   message,
@@ -133,5 +133,3 @@ const Alert: React.FC<AlertProps> = ({
     </div>
   );
 };
-
-export default Alert;

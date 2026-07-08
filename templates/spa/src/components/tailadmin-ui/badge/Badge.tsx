@@ -11,7 +11,7 @@ interface BadgeProps {
   children: React.ReactNode; // Badge content
 }
 
-const Badge: React.FC<BadgeProps> = ({
+export const Badge: React.FC<BadgeProps> = ({
   variant = 'light',
   color = 'primary',
   size = 'md',
@@ -62,5 +62,3 @@ const Badge: React.FC<BadgeProps> = ({
     </span>
   );
 };
-
-export default Badge;

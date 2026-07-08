@@ -1,9 +1,9 @@
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import ComponentCard from '@/components/common/ComponentCard';
-import Avatar from '@/components/tailadmin-ui/avatar/Avatar';
-import PageMeta from '@/components/common/PageMeta';
+import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Avatar } from '@/components/tailadmin-ui/avatar/Avatar';
+import { PageMeta } from '@/components/common/PageMeta';
 
-const Avatars = () => {
+export const Avatars = () => {
   return (
     <>
       <PageMeta
@@ -57,5 +57,3 @@ const Avatars = () => {
     </>
   );
 };
-
-export default Avatars;

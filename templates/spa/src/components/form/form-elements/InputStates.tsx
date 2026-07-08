@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import ComponentCard from '@/components/common/ComponentCard';
-import Input from '@/components/form/input/InputField';
-import Label from '@/components/form/Label';
-const InputStates = () => {
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Input } from '@/components/form/input/InputField';
+import { Label } from '@/components/form/Label';
+export const InputStates = () => {
   const [email, setEmail] = useState('');
   const [emailTwo, setEmailTwo] = useState('');
   const [error, setError] = useState(false);
@@ -70,5 +70,3 @@ const InputStates = () => {
     </ComponentCard>
   );
 };
-
-export default InputStates;

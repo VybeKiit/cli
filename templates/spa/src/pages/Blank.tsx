@@ -1,7 +1,7 @@
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import PageMeta from '@/components/common/PageMeta';
+import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import { PageMeta } from '@/components/common/PageMeta';
 
-const Blank = () => (
+export const Blank = () => (
   <div>
     <PageMeta
       title="React.js Blank Dashboard | TailAdmin - Next.js Admin Dashboard Template"
@@ -22,5 +22,3 @@ const Blank = () => (
     </div>
   </div>
 );
-
-export default Blank;

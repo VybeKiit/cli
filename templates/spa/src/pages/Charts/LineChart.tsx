@@ -1,9 +1,9 @@
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import ComponentCard from '@/components/common/ComponentCard';
-import LineChartOne from '@/components/charts/line/LineChartOne';
-import PageMeta from '@/components/common/PageMeta';
+import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { LineChartOne } from '@/components/charts/line/LineChartOne';
+import { PageMeta } from '@/components/common/PageMeta';
 
-const LineChart = () => (
+export const LineChart = () => (
   <>
     <PageMeta
       title="React.js Chart Dashboard | TailAdmin - React.js Admin Dashboard Template"
@@ -17,5 +17,3 @@ const LineChart = () => (
     </div>
   </>
 );
-
-export default LineChart;

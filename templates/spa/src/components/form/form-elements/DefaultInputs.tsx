@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import ComponentCard from '@/components/common/ComponentCard';
-import Label from '@/components/form/Label';
-import Input from '@/components/form/input/InputField';
-import Select from '@/components/form/Select';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Label } from '@/components/form/Label';
+import { Input } from '@/components/form/input/InputField';
+import { Select } from '@/components/form/Select';
 import { EyeCloseIcon, EyeIcon, TimeIcon } from '@/icons';
-import DatePicker from '@/components/form/date-picker.tsx';
+import { DatePicker } from '@/components/form/date-picker.tsx';
 
-const DefaultInputs = () => {
+export const DefaultInputs = () => {
   const [showPassword, setShowPassword] = useState(false);
   const options = [
     { value: 'marketing', label: 'Marketing' },
@@ -108,5 +108,3 @@ const DefaultInputs = () => {
     </ComponentCard>
   );
 };
-
-export default DefaultInputs;

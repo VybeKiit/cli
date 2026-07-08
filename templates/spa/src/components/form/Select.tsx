@@ -13,7 +13,7 @@ interface SelectProps {
   defaultValue?: string;
 }
 
-const Select: React.FC<SelectProps> = ({
+export const Select: React.FC<SelectProps> = ({
   options,
   placeholder = 'Select an option',
   onChange,
@@ -58,5 +58,3 @@ const Select: React.FC<SelectProps> = ({
     </select>
   );
 };
-
-export default Select;

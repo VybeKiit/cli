@@ -3,7 +3,7 @@ import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
 import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
 import { Link } from '@tanstack/react-router';
 
-const NotificationDropdown = () => {
+export const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
 
@@ -368,5 +368,3 @@ const NotificationDropdown = () => {
     </div>
   );
 };
-
-export default NotificationDropdown;

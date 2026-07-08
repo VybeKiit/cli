@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import ComponentCard from '@/components/common/ComponentCard';
-import TextArea from '@/components/form/input/TextArea';
-import Label from '@/components/form/Label';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { TextArea } from '@/components/form/input/TextArea';
+import { Label } from '@/components/form/Label';
 
-const TextAreaInput = () => {
+export const TextAreaInput = () => {
   const [message, setMessage] = useState('');
   const [messageTwo, setMessageTwo] = useState('');
   return (
@@ -36,5 +36,3 @@ const TextAreaInput = () => {
     </ComponentCard>
   );
 };
-
-export default TextAreaInput;

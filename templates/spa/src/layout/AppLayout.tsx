@@ -1,8 +1,8 @@
 import { SidebarProvider, useSidebar } from '@/context/SidebarContext';
 import { Outlet } from '@tanstack/react-router';
-import AppHeader from './AppHeader';
-import Backdrop from './Backdrop';
-import AppSidebar from './AppSidebar';
+import { AppHeader } from './AppHeader';
+import { Backdrop } from './Backdrop';
+import { AppSidebar } from './AppSidebar';
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -27,10 +27,8 @@ const LayoutContent: React.FC = () => {
   );
 };
 
-const AppLayout: React.FC = () => (
+export const AppLayout: React.FC = () => (
   <SidebarProvider>
     <LayoutContent />
   </SidebarProvider>
 );
-
-export default AppLayout;

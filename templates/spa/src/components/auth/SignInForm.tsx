@@ -3,14 +3,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
-import Label from '@/components/form/Label';
-import Input from '@/components/form/input/InputField';
-import Checkbox from '@/components/form/input/Checkbox';
-import Button from '@/components/tailadmin-ui/button/Button';
+import { Label } from '@/components/form/Label';
+import { Input } from '@/components/form/input/InputField';
+import { Checkbox } from '@/components/form/input/Checkbox';
+import { Button } from '@/components/tailadmin-ui/button/Button';
 import { useAsync } from '@/hooks/useAsync';
 import { signInWithPassword } from '@/lib/authClient';
 
-const SignInForm = () => {
+export const SignInForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -186,5 +186,3 @@ const SignInForm = () => {
     </div>
   );
 };
-
-export default SignInForm;

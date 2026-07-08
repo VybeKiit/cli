@@ -29,7 +29,7 @@ const statusColorClasses = {
   busy: 'bg-warning-500',
 };
 
-const Avatar: React.FC<AvatarProps> = ({
+export const Avatar: React.FC<AvatarProps> = ({
   src,
   alt = 'User Avatar',
   size = 'medium',
@@ -51,5 +51,3 @@ const Avatar: React.FC<AvatarProps> = ({
     </div>
   );
 };
-
-export default Avatar;

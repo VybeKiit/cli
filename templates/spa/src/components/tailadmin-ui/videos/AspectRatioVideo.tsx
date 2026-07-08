@@ -4,7 +4,7 @@ type AspectRatioVideoProps = {
   title?: string; // Video title, default is "Embedded Video"
 };
 
-const AspectRatioVideo: React.FC<AspectRatioVideoProps> = ({
+export const AspectRatioVideo: React.FC<AspectRatioVideoProps> = ({
   videoUrl,
   aspectRatio = 'video', // Default aspect ratio
   title = 'Embedded Video',
@@ -20,5 +20,3 @@ const AspectRatioVideo: React.FC<AspectRatioVideoProps> = ({
     />
   </div>
 );
-
-export default AspectRatioVideo;

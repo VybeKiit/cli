@@ -8,7 +8,7 @@ interface SwitchProps {
   color?: 'blue' | 'gray'; // Added prop to toggle color theme
 }
 
-const Switch: React.FC<SwitchProps> = ({
+export const Switch: React.FC<SwitchProps> = ({
   label,
   defaultChecked = false,
   disabled = false,
@@ -58,5 +58,3 @@ const Switch: React.FC<SwitchProps> = ({
     </label>
   );
 };
-
-export default Switch;

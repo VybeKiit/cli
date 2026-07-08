@@ -16,7 +16,7 @@ interface MultiSelectProps {
   placeholder?: string;
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({
+export const MultiSelect: React.FC<MultiSelectProps> = ({
   label,
   options,
   defaultSelected = [],
@@ -237,5 +237,3 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     </div>
   );
 };
-
-export default MultiSelect;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import ComponentCard from '@/components/common/ComponentCard';
-import Label from '@/components/form/Label';
-import Select from '@/components/form/Select';
-import MultiSelect from '@/components/form/MultiSelect';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Label } from '@/components/form/Label';
+import { Select } from '@/components/form/Select';
+import { MultiSelect } from '@/components/form/MultiSelect';
 
-const SelectInputs = () => {
+export const SelectInputs = () => {
   const options = [
     { value: 'marketing', label: 'Marketing' },
     { value: 'template', label: 'Template' },
@@ -47,5 +47,3 @@ const SelectInputs = () => {
     </ComponentCard>
   );
 };
-
-export default SelectInputs;

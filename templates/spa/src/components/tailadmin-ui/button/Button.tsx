@@ -15,7 +15,7 @@ interface ButtonProps {
 }
 
 /** TailAdmin button API backed by shadcn `Button`. */
-const Button = ({
+export const Button = ({
   children,
   size = 'md',
   variant = 'primary',
@@ -44,5 +44,3 @@ const Button = ({
     {endIcon ? <span className="flex items-center">{endIcon}</span> : null}
   </ShadcnButton>
 );
-
-export default Button;

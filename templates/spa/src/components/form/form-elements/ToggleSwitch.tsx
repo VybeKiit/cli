@@ -1,7 +1,7 @@
-import ComponentCard from '@/components/common/ComponentCard';
-import Switch from '@/components/form/switch/Switch';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Switch } from '@/components/form/switch/Switch';
 
-const ToggleSwitch = () => {
+export const ToggleSwitch = () => {
   const handleSwitchChange = (checked: boolean) => {
     void checked;
   };
@@ -20,5 +20,3 @@ const ToggleSwitch = () => {
     </ComponentCard>
   );
 };
-
-export default ToggleSwitch;

@@ -1,4 +1,4 @@
-const ResponsiveImage = () => (
+export const ResponsiveImage = () => (
   <div className="relative">
     <div className="overflow-hidden">
       <img
@@ -9,5 +9,3 @@ const ResponsiveImage = () => (
     </div>
   </div>
 );
-
-export default ResponsiveImage;

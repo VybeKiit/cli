@@ -1,10 +1,10 @@
 import { useModal } from '@/hooks/useModal';
 import { Modal } from '@/components/tailadmin-ui/modal';
-import Button from '@/components/tailadmin-ui/button/Button';
-import Input from '@/components/form/input/InputField';
-import Label from '@/components/form/Label';
+import { Button } from '@/components/tailadmin-ui/button/Button';
+import { Input } from '@/components/form/input/InputField';
+import { Label } from '@/components/form/Label';
 
-const UserInfoCard = () => {
+export const UserInfoCard = () => {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     closeModal();
@@ -162,5 +162,3 @@ const UserInfoCard = () => {
     </div>
   );
 };
-
-export default UserInfoCard;

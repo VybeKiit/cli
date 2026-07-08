@@ -11,7 +11,7 @@ interface TextareaProps {
   hint?: string; // Hint text to display
 }
 
-const TextArea: React.FC<TextareaProps> = ({
+export const TextArea: React.FC<TextareaProps> = ({
   placeholder = 'Enter your message', // Default placeholder
   rows = 3, // Default number of rows
   value = '', // Default value
@@ -62,5 +62,3 @@ const TextArea: React.FC<TextareaProps> = ({
     </div>
   );
 };
-
-export default TextArea;

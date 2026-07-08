@@ -1,7 +1,7 @@
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
 
-const LineChartOne = () => {
+export const LineChartOne = () => {
   const options: ApexOptions = {
     legend: {
       show: false, // Hide legend
@@ -118,5 +118,3 @@ const LineChartOne = () => {
     </div>
   );
 };
-
-export default LineChartOne;

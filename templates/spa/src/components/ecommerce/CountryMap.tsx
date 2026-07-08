@@ -7,7 +7,7 @@ interface CountryMapProps {
   mapColor?: string;
 }
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+export const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
   return (
     <VectorMap
       map={worldMill}
@@ -90,5 +90,3 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
     />
   );
 };
-
-export default CountryMap;

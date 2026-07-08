@@ -1,8 +1,8 @@
-import ComponentCard from '@/components/common/ComponentCard';
-import FileInput from '@/components/form/input/FileInput';
-import Label from '@/components/form/Label';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { FileInput } from '@/components/form/input/FileInput';
+import { Label } from '@/components/form/Label';
 
-const FileInputExample = () => {
+export const FileInputExample = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -19,5 +19,3 @@ const FileInputExample = () => {
     </ComponentCard>
   );
 };
-
-export default FileInputExample;

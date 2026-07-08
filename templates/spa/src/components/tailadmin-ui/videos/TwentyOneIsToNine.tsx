@@ -1,4 +1,4 @@
-const TwentyOneIsToNine = () => (
+export const TwentyOneIsToNine = () => (
   <div className="aspect-21/9 overflow-hidden rounded-lg">
     <iframe
       src="https://www.youtube.com/embed/dQw4w9WgXcQ"
@@ -10,5 +10,3 @@ const TwentyOneIsToNine = () => (
     />
   </div>
 );
-
-export default TwentyOneIsToNine;

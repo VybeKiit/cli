@@ -1,10 +1,10 @@
-import ComponentCard from '@/components/common/ComponentCard';
-import Label from '@/components/form/Label';
-import Input from '@/components/form/input/InputField';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Label } from '@/components/form/Label';
+import { Input } from '@/components/form/input/InputField';
 import { EnvelopeIcon } from '@/icons';
-import PhoneInput from '@/components/form/group-input/PhoneInput';
+import { PhoneInput } from '@/components/form/group-input/PhoneInput';
 
-const InputGroup = () => {
+export const InputGroup = () => {
   const countries = [
     { code: 'US', label: '+1' },
     { code: 'GB', label: '+44' },
@@ -48,5 +48,3 @@ const InputGroup = () => {
     </ComponentCard>
   );
 };
-
-export default InputGroup;

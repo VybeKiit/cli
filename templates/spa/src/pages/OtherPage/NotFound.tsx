@@ -1,8 +1,8 @@
-import GridShape from '@/components/common/GridShape';
+import { GridShape } from '@/components/common/GridShape';
 import { Link } from '@tanstack/react-router';
-import PageMeta from '@/components/common/PageMeta';
+import { PageMeta } from '@/components/common/PageMeta';
 
-const NotFound = () => {
+export const NotFound = () => {
   return (
     <>
       <PageMeta
@@ -38,5 +38,3 @@ const NotFound = () => {
     </>
   );
 };
-
-export default NotFound;

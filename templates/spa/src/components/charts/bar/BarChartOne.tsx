@@ -1,7 +1,7 @@
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
 
-const BarChartOne = () => {
+export const BarChartOne = () => {
   const options: ApexOptions = {
     colors: ['#465fff'],
     chart: {
@@ -95,5 +95,3 @@ const BarChartOne = () => {
     </div>
   );
 };
-
-export default BarChartOne;

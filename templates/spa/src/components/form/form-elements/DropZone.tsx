@@ -1,8 +1,8 @@
-import ComponentCard from '@/components/common/ComponentCard';
+import { ComponentCard } from '@/components/common/ComponentCard';
 import { useDropzone } from 'react-dropzone';
 // import Dropzone from "react-dropzone";
 
-const DropzoneComponent: React.FC = () => {
+export const DropzoneComponent: React.FC = () => {
   const onDrop = (acceptedFiles: File[]) => {
     void acceptedFiles;
   };
@@ -69,5 +69,3 @@ const DropzoneComponent: React.FC = () => {
     </ComponentCard>
   );
 };
-
-export default DropzoneComponent;

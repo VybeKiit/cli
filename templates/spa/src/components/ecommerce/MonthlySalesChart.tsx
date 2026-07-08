@@ -5,7 +5,7 @@ import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
 import { MoreDotIcon } from '@/icons';
 import { useState } from 'react';
 
-const MonthlySalesChart = () => {
+export const MonthlySalesChart = () => {
   const options: ApexOptions = {
     colors: ['#465fff'],
     chart: {
@@ -133,5 +133,3 @@ const MonthlySalesChart = () => {
     </div>
   );
 };
-
-export default MonthlySalesChart;

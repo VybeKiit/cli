@@ -18,7 +18,7 @@ interface InputProps {
   hint?: string;
 }
 
-const Input: FC<InputProps> = ({
+export const Input: FC<InputProps> = ({
   type = 'text',
   id,
   name,
@@ -78,5 +78,3 @@ const Input: FC<InputProps> = ({
     </div>
   );
 };
-
-export default Input;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import ComponentCard from '@/components/common/ComponentCard';
-import Checkbox from '@/components/form/input/Checkbox';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { Checkbox } from '@/components/form/input/Checkbox';
 
-const CheckboxComponents = () => {
+export const CheckboxComponents = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedTwo, setIsCheckedTwo] = useState(true);
   const [isCheckedDisabled, setIsCheckedDisabled] = useState(false);
@@ -30,5 +30,3 @@ const CheckboxComponents = () => {
     </ComponentCard>
   );
 };
-
-export default CheckboxComponents;

@@ -5,7 +5,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 /** Practice checkout — simulates a hosted payment page when no provider keys are set. */
-const PracticeCheckout = () => {
+export const PracticeCheckout = () => {
   const navigate = useNavigate();
   const [productId, setProductId] = useState('');
   const [pending, setPending] = useState(false);
@@ -54,5 +54,3 @@ const PracticeCheckout = () => {
     </div>
   );
 };
-
-export default PracticeCheckout;

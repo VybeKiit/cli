@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/tailadmin-ui/table';
-import Badge from '@/components/tailadmin-ui/badge/Badge';
+import { Badge } from '@/components/tailadmin-ui/badge/Badge';
 
 // Define the TypeScript interface for the table rows
 interface Product {
@@ -62,7 +62,7 @@ const tableData: Product[] = [
   },
 ];
 
-const RecentOrders = () => {
+export const RecentOrders = () => {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -194,5 +194,3 @@ const RecentOrders = () => {
     </div>
   );
 };
-
-export default RecentOrders;

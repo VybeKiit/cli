@@ -12,7 +12,7 @@ interface PhoneInputProps {
   selectPosition?: 'start' | 'end'; // New prop for dropdown position
 }
 
-const PhoneInput: React.FC<PhoneInputProps> = ({
+export const PhoneInput: React.FC<PhoneInputProps> = ({
   countries,
   placeholder = '+1 (555) 000-0000',
   onChange,
@@ -136,5 +136,3 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
     </div>
   );
 };
-
-export default PhoneInput;

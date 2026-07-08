@@ -8,7 +8,7 @@ interface RadioProps {
   className?: string; // Optional custom classes for styling
 }
 
-const RadioSm: React.FC<RadioProps> = ({
+export const RadioSm: React.FC<RadioProps> = ({
   id,
   name,
   value,
@@ -53,5 +53,3 @@ const RadioSm: React.FC<RadioProps> = ({
     </label>
   );
 };
-
-export default RadioSm;

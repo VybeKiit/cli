@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
-import Label from '@/components/form/Label';
-import Input from '@/components/form/input/InputField';
-import Checkbox from '@/components/form/input/Checkbox';
+import { Label } from '@/components/form/Label';
+import { Input } from '@/components/form/input/InputField';
+import { Checkbox } from '@/components/form/input/Checkbox';
 
-const SignUpForm = () => {
+export const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   return (
@@ -169,5 +169,3 @@ const SignUpForm = () => {
     </div>
   );
 };
-
-export default SignUpForm;

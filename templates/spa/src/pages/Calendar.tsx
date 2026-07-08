@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import type { EventInput, DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import { Modal } from '@/components/tailadmin-ui/modal';
 import { useModal } from '@/hooks/useModal';
-import PageMeta from '@/components/common/PageMeta';
+import { PageMeta } from '@/components/common/PageMeta';
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
@@ -14,7 +14,7 @@ interface CalendarEvent extends EventInput {
   };
 }
 
-const Calendar: React.FC = () => {
+export const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventTitle, setEventTitle] = useState('');
   const [eventStartDate, setEventStartDate] = useState('');
@@ -269,5 +269,3 @@ const renderEventContent = (eventInfo: any) => {
     </div>
   );
 };
-
-export default Calendar;

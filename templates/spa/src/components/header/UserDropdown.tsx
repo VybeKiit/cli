@@ -3,7 +3,7 @@ import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
 import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
 import { Link } from '@tanstack/react-router';
 
-const UserDropdown = () => {
+export const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -160,5 +160,3 @@ const UserDropdown = () => {
     </div>
   );
 };
-
-export default UserDropdown;

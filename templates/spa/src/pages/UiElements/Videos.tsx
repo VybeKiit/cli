@@ -1,12 +1,12 @@
-import ComponentCard from '@/components/common/ComponentCard';
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import PageMeta from '@/components/common/PageMeta';
-import FourIsToThree from '@/components/tailadmin-ui/videos/FourIsToThree';
-import OneIsToOne from '@/components/tailadmin-ui/videos/OneIsToOne';
-import SixteenIsToNine from '@/components/tailadmin-ui/videos/SixteenIsToNine';
-import TwentyOneIsToNine from '@/components/tailadmin-ui/videos/TwentyOneIsToNine';
+import { ComponentCard } from '@/components/common/ComponentCard';
+import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import { PageMeta } from '@/components/common/PageMeta';
+import { FourIsToThree } from '@/components/tailadmin-ui/videos/FourIsToThree';
+import { OneIsToOne } from '@/components/tailadmin-ui/videos/OneIsToOne';
+import { SixteenIsToNine } from '@/components/tailadmin-ui/videos/SixteenIsToNine';
+import { TwentyOneIsToNine } from '@/components/tailadmin-ui/videos/TwentyOneIsToNine';
 
-const Videos = () => (
+export const Videos = () => (
   <>
     <PageMeta
       title="React.js Videos Tabs | TailAdmin - React.js Admin Dashboard Template"
@@ -33,5 +33,3 @@ const Videos = () => (
     </div>
   </>
 );
-
-export default Videos;

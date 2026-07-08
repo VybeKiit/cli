@@ -1,10 +1,10 @@
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import Badge from '@/components/tailadmin-ui/badge/Badge';
+import { PageBreadcrumb } from '@/components/common/PageBreadCrumb';
+import { Badge } from '@/components/tailadmin-ui/badge/Badge';
 import { PlusIcon } from '@/icons';
-import PageMeta from '@/components/common/PageMeta';
-import ComponentCard from '@/components/common/ComponentCard';
+import { PageMeta } from '@/components/common/PageMeta';
+import { ComponentCard } from '@/components/common/ComponentCard';
 
-const Badges = () => {
+export const Badges = () => {
   return (
     <div>
       <PageMeta
@@ -169,5 +169,3 @@ const Badges = () => {
     </div>
   );
 };
-
-export default Badges;

@@ -5,7 +5,7 @@ import { Dropdown } from '@/components/tailadmin-ui/dropdown/Dropdown';
 import { DropdownItem } from '@/components/tailadmin-ui/dropdown/DropdownItem';
 import { MoreDotIcon } from '@/icons';
 
-const MonthlyTarget = () => {
+export const MonthlyTarget = () => {
   const series = [75.55];
   const options: ApexOptions = {
     colors: ['#465FFF'],
@@ -184,5 +184,3 @@ const MonthlyTarget = () => {
     </div>
   );
 };
-
-export default MonthlyTarget;

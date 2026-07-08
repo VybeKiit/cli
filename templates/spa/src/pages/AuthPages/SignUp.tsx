@@ -1,8 +1,8 @@
-import PageMeta from '@/components/common/PageMeta';
-import AuthLayout from './AuthPageLayout';
-import SignUpForm from '@/components/auth/SignUpForm';
+import { PageMeta } from '@/components/common/PageMeta';
+import { AuthLayout } from './AuthPageLayout';
+import { SignUpForm } from '@/components/auth/SignUpForm';
 
-const SignUp = () => (
+export const SignUp = () => (
   <>
     <PageMeta
       title="React.js SignUp Dashboard | TailAdmin - Next.js Admin Dashboard Template"
@@ -13,5 +13,3 @@ const SignUp = () => (
     </AuthLayout>
   </>
 );
-
-export default SignUp;

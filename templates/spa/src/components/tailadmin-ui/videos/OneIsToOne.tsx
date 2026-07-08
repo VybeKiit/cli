@@ -1,4 +1,4 @@
-const OneIsToOne = () => (
+export const OneIsToOne = () => (
   <div className="overflow-hidden rounded-lg aspect-square">
     <iframe
       src="https://www.youtube.com/embed/dQw4w9WgXcQ"
@@ -10,5 +10,3 @@ const OneIsToOne = () => (
     />
   </div>
 );
-
-export default OneIsToOne;

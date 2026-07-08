@@ -6,7 +6,7 @@ interface FormProps {
   className?: string;
 }
 
-const Form: FC<FormProps> = ({ onSubmit, children, className }) => {
+export const Form: FC<FormProps> = ({ onSubmit, children, className }) => {
   return (
     <form
       onSubmit={(event) => {
@@ -19,5 +19,3 @@ const Form: FC<FormProps> = ({ onSubmit, children, className }) => {
     </form>
   );
 };
-
-export default Form;

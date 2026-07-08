@@ -10,7 +10,7 @@ interface CheckboxProps {
   readonly disabled?: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({
+export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   checked,
   id,
@@ -76,5 +76,3 @@ const Checkbox: React.FC<CheckboxProps> = ({
     {label && <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</span>}
   </label>
 );
-
-export default Checkbox;

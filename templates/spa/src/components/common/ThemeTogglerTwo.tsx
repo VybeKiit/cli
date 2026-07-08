@@ -1,6 +1,6 @@
 import { useTheme } from '@/context/ThemeContext';
 
-const ThemeTogglerTwo = () => {
+export const ThemeTogglerTwo = () => {
   const { toggleTheme } = useTheme();
   return (
     <button
@@ -38,5 +38,3 @@ const ThemeTogglerTwo = () => {
     </button>
   );
 };
-
-export default ThemeTogglerTwo;
