@@ -172,7 +172,7 @@
           "id": "auth",
           "slug": "auth",
           "title": "Auth page",
-          "summary": "A full account access page covering password, OTP, phone, and social entry.",
+          "summary": "A production account-access page: sign-in, sign-up, and password reset with password, magic-link, and Google/GitHub social entry.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/AuthPage.tsx",
           "exportName": "AuthPage",
           "targetRoute": "/login",
@@ -180,20 +180,33 @@
           "installNotes": [
             {
               "kind": "service",
-              "label": "Connect auth",
-              "note": "Connect the form to the active Supabase auth provider.",
-              "todo": "Connect this form to the active Supabase auth provider.",
+              "label": "Provision Supabase",
+              "note": "Run the onboarding skill to set SUPABASE_URL and SUPABASE_ANON_KEY, then create the @vybekiit/auth client.",
+              "todo": "Provision Supabase (SUPABASE_URL, SUPABASE_ANON_KEY) via the onboarding skill.",
               "owner": "auth"
             },
             {
               "kind": "service",
-              "label": "Enable code methods",
-              "note": "Connect phone and email-code buttons to the configured auth methods.",
-              "todo": "Connect phone and email-code buttons to the configured auth methods.",
+              "label": "Wire submit",
+              "note": "Route handleSubmit to @vybekiit/auth: signIn({ email, password }), signUp({ name, email, password }), sendMagicLink(email), or resetPassword(email) based on the mode and method.",
+              "todo": "Wire handleSubmit to the @vybekiit/auth signIn / signUp / sendMagicLink / resetPassword calls.",
+              "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Wire OAuth",
+              "note": "Point the Google and GitHub buttons at signInWithOAuth('google' | 'github'), which redirects to the provider and back.",
+              "todo": "Wire the Google and GitHub buttons to signInWithOAuth(provider).",
               "owner": "auth"
             }
           ],
-          "acceptanceChecks": ["The page renders account access choices before auth is configured."]
+          "acceptanceChecks": [
+            "The Sign in / Sign up toggle switches the form fields, and Forgot password? opens the reset mode.",
+            "Invalid email, a sign-up password under 8 characters, or a mismatched confirmation shows inline field errors and blocks submit.",
+            "On sign-in the demo password 'wrongpass' returns an inline error; any other password shows a signed-in screen.",
+            "Sign-up, reset, and magic-link submits show a loading state then a 'check your inbox' screen with focus moved to the heading.",
+            "The magic-link / password toggle and the Google and GitHub buttons switch method and show a redirecting state."
+          ]
         }
       ]
     },
