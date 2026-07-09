@@ -12,12 +12,18 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "APP_URL": "https://vybekiit.com",
+    "PAYMENTS_PROVIDER": "lemon-squeezy",
+    "LEMONSQUEEZY_STORE_ID": "270009",
+    "LEMONSQUEEZY_TEST_MODE": "true"
+  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "vybekiit",
-      "database_id": "40ddaa57-58e5-4f25-9c1a-86fb6efcb3d4"
+      "database_id": "40ddaa57-58e5-4f25-9c1a-86fb6efcb3d4",
+      "migrations_dir": "migrations"
     }
-  ],
-  "migrations_dir": "migrations"
+  ]
 }

@@ -38,6 +38,9 @@ const gateHeaders = (config: GithubGateConfig): HeadersInit => ({
   Accept: 'application/vnd.github+json',
   Authorization: `Bearer ${config.GITHUB_GATE_TOKEN}`,
   'X-GitHub-Api-Version': '2022-11-28',
+  // GitHub rejects API requests with no User-Agent (403). The Cloudflare Workers `fetch`
+  // does not set one, so the gate must send it explicitly or every invite fails in prod.
+  'User-Agent': 'vybekiit-gate',
 });
 
 /**
@@ -194,7 +197,9 @@ const runForEachMirror = (
   Effect.flatMap(
     Effect.all(
       config.GITHUB_GATE_REPOS.map((repo) => Effect.either(action(config, repo, username))),
-      { concurrency: 'unbounded' },
+      // Invite the mirror repos serially: GitHub's secondary rate limit rejects *concurrent*
+      // write requests for one token (403), which would leave a paid buyer un-invited.
+      { concurrency: 1 },
     ),
     (results) => {
       const failures = results.filter(Either.isLeft).map((result) => result.left.message);
