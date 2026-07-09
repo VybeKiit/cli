@@ -514,21 +514,24 @@
           "installNotes": [
             {
               "kind": "provider",
-              "label": "Checkout session",
-              "note": "Load checkout session and order summary from the configured commerce provider.",
-              "todo": "Load checkout session and order summary from the configured commerce provider.",
+              "label": "Catalog",
+              "note": "Replace INITIAL_ITEMS with your catalog — each item needs its Lemon Squeezy variantId from @vybekiit/payments.",
+              "todo": "Replace INITIAL_ITEMS with real catalog items (Lemon Squeezy variant ids).",
               "owner": "commerce"
             },
             {
               "kind": "provider",
-              "label": "Payment submit",
-              "note": "Submit checkout through the configured payment provider.",
-              "todo": "Submit checkout through the configured payment provider.",
+              "label": "Checkout handoff",
+              "note": "On Pay, POST /api/checkout with { items:[{ variantId, quantity }], email, couponCode } to get { url }, then redirect. The shipped webhook records the order in D1 and invites the buyer via the gate.",
+              "todo": "Wire Pay to POST /api/checkout and redirect to the returned hosted-checkout url.",
               "owner": "payments"
             }
           ],
           "acceptanceChecks": [
-            "The page shows contact, shipping, payment, summary, and submit-loading states."
+            "Quantity +/- and remove recompute the subtotal, tax, and total live.",
+            "VYBE20 applies a 20% discount; an unknown code shows an inline error.",
+            "Removing all items shows the empty state; Pay shows a processing state then an order-confirmed screen.",
+            "Email is required and validated before Pay proceeds; total changes are announced via aria-live."
           ]
         },
         {
