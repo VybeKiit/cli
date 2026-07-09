@@ -373,7 +373,7 @@
           "id": "pricing",
           "slug": "pricing",
           "title": "Pricing page",
-          "summary": "A pricing page that points live prices to the active payment provider.",
+          "summary": "A pricing page with a live billing-period toggle and seat count that recompute every tier's price, a per-plan checkout handoff, and a Contact-sales state past each tier's seat cap.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/PricingPage.tsx",
           "exportName": "PricingPage",
           "targetRoute": "/pricing",
@@ -381,21 +381,31 @@
           "installNotes": [
             {
               "kind": "provider",
-              "label": "Plan source",
-              "note": "Read plans from the active payment provider configuration.",
-              "todo": "Read plans from the active payment provider configuration.",
+              "label": "Plans + variants",
+              "note": "Replace PLANS with your tiers — each needs a monthly and an annual Lemon Squeezy variantId from @vybekiit/payments.",
+              "todo": "Replace PLANS with real tiers (monthly + annual Lemon Squeezy variant ids).",
               "owner": "payments"
             },
             {
               "kind": "provider",
-              "label": "Checkout route",
-              "note": "Send checkout clicks to the configured payments checkout route.",
-              "todo": "Send checkout clicks to the configured payments checkout route.",
+              "label": "Checkout handoff",
+              "note": "On Start checkout, POST /api/checkout with { variantId, quantity: seats } (pick the monthly or annual variant from the toggle) to get { url }, then redirect. The shipped webhook records the order in D1 and runs the gate.",
+              "todo": "Wire Start checkout to POST /api/checkout ({ variantId, quantity: seats }) and redirect to the returned url.",
+              "owner": "payments"
+            },
+            {
+              "kind": "provider",
+              "label": "Seat gating",
+              "note": "Gate seat-based access with the order quantity; a tier shows Contact sales once the seat count passes its maxSeats.",
+              "todo": "Enforce per-tier seat limits from the order quantity and wire the Contact sales CTA.",
               "owner": "payments"
             }
           ],
           "acceptanceChecks": [
-            "The page never claims UI card text is the source of truth for prices."
+            "Toggling Monthly / Annual recomputes every plan's per-seat and total price live, and Annual adds a 'billed …/yr' line.",
+            "The seat stepper changes each plan's total, and the change is announced via an aria-live summary.",
+            "Raising seats past a tier's limit switches that tier's CTA to a disabled Contact sales with an 'Up to N seats' note.",
+            "Start checkout shows a per-plan redirecting state; the real app POSTs /api/checkout and redirects."
           ]
         }
       ]
