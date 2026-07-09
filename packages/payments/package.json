@@ -81,7 +81,8 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "ls:webhooks": "tsx src/admin/cli.ts"
   },
   "dependencies": {
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
@@ -102,6 +103,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "catalog:",
     "express": "^4.21.2",
+    "fresh-squeezy": "^0.1.14",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
