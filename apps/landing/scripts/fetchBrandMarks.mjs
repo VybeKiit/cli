@@ -30,6 +30,31 @@ const SHADCN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256
 /** Sonner toast mark — matches the library's toast silhouette. */
 const SONNER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="5" fill="#171717"/><rect x="7" y="11" width="7" height="1.5" rx=".75" fill="#fff" opacity=".85"/></svg>`;
 
+/**
+ * Official Kiro mascot from kiro.dev nav (white body + black eyes).
+ * Prefer this over kiro.dev/icon.svg (purple app tile) — geometry matches the site wordmark-adjacent mark.
+ */
+const KIRO_MASCOT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" fill="none">
+  <g transform="matrix(1.45761 0 0 1.45761 265.367 317.039)">
+    <g transform="scale(-1 1)">
+      <path fill="#FFFFFF" d="M124.872 -2.098C121.933 -31.071 121.463 -58.981 113.863 -83.37C81.313 -222.739 -107.797 -222.6 -145.633 -84.076C-201.448 150.349 133.689 84.831 124.872 -2.098Z"/>
+      <path fill="#FFFFFF" d="M-9.994 160.678C7.798 54.302 -74.528 -129.561 -145.633 -84.076C-151.149 -63.764 -172.644 34.713 -119.418 131.246C-95.27 175.043 -27.933 217.214 -9.994 160.678Z"/>
+      <path fill="#FFFFFF" d="M-9.994 160.677C51.057 211.092 133.831 189.493 94.958 103.345C94.958 103.345 29.176 -50.213 -20.944 -22.834C-74.722 6.544 -64.237 96.151 -9.994 160.677Z"/>
+      <path fill="#FFFFFF" d="M100.242 105.752C100.242 105.757 100.242 105.736 100.242 105.736C156.154 126.169 161.723 86.208 149.883 66.353C112.421 3.534 128.201 -32.828 113.863 -83.37C81.313 -222.739 -15.528 40.717 100.242 105.752Z"/>
+    </g>
+  </g>
+  <g transform="matrix(1.45761 0 0 1.45761 263.3 317.039)">
+    <g transform="translate(17.992 -53.739)">
+      <path fill="#000000" d="M-18.456 -0.001C-18.456 11.057 -16.138 29.607 -0.615 29.607C-0.615 29.607 -0.612 29.607 -0.612 29.607C11.327 29.607 18.456 18.54 18.456 -0.001C18.456 -9.814 16.48 -17.707 12.741 -22.831C9.459 -27.328 4.807 -29.607 -0.615 -29.607C-6.037 -29.607 -10.3 -27.363 -13.28 -22.94C-16.667 -17.913 -18.456 -9.981 -18.456 -0.001Z"/>
+    </g>
+  </g>
+  <g transform="matrix(1.45761 0 0 1.45761 265.367 317.039)">
+    <g transform="translate(81.822 -53.739)">
+      <path fill="#000000" d="M-18.456 -0.001C-18.456 11.057 -16.138 29.607 -0.615 29.607C-0.615 29.607 -0.612 29.607 -0.612 29.607C11.327 29.607 18.456 18.54 18.456 -0.001C18.456 -9.814 16.48 -17.707 12.741 -22.831C9.459 -27.328 4.807 -29.607 -0.615 -29.607C-6.037 -29.607 -10.3 -27.363 -13.28 -22.94C-16.667 -17.913 -18.456 -9.981 -18.456 -0.001Z"/>
+    </g>
+  </g>
+</svg>`;
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const simpleIconSvg = (icon, hex = icon.hex) =>
@@ -37,8 +62,10 @@ const simpleIconSvg = (icon, hex = icon.hex) =>
 
 /** slug → official source URL(s), tried in order */
 const SOURCES = {
+  // Official AWS smile wordmark (not the architecture cube icon from vectorlogo-zone).
+  // simple-icons dropped amazonaws from the package; pin the historical icon SVG.
   aws: [
-    'https://www.vectorlogo.zone/logos/amazon_aws/amazon_aws-icon.svg',
+    'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/amazonaws.svg',
     'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
   ],
   paypal: [
@@ -110,6 +137,9 @@ const SOURCES = {
   ],
   vercel: ['https://www.vectorlogo.zone/logos/vercel/vercel-icon.svg'],
   playwright: ['https://playwright.dev/img/playwright-logo.svg'],
+  // Official agent marks (app.devin.ai / devin.ai). Kiro is written inline (nav mascot).
+  devin: ['https://devin.ai/favicon.svg', 'https://devin.ai/icon.png'],
+  kiro: [],
 };
 
 /** Inline simple-icons fallbacks when every URL fails. */
@@ -133,12 +163,38 @@ const fetchBuffer = async (url) => {
   return Buffer.from(await response.arrayBuffer());
 };
 
+/**
+ * simple-icons SVGs are mono (currentColor). Paint brand orange for AWS smile mark.
+ * @param {string} slug
+ * @param {Buffer} input
+ * @returns {Buffer}
+ */
+const prepareRasterInput = (slug, input) => {
+  if (slug !== 'aws') {
+    return input;
+  }
+  const text = input.toString('utf8');
+  if (!text.includes('<svg')) {
+    return input;
+  }
+  // AWS smile wordmark in brand orange on transparent (not architecture cubes).
+  const colored = text
+    .replace(/fill="currentColor"/gi, 'fill="#FF9900"')
+    .replace(/<path(?![^>]*\bfill=)/, '<path fill="#FF9900"');
+  return Buffer.from(colored);
+};
+
 const writeWebp = async (slug, input) => {
-  const webp = await sharp(input, { density: 300 })
+  const prepared = prepareRasterInput(slug, input);
+  const webp = await sharp(prepared, { density: 300 })
     .resize(SIZE, SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .webp({ quality: 92, effort: 6, alphaQuality: 100 })
     .toBuffer();
   await writeFile(path.join(outDir, `${slug}.webp`), webp);
+  // Marquee / 3d catalog use `amazonaws.webp`; LogoMarkIcon maps amazonaws → aws.webp.
+  if (slug === 'aws') {
+    await writeFile(path.join(outDir, 'amazonaws.webp'), webp);
+  }
 };
 
 const logInfo = (message) => {
@@ -197,6 +253,12 @@ const writeSonnerMark = async () => {
   await writeInlineSvg('sonner', SONNER_SVG, 'sonner toast mark');
 };
 
+const writeKiroMark = async () => {
+  const svgPath = path.join(outDir, 'kiro.svg');
+  await writeFile(svgPath, `${KIRO_MASCOT_SVG}\n`);
+  await writeInlineSvg('kiro', KIRO_MASCOT_SVG, 'official Kiro mascot (kiro.dev nav)');
+};
+
 const verifyTransparency = async (slug) => {
   const file = path.join(outDir, `${slug}.webp`);
   const { data, info } = await sharp(file)
@@ -222,6 +284,7 @@ await mkdir(outDir, { recursive: true });
 await writeOpenAiKnot();
 await writeShadcnMark();
 await writeSonnerMark();
+await writeKiroMark();
 
 const failures = [];
 for (const [slug, urls] of Object.entries(SOURCES)) {

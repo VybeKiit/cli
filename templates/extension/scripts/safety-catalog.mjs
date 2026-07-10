@@ -214,21 +214,15 @@ export const SECRET_FAMILIES = [
     // Covers Supabase service-role, Cloudflare tokens, Lemon Squeezy keys, and anything new.
     id: 'named-secret',
     name: L('secret value', 'ערך סודי'),
-    re: /\b[A-Z0-9_]*(?:SECRET|TOKEN|API_?KEY|PASSWORD|PRIVATE_KEY|ACCESS_KEY|SERVICE_ROLE)[A-Z0-9_]*\s*[:=]\s*['"][^'"\s]{12,}['"]/i,
+    // ENV-style names only (UPPER_SNAKE). Avoid camelCase i18n keys like forgotPassword.
+    // API_KEY_LIVE = "sk-...." → match; forgotPassword: "navigation.x" → no match
+    re: /\b[A-Z][A-Z0-9_]*(?:SECRET|TOKEN|API_?KEY|PASSWORD|PRIVATE_KEY|ACCESS_KEY|SERVICE_ROLE)[A-Z0-9_]*\s*[:=]\s*['"][^'"\s]{12,}['"]/,
   },
 ];
 
-/**
- * Build a finding title for one secret family and leak path.
- *
- * @param family - Secret family metadata from the catalog.
- * @param leakPathId - Leak path id detected by the scanner.
- * @returns Localized finding title.
- * @example
- * const title = titleFor(family, 'git');
- */
-const titleFor = (family, leakPathId) => {
-  const { name } = family;
+/** Titles and fixes read differently depending on how the key leaked. */
+function titleFor(family, leakPathId) {
+  const name = family.name;
   if (leakPathId === 'public' || leakPathId === 'clientBundle') {
     return L(`Your ${name.en} is visible to visitors`, `${name.he} שלך גלוי למבקרים`);
   }
@@ -239,18 +233,9 @@ const titleFor = (family, leakPathId) => {
     );
   }
   return L(`Your ${name.en} is exposed`, `${name.he} שלך חשוף`);
-};
+}
 
-/**
- * Build the plain-language fix for one secret family and leak path.
- *
- * @param family - Secret family metadata from the catalog.
- * @param leakPathId - Leak path id detected by the scanner.
- * @returns Localized remediation copy.
- * @example
- * const fix = fixFor(family, 'public');
- */
-const fixFor = (_family, leakPathId) => {
+function fixFor(family, leakPathId) {
   if (leakPathId === 'git') {
     return L(
       'I will replace this key with a fresh one and clear the old one from your history, so the leaked one stops working. Your features keep running the same.',
@@ -261,38 +246,14 @@ const fixFor = (_family, leakPathId) => {
     'I will move your key to a private spot only your app can read, so visitors never see it. Your features keep working exactly the same. Takes about 30 seconds.',
     'אעביר את המפתח למקום פרטי שרק האפליקציה שלך יכולה לקרוא, כך שהמבקרים לעולם לא יראו אותו. התכונות שלך ימשיכו לעבוד בדיוק אותו דבר. לוקח בערך 30 שניות.',
   );
-};
-
-/**
- * Return a localized value or the provided default.
- *
- * @param value - Optional localized value from the catalog entry.
- * @param fallback - Default localized value to use when missing.
- * @returns The configured value or fallback.
- * @example
- * const consequence = valueOrDefault(family.consequence, DEFAULT_CONSEQUENCE);
- */
-const valueOrDefault = (value, fallback) => {
-  if (value === undefined) {
-    return fallback;
-  }
-
-  return value;
-};
+}
 
 /**
  * Compose a full, buyer-facing finding for one secret on one leak path.
- *
- * @param family - Secret family metadata from the catalog.
- * @param leakPathId - Leak path id detected by the scanner.
- * @param proof - Proof object filled in by the scanner where it found the match.
- * @returns Full buyer-facing finding object for the safety report.
- * @example
- * const finding = secretFinding(family, 'code', proof);
+ * `proof` is `{ file, line, abs, snippet }` filled in by the scanner where it found the match.
  */
-export const secretFinding = (family, leakPathId, proof) => {
+export function secretFinding(family, leakPathId, proof) {
   const fix = fixFor(family, leakPathId);
-  const consequence = valueOrDefault(family.consequence, DEFAULT_CONSEQUENCE);
   return {
     id: `secret.${family.id}.${leakPathId}`,
     rung: 1,
@@ -304,13 +265,13 @@ export const secretFinding = (family, leakPathId, proof) => {
     tooltip: SECRET_TOOLTIP,
     plain: {
       title: titleFor(family, leakPathId),
-      what: consequence,
+      what: family.consequence ?? DEFAULT_CONSEQUENCE,
       fix,
     },
-    consequence,
-    remediation: { fix, defenseInDepth: valueOrDefault(family.defense, DEFAULT_DEFENSE) },
+    consequence: family.consequence ?? DEFAULT_CONSEQUENCE,
+    remediation: { fix, defenseInDepth: family.defense ?? DEFAULT_DEFENSE },
   };
-};
+}
 
 /**
  * Rungs 2 to 5 as data. The scan implements detection for the ones marked `detectable: true`
@@ -556,7 +517,6 @@ export const CASES = [
     severity: SEVERITY.medium,
     detectable: true,
     kitPreventable: false,
-    // biome-ignore lint/security/noSecrets: detector label for dangerous HTML, not a secret.
     detect: 'dangerouslySetInnerHTML / v-html used with non-constant input',
     leakPaths: [],
     tooltip: L(

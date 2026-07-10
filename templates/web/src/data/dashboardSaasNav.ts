@@ -7,6 +7,7 @@ const DASHBOARD_NAV_LINKS: readonly {
 }[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'activity' },
   { href: '/dashboard/settings', label: 'User settings', icon: 'settings' },
+  { href: '/dashboard/teams', label: 'Team', icon: 'users' },
   { href: '/dashboard/products', label: 'Products', icon: 'package' },
   { href: '/dashboard/orders', label: 'Orders', icon: 'cart' },
   { href: '/dashboard/integrations', label: 'Integrations', icon: 'plug' },

@@ -18,6 +18,14 @@ metadata:
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install / extend the auth page recipe first (catalog SSOT — Option C).**
+   Copy or extend `apps/componentLibrary/src/pageRecipes/AuthPage.tsx` export `AuthPage` at route `/login`
+   with phone + code UI. Recipe id: `auth`. Preset: auth-bridge.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('sign-in-with-phone')` / page-recipe-manifest.json.
+   **Verify:** `/login` shows practice phone sign-in UI before provider wiring.
+
 1. **Run `setup-sms` first** if Twilio secret settings are not filled in.
    **Verify:** `NOTIFICATIONS_PROVIDER=twilio` and Twilio keys in `.env`.
 

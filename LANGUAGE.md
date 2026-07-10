@@ -276,7 +276,11 @@ a stranger pays, gets invited, scaffolds a web app, wires payments, deploys live
 ## Data, providers & the wire
 
 **DB preset** — a composable SaaS table bundle (schema + indexes + RLS) for one kit feature — e.g.
-`orders`, `organizations`. Applied via `vybekiit apply-preset`; verified by doctor and goal skills.
+`orders`, `organizations`, plus commerce/CRM/content packs (`products`, `cart`,
+`coupons`, `customers`, `pipeline`, `support_tickets`, `tasks`, `blog_posts`,
+`calendar_events`). Applied via `vybekiit apply-preset` for Postgres
+(supabase/neon/railway) **and** NoSQL (`mongodb` / `firebase` / `aws` — dry-run
+offline; live apply uses the provider SDK). Verified by doctor and goal skills.
 Agent-only term; buyer hears "setting up your app's data for [feature]."
 _Avoid_: migration, DDL, or preset jargon in buyer speech.
 

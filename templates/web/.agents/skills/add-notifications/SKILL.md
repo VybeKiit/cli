@@ -20,6 +20,15 @@ from the app.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/NotificationsCenterPage.tsx` export `NotificationsCenterPage` into the buyer app at route `/dashboard/notifications`.
+   Recipe id: `notifications-center`. Presets: notifications_log.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-notifications')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Confirm email works first.** If `setup-email` is not done, run that skill first.
    **Verify:** a test email arrives.
 

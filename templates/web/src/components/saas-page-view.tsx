@@ -99,13 +99,14 @@ export const SaasPageView = ({ definition, surface = 'public' }: SaasPageViewPro
       </div>
       <Card className="overflow-hidden">
         <CardHeader>
-          <CardDescription>Setup progress</CardDescription>
-          <CardTitle className="text-2xl">Plug-and-play</CardTitle>
+          <CardDescription>Route map</CardDescription>
+          <CardTitle className="text-2xl">Starter layout</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Progress value={82} />
+          <Progress value={40} />
           <p className="text-muted-foreground text-sm">
-            Replace the demo data with your provider calls when your agent wires the feature.
+            Long-tail surface map. Ask the agent to install the matching page recipe, or open a
+            Tier-1 route (settings, teams, orders, integrations) for a full interactive UI.
           </p>
         </CardContent>
       </Card>

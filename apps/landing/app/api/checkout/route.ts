@@ -3,6 +3,8 @@ import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { Effect, Either, Schema } from 'effect';
 import { NextResponse } from 'next/server';
+import { AnalyticsEvent } from '@/lib/analyticsEvents';
+import { captureServerEvent } from '@/lib/analyticsServer';
 import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 
 const LandingCheckoutBodySchema = Schema.Struct({
@@ -40,6 +42,7 @@ const POST = async (request: Request): Promise<NextResponse> => {
     return NextResponse.json(parsed.response.body, { status: parsed.response.status });
   }
   const { githubUsername, email } = parsed.body;
+  const distinctId = email.trim().toLowerCase();
 
   if (!isValidGithubUsername(githubUsername)) {
     return NextResponse.json({ error: 'Enter a valid GitHub username.' }, { status: 400 });
@@ -54,6 +57,10 @@ const POST = async (request: Request): Promise<NextResponse> => {
     productId = parseEnv(storeConfigSchema).STORE_PRODUCT_ID;
     app = parseEnv(appConfigSchema);
   } catch {
+    await captureServerEvent(distinctId, AnalyticsEvent.checkoutSessionFailed, {
+      error: 'config_unavailable',
+      source: 'server',
+    });
     return NextResponse.json({ error: 'Checkout is not available right now.' }, { status: 500 });
   }
 
@@ -70,8 +77,20 @@ const POST = async (request: Request): Promise<NextResponse> => {
   );
 
   if (Either.isLeft(checkout)) {
+    await captureServerEvent(distinctId, AnalyticsEvent.checkoutSessionFailed, {
+      error: checkout.left.message,
+      source: 'server',
+      product_id: productId,
+    });
     return NextResponse.json({ error: checkout.left.message }, { status: 502 });
   }
+
+  await captureServerEvent(distinctId, AnalyticsEvent.checkoutSessionCreated, {
+    source: 'server',
+    product_id: productId,
+    github_username: githubUsername.trim(),
+  });
+
   return NextResponse.json({ url: checkout.right.url });
 };
 

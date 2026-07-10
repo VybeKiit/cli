@@ -20,6 +20,15 @@ metadata:
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/BlogPage.tsx` export `BlogPage` into the buyer app at route `/blog`.
+   Recipe id: `blog`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-blog')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. Explain: *"I'll add blog pages you can edit as simple files."*
 2. Add MDX pages under `content/` (title from `#` heading; optional description in front matter).
 3. Blog index at `/blog` lists pages via `getCms().listPages()`; each post at `/blog/[slug]`.

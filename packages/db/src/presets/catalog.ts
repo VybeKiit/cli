@@ -3,6 +3,13 @@ import aiConversations from '../../presets/ai_conversations/preset.manifest.json
 };
 import auditLog from '../../presets/audit_log/preset.manifest.json' with { type: 'json' };
 import authBridge from '../../presets/auth-bridge/preset.manifest.json' with { type: 'json' };
+import blogPosts from '../../presets/blog_posts/preset.manifest.json' with { type: 'json' };
+import calendarEvents from '../../presets/calendar_events/preset.manifest.json' with {
+  type: 'json',
+};
+import cart from '../../presets/cart/preset.manifest.json' with { type: 'json' };
+import coupons from '../../presets/coupons/preset.manifest.json' with { type: 'json' };
+import customers from '../../presets/customers/preset.manifest.json' with { type: 'json' };
 import embeddings from '../../presets/embeddings/preset.manifest.json' with { type: 'json' };
 import featureFlags from '../../presets/feature_flags/preset.manifest.json' with { type: 'json' };
 import fileMetadata from '../../presets/file_metadata/preset.manifest.json' with { type: 'json' };
@@ -12,12 +19,18 @@ import notificationsLog from '../../presets/notifications_log/preset.manifest.js
 };
 import orders from '../../presets/orders/preset.manifest.json' with { type: 'json' };
 import organizations from '../../presets/organizations/preset.manifest.json' with { type: 'json' };
+import pipeline from '../../presets/pipeline/preset.manifest.json' with { type: 'json' };
+import products from '../../presets/products/preset.manifest.json' with { type: 'json' };
 import realtimePublications from '../../presets/realtime_publications/preset.manifest.json' with {
   type: 'json',
 };
 import searchDocuments from '../../presets/search_documents/preset.manifest.json' with {
   type: 'json',
 };
+import supportTickets from '../../presets/support_tickets/preset.manifest.json' with {
+  type: 'json',
+};
+import tasks from '../../presets/tasks/preset.manifest.json' with { type: 'json' };
 import webhookEvents from '../../presets/webhook_events/preset.manifest.json' with { type: 'json' };
 import type { PresetManifest } from './types';
 
@@ -36,6 +49,15 @@ export const PRESET_CATALOG: Readonly<Record<string, PresetManifest>> = {
   feature_flags: featureFlags as PresetManifest,
   file_metadata: fileMetadata as PresetManifest,
   job_runs: jobRuns as PresetManifest,
+  products: products as PresetManifest,
+  cart: cart as PresetManifest,
+  coupons: coupons as PresetManifest,
+  customers: customers as PresetManifest,
+  pipeline: pipeline as PresetManifest,
+  support_tickets: supportTickets as PresetManifest,
+  tasks: tasks as PresetManifest,
+  blog_posts: blogPosts as PresetManifest,
+  calendar_events: calendarEvents as PresetManifest,
 };
 
 /** Ordered list of all preset manifests. */

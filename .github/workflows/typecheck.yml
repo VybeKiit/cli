@@ -26,4 +26,6 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm typecheck
+      - run: pnpm exec turbo run typecheck --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192

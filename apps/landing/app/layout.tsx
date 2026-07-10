@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import { JsonLd } from '@/components/JsonLd';
-import { ReportModeDevShell } from '@/components/report-mode/ReportModeShell';
-import { AssistantChatDevShell } from '@/components/tools/assistant-chat/AssistantChatShell';
+import { VisitorScripts } from '@/components/VisitorScripts';
 import { BRAND, SEO_KEYWORDS } from '@/data/site';
 import { organizationJsonLd, websiteJsonLd } from '@/data/structuredData';
+import { cdnAssetUrl } from '@/lib/cdnAssets';
 import { resolveDirection } from '@/lib/direction';
 import './globals.css';
+
+const brandLogoUrl = cdnAssetUrl('/vybekiit-logo.svg');
 
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.url),
@@ -36,9 +37,9 @@ export const metadata: Metadata = {
     description: BRAND.description,
   },
   icons: {
-    icon: '/vybekiit-logo.svg',
-    shortcut: '/vybekiit-logo.svg',
-    apple: '/vybekiit-logo.svg',
+    icon: brandLogoUrl,
+    shortcut: brandLogoUrl,
+    apple: brandLogoUrl,
   },
   robots: {
     index: true,
@@ -54,19 +55,28 @@ export const metadata: Metadata = {
 };
 
 /**
- * Root layout for the store. Detects the visitor's language from the request and
- * sets `<html dir>` so RTL locales (Hebrew/Arabic) mirror automatically — see
- * `src/lib/direction.ts`. Copy stays English; the structure is RTL-safe.
+ * Root layout for the store.
+ *
+ * Direction defaults to English/LTR so the marketing site can be statically
+ * generated (no per-request `headers()`). Copy is English; logical CSS keeps the
+ * structure RTL-safe when we localize later. Dev-only report/assistant shells are
+ * loaded only in development so production visitors never download that graph.
  */
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const { lang, dir } = resolveDirection((await headers()).get('accept-language'));
+  const { lang, dir } = resolveDirection(null);
+  const devShells =
+    process.env.NODE_ENV === 'development'
+      ? (await import('@/components/LandingDevShells')).LandingDevShells
+      : null;
+  const DevShells = devShells;
+
   return (
-    <html lang={lang} dir={dir}>
-      <body>
+    <html lang={lang} dir={dir} suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true}>
         <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
+        <VisitorScripts />
         {children}
-        <ReportModeDevShell />
-        <AssistantChatDevShell />
+        {DevShells ? <DevShells /> : null}
       </body>
     </html>
   );

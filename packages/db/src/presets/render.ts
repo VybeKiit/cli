@@ -1,13 +1,110 @@
 import { PRESET_HELPERS, REALTIME_TABLES, renderRealtimeGrants } from './helpers';
 import type {
+  NosqlProviderName,
   PostgresProviderName,
   PresetColumn,
   PresetColumnType,
   PresetEntity,
+  PresetIndex,
   PresetManifest,
   PresetRlsMode,
   RenderedPreset,
 } from './types';
+
+/** MongoDB index keys map field → sort direction. */
+export type MongoIndexKeys = Readonly<Record<string, 1 | -1>>;
+
+/** Executable MongoDB createIndex specification derived from a preset index. */
+export type MongoIndexSpec = {
+  readonly name: string;
+  readonly keys: MongoIndexKeys;
+  readonly unique?: boolean;
+  readonly partialFilterExpression?: Readonly<Record<string, unknown>>;
+  readonly reason: string;
+};
+
+/** Collection + indexes plan for MongoDB apply. */
+export type MongoCollectionPlan = {
+  readonly name: string;
+  readonly indexes: readonly MongoIndexSpec[];
+};
+
+/** Stable MongoDB apply plan (JSON-friendly). */
+export type MongoApplyPlan = {
+  readonly kind: 'stable apply plan';
+  readonly provider: 'mongodb';
+  readonly presetId: string;
+  readonly description: string;
+  readonly collections: readonly MongoCollectionPlan[];
+};
+
+/** Single field entry for a Firestore composite index. */
+export type FirebaseIndexField = {
+  readonly fieldPath: string;
+  readonly order: 'ASCENDING' | 'DESCENDING';
+};
+
+/** Firestore composite index definition for firebase.json / gcloud. */
+export type FirebaseCompositeIndex = {
+  readonly collectionGroup: string;
+  readonly queryScope: 'COLLECTION' | 'COLLECTION_GROUP';
+  readonly fields: readonly FirebaseIndexField[];
+  readonly reason: string;
+};
+
+/** Stable Firebase apply plan (JSON-friendly). */
+export type FirebaseApplyPlan = {
+  readonly kind: 'stable apply plan';
+  readonly provider: 'firebase';
+  readonly presetId: string;
+  readonly description: string;
+  readonly collections: readonly string[];
+  readonly compositeIndexes: readonly FirebaseCompositeIndex[];
+};
+
+/** DynamoDB attribute definition for CreateTable. */
+export type DynamoAttributeDefinition = {
+  readonly AttributeName: string;
+  readonly AttributeType: 'S' | 'N' | 'B';
+};
+
+/** DynamoDB key-schema element. */
+export type DynamoKeySchemaElement = {
+  readonly AttributeName: string;
+  readonly KeyType: 'HASH' | 'RANGE';
+};
+
+/** DynamoDB global secondary index for unique/lookup columns. */
+export type DynamoGlobalSecondaryIndex = {
+  readonly IndexName: string;
+  readonly KeySchema: readonly DynamoKeySchemaElement[];
+  readonly Projection: { readonly ProjectionType: 'ALL' };
+  readonly reason: string;
+};
+
+/** One DynamoDB table plan (id HASH + optional GSIs). */
+export type DynamoTablePlan = {
+  readonly tableName: string;
+  readonly keySchema: readonly DynamoKeySchemaElement[];
+  readonly attributeDefinitions: readonly DynamoAttributeDefinition[];
+  readonly billingMode: 'PAY_PER_REQUEST';
+  readonly globalSecondaryIndexes: readonly DynamoGlobalSecondaryIndex[];
+};
+
+/** Stable AWS DynamoDB apply plan (JSON-friendly). */
+export type AwsApplyPlan = {
+  readonly kind: 'stable apply plan';
+  readonly provider: 'aws';
+  readonly presetId: string;
+  readonly description: string;
+  readonly tables: readonly DynamoTablePlan[];
+};
+
+/** Union of executable NoSQL apply plans. */
+export type NosqlApplyPlan = MongoApplyPlan | FirebaseApplyPlan | AwsApplyPlan;
+
+// "license_key is not null" -> match, "status = 'active'" -> no match
+const SIMPLE_IS_NOT_NULL = /^([a-zA-Z_][a-zA-Z0-9_]*)\s+is\s+not\s+null$/i;
 
 const SQL_TYPE_BY_PRESET_TYPE = {
   text: 'text',
@@ -316,17 +413,295 @@ export const renderPostgresPreset = (
 };
 
 /**
+ * Build a stable index name from table + columns.
+ *
+ * @param index - Preset index definition.
+ * @returns Deterministic index name.
+ * @example
+ * const name = indexName({ table: 'orders', columns: ['order_id'], reason: 'lookup' });
+ */
+const indexName = (index: PresetIndex): string => `${index.table}_${index.columns.join('_')}_idx`;
+
+/**
+ * Map a simple SQL-style partial where clause to a Mongo partialFilterExpression.
+ *
+ * Only supports `column is not null`. Complex predicates are skipped.
+ *
+ * @param where - Optional SQL where fragment from the preset index.
+ * @returns Mongo partial filter, or undefined when not representable.
+ * @example
+ * const filter = mongoPartialFromWhere('license_key is not null');
+ */
+const mongoPartialFromWhere = (
+  where: string | undefined,
+): Readonly<Record<string, unknown>> | undefined => {
+  if (where === undefined || where.trim() === '') {
+    return;
+  }
+  const match = SIMPLE_IS_NOT_NULL.exec(where.trim());
+  if (match === null) {
+    return;
+  }
+  const column = match[1];
+  if (column === undefined) {
+    return;
+  }
+  return { [column]: { $exists: true, $ne: null } };
+};
+
+/**
+ * Map a preset index to a Mongo createIndex specification.
+ *
+ * @param index - Preset index definition.
+ * @returns Mongo index keys + options.
+ * @example
+ * const spec = toMongoIndexSpec(manifest.indexes[0]);
+ */
+const toMongoIndexSpec = (index: PresetIndex): MongoIndexSpec => {
+  const keys: Record<string, 1 | -1> = {};
+  for (const column of index.columns) {
+    keys[column] = 1;
+  }
+  const partialFilterExpression = mongoPartialFromWhere(index.where);
+  return {
+    name: indexName(index),
+    keys,
+    reason: index.reason,
+    ...(index.unique === true ? { unique: true } : {}),
+    ...(partialFilterExpression === undefined ? {} : { partialFilterExpression }),
+  };
+};
+
+/**
+ * Build a MongoDB apply plan from a preset manifest.
+ *
+ * @param manifest - Preset manifest to plan.
+ * @returns Collection names + createIndex specs.
+ * @example
+ * const plan = buildMongoApplyPlan(manifest);
+ */
+export const buildMongoApplyPlan = (manifest: PresetManifest): MongoApplyPlan => {
+  const description = manifest.description === undefined ? '' : manifest.description;
+  const collections = manifest.entities.map((entity) => ({
+    name: entity.name,
+    indexes: manifest.indexes.filter((index) => index.table === entity.name).map(toMongoIndexSpec),
+  }));
+  return {
+    kind: 'stable apply plan',
+    provider: 'mongodb',
+    presetId: manifest.id,
+    description,
+    collections,
+  };
+};
+
+/**
+ * Build a Firebase/Firestore apply plan from a preset manifest.
+ *
+ * Single-field equality indexes are automatic in Firestore; multi-field and
+ * explicit unique/lookup indexes are emitted as composite index entries.
+ *
+ * @param manifest - Preset manifest to plan.
+ * @returns Collection names + composite index fieldPaths.
+ * @example
+ * const plan = buildFirebaseApplyPlan(manifest);
+ */
+export const buildFirebaseApplyPlan = (manifest: PresetManifest): FirebaseApplyPlan => {
+  const description = manifest.description === undefined ? '' : manifest.description;
+  const collections = manifest.entities.map((entity) => entity.name);
+  const compositeIndexes: FirebaseCompositeIndex[] = [];
+
+  for (const index of manifest.indexes) {
+    // Single-field ASC is automatic; still emit when unique so apply notes stay complete.
+    const fields: FirebaseIndexField[] = index.columns.map((fieldPath) => ({
+      fieldPath,
+      order: 'ASCENDING',
+    }));
+    compositeIndexes.push({
+      collectionGroup: index.table,
+      queryScope: 'COLLECTION',
+      fields,
+      reason: index.reason,
+    });
+  }
+
+  return {
+    kind: 'stable apply plan',
+    provider: 'firebase',
+    presetId: manifest.id,
+    description,
+    collections,
+    compositeIndexes,
+  };
+};
+
+/**
+ * Map a preset column type to a DynamoDB scalar attribute type.
+ *
+ * @param columnType - Preset column type.
+ * @returns DynamoDB AttributeType.
+ * @example
+ * const attr = dynamoAttributeType('uuid');
+ */
+const dynamoAttributeType = (columnType: PresetColumnType): 'S' | 'N' | 'B' => {
+  if (columnType === 'numeric') {
+    return 'N';
+  }
+  return 'S';
+};
+
+/**
+ * Resolve the DynamoDB attribute type for a named column on an entity.
+ *
+ * @param entity - Entity that owns the column.
+ * @param columnName - Column / attribute name.
+ * @returns Attribute type (defaults to string).
+ * @example
+ * const type = attributeTypeForColumn(entity, 'order_id');
+ */
+const attributeTypeForColumn = (entity: PresetEntity, columnName: string): 'S' | 'N' | 'B' => {
+  const column = entity.columns.find((entry) => entry.name === columnName);
+  if (column === undefined) {
+    return 'S';
+  }
+  return dynamoAttributeType(column.type);
+};
+
+/**
+ * Build DynamoDB GSI definitions for unique/lookup indexes when columns allow.
+ *
+ * Uses the first index column as HASH and an optional second column as RANGE.
+ * Skips indexes whose only column is the table primary key.
+ *
+ * @param entity - Parent entity (for attribute types).
+ * @param indexes - Indexes targeting this entity's table.
+ * @returns GSI definitions + attribute names required beyond the primary key.
+ * @example
+ * const { gsis, extraAttributes } = buildDynamoGsis(entity, indexes);
+ */
+const buildDynamoGsis = (
+  entity: PresetEntity,
+  indexes: readonly PresetIndex[],
+): {
+  readonly gsis: readonly DynamoGlobalSecondaryIndex[];
+  readonly extraAttributes: readonly DynamoAttributeDefinition[];
+} => {
+  const pk = resolvePrimaryKey(entity);
+  const gsis: DynamoGlobalSecondaryIndex[] = [];
+  const attributeByName = new Map<string, DynamoAttributeDefinition>();
+
+  for (const index of indexes) {
+    const hashKey = index.columns[0];
+    if (hashKey === undefined) {
+      continue;
+    }
+    if (index.columns.length === 1 && hashKey === pk) {
+      continue;
+    }
+
+    const keySchema: DynamoKeySchemaElement[] = [{ AttributeName: hashKey, KeyType: 'HASH' }];
+    attributeByName.set(hashKey, {
+      AttributeName: hashKey,
+      AttributeType: attributeTypeForColumn(entity, hashKey),
+    });
+
+    const rangeKey = index.columns[1];
+    if (rangeKey !== undefined) {
+      keySchema.push({ AttributeName: rangeKey, KeyType: 'RANGE' });
+      attributeByName.set(rangeKey, {
+        AttributeName: rangeKey,
+        AttributeType: attributeTypeForColumn(entity, rangeKey),
+      });
+    }
+
+    gsis.push({
+      IndexName: `${index.table}_${index.columns.join('_')}_gsi`,
+      KeySchema: keySchema,
+      Projection: { ProjectionType: 'ALL' },
+      reason: index.reason,
+    });
+  }
+
+  return { gsis, extraAttributes: [...attributeByName.values()] };
+};
+
+/**
+ * Build an AWS DynamoDB apply plan from a preset manifest.
+ *
+ * @param manifest - Preset manifest to plan.
+ * @returns Tables with id HASH key + GSI definitions.
+ * @example
+ * const plan = buildAwsApplyPlan(manifest);
+ */
+export const buildAwsApplyPlan = (manifest: PresetManifest): AwsApplyPlan => {
+  const description = manifest.description === undefined ? '' : manifest.description;
+  const tables = manifest.entities.map((entity) => {
+    const pk = resolvePrimaryKey(entity);
+    const entityIndexes = manifest.indexes.filter((index) => index.table === entity.name);
+    const { gsis, extraAttributes } = buildDynamoGsis(entity, entityIndexes);
+    const pkAttribute: DynamoAttributeDefinition = {
+      AttributeName: pk,
+      AttributeType: attributeTypeForColumn(entity, pk),
+    };
+    const seen = new Set<string>([pk]);
+    const attributeDefinitions: DynamoAttributeDefinition[] = [pkAttribute];
+    for (const attr of extraAttributes) {
+      if (!seen.has(attr.AttributeName)) {
+        seen.add(attr.AttributeName);
+        attributeDefinitions.push(attr);
+      }
+    }
+    return {
+      tableName: entity.name,
+      keySchema: [{ AttributeName: pk, KeyType: 'HASH' as const }],
+      attributeDefinitions,
+      billingMode: 'PAY_PER_REQUEST' as const,
+      globalSecondaryIndexes: gsis,
+    };
+  });
+  return {
+    kind: 'stable apply plan',
+    provider: 'aws',
+    presetId: manifest.id,
+    description,
+    tables,
+  };
+};
+
+/**
+ * Build a structured executable NoSQL apply plan for a preset.
+ *
+ * @param manifest - Preset manifest to plan.
+ * @param provider - NoSQL provider target.
+ * @returns JSON-friendly apply plan.
+ * @example
+ * const plan = buildNosqlApplyPlan(manifest, 'mongodb');
+ */
+export const buildNosqlApplyPlan = (
+  manifest: PresetManifest,
+  provider: NosqlProviderName,
+): NosqlApplyPlan => {
+  if (provider === 'mongodb') {
+    return buildMongoApplyPlan(manifest);
+  }
+  if (provider === 'firebase') {
+    return buildFirebaseApplyPlan(manifest);
+  }
+  return buildAwsApplyPlan(manifest);
+};
+
+/**
  * Render a preset for the requested provider.
  *
  * @param manifest - Preset manifest to render.
  * @param provider - Target data provider.
- * @returns Rendered SQL for Postgres providers or notes for planned NoSQL providers.
+ * @returns Rendered SQL for Postgres providers or stable NoSQL apply notes.
  * @example
  * const rendered = renderPreset(manifest, 'supabase');
  */
 export const renderPreset = (
   manifest: PresetManifest,
-  provider: PostgresProviderName | 'mongodb' | 'firebase' | 'aws',
+  provider: PostgresProviderName | NosqlProviderName,
 ): RenderedPreset => {
   const status = manifest.providers === undefined ? undefined : manifest.providers[provider];
   if (provider === 'mongodb' || provider === 'firebase' || provider === 'aws') {
@@ -351,41 +726,13 @@ export const renderPreset = (
 };
 
 /**
- * Render NoSQL implementation notes for a preset.
+ * Render a stable NoSQL apply plan as a JSON string for CLI display and apply.
  *
  * @param manifest - Preset manifest to describe.
  * @param provider - NoSQL provider target.
- * @returns Markdown notes for the provider-specific implementation plan.
+ * @returns JSON string of the executable apply plan.
  * @example
  * const notes = renderNosqlPreset(manifest, 'mongodb');
  */
-const renderNosqlPreset = (
-  manifest: PresetManifest,
-  provider: 'mongodb' | 'firebase' | 'aws',
-): string => {
-  const description = manifest.description === undefined ? '' : manifest.description;
-  const lines: string[] = [
-    `# VybeKiit preset: ${manifest.id} (${provider}) — v1.1 planned`,
-    `# ${description}`,
-  ];
-  for (const entity of manifest.entities) {
-    lines.push(`\n## Collection/table: ${entity.name}`);
-    for (const column of entity.columns) {
-      lines.push(`- ${column.name}: ${column.type}${column.required ? ' (required)' : ''}`);
-    }
-  }
-  for (const index of manifest.indexes) {
-    const unique = index.unique ? ' UNIQUE' : '';
-    lines.push(`\nIndex${unique} on ${index.table}(${index.columns.join(', ')}) — ${index.reason}`);
-  }
-  if (provider === 'mongodb') {
-    lines.push('\n// db.collection(name).createIndex({ ... })');
-  }
-  if (provider === 'aws') {
-    lines.push('\n// DynamoDB GSI or attribute definitions per entity');
-  }
-  if (provider === 'firebase') {
-    lines.push('\n// Firestore composite indexes in firebase.json');
-  }
-  return lines.join('\n');
-};
+export const renderNosqlPreset = (manifest: PresetManifest, provider: NosqlProviderName): string =>
+  JSON.stringify(buildNosqlApplyPlan(manifest, provider), null, 2);

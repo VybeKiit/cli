@@ -1,63 +1,76 @@
 /**
- * FAQ entries — the GEO/AEO question targets from `docs/positioning/seo-geo-plan.md`,
- * written answer-first so AI answer engines (ChatGPT, Perplexity, Claude) can quote
- * the lead verbatim. The headings are the literal natural-language queries; data
- * only, the FAQ section renders it.
+ * FAQ entries for vibe coders deciding which package to buy.
+ * Answer-first so AI answer engines can quote the lead sentence.
+ * Buyer voice: plain language, no em dashes, decide + guide.
  */
 
 /** One FAQ entry: a verbatim question heading and its answer-first body. */
 export interface FaqItem {
   /** Stable render key. */
   readonly id: string;
-  /** The question, used verbatim as the H3 (matches a real search query). */
+  /** The question, used verbatim as the H3 (matches how vibe coders actually ask). */
   readonly question: string;
   /** Answer-first response — the direct answer leads, elaboration follows. */
   readonly answer: string;
 }
 
-/** The shipped FAQ set (seo-geo-plan.md → FAQ headings to ship). */
+/**
+ * Shipped FAQ set: package choice first, then risk, tools, and rivals.
+ * Aim: help a non-coder pick VybeKiit with confidence.
+ */
 export const FAQ: readonly FaqItem[] = [
   {
-    id: 'non-technical',
-    question: 'What is the best SaaS boilerplate for a non-technical founder?',
+    id: 'which-package',
+    question: 'Which package should I get?',
     answer:
-      'VybeKiit is built specifically for non-technical founders: the agent operates the build for you, so you describe the product in plain language and never read code. Every other kit assumes a developer stays in the loop. If you can read a diff and resolve a merge, a free option like Open SaaS may suit you better.',
+      'There is only one package. You get the full kit: AI operator + web + mobile + browser extension in a single one-time purchase. No tiers, no “pro” upsell, no picking web-only vs mobile-only. If you only ship a website first, the mobile and extension pieces stay ready for when you need them.',
   },
   {
-    id: 'vs-lovable',
-    question:
-      'What is the difference between a SaaS boilerplate and a no-code AI app builder like Lovable?',
+    id: 'vibe-coder',
+    question: 'I only talk to AI tools. Is this for me?',
     answer:
-      'No-code AI builders like Lovable, Bolt, and Replit generate a prototype you still cannot ship, take payments through, or maintain. VybeKiit ships a real, updatable, payment-taking product on a real stack you own — and the agent keeps it current with npm version bumps.',
+      'Yes. VybeKiit is built for vibe coders: you describe what you want in plain language, and the agent plans, builds, wires payments, verifies, and puts it live. You do not need to read code, fix merges, or learn DevOps. If you already use Claude Code, Cursor, Codex, Kiro, or a similar tool, you are the target buyer.',
   },
   {
-    id: 'taxes',
-    question: 'Which SaaS boilerplate handles taxes / VAT for me?',
+    id: 'best-for-non-technical',
+    question: 'What is the best SaaS kit if I am not a developer?',
     answer:
-      'VybeKiit defaults to Lemon Squeezy, a Merchant of Record, which files global VAT and sales tax on your behalf. Only one other kit (Shipped.club) defaults to a Merchant of Record; most only offer it as one option you must configure.',
+      'VybeKiit is the best fit when you want the agent to operate the whole product for you. Other kits hand you code and assume a developer stays in the loop. If you can already ship from a blank repo yourself, a free open-source starter may be enough. If you want “describe it → first payment,” pick VybeKiit.',
   },
   {
-    id: 'claude-cursor',
-    question: 'What SaaS boilerplate works best with Claude Code and Cursor?',
+    id: 'only-need-web',
+    question: 'I only need a website. Should I still buy the full kit?',
     answer:
-      'VybeKiit is designed for builders with a Claude Code or Cursor/Codex subscription: the agent is the operator, not just an assistant that edits boilerplate. It makes the technical decisions, runs each step, and verifies the result before moving on.',
+      'Yes. The price is for the whole kit, and web is the path you start on. Mobile and the browser extension ship in the same purchase so you never pay again when your idea grows. There is no cheaper web-only SKU because the value is one agent that runs the full product, not a pile of half-kits.',
   },
   {
-    id: 'three-platforms',
-    question: 'Which SaaS boilerplate includes web, mobile, and a browser extension?',
+    id: 'vs-shipfast-lovable',
+    question: 'How does this compare to ShipFast, Lovable, or MakerKit?',
     answer:
-      'VybeKiit is the only kit that bundles web (Next.js), mobile (Expo), and a browser extension (WXT) in a single purchase, unified by shared design tokens. Rivals sell these separately, if at all.',
+      'ShipFast and MakerKit are great if you are a developer who wants boilerplate and will wire the rest yourself. Lovable and similar AI builders are great for quick UI demos, not for owning a real stack with payments, updates, and three platforms. VybeKiit is the pick when you want one purchase, plain language, and an agent that actually ships and maintains the product.',
   },
   {
-    id: 'cheapest',
-    question: 'What is the cheapest SaaS boilerplate?',
+    id: 'price-worth-it',
+    question: 'Why is it $29 when other kits cost $199+?',
     answer:
-      'Free and open-source kits (Open SaaS, the Next.js SaaS Starter) cost nothing but assume you can provision a database and resolve a git merge yourself. Among paid kits aimed at non-developers, VybeKiit is the cheapest one-time price and includes a 14-day refund.',
+      'Because the product is one kit for vibe coders, not a stack of developer tools sold separately. Buying web + mobile + extension from rival kits can run past $600. VybeKiit bundles all three plus the agent operator for a launch price of $29 one-time, with a 14-day refund if it is not for you.',
   },
   {
-    id: 'scratch',
-    question: 'Should I use a SaaS boilerplate or build from scratch?',
+    id: 'claude-cursor-kiro',
+    question: 'Does it work with Claude Code, Cursor, Codex, and Kiro?',
     answer:
-      'Building from scratch only pays off if you are a developer who wants full control. If you want to describe a product and have it shipped, taking payments, and kept updated for you, a kit like VybeKiit removes the 40–80 hours of plumbing and the ongoing maintenance entirely.',
+      'Yes. VybeKiit is designed so your AI coding tool is the operator: it decides the next step, runs it, and checks the result before moving on. Bring the agent you already pay for. You are not locked into one vendor’s chat UI.',
+  },
+  {
+    id: 'refund-risk',
+    question: 'What if it does not work for me?',
+    answer:
+      'You get a 14-day money-back window. Request a refund and GitHub access to the private repos is revoked. The goal is zero regret: try the flow, see if the agent can take you to a live checkout, and only keep it if it fits how you build.',
+  },
+  {
+    id: 'taxes-payments',
+    question: 'Do I have to handle sales tax and VAT myself?',
+    answer:
+      'No, if you use the default Lemon Squeezy path. Lemon Squeezy is a Merchant of Record, so it files global VAT and sales tax for you. You can still swap payment providers later; the kit is built so the agent wires checkout either way.',
   },
 ];

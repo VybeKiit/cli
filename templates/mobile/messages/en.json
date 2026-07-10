@@ -2,6 +2,7 @@
   "navigation.screen.home": "Home",
   "navigation.screen.login": "Sign in",
   "navigation.screen.signup": "Create account",
+  "navigation.screen.forgotPassword": "Reset password",
   "navigation.screen.verify": "Verify email",
   "navigation.screen.pricing": "Pricing",
   "navigation.screen.dashboard": "Dashboard",
@@ -12,6 +13,11 @@
   "navigation.screen.status": "Status",
   "navigation.screen.changelog": "Changelog",
   "navigation.screen.app": "App",
+
+  "navigation.tab.home": "Home",
+  "navigation.tab.orders": "Orders",
+  "navigation.tab.products": "Products",
+  "navigation.tab.settings": "Settings",
 
   "common.close": "Close",
   "common.fallback.user": "User",
@@ -37,6 +43,8 @@
   "auth.login.passwordLabel": "Password",
   "auth.login.submit": "Sign in",
   "auth.login.submitting": "Signing in...",
+  "auth.login.forgotPassword": "Forgot password?",
+  "auth.login.orContinueWith": "or continue with",
 
   "auth.signup.title": "Create your account",
   "auth.signup.description": "Start building in a couple of minutes.",
@@ -46,6 +54,21 @@
   "auth.signup.passwordLabel": "Password",
   "auth.signup.submit": "Create account",
   "auth.signup.submitting": "Creating account...",
+  "auth.signup.orContinueWith": "or continue with",
+
+  "auth.forgot.title": "Reset your password",
+  "auth.forgot.description": "Enter your email and we will send a reset link.",
+  "auth.forgot.emailLabel": "Email",
+  "auth.forgot.submit": "Send reset link",
+  "auth.forgot.resend": "Send again",
+  "auth.forgot.sent": "If that email exists, a practice reset link is ready. Wire real email with the reset-password skill.",
+  "auth.forgot.footerPrefix": "Remembered it?",
+  "auth.forgot.footerLink": "Sign in",
+
+  "auth.oauth.google": "Continue with Google",
+  "auth.oauth.apple": "Continue with Apple",
+  "auth.oauth.googlePractice": "Google sign-in is practice UI. Ask your agent: sign in with Google.",
+  "auth.oauth.applePractice": "Apple sign-in is practice UI. Ask your agent when you are ready to wire it.",
 
   "auth.verify.title": "Check your email",
   "auth.verify.description": "Enter the code we sent to confirm it is you.",
@@ -91,6 +114,13 @@
 
   "dashboard.badge": "Signed in",
   "dashboard.title": "Dashboard",
+  "dashboard.welcome": "Welcome back",
+  "dashboard.subtitle": "Launch health and the next actions that matter on mobile.",
+  "dashboard.chart.title": "Activity",
+  "dashboard.chart.description": "Practice trend for the selected range.",
+  "dashboard.actions.title": "Next actions",
+  "dashboard.actions.description": "Companion routes that already ship interactive UI",
+  "dashboard.refresh": "Refresh metrics",
 
   "dashboard.tabs.overview": "Overview",
   "dashboard.tabs.nextSteps": "Next steps",

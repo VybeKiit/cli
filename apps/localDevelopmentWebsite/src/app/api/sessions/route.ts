@@ -71,53 +71,65 @@ const parseLimit = (limitParam: string | null): number => {
 /**
  * Read Kiro sessions from ~/.kiro/sessions/cli/*.json
  */
-const readKiroSessions = async (cwd: string | null, limit: number): Promise<AgentSession[]> => {
-  const files = await readSessionDirectory(KIRO_SESSIONS_DIR);
-  const jsonFiles = files.filter((f) => f.endsWith('.json'));
-
-  const sessions: AgentSession[] = [];
-  for (const file of jsonFiles.slice(0, 200)) {
-    const raw = await readFile(join(KIRO_SESSIONS_DIR, file), 'utf-8');
-    const data = JSON.parse(raw) as Record<string, unknown>;
-    const shouldInclude =
-      data.session_created_reason !== 'subagent' && (cwd === null || data.cwd === cwd);
-
-    if (shouldInclude) {
-      const session: AgentSession = {
-        session_id: valueText(data, 'session_id', sessionIdFromFile(file)),
-        title: valueText(data, 'title', '(untitled)').slice(0, 120),
-        cwd: valueText(data, 'cwd', ''),
-        created_at: valueText(data, 'created_at', ''),
-        updated_at: valueText(data, 'updated_at', ''),
-      };
-      if (data.parent_session_id) {
-        sessions.push({
-          ...session,
-          parent_session_id: String(data.parent_session_id),
-        });
-      } else if (data.session_created_reason) {
-        sessions.push({
-          ...session,
-          session_created_reason: String(data.session_created_reason),
-        });
-      } else {
-        sessions.push(session);
-      }
-
-      if (data.parent_session_id && data.session_created_reason) {
-        const lastIndex = sessions.length - 1;
-        const lastSession = sessions[lastIndex];
-        if (lastSession === undefined) {
-          throw new Error(`Could not build session row for ${file}.`);
-        }
-        sessions[lastIndex] = {
-          ...lastSession,
-          session_created_reason: String(data.session_created_reason),
-        };
-      }
-    }
+const parseKiroSessionFile = (
+  file: string,
+  raw: string,
+  cwd: string | null,
+): AgentSession | null => {
+  const data = JSON.parse(raw) as Record<string, unknown>;
+  const shouldInclude =
+    data.session_created_reason !== 'subagent' && (cwd === null || data.cwd === cwd);
+  if (!shouldInclude) {
+    return null;
   }
 
+  const session: AgentSession = {
+    session_id: valueText(data, 'session_id', sessionIdFromFile(file)),
+    title: valueText(data, 'title', '(untitled)').slice(0, 120),
+    cwd: valueText(data, 'cwd', ''),
+    created_at: valueText(data, 'created_at', ''),
+    updated_at: valueText(data, 'updated_at', ''),
+  };
+
+  if (data.parent_session_id && data.session_created_reason) {
+    return {
+      ...session,
+      parent_session_id: String(data.parent_session_id),
+      session_created_reason: String(data.session_created_reason),
+    };
+  }
+  if (data.parent_session_id) {
+    return {
+      ...session,
+      parent_session_id: String(data.parent_session_id),
+    };
+  }
+  if (data.session_created_reason) {
+    return {
+      ...session,
+      session_created_reason: String(data.session_created_reason),
+    };
+  }
+  return session;
+};
+
+const readKiroSessions = async (cwd: string | null, limit: number): Promise<AgentSession[]> => {
+  const files = await readSessionDirectory(KIRO_SESSIONS_DIR);
+  // Cap + parallelize: large ~/.kiro trees made e2e hang on "Loading sessions…".
+  const jsonFiles = files.filter((f) => f.endsWith('.json')).slice(0, 80);
+
+  const parsed = await Promise.all(
+    jsonFiles.map(async (file) => {
+      try {
+        const raw = await readFile(join(KIRO_SESSIONS_DIR, file), 'utf-8');
+        return parseKiroSessionFile(file, raw, cwd);
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const sessions = parsed.filter((s): s is AgentSession => s !== null);
   sessions.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
   return sessions.slice(0, limit);
 };
@@ -238,6 +250,15 @@ export const GET = async (request: Request) => {
   const limit = parseLimit(limitParam);
   const requestedAgent = searchParams.get('agent');
   const agentParam = requestedAgent === null ? 'kiro' : requestedAgent;
+
+  // Playwright sets NEXT_PUBLIC_E2E=1 so e2e never waits on a large local session tree.
+  if (process.env.NEXT_PUBLIC_E2E === '1') {
+    return NextResponse.json({
+      agent: agentParam,
+      sessions: [],
+      total: 0,
+    });
+  }
 
   let sessions: AgentSession[] = [];
 

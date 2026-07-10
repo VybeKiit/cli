@@ -5,7 +5,9 @@
   "packageManager": "pnpm@10.33.2",
   "type": "module",
   "scripts": {
-    "dev": "wxt",
+    "dev": "node scripts/dev.mjs",
+    "dev:wxt": "wxt",
+    "dev:firefox": "wxt -b firefox",
     "prebuild": "tsx scripts/optimizeAssets.mts",
     "build": "wxt build",
     "postinstall": "wxt prepare",

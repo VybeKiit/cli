@@ -12,8 +12,12 @@ import {
 import { Effect, Either } from 'effect';
 
 type PostgresProvider = 'supabase' | 'neon' | 'railway';
+type NosqlProvider = 'mongodb' | 'firebase' | 'aws';
+type PresetProvider = PostgresProvider | NosqlProvider;
 
 const POSTGRES_PROVIDERS: readonly PostgresProvider[] = ['supabase', 'neon', 'railway'];
+const NOSQL_PROVIDERS: readonly NosqlProvider[] = ['mongodb', 'firebase', 'aws'];
+const PRESET_PROVIDERS: readonly PresetProvider[] = [...POSTGRES_PROVIDERS, ...NOSQL_PROVIDERS];
 
 type PresetFailure = {
   readonly code: string;
@@ -98,7 +102,48 @@ const parseFlags = (
 const databaseUrlFromEnv = (env: NodeJS.ProcessEnv): string | undefined => env.DATABASE_URL;
 
 /**
- * Resolve the postgres provider for preset commands.
+ * Whether a provider is a NoSQL target.
+ *
+ * @param provider - Resolved preset provider.
+ * @returns True for mongodb, firebase, or aws.
+ * @example
+ * const nosql = isNosqlProvider('mongodb');
+ */
+const isNosqlProvider = (provider: PresetProvider): provider is NosqlProvider =>
+  provider === 'mongodb' || provider === 'firebase' || provider === 'aws';
+
+/**
+ * Resolve connection URL for apply-preset.
+ *
+ * Postgres uses DATABASE_URL. MongoDB accepts DATABASE_URL or MONGODB_URI.
+ * Firebase/AWS dry-run does not need a URL; live apply uses SDK env credentials.
+ *
+ * @param provider - Resolved provider.
+ * @param env - Environment source.
+ * @returns Connection URL when present.
+ * @example
+ * const url = connectionUrlForProvider('mongodb', process.env);
+ */
+const connectionUrlForProvider = (
+  provider: PresetProvider,
+  env: NodeJS.ProcessEnv,
+): string | undefined => {
+  if (provider === 'mongodb') {
+    const mongoUri = env.MONGODB_URI;
+    const databaseUrl = env.DATABASE_URL;
+    if (databaseUrl !== undefined && databaseUrl !== '') {
+      return databaseUrl;
+    }
+    if (mongoUri !== undefined && mongoUri !== '') {
+      return mongoUri;
+    }
+    return;
+  }
+  return databaseUrlFromEnv(env);
+};
+
+/**
+ * Resolve the postgres provider for verify-presets (--fix still applies SQL).
  *
  * @param explicit - Optional provider flag value.
  * @param env - Environment source used when no explicit provider is passed.
@@ -117,6 +162,43 @@ const resolvePostgresProvider = (
   const envProvider = postgresProviderFromEnv(env);
   if (envProvider !== null) {
     return envProvider;
+  }
+
+  return 'supabase';
+};
+
+/**
+ * Resolve any supported preset provider (Postgres + NoSQL).
+ *
+ * @param explicit - Optional provider flag value.
+ * @param env - Environment source used when no explicit provider is passed.
+ * @returns Supported provider, or undefined for an unsupported explicit value.
+ * @example
+ * const provider = resolvePresetProvider('mongodb', process.env);
+ */
+const resolvePresetProvider = (
+  explicit: string | undefined,
+  env: NodeJS.ProcessEnv,
+): PresetProvider | undefined => {
+  if (explicit !== undefined) {
+    return PRESET_PROVIDERS.find((provider) => provider === explicit);
+  }
+
+  const envProvider = postgresProviderFromEnv(env);
+  if (envProvider !== null) {
+    return envProvider;
+  }
+
+  const dataProvider = env.DATA_PROVIDER;
+  if (
+    dataProvider === 'mongodb' ||
+    dataProvider === 'firebase' ||
+    dataProvider === 'aws' ||
+    dataProvider === 'supabase' ||
+    dataProvider === 'neon' ||
+    dataProvider === 'railway'
+  ) {
+    return dataProvider;
   }
 
   return 'supabase';
@@ -151,20 +233,38 @@ export const runApplyPreset = async (
     };
   }
 
-  const provider = resolvePostgresProvider(flags.provider, process.env);
+  const provider = resolvePresetProvider(flags.provider, process.env);
   if (provider === undefined) {
     return {
-      json: JSON.stringify({ ok: false, error: `Unsupported preset provider: ${flags.provider}` }),
+      json: JSON.stringify({
+        ok: false,
+        error: `Unsupported preset provider: ${flags.provider}. Use supabase|neon|railway|mongodb|firebase|aws.`,
+      }),
       exitCode: 1,
     };
   }
 
-  const databaseUrl = databaseUrlFromEnv(process.env);
-  if (databaseUrl === undefined || databaseUrl === '') {
+  const dryRun = flags.dryRun === true;
+  const databaseUrl = connectionUrlForProvider(provider, process.env);
+  const missingUrl = databaseUrl === undefined || databaseUrl === '';
+
+  // Postgres always needs DATABASE_URL. MongoDB live apply needs DATABASE_URL or MONGODB_URI.
+  // NoSQL dry-run and firebase/aws live apply do not require a connection URL string
+  // (firebase/aws live use SDK credential env vars instead).
+  if (missingUrl && !isNosqlProvider(provider)) {
     return {
       json: JSON.stringify({
         ok: false,
         error: 'DATABASE_URL is required to apply presets.',
+      }),
+      exitCode: 1,
+    };
+  }
+  if (missingUrl && provider === 'mongodb' && !dryRun) {
+    return {
+      json: JSON.stringify({
+        ok: false,
+        error: 'DATABASE_URL or MONGODB_URI is required to apply MongoDB presets.',
       }),
       exitCode: 1,
     };
@@ -174,8 +274,8 @@ export const runApplyPreset = async (
     applyPreset({
       presetId,
       provider,
-      databaseUrl,
-      dryRun: flags.dryRun,
+      databaseUrl: databaseUrl ?? '',
+      dryRun,
     }),
   );
 

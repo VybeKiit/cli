@@ -24,6 +24,8 @@ interface AutoScrollRowProps {
   readonly durationMobile?: string;
   readonly pauseOnHover?: boolean;
   readonly hoverBehavior?: HoverBehavior;
+  /** When true, the track scrolls the opposite way (right-to-left becomes left-to-right). */
+  readonly reverse?: boolean;
   readonly className?: string;
   readonly trackClassName?: string;
   readonly rowClassName?: string;
@@ -77,6 +79,7 @@ export const AutoScrollRow = ({
   durationMobile = '55s',
   pauseOnHover = true,
   hoverBehavior,
+  reverse = false,
   className,
   trackClassName,
   rowClassName,
@@ -107,6 +110,7 @@ export const AutoScrollRow = ({
 
   useMarqueeLoop(trackRef, copyRef, regionRef, {
     durationSeconds,
+    direction: reverse ? -1 : 1,
     enabled: useJsMarquee,
   });
 
@@ -123,6 +127,7 @@ export const AutoScrollRow = ({
         'auto-scroll-row',
         resolvedHover === 'pause' && 'auto-scroll-row--pause-hover',
         useJsMarquee && 'auto-scroll-row--js-marquee',
+        reverse && 'auto-scroll-row--reverse',
         className,
       )}
       role="region"

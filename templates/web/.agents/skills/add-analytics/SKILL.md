@@ -22,6 +22,15 @@ unless you screen-share a summary.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/AnalyticsPage.tsx` export `AnalyticsPage` into the buyer app at route `/dashboard/analytics`.
+   Recipe id: `analytics`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-analytics')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Explain in one line.** *"I'll set up visitor stats so you can see how many people use your app."*
 
 2. **Pick a provider and collect one value.** Choose Plausible (simple) or PostHog (richer) based on

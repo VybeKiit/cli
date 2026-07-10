@@ -211,13 +211,17 @@ export const TECH_STACK_MARKS = PRODUCT_STACK_MARKS;
 
 export { VIBE_HINTS } from './vibeHints';
 
-/** FAQ entry ids to show on the landing page (from faq.ts). */
+/** FAQ entry ids to show on the dark cinematic landing (from faq.ts). */
 export const LANDING_FAQ_IDS = [
-  'non-technical',
-  'three-platforms',
-  'claude-cursor',
-  'taxes',
-  'vs-lovable',
+  'which-package',
+  'vibe-coder',
+  'best-for-non-technical',
+  'only-need-web',
+  'vs-shipfast-lovable',
+  'price-worth-it',
+  'claude-cursor-kiro',
+  'refund-risk',
+  'taxes-payments',
 ] as const;
 
 /** Framer Motion easing shared across landing animations. */

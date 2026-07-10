@@ -17,6 +17,15 @@ translate every error · celebrate. Decide all technical choices yourself.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the end-user onboarding recipe when the builder wants a first-run wizard (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/OnboardingPage.tsx` export `OnboardingPage` into the buyer app at route `/onboarding`.
+   Recipe id: `onboarding`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Skip this step if the builder only needs *their* kit setup (steps 1–5 below) and not a product wizard for their users.
+   Also reference `packages/agentKit` `getPageRecipeInstall('onboarding')` / page-recipe-manifest.json.
+   **Verify:** if installed, `/onboarding` builds with practice UI.
+
 1. **Welcome + ask the one thing that matters.**
    Greet warmly. Ask: *"In one sentence, what do you want to build?"* Use their answer to tailor the
    starter page later — don't turn it into a technical interview.

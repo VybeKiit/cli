@@ -7,11 +7,18 @@
     "CODEX_HOME",
     "CORS_ORIGIN",
     "FRONTEND_URL",
+    "NEXT_PUBLIC_POSTHOG_HOST",
+    "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
+    "NEXT_PUBLIC_SENTRY_DSN",
     "NEXT_RUNTIME",
     "PLAYWRIGHT_BASE_URL",
     "PLAYWRIGHT_ENABLED",
     "PLAYWRIGHT_PORT",
     "PORT",
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_DSN",
+    "SENTRY_ORG",
+    "SENTRY_PROJECT",
     "SESSION_SECRET",
     "VYBEKIIT_GATE_ORG",
     "VYBEKIIT_GATE_REPOS",
@@ -27,8 +34,10 @@
     "typecheck": {
       "dependsOn": ["^build"]
     },
+    // Self-build first: package exports point at dist/, so colocated tests that
+    // import `@vybekiit/<pkg>/…` need this package built on a clean CI checkout.
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build", "^build"]
     },
     "dev": {
       "cache": false,

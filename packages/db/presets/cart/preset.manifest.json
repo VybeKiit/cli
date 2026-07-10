@@ -1,0 +1,83 @@
+{
+  "id": "cart",
+  "version": 1,
+  "description": "Shopping carts and line items for multi-device checkout.",
+  "entities": [
+    {
+      "name": "carts",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "status", "type": "text", "required": true, "default": "'open'" },
+        { "name": "currency", "type": "text", "required": true, "default": "'usd'" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "cart_items",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        {
+          "name": "cart_id",
+          "type": "uuid",
+          "required": true,
+          "references": { "table": "carts", "column": "id" }
+        },
+        { "name": "product_id", "type": "text", "required": true },
+        { "name": "variant_id", "type": "text" },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "unit_price_cents", "type": "numeric", "required": true },
+        { "name": "quantity", "type": "numeric", "required": true, "default": "1" },
+        { "name": "metadata", "type": "jsonb", "default": "'{}'" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "cart_items",
+      "to": "carts",
+      "foreignKey": "cart_id",
+      "type": "many"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "carts",
+      "columns": ["user_id"],
+      "unique": true,
+      "where": "status = 'open'",
+      "reason": "one open cart per buyer for multi-device sync"
+    },
+    {
+      "table": "carts",
+      "columns": ["user_id", "status"],
+      "reason": "list carts by buyer and lifecycle status"
+    },
+    {
+      "table": "cart_items",
+      "columns": ["cart_id"],
+      "reason": "list line items for a cart"
+    },
+    {
+      "table": "cart_items",
+      "columns": ["cart_id", "product_id", "variant_id"],
+      "unique": true,
+      "reason": "upsert conflict key for cart line quantity updates"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["upsert"],
+  "skills": [],
+  "packages": ["@vybekiit/db"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "stable",
+    "firebase": "stable",
+    "aws": "stable"
+  }
+}

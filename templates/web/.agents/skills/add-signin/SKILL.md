@@ -20,6 +20,16 @@ translate every error · celebrate. You wire all the code; the builder only past
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/AuthPage.tsx` export `AuthPage` into the buyer app at route `/login`
+   (merge with existing login/sign-up screens if present — do not duplicate routes).
+   Recipe id: `auth`. Preset: auth-bridge.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Goal id for lookup is `sign-in` (this skill folder is `add-signin`).
+   Also reference `packages/agentKit` `getPageRecipeInstall('sign-in')` / page-recipe-manifest.json.
+   **Verify:** `/login` builds and shows practice sign-in UI before provider wiring.
+
 1. **Make sure their app can remember things first.** Sign-in needs a database. If one isn't set
    up yet, run `save-data` first, then come back.
    **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).

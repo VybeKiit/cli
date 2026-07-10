@@ -1,5 +1,6 @@
 import { access, cp, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
 export const TEMPLATES = ['web', 'spa', 'mobile', 'extension', 'backend'] as const;
@@ -106,6 +107,9 @@ export const scaffold = async (options: ScaffoldOptions): Promise<{ readonly des
     recursive: true,
     filter: (src) => shouldCopyScaffoldPath(src),
   });
+
+  // Cursor + Claude discover skills via per-agent paths; ensure links even if copy dropped them.
+  await ensureAgentSkillSymlinks(options.dest);
 
   return { dest: options.dest };
 };

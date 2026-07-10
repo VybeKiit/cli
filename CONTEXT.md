@@ -17,6 +17,8 @@
 | Marketing / auth UX | Normalized hero, legal defaults | Hero + feature cards | Popup + backend URL |
 | Signed-in guard | `useUser` dashboard layout | Dashboard redirect | `useUser` + practice sign-in in popup |
 | Practice checkout | Local `/checkout/practice` + fulfillment | `billing-client` → web `/api/checkout` | `billing-client` → web `/api/checkout` |
+| Tier-1 SaaS UI (B) | Interactive settings, teams, orders, dashboard home, integrations (`src/components/saas/*`) | Interactive settings + dashboard home | Interactive settings screen |
+| Long-tail UI (C) | Page recipes install via buyer skills + `pageRecipeInstall` catalog (auth, payments, ops, commerce/CRM orphans) | Shell maps / web-backed | Shell maps / web-backed |
 | Quality gate | vitest + Playwright smoke | vitest + typecheck | build + typecheck + vitest |
 | Open issues | **#6 closed** (screens) | — | **#20 scaffold shipped** (store publish still skill-driven) |
 

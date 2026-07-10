@@ -12,6 +12,7 @@ import {
   View,
   type GestureResponderEvent,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/useTheme';
 
 declare const __DEV__: boolean;
@@ -26,6 +27,7 @@ declare const __DEV__: boolean;
 export const ReportModeDev = () => {
   const pathname = usePathname();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { corner, setCorner } = useReportDockMobile();
   const [active, setActive] = useState(false);
   const [showPin, setShowPin] = useState(false);
@@ -69,73 +71,88 @@ export const ReportModeDev = () => {
 
   return (
     <>
-      {active ? null : (
-        <View style={[styles.fabCluster, fabInset]} pointerEvents="box-none">
-          {showPin ? (
-            <View
-              style={[
-                styles.pinRow,
-                { backgroundColor: colors.background, borderColor: colors.border },
-              ]}
-            >
-              {DOCK_CORNER_PRESETS.map((preset) => (
-                <Pressable
-                  key={preset}
-                  onPress={() => {
-                    setCorner(preset);
-                    setShowPin(false);
-                  }}
-                  style={[
-                    styles.pinChip,
-                    {
-                      backgroundColor: corner === preset ? colors.primary : colors.muted,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={{
-                      color: corner === preset ? colors.primaryForeground : colors.foreground,
-                      fontSize: 11,
-                    }}
-                  >
-                    {DOCK_CORNER_LABELS[preset]}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          ) : null}
-          <View style={styles.fabRow}>
-            <Pressable
-              accessibilityLabel="Pin report button position"
-              onPress={() => setShowPin((value) => !value)}
-              style={[
-                styles.pinButton,
-                { borderColor: colors.border, backgroundColor: colors.background },
-              ]}
-            >
-              <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>Pin</Text>
-            </Pressable>
-            <Pressable
-              accessibilityLabel="Toggle report mode"
-              onPress={() => setActive(true)}
-              style={[styles.fab, { backgroundColor: colors.primary }]}
-            >
-              <Text style={[styles.fabText, { color: colors.primaryForeground }]}>R</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-
       {active && !tapPoint ? (
         <Pressable style={styles.overlay} onPress={handleScreenTap}>
-          <View style={styles.banner}>
-            <Text style={styles.bannerText}>Tap what looks wrong</Text>
-            <Pressable onPress={() => setActive(false)} hitSlop={8}>
-              <Text style={styles.bannerAction}>Cancel</Text>
+          <View style={[styles.banner, { paddingTop: insets.top + 10 }]}>
+            <Text style={styles.bannerText}>Tap what looks wrong — or tap ✕ to exit</Text>
+            <Pressable onPress={() => setActive(false)} hitSlop={8} style={styles.bannerExit}>
+              <Text style={styles.bannerAction}>Exit</Text>
             </Pressable>
           </View>
         </Pressable>
       ) : null}
+
+      <View style={[styles.fabCluster, fabInset]} pointerEvents="box-none">
+        {active ? (
+          <Pressable
+            accessibilityLabel="Exit report mode"
+            onPress={() => {
+              setActive(false);
+              setShowPin(false);
+            }}
+            style={[styles.fab, styles.fabStop]}
+          >
+            <Text style={[styles.fabText, styles.fabStopText]}>✕</Text>
+          </Pressable>
+        ) : (
+          <>
+            {showPin ? (
+              <View
+                style={[
+                  styles.pinRow,
+                  { backgroundColor: colors.background, borderColor: colors.border },
+                ]}
+              >
+                {DOCK_CORNER_PRESETS.map((preset) => (
+                  <Pressable
+                    key={preset}
+                    onPress={() => {
+                      setCorner(preset);
+                      setShowPin(false);
+                    }}
+                    style={[
+                      styles.pinChip,
+                      {
+                        backgroundColor: corner === preset ? colors.primary : colors.muted,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={{
+                        color: corner === preset ? colors.primaryForeground : colors.foreground,
+                        fontSize: 11,
+                      }}
+                    >
+                      {DOCK_CORNER_LABELS[preset]}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+            <View style={styles.fabRow}>
+              <Pressable
+                accessibilityLabel="Pin report button position"
+                onPress={() => setShowPin((value) => !value)}
+                style={[
+                  styles.pinButton,
+                  { borderColor: colors.border, backgroundColor: colors.background },
+                ]}
+              >
+                <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '600' }}>
+                  Pin
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityLabel="Start report mode"
+                onPress={() => setActive(true)}
+                style={[styles.fab, { backgroundColor: colors.primary }]}
+              >
+                <Text style={[styles.fabText, { color: colors.primaryForeground }]}>R</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+      </View>
 
       <Modal visible={Boolean(tapPoint)} transparent={true} animationType="fade">
         <View style={styles.modalBackdrop}>
@@ -219,6 +236,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+  fabStop: {
+    backgroundColor: '#dc2626',
+  },
+  fabStopText: {
+    color: '#ffffff',
+    fontSize: 20,
+  },
   overlay: {
     ...StyleSheet.absoluteFill,
     zIndex: 9998,
@@ -240,7 +264,14 @@ const styles = StyleSheet.create({
   bannerAction: {
     color: '#451a03',
     fontWeight: '600',
+  },
+  bannerExit: {
     marginLeft: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#451a03',
   },
   modalBackdrop: {
     flex: 1,

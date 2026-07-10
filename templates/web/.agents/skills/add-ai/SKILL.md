@@ -24,6 +24,15 @@ metadata:
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/AiAssistantPage.tsx` export `AiAssistantPage` into the buyer app at route `/dashboard/ai`.
+   Recipe id: `ai-assistant`. Presets: ai_conversations + embeddings.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-ai')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Explain in one line.** *"I'll add a smart helper that answers using AI."*
 2. **Collect the API key** into secret settings if not already present (`OPENAI_API_KEY` default).
    Run `vybekiit apply-preset embeddings` and `vybekiit apply-preset ai_conversations` when chat history

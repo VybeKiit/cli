@@ -6,9 +6,20 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/bin.ts'],
   format: ['esm'],
+  platform: 'node',
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
   // Every @vybekiit/* package is private (ADR-0033) — never on npm — so the published CLI
   // (the single public artifact) must inline their source rather than declare unresolvable deps.
   noExternal: [/^@vybekiit\//],
+  // CJS SDKs pulled in via inlined @vybekiit/db break in the ESM bin
+  // ("Dynamic require of fs/timers/promises is not supported"). Keep them external
+  // and listed in package.json dependencies so Node can load them at runtime.
+  external: [
+    /^firebase-admin(\/|$)/,
+    'mongodb',
+    /^@aws-sdk\//,
+    '@neondatabase/serverless',
+    '@supabase/supabase-js',
+  ],
 });

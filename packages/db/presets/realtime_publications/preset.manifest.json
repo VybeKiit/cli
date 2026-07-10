@@ -13,8 +13,8 @@
     "supabase": "stable",
     "neon": "planned",
     "railway": "planned",
-    "mongodb": "planned",
-    "firebase": "planned",
-    "aws": "planned"
+    "mongodb": "stable",
+    "firebase": "stable",
+    "aws": "stable"
   }
 }

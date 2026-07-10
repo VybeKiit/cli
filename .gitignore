@@ -14,6 +14,7 @@ next-env.d.ts
 # test / local runtime output
 test-results/
 .playwright/
+.lighthouseci/
 
 # editor / agent local overrides
 .kimi-code/
@@ -66,5 +67,10 @@ tools/dedup/target/
 # local-only dev scripts
 scripts/dev/
 
-# Local runtime data (domain map cache, feedback event log)
-.vybekiit/
+# Local runtime data at monorepo root only (domain map cache, feedback event log).
+# Template agent layers live at templates/*/.vybekiit/ and must stay trackable.
+/.vybekiit/
+
+# Isolated Next dist dirs for concurrent landing preview
+.next-dev-*/
+.next-prod-*/

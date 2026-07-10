@@ -12,6 +12,7 @@ import {
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
 import { loadExistingAgentLayerRenderInputs } from '../lib/agentLayerIo';
+import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import { detectTemplateName as detectProjectTemplateName } from '../lib/detectTemplate';
 import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
@@ -353,6 +354,11 @@ export const runSyncAgentLayer = async (
 
     await copyPlannedAgentLayerPaths(plan.pathsToSync, mirrorRoot, cwd, deps);
     await mergeGoalIndexAfterSync(cwd, goalIndexBefore);
+
+    const skillLinks = await ensureAgentSkillSymlinks(cwd);
+    if (skillLinks.length > 0) {
+      lines.push('Linked Cursor and Claude skill folders to your project skills.');
+    }
 
     if (await refreshGeneratedInstructionSections(cwd, template, deps)) {
       lines.push('Refreshed generated instruction sections.');

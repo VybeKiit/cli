@@ -3,6 +3,7 @@
  * search engines render rich results (Product price, FAQ accordion) and grounds
  * AI answer engines. Built from the same SSOT the UI renders, so the copy never forks.
  */
+import { cdnAssetUrl } from '@/lib/cdnAssets';
 import { FAQ } from './faq';
 import { BRAND, PRICE } from './site';
 
@@ -15,7 +16,7 @@ export const organizationJsonLd: JsonLdObject = {
   '@type': 'Organization',
   name: BRAND.name,
   url: BRAND.url,
-  logo: `${BRAND.url}/vybekiit-logo.svg`,
+  logo: cdnAssetUrl('/vybekiit-logo.svg'),
   description: BRAND.description,
 };
 

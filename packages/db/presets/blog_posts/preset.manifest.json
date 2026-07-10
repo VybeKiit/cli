@@ -1,0 +1,102 @@
+{
+  "id": "blog_posts",
+  "version": 1,
+  "description": "Blog posts and tags for marketing content pages.",
+  "entities": [
+    {
+      "name": "blog_posts",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "title", "type": "text", "required": true },
+        { "name": "slug", "type": "text", "required": true },
+        { "name": "excerpt", "type": "text" },
+        { "name": "body", "type": "text" },
+        { "name": "status", "type": "text", "required": true, "default": "'draft'" },
+        { "name": "published_at", "type": "timestamptz" },
+        { "name": "cover_image_url", "type": "text" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "blog_tags",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "slug", "type": "text", "required": true }
+      ]
+    },
+    {
+      "name": "blog_post_tags",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "required": true,
+          "references": { "table": "blog_posts", "column": "id" }
+        },
+        {
+          "name": "tag_id",
+          "type": "uuid",
+          "required": true,
+          "references": { "table": "blog_tags", "column": "id" }
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "blog_post_tags",
+      "to": "blog_posts",
+      "foreignKey": "post_id",
+      "type": "many"
+    },
+    {
+      "from": "blog_post_tags",
+      "to": "blog_tags",
+      "foreignKey": "tag_id",
+      "type": "many"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "blog_posts",
+      "columns": ["user_id", "slug"],
+      "unique": true,
+      "reason": "one slug per author for stable post URLs"
+    },
+    {
+      "table": "blog_posts",
+      "columns": ["status", "published_at"],
+      "reason": "list published posts by publish date"
+    },
+    {
+      "table": "blog_tags",
+      "columns": ["user_id", "slug"],
+      "unique": true,
+      "reason": "one tag slug per owner"
+    },
+    {
+      "table": "blog_post_tags",
+      "columns": ["post_id", "tag_id"],
+      "unique": true,
+      "reason": "one link per post-tag pair"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["upsert"],
+  "skills": ["add-blog"],
+  "packages": ["@vybekiit/cms"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "stable",
+    "firebase": "stable",
+    "aws": "stable"
+  }
+}

@@ -34,6 +34,8 @@ export type AgentLayerComplianceIssue = {
   readonly check: AgentLayerComplianceCheckId;
   readonly message: string;
   readonly file?: string;
+  /** 'error' blocks ok; 'warn' is advisory (e.g. optional runtime pointers). */
+  readonly severity?: 'error' | 'warn';
 };
 
 export type AgentLayerComplianceInput = {
@@ -230,10 +232,13 @@ export const planAgentLayerCompliance = (
     issues.push({
       check: issue.check,
       message: issue.message,
+      severity: issue.severity,
       ...(issue.file === undefined ? {} : { file: issue.file }),
     });
   }
 
-  return { template, issues, ok: issues.length === 0 };
+  // Structural issues (above) are errors; runtime optional pointers are warns.
+  const hasBlockingError = issues.some((issue) => issue.severity !== 'warn');
+  return { template, issues, ok: !hasBlockingError };
 };
 // biome-ignore-end lint/complexity/noExcessiveCognitiveComplexity: end coordinator suppression.

@@ -1,101 +1,423 @@
-import { CheckSquare, ClipboardList, Filter, Plus, RefreshCw } from 'lucide-react';
-import { DemoQuickWinPage } from './shared/DemoQuickWinPage';
+'use client';
 
-const metrics = [
-  {
-    label: 'Tasks',
-    value: '42',
-    detail: 'Across projects',
-    icon: <ClipboardList className="h-5 w-5" />,
-    tone: 'blue',
-  },
-  {
-    label: 'Due today',
-    value: '8',
-    detail: 'Needs focus',
-    icon: <CheckSquare className="h-5 w-5" />,
-    tone: 'amber',
-  },
-  {
-    label: 'Blocked',
-    value: '3',
-    detail: 'Waiting on owner',
-    icon: <RefreshCw className="h-5 w-5" />,
-    tone: 'rose',
-  },
-  {
-    label: 'Completed',
-    value: '64%',
-    detail: 'This week',
-    icon: <Filter className="h-5 w-5" />,
-    tone: 'emerald',
-  },
-] as const;
+import { Badge } from '@vybekiit/ui/badge';
+import { Button } from '@vybekiit/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Input } from '@vybekiit/ui/input';
+import { Label } from '@vybekiit/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
+import { CheckCircle2, Circle, ListTodo, Plus, Trash2 } from 'lucide-react';
+import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
+import { DemoTransitionStage } from './shared/DemoTransitionStage';
 
-const taskItems = [
-  {
-    title: 'Task list',
-    description: 'Title, priority, assignee, due date, and status.',
-    badge: 'List',
-  },
-  {
-    title: 'Priority lanes',
-    description: 'Today, upcoming, blocked, and done sections.',
-    badge: 'Priority',
-  },
-  {
-    title: 'Assignment states',
-    description: 'Owner avatars, unassigned state, and handoff copy.',
-    badge: 'Owner',
-  },
-] as const;
+type TaskStatus = 'todo' | 'doing' | 'done';
+type Priority = 'low' | 'normal' | 'high';
+type StatusFilter = 'all' | TaskStatus;
 
-const taskControls = [
+/** One task row (mirrors the tasks preset). */
+type Task = {
+  readonly id: string;
+  readonly title: string;
+  readonly status: TaskStatus;
+  readonly priority: Priority;
+  readonly due: string;
+  readonly assignee: string;
+};
+
+const PRIORITY_META: Record<Priority, { readonly label: string; readonly className: string }> = {
+  low: { label: 'Low', className: 'text-muted-foreground' },
+  normal: { label: 'Normal', className: 'border-border text-foreground' },
+  high: {
+    label: 'High',
+    className: 'border-red-500/40 bg-red-500/10 text-red-600',
+  },
+};
+
+const STATUS_FILTERS: readonly { readonly value: StatusFilter; readonly label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'todo', label: 'To do' },
+  { value: 'doing', label: 'Doing' },
+  { value: 'done', label: 'Done' },
+];
+
+const INITIAL_TASKS: readonly Task[] = [
   {
-    title: 'Create task',
-    description: 'Quick add with title, owner, due date, and priority.',
-    badge: 'Create',
+    id: 'task_01',
+    title: 'Ship webhook retry UI',
+    status: 'doing',
+    priority: 'high',
+    due: 'Today',
+    assignee: 'Maya',
   },
   {
-    title: 'Bulk complete',
-    description: 'Mark selected tasks complete with loading state.',
-    badge: 'Bulk',
+    id: 'task_02',
+    title: 'Write onboarding email copy',
+    status: 'todo',
+    priority: 'normal',
+    due: 'Tomorrow',
+    assignee: 'Sam',
   },
-  { title: 'Filter by owner', description: 'Personal and team task views.', badge: 'Filter' },
-] as const;
+  {
+    id: 'task_03',
+    title: 'Fix Safari checkout hang',
+    status: 'todo',
+    priority: 'high',
+    due: 'Today',
+    assignee: 'Jordan',
+  },
+  {
+    id: 'task_04',
+    title: 'Review Q3 pipeline forecast',
+    status: 'todo',
+    priority: 'normal',
+    due: 'Fri',
+    assignee: 'Lee',
+  },
+  {
+    id: 'task_05',
+    title: 'Publish changelog v1.4.2',
+    status: 'done',
+    priority: 'low',
+    due: 'Mon',
+    assignee: 'Maya',
+  },
+  {
+    id: 'task_06',
+    title: 'Invite design contractor',
+    status: 'doing',
+    priority: 'normal',
+    due: 'Wed',
+    assignee: 'Sam',
+  },
+  {
+    id: 'task_07',
+    title: 'Archive churned Fieldkit notes',
+    status: 'done',
+    priority: 'low',
+    due: 'Last week',
+    assignee: 'Lee',
+  },
+];
 
 /**
- * Render a source-backed tasks page recipe.
+ * A production-shaped task list: complete toggle, status filter, add-task form with validation,
+ * and delete. Completing every visible task (or filtering to nothing) reaches a real empty state.
+ * Plug-in panel maps onto the tasks preset.
  *
- * @returns A task list page with priority and assignment controls.
+ * @returns The tasks recipe element.
  * @example
  * const element = <TasksPage />;
  */
 export const TasksPage = () => {
-  // TODO: Load tasks, assignees, and priorities from the configured task source.
-  // TODO: Save task changes through the configured task actions.
+  // TODO: Load tasks, assignees, and priorities from the tasks preset tables.
+  // TODO: Persist task create, complete, and status changes through task mutations.
+  const titleId = useId();
+  const titleErrorId = useId();
+  const priorityId = useId();
+  const filterLabelId = useId();
+
+  const [tasks, setTasks] = useState<readonly Task[]>(INITIAL_TASKS);
+  const [filter, setFilter] = useState<StatusFilter>('all');
+  const [newTitle, setNewTitle] = useState('');
+  const [newPriority, setNewPriority] = useState<Priority>('normal');
+  const [touched, setTouched] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const visible = useMemo(
+    () => (filter === 'all' ? tasks : tasks.filter((task) => task.status === filter)),
+    [tasks, filter],
+  );
+
+  const counts = useMemo(
+    () => ({
+      todo: tasks.filter((t) => t.status === 'todo').length,
+      doing: tasks.filter((t) => t.status === 'doing').length,
+      done: tasks.filter((t) => t.status === 'done').length,
+    }),
+    [tasks],
+  );
+
+  const titleValid = newTitle.trim().length >= 2;
+
+  const toggleComplete = (id: string) => {
+    setTasks((current) =>
+      current.map((task) => {
+        if (task.id !== id) {
+          return task;
+        }
+        const nextStatus: TaskStatus = task.status === 'done' ? 'todo' : 'done';
+        return { ...task, status: nextStatus };
+      }),
+    );
+  };
+
+  const removeTask = (id: string) => {
+    setTasks((current) => current.filter((task) => task.id !== id));
+    setNotice('Task removed.');
+  };
+
+  const addTask = (event: FormEvent) => {
+    event.preventDefault();
+    setTouched(true);
+    if (!titleValid) {
+      return;
+    }
+    const next: Task = {
+      id: `task_${Date.now()}`,
+      title: newTitle.trim(),
+      status: 'todo',
+      priority: newPriority,
+      due: 'Soon',
+      assignee: 'You',
+    };
+    setTasks((current) => [next, ...current]);
+    setNewTitle('');
+    setNewPriority('normal');
+    setTouched(false);
+    setNotice('Task added.');
+    setFilter('all');
+  };
+
   return (
-    <DemoQuickWinPage
-      active="tasks"
-      badge="Tasks"
-      detailItems={taskControls}
-      detailTitle="Task controls"
-      listDescription="A productivity route for internal apps, SaaS dashboards, and project tools."
-      listItems={taskItems}
-      listTitle="Task workspace"
-      metrics={metrics}
-      primaryAction={{ label: 'Add task', icon: <Plus className="h-4 w-4" /> }}
-      secondaryAction={{
-        label: 'Filter tasks',
-        icon: <Filter className="h-4 w-4" />,
-        variant: 'outline',
-      }}
-      summary="A task management page with priorities, assignees, due dates, blocked states, and bulk actions."
-      title="Tasks"
-      transition="fade"
-      variantDescription="Task pages need dense rows, priority indicators, and quick owner/date controls."
-      variantItems={taskControls}
-      variantTitle="Task component variants"
-    />
+    <Frame>
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <div className="mb-6 space-y-1">
+          <Badge className="w-fit" variant="secondary">
+            Productivity
+          </Badge>
+          <h1 className="font-bold text-3xl tracking-tight md:text-4xl">Tasks</h1>
+          <p className="max-w-xl text-muted-foreground">
+            Check items off, filter by status, or add a new task. Counts update live.
+          </p>
+        </div>
+
+        <p aria-live="polite" className="sr-only">
+          {notice ?? ''}
+        </p>
+
+        <div className="mb-4 grid grid-cols-3 gap-3">
+          <Kpi label="To do" value={counts.todo} />
+          <Kpi label="Doing" value={counts.doing} />
+          <Kpi label="Done" value={counts.done} />
+        </div>
+
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-base">Add task</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form
+              className="flex flex-col gap-3 sm:flex-row sm:items-end"
+              noValidate={true}
+              onSubmit={addTask}
+            >
+              <div className="flex-1 space-y-1.5">
+                <Label htmlFor={titleId}>Title</Label>
+                <Input
+                  aria-describedby={touched && !titleValid ? titleErrorId : undefined}
+                  aria-invalid={touched && !titleValid}
+                  id={titleId}
+                  onBlur={() => setTouched(true)}
+                  onChange={(event) => setNewTitle(event.target.value)}
+                  placeholder="What needs doing?"
+                  value={newTitle}
+                />
+                {touched && !titleValid ? (
+                  <p className="text-destructive text-sm" id={titleErrorId}>
+                    Enter at least 2 characters.
+                  </p>
+                ) : null}
+              </div>
+              <div className="space-y-1.5 sm:w-36">
+                <Label htmlFor={priorityId}>Priority</Label>
+                <Select
+                  onValueChange={(value) => setNewPriority(value as Priority)}
+                  value={newPriority}
+                >
+                  <SelectTrigger id={priorityId}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit">
+                <Plus aria-hidden="true" className="h-4 w-4" /> Add
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="text-muted-foreground text-sm" id={filterLabelId}>
+            Show
+          </span>
+          <div
+            aria-labelledby={filterLabelId}
+            className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1"
+            role="group"
+          >
+            {STATUS_FILTERS.map((option) => (
+              <button
+                aria-pressed={filter === option.value}
+                className={cn(
+                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
+                  filter === option.value
+                    ? 'bg-background shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+                key={option.value}
+                onClick={() => setFilter(option.value)}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="p-2 sm:p-3">
+            {visible.length === 0 ? (
+              <div className="flex flex-col items-center px-4 py-14 text-center">
+                <ListTodo aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
+                <h2 className="mt-3 font-semibold">No tasks here</h2>
+                <p className="mt-1 text-muted-foreground text-sm">
+                  {filter === 'all'
+                    ? 'Add a task above to get started.'
+                    : 'Nothing matches this status — try All.'}
+                </p>
+                {filter === 'all' ? null : (
+                  <Button
+                    className="mt-4"
+                    onClick={() => setFilter('all')}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    Show all
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <ul aria-label="Task list" className="divide-y">
+                {visible.map((task) => {
+                  const done = task.status === 'done';
+                  return (
+                    <li className="flex items-start gap-3 px-2 py-3 sm:items-center" key={task.id}>
+                      <Checkbox
+                        aria-label={
+                          done ? `Mark ${task.title} incomplete` : `Complete ${task.title}`
+                        }
+                        checked={done}
+                        className="mt-1 sm:mt-0"
+                        onCheckedChange={() => toggleComplete(task.id)}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className={cn(
+                            'font-medium text-sm',
+                            done && 'text-muted-foreground line-through',
+                          )}
+                        >
+                          {task.title}
+                        </p>
+                        <p className="mt-0.5 flex flex-wrap items-center gap-2 text-muted-foreground text-xs">
+                          <span>{task.assignee}</span>
+                          <span>·</span>
+                          <span>Due {task.due}</span>
+                          <Badge
+                            className={cn('font-normal', PRIORITY_META[task.priority].className)}
+                            variant="outline"
+                          >
+                            {PRIORITY_META[task.priority].label}
+                          </Badge>
+                          {task.status === 'doing' ? (
+                            <Badge className="font-normal" variant="secondary">
+                              Doing
+                            </Badge>
+                          ) : null}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1">
+                        {done ? (
+                          <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-emerald-600" />
+                        ) : (
+                          <Circle aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <Button
+                          aria-label={`Delete ${task.title}`}
+                          onClick={() => removeTask(task.id)}
+                          size="icon"
+                          type="button"
+                          variant="ghost"
+                          className="h-8 w-8"
+                        >
+                          <Trash2 aria-hidden="true" className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
+          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
+          <div className="mt-3 space-y-2 text-muted-foreground">
+            <p>
+              Fully interactive with local state — complete toggles, filters, add, and delete all
+              recompute the list. To make it real:
+            </p>
+            <ol className="list-decimal space-y-1 pl-5">
+              <li>
+                Run <code>vybekiit apply-preset tasks</code> for <code>task_lists</code> and{' '}
+                <code>tasks</code>.
+              </li>
+              <li>
+                <code>GET /api/tasks?status=</code> loads rows; map <code>status</code> to{' '}
+                <code>todo</code> / <code>doing</code> / <code>done</code>.
+              </li>
+              <li>
+                Checkbox → <code>PATCH /api/tasks/:id</code> with{' '}
+                <code>{'{ status: "done" }'}</code> (or back to <code>todo</code>).
+              </li>
+              <li>
+                Add form → <code>POST /api/tasks</code> with{' '}
+                <code>{'{ title, priority, listId }'}</code>; delete →{' '}
+                <code>DELETE /api/tasks/:id</code>.
+              </li>
+            </ol>
+          </div>
+        </details>
+      </main>
+    </Frame>
   );
 };
+
+/** Gallery theme + motion wrapper (matches the other recipes). */
+const Frame = ({ children }: { readonly children: ReactNode }) => (
+  <DemoThemeRandomizer>
+    <DemoTransitionStage defaultTransition="fade" title="Tasks motion pass">
+      <div className="min-h-screen bg-background text-foreground">{children}</div>
+    </DemoTransitionStage>
+  </DemoThemeRandomizer>
+);
+
+/** Small count tile above the task list. */
+const Kpi = ({ label, value }: { readonly label: string; readonly value: number }) => (
+  <Card>
+    <CardContent className="p-3 text-center">
+      <p className="font-semibold text-2xl tabular-nums">{value}</p>
+      <p className="text-muted-foreground text-xs">{label}</p>
+    </CardContent>
+  </Card>
+);

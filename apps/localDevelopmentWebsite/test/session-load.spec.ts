@@ -6,15 +6,23 @@ test.describe('session loading', () => {
 
     const sidebar = page.getByTestId('chat-sidebar');
 
-    await expect(sidebar.getByText('Kiro sessions')).toBeVisible();
+    await expect(sidebar.getByText('Kiro sessions', { exact: true })).toBeVisible();
 
     const sessionButtons = sidebar.locator('[data-testid^="session-item"]');
+    // Wait until loading finishes (empty list or session rows). Local session trees can be large.
     await expect
-      .poll(async () => {
-        const sessionCount = await sessionButtons.count();
-        const noSessions = await sidebar.getByText('No Kiro sessions found').isVisible();
-        return sessionCount > 0 || noSessions;
-      })
+      .poll(
+        async () => {
+          const stillLoading = await sidebar.getByText('Loading sessions').isVisible();
+          if (stillLoading) {
+            return false;
+          }
+          const sessionCount = await sessionButtons.count();
+          const noSessions = await sidebar.getByText('No Kiro sessions found').isVisible();
+          return sessionCount > 0 || noSessions;
+        },
+        { timeout: 20_000 },
+      )
       .toBe(true);
 
     const hasSessions = await sessionButtons.count().then((c) => c > 0);

@@ -21,6 +21,16 @@ needs it.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install / extend the auth page recipe first (catalog SSOT — Option C).**
+   Copy or extend `apps/componentLibrary/src/pageRecipes/AuthPage.tsx` export `AuthPage` at route `/login`
+   with a **Continue with Google** button. Recipe id: `auth`. Preset: auth-bridge.
+   Legal pages when needed: `TermsOfServicePage` → `/terms`, `PrivacyPolicyPage` → `/privacy`
+   from the page-recipe manifest (group `legal`).
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('sign-in-with-google')` / page-recipe-manifest.json.
+   **Verify:** `/login` shows practice Google button before provider wiring.
+
 1. **Make sure the basics exist.** Database (`save-data`) and base sign-in (`add-signin`) must work
    first — Google builds on top.
    **Verify:** a real email/password account can sign up and reach the dashboard.

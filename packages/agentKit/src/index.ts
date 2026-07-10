@@ -1,6 +1,7 @@
 export * from './catalogs/agentRuntimeDocSources';
 export * from './catalogs/backendCapabilities';
 export * from './catalogs/goalCatalog';
+export * from './catalogs/pageRecipeInstall';
 export * from './catalogs/platformSkillsAudit';
 export * from './catalogs/platformSkillsMerge';
 export * from './catalogs/productionGates';

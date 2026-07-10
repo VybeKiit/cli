@@ -1,6 +1,7 @@
 'use client';
 
 import { HERO_STACK_MARKS } from '@/data/brandMarks3d';
+import { cdnAssetUrl } from '@/lib/cdnAssets';
 import { cn } from '@/lib/utils';
 
 /**
@@ -37,7 +38,7 @@ export const HeroProductStackOrbit = ({ className }: { readonly className?: stri
           decoding="async"
           draggable={false}
           key={entry.slug}
-          src={entry.src}
+          src={cdnAssetUrl(entry.src)}
           style={{
             left: `${entry.x * 100}%`,
             top: `${entry.y * 100}%`,

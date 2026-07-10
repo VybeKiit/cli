@@ -1,68 +1,68 @@
-/** Cheeky plain-English vibe hints keyed by brand-mark slug — one string per slug. */
+/** Cheeky plain-English vibe hints keyed by brand-mark slug. One string per slug. */
 export const VIBE_HINTS: Readonly<Record<string, string>> = {
-  // Builder tools (hero orbit)
+  // AI coding agents (trust strip top marquee)
   cursor:
-    'Your AI coding buddy with the fancy autocomplete. You describe; it types — you never touch the plumbing.',
+    'Your AI coding buddy. You describe the app in plain words; it types and never asks you to touch plumbing.',
   claude:
-    'The assistant that reads your whole project and actually gets context. You talk goals; it writes the code.',
+    'The agent that reads your whole project and actually gets the goal. You talk; it builds.',
   codex:
-    'Another assistant you paste plain requests into — great when you want a second opinion on a screen.',
+    'OpenAI coding agent in the terminal. Same VybeKiit skills; pick the agent you already use.',
+  kiro: "Amazon's AI coding agent. Same kit and skills; stay in the agent you like.",
+  kimi: "Moonshot's coding agent. Describe the product; it works the kit for you.",
+  zed: 'Fast editor with its own AI. Still runs the full VybeKiit plan → live flow.',
+  opencode: 'Open-source coding agent. Same plain-language skills; no lock-in to one vendor.',
+  grok: 'xAI coding agent. Prompt like a vibe coder; ship payments and deploy in session one.',
+  googlegemini: "Google's coding agent. Same stack skills; you never juggle a different playbook.",
+  devin: 'Autonomous software agent. VybeKiit gives it the stack, payments, and ship checklist.',
+
+  // Builder tools / product stack
   github:
-    'Where your code lives online so you never lose a file. Your agent pushes; you never learn git commands.',
+    'Where your code lives online so you never lose a file. Your agent pushes; you never learn git.',
   figma:
-    'The design mockup tool designers love. You can ignore it — your agent builds screens from words, not pixel-pushing.',
+    'Design mockups if you want them. Most vibe coders skip it; the agent builds screens from words.',
   typescript:
-    'Code with guardrails so things break loudly instead of silently. Your agent writes it; you never fix typo hunts.',
+    'Code with guardrails so things break loudly instead of silently. Your agent writes it.',
   nodedotjs:
     "It's a server. Doesn't tell you much, huh? Good news: your agent lives here so you don't have to.",
   playwright:
-    'A robot that clicks through your app like a user would. Your agent uses it to catch broken checkout before you do.',
+    'A robot that clicks through your app like a user. Catches broken checkout before buyers do.',
 
-  // Product stack (pricing row)
   nextdotjs:
-    'The engine behind your website — pages, sign-in, checkout, all of it. Fast by default; your agent wires it up.',
+    'The engine behind your website: pages, sign-in, checkout. Fast by default; your agent wires it.',
   tailwindcss:
-    'Makes your site look beautiful without you picking colors. Your agent handles the styling — you just say "make it pop."',
+    'Makes your site look good without you picking hex colors. Say "make it pop" and move on.',
   react:
-    'How buttons, forms, and dashboards actually show up on screen. Lego blocks your agent snaps together.',
+    'How buttons, forms, and dashboards show up on screen. Lego blocks your agent snaps together.',
   shadcn:
-    'Pre-built screen pieces that actually look good. Your agent picks them — you just say "make a dashboard."',
+    'Pre-built screen pieces that look polished. You say "make a dashboard"; the agent picks them.',
   supabase:
-    "Where your app's info lives online — users, orders, settings, the lot. Your agent sets it up; you never open an admin panel unless you want to.",
-  cloudflare:
-    'Where your site lives on the internet — fast, cheap, worldwide. Your agent puts it live; you never touch a server dashboard.',
+    "Where your app's info lives: users, orders, settings. Agent sets it up; you stay out of admin panels.",
+  cloudflare: 'Where your site lives on the internet: fast, cheap, worldwide. Agent puts it live.',
   lemonsqueezy:
-    'The cash register that also handles tax headaches. You paste one key; buyers pay; you get paid.',
+    'The cash register that also handles tax headaches. Paste one key; buyers pay; you get paid.',
   betterauth:
-    'Sign-in without the "why won\'t Google login work" spiral. Your agent wires it; users get a magic link or password.',
-  openai:
-    'The brains behind smart features in your app — chat, summaries, whatever you describe. One secret key in, magic out.',
-  expo: 'Turns your idea into a real iPhone and Android app. Your agent handles the builds; you never install Apple dev tools.',
-  wxt: 'The starter kit for browser add-ons — the little popup, the behind-the-scenes bits, the Chrome store listing. Agent territory only.',
+    'Sign-in without the "why won\'t Google login work" spiral. Magic link or password, agent-wired.',
+  openai: 'Brains for smart features in your app: chat, summaries, whatever you describe.',
+  expo: 'Turns your idea into a real iPhone and Android app for the App Store and Play Store.',
+  wxt: 'Browser add-ons: popup, background bits, Chrome store listing. Agent territory only.',
   sonner:
-    'Those little pop-up messages that say "Saved!" or "Oops." Polished feedback your agent drops in for free.',
-  resend:
-    'Sends emails from your app — welcome messages, receipts, password resets. Your agent connects it; you never touch mail settings.',
+    'Little pop-ups that say "Saved!" or "Oops." Polished feedback the agent drops in for free.',
+  resend: 'Emails from your app: welcome notes, receipts, password resets. Agent connects it.',
   stripe:
-    'Another way to take card payments and monthly plans. Only if you need it — your agent flips the switch, not you.',
+    'We give you a payment system: cards and subscriptions when you need them. Agent flips the switch.',
   paypal:
-    'PayPal checkout for buyers who insist on it. Your agent turns it on — you never read their setup docs.',
+    'PayPal checkout for buyers who insist on it. Agent turns it on; you never read setup docs.',
   vercel:
-    "Alternative place to host your site if Cloudflare isn't your vibe. One secret setting; your agent handles the rest.",
-  amazonaws:
-    'The big-cloud backup plan — online filing cabinets for your data and files. Your agent navigates the maze; you stay out.',
-  mongodb:
-    'Stores your app info in flexible chunks instead of neat rows. Only if you need it — your agent picks it, not you.',
-  google:
-    'Sign in with Google — one click for your users. Your agent drops in the keys; you approve the popup once.',
+    "Another place to host your site if Cloudflare isn't your vibe. One secret; agent handles it.",
+  amazonaws: 'Big-cloud backup plan for data and files. Agent navigates the maze; you stay out.',
+  mongodb: 'Stores app info in flexible chunks instead of neat rows. Only if you need it.',
+  google: 'Sign up / sign in with Google. One click for users; agent drops in the keys once.',
   sentry:
-    'Catches crashes before your users DM you "it\'s broken." Your agent wires it; you get a plain summary, not gibberish error codes.',
-  plausible:
-    'Simple visitor counts — how many people showed up, no creepy cookie banner required. Your agent adds it; you check an easy stats page.',
-  googlechrome:
-    'The browser your extension lives in. Users install from the Chrome Web Store — your agent handles submission.',
+    'Catches crashes before users DM "it\'s broken." You get a plain summary, not error gibberish.',
+  plausible: 'Simple visitor counts: how many people showed up, no creepy cookie banner.',
+  googlechrome: 'The browser your extension lives in. Users install from the Chrome Web Store.',
   appstore:
-    'Where iPhone users download your app. Apple review is painful; your agent walks you through one step at a time.',
+    'Where iPhone users download your app. Apple review is painful; agent walks you through it.',
   googleplay:
-    "Android's app store — same deal, different logo. Your agent handles the listing; you click approve.",
+    "Android's app store. Same deal, different logo. Agent handles the listing; you approve.",
 };

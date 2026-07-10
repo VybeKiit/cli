@@ -1,6 +1,9 @@
-import Link from 'next/link';
+import { PageEvent } from '@/components/analytics/PageEvent';
+import { TrackedLink } from '@/components/analytics/TrackedLink';
 import { CheckoutShell } from '@/components/CheckoutShell';
+import { TrustChips } from '@/components/TrustChips';
 import { Button } from '@/components/ui/button';
+import { AnalyticsEvent } from '@/lib/analyticsEvents';
 
 export const metadata = {
   title: 'Checkout canceled — VybeKiit',
@@ -12,14 +15,33 @@ export const metadata = {
  */
 const CancelPage = () => (
   <CheckoutShell>
-    <section className="mx-auto flex max-w-xl flex-col items-start gap-6 px-6 py-24">
-      <h1 className="font-bold text-4xl tracking-tight">Checkout canceled</h1>
-      <p className="text-lg text-muted-foreground">
-        No charge was made. Whenever you are ready, you can pick up right where you left off.
+    <PageEvent event={AnalyticsEvent.checkoutCanceled} />
+    <section className="mx-auto flex max-w-2xl flex-col items-start gap-6 px-6 py-16 sm:py-24">
+      <p className="text-muted-foreground text-sm">No charge was made</p>
+      <h1 className="text-balance font-bold text-4xl tracking-tight sm:text-5xl">
+        Checkout canceled
+      </h1>
+      <p className="text-balance text-lg text-muted-foreground leading-relaxed">
+        Whenever you are ready, you can pick up right where you left off. The kit is still one
+        purchase for web, mobile, and extension.
       </p>
-      <Button asChild={true} size="lg">
-        <Link href="/checkout">Try again</Link>
-      </Button>
+      <TrustChips animate={false} />
+      <div className="flex flex-wrap gap-3">
+        <Button asChild={true} size="lg" className="rounded-full px-6">
+          <TrackedLink
+            href="/?checkout=1"
+            location="cancel_retry"
+            trackProperties={{ label: 'Try again' }}
+          >
+            Try again
+          </TrackedLink>
+        </Button>
+        <Button asChild={true} size="lg" variant="outline" className="rounded-full px-6">
+          <TrackedLink href="/" location="cancel_retry" trackProperties={{ label: 'Back to home' }}>
+            Back to home
+          </TrackedLink>
+        </Button>
+      </div>
     </section>
   </CheckoutShell>
 );

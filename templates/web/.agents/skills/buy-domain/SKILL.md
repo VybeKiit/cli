@@ -22,6 +22,15 @@ it.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the launch checklist recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/LaunchChecklistPage.tsx` export `LaunchChecklistPage` into the buyer app at route `/dashboard/launch`
+   (reuse if `go-live` already installed it).
+   Recipe id: `launch-checklist`. Preset: job_runs when deploy jobs are tracked.
+   Keep every `TODO:` in the recipe and wire domain checklist items after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('buy-domain')` / page-recipe-manifest.json.
+   **Verify:** `/dashboard/launch` builds with practice checklist UI.
+
 1. **Help them choose a name.** Talk through a web address they'd like. Check it's available and
    guide registration **one step at a time** — they pay for it (it's their address).
    **Verify:** the domain is registered to them.

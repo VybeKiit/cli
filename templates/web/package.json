@@ -5,7 +5,8 @@
   "packageManager": "pnpm@10.33.2",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev",
     "prebuild": "tsx scripts/optimizeAssets.ts",
     "build": "next build",
     "start": "next start",

@@ -25,6 +25,16 @@ translate every error · celebrate. You wire all the code; the builder only sign
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/PricingPage.tsx` export `PricingPage` into the buyer app at route `/pricing`.
+   Recipe id: `pricing`. Presets: orders + webhook_events (apply after provider secrets exist).
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Selling physical/digital goods (not only subscriptions)? Also install catalog ids
+   `commerce-products`, `commerce-cart`, `commerce-checkout` via `getPageRecipeInstall`.
+   Also reference `packages/agentKit` `getPageRecipeInstall('setup-payments')` / page-recipe-manifest.json.
+   **Verify:** `/pricing` builds and shows practice plans before provider wiring.
+
 1. **Explain the plan in one line.** *"I'll connect a payment service so you can charge people. I'll do
    the setup — you'll sign in once when I ask."* (Never name Lemon Squeezy, Stripe, or PayPal.)
 

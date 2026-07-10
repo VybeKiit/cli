@@ -26,4 +26,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm build
+      # tsup DTS for large packages (e.g. @vybekiit/db) OOMs under default heap when
+      # turbo runs many package builds in parallel on a GH-hosted runner.
+      - run: pnpm exec turbo run build --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192

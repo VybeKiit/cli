@@ -9,7 +9,7 @@ import process from 'node:process';
 import { repoRootFrom } from '../../lib/repoRoot.mjs';
 
 const repoRoot = repoRootFrom(import.meta.url);
-const cli = join(repoRoot, 'cli/dist/index.js');
+const cli = join(repoRoot, 'cli/dist/bin.js');
 const docsScript = join(repoRoot, 'scripts/dev/checks/checkAgentRuntimeDocs.mjs');
 
 const fetchDocs = spawnSync('node', [docsScript], { encoding: 'utf8' });

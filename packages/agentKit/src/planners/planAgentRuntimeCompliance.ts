@@ -130,7 +130,12 @@ const validateLiveDocs = (
     return [];
   }
   const issues: AgentRuntimeComplianceIssue[] = [];
+  // Only validate docs the fetch step actually returned. The catalog lists many
+  // optional runtimes; CI fetches the primary set (see checkAgentRuntimeDocs.mjs).
   for (const source of AGENT_RUNTIME_DOC_SOURCES) {
+    if (!Object.hasOwn(liveDocs, source.id)) {
+      continue;
+    }
     const body = liveDocs[source.id];
     if (body === undefined || body.length === 0) {
       issues.push({
@@ -138,15 +143,15 @@ const validateLiveDocs = (
         message: `Missing live doc body for ${source.id} (${source.url})`,
         severity: 'error',
       });
-    } else {
-      for (const phrase of source.mustInclude) {
-        if (!body.includes(phrase)) {
-          issues.push({
-            check: 'runtime-docs-live',
-            message: `Official doc drift: ${source.id} no longer mentions "${phrase}" — update agent-runtime rules`,
-            severity: 'error',
-          });
-        }
+      continue;
+    }
+    for (const phrase of source.mustInclude) {
+      if (!body.includes(phrase)) {
+        issues.push({
+          check: 'runtime-docs-live',
+          message: `Official doc drift: ${source.id} no longer mentions "${phrase}" — update agent-runtime rules`,
+          severity: 'error',
+        });
       }
     }
   }

@@ -27,6 +27,7 @@ const orderEvent: OrderEvent = {
   eventName: 'order_created',
   orderId: 'order_1',
   customerEmail: null,
+  customerName: null,
   githubUsername: null,
   isRefund: false,
 };

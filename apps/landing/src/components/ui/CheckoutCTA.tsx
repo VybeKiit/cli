@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { type ReactNode, useCallback, useState } from 'react';
 import { CartIcon, LockIcon } from '@/components/ui/CustomIcons';
+import { trackClient } from '@/lib/analyticsClient';
+import { AnalyticsEvent } from '@/lib/analyticsEvents';
 import { cn } from '@/lib/utils';
 
 interface CheckoutCTAProps {
@@ -36,7 +38,12 @@ export const CheckoutCTA = ({
 
   const handleClick = useCallback(() => {
     setProceeding(true);
-  }, []);
+    trackClient(AnalyticsEvent.ctaClicked, {
+      location: size === 'pricing' ? 'pricing' : 'hero_primary',
+      href,
+      surface: 'CheckoutCTA',
+    });
+  }, [href, size]);
 
   return (
     <Link

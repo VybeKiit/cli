@@ -14,6 +14,18 @@ import {
 const RASTER_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.tiff']);
 const RASTER_SOURCE_PRIORITY = ['.png', '.jpg', '.jpeg', '.gif', '.tiff', '.webp', '.avif'];
 const SVG_EXT = '.svg';
+/** Basenames owned by `pnpm sync:brand` (assets/brand SSOT). SVGO must not rewrite them. */
+const BRAND_LOCKED_SVG_NAMES = new Set([
+  'logo.svg',
+  'icon.svg',
+  'favicon.svg',
+  'logo-icon.svg',
+  'vybekiit-logo.svg',
+  'vybekiit-profile.svg',
+  'vybekiit-wordmark.svg',
+  'auth-logo.svg',
+  'logo-dark.svg',
+]);
 const MAX_WIDTH = 1920;
 const QUALITY = 80;
 // swap the trailing file extension: "img.png" -> "img.webp"
@@ -167,7 +179,10 @@ const optimizeAssetFile = async (
 
   try {
     if (extname(filePath).toLowerCase() === SVG_EXT) {
-      await optimizeSvgFile(filePath, outPath);
+      // Brand marks stay byte-identical to assets/brand so sync:brand / brand tests stay green.
+      if (!BRAND_LOCKED_SVG_NAMES.has(basename(filePath))) {
+        await optimizeSvgFile(filePath, outPath);
+      }
       return {
         rel,
         entry: {

@@ -214,7 +214,9 @@ export const SECRET_FAMILIES = [
     // Covers Supabase service-role, Cloudflare tokens, Lemon Squeezy keys, and anything new.
     id: 'named-secret',
     name: L('secret value', 'ערך סודי'),
-    re: /\b[A-Z0-9_]*(?:SECRET|TOKEN|API_?KEY|PASSWORD|PRIVATE_KEY|ACCESS_KEY|SERVICE_ROLE)[A-Z0-9_]*\s*[:=]\s*['"][^'"\s]{12,}['"]/i,
+    // ENV-style names only (UPPER_SNAKE). Avoid camelCase i18n keys like forgotPassword.
+    // API_KEY_LIVE = "sk-...." → match; forgotPassword: "navigation.x" → no match
+    re: /\b[A-Z][A-Z0-9_]*(?:SECRET|TOKEN|API_?KEY|PASSWORD|PRIVATE_KEY|ACCESS_KEY|SERVICE_ROLE)[A-Z0-9_]*\s*[:=]\s*['"][^'"\s]{12,}['"]/,
   },
 ];
 

@@ -12,7 +12,7 @@ const STATS = [
 ] as const;
 
 /**
- * Mobile App carousel slide — native dashboard inside a phone frame.
+ * Mobile App carousel slide — native dashboard inside a realistic iPhone frame.
  *
  * @returns The rendered MobileAppSlide element.
  * @example
@@ -20,14 +20,13 @@ const STATS = [
  * <MobileAppSlide />
  * ```
  */
-
 export const MobileAppSlide = () => (
   <div className="flex h-full items-center justify-center bg-[#03070d] p-3">
-    <MiniPhoneShell className="h-full max-h-[430px]">
-      <div className="flex h-full flex-col p-3.5">
-        <div className="mb-3 flex items-center justify-between">
+    <MiniPhoneShell className="h-full max-h-[430px] w-[188px] max-w-none">
+      <div className="flex h-full flex-col px-3 pt-1 pb-0">
+        <div className="mb-2 flex items-center justify-between">
           <p className="font-semibold text-[13px] text-white">Dashboard</p>
-          <span className="text-[9px] text-white/40">9:41</span>
+          <span className="text-[9px] text-white/40">Today</span>
         </div>
 
         <p className="text-[9px] text-white/45">Total Revenue</p>

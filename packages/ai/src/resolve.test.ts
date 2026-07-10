@@ -1,7 +1,7 @@
 import { it } from '@effect/vitest';
-import { completeAi, makeAiLive, resolveAiProvider } from '@vybekiit/ai/resolve';
 import { Effect } from 'effect';
 import { describe, expect } from 'vitest';
+import { completeAi, makeAiLive, resolveAiProvider } from './resolve';
 
 describe('resolveAiProvider', () => {
   it.effect('defaults to the local adapter from Schema config', () =>

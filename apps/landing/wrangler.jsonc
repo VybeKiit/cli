@@ -14,6 +14,7 @@
   },
   "vars": {
     "APP_URL": "https://vybekiit.com",
+    "NEXT_PUBLIC_ASSETS_BASE_URL": "https://pub-e43389539f974d69b9ec3c1fb0f08dd6.r2.dev",
     "PAYMENTS_PROVIDER": "lemon-squeezy",
     "LEMONSQUEEZY_STORE_ID": "270009",
     "LEMONSQUEEZY_TEST_MODE": "false"

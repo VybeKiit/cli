@@ -1,13 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { VIBE_HINTS } from '@/data/vibeHints';
-import { useFirstHoverTypewriter } from '@/hooks/useFirstHoverTypewriter';
-import { cn } from '@/lib/utils';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-const DESKTOP_MEDIA = '(min-width: 768px)';
+import { VIBE_HINTS } from '@/data/vibeHints';
+import { cn } from '@/lib/utils';
 
 export type BrandMarkVibeHintMode = 'tooltip-only' | 'tooltip-and-mobile-subtitle';
 
@@ -17,7 +15,12 @@ interface BrandMarkVibeHintProps {
   readonly mode?: BrandMarkVibeHintMode;
   readonly forceOpen?: boolean;
   readonly side?: 'top' | 'bottom' | 'left' | 'right';
-  readonly onCascadeInterrupt?: () => void;
+  readonly onCascadeInterrupt?: (() => void) | undefined;
+  /**
+   * When true, show the full hint immediately (no hover typewriter).
+   * Use under moving marquees so the tooltip is readable on first paint.
+   */
+  readonly instant?: boolean;
 }
 
 /**
@@ -27,10 +30,9 @@ interface BrandMarkVibeHintProps {
  * @returns The rendered BrandMarkVibeHintMobile element.
  * @example
  * ```tsx
- * <BrandMarkVibeHintMobile />
+ * <BrandMarkVibeHintMobile slug="cursor" />
  * ```
  */
-
 export const BrandMarkVibeHintMobile = ({ slug }: { readonly slug: string }) => {
   const hint = VIBE_HINTS[slug];
   if (!hint) {
@@ -40,17 +42,86 @@ export const BrandMarkVibeHintMobile = ({ slug }: { readonly slug: string }) => 
   return <span className="brand-mark-vibe-hint md:hidden">{hint}</span>;
 };
 
+interface TooltipBoxProps {
+  readonly text: string;
+  readonly anchor: DOMRect;
+  readonly side: 'top' | 'bottom' | 'left' | 'right';
+  readonly labelId: string;
+}
+
 /**
- * Plain-English vibe hint — desktop tooltip; mobile subtitle lives in children.
+ * Fixed-position portal tooltip. Avoids Radix opacity/animation fights under marquees.
+ *
+ * @param props - Text, anchor rect, and preferred side.
+ * @returns Portal tooltip node.
+ */
+const TooltipBox = ({ text, anchor, side, labelId }: TooltipBoxProps) => {
+  const gap = 12;
+  const maxWidth = 256;
+  const viewportPad = 12;
+
+  let top = anchor.top;
+  let left = anchor.left + anchor.width / 2;
+
+  if (side === 'top') {
+    top = anchor.top - gap;
+  } else if (side === 'bottom') {
+    top = anchor.bottom + gap;
+  } else if (side === 'left') {
+    top = anchor.top + anchor.height / 2;
+    left = anchor.left - gap;
+  } else {
+    top = anchor.top + anchor.height / 2;
+    left = anchor.right + gap;
+  }
+
+  // Keep the bubble inside the viewport horizontally.
+  const half = maxWidth / 2;
+  const clampedLeft = Math.min(
+    Math.max(left, half + viewportPad),
+    window.innerWidth - half - viewportPad,
+  );
+
+  let transform = 'translate(0, -50%)';
+  if (side === 'top') {
+    transform = 'translate(-50%, -100%)';
+  } else if (side === 'bottom') {
+    transform = 'translate(-50%, 0)';
+  } else if (side === 'left') {
+    transform = 'translate(-100%, -50%)';
+  }
+
+  return createPortal(
+    <div
+      className="brand-vibe-tooltip"
+      id={labelId}
+      role="tooltip"
+      style={{
+        position: 'fixed',
+        top,
+        left: side === 'top' || side === 'bottom' ? clampedLeft : left,
+        transform,
+        zIndex: 400,
+      }}
+    >
+      {text}
+    </div>,
+    document.body,
+  );
+};
+
+/**
+ * Plain-English vibe hint — desktop portal tooltip; works under marquees and auto-popups.
  *
  * @param props - Component props.
  * @returns The rendered BrandMarkVibeHint element.
  * @example
  * ```tsx
- * <BrandMarkVibeHint />
+ * <BrandMarkVibeHint slug="cursor" instant>
+ *   <button type="button">Cursor</button>
+ * </BrandMarkVibeHint>
  * ```
  */
-
 export const BrandMarkVibeHint = ({
   slug,
   children,
@@ -59,13 +130,16 @@ export const BrandMarkVibeHint = ({
   onCascadeInterrupt,
 }: BrandMarkVibeHintProps) => {
   const hint = VIBE_HINTS[slug];
-  const [isDesktop, setIsDesktop] = useState(false);
+  const labelId = useId();
+  const [finePointer, setFinePointer] = useState(true);
   const [hoverOpen, setHoverOpen] = useState(false);
+  const [anchor, setAnchor] = useState<DOMRect | null>(null);
+  const [wrapEl, setWrapEl] = useState<HTMLSpanElement | null>(null);
 
   useEffect(() => {
-    const media = window.matchMedia(DESKTOP_MEDIA);
+    const media = window.matchMedia('(hover: hover) and (pointer: fine)');
     const sync = () => {
-      setIsDesktop(media.matches);
+      setFinePointer(media.matches);
     };
     sync();
     media.addEventListener('change', sync);
@@ -74,26 +148,44 @@ export const BrandMarkVibeHint = ({
     };
   }, []);
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (forceOpen) {
-        if (nextOpen) {
-          onCascadeInterrupt?.();
-        }
-        return;
-      }
-      setHoverOpen(nextOpen);
-    },
-    [forceOpen, onCascadeInterrupt],
-  );
+  const open = Boolean(hint) && finePointer && (forceOpen || hoverOpen);
+
+  const measure = useCallback(() => {
+    if (wrapEl === null) {
+      return;
+    }
+    setAnchor(wrapEl.getBoundingClientRect());
+  }, [wrapEl]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    measure();
+    const onScrollOrResize = () => {
+      measure();
+    };
+    window.addEventListener('scroll', onScrollOrResize, true);
+    window.addEventListener('resize', onScrollOrResize);
+    // Marquees move every frame — keep the bubble glued to the logo.
+    const raf = window.setInterval(measure, 80);
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize, true);
+      window.removeEventListener('resize', onScrollOrResize);
+      window.clearInterval(raf);
+    };
+  }, [open, measure]);
 
   const handlePointerEnter = useCallback(() => {
-    if (!isDesktop) {
+    if (!(finePointer && hint)) {
       return;
     }
     onCascadeInterrupt?.();
     setHoverOpen(true);
-  }, [isDesktop, onCascadeInterrupt]);
+    if (wrapEl !== null) {
+      setAnchor(wrapEl.getBoundingClientRect());
+    }
+  }, [finePointer, hint, onCascadeInterrupt, wrapEl]);
 
   const handlePointerLeave = useCallback(() => {
     if (forceOpen) {
@@ -102,35 +194,23 @@ export const BrandMarkVibeHint = ({
     setHoverOpen(false);
   }, [forceOpen]);
 
-  const open = Boolean(hint) && isDesktop && (forceOpen || hoverOpen);
-  const typewriterHint = hint === undefined ? '' : hint;
-  const { text: tooltipText, showCursor } = useFirstHoverTypewriter(slug, typewriterHint, {
-    open,
-    enabled: !forceOpen && Boolean(hint),
-  });
-
   if (!hint) {
     return <>{children}</>;
   }
 
   return (
-    <Tooltip open={open} onOpenChange={handleOpenChange}>
-      <TooltipTrigger
-        asChild={true}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
-      >
+    <span
+      ref={setWrapEl}
+      className={cn('brand-vibe-hint-wrap', open && 'brand-vibe-hint-wrap--open')}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
+      <span aria-describedby={open ? labelId : undefined} className="brand-vibe-hint-trigger">
         {children}
-      </TooltipTrigger>
-      <TooltipContent
-        className={cn(
-          'max-w-[16rem] border border-white/12 bg-[#080b12] px-2.5 py-2 text-center font-medium text-[0.68rem] text-white/88 leading-snug shadow-lg',
-        )}
-        side={side}
-        sideOffset={8}
-      >
-        <span className={cn(showCursor && 'typewriter-cursor')}>{tooltipText}</span>
-      </TooltipContent>
-    </Tooltip>
+      </span>
+      {open && anchor !== null ? (
+        <TooltipBox anchor={anchor} labelId={labelId} side={side} text={hint} />
+      ) : null}
+    </span>
   );
 };

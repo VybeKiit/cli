@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { CheckoutShell } from '@/components/CheckoutShell';
 import { BRAND } from '@/data/site';
+import { cdnAssetUrl } from '@/lib/cdnAssets';
 
 export const metadata = {
   title: 'Brand & Media — VybeKiit',
@@ -34,16 +35,17 @@ const BrandPage = () => (
         <h2 className="font-semibold text-xl">Logo</h2>
         <div className="flex items-center gap-6 rounded-xl border bg-card p-8">
           <Image
-            src="/vybekiit-logo.svg"
+            src={cdnAssetUrl('/vybekiit-logo.svg')}
             alt="VybeKiit logo"
             width={96}
             height={96}
             priority={true}
+            unoptimized={true}
           />
           <div className="flex flex-col gap-2">
             <a
               className="font-medium text-primary underline underline-offset-4"
-              href="/vybekiit-logo.svg"
+              href={cdnAssetUrl('/vybekiit-logo.svg')}
               download={true}
             >
               Download SVG

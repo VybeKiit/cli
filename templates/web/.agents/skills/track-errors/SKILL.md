@@ -20,6 +20,15 @@ translate every error · celebrate. You set up alerts; the builder only pastes o
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/SystemHealthPage.tsx` export `SystemHealthPage` into the buyer app at route `/admin/health`.
+   Recipe id: `system-health`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('track-errors')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Explain in one line.** *"I'm going to set up alerts so you know when something breaks in your live app."*
 
 2. **Create or open the alert project.** Sign in to the error-tracking dashboard (Sentry free tier) and

@@ -4,15 +4,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useAsync } from '@/hooks/useAsync';
 import { displayError, useTranslations } from '@/hooks/useTranslations';
+import { useToast } from '@/hooks/useToast';
 import { signInWithPassword } from '@/lib/authClient';
 import { useTheme } from '@/theme/useTheme';
 import { Either } from 'effect';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 /**
- * Render the mobile sign-in screen.
+ * Render the mobile sign-in screen with email/password, forgot password, and OAuth rows.
  *
  * @returns React Native sign-in screen.
  * @example
@@ -20,8 +21,9 @@ import { Text } from 'react-native';
  */
 const LoginScreen = () => {
   const router = useRouter();
-  const { colors, fontSizes } = useTheme();
+  const { colors, fontSizes, spacing } = useTheme();
   const { t } = useTranslations();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { loading: pending, error, run: signIn } = useAsync(signInWithPassword);
@@ -33,6 +35,14 @@ const LoginScreen = () => {
     }
 
     router.replace('/dashboard');
+  };
+
+  const handleGoogle = () => {
+    toast(t('auth.oauth.googlePractice'));
+  };
+
+  const handleApple = () => {
+    toast(t('auth.oauth.applePractice'));
   };
 
   return (
@@ -73,11 +83,33 @@ const LoginScreen = () => {
         value={password}
         onChangeText={setPassword}
       />
+      <Link
+        href="/forgot-password"
+        style={{
+          alignSelf: 'flex-end',
+          color: colors.primary,
+          fontSize: fontSizes.sm,
+          marginTop: -spacing.xs,
+        }}
+      >
+        {t('auth.login.forgotPassword')}
+      </Link>
       <Button
         title={pending ? t('auth.login.submitting') : t('auth.login.submit')}
         loading={pending}
         onPress={handleSubmit}
       />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+        <Text style={{ color: colors.mutedForeground, fontSize: fontSizes.xs }}>
+          {t('auth.login.orContinueWith')}
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+      </View>
+
+      <Button title={t('auth.oauth.google')} variant="outline" onPress={handleGoogle} />
+      <Button title={t('auth.oauth.apple')} variant="outline" onPress={handleApple} />
     </AuthShell>
   );
 };

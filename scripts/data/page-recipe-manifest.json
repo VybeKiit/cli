@@ -13,7 +13,7 @@
           "id": "onboarding",
           "slug": "onboarding",
           "title": "Onboarding page",
-          "summary": "A first-run checklist for setup progress, updates, and next actions.",
+          "summary": "A four-step first-run wizard (workspace, brand, team, review) with a live-derived URL slug, validation-gated navigation, real email-invite chips, and a provisioning → done sequence.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/OnboardingPage.tsx",
           "exportName": "OnboardingPage",
           "targetRoute": "/onboarding",
@@ -21,20 +21,32 @@
           "installNotes": [
             {
               "kind": "service",
-              "label": "Save progress",
-              "note": "Connect checklist progress to the buyer's saved setup state.",
-              "todo": "Connect checklist progress to the user's saved setup state.",
-              "owner": "client-state"
+              "label": "Persist setup",
+              "note": "Persist each step (or the whole payload on Finish) with POST /api/onboarding writing to your DB / D1, and verify the chosen slug is free before committing it.",
+              "todo": "Wire POST /api/onboarding to persist setup and check slug availability.",
+              "owner": "db"
             },
             {
               "kind": "service",
-              "label": "Update workflow",
-              "note": "Connect update prompts to the kit update workflow.",
-              "todo": "Connect update prompts to the kit update workflow.",
-              "owner": "update-kit"
+              "label": "Provision + complete",
+              "note": "On Finish, provision the workspace, save accent + productType to the user's settings, and set onboardingComplete so the app routes past this page next time; replace the setTimeout in finish() with the real request.",
+              "todo": "Provision the workspace on Finish and flip onboardingComplete.",
+              "owner": "core"
+            },
+            {
+              "kind": "service",
+              "label": "Team invites",
+              "note": "Send the collected emails through your invite flow — the same GitHub gate the checkout webhook uses can add teammates to your repos.",
+              "todo": "Send onboarding email invites through the invite/gate flow.",
+              "owner": "core"
             }
           ],
-          "acceptanceChecks": ["The page shows the current setup step and a next action."]
+          "acceptanceChecks": [
+            "Typing an app name auto-fills the workspace URL slug until the slug is edited by hand.",
+            "Continue on step 1 is blocked with inline errors until the name and slug are valid.",
+            "Adding a malformed or duplicate teammate email shows an inline error instead of a chip; valid emails become removable chips.",
+            "Finish moves through a provisioning state to a confirmation screen that reflects the entered name, slug, and invite count."
+          ]
         }
       ]
     },
@@ -50,7 +62,7 @@
           "id": "idea-planner",
           "slug": "idea-planner",
           "title": "Idea planner page",
-          "summary": "A planning surface for app notes and first data entities.",
+          "summary": "Interactive idea planner with notes, entity approve/add/remove, filters, and save plan.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/IdeaPlannerPage.tsx",
           "exportName": "IdeaPlannerPage",
           "targetRoute": "/plan",
@@ -71,7 +83,10 @@
               "owner": "db"
             }
           ],
-          "acceptanceChecks": ["The page captures the idea and shows the first entity list."]
+          "acceptanceChecks": [
+            "Add entity validates length; approve and remove recompute counts; draft/approved filters work.",
+            "Save plan stores the idea snapshot; empty filter shows the empty state."
+          ]
         }
       ]
     },
@@ -87,7 +102,7 @@
           "id": "dashboard-home",
           "slug": "dashboard-home",
           "title": "Dashboard home page",
-          "summary": "A generic signed-in dashboard home with overview cards and next actions.",
+          "summary": "A signed-in dashboard home with live KPI cards driven by a 24h/7d/30d range toggle, a filterable activity feed, and a dismissable action rail — with real loading, error, and caught-up states reachable by interaction.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/DashboardHomePage.tsx",
           "exportName": "DashboardHomePage",
           "targetRoute": "/dashboard",
@@ -100,28 +115,38 @@
           "installNotes": [
             {
               "kind": "service",
-              "label": "Dashboard data",
-              "note": "Load dashboard widgets and activity from the configured app data sources.",
-              "todo": "Load dashboard widgets and activity from the configured app data sources.",
-              "owner": "client-state"
+              "label": "Metrics endpoint",
+              "note": "Add a GET /api/metrics?range= route handler that queries the D1 'vybekiit' orders table (the one the shipped app/api/webhook/route.ts writes) and returns { revenueCents, newCustomers, activeUsers, churnRisk, deltaPct }; call it from runRefresh in place of METRICS_BY_RANGE.",
+              "todo": "Wire GET /api/metrics?range= to the D1 orders table and fetch it from runRefresh.",
+              "owner": "core"
             },
             {
               "kind": "service",
-              "label": "Widget preferences",
-              "note": "Save dashboard widget preferences through client state actions.",
-              "todo": "Save dashboard widget preferences through client state actions.",
+              "label": "Activity feed",
+              "note": "Replace the ACTIVITY sample with your real events — recent D1 orders rows map straight onto the feed shape ({ id, kind, title, meta, time }).",
+              "todo": "Feed the activity list from real order + app events.",
+              "owner": "core"
+            },
+            {
+              "kind": "service",
+              "label": "Action items",
+              "note": "Derive ACTION_ITEMS from your own launch checks and persist a dismissal via PATCH /api/actions/:id so cleared items stay cleared on reload; delete the demo 'Simulate outage' toggle.",
+              "todo": "Derive action items from real checks and persist dismissals.",
               "owner": "client-state"
             }
           ],
           "acceptanceChecks": [
-            "The page shows overview cards, recent activity, and a primary next action."
+            "Switching the range between 24h, 7d, and 30d recomputes every KPI card's value and delta.",
+            "Refresh shows a loading skeleton on the cards; toggling 'Simulate outage' then refreshing enters a full error state with a working Retry.",
+            "Filtering the activity feed by Orders, Signups, or System narrows the list to that kind.",
+            "Marking every action item done reaches the 'You're all caught up' empty state, and Restore items brings them back."
           ]
         },
         {
           "id": "command-center",
           "slug": "command-center",
           "title": "Command center page",
-          "summary": "A command palette and action launcher page for power users.",
+          "summary": "Interactive command palette with live search, pin/unpin, recent history, and runnable actions with busy state.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CommandCenterPage.tsx",
           "exportName": "CommandCenterPage",
           "targetRoute": "/command",
@@ -135,20 +160,23 @@
             {
               "kind": "service",
               "label": "Command source",
-              "note": "Load command definitions and recent actions from the configured command source.",
-              "todo": "Load command definitions and recent actions from the configured command source.",
+              "note": "Load command definitions and recent actions from a client catalog plus job_runs for ops commands.",
+              "todo": "Load command definitions and recent actions from the configured command source (job_runs for ops).",
               "owner": "core"
             },
             {
               "kind": "service",
               "label": "Command execution",
-              "note": "Execute selected commands through audited command actions.",
+              "note": "Execute selected commands through audited command actions and write actor + payload to audit_log.",
               "todo": "Execute selected commands through audited command actions.",
               "owner": "core"
             }
           ],
           "acceptanceChecks": [
-            "The page exposes search, recent commands, and runnable action states."
+            "Search filters commands by label, group, and keywords; empty search shows groups and recent.",
+            "Pin toggles the pin icon and pinned KPI count.",
+            "Running a command shows a busy spinner then adds it to Recent.",
+            "Clear search recovers the full grouped list from an empty filter state."
           ]
         }
       ]
@@ -222,7 +250,7 @@
           "id": "terms-of-service",
           "slug": "terms-of-service",
           "title": "Terms of service page",
-          "summary": "A public terms page with company defaults and OAuth consent links.",
+          "summary": "Public terms page with TOC nav, last-updated stamp, company defaults, and acceptance UI.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/TermsOfServicePage.tsx",
           "exportName": "TermsOfServicePage",
           "targetRoute": "/terms",
@@ -244,14 +272,15 @@
             }
           ],
           "acceptanceChecks": [
-            "The page shows a company name, support email, optional registration ID, and public policy links."
+            "The page shows company details, OAuth links, last-updated date, and section TOC anchors.",
+            "Accept requires the checkbox; confirmed state disables further acceptance."
           ]
         },
         {
           "id": "privacy-policy",
           "slug": "privacy-policy",
           "title": "Privacy policy page",
-          "summary": "A public privacy page with Google OAuth data disclosure defaults.",
+          "summary": "Public privacy page with TOC nav, last-updated stamp, Google OAuth disclosure, and acknowledgement UI.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/PrivacyPolicyPage.tsx",
           "exportName": "PrivacyPolicyPage",
           "targetRoute": "/privacy",
@@ -273,7 +302,8 @@
             }
           ],
           "acceptanceChecks": [
-            "The page explains Google profile data usage and exposes the support email."
+            "The page explains Google profile data usage, exposes support email, and offers TOC anchors.",
+            "Acknowledge requires the checkbox; confirmed state disables further acknowledgement."
           ]
         }
       ]
@@ -290,7 +320,7 @@
           "id": "user-settings",
           "slug": "user-settings",
           "title": "User settings page",
-          "summary": "A profile and preference page for signed-in users.",
+          "summary": "A populated account settings page — profile form with a live avatar and bio counter, theme and notification preferences on real switches, and a dirty-state save bar with a reachable email-validation error and a saving → saved sequence.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/UserSettingsPage.tsx",
           "exportName": "UserSettingsPage",
           "targetRoute": "/settings/profile",
@@ -303,28 +333,38 @@
           "installNotes": [
             {
               "kind": "service",
-              "label": "Profile data",
-              "note": "Load profile and preference data from the active account service.",
-              "todo": "Load profile and preference data from the active account service.",
+              "label": "Load settings",
+              "note": "Seed INITIAL_FORM from your account service (a server component or GET /api/settings) so the page loads already populated.",
+              "todo": "Seed INITIAL_FORM from the account service instead of the hardcoded default.",
               "owner": "auth"
             },
             {
               "kind": "service",
               "label": "Save settings",
-              "note": "Save settings changes through audited user actions.",
-              "todo": "Save settings changes through audited user actions.",
+              "note": "On Save, PATCH /api/settings with the diff and adopt the server's echoed record into `saved` so the dirty bar clears; validate the email and run verification if it changed.",
+              "todo": "Wire PATCH /api/settings and adopt the echoed record into saved state.",
               "owner": "auth"
+            },
+            {
+              "kind": "service",
+              "label": "Apply preferences",
+              "note": "Persist `theme` to your theme provider and the notification switches to your messaging preferences; Discard already resets to the last saved state.",
+              "todo": "Persist theme + notification preferences to their providers.",
+              "owner": "client-state"
             }
           ],
           "acceptanceChecks": [
-            "The page shows profile, sessions, connected accounts, and account deletion states."
+            "Editing any field reveals a sticky save bar; Discard reverts to the saved values and hides it.",
+            "Saving with an invalid email is blocked with an inline error; a valid email lets Save proceed.",
+            "Save runs a saving state and then shows a 'Settings saved' confirmation with the bar cleared.",
+            "The avatar initials and the bio character counter update live as you type."
           ]
         },
         {
           "id": "account-security",
           "slug": "account-security",
           "title": "Account security page",
-          "summary": "A security settings page for sessions, 2FA, and recovery codes.",
+          "summary": "Interactive security settings: 2FA toggle, session revoke, trusted devices, recovery-code rotate/download, and policy switches.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/AccountSecurityPage.tsx",
           "exportName": "AccountSecurityPage",
           "targetRoute": "/settings/security",
@@ -337,20 +377,23 @@
             {
               "kind": "service",
               "label": "Security data",
-              "note": "Load security sessions and recovery code status from the active auth provider.",
-              "todo": "Load security sessions and recovery code status from the active auth provider.",
+              "note": "Load sessions and recovery-code status from your auth provider, and keep a trail of security actions in the audit_log preset.",
+              "todo": "Load sessions and recovery-code status from GET /api/account/security (auth provider + audit_log).",
               "owner": "auth"
             },
             {
               "kind": "service",
               "label": "Security changes",
-              "note": "Save security changes through audited account actions.",
-              "todo": "Save security changes through audited account actions.",
+              "note": "Persist 2FA, session revoke, trust flags, and policy flips via audited account security mutations.",
+              "todo": "Persist 2FA, session revoke, and policy changes via audited account security mutations.",
               "owner": "auth"
             }
           ],
           "acceptanceChecks": [
-            "The page exposes 2FA, active sessions, trusted devices, and recovery codes."
+            "Toggling 2FA and policies updates the KPI strip and switches live.",
+            "Revoking a non-current session removes it from the list; the current device cannot be revoked.",
+            "Rotate codes shows the recovery code grid; Download announces a demo file ready state.",
+            "Trusted/untrusted device labels toggle per session."
           ]
         }
       ]
@@ -360,7 +403,7 @@
       "label": "Payments",
       "description": "Pricing and checkout handoff pages.",
       "order": 40,
-      "presetIds": ["orders", "webhook_events"],
+      "presetIds": ["orders", "webhook_events", "coupons"],
       "goalIds": ["setup-payments"],
       "providerPointers": [
         {
@@ -415,14 +458,20 @@
       "label": "Commerce",
       "description": "Generic ecommerce product, cart, checkout, and order pages.",
       "order": 45,
-      "presetIds": [],
+      "presetIds": ["products", "cart", "coupons", "orders", "webhook_events"],
       "goalIds": [],
+      "providerPointers": [
+        {
+          "provider": "payments",
+          "note": "Wire cart checkout and coupons through the active payment provider; catalog prices live in the products preset until checkout creates an order."
+        }
+      ],
       "recipes": [
         {
           "id": "product-grid",
           "slug": "product-grid",
           "title": "Product grid page",
-          "summary": "A generic ecommerce catalog with product cards and filters.",
+          "summary": "Interactive product catalog with category chips, search, sort, prices in cents, and live add-to-cart feedback.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductGridPage.tsx",
           "exportName": "ProductGridPage",
           "targetRoute": "/products",
@@ -436,27 +485,30 @@
             {
               "kind": "service",
               "label": "Product source",
-              "note": "Load products, prices, and categories from the configured commerce source.",
-              "todo": "Load products, prices, and categories from the configured commerce source.",
+              "note": "Run vybekiit apply-preset products, then replace CATALOG with GET /api/products (id, name, price_cents, image_url, category in metadata).",
+              "todo": "Load catalog from GET /api/products after vybekiit apply-preset products.",
               "owner": "commerce"
             },
             {
               "kind": "service",
               "label": "Cart action",
-              "note": "Send add-to-cart actions through the configured cart action.",
-              "todo": "Send add-to-cart actions through the configured cart action.",
+              "note": "After vybekiit apply-preset cart, upsert cart_items on Add: { cart_id, product_id, name, unit_price_cents, quantity: 1 }.",
+              "todo": "POST add-to-cart to cart_items after vybekiit apply-preset cart.",
               "owner": "commerce"
             }
           ],
           "acceptanceChecks": [
-            "The page shows product cards, prices, filters, and add-to-cart actions."
+            "Category chips, search, and sort filter/reorder the product grid live.",
+            "Add to cart increments the cart badge and shows a success toast; the button shows a brief loading state.",
+            "Filters that match nothing show the empty state with a Clear filters action.",
+            "Reload shows a loading state; Simulate error shows a recoverable error alert."
           ]
         },
         {
           "id": "product-detail",
           "slug": "product-detail",
           "title": "Product detail page",
-          "summary": "A product detail page with gallery, variants, reviews, and related products.",
+          "summary": "Interactive product detail with variants, stock-aware CTA, quantity, related products, and add-to-cart feedback.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/ProductDetailPage.tsx",
           "exportName": "ProductDetailPage",
           "targetRoute": "/products/example",
@@ -470,27 +522,30 @@
             {
               "kind": "service",
               "label": "Product details",
-              "note": "Load product details, variants, reviews, and related products from the commerce source.",
-              "todo": "Load product details, variants, reviews, and related products from the commerce source.",
+              "note": "Run vybekiit apply-preset products, then load GET /api/products/:slug with nested product_variants (id, name, price_cents, stock).",
+              "todo": "Load product + variants from GET /api/products/:slug after apply-preset products.",
               "owner": "commerce"
             },
             {
               "kind": "service",
               "label": "Variant cart action",
-              "note": "Send variant add-to-cart actions through the configured cart action.",
-              "todo": "Send variant add-to-cart actions through the configured cart action.",
+              "note": "After apply-preset cart, upsert cart_items with product_id, variant_id, unit_price_cents, and quantity.",
+              "todo": "POST selected variant to cart_items after apply-preset cart.",
               "owner": "commerce"
             }
           ],
           "acceptanceChecks": [
-            "The page shows gallery, variant, review, related-product, and cart states."
+            "Selecting a variant updates price; Size L (out of stock) and Simulate out of stock disable the Add to cart CTA.",
+            "Quantity +/- respects stock limits; Add to cart shows loading then success and increments the cart badge.",
+            "Related products strip shows four items with prices in cents.",
+            "Simulate error shows a recoverable error alert with Retry."
           ]
         },
         {
           "id": "cart",
           "slug": "cart",
           "title": "Cart page",
-          "summary": "A cart review page with line items, coupons, totals, and checkout action.",
+          "summary": "Interactive cart with editable quantities, coupons (VYBE20), live totals, empty state, and checkout handoff.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CartPage.tsx",
           "exportName": "CartPage",
           "targetRoute": "/cart",
@@ -504,20 +559,23 @@
             {
               "kind": "service",
               "label": "Cart totals",
-              "note": "Load cart line items and totals from the configured commerce source.",
-              "todo": "Load cart line items and totals from the configured commerce source.",
+              "note": "Run vybekiit apply-preset cart, then load the open cart via GET /api/cart with line items (product_id, variant_id, unit_price_cents, quantity).",
+              "todo": "Load open cart line items from GET /api/cart after apply-preset cart.",
               "owner": "commerce"
             },
             {
               "kind": "service",
               "label": "Cart changes",
-              "note": "Save cart changes through the configured cart action.",
-              "todo": "Save cart changes through the configured cart action.",
+              "note": "Persist quantity and remove via cart_items upsert/delete keyed by (cart_id, product_id, variant_id); Checkout navigates to /checkout.",
+              "todo": "Persist quantity/remove via cart_items upsert after apply-preset cart.",
               "owner": "commerce"
             }
           ],
           "acceptanceChecks": [
-            "The page shows line items, coupon, total, empty state, and checkout action."
+            "Quantity +/- and remove recompute subtotal, tax, shipping, and total live (aria-live).",
+            "VYBE20 applies 20% off; an unknown code shows an inline error.",
+            "Removing all items shows the empty state; Restore demo cart reloads items.",
+            "Checkout shows a brief handoff loading state; Reload/Simulate error reach loading and error screens."
           ]
         },
         {
@@ -561,7 +619,7 @@
           "id": "orders",
           "slug": "orders",
           "title": "Orders page",
-          "summary": "An order history page for receipts, fulfillment, and tracking.",
+          "summary": "Interactive order history with status filters, selectable detail panel, invoices, and reorder actions.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/OrdersPage.tsx",
           "exportName": "OrdersPage",
           "targetRoute": "/orders",
@@ -574,20 +632,23 @@
             {
               "kind": "service",
               "label": "Order history",
-              "note": "Load order history and fulfillment status from the configured commerce source.",
-              "todo": "Load order history and fulfillment status from the configured commerce source.",
+              "note": "Run vybekiit apply-preset orders; rows are filled by the payment webhook. List with GET /api/orders for the signed-in buyer.",
+              "todo": "Load order history from GET /api/orders after apply-preset orders (filled by webhook).",
               "owner": "commerce"
             },
             {
               "kind": "service",
               "label": "Order actions",
-              "note": "Send invoice and reorder actions through the configured commerce actions.",
-              "todo": "Send invoice and reorder actions through the configured commerce actions.",
+              "note": "Invoice generates a receipt for the order id; reorder re-inserts lines into the open cart after apply-preset cart.",
+              "todo": "Wire invoice download and reorder actions to orders + cart endpoints.",
               "owner": "commerce"
             }
           ],
           "acceptanceChecks": [
-            "The page shows order history, status badges, invoices, tracking, and reorder actions."
+            "Status filters (all/paid/shipped/refunded) narrow the list; a filter with no matches shows empty with Show all orders.",
+            "Selecting a row updates the detail panel with lines, total, and tracking when present.",
+            "Download invoice and Reorder show success feedback; both are disabled for refunded orders.",
+            "Reload shows loading; Simulate error shows a recoverable error alert."
           ]
         }
       ]
@@ -604,7 +665,7 @@
           "id": "launch-checklist",
           "slug": "launch-checklist",
           "title": "Launch checklist page",
-          "summary": "A launch readiness page for deployment, domain, backup, and job status.",
+          "summary": "Interactive go-live checklist with progress, category filters, and scheduled job health.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/LaunchChecklistPage.tsx",
           "exportName": "LaunchChecklistPage",
           "targetRoute": "/launch",
@@ -625,7 +686,10 @@
               "owner": "jobs"
             }
           ],
-          "acceptanceChecks": ["The page exposes launch status without needing provider secrets."]
+          "acceptanceChecks": [
+            "Checkboxes recompute progress percent; Continue launch marks the next incomplete item done.",
+            "Category chips filter items; Retry flips a failed job to healthy."
+          ]
         }
       ]
     },
@@ -641,7 +705,7 @@
           "id": "file-manager",
           "slug": "file-manager",
           "title": "File manager page",
-          "summary": "An upload and file metadata page for app attachments.",
+          "summary": "Interactive file manager with upload simulation, search, type filters, selection, and delete.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/FileManagerPage.tsx",
           "exportName": "FileManagerPage",
           "targetRoute": "/files",
@@ -662,7 +726,10 @@
               "owner": "db"
             }
           ],
-          "acceptanceChecks": ["The page shows an upload slot and metadata handoff."]
+          "acceptanceChecks": [
+            "Upload prepends files and recomputes storage KPIs; delete removes rows and clears selection.",
+            "Search and type filters recompute the list; empty filters show the empty state."
+          ]
         }
       ]
     },
@@ -678,7 +745,7 @@
           "id": "email-notifications",
           "slug": "email-notifications",
           "title": "Email notifications page",
-          "summary": "A page for test emails and notification preferences.",
+          "summary": "Interactive test email form and notification preferences with validation, dirty save, and activity log.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/EmailNotificationsPage.tsx",
           "exportName": "EmailNotificationsPage",
           "targetRoute": "/settings/notifications",
@@ -699,13 +766,16 @@
               "owner": "notifications"
             }
           ],
-          "acceptanceChecks": ["The page separates email sending from notification preferences."]
+          "acceptanceChecks": [
+            "Invalid email blocks send; successful send appends a log row.",
+            "Preference toggles dirty the draft until Save; log Clear empties the list."
+          ]
         },
         {
           "id": "notifications-center",
           "slug": "notifications-center",
           "title": "Notifications page",
-          "summary": "A notification feed and channel preference page.",
+          "summary": "Interactive notifications inbox with category/unread filters, mark-read actions, and channel preference save.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/NotificationsCenterPage.tsx",
           "exportName": "NotificationsCenterPage",
           "targetRoute": "/notifications",
@@ -719,20 +789,23 @@
             {
               "kind": "service",
               "label": "Notification source",
-              "note": "Load notifications from the active notification source.",
-              "todo": "Load notifications from the active notification source.",
+              "note": "Load notifications from the notifications_log preset via GET /api/notifications.",
+              "todo": "Load notifications from the notifications_log preset via GET /api/notifications.",
               "owner": "notifications"
             },
             {
               "kind": "service",
               "label": "Notification preferences",
-              "note": "Save notification preferences through the notifications feature.",
-              "todo": "Save notification preferences through the notifications feature.",
+              "note": "Persist read state and channel preferences through notification mutations.",
+              "todo": "Persist read state and channel preferences through notification mutations.",
               "owner": "notifications"
             }
           ],
           "acceptanceChecks": [
-            "The page shows unread states, notification categories, and channel preferences."
+            "Category and Unread filters recompute the feed; empty unread shows All caught up.",
+            "Mark read and Mark all read clear unread badges and the Unread KPI.",
+            "Channel switches update local prefs; Save preferences announces success.",
+            "Show all recovers from a filtered empty state."
           ]
         }
       ]
@@ -742,14 +815,14 @@
       "label": "Support",
       "description": "Support center, help desk, and ticket pages.",
       "order": 75,
-      "presetIds": [],
+      "presetIds": ["support_tickets"],
       "goalIds": [],
       "recipes": [
         {
           "id": "support-center",
           "slug": "support-center",
           "title": "Support center page",
-          "summary": "A help desk page with tickets, docs search, and contact actions.",
+          "summary": "Interactive help desk with ticket list, message thread, status change, and live replies.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/SupportCenterPage.tsx",
           "exportName": "SupportCenterPage",
           "targetRoute": "/support",
@@ -763,20 +836,22 @@
             {
               "kind": "service",
               "label": "Support data",
-              "note": "Load support tickets and documentation results from the configured support provider.",
-              "todo": "Load support tickets and documentation results from the configured support provider.",
+              "note": "Run vybekiit apply-preset support_tickets, then load tickets and message threads via GET /api/support/tickets.",
+              "todo": "Load support tickets and message threads from the support_tickets preset tables.",
               "owner": "support"
             },
             {
               "kind": "service",
-              "label": "Support request",
-              "note": "Send support requests through the configured support action.",
-              "todo": "Send support requests through the configured support action.",
+              "label": "Support mutations",
+              "note": "PATCH ticket status and POST replies onto support_ticket_messages.",
+              "todo": "Persist status changes and replies through support ticket mutations.",
               "owner": "support"
             }
           ],
           "acceptanceChecks": [
-            "The page shows ticket, docs search, contact, attachment, and status handoff states."
+            "Selecting a ticket shows its message thread; status select flips open/pending/resolved live.",
+            "Send reply appends an agent message; empty reply under 2 characters shows validation.",
+            "Status filter can empty the list and shows a no-tickets empty state."
           ]
         }
       ]
@@ -793,7 +868,7 @@
           "id": "integrations",
           "slug": "integrations",
           "title": "Integrations page",
-          "summary": "An integrations, API keys, and webhook management page.",
+          "summary": "Interactive integrations console: connect tools, create/rotate/revoke API keys, and retry failed webhooks.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/IntegrationsPage.tsx",
           "exportName": "IntegrationsPage",
           "targetRoute": "/integrations",
@@ -807,20 +882,23 @@
             {
               "kind": "service",
               "label": "Integration data",
-              "note": "Load connected integrations and API keys from the configured integrations source.",
-              "todo": "Load connected integrations and API keys from the configured integrations source.",
+              "note": "Load connected integrations, API keys, and webhooks from the configured integrations source.",
+              "todo": "Load connected integrations, API keys, and webhooks from the integrations source.",
               "owner": "integrations"
             },
             {
               "kind": "service",
               "label": "Integration actions",
-              "note": "Save integration changes through audited integration actions.",
-              "todo": "Save integration changes through audited integration actions.",
+              "note": "Persist connect/disconnect, key rotation, and webhook retries through audited integration actions.",
+              "todo": "Persist connect/disconnect, key rotation, and webhook retries through audited actions.",
               "owner": "integrations"
             }
           ],
           "acceptanceChecks": [
-            "The page shows API keys, webhooks, OAuth apps, scopes, and secret rotation states."
+            "Connection switches update Connected KPI and status badges.",
+            "Create key reveals a one-time secret; Rotate and Revoke update the key list.",
+            "Retry delivery clears the Failing badge on a webhook endpoint.",
+            "Notices announce every successful integration action."
           ]
         }
       ]
@@ -837,7 +915,7 @@
           "id": "teams",
           "slug": "teams",
           "title": "Teams page",
-          "summary": "A workspace member and invitation page.",
+          "summary": "Interactive team members page with validated invites, role changes, status filters, and remove.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/TeamsPage.tsx",
           "exportName": "TeamsPage",
           "targetRoute": "/settings/team",
@@ -858,7 +936,10 @@
               "owner": "tenancy"
             }
           ],
-          "acceptanceChecks": ["The page offers member roles and invite entry before team wiring."]
+          "acceptanceChecks": [
+            "Invite validates email and prepends an invited seat; status chips filter the list.",
+            "Role changes and remove recompute seats; last-owner cannot be demoted or removed."
+          ]
         }
       ]
     },
@@ -874,7 +955,7 @@
           "id": "analytics",
           "slug": "analytics",
           "title": "Analytics page",
-          "summary": "A product health page for usage totals and error status.",
+          "summary": "Interactive product health dashboard with range KPIs, sparkline, event filters, and export.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/AnalyticsPage.tsx",
           "exportName": "AnalyticsPage",
           "targetRoute": "/analytics",
@@ -896,7 +977,8 @@
             }
           ],
           "acceptanceChecks": [
-            "The page shows product health without inventing production metrics."
+            "Range chips recompute KPIs and the sparkline series.",
+            "Event kind filters recompute the list; empty filter shows the empty state; Export announces via aria-live."
           ]
         }
       ]
@@ -949,7 +1031,7 @@
           "id": "user-management",
           "slug": "user-management",
           "title": "User management page",
-          "summary": "An admin users table with role and access controls.",
+          "summary": "Interactive admin users table with search/status filters, invite form, role changes, suspend/restore, and loading skeleton.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/UserManagementPage.tsx",
           "exportName": "UserManagementPage",
           "targetRoute": "/admin/users",
@@ -962,27 +1044,30 @@
             {
               "kind": "service",
               "label": "Admin users",
-              "note": "Load users, roles, and account status from the configured admin user source.",
-              "todo": "Load users, roles, and account status from the configured admin user source.",
+              "note": "Load users, roles, and status from the organizations preset via GET /api/admin/users.",
+              "todo": "Load users, roles, and status from the organizations preset via GET /api/admin/users.",
               "owner": "admin"
             },
             {
               "kind": "service",
               "label": "Access changes",
-              "note": "Save user access changes through audited admin actions.",
-              "todo": "Save user access changes through audited admin actions.",
+              "note": "Persist invites, role changes, and suspend/restore through audited admin mutations.",
+              "todo": "Persist invites, role changes, and suspend/restore through audited admin mutations.",
               "owner": "admin"
             }
           ],
           "acceptanceChecks": [
-            "The page shows user search, roles, suspend/restore states, and invite actions."
+            "Search and status filters recompute the table and showing N of M count.",
+            "Invite validates email, rejects duplicates, and adds an Invited row.",
+            "Role select updates non-owner members; Owner stays protected.",
+            "Suspend/Restore flips status badges and KPIs; empty filters show Clear filters."
           ]
         },
         {
           "id": "audit-log",
           "slug": "audit-log",
           "title": "Audit log page",
-          "summary": "A filterable audit trail page for admin and security events.",
+          "summary": "Interactive admin audit trail with live search, severity filter, loading skeleton, empty state, and CSV export.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/AuditLogPage.tsx",
           "exportName": "AuditLogPage",
           "targetRoute": "/admin/audit-log",
@@ -995,27 +1080,30 @@
             {
               "kind": "service",
               "label": "Audit events",
-              "note": "Load audit events from the configured audit log source.",
-              "todo": "Load audit events from the configured audit log source.",
+              "note": "Load audit events from the audit_log preset via an admin-guarded GET /api/admin/audit-log endpoint.",
+              "todo": "Load audit events from the audit_log preset via GET /api/admin/audit-log.",
               "owner": "compliance"
             },
             {
               "kind": "service",
               "label": "Audit export",
-              "note": "Export audit events through the configured compliance action.",
-              "todo": "Export audit events through the configured compliance action.",
+              "note": "Export the filtered event set as CSV from a compliance export endpoint.",
+              "todo": "Export filtered audit events as CSV through the compliance export endpoint.",
               "owner": "compliance"
             }
           ],
           "acceptanceChecks": [
-            "The page shows actor, target, severity, filters, export, and retention states."
+            "Search and severity filters recompute the table and the showing N of M count.",
+            "Refresh shows a loading skeleton before restoring rows.",
+            "A nonsense query reaches the empty state with Clear filters.",
+            "Export CSV announces a demo export for the currently visible rows."
           ]
         },
         {
           "id": "billing-admin",
           "slug": "billing-admin",
           "title": "Billing admin page",
-          "summary": "An admin billing page for subscriptions, invoices, and failed payments.",
+          "summary": "An admin billing console: a searchable, filterable table of every workspace subscription with live MRR and status KPIs and real retry, cancel, and reactivate actions.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/BillingAdminPage.tsx",
           "exportName": "BillingAdminPage",
           "targetRoute": "/admin/billing",
@@ -1027,28 +1115,38 @@
           "installNotes": [
             {
               "kind": "provider",
-              "label": "Billing provider data",
-              "note": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
-              "todo": "Load subscriptions, invoices, and failed payments from the configured payments provider.",
+              "label": "Subscriptions source",
+              "note": "Back the table with the D1 `orders` ledger the checkout webhook already writes, joined to live Lemon Squeezy subscription state from `@vybekiit/payments`, served from an admin-guarded `GET /api/admin/subscriptions`.",
+              "todo": "Replace INITIAL_SUBS with GET /api/admin/subscriptions, backed by the D1 orders ledger joined to @vybekiit/payments subscription state.",
               "owner": "payments"
             },
             {
               "kind": "provider",
-              "label": "Billing admin actions",
-              "note": "Save billing admin actions through audited payment actions.",
-              "todo": "Save billing admin actions through audited payment actions.",
+              "label": "Lifecycle actions",
+              "note": "Wire Retry to `POST /api/admin/subscriptions/:id/retry`, Cancel to `.../cancel` (cancel-at-period-end), and Reactivate to `.../reactivate`; the shipped webhook at `app/api/webhook/route.ts` reconciles D1 when the provider settles.",
+              "todo": "Wire retry/cancel/reactivate to POST /api/admin/subscriptions/:id/{retry,cancel,reactivate} and let the shipped webhook reconcile D1.",
               "owner": "payments"
+            },
+            {
+              "kind": "service",
+              "label": "Admin gate & audit",
+              "note": "Gate the route and its mutations to admins, and append every billing action to the audit log — billing mutations must never be anonymous.",
+              "todo": "Require admin auth on the route and write each billing mutation to the audit log.",
+              "owner": "admin"
             }
           ],
           "acceptanceChecks": [
-            "The page shows subscriptions, failed payments, invoices, credits, refunds, and retry actions."
+            "The subscriptions table loads through a skeleton state, then renders customer, plan, status, MRR, and renewal columns.",
+            "Toggling 'Simulate outage' and pressing Refresh shows a full error state with a working Retry that recovers the table.",
+            "Retrying a past-due row shows an inline spinner, then flips the row to Active, updates the KPIs, and announces the result.",
+            "Cancelling opens a confirmation dialog; confirming moves the row to Canceled with a Reactivate action, and filtering to no matches shows the empty state."
           ]
         },
         {
           "id": "system-health",
           "slug": "system-health",
           "title": "System health page",
-          "summary": "A system health page for services, queues, jobs, and errors.",
+          "summary": "Interactive ops health console: service and queue status, job_runs filters, job retry, loading skeleton, and error/retry.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/SystemHealthPage.tsx",
           "exportName": "SystemHealthPage",
           "targetRoute": "/admin/health",
@@ -1061,27 +1159,30 @@
             {
               "kind": "service",
               "label": "Health source",
-              "note": "Load service health, queue depth, and job status from the configured observability source.",
-              "todo": "Load service health, queue depth, and job status from the configured observability source.",
+              "note": "Load service health, queue depth, and job status from job_runs plus observability probes.",
+              "todo": "Load service health, queue depth, and job status from job_runs + observability probes.",
               "owner": "observability"
             },
             {
               "kind": "service",
               "label": "Health actions",
-              "note": "Send health actions through the configured operations actions.",
-              "todo": "Send health actions through the configured operations actions.",
+              "note": "Retry failed jobs via POST /api/admin/jobs/:id/retry and log the action.",
+              "todo": "Retry failed jobs via POST /api/admin/jobs/:id/retry and log the action.",
               "owner": "operations"
             }
           ],
           "acceptanceChecks": [
-            "The page shows service status, queues, cron jobs, error rates, and incident thresholds."
+            "Refresh shows a loading skeleton then restores KPIs and lists.",
+            "Simulate outage reaches the error card with Retry.",
+            "Job status filters recompute the scheduled jobs list.",
+            "Retry on a failed or delayed job marks it OK and updates last run."
           ]
         },
         {
           "id": "role-permissions",
           "slug": "role-permissions",
           "title": "Role permissions page",
-          "summary": "A role and permissions matrix page.",
+          "summary": "Interactive role matrix with capability toggles, protected owner rights, invite policy, dirty state, and save.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/RolePermissionsPage.tsx",
           "exportName": "RolePermissionsPage",
           "targetRoute": "/admin/roles",
@@ -1090,20 +1191,23 @@
             {
               "kind": "service",
               "label": "Authorization source",
-              "note": "Load roles and permissions from the configured authorization source.",
-              "todo": "Load roles and permissions from the configured authorization source.",
+              "note": "Load roles and permission grants from the organizations preset or authz store.",
+              "todo": "Load roles and permission grants from the organizations preset / authz store.",
               "owner": "auth"
             },
             {
               "kind": "service",
               "label": "Authorization actions",
-              "note": "Save role changes through audited authorization actions.",
-              "todo": "Save role changes through audited authorization actions.",
+              "note": "Persist the role matrix and invite policy through audited authorization mutations.",
+              "todo": "Persist role matrix and invite policy through audited authorization mutations.",
               "owner": "auth"
             }
           ],
           "acceptanceChecks": [
-            "The page shows role matrix, invite policy, owner protection, and permission edit states."
+            "Toggling a matrix cell marks the page dirty and updates the role permission KPI.",
+            "Owner billing and role-change switches stay locked with a notice if clicked.",
+            "Save roles clears dirty state; Reset restores the default matrix.",
+            "Invite policy switch flips require-admin without losing matrix edits."
           ]
         }
       ]
@@ -1113,14 +1217,14 @@
       "label": "CRM",
       "description": "Customer management, customer detail, and sales pipeline pages.",
       "order": 98,
-      "presetIds": [],
+      "presetIds": ["customers", "pipeline"],
       "goalIds": [],
       "recipes": [
         {
           "id": "customers",
           "slug": "customers",
           "title": "Customers page",
-          "summary": "A customer list and segmentation page.",
+          "summary": "Interactive CRM directory with live search, status filter, row selection, and empty/loading states.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomersPage.tsx",
           "exportName": "CustomersPage",
           "targetRoute": "/customers",
@@ -1129,27 +1233,28 @@
             {
               "kind": "service",
               "label": "Customer records",
-              "note": "Load customer records and segments from the configured CRM source.",
-              "todo": "Load customer records and segments from the configured CRM source.",
+              "note": "Run vybekiit apply-preset customers, then load rows via GET /api/customers.",
+              "todo": "Load customer records from the customers preset tables via GET /api/customers.",
               "owner": "crm"
             },
             {
               "kind": "service",
               "label": "Customer changes",
-              "note": "Save customer owner and segment changes through CRM actions.",
-              "todo": "Save customer owner and segment changes through CRM actions.",
+              "note": "Persist customer status and selection actions through CRM mutations.",
+              "todo": "Persist customer status and selection actions through CRM mutations.",
               "owner": "crm"
             }
           ],
           "acceptanceChecks": [
-            "The page shows customers, segments, account owners, and export actions."
+            "Search and status filter recompute the table; nonsense query shows the empty state.",
+            "Selecting a row pins the profile strip; Refresh shows the loading skeleton."
           ]
         },
         {
           "id": "customer-detail",
           "slug": "customer-detail",
           "title": "Customer detail page",
-          "summary": "A customer profile page with timeline, notes, and related records.",
+          "summary": "Interactive customer profile with overview, notes form, and related orders tabs.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CustomerDetailPage.tsx",
           "exportName": "CustomerDetailPage",
           "targetRoute": "/customers/example",
@@ -1162,27 +1267,28 @@
             {
               "kind": "service",
               "label": "Customer timeline",
-              "note": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
-              "todo": "Load customer timeline, notes, invoices, and support records from the configured CRM source.",
+              "note": "Run vybekiit apply-preset customers; load profile, notes, and related orders from the preset tables.",
+              "todo": "Load customer timeline, notes, and related orders from the customers preset tables.",
               "owner": "crm"
             },
             {
               "kind": "service",
               "label": "Customer notes",
-              "note": "Save customer notes and owner changes through CRM actions.",
-              "todo": "Save customer notes and owner changes through CRM actions.",
+              "note": "Persist new notes through POST /api/customers/:id/notes.",
+              "todo": "Persist new notes through POST /api/customers/:id/notes.",
               "owner": "crm"
             }
           ],
           "acceptanceChecks": [
-            "The page shows timeline, notes, invoices, files, support tickets, and owner controls."
+            "Tabs switch between overview, notes, and orders.",
+            "Add note validates length and prepends to the timeline; Clear all reaches the empty notes state."
           ]
         },
         {
           "id": "pipeline",
           "slug": "pipeline",
           "title": "Pipeline page",
-          "summary": "A CRM pipeline board page.",
+          "summary": "Interactive sales kanban with drag-and-drop, move buttons, and live deal counts.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/PipelinePage.tsx",
           "exportName": "PipelinePage",
           "targetRoute": "/pipeline",
@@ -1191,20 +1297,21 @@
             {
               "kind": "service",
               "label": "Pipeline data",
-              "note": "Load pipeline stages and opportunities from the configured CRM source.",
-              "todo": "Load pipeline stages and opportunities from the configured CRM source.",
+              "note": "Run vybekiit apply-preset pipeline; load deal_stages and deals grouped by stage.",
+              "todo": "Load pipeline stages and deals from the pipeline preset tables.",
               "owner": "crm"
             },
             {
               "kind": "service",
               "label": "Pipeline actions",
-              "note": "Save opportunity stage changes through CRM actions.",
-              "todo": "Save opportunity stage changes through CRM actions.",
+              "note": "Persist deal stage moves through PATCH /api/deals/:id.",
+              "todo": "Persist deal stage moves through PATCH /api/deals/:id.",
               "owner": "crm"
             }
           ],
           "acceptanceChecks": [
-            "The page shows pipeline stages, opportunity cards, owners, values, and due dates."
+            "Drag or arrow-move a deal between stages; column counts and open value recompute.",
+            "Empty stages show a drop-target empty state."
           ]
         }
       ]
@@ -1221,7 +1328,7 @@
           "id": "ai-assistant",
           "slug": "ai-assistant",
           "title": "AI assistant page",
-          "summary": "A chat workspace for AI conversations and knowledge retrieval.",
+          "summary": "Interactive AI chat workspace with send, suggestions, attachments, knowledge toggle, and clear.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/AiAssistantPage.tsx",
           "exportName": "AiAssistantPage",
           "targetRoute": "/assistant",
@@ -1242,7 +1349,10 @@
               "owner": "search"
             }
           ],
-          "acceptanceChecks": ["The page renders a chat surface without calling an AI provider."]
+          "acceptanceChecks": [
+            "Send and suggestions append user then assistant messages; attachments appear on the next prompt.",
+            "Knowledge toggle changes the assistant footer note; Clear chat restores the starter thread."
+          ]
         }
       ]
     },
@@ -1258,7 +1368,7 @@
           "id": "search",
           "slug": "search",
           "title": "Search page",
-          "summary": "A search page for indexed app records.",
+          "summary": "Interactive in-app search with live query, type filters, result counts, and empty state.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/SearchPage.tsx",
           "exportName": "SearchPage",
           "targetRoute": "/search",
@@ -1266,20 +1376,23 @@
           "installNotes": [
             {
               "kind": "service",
-              "label": "Search provider",
-              "note": "Connect the search input to the configured search provider.",
-              "todo": "Connect the search input to the configured search provider.",
+              "label": "Search index",
+              "note": "Run vybekiit apply-preset search_documents and wire the input to the full-text index.",
+              "todo": "Connect the search input to the search_documents full-text index.",
               "owner": "search"
             },
             {
               "kind": "service",
               "label": "Search results",
-              "note": "Replace default result labels with records from the search index.",
-              "todo": "Replace default result labels with records from the search index.",
+              "note": "Replace the demo corpus with records from GET /api/search.",
+              "todo": "Replace demo corpus with records from GET /api/search.",
               "owner": "search"
             }
           ],
-          "acceptanceChecks": ["The page shows a search box and safe default result labels."]
+          "acceptanceChecks": [
+            "Typing filters the multi-type corpus live; result count announces via aria-live.",
+            "Type chips (docs/customers/tickets/posts) further filter results; nonsense query shows empty state."
+          ]
         }
       ]
     },
@@ -1295,7 +1408,7 @@
           "id": "realtime",
           "slug": "realtime",
           "title": "Realtime page",
-          "summary": "A live activity page for database updates.",
+          "summary": "Interactive live activity feed with connect/pause, channel filter, and simulated events.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/RealtimePage.tsx",
           "exportName": "RealtimePage",
           "targetRoute": "/activity",
@@ -1316,7 +1429,10 @@
               "owner": "realtime"
             }
           ],
-          "acceptanceChecks": ["The page makes live status visible without requiring a socket."]
+          "acceptanceChecks": [
+            "While connected and listening, new events prepend to the feed; Pause stops the stream.",
+            "Disconnect shows the offline empty state; channel chips filter the list; Clear empties the feed."
+          ]
         }
       ]
     },
@@ -1325,14 +1441,14 @@
       "label": "Productivity",
       "description": "Tasks and calendar pages for work management.",
       "order": 125,
-      "presetIds": [],
+      "presetIds": ["tasks", "calendar_events"],
       "goalIds": [],
       "recipes": [
         {
           "id": "tasks",
           "slug": "tasks",
           "title": "Tasks page",
-          "summary": "A task list page with priority and assignment controls.",
+          "summary": "Interactive task list with complete toggle, status filter, add form, and live counts.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/TasksPage.tsx",
           "exportName": "TasksPage",
           "targetRoute": "/tasks",
@@ -1341,27 +1457,28 @@
             {
               "kind": "service",
               "label": "Task data",
-              "note": "Load tasks, assignees, and priorities from the configured task source.",
-              "todo": "Load tasks, assignees, and priorities from the configured task source.",
+              "note": "Run vybekiit apply-preset tasks; load tasks, assignees, and priorities from the preset tables.",
+              "todo": "Load tasks, assignees, and priorities from the tasks preset tables.",
               "owner": "tasks"
             },
             {
               "kind": "service",
               "label": "Task actions",
-              "note": "Save task changes through the configured task actions.",
-              "todo": "Save task changes through the configured task actions.",
+              "note": "Persist task create, complete, and status changes through task mutations.",
+              "todo": "Persist task create, complete, and status changes through task mutations.",
               "owner": "tasks"
             }
           ],
           "acceptanceChecks": [
-            "The page shows task priorities, assignees, due dates, blocked states, and bulk actions."
+            "Checkbox toggles done/todo; status chips filter the list; empty filter shows empty state.",
+            "Add task validates title length and prepends a row; KPIs recompute from live state."
           ]
         },
         {
           "id": "calendar",
           "slug": "calendar",
           "title": "Calendar page",
-          "summary": "A calendar and booking page with event controls.",
+          "summary": "Interactive month grid with day selection, event list, and add-event form.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CalendarPage.tsx",
           "exportName": "CalendarPage",
           "targetRoute": "/calendar",
@@ -1370,20 +1487,21 @@
             {
               "kind": "service",
               "label": "Calendar data",
-              "note": "Load events, bookings, and reminders from the configured calendar source.",
-              "todo": "Load events, bookings, and reminders from the configured calendar source.",
+              "note": "Run vybekiit apply-preset calendar_events; load events for the visible range.",
+              "todo": "Load events and attendees from the calendar_events preset tables.",
               "owner": "calendar"
             },
             {
               "kind": "service",
               "label": "Calendar actions",
-              "note": "Save calendar changes through the configured calendar actions.",
-              "todo": "Save calendar changes through the configured calendar actions.",
+              "note": "Persist new events through POST /api/calendar/events.",
+              "todo": "Persist new events through POST /api/calendar/events.",
               "owner": "calendar"
             }
           ],
           "acceptanceChecks": [
-            "The page shows events, booking slots, reminders, conflicts, and sync states."
+            "Clicking a day lists that day's events; days without events show empty state.",
+            "Add event form validates title and pins a new event onto the selected day with a grid dot."
           ]
         }
       ]
@@ -1393,14 +1511,14 @@
       "label": "Blog",
       "description": "Publishing, article index, and changelog pages.",
       "order": 130,
-      "presetIds": [],
+      "presetIds": ["blog_posts"],
       "goalIds": ["add-blog"],
       "recipes": [
         {
           "id": "blog",
           "slug": "blog",
           "title": "Blog page",
-          "summary": "An article index page for posts, changelogs, and product stories.",
+          "summary": "Interactive post index with draft/published filter and click-to-open post preview.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/BlogPage.tsx",
           "exportName": "BlogPage",
           "targetRoute": "/blog",
@@ -1409,19 +1527,22 @@
             {
               "kind": "service",
               "label": "Content source",
-              "note": "Load published posts from the configured CMS or markdown content source.",
-              "todo": "Load published posts from the configured CMS or markdown content source.",
+              "note": "Run vybekiit apply-preset blog_posts; load published and draft posts from the preset tables.",
+              "todo": "Load published and draft posts from the blog_posts preset tables.",
               "owner": "cms"
             },
             {
               "kind": "service",
               "label": "Article routes",
-              "note": "Connect article cards to real blog routes.",
-              "todo": "Connect article cards to real blog routes.",
+              "note": "Connect post cards to real /blog/[slug] routes instead of the in-page preview.",
+              "todo": "Connect post cards to real /blog/[slug] routes.",
               "owner": "cms"
             }
           ],
-          "acceptanceChecks": ["The page shows article cards before content wiring."]
+          "acceptanceChecks": [
+            "Draft/published filter recomputes the card grid; empty filter shows empty state.",
+            "Clicking a card opens the post preview; Back returns to the index."
+          ]
         }
       ]
     },
@@ -1437,7 +1558,7 @@
           "id": "media-gallery",
           "slug": "media-gallery",
           "title": "Media gallery page",
-          "summary": "A media asset gallery and upload page.",
+          "summary": "Interactive media gallery with type/alt filters, asset grid, selection preview, alt editing, and simulated upload.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/MediaGalleryPage.tsx",
           "exportName": "MediaGalleryPage",
           "targetRoute": "/media",
@@ -1450,27 +1571,30 @@
             {
               "kind": "service",
               "label": "Media assets",
-              "note": "Load media assets and metadata from the configured asset source.",
-              "todo": "Load media assets and metadata from the configured asset source.",
+              "note": "Load media assets from the file_metadata preset via GET /api/media.",
+              "todo": "Load media assets from the file_metadata preset via GET /api/media.",
               "owner": "assets"
             },
             {
               "kind": "service",
               "label": "Media changes",
-              "note": "Save media uploads and metadata changes through asset actions.",
-              "todo": "Save media uploads and metadata changes through asset actions.",
+              "note": "Persist uploads and alt/tag edits through file_metadata asset actions.",
+              "todo": "Persist uploads and alt/tag edits through file_metadata asset actions.",
               "owner": "assets"
             }
           ],
           "acceptanceChecks": [
-            "The page shows asset cards, upload queue, preview panel, tags, and accessibility checks."
+            "Type chips, Needs alt, and search recompute the asset grid and KPIs.",
+            "Selecting a card opens the preview panel; Save alt updates missing-alt badges.",
+            "Upload media adds a new image with no alt and selects it.",
+            "Clear filters recovers from an empty grid state."
           ]
         },
         {
           "id": "docs",
           "slug": "docs",
           "title": "Docs page",
-          "summary": "A help documentation page with sidebar and article view.",
+          "summary": "Interactive help docs with collection sidebar, live search, article selection, feedback, and stale-doc badges.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/DocsPage.tsx",
           "exportName": "DocsPage",
           "targetRoute": "/docs",
@@ -1479,27 +1603,30 @@
             {
               "kind": "service",
               "label": "Docs content",
-              "note": "Load documentation collections and articles from the configured content source.",
+              "note": "Load documentation collections and articles from the configured content source with reviewedAt for stale detection.",
               "todo": "Load documentation collections and articles from the configured content source.",
               "owner": "cms"
             },
             {
               "kind": "service",
               "label": "Docs feedback",
-              "note": "Save documentation feedback through the configured feedback action.",
-              "todo": "Save documentation feedback through the configured feedback action.",
+              "note": "Save article feedback via POST /api/docs/feedback with article id and thumbs up/down.",
+              "todo": "Save article feedback via POST /api/docs/feedback.",
               "owner": "cms"
             }
           ],
           "acceptanceChecks": [
-            "The page shows docs sidebar, article view, search, feedback, and stale-doc states."
+            "Collection filters and search recompute the article list.",
+            "Selecting an article shows its body and metadata in the reader panel.",
+            "Yes/No feedback records a choice and announces a thank-you notice.",
+            "Clear filters recovers from a no-articles empty state."
           ]
         },
         {
           "id": "status",
           "slug": "status",
           "title": "Status page",
-          "summary": "A public service status and incident page.",
+          "summary": "Interactive public status page with service rollup, incident filters, outage simulation, and email subscribe.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/StatusPage.tsx",
           "exportName": "StatusPage",
           "targetRoute": "/status",
@@ -1512,27 +1639,30 @@
             {
               "kind": "service",
               "label": "Status source",
-              "note": "Load public service status and incidents from the configured status source.",
+              "note": "Load public service status and incidents from the configured status source (probes / job_runs).",
               "todo": "Load public service status and incidents from the configured status source.",
               "owner": "status"
             },
             {
               "kind": "service",
               "label": "Status updates",
-              "note": "Publish incident updates through the configured status action.",
-              "todo": "Publish incident updates through the configured status action.",
+              "note": "Publish incident updates and subscriber emails through the status notification action.",
+              "todo": "Publish incident updates and subscriber emails through the status notification action.",
               "owner": "status"
             }
           ],
           "acceptanceChecks": [
-            "The page shows service health, incidents, uptime, subscriptions, and publish states."
+            "Overall banner reflects the worst service status across the list.",
+            "Simulate outage opens an active incident; Resolve all restores services.",
+            "Active filter shows only non-resolved incidents with an empty state when none remain.",
+            "Subscribe validates email and reaches a confirmation state."
           ]
         },
         {
           "id": "changelog",
           "slug": "changelog",
           "title": "Changelog page",
-          "summary": "A product changelog page with release timeline and subscriptions.",
+          "summary": "Interactive product changelog with type filters, search, draft publish, and email subscribe with validation.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/ChangelogPage.tsx",
           "exportName": "ChangelogPage",
           "targetRoute": "/changelog",
@@ -1545,20 +1675,23 @@
             {
               "kind": "service",
               "label": "Changelog content",
-              "note": "Load changelog entries from the configured content source.",
-              "todo": "Load changelog entries from the configured content source.",
+              "note": "Load changelog entries from the configured CMS or markdown content source with kind, version, and publishedAt.",
+              "todo": "Load changelog entries from the configured content source (CMS or markdown).",
               "owner": "cms"
             },
             {
               "kind": "service",
               "label": "Changelog publish",
-              "note": "Publish changelog updates through the configured content action.",
-              "todo": "Publish changelog updates through the configured content action.",
+              "note": "Publish drafts and notify subscribers through content + notification actions.",
+              "todo": "Publish drafts and notify subscribers through the content + notifications actions.",
               "owner": "cms"
             }
           ],
           "acceptanceChecks": [
-            "The page shows release entries, timeline, tags, subscriptions, and publish states."
+            "Type chips and search filter the timeline; drafts appear only when Show drafts is on.",
+            "Publish release flips a draft to published with a Just now date.",
+            "Subscribe validates email and reaches a confirmation state.",
+            "Reset filters recovers the list from an empty state."
           ]
         }
       ]
@@ -1575,7 +1708,7 @@
           "id": "safety",
           "slug": "safety",
           "title": "Safety page",
-          "summary": "A doctor and launch safety checklist page.",
+          "summary": "Interactive safety doctor with run checks, acknowledge warnings, and incident severity filters.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/SafetyPage.tsx",
           "exportName": "SafetyPage",
           "targetRoute": "/safety",
@@ -1596,7 +1729,10 @@
               "owner": "observability"
             }
           ],
-          "acceptanceChecks": ["The page tells the vibe coder the one thing to fix next."]
+          "acceptanceChecks": [
+            "Run checks shows pending then restores results; next-fix panel tracks unacknowledged fails/warns.",
+            "Severity chips filter incidents; acknowledge toggles clear the next-fix highlight."
+          ]
         }
       ]
     },
@@ -1612,7 +1748,7 @@
           "id": "brand-assets",
           "slug": "brand-assets",
           "title": "Brand assets page",
-          "summary": "A visual setup page for logos, images, colors, and shape.",
+          "summary": "Interactive brand setup with live color/radius preview, asset upload slots, and dirty save.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/BrandAssetsPage.tsx",
           "exportName": "BrandAssetsPage",
           "targetRoute": "/brand",
@@ -1633,7 +1769,10 @@
               "owner": "tokens"
             }
           ],
-          "acceptanceChecks": ["The page only suggests visual edits for image, color, and shape."]
+          "acceptanceChecks": [
+            "Name, hex color, and radius update the live preview; invalid hex blocks save messaging.",
+            "Upload and clear fill or empty asset slots; Save style clears the dirty draft."
+          ]
         }
       ]
     },
@@ -1649,7 +1788,7 @@
           "id": "language",
           "slug": "language",
           "title": "Language page",
-          "summary": "A translation setup page for locales and visible strings.",
+          "summary": "Interactive locale setup with enable toggles, default locale, phrase preview, and filters.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/LanguagePage.tsx",
           "exportName": "LanguagePage",
           "targetRoute": "/settings/language",
@@ -1670,7 +1809,10 @@
               "owner": "i18n"
             }
           ],
-          "acceptanceChecks": ["The page makes language choices visible before translation wiring."]
+          "acceptanceChecks": [
+            "Enable toggles and default locale recompute KPIs; Enabled-only filter shows an empty state when nothing matches.",
+            "Preview phrase switches with the selected enabled locale; Save clears the dirty draft."
+          ]
         }
       ]
     },
@@ -1686,7 +1828,7 @@
           "id": "feature-flags",
           "slug": "feature-flags",
           "title": "Feature flags page",
-          "summary": "A release control page for turning app features on and off.",
+          "summary": "Interactive feature flags console with toggles, env/status filters, dirty save, and search.",
           "sourcePath": "apps/componentLibrary/src/pageRecipes/FeatureFlagsPage.tsx",
           "exportName": "FeatureFlagsPage",
           "targetRoute": "/admin/feature-flags",
@@ -1707,7 +1849,10 @@
               "owner": "core"
             }
           ],
-          "acceptanceChecks": ["The page shows release switches without hiding the owning config."]
+          "acceptanceChecks": [
+            "Toggles mark the draft dirty; Save clears dirty and Reset restores the baseline.",
+            "Search plus env/status filters recompute the list; nonsense query shows the empty state."
+          ]
         }
       ]
     }

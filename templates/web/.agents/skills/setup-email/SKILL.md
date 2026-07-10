@@ -24,6 +24,15 @@ when asked.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/EmailNotificationsPage.tsx` export `EmailNotificationsPage` into the buyer app at route `/dashboard/email`.
+   Recipe id: `email-notifications`. Presets: notifications_log.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('setup-email')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Confirm the one sending detail.** Ask for (or guide them to set up) a verified sender address —
    the "from" address their app's emails come from. Tell them exactly where to confirm it, then save
    it to the secret settings file.

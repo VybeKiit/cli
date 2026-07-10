@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { BrandRichText } from '@/components/landing/BrandRichText';
 import { SectionShell } from '@/components/ui/SectionShell';
 import { FAQ } from '@/data/faq';
 import { LANDING_EASE, LANDING_FAQ_IDS } from '@/data/landing';
@@ -45,12 +46,14 @@ export const FaqSection = () => {
                   onClick={() => setOpenId(open ? null : item.id)}
                   type="button"
                 >
-                  <h3 className="font-semibold text-base text-white md:text-lg">{item.question}</h3>
+                  <h3 className="font-semibold text-base text-white md:text-lg">
+                    <BrandRichText mono={true} text={item.question} />
+                  </h3>
                   <span className="text-[var(--text-muted)]">{open ? '−' : '+'}</span>
                 </button>
                 {open ? (
                   <p className="px-6 pb-5 text-[var(--text-muted)] leading-relaxed">
-                    {item.answer}
+                    <BrandRichText mono={true} text={item.answer} />
                   </p>
                 ) : null}
               </div>

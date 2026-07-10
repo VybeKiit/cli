@@ -17,6 +17,14 @@ metadata:
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install / extend the auth page recipe first (catalog SSOT — Option C).**
+   Copy or extend `apps/componentLibrary/src/pageRecipes/AuthPage.tsx` export `AuthPage` at route `/login`
+   with a "Email me a link" path. Recipe id: `auth`. Preset: auth-bridge.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('sign-in-with-email-link')` / page-recipe-manifest.json.
+   **Verify:** `/login` shows a practice magic-link entry before provider wiring.
+
 1. **Confirm sign-in + email are wired** (`add-signin`, `setup-email` when going live).
    **Verify:** email OTP or password sign-in already works.
 

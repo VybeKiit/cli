@@ -2,6 +2,8 @@ import { githubGateConfigSchema, parseEnv } from '@vybekiit/core';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { Effect, Either } from 'effect';
 import { NextResponse } from 'next/server';
+import { AnalyticsEvent } from '@/lib/analyticsEvents';
+import { captureServerEvent } from '@/lib/analyticsServer';
 import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 import { recordOrderBestEffort } from '@/lib/orders';
 
@@ -30,6 +32,10 @@ const POST = async (request: Request): Promise<NextResponse> => {
   }
 
   const { customerEmail, customerName, githubUsername, isRefund, orderId } = webhook.right;
+  const distinctId =
+    customerEmail !== null && customerEmail.length > 0
+      ? customerEmail.trim().toLowerCase()
+      : orderId;
 
   // Record every order in D1 first — a best-effort bookkeeping write that must never block
   // the gate (Lemon Squeezy stays the source of truth for payments). See ADR-0037.
@@ -42,6 +48,12 @@ const POST = async (request: Request): Promise<NextResponse> => {
   });
 
   if (!githubUsername) {
+    await captureServerEvent(distinctId, AnalyticsEvent.orderFulfilled, {
+      order_id: orderId,
+      gated: false,
+      recorded,
+      is_refund: isRefund,
+    });
     return NextResponse.json({ ok: true, gated: false, recorded });
   }
 
@@ -57,6 +69,19 @@ const POST = async (request: Request): Promise<NextResponse> => {
   if (Either.isLeft(gate)) {
     return NextResponse.json({ error: gate.left.message }, { status: 502 });
   }
+
+  await captureServerEvent(
+    distinctId,
+    isRefund ? AnalyticsEvent.orderRefunded : AnalyticsEvent.orderFulfilled,
+    {
+      order_id: orderId,
+      gated: true,
+      recorded,
+      github_username: githubUsername,
+      action: isRefund ? 'removed' : 'invited',
+    },
+  );
+
   return NextResponse.json({
     ok: true,
     gated: true,

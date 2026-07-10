@@ -24,7 +24,7 @@ const TooltipContent = ({
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'landing-tooltip-content z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-primary-foreground text-xs',
+        'landing-tooltip-content z-[200] overflow-hidden rounded-md bg-primary px-3 py-1.5 text-primary-foreground text-xs',
         className,
       )}
       {...props}

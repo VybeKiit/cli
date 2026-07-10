@@ -1,31 +1,138 @@
+'use client';
+
+import { ChevronDown } from 'lucide-react';
+import { useCallback, useId, useState } from 'react';
+import { BrandRichText } from '@/components/landing/BrandRichText';
 import { FAQ } from '@/data/faq';
+import { VISITOR_FAQ } from '@/data/visitorLanding';
+import { trackClient } from '@/lib/analyticsClient';
+import { AnalyticsEvent } from '@/lib/analyticsEvents';
+import { useReducedMotion } from '@/lib/motion';
+import { cn } from '@/lib/utils';
+
+interface FaqRowProps {
+  readonly item: (typeof FAQ)[number];
+  readonly open: boolean;
+  readonly onToggle: (id: string) => void;
+  readonly panelId: string;
+  readonly buttonId: string;
+  readonly reduced: boolean;
+}
 
 /**
- * FAQ — the GEO/AEO question targets, rendered answer-first so AI answer engines
- * can quote the lead. Uses native `<details>`/`<summary>` for zero-JS, keyboard-
- * accessible disclosure. Each question is a verbatim search query (an H3 inside the
- * summary) so the structure stays semantic and citation-friendly.
+ * One FAQ row with height-smooth expand / collapse and chevron rotation.
+ *
+ * @param props - Row state and handlers.
+ * @returns The rendered FAQ row.
  */
-export const Faq = () => (
-  <section id="faq" className="border-t">
-    <div className="mx-auto max-w-3xl px-6 py-20">
-      <h2 className="font-bold text-3xl tracking-tight">Questions, answered</h2>
-      <div className="mt-10 flex flex-col divide-y">
-        {FAQ.map((item) => (
-          <details key={item.id} className="group py-4">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-              <h3 className="font-medium">{item.question}</h3>
-              <span
-                aria-hidden={true}
-                className="text-muted-foreground transition-transform group-open:rotate-45"
-              >
-                +
-              </span>
-            </summary>
-            <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{item.answer}</p>
-          </details>
-        ))}
+const FaqRow = ({ item, open, onToggle, panelId, buttonId, reduced }: FaqRowProps) => {
+  const handleClick = useCallback(() => {
+    onToggle(item.id);
+    if (!open) {
+      trackClient(AnalyticsEvent.faqOpened, {
+        faq_id: item.id,
+        question: item.question,
+      });
+    }
+  }, [item.id, item.question, onToggle, open]);
+
+  return (
+    <div className="border-border border-b last:border-b-0">
+      <h3 className="m-0">
+        <button
+          aria-controls={panelId}
+          aria-expanded={open}
+          className={cn(
+            'flex w-full items-center justify-between gap-4 py-5 text-start transition-colors',
+            'hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40 focus-visible:ring-offset-2',
+          )}
+          id={buttonId}
+          onClick={handleClick}
+          type="button"
+        >
+          <span className="faq-question-rich font-medium text-base leading-[1.45] md:text-[1.05rem]">
+            <BrandRichText text={item.question} />
+          </span>
+          <span
+            aria-hidden={true}
+            className={cn(
+              'flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted/50 text-muted-foreground',
+              reduced ? '' : 'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+              open && 'rotate-180 border-blue-200 bg-blue-50 text-blue-600',
+            )}
+          >
+            <ChevronDown className="size-4" strokeWidth={2.25} />
+          </span>
+        </button>
+      </h3>
+      <div
+        aria-labelledby={buttonId}
+        className={cn(
+          'grid',
+          !reduced &&
+            'transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+        )}
+        id={panelId}
+        role="region"
+      >
+        <div className="overflow-hidden">
+          <p
+            className={cn(
+              'pb-5 text-muted-foreground text-sm leading-relaxed',
+              reduced ? '' : 'transition-opacity duration-300',
+              open ? 'opacity-100' : 'opacity-0',
+            )}
+          >
+            <BrandRichText text={item.answer} />
+          </p>
+        </div>
       </div>
     </div>
-  </section>
-);
+  );
+};
+
+/**
+ * FAQ for vibe coders: package choice first, smooth accordion open/close.
+ * Tracks which questions buyers open (friction / objection signals).
+ *
+ * @returns The rendered FAQ section.
+ * @example
+ * <Faq />
+ */
+export const Faq = () => {
+  const baseId = useId();
+  const reduced = useReducedMotion();
+  const first = FAQ[0];
+  const [openId, setOpenId] = useState<string | null>(first === undefined ? null : first.id);
+
+  const handleToggle = useCallback((id: string) => {
+    setOpenId((current) => (current === id ? null : id));
+  }, []);
+
+  return (
+    <section id="faq" className="border-border/60 border-t">
+      <div className="mx-auto max-w-3xl px-6 py-16">
+        <p className="font-medium text-muted-foreground text-xs uppercase tracking-widest">FAQ</p>
+        <h2 className="mt-2 font-bold text-3xl tracking-tight">{VISITOR_FAQ.heading}</h2>
+        <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
+          Not sure which package to get? Start here. Built for people who ship with AI tools, not
+          for people who want to live in a terminal.
+        </p>
+        <div className="mt-10 rounded-2xl border border-border bg-card px-5 shadow-sm sm:px-6">
+          {FAQ.map((item, index) => (
+            <FaqRow
+              key={item.id}
+              buttonId={`${baseId}-btn-${index}`}
+              item={item}
+              onToggle={handleToggle}
+              open={openId === item.id}
+              panelId={`${baseId}-panel-${index}`}
+              reduced={reduced}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};

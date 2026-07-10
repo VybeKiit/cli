@@ -21,6 +21,15 @@ translate every error · celebrate. You place and wire images; the kit compresse
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/BrandAssetsPage.tsx` export `BrandAssetsPage` into the buyer app at route `/dashboard/brand`.
+   Recipe id: `brand-assets`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-images')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Pick the folder.** Web → `public/`. Mobile → `assets/`. Extension → `public/icon/` (icons) or
    `public/` for other static files.
    **Verify:** the folder exists (scaffold ships placeholders).

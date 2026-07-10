@@ -32,6 +32,8 @@ jobs:
       # one test file launches a browser, and only chromium, so we skip firefox/webkit.
       - run: pnpm --filter @vybekiit/browser-automation exec playwright install --with-deps chromium
 
-      - run: pnpm test
+      - run: pnpm exec turbo run test --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - run: pnpm test:scripts

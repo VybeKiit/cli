@@ -19,6 +19,14 @@ translate every error · celebrate.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/AccountSecurityPage.tsx` export `AccountSecurityPage` into the buyer app at route `/settings/security`.
+   Recipe id: `account-security`. Preset: auth-bridge.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('reset-password')` / page-recipe-manifest.json.
+   **Verify:** route builds with practice security UI before provider wiring.
+
 1. **Confirm sign-in is wired.** Run `add-signin` first if accounts are not set up yet.
    **Verify:** existing sign-in works.
 

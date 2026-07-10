@@ -19,6 +19,15 @@ translate every error · celebrate.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/RealtimePage.tsx` export `RealtimePage` into the buyer app at route `/dashboard/realtime`.
+   Recipe id: `realtime`. Presets: realtime_publications.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-realtime')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Explain in one line.** *"I'll turn on live updates so your app refreshes when data changes."*
 
 2. **Apply the realtime preset.**

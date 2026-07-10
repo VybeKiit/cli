@@ -16,6 +16,15 @@ API route classified correctly. Output a plain pass/fail summary for the builder
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/SafetyPage.tsx` export `SafetyPage` into the buyer app at route `/dashboard/safety`.
+   Recipe id: `safety`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('check-safety')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Abuse / DDoS layer.** Confirm `SECURITY_RATE_LIMIT` and `SECURITY_ORIGIN_LOCK` are `on` in
    `.env`. Confirm `middleware.ts` passes the request path for tiered limits. Confirm `/api/webhook`
    is **not** blocked by origin lock (payment providers POST cross-origin). Run quick probes: hammer

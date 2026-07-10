@@ -1,0 +1,103 @@
+{
+  "id": "pipeline",
+  "version": 1,
+  "description": "Sales pipeline deals and stages for CRM kanban.",
+  "entities": [
+    {
+      "name": "deal_stages",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "name", "type": "text", "required": true },
+        { "name": "position", "type": "numeric", "required": true, "default": "0" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "deals",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        {
+          "name": "stage_id",
+          "type": "uuid",
+          "references": { "table": "deal_stages", "column": "id" }
+        },
+        { "name": "customer_id", "type": "text" },
+        { "name": "title", "type": "text", "required": true },
+        { "name": "value_cents", "type": "numeric", "default": "0" },
+        { "name": "currency", "type": "text", "default": "'usd'" },
+        { "name": "status", "type": "text", "required": true, "default": "'open'" },
+        { "name": "expected_close_at", "type": "timestamptz" },
+        { "name": "metadata", "type": "jsonb", "required": true, "default": "'{}'::jsonb" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "deal_activities",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        {
+          "name": "deal_id",
+          "type": "uuid",
+          "required": true,
+          "references": { "table": "deals", "column": "id" }
+        },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "kind", "type": "text", "required": true },
+        { "name": "body", "type": "text" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "deals",
+      "to": "deal_stages",
+      "foreignKey": "stage_id",
+      "type": "many"
+    },
+    {
+      "from": "deal_activities",
+      "to": "deals",
+      "foreignKey": "deal_id",
+      "type": "many"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "deal_stages",
+      "columns": ["user_id", "position"],
+      "reason": "order pipeline stages per owner"
+    },
+    {
+      "table": "deals",
+      "columns": ["user_id", "stage_id"],
+      "reason": "kanban column deals per stage"
+    },
+    {
+      "table": "deals",
+      "columns": ["user_id", "status"],
+      "reason": "filter deals by open or closed status"
+    },
+    {
+      "table": "deal_activities",
+      "columns": ["deal_id", "created_at"],
+      "reason": "activity timeline per deal"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["upsert"],
+  "skills": [],
+  "packages": ["@vybekiit/db"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "stable",
+    "firebase": "stable",
+    "aws": "stable"
+  }
+}

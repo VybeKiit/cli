@@ -29,6 +29,15 @@ translate every error · celebrate. You do all the work; the builder just approv
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/AuditLogPage.tsx` export `AuditLogPage` into the buyer app at route `/admin/audit`.
+   Recipe id: `audit-log`. Presets: audit_log.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('harden')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Explain in one line.** *"I'm going to make sure your app is safe from abuse — limiting how fast
    anyone can hammer it and blocking requests pretending to come from other sites. It's already on; I'll
    tune it to your app."*

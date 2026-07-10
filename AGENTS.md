@@ -165,6 +165,11 @@ catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing 
 - **`templates/*/scripts/`** — buyer `pnpm verify` surface; each script must be **self-contained** (no monorepo parent paths). Local maintainer scratch may live in `templates/*/scripts/dev/` — gitignored + excluded by the CLI scaffold filter (ADR-0029).
 - **`apps/*/scripts/`**, **`infra/scripts/`** — app/infra delivery boundaries unchanged.
 
+## Running apps (dev)
+
+- `pnpm dev` opens an interactive menu of every app; `pnpm dev <app>` runs one directly — `web`, `mobile`, `extension`, `backend`, `spa`, `landing`, `ui`, `local`, or `all`. `pnpm dev --help` lists them, and every template ships its own `pnpm dev --help`. (`pnpm dev:all` is the old `turbo run dev`.)
+- **Mobile in a simulator:** `pnpm dev mobile --ios` / `--android` builds a native **dev build** (`expo run:ios`) and launches it — Metro's port is auto-picked so a busy `8081` never blocks. Expo Go can't run the mobile template (it links `react-native-mmkv`/`expo-sqlite`); `pnpm dev mobile --go` starts Metro/Expo Go for JS-only screens.
+
 ## Delivery mirror sync (maintainer-only)
 
 Every push to this monorepo runs **mirror sync automatically** in the pre-push hook, after the

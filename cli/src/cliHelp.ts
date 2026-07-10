@@ -16,7 +16,7 @@ Usage:
   vybekiit plan-readiness <feature> [template]
   vybekiit plan-setup <domain>
   vybekiit plan-data-model <entities.json> [provider]
-  vybekiit apply-preset <feature> [--provider=supabase|neon|railway] [--dry-run]
+  vybekiit apply-preset <feature> [--provider=supabase|neon|railway|mongodb|firebase|aws] [--dry-run]
   vybekiit list-presets
   vybekiit verify-presets [--fix] [preset...]
   vybekiit check-agent-layer [template]

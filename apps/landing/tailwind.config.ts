@@ -5,7 +5,8 @@ import type { Config } from 'tailwindcss';
  *
  * Mirrors `templates/web/tailwind.config.ts`: the color names map to the CSS
  * variables in `app/globals.css`, so shadcn-style components use semantic classes
- * (`bg-primary` / `text-muted-foreground`) and dark mode follows the OS preference.
+ * (`bg-primary` / `text-muted-foreground`). Dark mode is class-based (`html.dark`)
+ * so the navbar theme toggle can switch without following the OS.
  *
  * RTL is handled by CSS *logical properties* (`ms-`/`me-`/`ps-`/`pe-` and
  * `start-`/`end-`, never `ml-`/`mr-`/`left-`/`right-`), so the layout mirrors
@@ -13,6 +14,7 @@ import type { Config } from 'tailwindcss';
  * detection. Copy stays English; the structure stays RTL-safe.
  */
 export default {
+  darkMode: 'class',
   content: [
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',

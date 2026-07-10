@@ -3,100 +3,35 @@ import type { SaasPageDefinition } from '@/data/saasPageTypes';
 
 const dashboardPublicSlugs = new Set(['products', 'cart', 'support', 'status', 'changelog']);
 
+/**
+ * Shell-only dashboard definitions (route maps for long-tail surfaces).
+ * Tier-1 interactive pages live in `components/saas/*` and are not listed here.
+ */
 const DASHBOARD_SAAS_PAGES: readonly SaasPageDefinition[] = [
   {
-    slug: 'dashboard',
-    title: 'Dashboard',
-    eyebrow: 'Overview',
-    summary:
-      'A signed-in home screen with business health, next actions, onboarding, and recent activity.',
-    primaryAction: { label: 'Create workflow', icon: 'sparkles', variant: 'default' },
-    secondaryAction: { label: 'View settings', icon: 'settings', variant: 'outline' },
+    slug: 'teams',
+    title: 'Team',
+    eyebrow: 'Collaboration',
+    summary: 'Interactive invite + member management (see TeamsPage feature surface).',
+    primaryAction: { label: 'Invite teammate', icon: 'users', variant: 'default' },
+    secondaryAction: { label: 'Manage roles', icon: 'shield', variant: 'outline' },
     metrics: [
-      { label: 'Revenue', value: '$18.4k', detail: '+9% from last month', icon: 'credit-card' },
-      { label: 'Customers', value: '1,284', detail: '+18 this week', icon: 'users' },
-      { label: 'Tasks', value: '24', detail: '7 due today', icon: 'kanban' },
+      { label: 'Members', value: '3', detail: 'Practice seats', icon: 'users' },
+      { label: 'Invites', value: '1', detail: 'Pending', icon: 'bell' },
+      { label: 'Roles', value: '4', detail: 'Owner → Viewer', icon: 'shield' },
     ],
     mainItems: [
       {
-        title: 'Launch checklist',
-        description: 'Payments, auth, domain, and email are visible.',
-        meta: '4 steps',
-      },
-      {
-        title: 'Recent activity',
-        description: 'Orders, support, sign-ins, and admin events.',
-        meta: 'Live feed',
-      },
-      {
-        title: 'Builder handoff',
-        description: 'Plain-language next actions for your AI agent.',
-        meta: 'Ready',
+        title: 'Feature page',
+        description: 'Rendered by TeamsPage, not this shell definition.',
+        meta: 'Interactive',
       },
     ],
     asideItems: [
       {
-        title: 'Onboarding',
-        description: 'Runs after signup before this dashboard.',
-        meta: 'Linked',
-      },
-      {
-        title: 'Walkthrough',
-        description: 'Tutorial prompts can start from this route.',
-        meta: 'Prepared',
-      },
-      {
-        title: 'Responsive shell',
-        description: 'Sidebar routes stay available on desktop and mobile.',
-        meta: 'Ready',
-      },
-    ],
-  },
-  {
-    slug: 'settings',
-    title: 'User settings',
-    eyebrow: 'Account',
-    summary:
-      'Profile, security, sessions, notifications, connected accounts, and danger-zone controls.',
-    primaryAction: { label: 'Save changes', icon: 'settings', variant: 'default' },
-    secondaryAction: { label: 'Review security', icon: 'shield', variant: 'outline' },
-    metrics: [
-      { label: 'Profile', value: 'Complete', detail: 'Owner details saved', icon: 'check' },
-      { label: 'Sessions', value: '3', detail: '2 trusted devices', icon: 'shield' },
-      { label: 'Alerts', value: '8', detail: 'Notification channels', icon: 'bell' },
-    ],
-    mainItems: [
-      {
-        title: 'Profile',
-        description: 'Name, email, avatar, timezone, and locale.',
-        meta: 'Editable',
-      },
-      {
-        title: 'Security',
-        description: 'Password, two-factor, recovery codes, and sessions.',
-        meta: 'Important',
-      },
-      {
-        title: 'Notifications',
-        description: 'Email, push, digest, and billing alerts.',
-        meta: 'Granular',
-      },
-    ],
-    asideItems: [
-      {
-        title: 'Connected accounts',
-        description: 'Google, GitHub, Slack, and API keys.',
-        meta: '4 providers',
-      },
-      {
-        title: 'Danger zone',
-        description: 'Export data, transfer ownership, delete account.',
-        meta: 'Guarded',
-      },
-      {
-        title: 'Audit trail',
-        description: 'Recent profile and security changes.',
-        meta: 'Visible',
+        title: 'Skill',
+        description: 'Wire orgs with add-teams + organizations preset.',
+        meta: 'add-teams',
       },
     ],
   },
@@ -105,7 +40,7 @@ const DASHBOARD_SAAS_PAGES: readonly SaasPageDefinition[] = [
     slug: 'orders',
     title: 'Orders',
     eyebrow: 'Commerce',
-    summary: 'Order history, fulfillment states, invoices, tracking, refunds, and reorders.',
+    summary: 'Interactive orders surface (see OrdersPage feature surface).',
     primaryAction: { label: 'Export orders', icon: 'file', variant: 'default' },
     secondaryAction: { label: 'Create refund', icon: 'credit-card', variant: 'outline' },
     metrics: [
@@ -115,28 +50,24 @@ const DASHBOARD_SAAS_PAGES: readonly SaasPageDefinition[] = [
     ],
     mainItems: [
       {
-        title: 'Order #1048',
-        description: 'Template bundle, paid, awaiting license email.',
-        meta: 'Paid',
+        title: 'Feature page',
+        description: 'Rendered by OrdersPage, not this shell definition.',
+        meta: 'Interactive',
       },
-      { title: 'Order #1047', description: 'Design audit booked for Friday.', meta: 'Scheduled' },
-      { title: 'Order #1046', description: 'Starter kit license delivered.', meta: 'Complete' },
     ],
     asideItems: [
       {
-        title: 'Filters',
-        description: 'Status, customer, date, product, and fulfillment.',
-        meta: 'Ready',
+        title: 'Skill',
+        description: 'Wire commerce via setup-payments + orders preset.',
+        meta: 'setup-payments',
       },
-      { title: 'Invoices', description: 'Download and resend invoice controls.', meta: 'Visible' },
-      { title: 'Refunds', description: 'Guarded refund and cancellation actions.', meta: 'Safe' },
     ],
   },
   {
     slug: 'integrations',
     title: 'Integrations',
     eyebrow: 'Connections',
-    summary: 'API keys, webhooks, OAuth apps, analytics, CRM, and automation tools.',
+    summary: 'Interactive integrations hub (see IntegrationsPage feature surface).',
     primaryAction: { label: 'Create API key', icon: 'plug', variant: 'default' },
     secondaryAction: { label: 'Test webhook', icon: 'activity', variant: 'outline' },
     metrics: [
@@ -146,23 +77,16 @@ const DASHBOARD_SAAS_PAGES: readonly SaasPageDefinition[] = [
     ],
     mainItems: [
       {
-        title: 'Stripe',
-        description: 'Checkout, invoices, subscriptions, and tax.',
-        meta: 'Connected',
+        title: 'Feature page',
+        description: 'Rendered by IntegrationsPage, not this shell definition.',
+        meta: 'Interactive',
       },
-      { title: 'PostHog', description: 'Product analytics and visitor stats.', meta: 'Connected' },
-      { title: 'Slack', description: 'Incident, order, and support notifications.', meta: 'Ready' },
     ],
     asideItems: [
       {
         title: 'API keys',
         description: 'Create, reveal once, rotate, and revoke.',
         meta: 'Secure',
-      },
-      {
-        title: 'OAuth apps',
-        description: 'Client id, scopes, callbacks, and consent.',
-        meta: 'Ready',
       },
       {
         title: 'Webhook logs',

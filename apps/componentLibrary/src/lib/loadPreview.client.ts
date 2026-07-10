@@ -21,70 +21,38 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
     return import(`@library/demos/vybekiit/${entry.name}`);
   }
   switch (entry.previewKey) {
-    case 'kokonutui/card-flip':
-      return import('@library/demos/kokonutui/card-flip');
-    case 'kokonutui/shape-hero':
-      return import('@library/demos/kokonutui/shape-hero');
-    case 'kokonutui/ai-text-loading':
-      return import('@library/demos/kokonutui/ai-text-loading');
-    case 'kokonutui/shimmer-text':
-      return import('@library/demos/kokonutui/shimmer-text');
-    case 'kokonutui/file-upload':
-      return import('@library/demos/kokonutui/file-upload');
-    case 'kokonutui/background-paths':
-      return import('@library/demos/kokonutui/background-paths');
-    case 'kokonutui/beams-background':
-      return import('@library/demos/kokonutui/beams-background');
-    case 'kokonutui/apple-activity-card':
-      return import('@library/demos/kokonutui/apple-activity-card');
-    case 'kokonutui/ai-voice':
-      return import('@library/demos/kokonutui/ai-voice');
-    case 'kokonutui/smooth-tab':
-      return import('@library/demos/kokonutui/smooth-tab');
-    case 'kokonutui/team-selector':
-      return import('@library/demos/kokonutui/team-selector');
-    case 'kokonutui/bento-grid':
-      return import('@library/demos/kokonutui/bento-grid');
-    case 'kokonutui/toolbar':
-      return import('@library/demos/kokonutui/toolbar');
-    case 'kokonutui/ai-loading':
-      return import('@library/demos/kokonutui/ai-loading');
-    case 'kokonutui/card-stack':
-      return import('@library/demos/kokonutui/card-stack');
-    case 'kokonutui/type-writer':
-      return import('@library/demos/kokonutui/type-writer');
-    case 'kokonutui/swoosh-text':
-      return import('@library/demos/kokonutui/swoosh-text');
-    case 'kokonutui/sliced-text':
-      return import('@library/demos/kokonutui/sliced-text');
-    case 'kokonutui/glitch-text':
-      return import('@library/demos/kokonutui/glitch-text');
-    case 'kokonutui/matrix-text':
-      return import('@library/demos/kokonutui/matrix-text');
-    case 'kokonutui/dynamic-text':
-      return import('@library/demos/kokonutui/dynamic-text');
-    case 'kokonutui/tweet-card':
-      return import('@library/demos/kokonutui/tweet-card');
-    case 'kokonutui/scroll-text':
-      return import('@library/demos/kokonutui/scroll-text');
     case 'bundui/animated-text':
       return import('@library/demos/bundui/animated-text');
     case 'bundui/animated-gradient-text':
       return import('@library/demos/bundui/animated-gradient-text');
+    case 'bundui/text-morph-animation':
+      return import('@library/demos/bundui/text-morph-animation');
     case 'bundui/text-gradient-scroll':
       return import('@library/demos/bundui/text-gradient-scroll');
     case 'bundui/circle-path':
       return import('@library/demos/bundui/circle-path');
     case 'bundui/flip-card':
       return import('@library/demos/bundui/flip-card');
+    case 'bundui/magnetic-hover-effect-01':
+      return import('@library/demos/bundui/magnetic-hover-effect-01');
+    case 'bundui/magnetic-hover-effect-02':
+      return import('@library/demos/bundui/magnetic-hover-effect-02');
     case 'bundui/tilt-effect':
       return import('@library/demos/bundui/tilt-effect');
+    case 'bundui/ripple-effect-01':
+      return import('@library/demos/bundui/ripple-effect-01');
+    case 'bundui/ripple-effect-02':
+      return import('@library/demos/bundui/ripple-effect-02');
+    case 'bundui/ripple-effect-03':
+      return import('@library/demos/bundui/ripple-effect-03');
     case 'bundui/mouse-trail':
       return import('@library/demos/bundui/mouse-trail');
     case 'bundui/animated-beam':
       return import('@library/demos/bundui/animated-beam');
     case 'bundui/animated-tab':
       return import('@library/demos/bundui/animated-tab');
+    case 'bundui/animated-gradient-border':
+      return import('@library/demos/bundui/animated-gradient-border');
     case 'bundui/counter-animation':
       return import('@library/demos/bundui/counter-animation');
     case 'bundui/floating-button':
@@ -101,6 +69,8 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/bundui/sliding-number');
     case 'bundui/countdown':
       return import('@library/demos/bundui/countdown');
+    case 'bundui/meteor-shower-animation':
+      return import('@library/demos/bundui/meteor-shower-animation');
     case 'bundui/fireworks':
       return import('@library/demos/bundui/fireworks');
     case 'bundui/floating-paths':
@@ -109,70 +79,6 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/bundui/fluid-particles');
     case 'bundui/stars':
       return import('@library/demos/bundui/stars');
-    case 'kibo/announcement':
-      return import('@library/demos/kibo/announcement');
-    case 'kibo/avatar-stack':
-      return import('@library/demos/kibo/avatar-stack');
-    case 'kibo/banner':
-      return import('@library/demos/kibo/banner');
-    case 'kibo/choicebox':
-      return import('@library/demos/kibo/choicebox');
-    case 'kibo/color-picker':
-      return import('@library/demos/kibo/color-picker');
-    case 'kibo/comparison':
-      return import('@library/demos/kibo/comparison');
-    case 'kibo/contribution-graph':
-      return import('@library/demos/kibo/contribution-graph');
-    case 'kibo/credit-card':
-      return import('@library/demos/kibo/credit-card');
-    case 'kibo/cursor':
-      return import('@library/demos/kibo/cursor');
-    case 'kibo/deck':
-      return import('@library/demos/kibo/deck');
-    case 'kibo/dialog-stack':
-      return import('@library/demos/kibo/dialog-stack');
-    case 'kibo/dropzone':
-      return import('@library/demos/kibo/dropzone');
-    case 'kibo/gantt':
-      return import('@library/demos/kibo/gantt');
-    case 'kibo/glimpse':
-      return import('@library/demos/kibo/glimpse');
-    case 'kibo/image-crop':
-      return import('@library/demos/kibo/image-crop');
-    case 'kibo/image-zoom':
-      return import('@library/demos/kibo/image-zoom');
-    case 'kibo/kanban':
-      return import('@library/demos/kibo/kanban');
-    case 'kibo/list':
-      return import('@library/demos/kibo/list');
-    case 'kibo/mini-calendar':
-      return import('@library/demos/kibo/mini-calendar');
-    case 'kibo/pill':
-      return import('@library/demos/kibo/pill');
-    case 'kibo/qr-code':
-      return import('@library/demos/kibo/qr-code');
-    case 'kibo/rating':
-      return import('@library/demos/kibo/rating');
-    case 'kibo/relative-time':
-      return import('@library/demos/kibo/relative-time');
-    case 'kibo/sandbox':
-      return import('@library/demos/kibo/sandbox');
-    case 'kibo/snippet':
-      return import('@library/demos/kibo/snippet');
-    case 'kibo/spinner':
-      return import('@library/demos/kibo/spinner');
-    case 'kibo/status':
-      return import('@library/demos/kibo/status');
-    case 'kibo/stories':
-      return import('@library/demos/kibo/stories');
-    case 'kibo/theme-switcher':
-      return import('@library/demos/kibo/theme-switcher');
-    case 'kibo/ticker':
-      return import('@library/demos/kibo/ticker');
-    case 'kibo/tree':
-      return import('@library/demos/kibo/tree');
-    case 'kibo/video-player':
-      return import('@library/demos/kibo/video-player');
     case 'magicui/android':
       return import('@library/demos/magicui/android');
     case 'magicui/line-shadow-text':
@@ -191,6 +97,8 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/neon-gradient-card');
     case 'magicui/noise-texture':
       return import('@library/demos/magicui/noise-texture');
+    case 'magicui/meteors':
+      return import('@library/demos/magicui/meteors');
     case 'magicui/grid-pattern':
       return import('@library/demos/magicui/grid-pattern');
     case 'magicui/hexagon-pattern':
@@ -207,8 +115,12 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/hero-video-dialog');
     case 'magicui/marquee':
       return import('@library/demos/magicui/marquee');
+    case 'magicui/globe':
+      return import('@library/demos/magicui/globe');
     case 'magicui/shimmer-button':
       return import('@library/demos/magicui/shimmer-button');
+    case 'magicui/tweet-card':
+      return import('@library/demos/magicui/tweet-card');
     case 'magicui/client-tweet-card':
       return import('@library/demos/magicui/client-tweet-card');
     case 'magicui/particles':
@@ -225,12 +137,16 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/animated-shiny-text');
     case 'magicui/animated-grid-pattern':
       return import('@library/demos/magicui/animated-grid-pattern');
+    case 'magicui/animated-beam':
+      return import('@library/demos/magicui/animated-beam');
     case 'magicui/text-reveal':
       return import('@library/demos/magicui/text-reveal');
     case 'magicui/dia-text-reveal':
       return import('@library/demos/magicui/dia-text-reveal');
     case 'magicui/hyper-text':
       return import('@library/demos/magicui/hyper-text');
+    case 'magicui/animated-gradient-text':
+      return import('@library/demos/magicui/animated-gradient-text');
     case 'magicui/orbiting-circles':
       return import('@library/demos/magicui/orbiting-circles');
     case 'magicui/word-rotate':
@@ -269,6 +185,8 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/magicui/rainbow-button');
     case 'magicui/interactive-hover-button':
       return import('@library/demos/magicui/interactive-hover-button');
+    case 'magicui/terminal':
+      return import('@library/demos/magicui/terminal');
     case 'magicui/video-text':
       return import('@library/demos/magicui/video-text');
     case 'magicui/pixel-image':
@@ -743,6 +661,42 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@/components/aceternity/features-section-demo-2');
     case 'aceternity/features-section-demo-3':
       return import('@/components/aceternity/features-section-demo-3');
+    case 'untitled/app-store-buttons-outline':
+      return import('@library/demos/untitled/app-store-buttons-outline');
+    case 'untitled/app-store-buttons':
+      return import('@library/demos/untitled/app-store-buttons');
+    case 'untitled/close-button':
+      return import('@library/demos/untitled/close-button');
+    case 'untitled/social-logos':
+      return import('@library/demos/untitled/social-logos');
+    case 'untitled/hint-text':
+      return import('@library/demos/untitled/hint-text');
+    case 'untitled/checkbox':
+      return import('@library/demos/untitled/checkbox');
+    case 'untitled/popover':
+      return import('@library/demos/untitled/popover');
+    case 'untitled/select-shared':
+      return import('@library/demos/untitled/select-shared');
+    case 'untitled/form':
+      return import('@library/demos/untitled/form');
+    case 'untitled/hook-form':
+      return import('@library/demos/untitled/hook-form');
+    case 'untitled/radio-buttons':
+      return import('@library/demos/untitled/radio-buttons');
+    case 'untitled/progress-indicators':
+      return import('@library/demos/untitled/progress-indicators');
+    case 'untitled/simple-circle':
+      return import('@library/demos/untitled/simple-circle');
+    case 'untitled/modal':
+      return import('@library/demos/untitled/modal');
+    case 'untitled/pagination-base':
+      return import('@library/demos/untitled/pagination-base');
+    case 'untitled/pagination-dot':
+      return import('@library/demos/untitled/pagination-dot');
+    case 'untitled/pagination-line':
+      return import('@library/demos/untitled/pagination-line');
+    case 'gluestack/index.web':
+      return import('@library/demos/gluestack/index.web');
     case 'ai-elements/agent':
       return import('@library/demos/ai-elements/agent');
     case 'ai-elements/artifact':
@@ -773,6 +727,8 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@library/demos/ai-elements/edge');
     case 'ai-elements/environment-variables':
       return import('@library/demos/ai-elements/environment-variables');
+    case 'ai-elements/file-tree':
+      return import('@library/demos/ai-elements/file-tree');
     case 'ai-elements/image':
       return import('@library/demos/ai-elements/image');
     case 'ai-elements/inline-citation':
@@ -959,8 +915,70 @@ export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<str
       return import('@/components/ai-elements/example-voice-selector');
     case 'ai-elements/example-web-preview':
       return import('@/components/ai-elements/example-web-preview');
-    case 'magicui/logo-trust-grid':
-      return import('@library/demos/magicui/logo-trust-grid');
+    case 'kibo/announcement':
+      return import('@library/demos/kibo/announcement');
+    case 'kibo/avatar-stack':
+      return import('@library/demos/kibo/avatar-stack');
+    case 'kibo/banner':
+      return import('@library/demos/kibo/banner');
+    case 'kibo/choicebox':
+      return import('@library/demos/kibo/choicebox');
+    case 'kibo/color-picker':
+      return import('@library/demos/kibo/color-picker');
+    case 'kibo/comparison':
+      return import('@library/demos/kibo/comparison');
+    case 'kibo/contribution-graph':
+      return import('@library/demos/kibo/contribution-graph');
+    case 'kibo/credit-card':
+      return import('@library/demos/kibo/credit-card');
+    case 'kibo/cursor':
+      return import('@library/demos/kibo/cursor');
+    case 'kibo/deck':
+      return import('@library/demos/kibo/deck');
+    case 'kibo/dialog-stack':
+      return import('@library/demos/kibo/dialog-stack');
+    case 'kibo/dropzone':
+      return import('@library/demos/kibo/dropzone');
+    case 'kibo/gantt':
+      return import('@library/demos/kibo/gantt');
+    case 'kibo/glimpse':
+      return import('@library/demos/kibo/glimpse');
+    case 'kibo/image-crop':
+      return import('@library/demos/kibo/image-crop');
+    case 'kibo/image-zoom':
+      return import('@library/demos/kibo/image-zoom');
+    case 'kibo/kanban':
+      return import('@library/demos/kibo/kanban');
+    case 'kibo/list':
+      return import('@library/demos/kibo/list');
+    case 'kibo/mini-calendar':
+      return import('@library/demos/kibo/mini-calendar');
+    case 'kibo/pill':
+      return import('@library/demos/kibo/pill');
+    case 'kibo/qr-code':
+      return import('@library/demos/kibo/qr-code');
+    case 'kibo/rating':
+      return import('@library/demos/kibo/rating');
+    case 'kibo/relative-time':
+      return import('@library/demos/kibo/relative-time');
+    case 'kibo/sandbox':
+      return import('@library/demos/kibo/sandbox');
+    case 'kibo/snippet':
+      return import('@library/demos/kibo/snippet');
+    case 'kibo/spinner':
+      return import('@library/demos/kibo/spinner');
+    case 'kibo/status':
+      return import('@library/demos/kibo/status');
+    case 'kibo/stories':
+      return import('@library/demos/kibo/stories');
+    case 'kibo/theme-switcher':
+      return import('@library/demos/kibo/theme-switcher');
+    case 'kibo/ticker':
+      return import('@library/demos/kibo/ticker');
+    case 'kibo/tree':
+      return import('@library/demos/kibo/tree');
+    case 'kibo/video-player':
+      return import('@library/demos/kibo/video-player');
     case 'kokonutui/anthropic':
       return import('@library/demos/kokonutui/anthropic');
     case 'kokonutui/anthropic-dark':

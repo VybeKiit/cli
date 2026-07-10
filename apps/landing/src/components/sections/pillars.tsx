@@ -1,3 +1,4 @@
+import { BrandRichText } from '@/components/landing/BrandRichText';
 import { PILLARS } from '@/data/pillars';
 
 /**
@@ -16,7 +17,9 @@ export const Pillars = () => (
         {PILLARS.map((pillar) => (
           <div key={pillar.id} className="flex flex-col gap-2">
             <h3 className="font-semibold text-lg">{pillar.title}</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">{pillar.body}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              <BrandRichText text={pillar.body} />
+            </p>
           </div>
         ))}
       </div>

@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   AGENT_SKILL_SYMLINKS,
   buyerSkillStemFromPath,
@@ -14,8 +11,15 @@ import {
 } from '@vybekiit/agent-kit/render/buyerSkillStubs';
 import { describe, expect, it } from 'vitest';
 
-const REPO_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
-const GO_LIVE = readFileSync(join(REPO_ROOT, 'templates/web/.vybekiit/skills/go-live.md'), 'utf8');
+/** Fixture buyer skill body (source shape under `.vybekiit/skills/`). */
+const GO_LIVE = `# Skill: go-live
+
+**Goal:** the builder's app is online at a real web address that anyone can open.
+
+## Steps
+
+1. Put the app online.
+`;
 
 // "---\nname: go-live\n" -> true
 const GO_LIVE_FRONTMATTER_PATTERN = /^---\nname: go-live\n/;

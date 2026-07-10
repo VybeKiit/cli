@@ -46,13 +46,15 @@ export const PRICE_VALUE_STACK = {
 /** Brand identity strings shown in the header, footer, and metadata. */
 export const BRAND = {
   name: 'VybeKiit',
-  /** Meta-description / hero-adjacent tagline, drawn from the one-liner library. */
-  tagline: 'The SaaS kit that ships itself.',
+  /**
+   * Social / browser title tagline — the sentence platforms show when the URL is pasted.
+   */
+  tagline: 'The blueprint for vibe coders. Ship projects like a real software engineer.',
   /** Canonical production origin — the SSOT for metadataBase, canonical URLs, sitemap, robots, and OG. */
   url: 'https://vybekiit.com',
   /** One authoritative meta description, shared by the layout, Open Graph, and JSON-LD. */
   description:
-    'VybeKiit is the SaaS kit that ships itself. You describe the product in plain language; the agent builds it, deploys it, takes payments, and keeps it updated. Web, mobile, and a browser extension in one purchase.',
+    'The blueprint for vibe coders. Ship projects like a real software engineer. Describe your product in plain language; the agent builds it, deploys it, takes your first payment, and keeps it updated. Web, mobile, and a browser extension in one purchase.',
 } as const;
 
 /**
@@ -80,13 +82,15 @@ export interface NavLink {
   readonly label: string;
 }
 
-/** Primary in-page nav links shown in the header (anchors to the home sections). */
+/**
+ * Primary nav links in the header.
+ * Absolute home anchors so they work from /checkout and other store pages too.
+ */
 export const HEADER_LINKS: readonly NavLink[] = [
-  { href: 'https://ui.vybekiit.com', label: 'UI Library' },
-  { href: '#pillars', label: 'How it works' },
-  { href: '#compare', label: 'Compare' },
-  { href: '#pricing', label: 'Pricing' },
-  { href: '#faq', label: 'FAQ' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#how-it-works', label: 'How it works' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/#faq', label: 'FAQ' },
 ];
 
 /** Footer links — legal pages every product needs. */
@@ -115,8 +119,11 @@ export const SUPPORT: {
   discordUrl: string;
   kitEmail: string;
 } = {
-  /** Discord invite URL — set before launch. */
-  discordUrl: '',
-  /** Kit bug email — from root EMAIL_FROM when set. */
-  kitEmail: process.env.EMAIL_FROM === undefined ? 'support@vybekiit.com' : process.env.EMAIL_FROM,
+  /**
+   * Discord invite URL — set `NEXT_PUBLIC_DISCORD_URL` before launch
+   * (see docs/gtm/discord-setup.md).
+   */
+  discordUrl: process.env.NEXT_PUBLIC_DISCORD_URL ?? '',
+  /** Public contact email shown in the store footer. */
+  kitEmail: 'info@vybekiit.com',
 };

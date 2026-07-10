@@ -11,7 +11,7 @@
       "source": "aws/agent-toolkit-for-aws",
       "sourceType": "github",
       "skillPath": "skills/core-skills/aws-cloudformation/SKILL.md",
-      "computedHash": "eaa7a2be8d0641a2710e1d2654954325a4325b36747505d47d82c7c37521e8fa"
+      "computedHash": "269f25e8ad4a59db4fdd28fbd616cf2018f8ca36e16a04bbce8c172ba05b2d78"
     },
     "aws-serverless": {
       "source": "aws/agent-toolkit-for-aws",
@@ -113,13 +113,13 @@
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-feature-flags/SKILL.md",
-      "computedHash": "243c344401724f3c133bceee927ba86447de26c72676be2fdccbb80f7f5a9ad8"
+      "computedHash": "aad7d5397aad03d63bfb04883108611d487ced835f3357361b730b53dd1b1027"
     },
     "instrument-product-analytics": {
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-product-analytics/SKILL.md",
-      "computedHash": "cc6b39e945dcb8c1ef42374f802694af70f026b9765706e983eb35030116fa63"
+      "computedHash": "ae06e19669e02045b2e4fab3811bf2864d37d5cf455fb5320037e8e4b2aaac66"
     },
     "mongodb-atlas-stream-processing": {
       "source": "mongodb/agent-skills",
@@ -173,13 +173,13 @@
       "source": "neondatabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/neon-ai-gateway/SKILL.md",
-      "computedHash": "d294b4bc7c56a854ae15f4119775bca5754b01d862fcc034bd01fc968d109b49"
+      "computedHash": "8ba5c98806795077bc41d167216694b3ecfa1f2a44df6cd9ba25d73001c71268"
     },
     "neon-functions": {
       "source": "neondatabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/neon-functions/SKILL.md",
-      "computedHash": "d3a77595ceeabb2ab0756788b6277be886ae56fef69006ef09b39f27a0bbe091"
+      "computedHash": "baa9b6fbe0d0e7ff82dd56cbb15f105c77f7f1b4ffe7a1306053a60fc3a25e68"
     },
     "neon-object-storage": {
       "source": "neondatabase/agent-skills",
@@ -215,18 +215,18 @@
       "source": "getsentry/sentry-for-ai",
       "sourceType": "github",
       "skillPath": "skills/sentry-sdk-setup/SKILL.md",
-      "computedHash": "a471d03591daf5371c3dacc00532d957c14f7ae7f4120b7305ad3b148ccefbb2"
+      "computedHash": "d7fb017bcc2e3eb93280843b3343cc3aa8040a8667208c1ee083738be6420b7a"
     },
     "sentry-workflow": {
       "source": "getsentry/sentry-for-ai",
       "sourceType": "github",
       "skillPath": "skills/sentry-workflow/SKILL.md",
-      "computedHash": "00a62d74aa26a9007d74532ab405b16684386e59c4121a5496f0059206683c6e"
+      "computedHash": "32a032a0e195afa52ce700f9418329c8650fb12cc04439dec1e0182aa0ce92f5"
     },
     "stripe-best-practices": {
       "source": "docs.stripe.com",
       "sourceType": "well-known",
-      "computedHash": "fc3bec305bdf8b980991364633ff45e3051536de8a68e6c87b3f717054c2b06b"
+      "computedHash": "7ff3b3441a1b1396584f85c3c7304ca4c28f2af5622a1932a046c86739063fd3"
     },
     "supabase": {
       "source": "supabase/agent-skills",
@@ -244,7 +244,7 @@
       "source": "railwayapp/railway-skills",
       "sourceType": "github",
       "skillPath": "plugins/railway/skills/use-railway/SKILL.md",
-      "computedHash": "e6d2e37d3cdb0632b1abbf208f329e6521bdc12c0ec165199870e71d95d1467f"
+      "computedHash": "cfdc4787e6a7b163af71eefd1f02fcbfe2b8dcd94430c434b28f9c752831ce85"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

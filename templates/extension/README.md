@@ -1,33 +1,56 @@
-# Your browser extension
+<p align="center">
+  <img src="https://raw.githubusercontent.com/VybeKiit/vybekiit/main/assets/brand/vybekiit-profile.svg" width="160" height="160" alt="VybeKiit logo">
+</p>
 
-Built with **VybeKiit**. You don't need to read code to use this — just open the project
-in Claude or Codex and tell it what you want to build.
+<p align="center">
+  <strong>For vibe coders.</strong> You do not need to be technical or understand the code. Open this project in an AI coding tool, paste the ready prompt below, and build one step at a time.
+</p>
 
-The template ships a **WXT + React popup**, a background entrypoint, and the full **agent layer**
-(skills, husky quality gate, CI). Point `WXT_PUBLIC_APP_URL` at your web app — sign-in, data, and
-payments stay on that backend (extensions never hold secrets).
+<p align="center">
+  <strong>English</strong> ·
+  <a href="README.he.md">עברית</a> ·
+  <a href="README.ar.md">العربية</a> ·
+  <a href="README.ru.md">Русский</a>
+</p>
+
+# Your browser add-on
+
+Built with **VybeKiit**. This is your browser add-on starting point: the little window people open from their browser. You do not need to read code to use it. Tell your AI helper what you want to build.
+
+Sign-in, saved information, and payments live on **your web app**. The add-on talks to that app and never holds secret settings.
+
+## Ready prompt for your AI coding tool
+
+Open this project in [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), or any other AI coding tool, then paste:
+
+```text
+Set up my browser add-on.
+
+I am a non-technical vibe coder. Read AGENTS.md and language.md.
+Speak plain language. One action at a time. Translate any errors.
+Celebrate progress. Do not dump technical steps on me.
+
+Start with first-time setup until I can preview the add-on on my computer.
+```
 
 ## Start here
 
 Open this folder in your AI coding tool and say:
 
-> **"Set up my extension."**
+> **"Set up my browser add-on."**
 
-Your agent takes it from there — it reads its instructions, walks you through the few
-steps only you can do (one at a time, in plain language), and gets your extension going.
+Your helper takes it from there. It reads its instructions, walks you through the few steps only you can do (one at a time, in plain language), and gets your add-on going.
 
 ## Things you can ask for
 
-- "Set up my extension" — first-time setup.
-- "Add sign-in" — let people log in (handled by your web app — extensions can't safely
-  hold private keys). Say **"Sign in with Google"** for one-tap Google login.
-- "Save data" — store what your users create.
-- "Add payments" — start taking money.
-- "Publish to the Chrome Web Store" — ship the latest version.
-- "Something's broken" — your agent runs a checkup and fixes it.
+- **"Set up my browser add-on"**: first-time setup.
+- **"Add sign-in"**: let people log in (handled by your web app; the add-on does not keep private keys). Say **"Sign in with Google"** for one-tap Google login.
+- **"Save data"**: store what your users create (on your web app).
+- **"Add payments"**: start taking money (on your web app).
+- **"Publish to the extension store"**: ship the latest version.
+- **"Something's broken"**: your helper runs a checkup and fixes it.
 
-Security (rate limits, blocking bad requests) lives on your **backend web app** — the extension
-calls that server; you don't configure protection inside the extension itself.
+Safety checks (slowing abuse, blocking bad requests) live on your **web app**. The add-on calls that app; you do not set those up inside the add-on itself.
 
 That's it. Everything technical is handled for you.
 

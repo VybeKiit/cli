@@ -8,9 +8,9 @@ export type {
   UnavailableReason,
 } from './catalog';
 
-export const COMPONENT_CATALOG_COUNT = 1874;
-export const CATALOG_COMPONENT_COUNT = 1537;
-export const CATALOG_EXAMPLE_COUNT = 337;
+export const COMPONENT_CATALOG_COUNT = 2078;
+export const CATALOG_COMPONENT_COUNT = 1740;
+export const CATALOG_EXAMPLE_COUNT = 338;
 
 export const CATALOG_CATEGORIES = [
   {
@@ -22,85 +22,85 @@ export const CATALOG_CATEGORIES = [
   {
     slug: 'hero',
     label: 'Hero & landing',
-    count: 187,
+    count: 199,
     order: 1,
   },
   {
     slug: 'background',
     label: 'Backgrounds & effects',
-    count: 129,
+    count: 138,
     order: 2,
   },
   {
     slug: 'navigation',
     label: 'Navigation',
-    count: 68,
+    count: 72,
     order: 3,
   },
   {
     slug: 'form',
     label: 'Forms & inputs',
-    count: 412,
+    count: 415,
     order: 4,
   },
   {
     slug: 'button',
     label: 'Buttons & actions',
-    count: 131,
+    count: 132,
     order: 5,
   },
   {
     slug: 'card',
     label: 'Cards & content',
-    count: 148,
+    count: 145,
     order: 6,
   },
   {
     slug: 'data-display',
     label: 'Data display',
-    count: 209,
+    count: 231,
     order: 7,
   },
   {
     slug: 'ai',
     label: 'AI & chat',
-    count: 219,
+    count: 217,
     order: 8,
   },
   {
     slug: 'icons-logos',
     label: 'Logos & icons',
-    count: 18,
+    count: 37,
     order: 9,
   },
   {
     slug: 'pricing',
     label: 'Pricing & marketing',
-    count: 55,
+    count: 136,
     order: 10,
   },
   {
     slug: 'layout',
     label: 'Layout & shells',
-    count: 40,
+    count: 45,
     order: 11,
   },
   {
     slug: 'base',
     label: 'Primitives',
-    count: 9,
+    count: 65,
     order: 12,
   },
   {
     slug: 'application',
     label: 'Application',
-    count: 1,
+    count: 9,
     order: 13,
   },
   {
     slug: 'component',
     label: 'Other',
-    count: 33,
+    count: 22,
     order: 99,
   },
 ] as import('./catalog').CatalogCategory[];
@@ -113,11 +113,13 @@ export const CATALOG_NAMESPACES: readonly string[] = [
   'coss',
   'cult',
   'evilcharts',
+  'gluestack',
   'kibo',
   'kokonutui',
   'magicui',
   'prompt-kit',
   'supabase',
   'tailark',
+  'untitled',
   'vybekiit',
 ] as const;

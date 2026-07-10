@@ -13,6 +13,12 @@ Read this at the start of every task before writing code.
 6. On skill complete: append one entry to `checklist.md` Decision log via `formatChecklistEntry()`
 7. Stuck on an integration after one MCP or debug attempt: `vybekiit doc-fallback <tech-id>` and tell the builder the plain stuck phrase only
 
+## Project skill discovery
+
+- Auto-discovered Agent Skills: `.agents/skills/<goal>/SKILL.md` (Cursor + Claude via `.cursor/skills` / `.claude/skills` symlinks; Codex when project skills are enabled).
+- Authoring fallback: `.vybekiit/skills/<goal>.md` (same body; used when a goal-index row is opened explicitly).
+- Do not invent skills outside those folders or the buyer-owned `.vybekiit/extensions/` tree.
+
 Buyer-owned files you may append to (never delete): `checklist.md` Decision log, `CONTEXT.md` app glossary, `.vybekiit/extensions/**` (extension skills).
 Machine-global skills live in tool-specific paths (see `extend-capabilities-vybekiit.md`); tools auto-discover them.
 <!-- vybekiit:generated:end session-bootstrap -->

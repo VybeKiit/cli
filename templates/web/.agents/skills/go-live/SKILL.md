@@ -23,6 +23,15 @@ asked.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/LaunchChecklistPage.tsx` export `LaunchChecklistPage` into the buyer app at route `/dashboard/launch`.
+   Recipe id: `launch-checklist`. Presets: job_runs.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('go-live')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Pre-flight check.** Run `vybekiit doctor` to make sure the deploy tool is installed, then run
    the project's checks (tests + build) yourself. Asset optimization runs in `prebuild` / start hooks
    (`scripts/optimizeAssets.mjs`) — confirm it completes without errors. Run code-readiness greps from `check-safety`

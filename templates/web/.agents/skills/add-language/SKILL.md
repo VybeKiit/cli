@@ -17,6 +17,15 @@ celebrate. Follow `i18n-vybekiit.md` for all technical steps.
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/LanguagePage.tsx` export `LanguagePage` into the buyer app at route `/dashboard/language`.
+   Recipe id: `language`. Presets: none.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-language')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Ask which language** — plain words only. You pick the ISO code (e.g. Hebrew → `he`, Spanish → `es`).
 2. **Duplicate the catalog** — copy `messages/en.json` → `messages/{locale}.json`; translate every value.
 3. **Register the locale** — update `src/i18n/routing.ts` and `middleware.ts` (keep both in sync).

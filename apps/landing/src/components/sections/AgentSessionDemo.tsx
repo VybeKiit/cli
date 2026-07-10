@@ -76,7 +76,7 @@ export const AgentSessionDemo = () => {
         <span className="size-3 rounded-full bg-red-500/80" />
         <span className="size-3 rounded-full bg-yellow-500/80" />
         <span className="size-3 rounded-full bg-green-500/80" />
-        <span className="ms-2 text-neutral-500">vybekiit — session 1</span>
+        <span className="ms-2 text-neutral-500">vybekiit · session 1</span>
       </div>
       <div className="space-y-3 p-5 text-neutral-200">
         <p>

@@ -22,6 +22,15 @@ translate every error · celebrate. You build the upload; the builder only paste
 
 ## Steps
 
+<!-- vybekiit:page-recipe-install -->
+0. **Install the page recipe first (catalog SSOT — Option C).**
+   Copy `apps/componentLibrary/src/pageRecipes/FileManagerPage.tsx` export `FileManagerPage` into the buyer app at route `/dashboard/files`.
+   Recipe id: `file-manager`. Presets: file_metadata.
+   Keep every `TODO:` in the recipe and wire each one after the route renders.
+   Also reference `packages/agentKit` `getPageRecipeInstall('add-files')` / page-recipe-manifest.json.
+   **Verify:** route builds and shows practice UI before provider wiring.
+
+
 1. **Make sure file storage is ready.** Run `vybekiit doctor` so the storage tool is set up, and
    collect any access key it needs — one at a time — into the secret settings file.
    **Verify:** storage is reachable (a tiny test upload succeeds).

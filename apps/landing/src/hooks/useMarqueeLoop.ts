@@ -6,6 +6,8 @@ interface MarqueeLoopOptions {
   readonly durationSeconds: number;
   readonly hoverMultiplier?: number;
   readonly enabled?: boolean;
+  /** `1` default (leftward base drift), `-1` for the opposite direction. */
+  readonly direction?: 1 | -1;
 }
 
 const parseDurationSeconds = (duration: string): number => {
@@ -33,7 +35,7 @@ export const useMarqueeLoop = (
   trackRef: RefObject<HTMLElement | null>,
   copyRef: RefObject<HTMLElement | null>,
   regionRef: RefObject<HTMLElement | null>,
-  { durationSeconds, hoverMultiplier = 2.75, enabled = true }: MarqueeLoopOptions,
+  { durationSeconds, hoverMultiplier = 2.75, enabled = true, direction = 1 }: MarqueeLoopOptions,
 ) => {
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
@@ -56,12 +58,14 @@ export const useMarqueeLoop = (
     let lastTime = performance.now();
     let loopWidth = copy.getBoundingClientRect().width;
 
+    const signedBase = (width: number): number => (width / durationSeconds) * direction;
+
     const measure = () => {
       loopWidth = copy.getBoundingClientRect().width || track.scrollWidth / 2;
       if (loopWidth <= 0) {
         return;
       }
-      const baseSpeed = loopWidth / durationSeconds;
+      const baseSpeed = signedBase(loopWidth);
       targetVelocityRef.current = hoveredRef.current ? -baseSpeed * hoverMultiplier : baseSpeed;
       if (velocityRef.current === 0) {
         velocityRef.current = baseSpeed;
@@ -95,7 +99,7 @@ export const useMarqueeLoop = (
       lastTime = now;
 
       if (loopWidth > 0) {
-        const baseSpeed = loopWidth / durationSeconds;
+        const baseSpeed = signedBase(loopWidth);
         targetVelocityRef.current = hoveredRef.current ? -baseSpeed * hoverMultiplier : baseSpeed;
 
         velocityRef.current +=
@@ -123,7 +127,7 @@ export const useMarqueeLoop = (
       window.removeEventListener('resize', onResize);
       track.style.transform = '';
     };
-  }, [copyRef, durationSeconds, enabled, hoverMultiplier, regionRef, trackRef]);
+  }, [copyRef, direction, durationSeconds, enabled, hoverMultiplier, regionRef, trackRef]);
 };
 
 export { parseDurationSeconds };

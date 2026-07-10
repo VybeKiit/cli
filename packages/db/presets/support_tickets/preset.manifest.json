@@ -1,0 +1,74 @@
+{
+  "id": "support_tickets",
+  "version": 1,
+  "description": "Support tickets and message thread for the support center page.",
+  "entities": [
+    {
+      "name": "support_tickets",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        { "name": "user_id", "type": "text", "required": true },
+        { "name": "assignee_user_id", "type": "text" },
+        { "name": "subject", "type": "text", "required": true },
+        { "name": "status", "type": "text", "required": true, "default": "'open'" },
+        { "name": "priority", "type": "text", "required": true, "default": "'normal'" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    },
+    {
+      "name": "support_ticket_messages",
+      "columns": [
+        { "name": "id", "type": "uuid", "required": true, "default": "gen_random_uuid()" },
+        {
+          "name": "ticket_id",
+          "type": "uuid",
+          "required": true,
+          "references": { "table": "support_tickets", "column": "id" }
+        },
+        { "name": "author_user_id", "type": "text", "required": true },
+        { "name": "body", "type": "text", "required": true },
+        { "name": "is_internal", "type": "boolean", "required": true, "default": "false" },
+        { "name": "created_at", "type": "timestamptz", "required": true, "default": "now()" }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "support_ticket_messages",
+      "to": "support_tickets",
+      "foreignKey": "ticket_id",
+      "type": "many"
+    }
+  ],
+  "indexes": [
+    {
+      "table": "support_tickets",
+      "columns": ["user_id", "status"],
+      "reason": "list tickets by requester and status"
+    },
+    {
+      "table": "support_tickets",
+      "columns": ["assignee_user_id", "status"],
+      "reason": "agent inbox filtered by status"
+    },
+    {
+      "table": "support_ticket_messages",
+      "columns": ["ticket_id", "created_at"],
+      "reason": "message thread in chronological order"
+    }
+  ],
+  "rls": "user-owned",
+  "rlsColumn": "user_id",
+  "capabilities": ["upsert"],
+  "skills": [],
+  "packages": ["@vybekiit/db"],
+  "providers": {
+    "supabase": "stable",
+    "neon": "stable",
+    "railway": "stable",
+    "mongodb": "stable",
+    "firebase": "stable",
+    "aws": "stable"
+  }
+}

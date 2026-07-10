@@ -1,0 +1,85 @@
+# Lab gate — Lighthouse CI against apps/landing (mobile-first Core Web Vitals).
+# Budgets live in lighthouserc.json (SSOT with .github/perf/budgets.json).
+# Assertions start as `warn` so the first 1–2 weeks learn the baseline; flip
+# Core Web Vitals to `error` once mobile medians are stable under budget.
+name: Lighthouse CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/landing/**'
+      - 'packages/**'
+      - 'lighthouserc.json'
+      - 'lighthouserc.desktop.json'
+      - '.github/workflows/lighthouse-ci.yml'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/landing/**'
+      - 'packages/**'
+      - 'lighthouserc.json'
+      - 'lighthouserc.desktop.json'
+      - '.github/workflows/lighthouse-ci.yml'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse-mobile:
+    name: Lab (mobile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build landing (+ workspace package deps)
+        run: pnpm turbo run build --filter=vybekiit-landing... --concurrency=2
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Lighthouse CI (mobile)
+        run: npx --yes @lhci/cli@0.14.x autorun --config=./lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  lighthouse-desktop:
+    name: Lab (desktop)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build landing (+ workspace package deps)
+        run: pnpm turbo run build --filter=vybekiit-landing... --concurrency=2
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Lighthouse CI (desktop)
+        run: npx --yes @lhci/cli@0.14.x autorun --config=./lighthouserc.desktop.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
