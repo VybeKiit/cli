@@ -6,6 +6,7 @@ import { OperatorStepIllustration } from '@/components/sections/OperatorStepIllu
 import { Card, CardContent } from '@/components/ui/card';
 import { LANDING_EASE } from '@/data/landing';
 import { OPERATOR_STEPS_SECTION } from '@/data/visitorLanding';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
 /** Soft overshoot for icon pop — professional, not bouncy. */
@@ -89,6 +90,8 @@ const copyReveal = {
 export const OperatorSteps = () => {
   const reduced = useReducedMotion();
   const animate = reduced ? false : ('hidden' as const);
+  const { messages } = useLandingLocale();
+  const steps = messages.operator.steps;
 
   return (
     <motion.section
@@ -103,12 +106,16 @@ export const OperatorSteps = () => {
         className="text-center font-bold text-3xl tracking-tight will-change-transform"
         variants={headingReveal}
       >
-        {OPERATOR_STEPS_SECTION.heading}
+        {messages.operator.heading}
       </motion.h2>
 
       <motion.div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" variants={gridReveal}>
-        {OPERATOR_STEPS_SECTION.steps.map((step) => {
+        {OPERATOR_STEPS_SECTION.steps.map((step, index) => {
           const featured = step.featured;
+          const copy = steps[index] ?? steps[0];
+          if (copy === undefined) {
+            return null;
+          }
           return (
             <motion.div className="will-change-transform" key={step.id} variants={cardReveal}>
               <Card
@@ -134,7 +141,7 @@ export const OperatorSteps = () => {
                     />
                   </motion.div>
                   <motion.div className="flex items-center gap-1.5" variants={copyReveal}>
-                    <h3 className="font-semibold text-base">{step.title}</h3>
+                    <h3 className="font-semibold text-base">{copy.title}</h3>
                     {featured ? <Check aria-hidden={true} className="size-4 shrink-0" /> : null}
                   </motion.div>
                   <motion.p
@@ -144,7 +151,7 @@ export const OperatorSteps = () => {
                     )}
                     variants={copyReveal}
                   >
-                    {step.body}
+                    {copy.body}
                   </motion.p>
                 </CardContent>
               </Card>

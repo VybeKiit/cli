@@ -4,7 +4,9 @@ import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { CheckoutOpenButton } from '@/components/CheckoutOpenButton';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import { PRICE_VALUE_STACK } from '@/data/site';
 import { VISITOR_PRICING } from '@/data/visitorLanding';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
 /**
@@ -19,13 +21,10 @@ import { cn } from '@/lib/utils';
  */
 export const Pricing = () => {
   const [priceDone, setPriceDone] = useState(false);
-  const discount = VISITOR_PRICING.savingsDiscount;
-  const discountAt = VISITOR_PRICING.savingsLine.indexOf(discount);
-  const savingsBefore = discountAt >= 0 ? VISITOR_PRICING.savingsLine.slice(0, discountAt) : '';
-  const savingsAfter =
-    discountAt >= 0
-      ? VISITOR_PRICING.savingsLine.slice(discountAt + discount.length)
-      : VISITOR_PRICING.savingsLine;
+  const { messages } = useLandingLocale();
+  const pricing = messages.pricing;
+  const discount = `${PRICE_VALUE_STACK.savingsPercent}%`;
+  const ctaLabel = `${pricing.cta} · ${VISITOR_PRICING.display}`;
 
   return (
     <section id="pricing" className="border-border/60 border-t">
@@ -74,44 +73,42 @@ export const Pricing = () => {
         {priceDone ? (
           <div className="mt-4 space-y-2">
             <p className="pricing-fomo-line pricing-fomo-line--savings mx-auto max-w-lg text-[11px] sm:text-xs">
-              {savingsBefore}
+              {pricing.savingsBefore}
               <span className="pricing-fomo-discount">{discount}</span>
-              {savingsAfter}
+              {pricing.savingsAfter}
             </p>
             <p className="font-medium text-muted-foreground text-xs tracking-wide">
-              {VISITOR_PRICING.cadence}
+              {pricing.cadence}
             </p>
           </div>
         ) : (
-          <p className="mt-3 text-muted-foreground text-sm">{VISITOR_PRICING.cadence}</p>
+          <p className="mt-3 text-muted-foreground text-sm">{pricing.cadence}</p>
         )}
         <ul className="mx-auto mt-8 flex max-w-sm flex-col gap-3 text-start text-sm">
-          {VISITOR_PRICING.bullets.map((bullet) => (
+          {pricing.bullets.map((bullet) => (
             <li key={bullet} className="flex items-start gap-2">
               <Check className="mt-0.5 size-4 shrink-0 text-blue-600" aria-hidden={true} />
-              <span>
-                {bullet.startsWith('14-day') ? (
-                  <>
-                    <AnimatedNumber value="14" />
-                    -day money-back guarantee.
-                  </>
-                ) : (
-                  bullet
-                )}
-              </span>
+              <span>{bullet}</span>
             </li>
           ))}
+          <li className="flex items-start gap-2">
+            <Check className="mt-0.5 size-4 shrink-0 text-blue-600" aria-hidden={true} />
+            <span>
+              {pricing.refundBulletPrefix}
+              <AnimatedNumber value="14" />
+              {pricing.refundBulletSuffix}
+            </span>
+          </li>
         </ul>
         <CheckoutOpenButton
           location="pricing"
           className="mt-10 w-full px-8 sm:w-auto"
-          trackLabel={VISITOR_PRICING.ctaLabel}
+          trackLabel={ctaLabel}
         >
-          Get VybeKiit · <AnimatedNumber value={VISITOR_PRICING.display} />
+          {pricing.cta} · <AnimatedNumber value={VISITOR_PRICING.display} />
         </CheckoutOpenButton>
         <p className="sr-only">
-          Compare at {VISITOR_PRICING.compareAt}, now {VISITOR_PRICING.display}.{' '}
-          {VISITOR_PRICING.savingsLine}. {VISITOR_PRICING.cadence}.
+          Compare at {VISITOR_PRICING.compareAt}, now {VISITOR_PRICING.display}. {pricing.cadence}.
         </p>
       </div>
     </section>

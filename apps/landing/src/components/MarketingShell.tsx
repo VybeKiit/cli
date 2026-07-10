@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { LocaleProvider } from '@/i18n/LocaleProvider';
 
 interface MarketingShellProps {
   readonly children: ReactNode;
@@ -29,9 +30,10 @@ const MarketingChrome = memo(({ children }: MarketingShellProps) => (
 MarketingChrome.displayName = 'MarketingChrome';
 
 /**
- * Marketing page shell for the store: theme, header, content, footer.
+ * Marketing page shell for the store: theme, locale, header, content, footer.
  * Class name `visitor-light` scopes mockup CSS; tokens follow light/dark via `html.dark`.
  * Checkout CTAs open an in-page dialog via {@link CheckoutDialogProvider}.
+ * LocaleProvider drives EN / HE / RU / AR copy + document dir.
  *
  * @param props - Shell children.
  * @returns The rendered marketing chrome.
@@ -40,6 +42,8 @@ MarketingChrome.displayName = 'MarketingChrome';
  */
 export const MarketingShell = ({ children }: MarketingShellProps) => (
   <ThemeProvider>
-    <MarketingChrome>{children}</MarketingChrome>
+    <LocaleProvider>
+      <MarketingChrome>{children}</MarketingChrome>
+    </LocaleProvider>
   </ThemeProvider>
 );

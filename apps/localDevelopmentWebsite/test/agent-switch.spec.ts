@@ -13,17 +13,21 @@ test.describe('agent switch', () => {
     await expect(kiroButton).toBeVisible();
     await expect(claudeButton).toBeVisible();
 
-    await expect(sidebar.getByText('Kiro sessions')).toBeVisible();
+    await expect(sidebar.getByText('Kiro sessions', { exact: true })).toBeVisible();
 
     await claudeButton.click();
 
     const newSessionBtn = sidebar.getByTestId('new-agent-session');
-    await expect(sidebar.getByText('Claude Code sessions')).toBeVisible({ timeout: 5000 });
+    await expect(sidebar.getByText('Claude Code sessions', { exact: true })).toBeVisible({
+      timeout: 5000,
+    });
     await expect(newSessionBtn).toBeVisible({ timeout: 5000 });
     await expect(newSessionBtn).toContainText('New Claude Code session');
 
     await kiroButton.click();
-    await expect(sidebar.getByText('Kiro sessions')).toBeVisible({ timeout: 5000 });
+    await expect(sidebar.getByText('Kiro sessions', { exact: true })).toBeVisible({
+      timeout: 5000,
+    });
     await expect(newSessionBtn).toContainText('New Kiro session');
   });
 

@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TrackedLink } from '@/components/analytics/TrackedLink';
 import { CheckoutOpenButton } from '@/components/CheckoutOpenButton';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { VybeLogoIcon } from '@/components/ui/CustomIcons';
-import { BRAND, HEADER_LINKS } from '@/data/site';
+import { BRAND } from '@/data/site';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
 /**
  * Sticky top navigation for every visitor store page.
- * Desktop (md+): links + theme toggle + CTA. Mobile: animated hamburger drawer only.
+ * Desktop (md+): links + language + theme + CTA. Mobile: hamburger drawer.
  * Get VybeKiit opens the checkout dialog without leaving the page.
  *
  * @returns The rendered store header.
@@ -18,7 +20,19 @@ import { cn } from '@/lib/utils';
  * <SiteHeader />
  */
 export const SiteHeader = () => {
+  const { messages } = useLandingLocale();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const headerLinks = useMemo(
+    () =>
+      [
+        { href: '/#features', label: messages.nav.features },
+        { href: '/#how-it-works', label: messages.nav.howItWorks },
+        { href: '/#pricing', label: messages.nav.pricing },
+        { href: '/#faq', label: messages.nav.faq },
+      ] as const,
+    [messages.nav],
+  );
 
   useEffect(() => {
     if (!menuOpen) {
@@ -44,7 +58,6 @@ export const SiteHeader = () => {
     };
   }, [menuOpen]);
 
-  // Close the drawer if the viewport grows into desktop while open.
   useEffect(() => {
     const media = window.matchMedia('(min-width: 768px)');
     const onChange = () => {
@@ -71,7 +84,7 @@ export const SiteHeader = () => {
 
         <div className="flex items-center gap-1 sm:gap-3">
           <div className="hidden items-center gap-5 md:flex">
-            {HEADER_LINKS.map((link) => (
+            {headerLinks.map((link) => (
               <TrackedLink
                 key={link.href}
                 href={link.href}
@@ -84,21 +97,22 @@ export const SiteHeader = () => {
             ))}
           </div>
 
+          <LanguageToggle />
           <ThemeToggle />
 
           <CheckoutOpenButton
             location="header"
             size="sm"
             className="hidden px-4 md:inline-flex"
-            trackLabel="Get VybeKiit"
+            trackLabel={messages.nav.getVybekiit}
           >
-            Get VybeKiit
+            {messages.nav.getVybekiit}
           </CheckoutOpenButton>
 
           <button
             aria-controls="site-mobile-nav"
             aria-expanded={menuOpen}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={menuOpen ? messages.nav.closeMenu : messages.nav.openMenu}
             className={cn('nav-hamburger inline-flex md:hidden', menuOpen && 'nav-hamburger--open')}
             onClick={() => setMenuOpen((open) => !open)}
             type="button"
@@ -116,7 +130,7 @@ export const SiteHeader = () => {
         id="site-mobile-nav"
       >
         <div className="nav-mobile-panel-inner mx-auto flex max-w-5xl flex-col gap-1 px-6 pb-5">
-          {HEADER_LINKS.map((link) => (
+          {headerLinks.map((link) => (
             <TrackedLink
               key={link.href}
               href={link.href}
@@ -132,10 +146,10 @@ export const SiteHeader = () => {
             location="header"
             size="sm"
             className="mt-2 w-full"
-            trackLabel="Get VybeKiit"
+            trackLabel={messages.nav.getVybekiit}
             onClick={() => setMenuOpen(false)}
           >
-            Get VybeKiit
+            {messages.nav.getVybekiit}
           </CheckoutOpenButton>
         </div>
       </div>

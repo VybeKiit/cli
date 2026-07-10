@@ -1,10 +1,9 @@
 'use client';
 
 import { TypewriterText } from '@/components/ui/TypewriterText';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { handwriting } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
-
-const NOTE = 'this entire landing page was built with VybeKiit';
 
 /**
  * Handwritten typewriter caption under the hero terminal — meta product proof
@@ -14,22 +13,29 @@ const NOTE = 'this entire landing page was built with VybeKiit';
  * @example
  * <BuiltWithVybeKiitNote />
  */
-export const BuiltWithVybeKiitNote = () => (
-  <div
-    aria-label={NOTE}
-    className={cn(
-      handwriting.variable,
-      handwriting.className,
-      'built-with-note pointer-events-none select-none',
-    )}
-    role="note"
-  >
-    <TypewriterText
-      as="p"
-      className="built-with-note__text min-h-[1.4em] text-center sm:text-start"
-      humanPace={true}
-      msPerChar={36}
-      text={NOTE}
-    />
-  </div>
-);
+export const BuiltWithVybeKiitNote = () => {
+  const { messages, locale } = useLandingLocale();
+  const note = messages.builtWith.note;
+
+  return (
+    <div
+      aria-label={note}
+      className={cn(
+        handwriting.variable,
+        handwriting.className,
+        'built-with-note pointer-events-none select-none',
+      )}
+      role="note"
+    >
+      <TypewriterText
+        as="p"
+        // Remount when locale changes so the typewriter restarts in the new language.
+        key={locale}
+        className="built-with-note__text min-h-[1.4em] text-center sm:text-start"
+        humanPace={true}
+        msPerChar={36}
+        text={note}
+      />
+    </div>
+  );
+};

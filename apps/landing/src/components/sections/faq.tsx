@@ -3,15 +3,20 @@
 import { ChevronDown } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
 import { BrandRichText } from '@/components/landing/BrandRichText';
-import { FAQ } from '@/data/faq';
-import { VISITOR_FAQ } from '@/data/visitorLanding';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { trackClient } from '@/lib/analyticsClient';
 import { AnalyticsEvent } from '@/lib/analyticsEvents';
 import { useReducedMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
+interface FaqItem {
+  readonly id: string;
+  readonly question: string;
+  readonly answer: string;
+}
+
 interface FaqRowProps {
-  readonly item: (typeof FAQ)[number];
+  readonly item: FaqItem;
   readonly open: boolean;
   readonly onToggle: (id: string) => void;
   readonly panelId: string;
@@ -103,7 +108,9 @@ const FaqRow = ({ item, open, onToggle, panelId, buttonId, reduced }: FaqRowProp
 export const Faq = () => {
   const baseId = useId();
   const reduced = useReducedMotion();
-  const first = FAQ[0];
+  const { messages } = useLandingLocale();
+  const items = messages.faq.items;
+  const first = items[0];
   const [openId, setOpenId] = useState<string | null>(first === undefined ? null : first.id);
 
   const handleToggle = useCallback((id: string) => {
@@ -114,13 +121,9 @@ export const Faq = () => {
     <section id="faq" className="border-border/60 border-t">
       <div className="mx-auto max-w-3xl px-6 py-16">
         <p className="font-medium text-muted-foreground text-xs uppercase tracking-widest">FAQ</p>
-        <h2 className="mt-2 font-bold text-3xl tracking-tight">{VISITOR_FAQ.heading}</h2>
-        <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
-          Not sure which package to get? Start here. Built for people who ship with AI tools, not
-          for people who want to live in a terminal.
-        </p>
+        <h2 className="mt-2 font-bold text-3xl tracking-tight">{messages.faq.heading}</h2>
         <div className="mt-10 rounded-2xl border border-border bg-card px-5 shadow-sm sm:px-6">
-          {FAQ.map((item, index) => (
+          {items.map((item, index) => (
             <FaqRow
               key={item.id}
               buttonId={`${baseId}-btn-${index}`}

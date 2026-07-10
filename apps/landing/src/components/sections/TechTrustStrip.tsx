@@ -13,6 +13,7 @@ import {
   TECH_TRUST_STRIP,
   type TechTrustMark,
 } from '@/data/visitorLanding';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
 interface ActiveHintToastProps {
@@ -92,6 +93,7 @@ export const TechTrustStrip = () => {
   const agentMarks = AI_CODING_AGENTS_STRIP.marks;
   const techMarks = TECH_TRUST_STRIP.marks;
   const { open: checkoutOpen } = useCheckoutDialog();
+  const { messages, locale } = useLandingLocale();
 
   const pool = useMemo(
     () => [...AI_CODING_AGENTS_STRIP.marks, ...TECH_TRUST_STRIP.marks] as readonly TechTrustMark[],
@@ -120,13 +122,14 @@ export const TechTrustStrip = () => {
         <div className="space-y-5">
           <TypewriterText
             as="p"
+            key={`agents-${locale}`}
             className="trust-strip-caption min-h-[1.5em] px-6 text-center text-sm tracking-wide"
             msPerChar={36}
-            text={AI_CODING_AGENTS_STRIP.heading}
+            text={messages.techTrust.agentsHeading}
           />
           <LogoMarqueeRow
             activeIndex={activeIndex}
-            ariaLabel={AI_CODING_AGENTS_STRIP.heading}
+            ariaLabel={messages.techTrust.agentsHeading}
             durationDesktop="55s"
             durationMobile="40s"
             indexOffset={0}
@@ -141,14 +144,15 @@ export const TechTrustStrip = () => {
         <div className="space-y-5">
           <TypewriterText
             as="p"
+            key={`stack-${locale}`}
             className="trust-strip-caption min-h-[1.5em] px-6 text-center text-sm tracking-wide"
             id="tech-trust-heading"
             msPerChar={36}
-            text={TECH_TRUST_STRIP.heading}
+            text={messages.techTrust.stackHeading}
           />
           <LogoMarqueeRow
             activeIndex={activeIndex}
-            ariaLabel={TECH_TRUST_STRIP.heading}
+            ariaLabel={messages.techTrust.stackHeading}
             durationDesktop="80s"
             durationMobile="55s"
             indexOffset={agentMarks.length}

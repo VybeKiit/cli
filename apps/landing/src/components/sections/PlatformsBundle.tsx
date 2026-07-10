@@ -7,7 +7,7 @@ import { MiniBrowserChrome } from '@/components/landing/kit/MiniBrowserChrome';
 import { MiniPhoneShell } from '@/components/landing/kit/MiniPhoneShell';
 import { Sparkline } from '@/components/landing/kit/Sparkline';
 import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
-import { PLATFORMS_BUNDLE } from '@/data/visitorLanding';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
 interface PlatformCardProps {
@@ -44,95 +44,100 @@ const PlatformCard = ({ label, idle, preview, stageClassName }: PlatformCardProp
  * @example
  * <PlatformsBundle />
  */
-export const PlatformsBundle = () => (
-  <section className="mx-auto max-w-5xl px-6 py-16">
-    <div className="mx-auto max-w-2xl text-center">
-      <h2 className="font-bold text-3xl tracking-tight">{PLATFORMS_BUNDLE.heading}</h2>
-      <p className="mt-2 text-muted-foreground">{PLATFORMS_BUNDLE.subhead}</p>
-    </div>
-    <div className="mt-12 grid items-end gap-8 md:grid-cols-3">
-      <PlatformCard
-        label={PLATFORMS_BUNDLE.platforms[0].label}
-        idle={
-          <div className="platform-idle-stack flex-col">
-            <LogoMarkIcon className="platform-idle-logo size-14" slug="nextdotjs" />
-            <LogoMarkIcon className="platform-idle-logo size-11" slug="vercel" />
-            <LogoMarkIcon className="platform-idle-logo size-10" slug="react" />
-          </div>
-        }
-        preview={
-          <MiniBrowserChrome
-            className="w-full max-w-[280px] shadow-md"
-            dark={false}
-            url="app.yourapp.com"
-          >
-            <div className="space-y-3 bg-background p-4">
-              <p className="font-semibold text-xs">Overview</p>
-              <p className="font-bold text-2xl tracking-tight">$2,841</p>
-              <p className="text-[10px] text-emerald-600">+27.4% vs last 7 days</p>
-              <Sparkline className="h-16 w-full" id="platform-web-spark" />
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <div className="rounded-md border border-border bg-muted/40 p-2">
-                  <p className="text-[10px] text-muted-foreground">Transactions</p>
-                  <p className="font-semibold text-sm">128</p>
-                </div>
-                <div className="rounded-md border border-border bg-muted/40 p-2">
-                  <p className="text-[10px] text-muted-foreground">Customers</p>
-                  <p className="font-semibold text-sm">84</p>
-                </div>
-              </div>
-            </div>
-          </MiniBrowserChrome>
-        }
-      />
+export const PlatformsBundle = () => {
+  const { messages } = useLandingLocale();
+  const platforms = messages.platforms;
 
-      <PlatformCard
-        label={PLATFORMS_BUNDLE.platforms[1].label}
-        idle={
-          <div className="platform-idle-stack">
-            <LogoMarkIcon className="platform-idle-logo size-12" slug="appstore" />
-            <LogoMarkIcon className="platform-idle-logo size-12" slug="googleplay" />
-            <LogoMarkIcon className="platform-idle-logo size-11" slug="expo" />
-          </div>
-        }
-        preview={
-          <MiniPhoneShell className="w-[148px] max-w-none">
-            <div className="space-y-2.5 px-3 pb-1">
-              <p className="font-semibold text-white text-xs">Overview</p>
-              <p className="font-bold text-2xl text-white tracking-tight">$2,841</p>
-              <p className="text-[10px] text-emerald-400">+27.4%</p>
-              <Sparkline className="h-12 w-full" id="platform-mobile-spark" />
-              <div className="rounded-lg bg-white/5 p-2">
-                <p className="text-[10px] text-white/50">Transactions</p>
-                <p className="font-semibold text-sm text-white">128</p>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                <div className="rounded-md bg-white/5 p-1.5">
-                  <p className="text-[9px] text-white/45">Active</p>
-                  <p className="font-semibold text-white text-xs">84</p>
-                </div>
-                <div className="rounded-md bg-white/5 p-1.5">
-                  <p className="text-[9px] text-white/45">Refunds</p>
-                  <p className="font-semibold text-white text-xs">2</p>
-                </div>
-              </div>
+  return (
+    <section className="mx-auto max-w-5xl px-6 py-16">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="font-bold text-3xl tracking-tight">{platforms.heading}</h2>
+        <p className="mt-2 text-muted-foreground">{platforms.subhead}</p>
+      </div>
+      <div className="mt-12 grid items-end gap-8 md:grid-cols-3">
+        <PlatformCard
+          label={platforms.web}
+          idle={
+            <div className="platform-idle-stack flex-col">
+              <LogoMarkIcon className="platform-idle-logo size-14" slug="nextdotjs" />
+              <LogoMarkIcon className="platform-idle-logo size-11" slug="vercel" />
+              <LogoMarkIcon className="platform-idle-logo size-10" slug="react" />
             </div>
-          </MiniPhoneShell>
-        }
-      />
+          }
+          preview={
+            <MiniBrowserChrome
+              className="w-full max-w-[280px] shadow-md"
+              dark={false}
+              url="app.yourapp.com"
+            >
+              <div className="space-y-3 bg-background p-4">
+                <p className="font-semibold text-xs">Overview</p>
+                <p className="font-bold text-2xl tracking-tight">$2,841</p>
+                <p className="text-[10px] text-emerald-600">+27.4% vs last 7 days</p>
+                <Sparkline className="h-16 w-full" id="platform-web-spark" />
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="rounded-md border border-border bg-muted/40 p-2">
+                    <p className="text-[10px] text-muted-foreground">Transactions</p>
+                    <p className="font-semibold text-sm">128</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-muted/40 p-2">
+                    <p className="text-[10px] text-muted-foreground">Customers</p>
+                    <p className="font-semibold text-sm">84</p>
+                  </div>
+                </div>
+              </div>
+            </MiniBrowserChrome>
+          }
+        />
 
-      <PlatformCard
-        label={PLATFORMS_BUNDLE.platforms[2].label}
-        idle={
-          <div className="platform-idle-stack flex-col">
-            <LogoMarkIcon className="platform-idle-logo size-14" slug="googlechrome" />
-            <LogoMarkIcon className="platform-idle-logo size-10" slug="wxt" />
-          </div>
-        }
-        preview={
-          <ExtensionPopupScene animated={true} compact={true} className="w-full max-w-[248px]" />
-        }
-      />
-    </div>
-  </section>
-);
+        <PlatformCard
+          label={platforms.mobile}
+          idle={
+            <div className="platform-idle-stack">
+              <LogoMarkIcon className="platform-idle-logo size-12" slug="appstore" />
+              <LogoMarkIcon className="platform-idle-logo size-12" slug="googleplay" />
+              <LogoMarkIcon className="platform-idle-logo size-11" slug="expo" />
+            </div>
+          }
+          preview={
+            <MiniPhoneShell className="w-[148px] max-w-none">
+              <div className="space-y-2.5 px-3 pb-1">
+                <p className="font-semibold text-white text-xs">Overview</p>
+                <p className="font-bold text-2xl text-white tracking-tight">$2,841</p>
+                <p className="text-[10px] text-emerald-400">+27.4%</p>
+                <Sparkline className="h-12 w-full" id="platform-mobile-spark" />
+                <div className="rounded-lg bg-white/5 p-2">
+                  <p className="text-[10px] text-white/50">Transactions</p>
+                  <p className="font-semibold text-sm text-white">128</p>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <div className="rounded-md bg-white/5 p-1.5">
+                    <p className="text-[9px] text-white/45">Active</p>
+                    <p className="font-semibold text-white text-xs">84</p>
+                  </div>
+                  <div className="rounded-md bg-white/5 p-1.5">
+                    <p className="text-[9px] text-white/45">Refunds</p>
+                    <p className="font-semibold text-white text-xs">2</p>
+                  </div>
+                </div>
+              </div>
+            </MiniPhoneShell>
+          }
+        />
+
+        <PlatformCard
+          label={platforms.extension}
+          idle={
+            <div className="platform-idle-stack flex-col">
+              <LogoMarkIcon className="platform-idle-logo size-14" slug="googlechrome" />
+              <LogoMarkIcon className="platform-idle-logo size-10" slug="wxt" />
+            </div>
+          }
+          preview={
+            <ExtensionPopupScene animated={true} compact={true} className="w-full max-w-[248px]" />
+          }
+        />
+      </div>
+    </section>
+  );
+};
