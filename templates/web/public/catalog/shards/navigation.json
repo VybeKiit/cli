@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "source": "gluestack",
+      "namespace": "gluestack",
+      "name": "TabsAnimatedIndicator",
+      "previewKey": "gluestack/TabsAnimatedIndicator",
+      "importPath": "@/components/gluestack/tabs/TabsAnimatedIndicator",
+      "category": "navigation",
+      "kind": "component",
+      "renderMode": "auto",
+      "previewable": false,
+      "buildSafe": false,
+      "requiresEnv": false,
+      "unavailableReason": "native",
+      "relatedExamples": [],
+      "tags": ["cross-platform", "patterns"],
+      "portable": false
+    },
+    {
       "source": "bundui",
       "namespace": "bundui",
       "name": "breadcrumb-default",
@@ -303,23 +320,6 @@
       "relatedExamples": [],
       "tags": ["animated", "background", "hero", "motion", "navbar"],
       "portable": true
-    },
-    {
-      "source": "gluestack",
-      "namespace": "gluestack",
-      "name": "TabsAnimatedIndicator",
-      "previewKey": "gluestack/TabsAnimatedIndicator",
-      "importPath": "@/components/gluestack/tabs/TabsAnimatedIndicator",
-      "category": "navigation",
-      "kind": "component",
-      "renderMode": "auto",
-      "previewable": false,
-      "buildSafe": false,
-      "requiresEnv": false,
-      "unavailableReason": "native",
-      "relatedExamples": [],
-      "tags": ["cross-platform", "patterns"],
-      "portable": false
     },
     {
       "source": "cult",

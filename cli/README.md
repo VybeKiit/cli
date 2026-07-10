@@ -10,14 +10,18 @@ want to your AI coding agent (Claude Code, Codex, or Cursor) — it does the hea
 ## Get started
 
 ```sh
-npx vybekiit new web my-app
+npx vybekiit setup
+npx vybekiit create app --web
 ```
 
-This creates `my-app/` from the `web` template. Open the folder in your AI coding tool
-and tell it `"Set up my app."` — the agent reads its instructions and walks you through
-the rest one step at a time.
+Or run `npx vybekiit` in a terminal for the interactive menu.
 
-Before your first build, install and check the tools your app needs:
+`create app --web|--mobile|--extension` builds a kit workspace + that surface (not an
+app-only folder). Open the folder in your AI coding tool and say `"Set up my app."` —
+the agent walks you through the rest one step at a time.
+
+`setup` / `doctor` install and check the full toolchain (agents, `gh`, cloud CLIs, skills,
+assistant tools):
 
 ```sh
 vybekiit doctor
@@ -39,19 +43,22 @@ doctor installs and checks `gcloud` auth.
 ## Commands
 
 ```
-vybekiit new <template> [directory]   Scaffold a template into your own repo
-vybekiit doctor                       Set up + check the tools your app needs
-vybekiit sync-agent-layer [template]  Refresh agent instructions from the latest mirror
+vybekiit setup                              Welcome + full doctor + next step
+vybekiit create app --web|--mobile|--extension [dir]
+vybekiit doctor                             Full toolchain pass
+vybekiit sync-agent-layer [template]        Refresh agent instructions
 
-  -h, --help       Show help
+  -h, --help       Buyer help
+  --help --all     Full command list
   -v, --version    Show the CLI version
 ```
 
 Examples:
 
 ```sh
-vybekiit new web my-app
-vybekiit new web .
+vybekiit setup
+vybekiit create app --web my-app
+vybekiit create app --mobile
 vybekiit doctor
 ```
 

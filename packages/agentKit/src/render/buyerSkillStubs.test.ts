@@ -11,7 +11,7 @@ import {
 } from '@vybekiit/agent-kit/render/buyerSkillStubs';
 import { describe, expect, it } from 'vitest';
 
-/** Fixture buyer skill body (source shape under `.vybekiit/skills/`). */
+/** Fixture buyer skill body (source shape). Avoids reading gitignored `.vybekiit/skills/`. */
 const GO_LIVE = `# Skill: go-live
 
 **Goal:** the builder's app is online at a real web address that anyone can open.

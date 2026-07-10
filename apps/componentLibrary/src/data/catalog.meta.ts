@@ -8,9 +8,9 @@ export type {
   UnavailableReason,
 } from './catalog';
 
-export const COMPONENT_CATALOG_COUNT = 2078;
-export const CATALOG_COMPONENT_COUNT = 1740;
-export const CATALOG_EXAMPLE_COUNT = 338;
+export const COMPONENT_CATALOG_COUNT = 2126;
+export const CATALOG_COMPONENT_COUNT = 1789;
+export const CATALOG_EXAMPLE_COUNT = 337;
 
 export const CATALOG_CATEGORIES = [
   {
@@ -22,13 +22,13 @@ export const CATALOG_CATEGORIES = [
   {
     slug: 'hero',
     label: 'Hero & landing',
-    count: 199,
+    count: 198,
     order: 1,
   },
   {
     slug: 'background',
     label: 'Backgrounds & effects',
-    count: 138,
+    count: 139,
     order: 2,
   },
   {
@@ -40,37 +40,37 @@ export const CATALOG_CATEGORIES = [
   {
     slug: 'form',
     label: 'Forms & inputs',
-    count: 415,
+    count: 421,
     order: 4,
   },
   {
     slug: 'button',
     label: 'Buttons & actions',
-    count: 132,
+    count: 141,
     order: 5,
   },
   {
     slug: 'card',
     label: 'Cards & content',
-    count: 145,
+    count: 153,
     order: 6,
   },
   {
     slug: 'data-display',
     label: 'Data display',
-    count: 231,
+    count: 234,
     order: 7,
   },
   {
     slug: 'ai',
     label: 'AI & chat',
-    count: 217,
+    count: 219,
     order: 8,
   },
   {
     slug: 'icons-logos',
     label: 'Logos & icons',
-    count: 37,
+    count: 38,
     order: 9,
   },
   {
@@ -82,7 +82,7 @@ export const CATALOG_CATEGORIES = [
   {
     slug: 'layout',
     label: 'Layout & shells',
-    count: 45,
+    count: 49,
     order: 11,
   },
   {
@@ -100,7 +100,7 @@ export const CATALOG_CATEGORIES = [
   {
     slug: 'component',
     label: 'Other',
-    count: 22,
+    count: 37,
     order: 99,
   },
 ] as import('./catalog').CatalogCategory[];
@@ -108,6 +108,7 @@ export const CATALOG_CATEGORIES = [
 export const CATALOG_NAMESPACES: readonly string[] = [
   'aceternity',
   'ai-elements',
+  'blocks-21st',
   'blocks-so',
   'bundui',
   'coss',

@@ -2,10 +2,13 @@ import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
+import { runAgentExperience } from './agentExperience';
+import { verifyAssetsPipeline } from './assetsValidate';
 import { ensureCodexSkillsEnabled } from './codexConfig';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
 import { createDefaultCommandProbe, verifyMobilePublishReadiness } from './mobilePublishReadiness';
 import { mergeDoctorTools, selectNativeTools } from './nativeToolchain';
+import { verifyPerfReadiness } from './perfReadiness';
 import { computeDoctorExitCode, reportFor } from './planDoctorRun';
 import { formatPlatformSkillsReport, verifyPlatformSkills } from './platformSkills';
 import { formatProductSurfaceHints } from './productSurface';
@@ -285,6 +288,20 @@ const writeRailwayReport = (
   writeLines(log, formatRailwayStackReport(env, agentSetup));
 };
 
+/** Platform skills, project health, assets (§8.1), and perf readiness (§8.2). */
+const writeProjectLocalReports = (
+  cwd: string,
+  surface: ReturnType<typeof inferProjectSurfaceSync>,
+  log: Console,
+): boolean => {
+  writeLines(log, formatPlatformSkillsReport(verifyPlatformSkills(cwd)));
+  const projectHealth = verifyProjectHealth(cwd);
+  writeLines(log, projectHealth.lines);
+  writeLines(log, verifyAssetsPipeline(cwd, surface).lines);
+  writeLines(log, verifyPerfReadiness(cwd, surface).lines);
+  return projectHealth.ok;
+};
+
 /**
  * Ensure Codex skills discovery when Codex is installed.
  *
@@ -373,21 +390,19 @@ export const runDoctor = async (log: Console = console): Promise<number> => {
   }
 
   writeRailwayReport(env, reports, log);
-  const skillsReport = verifyPlatformSkills(cwd);
-  writeLines(log, formatPlatformSkillsReport(skillsReport));
-  const projectHealth = verifyProjectHealth(cwd);
-  writeLines(log, projectHealth.lines);
+  const projectHealthOk = writeProjectLocalReports(cwd, surface, log);
+
+  const skillsReady = isSkillsCliReady(reports);
+  const agentExperience = await runAgentExperience(cwd, { skillsCliReady: skillsReady });
+  writeLines(log, agentExperience.lines);
+
   const r2Result = await provisionR2Storage(cwd, env, log);
   log.log(`[doctor] ${r2Result.message}`);
   writeLines(log, formatProductSurfaceHints(env));
 
   const infraTools = [...providerTools, ...nativeTools];
-  const cloudReady = infraTools.every((tool) => {
-    const report = reportFor(reports, tool.name);
-    return report?.installed === true;
-  });
+  const cloudReady = infraTools.every((tool) => reportFor(reports, tool.name)?.installed === true);
   const agentReady = isAgentRuntimeReady(reports) || cursorSession;
-  const skillsReady = isSkillsCliReady(reports);
 
   await ensureCodexSkills(reports, log);
   writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
@@ -397,7 +412,7 @@ export const runDoctor = async (log: Console = console): Promise<number> => {
     r2Ok: r2Result.ok,
     agentReady,
     skillsReady,
-    projectHealthOk: projectHealth.ok,
+    projectHealthOk,
     mobilePublishOk,
   });
 };

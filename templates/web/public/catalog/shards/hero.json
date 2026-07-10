@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "source": "kokonutui",
+      "namespace": "kokonutui",
+      "name": "shape-hero",
+      "previewKey": "kokonutui/shape-hero",
+      "importPath": "@/components/kokonutui/shape-hero",
+      "category": "hero",
+      "kind": "component",
+      "renderMode": "demo",
+      "previewable": true,
+      "buildSafe": true,
+      "requiresEnv": false,
+      "demoSource": "generated",
+      "relatedExamples": [],
+      "tags": ["interactive", "marketing", "ai", "hero"],
+      "portable": false
+    },
+    {
       "source": "bundui",
       "namespace": "bundui",
       "name": "hero-sections-01",
@@ -67,23 +84,6 @@
       "relatedExamples": [],
       "tags": ["animated", "marketing", "hero", "bento"],
       "portable": true
-    },
-    {
-      "source": "magicui",
-      "namespace": "magicui",
-      "name": "lens",
-      "previewKey": "magicui/lens",
-      "importPath": "@/components/magicui/lens",
-      "category": "hero",
-      "kind": "component",
-      "renderMode": "auto",
-      "previewable": false,
-      "buildSafe": false,
-      "requiresEnv": false,
-      "unavailableReason": "nodemo",
-      "relatedExamples": [],
-      "tags": ["animated", "marketing", "hero", "bento"],
-      "portable": false
     },
     {
       "source": "magicui",
@@ -533,23 +533,6 @@
       "name": "safari",
       "previewKey": "magicui/safari",
       "importPath": "@/components/magicui/safari",
-      "category": "hero",
-      "kind": "component",
-      "renderMode": "demo",
-      "previewable": true,
-      "buildSafe": true,
-      "requiresEnv": false,
-      "demoSource": "upstream",
-      "relatedExamples": [],
-      "tags": ["animated", "marketing", "hero", "bento"],
-      "portable": true
-    },
-    {
-      "source": "magicui",
-      "namespace": "magicui",
-      "name": "terminal",
-      "previewKey": "magicui/terminal",
-      "importPath": "@/components/magicui/terminal",
       "category": "hero",
       "kind": "component",
       "renderMode": "demo",

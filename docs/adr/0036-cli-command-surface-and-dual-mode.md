@@ -36,3 +36,6 @@ add a second code path or a prompt that blocks a non-TTY run.
   a hung prompt.
 - This extends ADR-0034 §10 (lightweight CLI) and ADR-0011 (interactive front door); it does not
   reopen the parser-dependency question.
+- The **buyer journey**, bare menu contents, `create app` grammar, full doctor inventory, and
+  post-create presets/page-recipes/backends/update surface are specified in
+  [ADR-0038](./0038-cli-buyer-journey-and-create-app.md) (this ADR only locks dual-mode mechanics).

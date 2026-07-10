@@ -33,6 +33,9 @@ scaffold for project assets.
   documented as best-effort).
 - Doctor requires Cloudflare API token permissions for R2 token creation.
 - Sharp runs on the builder's machine during prebuild (same class of requirement as `next build`).
+- Buyer journey contract: [ADR-0038](./0038-cli-buyer-journey-and-create-app.md) §8.1 requires
+  `create app` / `doctor` to **validate** that template `public/` (and surface asset dirs) stay on
+  this optimize + CDN + cache + WebP path for web, mobile, and extension — not optional polish.
 
 ## Alternatives rejected
 

@@ -1,52 +1,36 @@
-import { resolve } from 'node:path';
-import { resolveTemplatesSource } from '../lib/resolveTemplates';
-import { isTemplateName, ScaffoldError, scaffold } from '../lib/scaffold';
-import { promptTemplateSelect } from '../prompts/templateSelect';
-import { isInteractive } from '../prompts/tty';
+import process from 'node:process';
+import { runCreateApp } from './createApp';
+import { isCreateSurface } from './scaffoldOutput';
 
 /**
- * Scaffold a new project from one VybeKiit template.
+ * Deprecated scaffold entry — maps to `create app` when possible (ADR-0038).
  *
- * @param args - CLI arguments after `new`; template then optional destination directory.
+ * @param args - CLI arguments after `new`; optional template then directory.
  * @returns Process exit code for the command.
  * @example
  * const exitCode = await runNew(['web', 'my-app']);
  */
 export const runNew = async (args: string[]): Promise<number> => {
-  let [template, dir] = args;
+  const [template, dir] = args;
 
-  if ((template === undefined || template === '') && isInteractive()) {
-    const picked = await promptTemplateSelect();
-    if (picked === null) {
-      return 1;
-    }
-    template = picked;
+  process.stderr.write(
+    'Note: `vybekiit new` is deprecated. Use `vybekiit create app --web|--mobile|--extension`.\n',
+  );
+
+  if (template !== undefined && template !== '' && isCreateSurface(template)) {
+    const forwarded = dir === undefined || dir === '' ? [`--${template}`] : [`--${template}`, dir];
+    return await runCreateApp(forwarded);
   }
 
-  if (template === undefined || template === '' || !isTemplateName(template)) {
-    return 1;
+  if (template === undefined || template === '') {
+    return await runCreateApp([]);
   }
 
-  const destName = dir === undefined || dir === '' ? template : dir;
-  const dest = resolve(process.cwd(), destName);
-  let cleanup: (() => Promise<void>) | undefined;
-  try {
-    const { cleanup: resolvedCleanup, source } = await resolveTemplatesSource(template);
-    cleanup = resolvedCleanup;
-    await scaffold({
-      template,
-      source,
-      dest,
-    });
-  } catch (error) {
-    if (error instanceof ScaffoldError) {
-      return 1;
-    }
-    throw error;
-  } finally {
-    if (cleanup !== undefined) {
-      await cleanup();
-    }
-  }
-  return 0;
+  process.stderr.write(
+    `Unknown surface "${template}". Use --web, --mobile, or --extension (spa/backend are not create-app surfaces).\n`,
+  );
+  process.stderr.write(
+    'Examples:\n  vybekiit create app --web my-app\n  vybekiit create app --mobile\n',
+  );
+  return 1;
 };

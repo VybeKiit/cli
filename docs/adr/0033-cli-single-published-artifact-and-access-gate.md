@@ -48,9 +48,11 @@ weaker distribution path that bypasses the gate.
   workspace package** (there is no public tier).
 - The published CLI bundle is larger (it inlines the concern packages + their transitive deps).
   Acceptable for a dev CLI; measured at build time.
-- **Follow-up (not in this change):** `new`/`drop` still copy a single template into a *fresh
-  external* directory, where `workspace:*` cannot resolve. Under the monorepo-clone delivery those
-  flows need a redesign (e.g. clone the whole gated mirror rather than copy one template dir). Tracked
-  separately; the dep-rewrite removal here only stops pointing buyers at now-nonexistent npm packages.
+- **Follow-up (closed by product contract):** `new`/`drop` still copy a single template into a *fresh
+  external* directory, where `workspace:*` cannot resolve. The buyer journey, `create app` grammar,
+  kit-workspace delivery, full doctor inventory, and post-create presets / page recipes / backends /
+  update path are specified in
+  [ADR-0038](./0038-cli-buyer-journey-and-create-app.md) (Tracks 1–2). The dep-rewrite removal here
+  only stops pointing buyers at now-nonexistent npm packages; ADR-0038 owns the redesign.
 - Stale publish docs (`docs/npm-first-publish.md`, `docs/wave-b-live-spine.md`,
   `docs/release-ci-setup.md`) describe the retired spine-publish model and are superseded by this ADR.

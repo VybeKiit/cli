@@ -241,6 +241,14 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   Lemon Squeezy checkout collects the buyer's GitHub username → webhook → **invite to the gated
   mirror** = the single gate. Refund → access removed. The buyer is **never** invited to the
   maintainer monorepo.
+- **Buyer CLI journey (ADR-0038):** `npx vybekiit` / `setup` → full `doctor` (complete toolchain
+  catalog, provider-selected install; **detect agents global + per-project → install skills**;
+  **wire curated MCPs** for MCP-capable agents) → access gate →
+  `create app --web|--mobile|--extension` (kit workspace; app never alone; **assets → optimize +
+  CDN + cache + WebP**; **web-perf-ci** discoverable for web/mobile/extension) → agent handoff →
+  ongoing **ready pieces** (DB presets, page recipes into the app, backend scaffold/add-*, kit
+  update, performance gates). See
+  [docs/adr/0038-cli-buyer-journey-and-create-app.md](./docs/adr/0038-cli-buyer-journey-and-create-app.md).
 - **Templates reach the buyer via private per-template mirror repos, not the npm CLI** (ADR-0005).
   A **delivery mirror** is one `VybeKiit/<repo>` that a monorepo job force-pushes from a mapped
   source path (one-way subtree split). There are **five**: the three template mirrors
@@ -312,14 +320,18 @@ that the CLIs it needs are actually present and usable — the buyer never confi
   when those opt-in adapters are selected. No tool is wired before the template/adapter that drives
   it is in use.
 - **Provisioned globally, OS-aware, by `vybekiit doctor`** — a maintained CLI subcommand (not
-  project-local devDeps, not a postinstall). It installs each CLI the right way per OS, is
-  idempotent, and verifies the toolchain. The agent (onboarding / `doctor` skills) calls it and
-  translates its output. Fixes ship via an npm bump of the CLI — one updatable home.
-- **`doctor` provisions per active adapter/template, only when needed.** Same OS-aware, idempotent
-  pattern, it also installs/verifies the **MongoDB Atlas CLI** (when the mongodb data adapter is in
-  use), the **AWS CLI** (aws data/hosting/storage/email adapters), and the **Expo/EAS CLI** + the
-  author's **`launch` CLI** (when the mobile template is in use). Nothing is wired before the adapter
-  or template that drives it is selected.
+  project-local devDeps, not a postinstall). It runs a **full** provision + verify pipeline
+  (install missing tools, auth probes, presets/registrar/email checks, platform skills, project
+  health, R2, report-mode, Codex skills config). The agent (onboarding / `doctor` skills) calls it
+  and translates its output. Fixes ship via an npm bump of the CLI — one updatable home. Full
+  inventory and pipeline: [ADR-0038 §4](./docs/adr/0038-cli-buyer-journey-and-create-app.md).
+- **`doctor` knows the complete tool catalog; installs sparsely.** Always considers agent runtimes
+  (`claude`, `codex`, `skills`) + `gh`. Hosting CLI from `HOSTING_PROVIDER` (`wrangler` /
+  `vercel` / `railway` / `aws`). Data CLI from `DATA_PROVIDER` (`supabase` / `neonctl` / `atlas`,
+  …). Conditionals: AWS for auxiliary providers, `gcloud` for Google sign-in, `eas` + `launch` for
+  mobile, native `watchman` / CocoaPods / `docker` by surface. Nothing is installed before the
+  adapter or template that drives it is selected — but docs and skills must not describe doctor as
+  a partial “gh-only” check.
 - **Auth = interactive browser login** (`wrangler login`, `supabase login`), not env tokens. This
   **amends the single-`.env` rule**: `.env` is the source of truth for *runtime* secrets
   (SUPABASE_URL/ANON/SERVICE_ROLE, payment keys), but *CLI/deploy auth* lives in each tool's native
@@ -390,11 +402,15 @@ plugin; the agent understands Hebrew/Arabic input regardless of how it renders.
 
 | Channel | Mechanism | Buyer hears |
 |---|---|---|
-| **1 — npm** | `planKitUpdate()` → bump `@vybekiit/*` | "latest improvements" |
+| **1 — kit packages / workspace** | Pull gated delivery / kit line after `create app` (ADR-0033/0038; not public `@vybekiit/*` npm bumps) | "latest improvements" |
 | **2 — agent layer** | `vybekiit sync-agent-layer` → `AGENT_LAYER_PATHS` allowlist | "refreshing my instructions" |
 | **3 — platform skills** | `npx skills update -y` when `skills-lock.json` exists | same sentence — never name Expo/Vercel |
 
-No background daemon — all three run only when the builder says "update the kit".
+No background daemon — all three run only when the builder says "update the kit". Same journey also
+covers **ready pieces** after create (ADR-0038 §7–§8): `apply-preset` / `verify-presets`, page recipe
+install into the OWNED app, `scaffold backend` + `backend add-*`, re-running full `doctor` (skills +
+MCP + assets validate), automatic **CDN/cache/WebP** for template `public/` assets (ADR-0010), and
+**web-perf-ci** speed gates for web/mobile/extension.
 
 ### Source-of-truth hierarchy
 

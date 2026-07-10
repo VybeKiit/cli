@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { CLI_HELP } from './cliHelp';
+import { CLI_HELP, CLI_HELP_ALL } from './cliHelp';
 import { runAddBridge } from './commands/addBridge';
 import {
   runBackendAddCrud,
@@ -12,6 +12,7 @@ import {
 } from './commands/backendCli';
 import { runCheckAgentLayer } from './commands/checkAgentLayer';
 import { runCheckGoals } from './commands/checkGoals';
+import { runCreateApp } from './commands/createApp';
 import { runDedup } from './commands/dedup';
 import { runDocFallback } from './commands/docFallback';
 import { runDrop } from './commands/drop';
@@ -30,9 +31,13 @@ import { ensureTool, formatEnsureResult } from './doctor/ensureTool';
 import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
 import { runEnvWizard } from './prompts/envWizard';
+import { promptMainMenu } from './prompts/mainMenu';
 import { isInteractive } from './prompts/tty';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+
+/** Commands that may run before license gate (first-run tools path). */
+const GATE_EXEMPT = new Set(['doctor', 'setup']);
 
 type CliCommandContext = {
   readonly command: string;
@@ -197,6 +202,7 @@ const handleBackendCommand = async (context: CliCommandContext): Promise<number>
     process.stdout.write(`${result.message}\n`);
     return result.exitCode;
   }
+  process.stderr.write('Unknown backend command. Try: backend add-route | add-crud | add-upload\n');
   return 1;
 };
 
@@ -210,6 +216,7 @@ const handleBackendCommand = async (context: CliCommandContext): Promise<number>
  */
 const handleEnvCommand = async (context: CliCommandContext): Promise<number> => {
   if (context.subcommand !== 'wizard') {
+    process.stderr.write('Unknown env command. Try: vybekiit env wizard\n');
     return 1;
   }
   if (!isInteractive()) {
@@ -219,9 +226,65 @@ const handleEnvCommand = async (context: CliCommandContext): Promise<number> => 
   return await runEnvWizard();
 };
 
+/**
+ * Run `create` subcommands (`create app …`).
+ *
+ * @param context - Parsed CLI command context.
+ * @returns Exit code for create.
+ * @example
+ * const code = await handleCreateCommand(context);
+ */
+const handleCreateCommand = async (context: CliCommandContext): Promise<number> => {
+  if (context.subcommand !== 'app') {
+    process.stderr.write('Usage: vybekiit create app --web|--mobile|--extension [directory]\n');
+    return 1;
+  }
+  return await runCreateApp([...context.rest]);
+};
+
+/**
+ * Whether help should print the full agent verb list.
+ *
+ * @param argv - Full argv after the binary name.
+ * @returns True when `--all` is present with help.
+ * @example
+ * wantsFullHelp(['help', '--all']);
+ */
+const wantsFullHelp = (argv: readonly string[]): boolean =>
+  argv.includes('--all') || argv.includes('-a');
+
+/**
+ * Dispatch a bare interactive menu choice to the same handlers as flags.
+ *
+ * @param choice - Main menu selection.
+ * @returns Exit code from the chosen path.
+ * @example
+ * const code = await runMainMenuChoice('setup');
+ */
+const runMainMenuChoice = async (
+  choice: 'setup' | 'create' | 'doctor' | 'help-all',
+): Promise<number> => {
+  if (choice === 'help-all') {
+    process.stdout.write(`${CLI_HELP_ALL}\n`);
+    return 0;
+  }
+  if (choice === 'setup') {
+    return await runSetup();
+  }
+  if (choice === 'doctor') {
+    return await runDoctor();
+  }
+  // create — still needs license gate
+  if (!ensureAccessOrExit()) {
+    return 1;
+  }
+  return await runCreateApp([]);
+};
+
 const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   setup: async () => await runSetup(),
-  new: (context) => runNew([...context.rest]),
+  create: handleCreateCommand,
+  new: (context) => runNew(commandArgs(context)),
   drop: (context) => runDrop(commandArgs(context)),
   doctor: handleDoctorCommand,
   init: async (context) => await runInit([...context.rest]),
@@ -291,6 +354,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   },
   add: async (context) => {
     if (context.subcommand !== 'bridge') {
+      process.stderr.write('Unknown add command. Try: vybekiit add bridge\n');
       return 1;
     }
     return await runAddBridge([...context.rest]);
@@ -298,6 +362,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   env: handleEnvCommand,
   scaffold: async (context) => {
     if (context.subcommand !== 'backend') {
+      process.stderr.write('Unknown scaffold command. Try: vybekiit scaffold backend\n');
       return 1;
     }
     const result = await runScaffoldBackend([...context.rest], process.cwd());
@@ -317,13 +382,21 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
  */
 export const runCli = async (argv: readonly string[]): Promise<number> => {
   const context = parseCommand(argv);
-  if (
-    context === null ||
-    context.command === 'help' ||
-    context.command === '--help' ||
-    context.command === '-h'
-  ) {
+
+  if (context === null) {
+    if (isInteractive()) {
+      const choice = await promptMainMenu();
+      if (choice === null) {
+        return 1;
+      }
+      return await runMainMenuChoice(choice);
+    }
     process.stdout.write(`${CLI_HELP}\n`);
+    return 0;
+  }
+
+  if (context.command === 'help' || context.command === '--help' || context.command === '-h') {
+    process.stdout.write(`${wantsFullHelp(argv) ? CLI_HELP_ALL : CLI_HELP}\n`);
     return 0;
   }
   if (context.command === '--version' || context.command === '-v') {
@@ -331,12 +404,15 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     return 0;
   }
 
-  if (context.command !== 'doctor' && !ensureAccessOrExit()) {
+  if (!(GATE_EXEMPT.has(context.command) || ensureAccessOrExit())) {
     return 1;
   }
 
   const handler = COMMAND_HANDLERS[context.command];
   if (handler === undefined) {
+    process.stderr.write(
+      `Unknown command: ${context.command}\nTry: vybekiit   or   vybekiit --help\n`,
+    );
     return 1;
   }
   return await handler(context);

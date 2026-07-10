@@ -523,6 +523,23 @@
       "portable": true
     },
     {
+      "source": "magicui",
+      "namespace": "magicui",
+      "name": "logo-trust-grid",
+      "previewKey": "magicui/logo-trust-grid",
+      "importPath": "@/components/magicui/logo-trust-grid",
+      "category": "icons-logos",
+      "kind": "component",
+      "renderMode": "demo",
+      "previewable": true,
+      "buildSafe": true,
+      "requiresEnv": false,
+      "demoSource": "upstream",
+      "relatedExamples": [],
+      "tags": ["logo", "brand", "marketing", "icons-logos"],
+      "portable": true
+    },
+    {
       "source": "kokonutui",
       "namespace": "kokonutui",
       "name": "anthropic",

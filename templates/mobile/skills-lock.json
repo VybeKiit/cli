@@ -275,7 +275,7 @@
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-product-analytics/SKILL.md",
-      "computedHash": "ae06e19669e02045b2e4fab3811bf2864d37d5cf455fb5320037e8e4b2aaac66"
+      "computedHash": "11a1319aa73fb1406a2e1b8e374cbae9acf28c8c0cc8add7af313cc9c4fd2c01"
     },
     "mongodb-atlas-stream-processing": {
       "source": "mongodb/agent-skills",
@@ -394,7 +394,7 @@
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
-      "computedHash": "d414d598b9428b3e851c4ce61898649906b19e55aa7415bb42a286bd9ca2ab32"
+      "computedHash": "8b3aae7b9c8c3f7db27ba90b4dad99b6921b2e41d5e01fda7fc6bf8f591cb02b"
     },
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
