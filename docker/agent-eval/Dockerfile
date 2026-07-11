@@ -60,13 +60,10 @@ COPY docker/agent-eval/agents /opt/agent-eval/agents
 COPY docker/agent-eval/mission /opt/agent-eval/mission
 RUN chmod +x /opt/agent-eval/entrypoint.sh /opt/agent-eval/agents/*.sh
 
-# Buyer-like empty home; workspace is a volume.
-ENV HOME=/home/agent
-RUN useradd --create-home --shell /bin/bash --uid 10001 agent \
-  && mkdir -p /workspace /logs /artifacts /kit-source \
-  && chown -R agent:agent /home/agent /workspace /logs /artifacts /opt/agent-eval
+# Dogfood harness runs as root so bind-mounted host volumes are writable.
+# Isolation is per-container + empty workspace, not multi-tenant security.
+ENV HOME=/root
+RUN mkdir -p /workspace /logs /artifacts /kit-source
 
-USER agent
 WORKDIR /workspace
-
 ENTRYPOINT ["/opt/agent-eval/entrypoint.sh"]

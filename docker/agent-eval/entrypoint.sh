@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Buyer-path bootstrap → optional autonomous agent → harvest FEEDBACK.md
 set -uo pipefail
+# Intentionally not `set -e`: bootstrap and agent failures still harvest artifacts.
 
 log() {
   printf '[agent-eval][%s] %s\n' "${AGENT_SLUG:-unknown}" "$*" | tee -a /logs/entrypoint.log

@@ -67,6 +67,10 @@ tools/dedup/target/
 # local-only dev scripts
 scripts/dev/
 
+# Multi-agent dogfood runs + secrets (maintainer agent-eval harness)
+runs/
+docker/agent-eval/secrets/env.agent-eval
+
 # Local runtime data at monorepo root only (domain map cache, feedback event log).
 # Template agent layers live at templates/*/.vybekiit/ and must stay trackable.
 /.vybekiit/

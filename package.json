@@ -46,6 +46,8 @@
     "verify:docker": "node scripts/dev/checks/verifyNativeDepsDocker.mjs",
     "preflight:docker": "node scripts/preflight-docker-test.mjs",
     "preflight:docker:quick": "node scripts/preflight-docker-test.mjs --quick",
+    "agent-eval": "node scripts/dev/agent-eval/run.mjs",
+    "agent-eval:bootstrap": "node scripts/dev/agent-eval/run.mjs --mode bootstrap-only --kit-mode local-kit",
     "bump-kit-version": "node scripts/dev/publish/bumpKitVersion.mjs",
     "tag-mirrors": "node scripts/dev/mirror/tagMirrorRepos.mjs",
     "test:scripts": "vitest run --root scripts",
