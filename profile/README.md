@@ -10,26 +10,29 @@ VybeKiit is a paid, agent-driven starter kit — the maintained plumbing (paymen
 database, deploy) plus an agent layer that carries a non-technical builder from "I bought
 this" to "my app is live and taking payments."
 
+## Get started (after purchase)
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+Open the new folder in your AI coding tool and say **"Set up my app."**
+
+You do **not** need Download ZIP or the green Code button for day one.
+
 ## Repositories
 
 | Repo | What it is |
 | --- | --- |
-| [vybekiit](https://github.com/VybeKiit/vybekiit) | Maintainer monorepo — packages, templates, CLI |
-| [web](https://github.com/VybeKiit/web) | Next.js + shadcn template (v1.0) |
-| [mobile](https://github.com/VybeKiit/mobile) | Expo template (v2) |
-| [extension](https://github.com/VybeKiit/extension) | WXT browser-extension template (v3) |
-| [cli](https://github.com/VybeKiit/cli) | `npx vybekiit` scaffolder |
+| [kit](https://github.com/VybeKiit/kit) | Gated kit workspace (packages + templates) — what `create app` downloads |
+| [web](https://github.com/VybeKiit/web) | Next.js + shadcn template mirror (v1.0) |
+| [mobile](https://github.com/VybeKiit/mobile) | Expo template mirror (v2) |
+| [extension](https://github.com/VybeKiit/extension) | WXT browser-extension template mirror (v3) |
+| [cli](https://github.com/VybeKiit/cli) | `npx vybekiit` scaffolder (public) |
 | [infra](https://github.com/VybeKiit/infra) | Cloudflare + Supabase deploy config |
-
-## Get started
-
-```sh
-npx vybekiit new web my-app
-```
-
-Open `my-app/` in your AI coding tool and tell it **"Set up my app."**
+| [vybekiit](https://github.com/VybeKiit/vybekiit) | Maintainer monorepo (lab) — not the day-one buyer start |
 
 ## Links
 
 - [vybekiit.com](https://vybekiit.com) — store & landing
-- [npm @vybekiit/*](https://www.npmjs.com/org/vybekiit) — maintained packages

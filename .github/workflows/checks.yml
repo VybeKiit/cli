@@ -1,9 +1,10 @@
 name: Checks
 
-# Reusable leg (workflow_call): the repo-specific gates that `pnpm verify` runs
-# after build — platform-skills audit, agent-config lint, template agent-layer, and
-# provider-dispatch. These read source only (no build output), so they run as their
-# own leg in parallel with build/test. Single-leg (ubuntu, node 22).
+# Reusable leg (workflow_call): pure one-job yml for repo-specific static gates
+# (dufflebag ADR-0009 shape) — platform-skills audit, agent-config lint,
+# provider-dispatch, page-recipe index freshness, single-component-per-file.
+# These read source only (no build output), so they run as their own leg in
+# parallel with build/test. Single-leg (ubuntu, node 22).
 
 on:
   workflow_call:
@@ -13,7 +14,7 @@ permissions:
 
 jobs:
   checks:
-    name: Repo checks (skills, agents, templates, dispatch)
+    name: Repo checks (skills, agents, dispatch, page-recipes)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +33,10 @@ jobs:
       - run: pnpm check:agent-configs
 
       - run: pnpm check:provider-dispatch
+
+      - run: pnpm check:page-recipes
+
+      - run: pnpm check:single-component
 
       # check:templates is intentionally NOT run in CI. It validates each
       # template's *pinned* platform skills (templates/*/.claude/skills — a

@@ -84,8 +84,18 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   skeleton, only `tooling` may `console`. `pnpm check:packages` fails when shape contradicts kind.
 - **UI & styling:** compose kit primitives (`@vybekiit/ui` / `@/components/ui/*`), never raw elements;
   variants via `cva()`, classes via `cn()`, colours/spacing from design tokens (web CSS vars, mobile
-  `@vybekiit/tokens`). Fetch through `@/lib/fetchJson` + TanStack Query, always rendering loading/error/
-  empty; forms use the `FormField` primitive; `'use client'` on interactive leaves only.
+  `@vybekiit/tokens`). **Type size is the Tailwind scale only** (`text-xs`…`text-9xl`) — never
+  `text-[10px]` / `text-[0.8rem]` / any `text-[Npx|rem|em]`. Empty lists/filters/previews use
+  `@vybekiit/ui/empty` — never a hand-rolled dashed “no results” panel. Success flashes use
+  `Alert variant="success"`; exclusive filters use `@vybekiit/ui/segmented-control`; metric tiles use
+  `@vybekiit/ui/kpi`; muted icon wells use `@vybekiit/ui/icon-box`. **Repeated sibling rows**
+  (`Kpi` strips, `SelectItem` / `TabsTrigger` / `TableHead` / filter options, list tiles that only
+  differ by props) are a **data array + `.map()`**, never N copy-pasted siblings (full rule in
+  CODE-STYLE). Prefer deriving option labels from an existing `*_META` / `*_LABEL` record.
+  **Named event handlers** for multi-step work (no inline `onClick={() => {…}}` soup); no
+  `window.prompt`/`confirm`/`alert` for product UX; component-only styles stay on the component
+  (not `globals.css`). Fetch through `@/lib/fetchJson` + TanStack Query, always rendering
+  loading/error/empty; forms use the `FormField` primitive; `'use client'` on interactive leaves only.
 - **Effect async:** stay `Effect` until a composition root, then run once (`runPromiseExit` on servers,
   one `ManagedRuntime` on clients); parallelize with `Effect.all(..., { concurrency })`; never
   fire-and-forget a serverless side-effect (await it, or `waitUntil` in a Worker).
@@ -115,7 +125,9 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   workspace manifests use `catalog:`. Named catalogs only for real framework lanes.
 - **AI-slop Never list:** no one-row predicate helpers like `isRecord`/`isObject`/`isDefined`/
   `isName`/`isKey`, no `noop`/`assertNever`, no generic `result`/`data`/`temp` names when a domain
-  noun exists, and no hidden runtime fallbacks.
+  noun exists, no hidden runtime fallbacks, and no 2+ copy-pasted sibling components that only
+  differ by props (`Kpi`, `SelectItem`, `TabsTrigger`, `TableHead`, filters — use a data array +
+  `.map()`; derive labels from `*_META` when present).
 - **Maintainer scripts** are `.mjs` + JSDoc types, `execFile`+`promisify`, secrets scrubbed from logs.
 
 ## TDD & quality gate (this is load-bearing — it's also the product promise)
@@ -154,7 +166,7 @@ catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing 
 - **Never** `git push origin main` directly — use throwaway branch → PR → squash merge.
 - **Never** `gh pr merge` until `gh pr checks --watch` shows all green (including `verify`).
 - Pre-push hook (`.husky/pre-push`) is the local gate; CI is the remote gate.
-- Red CI on `main` opens an auto-issue (`ci-failure-issue.yml`) — fix via PR, do not push to main.
+- Red CI on `main` opens an auto-issue (`report-failure.yml` from the CI orchestrator) — fix via PR, do not push to main.
 - Branch protection: run `./scripts/setup-branch-protection.sh` (needs GitHub Team/Pro on private repos).
 
 ## Scripts layout (maintainer vs buyer delivery)
@@ -173,7 +185,7 @@ catch yourself writing "env var", "deploy", or "merge conflict" in buyer-facing 
 ## Delivery mirror sync (maintainer-only)
 
 Every push to this monorepo runs **mirror sync automatically** in the pre-push hook, after the
-quality gate: `pin-platform-skills` → dirty-tree guard → `pnpm mirror` (all five delivery repos).
+quality gate: `pin-platform-skills` → dirty-tree guard → `pnpm mirror` (kit + template + cli + infra delivery repos).
 
 - Requires `gh auth login` with write access to `VybeKiit/*` mirrors (uses git credential helper;
   no `GH_MIRROR_TOKEN` needed locally).

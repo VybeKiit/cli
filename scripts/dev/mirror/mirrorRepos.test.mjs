@@ -8,13 +8,13 @@ import { parseArgs, redact } from './mirrorRepos.mjs';
 /**
  * Guard tests for the delivery-mirror sync (ADR-0005). The script self-guards its
  * `main()` behind an `import.meta`/argv check, so importing it here never triggers a real
- * `git subtree split` or push. These tests lock the three things a 5-repo registry is most
+ * `git subtree split` or push. These tests lock the three things a delivery registry is most
  * likely to silently break: an arg typo passing validation, a token leaking into a log, and
  * a mapped source prefix that no longer exists on disk.
  */
 const REPO_ROOT = repoRootFrom(import.meta.url);
 
-/** The mirrors whose source prefix must exist today. */
+/** The mirrors whose source prefix must exist today (kit is multi-path, not listed here). */
 const PRESENT_MIRRORS = [
   { repo: 'web', path: 'templates/web' },
   { repo: 'mobile', path: 'templates/mobile' },
@@ -26,7 +26,7 @@ const PRESENT_MIRRORS = [
 describe('parseArgs', () => {
   it('defaults to all delivery mirrors when no names are given', () => {
     const { names, dryRun } = parseArgs([]);
-    expect(names).toEqual(['web', 'mobile', 'extension', 'cli', 'infra']);
+    expect(names).toEqual(['web', 'mobile', 'extension', 'cli', 'infra', 'kit']);
     expect(dryRun).toBe(false);
   });
 

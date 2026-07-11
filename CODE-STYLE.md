@@ -245,6 +245,273 @@ import { Button } from '@vybekiit/ui/button';
 _Why:_ the whole kit reads as one design system, token edits ripple everywhere at once, and the
 buyer's agent normalizes every imported block to the same primitives instead of styling drift.
 
+### UI: named event handlers — no multi-step inline arrows · [taste]
+JSX event props (`onClick`, `onSubmit`, `onChange`, …) take a **named** function reference when the
+handler does more than one trivial call. Extract `const handleX = (): void => { … }` (or
+`useCallback` when deps matter) next to the component body. **Never** bury branching, async work,
+validation, storage, or multi-step logic inside `onClick={() => { … }}`.
+
+One-liner setters that only forward a single call may stay inline
+(`onClick={() => setOpen(true)}`, `onClick={onClose}`). Anything with an `if`, a second statement,
+`void` async, or domain work becomes a named handler so the JSX stays a wiring diagram.
+```tsx
+// ✗ multi-step inline — hard to test, hides flow in the prop
+<Button
+  onClick={() => {
+    const sessionId = globalThis.prompt('Paste session id');
+    if (sessionId === null || sessionId.trim().length === 0) return;
+    void openInTerminal('resume', undefined, sessionId.trim());
+  }}
+>
+  Resume
+</Button>
+
+// ✓ named handler + kit field for the input
+const handleResumeSession = (): void => {
+  const sessionId = resumeSessionId.trim();
+  if (sessionId.length === 0) {
+    setLaunchNote('Paste a session id to resume.');
+    return;
+  }
+  void openInTerminal('resume', undefined, sessionId);
+};
+<Input value={resumeSessionId} onChange={onResumeSessionIdChange} placeholder="Session id" />
+<Button onClick={handleResumeSession}>Resume</Button>
+```
+_Why:_ JSX reads as structure; behaviour lives in named units agents can test, reuse, and deslop
+without unpacking prop soup.
+
+### UI: no browser dialogs for product UX · [taste]
+Never use `window.prompt` / `window.confirm` / `window.alert` (or `globalThis.*` of the same) for
+product or maintainer UI. Collect input with kit primitives (`Input` / `FormField` / `Dialog` /
+`AlertDialog`). Browser dialogs block the main thread, break theming, and are untestable in the
+component tree.
+```tsx
+// ✗
+const id = globalThis.prompt('Session id');
+// ✓ controlled field + named submit handler
+<Input value={sessionId} onChange={onSessionIdChange} />
+```
+_Why:_ one interaction language (kit UI); no host-dialog escape hatches that skip a11y and tokens.
+
+### UI: component-scoped styles stay on the component · [taste]
+Styles that only apply to **one** component live on that component — Tailwind/`cn()` classes, or a
+component-local style object for CSS custom properties (e.g. an isolated theme panel). **Do not**
+dump component-only rules into app `globals.css` / `global.css`. Globals hold **app-wide** tokens,
+base resets, and host policy (e.g. hide a third-party overlay on the whole marketing site) — not a
+single panel's light/dark variable map.
+```tsx
+// ✓ tokens owned by the component
+<aside className={cn('…', isDark && 'dark')} style={panelThemeTokens(isDark)} />
+// ✗ component rules parked in globals.css
+// globals.css → .my-panel { --background: … } .my-panel.dark { … }
+```
+_Why:_ co-location keeps the style with the code that needs it; globals stay a thin design-token
+and reset layer instead of a junk drawer of one-off selectors.
+
+### UI: empty states use `@vybekiit/ui/empty` — no hand-rolled dashed panels · [taste]
+When a list, filter, preview, or panel has nothing to show, compose
+`Empty` / `EmptyHeader` / `EmptyMedia` / `EmptyTitle` / `EmptyDescription` / `EmptyContent`
+from `@vybekiit/ui/empty`. Use `variant="dashed"` for bordered placeholders, `variant="compact"`
+for tight in-card / column empties, and `EmptyMedia variant="icon"` for the muted circle icon.
+**Never** re-hand-roll
+`flex flex-col items-center … border border-dashed … text-center` empty panels in first-party
+apps, page recipes, or package UI. Domain copy and CTAs stay at the call site as children —
+do not put catalog/domain types into the primitive.
+```tsx
+// ✓ shared empty + call-site copy/action
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@vybekiit/ui/empty';
+<Empty variant="dashed">
+  <EmptyHeader>
+    <EmptyMedia variant="icon"><Search /></EmptyMedia>
+    <EmptyTitle>No matches</EmptyTitle>
+    <EmptyDescription>Try a different filter.</EmptyDescription>
+  </EmptyHeader>
+  <EmptyContent>
+    <Button variant="outline" onClick={clear}>Clear filters</Button>
+  </EmptyContent>
+</Empty>
+// ✗ one-off dashed empty (banned in first-party UI)
+<div className="flex flex-col items-center rounded-lg border border-dashed px-4 py-16 text-center">…</div>
+```
+_Why:_ empty states are a product surface buyers and agents copy everywhere; one primitive keeps
+layout, type, and border treatment consistent and stops every page inventing its own placeholder.
+
+### UI: success notices use `Alert variant="success"` · [taste]
+Saved / success / applied flashes use `Alert` / `AlertDescription` from `@vybekiit/ui/alert` with
+`variant="success"` (and `variant="warning"` when needed). **Never** hand-roll emerald borders
+(`border-emerald-500/30 bg-emerald-500/5 text-emerald-700`) for notice banners in first-party UI.
+```tsx
+// ✓
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
+<Alert className="mb-4" variant="success">
+  <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+  <AlertDescription>{notice}</AlertDescription>
+</Alert>
+// ✗
+<div className="mb-4 flex … border-emerald-500/30 bg-emerald-500/5 text-emerald-700">…</div>
+```
+_Why:_ Alert already owns default/destructive; success/warning must live on the same primitive so
+dark mode, icon padding, and role="alert" stay consistent.
+
+### UI: exclusive filters use `@vybekiit/ui/segmented-control` · [taste]
+Date range, channel, env, and similar exclusive option rows use
+`SegmentedControl` / `SegmentedControlItem`. **Never** re-hand-roll
+`rounded-lg border bg-muted p-1` + chip `<button aria-pressed>` tracks (or RadioGroup styled as that
+track) in first-party screens. Domain options stay at the call site as items.
+```tsx
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
+<SegmentedControl value={range} onValueChange={setRange}>
+  <SegmentedControlItem value="7d">7d</SegmentedControlItem>
+  <SegmentedControlItem value="30d">30d</SegmentedControlItem>
+</SegmentedControl>
+```
+_Why:_ one muted pill track reads as system chrome; every page inventing chip buttons drifts.
+
+### UI: metric tiles use `@vybekiit/ui/kpi` · [taste]
+Dashboard KPI strips and compact stat cards use `Kpi` (`label`, `value`, optional `icon` / `hint` /
+`valueClassName` / `layout`). **Never** paste a local `const Kpi = () => <Card>…` in page recipes or
+SaaS screens. Richer cards (sparklines, deltas) compose `Kpi` or stay domain-local as `MetricCard`.
+```tsx
+import { Kpi } from '@vybekiit/ui/kpi';
+<Kpi label="Open" value={12} />
+<Kpi icon={<Users className="h-4 w-4" />} label="Customers" value="1.2k" />
+```
+_Why:_ the same tile ships in recipes and buyer templates; one layout for number + label + icon.
+
+### UI: map repeated sibling rows — data array + `.map()`, never paste N times · [taste]
+When the same component is rendered **2+ times in a row** with only prop values differing
+(`Kpi` strips, `SegmentedControlItem` options, `SelectItem` lists, `TabsTrigger` rows,
+`TableHead` columns, list rows, action chips, metric cards, preference toggles), put the props in
+a **data array** and **`.map()`** once. Do **not** stack copy-pasted siblings. Prefer a stable
+`key` field; keep dynamic values (counts, conditionals, icons) in the array literals at the call
+site (or a small `useMemo` when the list is derived). When a `Record` already owns labels
+(`STATUS_META`, `PRIORITY_META`, `ROLE_LABEL`), derive the option list from it — do not retype the
+same labels into a second array.
+
+```tsx
+// ❌ repeated siblings
+<Kpi label="Sessions" value={String(kpis.sessions)} />
+<Kpi label="Trusted" value={String(kpis.trusted)} />
+<Kpi
+  label="Codes left"
+  value={String(codesRemaining)}
+  valueClassName={codesRemaining < 5 ? 'text-amber-600' : undefined}
+/>
+
+// ✅ one map
+{(
+  [
+    { key: 'sessions', label: 'Sessions', value: String(kpis.sessions) },
+    { key: 'trusted', label: 'Trusted', value: String(kpis.trusted) },
+    {
+      key: 'codes-left',
+      label: 'Codes left',
+      value: String(codesRemaining),
+      valueClassName: codesRemaining < 5 ? 'text-amber-600' : undefined,
+    },
+  ] as const
+).map(({ key, ...tile }) => (
+  <Kpi key={key} {...tile} />
+))}
+```
+
+Same idea for exclusive filters, select options, tab triggers, and table headers:
+
+```tsx
+{FILTERS.map((option) => (
+  <SegmentedControlItem key={option.value} value={option.value}>
+    {option.label}
+  </SegmentedControlItem>
+))}
+
+{(Object.keys(PRIORITY_META) as Priority[]).map((value) => (
+  <SelectItem key={value} value={value}>
+    {PRIORITY_META[value].label}
+  </SelectItem>
+))}
+
+{(
+  [
+    { value: 'users', label: 'Users' },
+    { value: 'billing', label: 'Billing' },
+    { value: 'audit', label: 'Audit log' },
+  ] as const
+).map(({ value, label }) => (
+  <TabsTrigger key={value} value={value}>
+    {label}
+  </TabsTrigger>
+))}
+
+{(
+  [
+    { key: 'user', label: 'User' },
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Actions', className: 'text-right' },
+  ] as const
+).map(({ key, label, ...head }) => (
+  <TableHead key={key} {...head}>
+    {label}
+  </TableHead>
+))}
+```
+
+**Keep hand-written siblings only when** structure diverges (different child trees, one-off
+layout, or a single instance). **Do not map** Cancel/Submit action pairs, one-off demo
+variant showcases that intentionally juxtapose different APIs, or siblings whose children are
+substantially different trees. Do not invent a micro-helper component for a one-line map.
+
+_Why:_ less paste, smaller diffs when a prop is added, and the strip stays data-driven instead of
+N nearly-identical JSX blocks.
+### UI: muted icon squares use `@vybekiit/ui/icon-box` · [taste]
+List-row and tile icon wells use `IconBox` (`size`, `shape`) instead of hand-rolled
+`h-9 w-9 … items-center justify-center rounded-md bg-muted` wrappers.
+```tsx
+import { IconBox } from '@vybekiit/ui/icon-box';
+<IconBox><Users className="h-4 w-4" /></IconBox>
+<IconBox shape="circle" className="font-semibold text-xs">JS</IconBox>
+```
+_Why:_ icon wells repeat on every list/KPI; sizing and muted fill should not re-decide per file.
+
+### Gallery: page recipes use `DemoRecipeFrame` + `DemoPlugInPanel` · [taste]
+Component-library page recipes wrap the page in `DemoRecipeFrame` (theme + motion chrome) and put
+install steps in `DemoPlugInPanel`. **Never** re-copy a local `const Frame = … DemoThemeRandomizer`
+or a one-off `<details className="mt-8 rounded-lg border bg-card…">Plug this into your app</details>`
+shell. Recipe-specific copy stays as children of those helpers.
+_Why:_ gallery chrome is not product UI; one shared shell keeps motion titles and plug-in steps
+aligned without 40 paste-duplicates.
+
+### UI: type scale only — ban arbitrary `text-[Npx|rem|em]` · [taste]
+Font size is **only** the Tailwind type scale (aligned with `@vybekiit/tokens` `fontSizes`):
+`text-xs` · `text-sm` · `text-base` · `text-lg` · `text-xl` · `text-2xl` · `text-3xl` · `text-4xl` ·
+`text-5xl` · `text-6xl` · `text-7xl` · `text-8xl` · `text-9xl`. Responsive prefixes are fine
+(`md:text-lg`). **Never** hardcode a pixel/rem/em size via arbitrary utilities
+(`text-[10px]`, `text-[0.8rem]`, `text-[11px]`, …) or inline `style={{ fontSize: … }}` when a
+scale class exists.
+
+Map to the nearest step (default root 16px): ≤12 → `text-xs`, 13–14 → `text-sm`, 15–16 →
+`text-base`, 17–18 → `text-lg`, 19–20 → `text-xl`, 21–24 → `text-2xl`, 25–30 → `text-3xl`,
+31–36 → `text-4xl`, 37–48 → `text-5xl`, and so on. Need something smaller than `text-xs`?
+Shrink the whole chrome with `scale-*` / a container transform, or raise the design so the
+smallest readable step is `text-xs` — do **not** invent a one-off `text-[9px]`.
+
+**Allowed arbitrary `text-[…]` forms** (not font-size): colours and gradients only when a token
+is missing at a true vendor seam (`text-[#3DDC84]` in a brand mock, `text-[hsl(var(--…))]` is
+preferable when the var exists). **Mirrored registry blocks** under `templates/*/src/components/{cult,magicui,aceternity,…}`
+may still carry third-party `text-[Npx]` until a sync/normalize pass — first-party apps,
+`packages/ui`, page recipes, and authored kit UI must stay on the scale.
+```tsx
+// ✓ named scale + responsive step
+<span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Live</span>
+<h1 className="text-3xl font-bold tracking-tight md:text-5xl">Ship your idea</h1>
+// ✗ arbitrary font-size utilities (banned)
+<span className="text-[10px]">Live</span>
+<p className="text-[0.8rem] text-muted-foreground">Hint</p>
+```
+_Why:_ arbitrary sizes fracture the type ramp, fight the mobile `fontSizes` tokens, and train
+agents to pixel-pick instead of composing the system. One scale keeps hierarchy consistent and
+makes global type tweaks a token/theme change, not a repo-wide find-replace.
+
 ### UI: `@/lib/fetchJson` is the fetch SSOT; render loading, error, and empty · [taste]
 Component data goes through `@/lib/fetchJson` (Effect-based, typed) and TanStack Query — never a
 hand-rolled `fetch` + `useState` loading flag. Every query renders all three branches: loading,
@@ -386,7 +653,7 @@ asserts on the typed success/failure channel instead of unwrapping by hand.
 Headless packages return an `Effect` (log via `Effect.log*`) or use `createLogger`
 (production-silent). `console` is for `cli/`, template-owned `report-mode`, and `tooling`-kind
 packages — code whose job is terminal/agent output. **Enforced:** `noConsole` is `error` under
-`packages/**`, with the `tooling`-kind paths (`agentKit`, `browserAutomation`, `uiCatalogMcp`,
+`packages/**`, with the `tooling`-kind paths (`agentKit`, `browserAutomation`, `uiCatalogMcp`, `agentMcp`,
 `deploy`) exempted in `biome.json`.
 _Why:_ a stray `console.log` in a buyer's `node_modules` is noise they can't turn off.
 
@@ -443,7 +710,7 @@ package through the ADR-0033 reorg, so a moved package carries its own rules.
 | **concern** | one provider seam, swappable adapters | yes — `types`/`config`/`resolve`/`providers`/`index` | no (Effect.log/createLogger) | yes | `payments`, `auth`, `db`, `email`, `ai`, `seo`, … |
 | **library** | foundation, no provider seam | no | no | yes | `core`, `i18n` |
 | **owned** | buyer-facing UI, folds into templates | no | discouraged | n/a | `ui`, `tokens`, `reportMode`, `walkthrough` |
-| **tooling** | agent/maintainer-only (CLI, MCP, automation) | no | **yes** — its job is terminal output | n/a | `agentKit`, `browserAutomation`, `uiCatalogMcp`, `deploy` |
+| **tooling** | agent/maintainer-only (CLI, MCP, automation) | no | **yes** — its job is terminal output | n/a | `agentKit`, `browserAutomation`, `uiCatalogMcp`, `agentMcp`, `deploy` |
 
 The kind is the SSOT the biome `console` carve-out and the concern-skeleton check both read: a
 `concern` with no `resolve.ts`, or a bare `console.*` outside a `tooling` package, fails
@@ -471,11 +738,11 @@ no hangs, no second implementation to drift.
 
 ## Canonical example
 
-The first positive target is `packages/email`: convert the send flow to Effect + Schema + Layer,
+The first positive target is `packages/messaging`: convert the send flow to Effect + Schema + Layer,
 with a pure wildcard barrel. This is illustrative documentation until the package itself is migrated.
 
 ```ts
-// packages/email/src/types.ts
+// packages/messaging/src/types.ts
 import { Context, Data, Effect, Schema } from 'effect';
 
 /** One transactional email, normalized before provider delivery. */
@@ -506,11 +773,11 @@ export type EmailService = {
 };
 
 /** Injectable email service tag used by composition roots and tests. */
-export class Email extends Context.Tag('@vybekiit/email/Email')<Email, EmailService>() {}
+export class Email extends Context.Tag('@vybekiit/messaging/email/Email')<Email, EmailService>() {}
 ```
 
 ```ts
-// packages/email/src/resolve.ts
+// packages/messaging/src/resolve.ts
 import { type EnvSource, parseEnv } from '@vybekiit/core';
 import { Effect, Layer } from 'effect';
 import { EmailConfig, type EmailConfigType, type EmailProviderNameType } from './config';
@@ -596,7 +863,7 @@ export const sendEmail = (
 ```
 
 ```ts
-// packages/email/src/index.ts
+// packages/messaging/src/index.ts
 export * from './config';
 export * from './resolve';
 export * from './types';
@@ -641,7 +908,7 @@ and headless.
    `tooling` (agent-only). If it's a `concern`, it earns the full skeleton; otherwise it does not.
 3. Create `package.json` with `"private": true` and `"vybekiit": { "kind": "<kind>" }` — no `publishConfig`.
 4. For a `concern`: scaffold `types.ts` / `config.ts` / `resolve.ts` / `providers/<name>/index.ts` /
-   pure `index.ts` barrel (shape it like `packages/email`).
+   pure `index.ts` barrel (shape it like `packages/messaging`).
 5. Colocate `*.test.ts`; run `pnpm check:packages` — it fails if the shape contradicts the kind.
 
 ### Add a first-party UI component (template-owned)
@@ -656,7 +923,7 @@ and headless.
 ## Exemplars
 
 Write new code like these:
-- `packages/email/` after the canonical migration — Schema-first DTOs, tagged errors, Layers, and pure wildcard barrel.
+- `packages/messaging/` after the canonical migration — Schema-first DTOs, tagged errors, Layers, and pure wildcard barrel.
 - `packages/payments/` after touched slices are converted — the concern-package skeleton (types/config/resolve-Layer/providers/barrel).
 - `packages/core/src/config.ts` — `parseEnv` over `Schema.decodeUnknownSync`.
 - `packages/payments/src/resolve.ts` after conversion — a service `Tag` + `Live` `Layer`.
@@ -684,8 +951,27 @@ The AI-slop / drift fingerprint for THIS repo — each with an offender and how 
 - `export default` in package source (except Worker handler / `tsup.config.ts`) · [lint: noDefaultExport under `packages/**`].
 - Bare `console.*` in a `concern`/`library`/`owned` package — return an `Effect` or use `createLogger`; only `tooling`-kind packages may `console` · [lint: noConsole under `packages/**`].
 - A raw `<button>`/`<input>` or a hardcoded colour/size where a kit primitive + design token belongs · [taste].
+- **Multi-step inline event handlers** — `onClick={() => { …branch…; void work(); }}` instead of a
+  named `const handleX = …` reference · [taste].
+- **`window.prompt` / `confirm` / `alert`** (or `globalThis.*`) for product or maintainer UI —
+  use kit `Input` / `Dialog` / `AlertDialog` · [taste].
+- **Component-only CSS in `globals.css`** — panel/component rules belong on the component
+  (Tailwind/`cn`/local style tokens); globals are app tokens + base only · [taste].
+- Arbitrary Tailwind font sizes — `text-[10px]`, `text-[0.8rem]`, `text-[11px]`, or any
+  `text-[Npx|rem|em]` — use the type scale (`text-xs`…`text-9xl`) only · [taste].
 - Inline label/input/error markup in a form instead of the `FormField` primitive · [taste].
 - A hand-rolled `fetch` + `useState` loading flag instead of `@/lib/fetchJson` + TanStack Query with loading/error/empty · [taste].
+- A hand-rolled dashed empty panel (`border-dashed` + centered “no results” markup) instead of
+  `@vybekiit/ui/empty` (`Empty` / `EmptyHeader` / `EmptyTitle` / …) · [taste].
+- A hand-rolled emerald success banner instead of `Alert variant="success"` · [taste].
+- A hand-rolled `border bg-muted p-1` chip track instead of `@vybekiit/ui/segmented-control` · [taste].
+- A local `const Kpi = …` Card tile instead of `@vybekiit/ui/kpi` · [taste].
+- **Two or more copy-pasted sibling components** that differ only by props (`Kpi` strips,
+  filter chips, `SelectItem` / `TabsTrigger` / `TableHead` / option rows) instead of a data
+  array + `.map()` · [taste].
+- A hand-rolled `h-9 w-9 … bg-muted` icon well instead of `@vybekiit/ui/icon-box` · [taste].
+- A local page-recipe `Frame` / plug-in `<details>` shell instead of `DemoRecipeFrame` /
+  `DemoPlugInPanel` · [taste].
 - A kebab-case filename on a first-party React component — authored components are PascalCase matching the export (`FormField.tsx`); kebab is only for shadcn/registry mirrors + framework-reserved files · [taste].
 - A `packages/*` with no `vybekiit.kind`, or one whose shape contradicts its kind (a `concern` with no `resolve.ts`) · [lint: check:packages].
 - `any`, or a cast except at a vendor-type seam (e.g. Supabase dynamic tables) · [lint: noExplicitAny].

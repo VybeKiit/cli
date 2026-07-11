@@ -153,19 +153,19 @@
     {
       "includes": [
         "packages/core/src/**/*.test.ts",
-        "packages/email/src/**/*.test.ts",
+        "packages/messaging/src/**/*.test.ts",
         "packages/assets/src/**/*.test.ts",
-        "packages/cms/src/**/*.test.ts",
+        "packages/content/src/**/*.test.ts",
         "packages/compliance/src/**/*.test.ts",
-        "packages/seo/src/**/*.test.ts",
-        "packages/search/src/**/*.test.ts",
+        "packages/content/src/**/*.test.ts",
+        "packages/db/src/**/*.test.ts",
         "packages/tenancy/src/**/*.test.ts",
         "packages/realtime/src/**/*.test.ts",
-        "packages/kv/src/**/*.test.ts",
-        "packages/jobs/src/**/*.test.ts",
+        "packages/infra/src/**/*.test.ts",
+        "packages/infra/src/**/*.test.ts",
         "packages/analytics/src/**/*.test.ts",
         "packages/ai/src/**/*.test.ts",
-        "packages/notifications/src/**/*.test.ts"
+        "packages/messaging/src/**/*.test.ts"
       ],
       "linter": {
         "rules": {
@@ -249,7 +249,8 @@
       "includes": [
         "packages/agentKit/**",
         "packages/browserAutomation/**",
-        "packages/uiCatalogMcp/**",
+        "packages/agentMcp/**",
+        "packages/agentMcp/**",
         "packages/deploy/**",
         "packages/**/*.test.ts"
       ],

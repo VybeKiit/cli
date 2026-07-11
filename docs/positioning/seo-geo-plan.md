@@ -131,14 +131,20 @@ Linking rules:
 
 ## 4. Content production order (matches the citation timeline)
 
+> **Implemented in `apps/landing` (2026-07):** `/llms.txt`, `/llms-full.txt`, AI-aware `robots.ts`,
+> expanded JSON-LD (Organization/WebSite/Product/SoftwareApplication/FAQ/BreadcrumbList), GEO FAQ,
+> `/compare` pillar, wedge cluster, alternative + vs spokes, home answer-first lead, brand fact hub,
+> catalog-driven sitemap. Human ops (GSC/Bing/Brave submit, SoM baseline) →
+> [`discoverability-ops.md`](./discoverability-ops.md).
+
 1. **Week 1:** `/compare` pillar (matrix + quick-pick + FAQ schema) + `llms.txt` + Bing/Brave
-   submission. *This alone makes us citation-eligible fastest.*
+   submission. *This alone makes us citation-eligible fastest.* ✅ code; ⬜ webmaster submit
 2. **Week 1–2:** the wedge cluster (`/vybekiit-vs-lovable`, `/vibe-coding-saas`,
-   `/saas-boilerplate-for-non-technical-founders`) — lowest competition, highest ICP match.
+   `/saas-boilerplate-for-non-technical-founders`) — lowest competition, highest ICP match. ✅
 3. **Week 2–3:** the five "X alternative" pages for ShipFast, MakerKit, Supastarter, AnotherWrapper,
-   Open SaaS.
-4. **Week 3–4:** the "vs" pages, including neutral ones (`shipfast-vs-makerkit`) for topical
-   authority.
+   Open SaaS (+ Shipped.club). ✅
+4. **Week 3–4:** the "vs" pages under `/compare/vybekiit-vs-*`. ✅ Neutral third-party-only vs pages
+   (`shipfast-vs-makerkit`) still optional for extra topical authority.
 5. **Ongoing:** long-tail feature pages; refresh prices quarterly (this market moves fast).
 
 ## 5. Open items / re-verify before publishing (from the research pass)

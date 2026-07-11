@@ -71,7 +71,7 @@ const descriptions = {
 for (const [name, desc] of Object.entries(descriptions)) {
   const extra =
     name === 'notifications'
-      ? { '@vybekiit/email': 'workspace:*' }
+      ? { '@vybekiit/messaging': 'workspace:*' }
       : name === 'tenancy'
         ? { '@vybekiit/auth': 'workspace:*', '@vybekiit/db': 'workspace:*' }
         : name === 'assets'

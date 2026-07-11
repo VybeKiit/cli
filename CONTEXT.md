@@ -61,6 +61,25 @@ Updates are mirror pulls handled by the agent, not public npm package bumps. The
 maintained logic because checkout grants access to the private delivery mirror, not because the
 logic is free on npm.
 
+### Money pipeline & access (store)
+
+**Store order pipeline**:
+The landing keystone process after a verified payment event: best-effort ledger write → price ladder
+commit → AccessGate grant/revoke. Lives as one module (`processStorePaymentEvent`); the webhook
+route is only a composition root.
+_Avoid_: Inline multi-step orchestration in the Next route
+
+**AccessGate**:
+The product paywall interface — `grant` / `revoke` (and CLI `hasAccess` probe) over delivery-mirror
+collaborators. REST adapter for the landing webhook; `gh` probe for the CLI. Shared org/repo identity
+via `readGateIdentity` / `GITHUB_GATE_*` + `VYBEKIIT_GATE_*`.
+_Avoid_: Separate “invite helper” and “CLI gate” with forked repo lists
+
+**Order ledger**:
+Canonical `OrderEvent` → row mapping (`mapOrderEventToLedgerRow`) plus store/buyer adapters that
+persist it. Buyer template “fulfillment” is ledger write only — not the store AccessGate.
+_Avoid_: Three hand-rolled OrderEvent mappers; calling buyer upsert “the gate”
+
 ### Template surface language
 
 **Surface recipe**:
@@ -126,9 +145,12 @@ vybekiit/                      private monorepo · pnpm + Turborepo
 │  ├─ db/                     MAINTAINED · one DataProvider · providers/{supabase,mongodb,aws} +
 │  │                          StorageProvider {supabase/R2,s3} — provider-agnostic (ADR-0002)
 │  ├─ clientState/            MAINTAINED · TanStack Query + Zustand/MMKV via resolveClientState() (ADR-0014)
-│  ├─ browserAutomation/      PRIVATE tooling · unified Playwright CLI — agent-only, no buyer runtime import
 │  ├─ agentKit/               PRIVATE tooling · shared agent-layer source, bundled into the CLI via tsup
-│  ├─ uiCatalogMcp/           PRIVATE tooling · UI catalog MCP server (maintainer/agent-only)
+│  │                          mcpToolsCatalog SSOT → use-kit-mcp skill on every template
+│  ├─ uiCatalogMcp/           PRIVATE tooling · UI catalog MCP (fuzzy search + cursor pages)
+│  ├─ agentMcp/               PRIVATE tooling · kit agent MCP (skills, CLI, doctor, automations, doc-fallback)
+│  ├─ browserAutomation/      PRIVATE tooling · vybekiit-automate CLI (+ catalog for MCP run_automation)
+│  │                          Always shipped by create app with agent-mcp + ui-catalog-mcp
 │  └─ deploy/                 PRIVATE tooling · Hosting + registrar automation (CLI-only)
 ├─ templates/                 OWNED · NOT published · cloned from private mirrors (ADR-0005) · frozen.
 │  │                          Also home to the folded concerns as OWNED code (kept in sync by

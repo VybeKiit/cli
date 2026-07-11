@@ -183,7 +183,7 @@ for (const domain of [...DOMAINS, 'i18n']) {
       : {};
   const extraDeps =
     domain === 'notifications'
-      ? { '@vybekiit/email': 'workspace:*' }
+      ? { '@vybekiit/messaging': 'workspace:*' }
       : domain === 'tenancy'
         ? { '@vybekiit/auth': 'workspace:*', '@vybekiit/db': 'workspace:*' }
         : domain === 'assets'

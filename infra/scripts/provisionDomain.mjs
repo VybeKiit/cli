@@ -83,7 +83,7 @@ async function main() {
   console.log('\n--- Next steps ---');
   console.log('1. Wait for zone status "active"');
   console.log(
-    '2. cd packages/email/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET',
+    '2. cd packages/messaging/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET',
   );
   console.log('3. CLOUDFLARE_ACCOUNT_ID=... npm run deploy');
   console.log('4. Set CLOUDFLARE_EMAIL_ENDPOINT in root .env');

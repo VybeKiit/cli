@@ -35,6 +35,10 @@ Before adding code: logic the buyer shouldn't touch → `packages/`. UI, screens
 - Zod at public boundaries. No scattered URLs or secrets.
 - Files ~200–400 lines; split when a file does multiple jobs.
 - Match nearest sibling style; reuse helpers before writing new ones.
+- **Repeated UI siblings:** 2+ of the same component differing only by props → data array +
+  `.map()` (see CODE-STYLE → “map repeated sibling rows”). Covers `Kpi`, `SelectItem`,
+  `TabsTrigger`, `TableHead`, segmented options — not Cancel/Submit pairs or divergent trees.
+  Prefer labels from an existing `*_META` / `*_LABEL` record when present.
 - **Provider dispatch:** read `.agents/skills/extend-provider-dispatch/SKILL.md` before any
   `resolve.ts` or `selectToolchain` change. `parseEnv` + `resolveEnvProvider` only (ADR-0018).
 

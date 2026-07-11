@@ -49,7 +49,8 @@ VybeKiit مجموعة بداية مدفوعة لـ vibe coders: أشخاص يع�
 بعد حصولك على وصول VybeKiit، أنشئ نقطة بداية تطبيقك (يمكن للمساعد تشغيل هذا نيابة عنك):
 
 ```bash
-npx vybekiit new web my-app
+npx vybekiit setup
+npx vybekiit create app --web
 ```
 
 ثم افتح المجلد الجديد في أداة البرمجة والصق الأمر أعلاه، أو قل ببساطة:

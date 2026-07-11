@@ -24,11 +24,11 @@ Skills/docs reference `@vybekiit/auth` + `@vybekiit/notifications` separately (`
 ## Consequences
 
 - Auth SMS changes touch `packages/auth/src/smsOtp.ts` only.
-- Notification SMS changes touch `packages/notifications/src/providers/twilio` only.
+- Notification SMS changes touch `packages/messaging/src/providers/twilio` only.
 - Env: Twilio credentials may be shared in `.env.example`, but each package reads only the keys its schema defines.
 
 ## References
 
 - `packages/auth/src/smsOtp.ts`
 - `packages/auth/src/twilioSchemas.ts`
-- `packages/notifications/src/providers/twilio/`
+- `packages/messaging/src/providers/twilio/`

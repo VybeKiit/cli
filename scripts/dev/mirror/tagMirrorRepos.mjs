@@ -9,6 +9,7 @@ import process from 'node:process';
 import { MIRROR_ORG, prefixExists, redact } from './mirrorTagShared.mjs';
 
 const MIRRORS = [
+  { repo: 'kit', path: 'packages' },
   { repo: 'web', path: 'templates/web' },
   { repo: 'mobile', path: 'templates/mobile' },
   { repo: 'extension', path: 'templates/extension' },
