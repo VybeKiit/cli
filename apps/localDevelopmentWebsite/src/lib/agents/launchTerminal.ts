@@ -123,7 +123,8 @@ export const buildLaunchShellCommand = async (
     displayCommand = buildNewSessionCommand(request.agentId, request.prompt);
   }
 
-  let defaultBin = request.agentId;
+  // Binary names may differ from AgentId (e.g. kiro → kiro-cli, claude-code → claude).
+  let defaultBin: string = request.agentId;
   if (request.agentId === 'kiro') {
     defaultBin = 'kiro-cli';
   } else if (request.agentId === 'claude-code') {
