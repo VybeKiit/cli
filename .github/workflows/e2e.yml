@@ -38,8 +38,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Templates/apps resolve @vybekiit/* exports to package dist/; cold checkout has no dist.
+      # Match build.yml: tsup DTS OOMs under default heap when many packages build in parallel.
       - name: Build workspace packages
-        run: pnpm --filter "./packages/**" run build
+        run: pnpm exec turbo run build --filter="./packages/**" --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Install Playwright browsers (component library)
         run: pnpm --filter vybekiit-component-library exec playwright install --with-deps chromium
