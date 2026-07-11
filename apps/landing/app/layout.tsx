@@ -87,8 +87,8 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
         {DevShells ? <DevShells /> : null}
         {/* Replybase AI chat — single-row install; logo/colors SSOT in Replybase dashboard */}
         <script
-          src="https://replybase-api.yosefisabag.workers.dev/widget.js"
-          data-api-base="https://replybase-api.yosefisabag.workers.dev"
+          src="https://cdn.replybase.dev/widget.js"
+          data-api-base="https://api.replybase.dev"
           data-assistant-id="asst_vybekiit_com"
           data-widget-key="wk_9efe71cfcf244911a9227e81dee70ef8"
           defer={true}
