@@ -25,8 +25,10 @@ export const submitExtensionReport = async (payload: ReportPayload): Promise<voi
       // best-effort
     }
     const url = buildAssistantDeepLink(assistant, '', prompt);
-    window.location.href = url;
-    return;
+    if (url !== null) {
+      window.location.href = url;
+      return;
+    }
   }
 
   await navigator.clipboard.writeText(prompt);

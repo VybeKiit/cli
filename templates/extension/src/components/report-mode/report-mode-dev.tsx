@@ -21,6 +21,7 @@ import {
   REPORT_MODE_HOTKEY_LABEL,
   getDockPlacementStyle,
   snapDockToNearestCorner,
+  type ReportDockAnchor,
 } from '@vybekiit/report-mode';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import '../../../styles/report-mode-note.css';
@@ -209,6 +210,21 @@ export const ReportModeDev = () => {
     }
   };
 
+  const handleToggleCorners = (): void => {
+    setShowColors(false);
+    setShowCorners((value) => !value);
+  };
+
+  const handleToggleColors = (): void => {
+    setShowCorners(false);
+    setShowColors((value) => !value);
+  };
+
+  const handleSelectCorner = (corner: Exclude<ReportDockAnchor, 'custom'>): void => {
+    setCorner(corner);
+    setShowCorners(false);
+  };
+
   if (!import.meta.env.DEV) {
     return null;
   }
@@ -278,10 +294,7 @@ export const ReportModeDev = () => {
             variant="outline"
             aria-expanded={showCorners}
             data-testid="report-mode-corner-menu"
-            onClick={() => {
-              setShowColors(false);
-              setShowCorners((value) => !value);
-            }}
+            onClick={handleToggleCorners}
           >
             Pin
           </Button>
@@ -291,10 +304,7 @@ export const ReportModeDev = () => {
             variant="outline"
             aria-expanded={showColors}
             data-testid="report-mode-highlight-color"
-            onClick={() => {
-              setShowCorners(false);
-              setShowColors((value) => !value);
-            }}
+            onClick={handleToggleColors}
           >
             <span
               aria-hidden="true"
@@ -322,10 +332,7 @@ export const ReportModeDev = () => {
                 size="sm"
                 variant={position.anchor === corner ? 'default' : 'outline'}
                 data-testid={`report-mode-corner-${corner}`}
-                onClick={() => {
-                  setCorner(corner);
-                  setShowCorners(false);
-                }}
+                onClick={() => handleSelectCorner(corner)}
               >
                 {DOCK_CORNER_LABELS[corner]}
               </Button>

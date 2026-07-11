@@ -19,6 +19,17 @@
 
 נבנתה עם **VybeKiit**. זו נקודת ההתחלה לאתר שאנשים יכולים לבקר בו. אין צורך לקרוא קוד. ספרו לעוזר ה־AI מה אתם רוצים לבנות.
 
+## אם קיבלתם רק הזמנה ב־GitHub
+
+עדיין לא סיימתם. במחשב הריצו:
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+ואז פתחו את **התיקייה החדשה** שהפקודה יצרה. אל תורידו ZIP מ־GitHub.
+
 ## פרומפט מוכן לכלי הקידוד
 
 פתחו את הפרויקט ב־[Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), או בכל כלי קידוד AI אחר, והדביקו:

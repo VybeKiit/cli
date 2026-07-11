@@ -1,4 +1,4 @@
-import type { JsonLdBlock } from '@vybekiit/seo';
+import type { JsonLdBlock } from '@vybekiit/content';
 
 interface VybeJsonLdProps {
   readonly data: JsonLdBlock | readonly JsonLdBlock[];

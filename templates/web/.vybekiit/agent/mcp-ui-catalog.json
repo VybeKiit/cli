@@ -3,10 +3,11 @@
     "vybekiit-ui-catalog": {
       "command": "node",
       "args": [
-        "../../packages/ui-catalog-mcp/dist/bin.js"
+        "../../packages/agentMcp/dist/uiCatalog/bin.js"
       ],
       "env": {
-        "VYBEKIIT_UI_CATALOG_PATH": ".vybekiit/agent/ui-catalog-index.json"
+        "VYBEKIIT_UI_CATALOG_PATH": ".vybekiit/agent/ui-catalog-index.json",
+        "VYBEKIIT_PROJECT_ROOT": "."
       }
     }
   }

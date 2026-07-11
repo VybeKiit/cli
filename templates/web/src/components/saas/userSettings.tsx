@@ -1,5 +1,6 @@
 'use client';
 
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { IntegrationTodo } from '@/components/saas/integrationTodo';
 import { Alert, AlertDescription, AlertTitle } from '@vybekiit/ui/alert';
 import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';
@@ -7,12 +8,10 @@ import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
-import { RadioGroup, RadioGroupItem } from '@vybekiit/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { Separator } from '@vybekiit/ui/separator';
 import { Switch } from '@vybekiit/ui/switch';
 import { Textarea } from '@vybekiit/ui/textarea';
-import { cn } from '@/lib/utils';
 import {
   AtSign,
   Bell,
@@ -30,7 +29,7 @@ type ThemePref = 'system' | 'light' | 'dark';
 type NotificationKey = 'productUpdates' | 'billingReceipts' | 'securityAlerts' | 'weeklyDigest';
 type SaveStatus = 'idle' | 'saving' | 'saved';
 
-type SettingsForm = {
+interface SettingsForm {
   readonly fullName: string;
   readonly username: string;
   readonly email: string;
@@ -38,7 +37,7 @@ type SettingsForm = {
   readonly timezone: string;
   readonly theme: ThemePref;
   readonly notifications: Readonly<Record<NotificationKey, boolean>>;
-};
+}
 
 const BIO_MAX = 160;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -283,30 +282,18 @@ export const UserSettingsPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <RadioGroup
+            <SegmentedControl
               aria-labelledby={themeLabelId}
-              className="flex gap-1 rounded-lg border bg-muted p-1"
+              className="w-full"
               onValueChange={(value) => update('theme', value as ThemePref)}
               value={form.theme}
             >
               {THEMES.map((option) => (
-                <Label
-                  className={cn(
-                    'flex flex-1 cursor-pointer items-center justify-center rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                    form.theme === option.id ? 'bg-background shadow-sm' : 'text-muted-foreground',
-                  )}
-                  htmlFor={`${themeLabelId}-${option.id}`}
-                  key={option.id}
-                >
-                  <RadioGroupItem
-                    className="sr-only"
-                    id={`${themeLabelId}-${option.id}`}
-                    value={option.id}
-                  />
+                <SegmentedControlItem className="flex-1" key={option.id} value={option.id}>
                   {option.label}
-                </Label>
+                </SegmentedControlItem>
               ))}
-            </RadioGroup>
+            </SegmentedControl>
           </CardContent>
         </Card>
 

@@ -6,6 +6,11 @@ import { fulfillOrderEffect } from '@/lib/fulfillment.js';
 /**
  * Normalize a Node header value into a plain string.
  *
+ * Steps:
+ * 1. Multi-value headers → join with commas (HTTP multi-header form).
+ * 2. Missing header → empty string (callers treat empty as absent).
+ * 3. Single string → return as-is.
+ *
  * @param value - Header value from Express.
  * @returns String header value, or an empty string when missing.
  * @example

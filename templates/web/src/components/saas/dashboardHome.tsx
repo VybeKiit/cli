@@ -1,5 +1,6 @@
 'use client';
 
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { IntegrationTodo } from '@/components/saas/integrationTodo';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
@@ -24,7 +25,10 @@ type RangeKey = '24h' | '7d' | '30d';
 type MetricId = 'revenue' | 'customers' | 'active' | 'orders';
 type ActivityKind = 'all' | 'order' | 'signup' | 'system';
 
-type MetricPoint = { readonly value: number; readonly deltaPct: number };
+interface MetricPoint {
+  readonly value: number;
+  readonly deltaPct: number;
+}
 
 const RANGE_OPTIONS: readonly { readonly id: RangeKey; readonly label: string }[] = [
   { id: '24h', label: '24h' },
@@ -193,23 +197,16 @@ export const DashboardHomePage = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-lg border bg-muted p-1">
+          <SegmentedControl
+            onValueChange={(value) => setRange(value as typeof range)}
+            value={range}
+          >
             {RANGE_OPTIONS.map((option) => (
-              <button
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                  range === option.id
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                key={option.id}
-                onClick={() => setRange(option.id)}
-                type="button"
-              >
+              <SegmentedControlItem key={option.id} value={option.id}>
                 {option.label}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
           <Button
             disabled={refreshing}
             onClick={() => refresh(false)}

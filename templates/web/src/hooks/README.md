@@ -9,5 +9,6 @@ Read this **before** adding a hook. Extend an existing hook when it already cove
 | `use-toast.ts` | Success/error toasts. **Required** for user feedback after actions. |
 | `use-storage.ts` | Client-only prefs in localStorage (`useSyncExternalStore`). Not for server records. |
 | `use-theme.ts` | Applies `@vybekiit/tokens` CSS variables from OS color scheme. |
+| `useDebouncedValue.ts` | Debounce any rapidly changing value. **Required** for every search input that filters a list or fires a query (`SEARCH_DEBOUNCE_MS` = 250). |
 
-**Rules:** server data via `@vybekiit/client-state` / TanStack Query · never duplicate async/auth/toast logic · validate forms with zod at submit · read `client-state-vybekiit.md` and `react-patterns-vybekiit.md`.
+**Rules:** server data via `@vybekiit/client-state` / TanStack Query · never duplicate async/auth/toast logic · validate forms with zod at submit · every search-filter input must use `useDebouncedValue` · read `client-state-vybekiit.md` and `react-patterns-vybekiit.md`.

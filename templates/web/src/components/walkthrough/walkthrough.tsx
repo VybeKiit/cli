@@ -24,6 +24,8 @@ interface WalkthroughProps {
   readonly variant?: WalkthroughVariant;
   /** Fire confetti when the final step completes (spotlight only). */
   readonly celebrate?: boolean;
+  /** Optional class on the spotlight root (e.g. raise z-index above a floating panel). */
+  readonly className?: string;
 }
 
 const CONFETTI_COLORS = ['#60a5fa', '#3b82f6', '#fbbf24', '#f8fafc', '#34d399'];
@@ -62,6 +64,7 @@ const Walkthrough = ({
   state,
   variant = 'spotlight',
   celebrate = false,
+  className,
 }: WalkthroughProps) => {
   const { active, stepIndex, next, back, skip, complete } = state;
   const step = steps[stepIndex];
@@ -98,6 +101,7 @@ const Walkthrough = ({
 
   return (
     <WalkthroughSpotlight
+      {...(className === undefined ? {} : { className })}
       isLast={isLast}
       onNext={handleNext}
       onSkip={skip}
@@ -115,6 +119,7 @@ interface SubViewProps {
   readonly isLast: boolean;
   readonly onNext: () => void;
   readonly onSkip: () => void;
+  readonly className?: string;
 }
 
 const SPOTLIGHT_PAD = 10;
@@ -150,6 +155,7 @@ const WalkthroughSpotlight = ({
   isLast,
   onNext,
   onSkip,
+  className,
 }: SubViewProps) => {
   const [spotlight, setSpotlight] = useState<DOMRect | null>(null);
 
@@ -199,7 +205,7 @@ const WalkthroughSpotlight = ({
     : null;
 
   return (
-    <div className="vybe-walkthrough" data-testid="vybe-walkthrough">
+    <div className={cn('vybe-walkthrough', className)} data-testid="vybe-walkthrough">
       {spotlightStyle ? (
         <>
           <div className="vybe-walkthrough-hole" style={spotlightStyle} />

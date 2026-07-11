@@ -19,6 +19,18 @@ Built with **VybeKiit**. This is your browser add-on starting point: the little 
 
 Sign-in, saved information, and payments live on **your web app**. The add-on talks to that app and never holds secret settings.
 
+## If you only got a GitHub invite
+
+You are not done yet. On your computer, run:
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --extension
+```
+
+Then open the **new folder** that command created (this template alone is not a full install).
+Do **not** use Download ZIP from GitHub.
+
 ## Ready prompt for your AI coding tool
 
 Open this project in [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), or any other AI coding tool, then paste:

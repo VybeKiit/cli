@@ -1,6 +1,7 @@
 'use client';
 
-import { type ChangeEvent, useCallback, useState } from 'react';
+import { type ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 interface User {
   readonly id: string;
@@ -82,6 +83,7 @@ const STATUS_BADGE: Record<User['status'], string> = {
  */
 export const AdminUserTable = () => {
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
   const [planFilter, setPlanFilter] = useState<string>('all');
 
   const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -92,12 +94,17 @@ export const AdminUserTable = () => {
     setPlanFilter(event.target.value);
   }, []);
 
-  const filtered = MOCK_USERS.filter((user) => {
-    const matchesSearch =
-      user.email.includes(search) || user.name.toLowerCase().includes(search.toLowerCase());
-    const matchesPlan = planFilter === 'all' || user.plan === planFilter;
-    return matchesSearch && matchesPlan;
-  });
+  const filtered = useMemo(() => {
+    const needle = debouncedSearch.trim().toLowerCase();
+    return MOCK_USERS.filter((user) => {
+      const matchesSearch =
+        needle.length === 0 ||
+        user.email.toLowerCase().includes(needle) ||
+        user.name.toLowerCase().includes(needle);
+      const matchesPlan = planFilter === 'all' || user.plan === planFilter;
+      return matchesSearch && matchesPlan;
+    });
+  }, [debouncedSearch, planFilter]);
 
   return (
     <div className="space-y-4">

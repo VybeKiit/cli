@@ -155,55 +155,57 @@
   transform-origin: center;
 }
 
+/* Prop accents ease with a soft overshoot so they read as smooth as the
+   celebrating confetti, while the body stays discrete (crispEdges frame-swap). */
 .octo-rig__accent--float {
-  animation: octo-rig-float 2.4s ease-in-out infinite;
+  animation: octo-rig-float 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .octo-rig__accent--rise {
-  animation: octo-rig-rise 2.8s ease-out infinite;
+  animation: octo-rig-rise 2.6s cubic-bezier(0.22, 0.8, 0.36, 1) infinite;
 }
 .octo-rig__accent--blink {
   animation: octo-rig-accent-blink 1.8s steps(1, end) infinite;
 }
 .octo-rig__accent--confetti {
   animation-iteration-count: infinite;
-  animation-timing-function: ease-in;
+  animation-timing-function: cubic-bezier(0.33, 0.1, 0.67, 1);
 }
 .octo-rig__accent--c1 {
   animation-name: octo-rig-confetti-1;
-  animation-duration: 1.5s;
+  animation-duration: 1.45s;
 }
 .octo-rig__accent--c2 {
   animation-name: octo-rig-confetti-2;
-  animation-duration: 1.7s;
+  animation-duration: 1.65s;
 }
 .octo-rig__accent--c3 {
   animation-name: octo-rig-confetti-3;
-  animation-duration: 1.3s;
+  animation-duration: 1.25s;
 }
 .octo-rig__accent--c4 {
   animation-name: octo-rig-confetti-4;
-  animation-duration: 1.9s;
+  animation-duration: 1.85s;
 }
 
 /* Prop motions — kept BEFORE the delay helpers so the shorthand (which resets
    animation-delay) doesn't clobber the staggered --delay1/--delay2 longhands. */
 .octo-rig__accent--spin {
-  animation: octo-rig-spin 2.4s steps(8, end) infinite;
+  animation: octo-rig-spin 2.2s steps(8, end) infinite;
 }
 .octo-rig__accent--twinkle {
-  animation: octo-rig-twinkle 1.6s ease-in-out infinite;
+  animation: octo-rig-twinkle 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .octo-rig__accent--shake {
-  animation: octo-rig-accent-shake 0.5s ease-in-out infinite;
+  animation: octo-rig-accent-shake 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .octo-rig__accent--swing {
-  animation: octo-rig-swing 2.2s ease-in-out infinite;
+  animation: octo-rig-swing 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .octo-rig__accent--drop {
-  animation: octo-rig-drop 2.2s ease-in infinite;
+  animation: octo-rig-drop 2s cubic-bezier(0.33, 0.1, 0.67, 1) infinite;
 }
 .octo-rig__accent--pop {
-  animation: octo-rig-pop 1.8s ease-out infinite;
+  animation: octo-rig-pop 1.6s cubic-bezier(0.34, 1.25, 0.64, 1) infinite;
 }
 
 /* Stagger helpers — declared after the motion rules so the delay wins. */
@@ -217,23 +219,27 @@
 @keyframes octo-rig-float {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
-  50% {
-    transform: translateY(-3px);
+  40% {
+    transform: translateY(-3.5px) scale(1.04);
+  }
+  70% {
+    transform: translateY(-1.5px) scale(1);
   }
 }
 @keyframes octo-rig-rise {
   0% {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(5px) scale(0.9);
   }
-  30% {
+  22% {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-9px);
+    transform: translateY(-10px) scale(0.96);
   }
 }
 @keyframes octo-rig-accent-blink {
@@ -322,53 +328,58 @@
     opacity: 1;
     transform: scale(1);
   }
-  50% {
-    opacity: 0.4;
-    transform: scale(0.82);
+  35% {
+    opacity: 0.55;
+    transform: scale(0.88);
+  }
+  55% {
+    opacity: 0.9;
+    transform: scale(1.06);
   }
 }
 @keyframes octo-rig-accent-shake {
   0%,
   100% {
-    transform: translateX(-1px);
+    transform: translateX(-1.5px) rotate(-2deg);
   }
   50% {
-    transform: translateX(1px);
+    transform: translateX(1.5px) rotate(2deg);
   }
 }
 @keyframes octo-rig-swing {
   0%,
   100% {
-    transform: rotate(-12deg);
+    transform: rotate(-14deg) translateY(0);
   }
   50% {
-    transform: rotate(12deg);
+    transform: rotate(14deg) translateY(-1px);
   }
 }
 @keyframes octo-rig-drop {
   0% {
     opacity: 0;
-    transform: translateY(-3px);
+    transform: translateY(-4px) scale(0.9);
   }
-  20% {
+  18% {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px) scale(0.95);
   }
 }
 @keyframes octo-rig-pop {
   0% {
-    opacity: 0.3;
-    transform: scale(0.6);
+    opacity: 0.25;
+    transform: scale(0.55);
   }
-  40% {
+  35% {
     opacity: 1;
-    transform: scale(1.15);
+    transform: scale(1.18);
   }
-  70% {
-    transform: scale(1);
+  60% {
+    transform: scale(0.96);
   }
   100% {
     opacity: 1;

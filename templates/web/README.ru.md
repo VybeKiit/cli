@@ -17,6 +17,17 @@
 
 Собрано с **VybeKiit**. Это стартовая точка веб‑сайта, который люди могут открыть. Код читать не нужно. Скажите AI‑помощнику, что хотите построить.
 
+## Если у вас только приглашение в GitHub
+
+Вы ещё не закончили. На компьютере выполните:
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+Затем откройте **новую папку**, которую создала команда. Не скачивайте ZIP с GitHub.
+
 ## Готовый промпт для AI‑инструмента
 
 Откройте проект в [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot) или любом другом AI‑инструменте и вставьте:

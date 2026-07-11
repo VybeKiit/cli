@@ -1,7 +1,12 @@
 import type { AuthHttpDeps } from '@vybekiit/auth/http';
+import { Either, Schema } from 'effect';
 import type { Request, Response } from 'express';
 import { clearSessionCookie, SESSION_COOKIE, setSessionCookie } from '@/middleware/session.js';
 import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from './authTelemetry.js';
+
+/** Session cookie value must be a non-empty string when present. */
+const SessionCookieSchema = Schema.String.pipe(Schema.minLength(1));
+const decodeSessionCookie = Schema.decodeUnknownEither(SessionCookieSchema);
 
 /**
  * Read the current auth session cookie from an Express request.
@@ -12,12 +17,11 @@ import { captureAuthFailure, captureAuthRejection, trackAuthEvent } from './auth
  * const sessionToken = readSessionCookie(req);
  */
 const readSessionCookie = (req: Request): string | null => {
-  const value = req.cookies?.[SESSION_COOKIE];
-  if (typeof value === 'string') {
-    return value;
+  const parsed = decodeSessionCookie(req.cookies?.[SESSION_COOKIE]);
+  if (Either.isLeft(parsed)) {
+    return null;
   }
-
-  return null;
+  return parsed.right;
 };
 
 /**

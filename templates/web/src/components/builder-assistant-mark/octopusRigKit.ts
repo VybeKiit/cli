@@ -159,15 +159,42 @@ const heart = (x: number, y: number, cls: string): readonly RigAccent[] => [
 
 // --- Motion archetypes -------------------------------------------------------
 /**
- * Each archetype is a MULTI-FRAME body-deformation sequence (squash, stretch,
- * lean, arm-throw) — the same technique as the hand-authored jump, generalised
- * so every generated pose inherits real choreography, not a 2-frame nudge.
+ * Each archetype is a MULTI-FRAME body-deformation sequence. Geometry is shared
+ * with the hand-authored "Shipped it" (celebrating) jump so every generated pose
+ * reads as the same character: split-torso lean, arm throw, squash land, settle.
+ * Five frames at a similar cadence keeps the hard frame-swap feeling fluid rather
+ * than a 2-frame nudge.
  */
 type MotionKind = 'static' | 'hop' | 'bob' | 'float' | 'pulse' | 'rock' | 'sway' | 'jitter';
 
 /** Shift each eye rect — keeps the eyes on the face as the torso deforms. */
 const nudgeEyes = (eyes: readonly RigRect[], dx: number, dy: number): readonly RigRect[] =>
   eyes.map((r): RigRect => [r[0] + dx, r[1] + dy, r[2], r[3]]);
+
+/**
+ * Asymmetric eye shift for lean poses (paired 2-rect eyes only). Matches the
+ * celebrating crouch where the high arm side lifts one eye with the torso split.
+ */
+const leanEyes = (
+  eyes: readonly RigRect[],
+  side: 'left' | 'right',
+  amount = 1,
+): readonly RigRect[] => {
+  if (eyes.length !== 2) {
+    return nudgeEyes(eyes, side === 'left' ? -amount : amount, 0);
+  }
+  const [left, right] = eyes as [RigRect, RigRect];
+  if (side === 'left') {
+    return [
+      [left[0] - amount, left[1] - 1 * amount, left[2], left[3]],
+      [right[0], right[1] + 2 * amount, right[2], right[3]],
+    ];
+  }
+  return [
+    [left[0], left[1] + 2 * amount, left[2], left[3]],
+    [right[0] + amount, right[1] - 1 * amount, right[2], right[3]],
+  ];
+};
 
 /** One frame as [tx, ty, body, eyes]; frame ids are assigned by `build`. */
 type FrameSpec = readonly [number, number, readonly RigRect[], readonly RigRect[]];
@@ -181,163 +208,259 @@ const build = (
   return loopMs === undefined ? { frames } : { frames, loopMs };
 };
 
-// Body deformations in local space (each frame is translated down by its ty).
-const LEGS_SPLAY: readonly RigRect[] = [
+// Body deformations — celebrating (CONFETTI_JUMP) geometry is the SSOT silhouette.
+/** Landing crouch — short, wide torso; splayed legs; arms braced low. */
+const BODY_SQUASH: readonly RigRect[] = [
+  [18, 9, 93, 56],
   [18, 65, 11, 12],
   [40, 66, 11, 11],
   [76, 66, 11, 11],
   [100, 65, 11, 12],
-];
-/** Landing crouch — short, wide torso; splayed legs; arms braced low. */
-const BODY_SQUASH: readonly RigRect[] = [
-  [18, 9, 93, 56],
-  ...LEGS_SPLAY,
   [0, 44, 22, 21],
   [107, 44, 22, 21],
 ];
-/** Launch stretch — tall, narrow torso; arms sweeping upward. */
-const BODY_STRETCH: readonly RigRect[] = [
-  [27, -6, 75, 71],
-  ...LEGS,
-  [3, 24, 19, 24],
-  [107, 24, 19, 24],
+/**
+ * Crouch lean with right arm up — celebrating l002/l004. Split torso + long legs
+ * is what makes the ship jump read as real weight, not a translate nudge.
+ */
+const BODY_JUMP_CROUCH: readonly RigRect[] = [
+  [22, 20, 42, 65],
+  [64, 9, 43, 71],
+  [43, 14, 32, 21],
+  [22, 85, 11, 25],
+  [43, 85, 11, 25],
+  [75, 80, 11, 30],
+  [96, 80, 11, 30],
+  [0, 42, 22, 23],
+  [103, 0, 22, 31],
 ];
-/** Peak — arms thrown fully overhead. */
-const BODY_ARMSUP: readonly RigRect[] = [
-  [25, -3, 79, 68],
-  ...LEGS,
-  [5, 2, 19, 26],
-  [105, 2, 19, 26],
+/** Peak launch — celebrating l003. Stacked arm rects throw the high arm overhead. */
+const BODY_JUMP_PEAK: readonly RigRect[] = [
+  [22, 23, 42, 65],
+  [64, 12, 43, 71],
+  [43, 17, 32, 21],
+  [103, 8, 8, 26],
+  [108, 0, 8, 30],
+  [112, 0, 8, 27],
+  [117, 0, 8, 24],
+  [22, 88, 11, 25],
+  [43, 88, 11, 25],
+  [75, 83, 11, 27],
+  [96, 83, 11, 27],
+  [0, 59, 22, 23],
 ];
-/** Lean left — torso split into two columns, left raised. */
+/** Mirror crouch — left arm high (used for rock/sway so lean reads both ways). */
+const BODY_JUMP_CROUCH_L: readonly RigRect[] = [
+  [22, 9, 43, 71],
+  [65, 20, 42, 65],
+  [54, 14, 32, 21],
+  [22, 80, 11, 30],
+  [43, 80, 11, 30],
+  [75, 85, 11, 25],
+  [96, 85, 11, 25],
+  [4, 0, 22, 31],
+  [107, 42, 22, 23],
+];
+/** Soft lean left — split torso without full arm throw (calm sway/rock). */
 const BODY_TILT_L: readonly RigRect[] = [
-  [22, -1, 42, 66],
-  [64, 3, 43, 62],
-  ...LEGS,
-  [0, 35, 22, 23],
-  [107, 38, 22, 23],
+  [20, -2, 44, 68],
+  [64, 4, 43, 61],
+  [22, 66, 11, 12],
+  [43, 66, 11, 12],
+  [75, 65, 11, 12],
+  [96, 65, 11, 12],
+  [0, 32, 22, 24],
+  [107, 40, 22, 21],
 ];
-/** Lean right — mirror of the left lean. */
+/** Soft lean right. */
 const BODY_TILT_R: readonly RigRect[] = [
-  [22, 3, 42, 62],
-  [64, -1, 43, 66],
-  ...LEGS,
-  [0, 38, 22, 23],
-  [107, 35, 22, 23],
+  [22, 4, 42, 61],
+  [64, -2, 45, 68],
+  [22, 65, 11, 12],
+  [43, 65, 11, 12],
+  [75, 66, 11, 12],
+  [96, 66, 11, 12],
+  [0, 40, 22, 21],
+  [107, 32, 22, 24],
 ];
-/** Inhale — a touch taller/narrower. */
+/** Inhale — taller/narrower chest, hands float out a pixel. */
 const BODY_INHALE: readonly RigRect[] = [
+  [24, -3, 81, 68],
+  [22, 65, 11, 12],
+  [43, 65, 11, 12],
+  [75, 65, 11, 12],
+  [96, 65, 11, 12],
+  [0, 32, 22, 24],
+  [107, 32, 22, 24],
+];
+/** Full breath peak — widest chest of the pulse cycle. */
+const BODY_BREATH_FULL: readonly RigRect[] = [
+  [20, -4, 89, 69],
+  [20, 65, 12, 12],
+  [42, 65, 12, 12],
+  [75, 65, 12, 12],
+  [97, 65, 12, 12],
+  [-1, 30, 23, 25],
+  [107, 30, 23, 25],
+];
+/** Exhale — shorter/wider, arms tuck. */
+const BODY_EXHALE: readonly RigRect[] = [
+  [20, 5, 89, 60],
+  [22, 65, 11, 12],
+  [43, 65, 11, 12],
+  [75, 65, 11, 12],
+  [96, 65, 11, 12],
+  [0, 40, 22, 20],
+  [107, 40, 22, 20],
+];
+/** Working taps — arms offset opposite ways with a slight torso dip. */
+const BODY_TAP_A: readonly RigRect[] = [
+  [22, 2, 85, 63],
+  ...LEGS,
+  [0, 42, 22, 20],
+  [107, 28, 22, 26],
+];
+const BODY_TAP_B: readonly RigRect[] = [
+  [22, 2, 85, 63],
+  ...LEGS,
+  [0, 28, 22, 26],
+  [107, 42, 22, 20],
+];
+/** Mid-bob settle — brief upright between taps so the cycle reads as rhythm. */
+const BODY_TAP_MID: readonly RigRect[] = [
+  [23, 0, 83, 65],
+  ...LEGS,
+  [0, 34, 22, 24],
+  [107, 34, 22, 24],
+];
+/** Drift — arms eased outward, chest a touch taller (weightless). */
+const BODY_DRIFT: readonly RigRect[] = [
   [24, -2, 81, 67],
   ...LEGS,
-  [0, 34, 22, 23],
-  [107, 34, 22, 23],
+  [-2, 30, 24, 24],
+  [107, 30, 24, 24],
 ];
-/** Exhale — a touch shorter/wider. */
-const BODY_EXHALE: readonly RigRect[] = [
-  [20, 4, 89, 61],
-  ...LEGS,
-  [0, 39, 22, 21],
-  [107, 39, 22, 21],
+/** Drift peak — highest float, arms widest. */
+const BODY_DRIFT_PEAK: readonly RigRect[] = [
+  [26, -4, 77, 69],
+  [22, 65, 11, 12],
+  [43, 65, 11, 12],
+  [75, 65, 11, 12],
+  [96, 65, 11, 12],
+  [-3, 28, 24, 24],
+  [108, 28, 24, 24],
 ];
-/** Working taps — arms offset opposite ways (alternate across frames). */
-const BODY_TAP_A: readonly RigRect[] = [TORSO, ...LEGS, [0, 39, 22, 21], [107, 32, 22, 24]];
-const BODY_TAP_B: readonly RigRect[] = [TORSO, ...LEGS, [0, 32, 22, 24], [107, 39, 22, 21]];
-/** Drifting — arms eased slightly outward for a weightless float. */
-const BODY_DRIFT: readonly RigRect[] = [TORSO, ...LEGS, [0, 33, 22, 23], [107, 33, 22, 23]];
+/** Panic squash — compressed chest mid-jitter. */
+const BODY_PANIC: readonly RigRect[] = [
+  [16, 8, 97, 55],
+  [18, 63, 12, 14],
+  [40, 64, 12, 13],
+  [76, 64, 12, 13],
+  [99, 63, 12, 14],
+  [0, 46, 22, 18],
+  [107, 46, 22, 18],
+];
 
 const motionFrames = (
   kind: MotionKind,
   eyes: readonly RigRect[],
 ): { frames: readonly RigFrame[]; loopMs?: number } => {
   switch (kind) {
-    // Excited leap — squash, launch with arms sweeping up, peak, land, settle.
+    // Same silhouette path as celebrating: stand → crouch-lean → peak → crouch → stand.
     case 'hop':
       return build(
         [
-          [0, 40, BODY_SQUASH, nudgeEyes(eyes, 0, 5)],
-          [0, 29, BODY_STRETCH, nudgeEyes(eyes, 1, -3)],
-          [0, 21, BODY_ARMSUP, nudgeEyes(eyes, 1, -2)],
-          [0, 33, STAND_BODY, eyes],
-          [0, 39, BODY_SQUASH, nudgeEyes(eyes, 0, 4)],
+          [0, 36, STAND_BODY, eyes],
+          [2, 3, BODY_JUMP_CROUCH, leanEyes(eyes, 'right', 2)],
+          [2, -8, BODY_JUMP_PEAK, leanEyes(nudgeEyes(eyes, 0, -2), 'right', 1)],
+          [2, 3, BODY_JUMP_CROUCH, leanEyes(eyes, 'right', 2)],
+          [0, 36, STAND_BODY, eyes],
         ],
-        840,
+        750,
       );
-    // Busy work — a low dip while the two arms tap alternately.
+    // Busy work — alternate arm taps with a mid upright beat (5 frames, dance-like).
     case 'bob':
       return build(
         [
-          [0, 36, BODY_TAP_A, eyes],
-          [0, 34, STAND_BODY, eyes],
-          [0, 36, BODY_TAP_B, eyes],
-          [0, 34, STAND_BODY, eyes],
+          [0, 36, BODY_TAP_A, leanEyes(eyes, 'right', 1)],
+          [0, 34, BODY_TAP_MID, eyes],
+          [0, 36, BODY_TAP_B, leanEyes(eyes, 'left', 1)],
+          [0, 34, BODY_TAP_MID, eyes],
+          [0, 37, BODY_EXHALE, nudgeEyes(eyes, 0, 1)],
         ],
-        520,
+        560,
       );
-    // Weightless drift — a slow rise and fall with arms easing outward.
+    // Weightless drift — slow rise with outward arms, soft settle (celebrating ease).
     case 'float':
       return build(
         [
           [0, 36, STAND_BODY, eyes],
-          [-1, 33, BODY_DRIFT, eyes],
-          [0, 30, BODY_DRIFT, eyes],
-          [1, 33, BODY_DRIFT, eyes],
+          [-1, 32, BODY_DRIFT, eyes],
+          [0, 28, BODY_DRIFT_PEAK, nudgeEyes(eyes, 0, -1)],
+          [1, 32, BODY_DRIFT, eyes],
+          [0, 36, STAND_BODY, eyes],
         ],
-        2400,
+        2000,
       );
-    // Breathing — a gentle inhale-stretch then exhale-squash in place.
+    // Breathing — ALIVE-style expand/contract so rest poses still feel alive.
     case 'pulse':
       return build(
         [
           [0, 36, STAND_BODY, eyes],
-          [0, 35, BODY_INHALE, nudgeEyes(eyes, 0, -1)],
-          [0, 36, STAND_BODY, eyes],
+          [0, 34, BODY_INHALE, nudgeEyes(eyes, 0, -1)],
+          [0, 32, BODY_BREATH_FULL, nudgeEyes(eyes, 0, -2)],
+          [0, 34, BODY_INHALE, nudgeEyes(eyes, 0, -1)],
           [0, 37, BODY_EXHALE, nudgeEyes(eyes, 0, 2)],
         ],
-        1300,
+        1400,
       );
-    // Weight shift — rock left, centre, right, centre with a matching tilt.
+    // Weight shift — full crouch-lean morphs (not a flat translate) left/right.
     case 'rock':
       return build(
         [
-          [-3, 36, BODY_TILT_L, eyes],
-          [0, 35, STAND_BODY, eyes],
-          [3, 36, BODY_TILT_R, eyes],
-          [0, 35, STAND_BODY, eyes],
+          [0, 36, STAND_BODY, eyes],
+          [-2, 6, BODY_JUMP_CROUCH_L, leanEyes(eyes, 'left', 2)],
+          [0, 34, STAND_BODY, eyes],
+          [2, 6, BODY_JUMP_CROUCH, leanEyes(eyes, 'right', 2)],
+          [0, 36, STAND_BODY, eyes],
         ],
-        700,
+        720,
       );
-    // Slow sway — the same lean, wider and calmer.
+    // Slow sway — softer tilts, longer loop (calm flow state).
     case 'sway':
       return build(
         [
-          [-4, 36, BODY_TILT_L, eyes],
+          [0, 36, STAND_BODY, eyes],
+          [-3, 34, BODY_TILT_L, leanEyes(eyes, 'left', 1)],
           [0, 35, STAND_BODY, eyes],
-          [4, 36, BODY_TILT_R, eyes],
-          [0, 35, STAND_BODY, eyes],
+          [3, 34, BODY_TILT_R, leanEyes(eyes, 'right', 1)],
+          [0, 36, STAND_BODY, eyes],
         ],
-        1800,
+        1680,
       );
-    // Nervous shiver — a fast jitter with a scared squash mid-shake.
+    // Nervous shiver — fast left/right with a mid panic squash (readable, not noise).
     case 'jitter':
       return build(
         [
           [-2, 36, STAND_BODY, eyes],
-          [2, 35, STAND_BODY, eyes],
-          [-1, 37, BODY_EXHALE, nudgeEyes(eyes, 0, 1)],
-          [2, 35, STAND_BODY, eyes],
-          [-2, 36, STAND_BODY, eyes],
+          [2, 35, BODY_TILT_R, leanEyes(eyes, 'right', 1)],
+          [0, 38, BODY_PANIC, nudgeEyes(eyes, 0, 2)],
+          [-2, 35, BODY_TILT_L, leanEyes(eyes, 'left', 1)],
+          [2, 36, STAND_BODY, eyes],
         ],
-        360,
+        400,
       );
-    // Idle — a slow, barely-there breath so a resting pose still feels alive.
+    // Idle / static — five-frame breath so resting props still feel present.
     default:
       return build(
         [
           [0, 36, STAND_BODY, eyes],
           [0, 35, BODY_INHALE, nudgeEyes(eyes, 0, -1)],
-          [0, 36, STAND_BODY, eyes],
+          [0, 34, BODY_BREATH_FULL, nudgeEyes(eyes, 0, -1)],
+          [0, 35, BODY_INHALE, nudgeEyes(eyes, 0, -1)],
+          [0, 37, BODY_EXHALE, nudgeEyes(eyes, 0, 1)],
         ],
-        2600,
+        2200,
       );
   }
 };
@@ -1069,47 +1192,48 @@ interface Spec {
  */
 const SPECS: Record<string, Spec> = {
   // --- core poses (the seven flagships live in HAND_POSES) ---
-  prompting: { m: 'static', e: 'open', p: 'cursor', pm: 'blink', t: 'ink' },
-  manifesting: { m: 'static', e: 'closed', p: 'star', pm: 'rise', t: 'gold', many: true },
+  // Living body motion only — no stiff single-nudge statics. Props still carry identity.
+  prompting: { m: 'bob', e: 'open', p: 'cursor', pm: 'blink', t: 'ink' },
+  manifesting: { m: 'pulse', e: 'closed', p: 'star', pm: 'rise', t: 'gold', many: true },
   summoning: { m: 'pulse', e: 'open', p: 'sparkle', pm: 'spin', t: 'gold', many: true },
-  reviewing: { m: 'static', e: 'squint', p: 'scope', pm: 'swing', t: 'sky' },
+  reviewing: { m: 'sway', e: 'squint', p: 'scope', pm: 'swing', t: 'sky' },
   merging: { m: 'rock', e: 'open', p: 'branch', t: 'green' },
   micdrop: { m: 'hop', e: 'open', p: 'mic', pm: 'drop', t: 'ink' },
   rich: { m: 'float', e: 'open', p: 'dollar', pm: 'float', t: 'gold', many: true },
   dancing: { m: 'rock', e: 'open', p: 'note', pm: 'swing', t: 'sky', many: true },
   singing: { m: 'bob', e: 'open', p: 'note', pm: 'float', t: 'pink', many: true },
-  vibing: { m: 'static', e: 'open', p: 'shades', t: 'ink' },
+  vibing: { m: 'sway', e: 'open', p: 'shades', t: 'ink' },
   coffee: { m: 'rock', e: 'open', p: 'mug', t: 'brand' },
   snacking: { m: 'bob', e: 'open', p: 'sparkle', pm: 'blink', t: 'coral' },
   typing: { m: 'bob', e: 'open', p: 'cursor', pm: 'blink', t: 'ink' },
-  scrolling: { m: 'static', e: 'squint', p: 'bubble', t: 'sky' },
-  rubberduck: { m: 'static', e: 'open', p: 'duck', t: 'gold' },
+  scrolling: { m: 'sway', e: 'squint', p: 'bubble', t: 'sky' },
+  rubberduck: { m: 'pulse', e: 'open', p: 'duck', t: 'gold' },
   gaming: { m: 'rock', e: 'open', p: 'pad', t: 'ink' },
-  streaking: { m: 'static', e: 'open', p: 'flame', pm: 'twinkle', t: 'coral' },
-  hoarding: { m: 'static', e: 'open', p: 'windows', t: 'sky' },
-  preaching: { m: 'static', e: 'open', p: 'megaphone', pm: 'swing', t: 'coral' },
-  nesting: { m: 'static', e: 'open', p: 'moon', t: 'sky' },
+  streaking: { m: 'hop', e: 'open', p: 'flame', pm: 'twinkle', t: 'coral' },
+  hoarding: { m: 'sway', e: 'open', p: 'windows', t: 'sky' },
+  preaching: { m: 'rock', e: 'open', p: 'megaphone', pm: 'swing', t: 'coral' },
+  nesting: { m: 'pulse', e: 'open', p: 'moon', t: 'sky' },
   ghosting: { m: 'float', e: 'open', p: 'ghost', t: 'white' },
   flexing: { m: 'hop', e: 'open', p: 'muscle', t: 'brand' },
   rewinding: { m: 'jitter', e: 'open', p: 'rewind', pm: 'spin', t: 'sky' },
   hotfix: { m: 'jitter', e: 'open', p: 'flame', pm: 'twinkle', t: 'coral' },
-  waiting: { m: 'static', e: 'open', p: 'clock', t: 'ink' },
+  waiting: { m: 'sway', e: 'open', p: 'clock', t: 'ink' },
   panicking: { m: 'jitter', e: 'wide', p: 'sweat', pm: 'drop', t: 'sky' },
-  broke: { m: 'static', e: 'x', p: 'crack', t: 'ink' },
+  broke: { m: 'pulse', e: 'x', p: 'crack', t: 'ink' },
   unhinged: { m: 'jitter', e: 'wide', p: 'sparkle', pm: 'spin', t: 'gold', many: true },
-  facepalm: { m: 'static', e: 'closed', p: 'palm', t: 'brand' },
-  tired: { m: 'static', e: 'droopy', p: 'zsmall', pm: 'rise', t: 'ink' },
-  sad: { m: 'static', e: 'droopy', p: 'tears', pm: 'drop', t: 'sky' },
+  facepalm: { m: 'pulse', e: 'closed', p: 'palm', t: 'brand' },
+  tired: { m: 'sway', e: 'droopy', p: 'zsmall', pm: 'rise', t: 'ink' },
+  sad: { m: 'sway', e: 'droopy', p: 'tears', pm: 'drop', t: 'sky' },
 
   // --- extended batch 1 ---
   brainstorming: { m: 'hop', e: 'open', p: 'bulb', pm: 'pop', t: 'gold' },
-  whiteboarding: { m: 'static', e: 'open', p: 'doc', t: 'cream' },
-  pairing: { m: 'static', e: 'open', p: 'people', t: 'sky' },
+  whiteboarding: { m: 'sway', e: 'open', p: 'doc', t: 'cream' },
+  pairing: { m: 'pulse', e: 'open', p: 'people', t: 'sky' },
   mobbing: { m: 'pulse', e: 'open', p: 'people', t: 'coral' },
   refactoring: { m: 'rock', e: 'open', p: 'wrench', pm: 'swing', t: 'ink' },
   optimizing: { m: 'jitter', e: 'open', p: 'bolt', pm: 'twinkle', t: 'gold' },
   benchmarking: { m: 'float', e: 'open', p: 'chart', t: 'sky' },
-  profiling: { m: 'static', e: 'squint', p: 'scope', pm: 'swing', t: 'ink' },
+  profiling: { m: 'sway', e: 'squint', p: 'scope', pm: 'swing', t: 'ink' },
   logging: { m: 'bob', e: 'open', p: 'doc', t: 'cream' },
   monitoring: { m: 'pulse', e: 'open', p: 'radar', pm: 'spin', t: 'green' },
   alerting: { m: 'jitter', e: 'open', p: 'siren', pm: 'twinkle', t: 'coral' },
@@ -1121,12 +1245,12 @@ const SPECS: Record<string, Spec> = {
   readme: { m: 'bob', e: 'open', p: 'book', t: 'green' },
   changelog: { m: 'sway', e: 'open', p: 'scroll', t: 'cream' },
   versioning: { m: 'pulse', e: 'open', p: 'tag', t: 'sky' },
-  tagging: { m: 'static', e: 'open', p: 'tag', pm: 'swing', t: 'coral' },
+  tagging: { m: 'rock', e: 'open', p: 'tag', pm: 'swing', t: 'coral' },
   rebasing: { m: 'rock', e: 'open', p: 'branch', t: 'green' },
   cherrypicking: { m: 'hop', e: 'open', p: 'cherry', t: 'pink' },
   stashing: { m: 'sway', e: 'open', p: 'box', t: 'brand' },
   cloning: { m: 'pulse', e: 'open', p: 'dna', pm: 'spin', t: 'sky' },
-  forking: { m: 'static', e: 'open', p: 'fork', t: 'ink' },
+  forking: { m: 'pulse', e: 'open', p: 'fork', t: 'ink' },
   starring: { m: 'float', e: 'open', p: 'star', pm: 'twinkle', t: 'gold' },
   linting: { m: 'jitter', e: 'open', p: 'sparkle', pm: 'twinkle', t: 'gold' },
   formatting: { m: 'hop', e: 'open', p: 'check', pm: 'pop', t: 'green' },
@@ -1142,20 +1266,20 @@ const SPECS: Record<string, Spec> = {
   darkmode: { m: 'float', e: 'open', p: 'moon', t: 'sky' },
   abtesting: { m: 'jitter', e: 'open', p: 'split', t: 'sky' },
   analytics: { m: 'float', e: 'open', p: 'chart', t: 'green' },
-  funneling: { m: 'static', e: 'open', p: 'funnel', pm: 'drop', t: 'sky' },
+  funneling: { m: 'sway', e: 'open', p: 'funnel', pm: 'drop', t: 'sky' },
   churning: { m: 'jitter', e: 'droopy', p: 'spiral', pm: 'spin', t: 'sky' },
   onboarding: { m: 'hop', e: 'open', p: 'backpack', t: 'coral' },
   offboarding: { m: 'sway', e: 'open', p: 'wave', pm: 'swing', t: 'sky' },
   retiring: { m: 'float', e: 'open', p: 'moon', t: 'gold' },
-  interviewing: { m: 'static', e: 'open', p: 'mic', t: 'ink' },
+  interviewing: { m: 'pulse', e: 'open', p: 'mic', t: 'ink' },
   hiring: { m: 'pulse', e: 'open', p: 'handshake', t: 'green' },
-  standup: { m: 'static', e: 'open', p: 'person', t: 'sky' },
+  standup: { m: 'bob', e: 'open', p: 'person', t: 'sky' },
   retro: { m: 'sway', e: 'open', p: 'crystal', t: 'pink' },
   slacking: { m: 'bob', e: 'open', p: 'bubble', t: 'sky' },
 
   // --- extended batch 2 ---
   sketching: { m: 'sway', e: 'open', p: 'pen', pm: 'swing', t: 'ink' },
-  wireframing: { m: 'static', e: 'open', p: 'doc', t: 'sky' },
+  wireframing: { m: 'sway', e: 'open', p: 'doc', t: 'sky' },
   prototyping: { m: 'hop', e: 'open', p: 'tube', t: 'coral' },
   pitching: { m: 'rock', e: 'open', p: 'megaphone', pm: 'swing', t: 'coral' },
   demoing: { m: 'pulse', e: 'open', p: 'star', pm: 'twinkle', t: 'gold' },
@@ -1167,21 +1291,21 @@ const SPECS: Record<string, Spec> = {
   learning: { m: 'float', e: 'open', p: 'book', t: 'sky' },
   certifying: { m: 'pulse', e: 'open', p: 'scroll', t: 'gold' },
   securing: { m: 'jitter', e: 'open', p: 'lock', t: 'ink' },
-  auditing: { m: 'static', e: 'squint', p: 'scope', pm: 'swing', t: 'ink' },
+  auditing: { m: 'sway', e: 'squint', p: 'scope', pm: 'swing', t: 'ink' },
   patching: { m: 'hop', e: 'open', p: 'check', t: 'coral' },
   hardening: { m: 'pulse', e: 'open', p: 'shield', t: 'sky' },
   caching: { m: 'float', e: 'open', p: 'box', t: 'ink' },
   scaling: { m: 'pulse', e: 'open', p: 'chart', t: 'green' },
   sharding: { m: 'rock', e: 'open', p: 'puzzle', t: 'sky' },
   balancing: { m: 'sway', e: 'open', p: 'scale', pm: 'swing', t: 'gold' },
-  throttling: { m: 'static', e: 'open', p: 'clock', t: 'ink' },
+  throttling: { m: 'sway', e: 'open', p: 'clock', t: 'ink' },
   queueing: { m: 'bob', e: 'open', p: 'doc', t: 'cream' },
   streaming: { m: 'float', e: 'open', p: 'wave', t: 'sky' },
   webhooks: { m: 'jitter', e: 'open', p: 'hook', pm: 'swing', t: 'ink' },
   polling: { m: 'jitter', e: 'open', p: 'loop', pm: 'spin', t: 'sky' },
   subscribing: { m: 'pulse', e: 'open', p: 'bell', pm: 'swing', t: 'gold' },
   publishing: { m: 'rock', e: 'open', p: 'megaphone', pm: 'swing', t: 'coral' },
-  graphql: { m: 'static', e: 'open', p: 'chain', t: 'pink' },
+  graphql: { m: 'pulse', e: 'open', p: 'chain', t: 'pink' },
   grpcing: { m: 'jitter', e: 'open', p: 'bolt', pm: 'twinkle', t: 'gold' },
   socketing: { m: 'rock', e: 'open', p: 'plug', pm: 'swing', t: 'sky' },
   cronning: { m: 'pulse', e: 'open', p: 'clock', t: 'ink' },
@@ -1189,28 +1313,28 @@ const SPECS: Record<string, Spec> = {
   backingup: { m: 'bob', e: 'open', p: 'box', t: 'ink' },
   restoring: { m: 'float', e: 'open', p: 'loop', pm: 'spin', t: 'green' },
   archiving: { m: 'sway', e: 'open', p: 'box', t: 'ink' },
-  parsing: { m: 'static', e: 'open', p: 'doc', t: 'cream' },
+  parsing: { m: 'bob', e: 'open', p: 'doc', t: 'cream' },
   validating: { m: 'hop', e: 'open', p: 'check', pm: 'pop', t: 'green' },
   sanitizing: { m: 'jitter', e: 'open', p: 'sparkle', pm: 'twinkle', t: 'sky' },
   opensourcing: { m: 'pulse', e: 'open', p: 'globe', pm: 'spin', t: 'green' },
   contributing: { m: 'hop', e: 'open', p: 'check', pm: 'pop', t: 'green' },
   triaging: { m: 'rock', e: 'open', p: 'tag', pm: 'swing', t: 'coral' },
-  prioritizing: { m: 'static', e: 'open', p: 'chart', t: 'coral' },
+  prioritizing: { m: 'sway', e: 'open', p: 'chart', t: 'coral' },
   estimating: { m: 'sway', e: 'open', p: 'doc', t: 'ink' },
   sprinting: { m: 'bob', e: 'open', p: 'flag', pm: 'swing', t: 'coral' },
   planning: { m: 'float', e: 'open', p: 'doc', t: 'sky' },
   grooming: { m: 'sway', e: 'open', p: 'check', t: 'ink' },
-  speccing: { m: 'static', e: 'open', p: 'doc', t: 'cream' },
-  scoping: { m: 'static', e: 'open', p: 'scope', t: 'coral' },
+  speccing: { m: 'sway', e: 'open', p: 'doc', t: 'cream' },
+  scoping: { m: 'sway', e: 'open', p: 'scope', t: 'coral' },
   descoping: { m: 'sway', e: 'open', p: 'check', t: 'ink' },
   yoloing: { m: 'jitter', e: 'open', p: 'sparkle', pm: 'spin', t: 'gold' },
-  freezing: { m: 'static', e: 'open', p: 'snow', t: 'sky' },
+  freezing: { m: 'pulse', e: 'open', p: 'snow', t: 'sky' },
   complying: { m: 'pulse', e: 'open', p: 'scale', t: 'ink' },
   licensing: { m: 'sway', e: 'open', p: 'doc', t: 'cream' },
   installing: { m: 'bob', e: 'open', p: 'download', pm: 'drop', t: 'sky' },
   dockerizing: { m: 'rock', e: 'open', p: 'whale', t: 'sky' },
   kubernetes: { m: 'jitter', e: 'open', p: 'wheel', pm: 'spin', t: 'sky' },
-  terraform: { m: 'static', e: 'open', p: 'box', t: 'coral' },
+  terraform: { m: 'pulse', e: 'open', p: 'box', t: 'coral' },
   infra: { m: 'pulse', e: 'open', p: 'factory', t: 'ink' },
   serverless: { m: 'float', e: 'open', p: 'cloud', t: 'sky' },
   edge: { m: 'jitter', e: 'open', p: 'signal', pm: 'twinkle', t: 'sky' },
@@ -1219,7 +1343,7 @@ const SPECS: Record<string, Spec> = {
   remote: { m: 'float', e: 'open', p: 'home', t: 'sky' },
   hybrid: { m: 'rock', e: 'open', p: 'loop', pm: 'spin', t: 'sky' },
   async: { m: 'pulse', e: 'open', p: 'hourglass', t: 'sky' },
-  awaiting: { m: 'static', e: 'open', p: 'hourglass', t: 'sky' },
+  awaiting: { m: 'sway', e: 'open', p: 'hourglass', t: 'sky' },
   blocking: { m: 'jitter', e: 'open', p: 'barrier', pm: 'shake', t: 'gold' },
   deadlocked: { m: 'jitter', e: 'open', p: 'lock', pm: 'spin', t: 'coral' },
   racecondition: { m: 'jitter', e: 'open', p: 'bolt', pm: 'shake', t: 'coral' },
@@ -1227,8 +1351,8 @@ const SPECS: Record<string, Spec> = {
   stackoverflowing: { m: 'bob', e: 'open', p: 'book', t: 'coral' },
   copypasting: { m: 'rock', e: 'open', p: 'doc', t: 'cream' },
   vibecommit: { m: 'pulse', e: 'open', p: 'sparkle', pm: 'twinkle', t: 'gold' },
-  nocap: { m: 'static', e: 'open', p: 'cap', t: 'ink' },
-  based: { m: 'static', e: 'open', p: 'crown', t: 'gold' },
+  nocap: { m: 'pulse', e: 'open', p: 'cap', t: 'ink' },
+  based: { m: 'hop', e: 'open', p: 'crown', t: 'gold' },
   cooked: { m: 'jitter', e: 'open', p: 'flame', pm: 'twinkle', t: 'coral' },
   delulu: { m: 'float', e: 'open', p: 'star', pm: 'twinkle', t: 'pink', many: true },
   maincharacter: { m: 'sway', e: 'open', p: 'star', pm: 'twinkle', t: 'gold' },
@@ -1237,7 +1361,7 @@ const SPECS: Record<string, Spec> = {
   leveling: { m: 'hop', e: 'open', p: 'signal', pm: 'pop', t: 'green' },
   grinding: { m: 'bob', e: 'open', p: 'gear', pm: 'spin', t: 'ink' },
   respawning: { m: 'jitter', e: 'open', p: 'sparkle', pm: 'spin', t: 'sky' },
-  permadeath: { m: 'static', e: 'x', p: 'skull', t: 'cream' },
+  permadeath: { m: 'pulse', e: 'x', p: 'skull', t: 'cream' },
   speedrunning: { m: 'jitter', e: 'open', p: 'flag', pm: 'shake', t: 'coral' },
   minmaxing: { m: 'float', e: 'open', p: 'chart', t: 'sky' },
   theorycraft: { m: 'sway', e: 'open', p: 'brain', t: 'pink' },
@@ -1252,7 +1376,7 @@ const SPECS: Record<string, Spec> = {
   n8n: { m: 'pulse', e: 'open', p: 'loop', pm: 'spin', t: 'green' },
   zapier: { m: 'hop', e: 'open', p: 'bolt', pm: 'pop', t: 'gold' },
   aiwrapping: { m: 'rock', e: 'open', p: 'gift', t: 'pink' },
-  promptinject: { m: 'static', e: 'open', p: 'syringe', pm: 'swing', t: 'coral' },
+  promptinject: { m: 'rock', e: 'open', p: 'syringe', pm: 'swing', t: 'coral' },
   agentswarm: { m: 'jitter', e: 'open', p: 'octo', pm: 'spin', t: 'brand' },
 };
 
@@ -1289,64 +1413,22 @@ export const CONFETTI_JUMP: readonly RigFrame[] = [
     id: 'l002',
     tx: 2,
     ty: 3,
-    body: [
-      [22, 20, 42, 65],
-      [64, 9, 43, 71],
-      [43, 14, 32, 21],
-      [22, 85, 11, 25],
-      [43, 85, 11, 25],
-      [75, 80, 11, 30],
-      [96, 80, 11, 30],
-      [0, 42, 22, 23],
-      [103, 0, 22, 31],
-    ],
-    eyes: [
-      [32, 31, 11, 11],
-      [86, 20, 11, 11],
-    ],
+    body: BODY_JUMP_CROUCH,
+    eyes: leanEyes(EYES_OPEN, 'right', 2),
   },
   {
     id: 'l003',
     tx: 2,
     ty: -8,
-    body: [
-      [22, 23, 42, 65],
-      [64, 12, 43, 71],
-      [43, 17, 32, 21],
-      [103, 8, 8, 26],
-      [108, 0, 8, 30],
-      [112, 0, 8, 27],
-      [117, 0, 8, 24],
-      [22, 88, 11, 25],
-      [43, 88, 11, 25],
-      [75, 83, 11, 27],
-      [96, 83, 11, 27],
-      [0, 59, 22, 23],
-    ],
-    eyes: [
-      [32, 34, 11, 11],
-      [86, 24, 11, 11],
-    ],
+    body: BODY_JUMP_PEAK,
+    eyes: leanEyes(nudgeEyes(EYES_OPEN, 0, -2), 'right', 1),
   },
   {
     id: 'l004',
     tx: 2,
     ty: 3,
-    body: [
-      [22, 20, 42, 65],
-      [64, 9, 43, 71],
-      [43, 14, 32, 21],
-      [22, 85, 11, 25],
-      [43, 85, 11, 25],
-      [75, 80, 11, 26],
-      [96, 80, 11, 26],
-      [0, 42, 22, 23],
-      [103, 0, 22, 31],
-    ],
-    eyes: [
-      [32, 31, 11, 11],
-      [86, 20, 11, 11],
-    ],
+    body: BODY_JUMP_CROUCH,
+    eyes: leanEyes(EYES_OPEN, 'right', 2),
   },
   { id: 'l005', tx: 0, ty: 36, body: STAND_BODY, eyes: EYES_OPEN },
 ];

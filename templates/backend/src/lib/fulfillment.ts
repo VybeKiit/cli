@@ -1,5 +1,5 @@
 import { type DataProvider, resolveDataProvider } from '@vybekiit/db';
-import type { OrderEvent } from '@vybekiit/payments';
+import { mapOrderEventToLedgerRow, type OrderEvent } from '@vybekiit/payments';
 import { Cause, Effect, Data as EffectData, Exit, Option } from 'effect';
 
 /** Row shape stored in the buyer app's `orders` collection or table. */
@@ -46,7 +46,7 @@ const caughtMessage = (caught: unknown): string =>
   caught instanceof Error ? caught.message : String(caught);
 
 /**
- * Resolve a nullable order email into the stored email string.
+ * Resolve a nullable order email into the stored email string via OrderLedger mapper.
  *
  * @param event - Normalized payment event.
  * @returns Customer email, or an empty string when the provider omitted it.
@@ -54,11 +54,12 @@ const caughtMessage = (caught: unknown): string =>
  * const email = customerEmail(event);
  */
 const customerEmail = (event: OrderEvent): string => {
-  if (event.customerEmail === null) {
+  const row = mapOrderEventToLedgerRow(event);
+  if (row.email === null) {
     return '';
   }
 
-  return event.customerEmail;
+  return row.email;
 };
 
 /**

@@ -64,16 +64,13 @@
     "@vybekiit/ai": "workspace:*",
     "@vybekiit/analytics": "workspace:*",
     "@vybekiit/assets": "workspace:*",
-    "@vybekiit/cms": "workspace:*",
+    "@vybekiit/content": "workspace:*",
     "@vybekiit/compliance": "workspace:*",
-    "@vybekiit/email": "workspace:*",
+    "@vybekiit/messaging": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
-    "@vybekiit/jobs": "workspace:*",
-    "@vybekiit/kv": "workspace:*",
-    "@vybekiit/notifications": "workspace:*",
+    "@vybekiit/infra": "workspace:*",
     "@vybekiit/realtime": "workspace:*",
-    "@vybekiit/search": "workspace:*",
-    "@vybekiit/seo": "workspace:*",
+    "@vybekiit/db": "workspace:*",
     "@vybekiit/tenancy": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "cnfast": "^0.0.8",
@@ -92,5 +89,9 @@
     "vite": "^6.1.0",
     "vite-plugin-svgr": "^4.3.0",
     "vitest": "catalog:"
+  },
+  "optionalDependencies": {
+    "@vybekiit/agent-mcp": "workspace:*",
+    "@vybekiit/browser-automation": "workspace:*"
   }
 }

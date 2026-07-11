@@ -19,6 +19,17 @@
 
 مبني مع **VybeKiit**. هذه نقطة بداية موقع يمكن للناس زيارته. لا تحتاج لقراءة الكود. أخبر مساعد الذكاء الاصطناعي ماذا تريد أن تبني.
 
+## إذا وصلك فقط دعوة GitHub
+
+لم تنتهِ بعد. على جهازك شغّل:
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+ثم افتح **المجلد الجديد** الذي أنشأه الأمر. لا تستخدم Download ZIP من GitHub.
+
 ## أمر جاهز لأداة البرمجة
 
 افتح المشروع في [Claude Code](https://code.claude.com/docs/en/overview) أو [Codex](https://developers.openai.com/codex/quickstart) أو [Cursor](https://cursor.com/docs) أو Grok أو Kimi أو Roo أو [Zed](https://zed.dev/) أو Kiro أو [GitHub Copilot](https://github.com/features/copilot) أو أي أداة أخرى، ثم الصق:

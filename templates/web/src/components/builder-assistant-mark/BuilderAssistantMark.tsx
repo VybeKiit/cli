@@ -32,24 +32,24 @@ import { ClaudeOctopusRig } from './octopusRig';
 import { getRigPose } from './octopusRigKit';
 import './builder-assistant-mark.css';
 
-export type { AssistantMood, ClaudeOctopusPose } from './claudeOctopusPoses';
-export type { BuilderAssistantMarkSize } from './builderAssistantMarkSizes';
-export {
-  CLAUDE_OCTOPUS_POSES,
-  CLAUDE_OCTOPUS_POSE_IDS,
-  claudeOctopusPoseDemoName,
-  resolveClaudeOctopusPose,
-} from './claudeOctopusPoses';
-export {
-  BUILDER_ASSISTANT_MARK_SIZE_LABELS,
-  BUILDER_ASSISTANT_MARK_SIZES,
-  builderAssistantMarkSizeClass,
-} from './builderAssistantMarkSizes';
-
 export const ASSISTANT_LABELS: Record<VybeAssistant, string> = {
   claude: 'Claude Code',
   codex: 'Codex',
   cursor: 'Cursor',
+  kiro: 'Kiro',
+  kimi: 'Kimi',
+  devin: 'Devin',
+  grok: 'Grok',
+};
+
+/** Brand monogram colors for assistants without a dedicated SVG mark. */
+const ASSISTANT_MONOGRAM: Partial<
+  Record<VybeAssistant, { readonly letter: string; readonly bg: string; readonly fg: string }>
+> = {
+  kiro: { letter: 'K', bg: '#FF6B00', fg: '#FFFFFF' },
+  kimi: { letter: 'Ki', bg: '#1A1A1A', fg: '#FFFFFF' },
+  devin: { letter: 'D', bg: '#5B5BD6', fg: '#FFFFFF' },
+  grok: { letter: 'G', bg: '#111111', fg: '#FFFFFF' },
 };
 
 const EXTENDED_POSES = CLAUDE_OCTOPUS_EXTENDED_POSES as readonly ClaudeOctopusExtendedPose[];
@@ -306,6 +306,52 @@ export const BuilderAssistantMark = ({
         size={size}
         working={working}
       />
+    );
+  }
+
+  if (assistant === 'codex') {
+    return (
+      <span
+        className={markShellClass(
+          size,
+          className,
+          'builder-assistant-mark--codex',
+          active && 'builder-assistant-mark--active',
+        )}
+        role="img"
+        aria-hidden={true}
+      >
+        <CodexMark className="builder-assistant-mark__codex-svg" />
+      </span>
+    );
+  }
+
+  const monogram = ASSISTANT_MONOGRAM[assistant];
+  if (monogram !== undefined) {
+    return (
+      <span
+        className={markShellClass(
+          size,
+          className,
+          'builder-assistant-mark--monogram',
+          active && 'builder-assistant-mark--active',
+        )}
+        role="img"
+        aria-hidden={true}
+        style={{
+          alignItems: 'center',
+          backgroundColor: monogram.bg,
+          borderRadius: '9999px',
+          color: monogram.fg,
+          display: 'inline-flex',
+          fontSize: '0.55em',
+          fontWeight: 700,
+          justifyContent: 'center',
+          lineHeight: 1,
+        }}
+      >
+        {monogram.letter}
+      </span>
     );
   }
 

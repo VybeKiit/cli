@@ -17,6 +17,18 @@
 
 Built with **VybeKiit**. This is your web app starting point: a website people can visit. You do not need to read code to use it. Tell your AI helper what you want to build.
 
+## If you only got a GitHub invite
+
+You are not done yet. On your computer, run:
+
+```sh
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+Then open the **new folder** that command created (this template alone is not a full install).
+Do **not** use Download ZIP from GitHub.
+
 ## Ready prompt for your AI coding tool
 
 Open this project in [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), or any other AI coding tool, then paste:

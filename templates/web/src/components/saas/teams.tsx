@@ -1,5 +1,6 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { IntegrationTodo } from '@/components/saas/integrationTodo';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
@@ -12,12 +13,12 @@ import { type FormEvent, useId, useState } from 'react';
 
 type MemberRole = 'Owner' | 'Admin' | 'Editor' | 'Viewer';
 
-type TeamMember = {
+interface TeamMember {
   readonly id: string;
   readonly name: string;
   readonly email: string;
   readonly role: MemberRole;
-};
+}
 
 const ROLE_OPTIONS: readonly MemberRole[] = ['Owner', 'Admin', 'Editor', 'Viewer'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,9 +93,9 @@ export const TeamsPage = () => {
       </header>
 
       {flash ? (
-        <p className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-emerald-700 text-sm">
-          {flash}
-        </p>
+        <Alert variant="success">
+          <AlertDescription>{flash}</AlertDescription>
+        </Alert>
       ) : null}
 
       <section className="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
