@@ -1,12 +1,22 @@
 import { spawn } from 'node:child_process';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+
+const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 test.describe('workflow real progress via daemon', () => {
   test('workflow steps advance when daemon emits agent.step messages', async ({ page }) => {
-    const daemon = spawn('node', ['test/mock-daemon.ts'], {
-      cwd: '/Users/yosefhayimsabag/Desktop/Code/vybekiit/apps/localDevelopmentWebsite',
-      stdio: 'ignore',
-    });
+    // Use process.execPath (not bare "node") so PATH-less CI runners still spawn Node.
+    // mock-daemon is TypeScript — strip types on Node 22+ without a separate build step.
+    const daemon = spawn(
+      process.execPath,
+      ['--experimental-strip-types', join(appRoot, 'test/mock-daemon.ts')],
+      {
+        cwd: appRoot,
+        stdio: 'ignore',
+      },
+    );
 
     try {
       await page.waitForTimeout(300);
