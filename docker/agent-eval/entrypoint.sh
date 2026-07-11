@@ -56,31 +56,17 @@ bootstrap_kit() {
   fi
 
   log "Running setup…"
-  set +e
-  "${VYBEKIIT_BIN[@]}" setup > >(tee -a /logs/setup.stdout.log) 2> >(tee -a /logs/setup.stderr.log >&2)
-  local setup_code=$?
-  set -e
+  "${VYBEKIIT_BIN[@]}" setup > >(tee -a /logs/setup.stdout.log) 2> >(tee -a /logs/setup.stderr.log >&2) || true
+  local setup_code=${PIPESTATUS[0]:-$?}
   log "setup exit=$setup_code"
 
   log "Creating kit workspace + web surface at $dest…"
-  set +e
-  # Prefer non-interactive flags. local-kit relies on monorepo-adjacent CLI path.
-  if [[ "${AGENT_EVAL_KIT_MODE:-local-kit}" == "local-kit" && -n "${LOCAL_KIT_ROOT:-}" ]]; then
-    # Force create-app to use mounted monorepo as kit source by running CLI from monorepo root context.
-    # create app resolves kit when packages/templates exist next to cli/ or via gh clone.
-    (
-      cd /workspace
-      # When local CLI is used, kit root is parent of cli/ → /kit-source
-      "${VYBEKIIT_BIN[@]}" create app --web "$dest"
-    ) > >(tee -a /logs/create-app.stdout.log) 2> >(tee -a /logs/create-app.stderr.log >&2)
-  else
-    (
-      cd /workspace
-      "${VYBEKIIT_BIN[@]}" create app --web "$dest"
-    ) > >(tee -a /logs/create-app.stdout.log) 2> >(tee -a /logs/create-app.stderr.log >&2)
-  fi
-  local create_code=$?
-  set -e
+  # Prefer non-interactive flags. local-kit sets VYBEKIIT_KIT_DIR to the mounted monorepo.
+  (
+    cd /workspace
+    "${VYBEKIIT_BIN[@]}" create app --web "$dest"
+  ) > >(tee -a /logs/create-app.stdout.log) 2> >(tee -a /logs/create-app.stderr.log >&2) || true
+  local create_code=${PIPESTATUS[0]:-$?}
   log "create app exit=$create_code"
 
   if [[ "$create_code" -ne 0 ]]; then
@@ -201,7 +187,6 @@ run_agent() {
     agent_cwd="/workspace"
   fi
 
-  set +e
   (
     cd "$agent_cwd"
     export MISSION_FILE="$mission"
@@ -211,9 +196,8 @@ run_agent() {
     else
       "$runner" "$mission"
     fi
-  ) > >(tee -a /logs/agent.stdout.log) 2> >(tee -a /logs/agent.stderr.log >&2)
-  local code=$?
-  set -e
+  ) > >(tee -a /logs/agent.stdout.log) 2> >(tee -a /logs/agent.stderr.log >&2) || true
+  local code=${PIPESTATUS[0]:-$?}
   log "Agent exit=$code"
   echo "agent_exit=$code" >> /artifacts/bootstrap.env
   return 0
