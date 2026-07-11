@@ -32,6 +32,7 @@ export const readFlagValue = (args: readonly string[], name: string): string | u
       }
     }
   }
+  return undefined;
 };
 
 /**
