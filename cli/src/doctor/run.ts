@@ -6,6 +6,7 @@ import { runAgentExperience } from './agentExperience';
 import { verifyAssetsPipeline } from './assetsValidate';
 import { ensureCodexSkillsEnabled } from './codexConfig';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
+import { verifyKitWorkspaceHealth } from './kitWorkspaceHealth';
 import { createDefaultCommandProbe, verifyMobilePublishReadiness } from './mobilePublishReadiness';
 import { mergeDoctorTools, selectNativeTools } from './nativeToolchain';
 import { verifyPerfReadiness } from './perfReadiness';
@@ -288,7 +289,7 @@ const writeRailwayReport = (
   writeLines(log, formatRailwayStackReport(env, agentSetup));
 };
 
-/** Platform skills, project health, assets (§8.1), and perf readiness (§8.2). */
+/** Platform skills, project health, kit package builds, assets (§8.1), and perf readiness (§8.2). */
 const writeProjectLocalReports = (
   cwd: string,
   surface: ReturnType<typeof inferProjectSurfaceSync>,
@@ -297,9 +298,11 @@ const writeProjectLocalReports = (
   writeLines(log, formatPlatformSkillsReport(verifyPlatformSkills(cwd)));
   const projectHealth = verifyProjectHealth(cwd);
   writeLines(log, projectHealth.lines);
+  const kitHealth = verifyKitWorkspaceHealth(cwd);
+  writeLines(log, kitHealth.lines);
   writeLines(log, verifyAssetsPipeline(cwd, surface).lines);
   writeLines(log, verifyPerfReadiness(cwd, surface).lines);
-  return projectHealth.ok;
+  return projectHealth.ok && kitHealth.ok;
 };
 
 /**

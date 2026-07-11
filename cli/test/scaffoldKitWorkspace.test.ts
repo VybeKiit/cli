@@ -32,8 +32,17 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
   const webDir = join(kitRoot, 'templates', 'web');
   await writePkg(coreDir, { name: '@vybekiit/core', version: '0.0.0', private: true });
   await writeFile(join(coreDir, 'index.ts'), 'export const core = true;\n');
+  // Prebuilt dist must ship so first-run preview resolves package exports.
+  await mkdir(join(coreDir, 'dist'), { recursive: true });
+  await writeFile(join(coreDir, 'dist', 'index.js'), 'export const core = true;\n');
   // Skip dirs must not be copied into the buyer kit.
   await mkdir(join(coreDir, 'node_modules', 'left-pad'), { recursive: true });
+  // Build roots so buyer kits can rebuild packages offline.
+  await writeFile(join(kitRoot, 'tsconfig.base.json'), '{}\n');
+  await writeFile(join(kitRoot, 'tsup.base.ts'), 'export {};\n');
+  await mkdir(join(kitRoot, 'scripts', 'lib'), { recursive: true });
+  await writeFile(join(kitRoot, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'export {};\n');
+  await writeFile(join(kitRoot, 'scripts', 'lib', 'repoRoot.mjs'), 'export {};\n');
   await writePkg(authDir, {
     name: '@vybekiit/auth',
     version: '0.0.0',
@@ -110,12 +119,23 @@ describe('scaffoldKitWorkspace happy path', () => {
 
     const rootPkg = JSON.parse(await readFile(join(emptyDest, 'package.json'), 'utf8')) as {
       readonly private?: boolean;
+      readonly scripts?: Record<string, string>;
     };
     expect(rootPkg.private).toBe(true);
+    expect(rootPkg.scripts?.dev).toBe('pnpm --dir templates/web dev');
+    expect(rootPkg.scripts?.['build:packages']).toContain('packages/**');
 
     const workspaceYaml = await readFile(join(emptyDest, 'pnpm-workspace.yaml'), 'utf8');
     expect(workspaceYaml).toContain('packages/*');
     expect(workspaceYaml).toContain('templates/web');
+
+    await expect(
+      readFile(join(emptyDest, 'packages', 'core', 'dist', 'index.js'), 'utf8'),
+    ).resolves.toContain('core');
+    await expect(readFile(join(emptyDest, 'tsconfig.base.json'), 'utf8')).resolves.toBeDefined();
+    await expect(
+      readFile(join(emptyDest, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'utf8'),
+    ).resolves.toBeDefined();
 
     const surfacePkgRaw = await readFile(
       join(emptyDest, 'templates', 'web', 'package.json'),

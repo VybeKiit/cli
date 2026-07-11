@@ -7,10 +7,16 @@ import {
 } from './deliveryCopyPolicy';
 
 describe('deliveryCopyPolicy', () => {
-  it('skips node_modules and dist for all profiles', () => {
+  it('skips node_modules and turbo for all profiles', () => {
     expect(shouldCopyScaffoldPath('a/node_modules/x')).toBe(false);
-    expect(shouldCopyDropPath('a/dist/x')).toBe(false);
+    expect(shouldCopyDropPath('a/node_modules/x')).toBe(false);
     expect(shouldCopyKitPath('a/.turbo/x')).toBe(false);
+  });
+
+  it('ships package dist on scaffold and kit, skips dist on drop', () => {
+    expect(shouldCopyScaffoldPath('packages/core/dist/index.js')).toBe(true);
+    expect(shouldCopyKitPath('packages/core/dist/index.js')).toBe(true);
+    expect(shouldCopyDropPath('packages/core/dist/index.js')).toBe(false);
   });
 
   it('skips scripts/dev only for scaffold', () => {

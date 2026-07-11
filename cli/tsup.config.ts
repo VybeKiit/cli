@@ -4,7 +4,12 @@ import { defineConfig } from 'tsup';
 // dual ESM/CJS + d.ts shape of the published library packages, so it uses its
 // own config rather than the shared `tsup.base`.
 export default defineConfig({
-  entry: ['src/bin.ts'],
+  // `bin` is the package.json bin entry. `index` keeps older global shims that still
+  // point at `dist/index.js` working after the entry was renamed to `bin.js`.
+  entry: {
+    bin: 'src/bin.ts',
+    index: 'src/bin.ts',
+  },
   format: ['esm'],
   platform: 'node',
   clean: true,
