@@ -1,28 +1,12 @@
 import { access, cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { shouldCopyDropPath } from '../lib/deliveryCopyPolicy';
 import { resolveTemplatesSource } from '../lib/resolveTemplates';
 import type { TemplateName } from '../lib/scaffold';
 import type { DropContext, DropDestinationState, DropFlags, DropTemplateSource } from './dropTypes';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-
-// "templates/web/app/page.tsx" or "templates\\web\\app\\page.tsx" -> path parts.
-const DROP_PATH_SEPARATOR_PATTERN = /[/\\]/;
-const DROP_SKIP_DIRS = new Set(['node_modules', '.git', '.next', 'test-results', '.expo']);
-
-/**
- * Check if a path should be copied during a drop operation.
- *
- * @param src - Source path from the template copy walker.
- * @returns True when the path is not a build artifact or installed dependency.
- * @example
- * const copy = shouldCopyDropPath('templates/web/app/page.tsx');
- */
-const shouldCopyDropPath = (src: string): boolean => {
-  const parts = src.split(DROP_PATH_SEPARATOR_PATTERN);
-  return !parts.some((part) => DROP_SKIP_DIRS.has(part));
-};
 
 /**
  * Locate template files from the monorepo checkout or the configured mirror source.

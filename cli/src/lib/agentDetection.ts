@@ -8,7 +8,15 @@
  */
 
 /** Agent runtime ids supported by the local development sidecar. */
-export type AgentId = 'claude-code' | 'cursor' | 'gemini' | 'codex';
+export type AgentId =
+  | 'claude-code'
+  | 'cursor'
+  | 'gemini'
+  | 'codex'
+  | 'kiro'
+  | 'kimi'
+  | 'grok'
+  | 'devin';
 
 /** Agent metadata shown by the local development sidecar. */
 export type DetectedAgent = {
@@ -48,6 +56,34 @@ const AGENTS: Record<AgentId, DetectedAgent> = {
     command: 'codex',
     mcpSupported: false,
   },
+  kiro: {
+    id: 'kiro',
+    name: 'Kiro',
+    icon: '🧡',
+    command: 'kiro-cli',
+    mcpSupported: true,
+  },
+  kimi: {
+    id: 'kimi',
+    name: 'Kimi',
+    icon: '🌙',
+    command: 'kimi',
+    mcpSupported: true,
+  },
+  grok: {
+    id: 'grok',
+    name: 'Grok',
+    icon: '⚡',
+    command: 'grok',
+    mcpSupported: true,
+  },
+  devin: {
+    id: 'devin',
+    name: 'Devin',
+    icon: '🟣',
+    command: 'devin',
+    mcpSupported: true,
+  },
 };
 
 /**
@@ -67,6 +103,10 @@ export const detectAgent = (): DetectedAgent => {
     GOOGLE_CLI,
     CODEX_CLI,
     OPENAI_CODEX,
+    KIRO_CLI,
+    KIMI_CLI,
+    GROK_CLI,
+    DEVIN_CLI,
     TERM_PROGRAM,
     SHELL,
   } = process.env;
@@ -83,6 +123,18 @@ export const detectAgent = (): DetectedAgent => {
   if (CODEX_CLI === '1' || OPENAI_CODEX === '1') {
     return AGENTS.codex;
   }
+  if (KIRO_CLI === '1') {
+    return AGENTS.kiro;
+  }
+  if (KIMI_CLI === '1') {
+    return AGENTS.kimi;
+  }
+  if (GROK_CLI === '1') {
+    return AGENTS.grok;
+  }
+  if (DEVIN_CLI === '1') {
+    return AGENTS.devin;
+  }
 
   const term = TERM_PROGRAM === undefined ? '' : TERM_PROGRAM.toLowerCase();
   if (term.includes('claude')) {
@@ -90,6 +142,9 @@ export const detectAgent = (): DetectedAgent => {
   }
   if (term.includes('cursor')) {
     return AGENTS.cursor;
+  }
+  if (term.includes('grok')) {
+    return AGENTS.grok;
   }
 
   const shell = SHELL === undefined ? '' : SHELL.toLowerCase();

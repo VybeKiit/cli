@@ -10,7 +10,9 @@ Getting started:
   vybekiit create app --extension [directory]
 
 After your app exists (your AI coding tool drives these):
-  vybekiit apply-preset / list-presets / verify-presets
+  vybekiit list-pieces · list-page-recipes · list-presets
+  vybekiit add page-recipe <id> [--to=dir] [--dry-run] [--force]
+  vybekiit apply-preset <id> [--cwd=dir] · verify-presets
   vybekiit scaffold backend · backend add-route|add-crud|add-upload
   vybekiit env wizard · sync-agent-layer · update path via your agent
 
@@ -57,9 +59,13 @@ Agent / kit:
   vybekiit plan-readiness <feature> [template]
   vybekiit plan-setup <domain>
   vybekiit plan-data-model <entities.json> [provider]
-  vybekiit apply-preset <feature> [--provider=supabase|neon|railway|mongodb|firebase|aws] [--dry-run]
+  vybekiit list-pieces [--kind=db|page-recipe|backend]
+  vybekiit list-page-recipes
   vybekiit list-presets
-  vybekiit verify-presets [--fix] [preset...]
+  vybekiit add page-recipe <id> [--to=dir] [--dry-run] [--force]
+  vybekiit add                              (interactive: pick a ready piece)
+  vybekiit apply-preset <feature> [--provider=supabase|neon|railway|mongodb|firebase|aws] [--cwd=dir] [--dry-run]
+  vybekiit verify-presets [--fix] [--cwd=dir] [preset...]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
   vybekiit dedup [--intent <desc>] [--target <file>] [--scope <dir>] [--index] [--json]

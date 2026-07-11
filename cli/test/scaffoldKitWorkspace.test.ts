@@ -26,6 +26,9 @@ const writePkg = async (dir: string, body: Record<string, unknown>): Promise<voi
 const writeFakeKit = async (kitRoot: string): Promise<void> => {
   const coreDir = join(kitRoot, 'packages', 'core');
   const authDir = join(kitRoot, 'packages', 'auth');
+  const agentKitDir = join(kitRoot, 'packages', 'agentKit');
+  const agentMcpDir = join(kitRoot, 'packages', 'agentMcp');
+  const browserAutomationDir = join(kitRoot, 'packages', 'browserAutomation');
   const webDir = join(kitRoot, 'templates', 'web');
   await writePkg(coreDir, { name: '@vybekiit/core', version: '0.0.0', private: true });
   await writeFile(join(coreDir, 'index.ts'), 'export const core = true;\n');
@@ -36,6 +39,26 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
     version: '0.0.0',
     private: true,
     dependencies: { '@vybekiit/core': 'workspace:*' },
+  });
+  await writePkg(agentKitDir, {
+    name: '@vybekiit/agent-kit',
+    version: '0.0.0',
+    private: true,
+    dependencies: { '@vybekiit/core': 'workspace:*' },
+  });
+  await writePkg(agentMcpDir, {
+    name: '@vybekiit/agent-mcp',
+    version: '0.0.0',
+    private: true,
+    dependencies: {
+      '@vybekiit/agent-kit': 'workspace:*',
+      '@vybekiit/browser-automation': 'workspace:*',
+    },
+  });
+  await writePkg(browserAutomationDir, {
+    name: '@vybekiit/browser-automation',
+    version: '0.0.0',
+    private: true,
   });
   await mkdir(join(webDir, 'src'), { recursive: true });
   await writePkg(webDir, {
@@ -110,6 +133,26 @@ describe('scaffoldKitWorkspace happy path', () => {
     await expect(
       readFile(join(emptyDest, 'packages', 'auth', 'package.json'), 'utf8'),
     ).resolves.toBeDefined();
+    await expect(
+      readFile(join(emptyDest, 'packages', 'agentMcp', 'package.json'), 'utf8'),
+    ).resolves.toBeDefined();
+    await expect(
+      readFile(join(emptyDest, 'packages', 'browserAutomation', 'package.json'), 'utf8'),
+    ).resolves.toBeDefined();
+
+    const surfaceMcp = JSON.parse(
+      await readFile(join(emptyDest, 'templates', 'web', '.cursor', 'mcp.json'), 'utf8'),
+    ) as { readonly mcpServers?: Record<string, unknown> };
+    expect(surfaceMcp.mcpServers?.vybekiit).toBeDefined();
+    expect(surfaceMcp.mcpServers?.['vybekiit-ui-catalog']).toBeDefined();
+
+    const rootMcp = JSON.parse(await readFile(join(emptyDest, '.cursor', 'mcp.json'), 'utf8')) as {
+      readonly mcpServers?: {
+        readonly vybekiit?: { readonly args?: readonly string[] };
+      };
+    };
+    expect(rootMcp.mcpServers?.vybekiit?.args?.[0]).toBe('packages/agentMcp/dist/bin.js');
+
     await expect(
       readFile(join(emptyDest, 'packages', 'core', 'node_modules', 'left-pad', 'x'), 'utf8'),
     ).rejects.toThrow();

@@ -54,7 +54,7 @@ export const verifyEmailWorkerDoctor = async (
       checked: true,
       ok: false,
       lines: [
-        '⚠ Email worker - set CLOUDFLARE_EMAIL_ENDPOINT after deploying packages/email/worker.',
+        '⚠ Email worker - set CLOUDFLARE_EMAIL_ENDPOINT after deploying packages/messaging/worker.',
       ],
     };
   }

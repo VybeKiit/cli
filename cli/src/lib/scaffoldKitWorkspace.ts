@@ -1,6 +1,7 @@
 import { access, cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
+import { shipFirstPartyMcpConfigs } from './firstPartyMcp';
 import {
   collectRequiredPackageDirs,
   indexPackageDirs,
@@ -185,6 +186,9 @@ export const scaffoldKitWorkspace = async (
 
   // Cursor + Claude discover skills via per-agent paths on the OWNED surface.
   await ensureAgentSkillSymlinks(surfaceDest);
+
+  // First-party MCPs always ship: packages (via KIT_ALWAYS_SHIP) + project configs.
+  await shipFirstPartyMcpConfigs({ dest: options.dest, template: options.template });
 
   return { dest: options.dest };
 };

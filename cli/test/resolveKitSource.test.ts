@@ -64,7 +64,7 @@ describe('resolveKitSource monorepo-local', () => {
         cloneCalls += 1;
         return Promise.resolve();
       },
-      // Real disk probe: skip cli/ (packages/email only) for monorepo root with templates/.
+      // Real disk probe: skip cli/ (packages/messaging only) for monorepo root with templates/.
       exists: async (path) => {
         try {
           await stat(path);

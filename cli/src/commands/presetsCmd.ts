@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import process from 'node:process';
 import {
   ALL_PRESETS,
@@ -10,6 +11,8 @@ import {
   verifyPresets,
 } from '@vybekiit/db';
 import { Effect, Either } from 'effect';
+import { loadEnvFile, mergeEnv } from '../doctor/env';
+import { hasBoolFlag, readFlagValue } from '../lib/argvFlags';
 
 type PostgresProvider = 'supabase' | 'neon' | 'railway';
 type NosqlProvider = 'mongodb' | 'firebase' | 'aws';
@@ -63,9 +66,9 @@ const runPresetEffect = async <T>(
  * Parse preset command flags.
  *
  * @param args - CLI arguments to scan.
- * @returns Parsed dry-run, fix, and provider flags.
+ * @returns Parsed dry-run, fix, provider, and cwd flags.
  * @example
- * const flags = parseFlags(['--provider=supabase', '--dry-run']);
+ * const flags = parseFlags(['--provider=supabase', '--dry-run', '--cwd=./app']);
  */
 const parseFlags = (
   args: readonly string[],
@@ -73,22 +76,32 @@ const parseFlags = (
   readonly dryRun: boolean;
   readonly fix: boolean;
   readonly provider?: string;
+  readonly cwd?: string;
 } => {
-  let dryRun = false;
-  let fix = false;
-  let provider: string | undefined;
-  for (const arg of args) {
-    if (arg === '--dry-run') {
-      dryRun = true;
-    }
-    if (arg === '--fix') {
-      fix = true;
-    }
-    if (arg.startsWith('--provider=')) {
-      provider = arg.slice('--provider='.length);
-    }
+  const provider = readFlagValue(args, 'provider');
+  const cwd = readFlagValue(args, 'cwd');
+  return {
+    dryRun: hasBoolFlag(args, 'dry-run'),
+    fix: hasBoolFlag(args, 'fix'),
+    ...(provider !== undefined && provider !== '' ? { provider } : {}),
+    ...(cwd !== undefined && cwd !== '' ? { cwd } : {}),
+  };
+};
+
+/**
+ * Build the env used for preset commands (process env + optional project `.env`).
+ *
+ * @param cwd - Optional project directory from `--cwd`.
+ * @returns Merged environment; when cwd is set, file values win over process.env.
+ * @example
+ * const env = resolvePresetEnv('./my-app');
+ */
+const resolvePresetEnv = (cwd: string | undefined): NodeJS.ProcessEnv => {
+  if (cwd === undefined || cwd === '') {
+    return process.env;
   }
-  return { dryRun, fix, ...(provider !== undefined && provider !== '' ? { provider } : {}) };
+  const absolute = resolve(process.cwd(), cwd);
+  return mergeEnv(process.env, loadEnvFile(absolute)) as NodeJS.ProcessEnv;
 };
 
 /**
@@ -215,8 +228,9 @@ const resolvePresetProvider = (
 export const runApplyPreset = async (
   args: string[],
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
-  const [presetId] = args;
-  const flags = parseFlags(args.slice(1));
+  // Allow `apply-preset --cwd=./app orders` or `apply-preset orders --cwd=./app`.
+  const flags = parseFlags(args);
+  const presetId = args.find((arg) => !arg.startsWith('--') && arg !== flags.cwd);
 
   if (presetId === undefined || presetId === '') {
     return {
@@ -233,7 +247,8 @@ export const runApplyPreset = async (
     };
   }
 
-  const provider = resolvePresetProvider(flags.provider, process.env);
+  const env = resolvePresetEnv(flags.cwd);
+  const provider = resolvePresetProvider(flags.provider, env);
   if (provider === undefined) {
     return {
       json: JSON.stringify({
@@ -245,17 +260,17 @@ export const runApplyPreset = async (
   }
 
   const dryRun = flags.dryRun === true;
-  const databaseUrl = connectionUrlForProvider(provider, process.env);
+  const databaseUrl = connectionUrlForProvider(provider, env);
   const missingUrl = databaseUrl === undefined || databaseUrl === '';
 
-  // Postgres always needs DATABASE_URL. MongoDB live apply needs DATABASE_URL or MONGODB_URI.
-  // NoSQL dry-run and firebase/aws live apply do not require a connection URL string
-  // (firebase/aws live use SDK credential env vars instead).
-  if (missingUrl && !isNosqlProvider(provider)) {
+  // Dry-run never needs a live connection. Postgres live apply always needs DATABASE_URL.
+  // MongoDB live apply needs DATABASE_URL or MONGODB_URI. Firebase/AWS live use SDK env.
+  if (missingUrl && !dryRun && !isNosqlProvider(provider)) {
     return {
       json: JSON.stringify({
         ok: false,
-        error: 'DATABASE_URL is required to apply presets.',
+        error:
+          'DATABASE_URL is required to apply presets. Pass --cwd=./your-app if .env lives there, or --dry-run to preview.',
       }),
       exitCode: 1,
     };
@@ -264,23 +279,37 @@ export const runApplyPreset = async (
     return {
       json: JSON.stringify({
         ok: false,
-        error: 'DATABASE_URL or MONGODB_URI is required to apply MongoDB presets.',
+        error:
+          'DATABASE_URL or MONGODB_URI is required to apply MongoDB presets. Pass --cwd=./your-app if .env lives there, or --dry-run to preview.',
       }),
       exitCode: 1,
     };
   }
 
+  // Dry-run may run offline with no URL; live paths already rejected missingUrl above.
+  const connectionUrl = databaseUrl === undefined ? '' : databaseUrl;
+
   const result = await runPresetEffect(
     applyPreset({
       presetId,
       provider,
-      databaseUrl: databaseUrl ?? '',
+      databaseUrl: connectionUrl,
       dryRun,
     }),
   );
 
   return {
-    json: JSON.stringify(result.ok ? { ok: true, ...result.value } : result, null, 2),
+    json: JSON.stringify(
+      result.ok
+        ? {
+            ok: true,
+            ...result.value,
+            ...(flags.cwd === undefined ? {} : { cwd: resolve(process.cwd(), flags.cwd) }),
+          }
+        : result,
+      null,
+      2,
+    ),
     exitCode: result.ok ? 0 : 1,
   };
 };
@@ -297,28 +326,28 @@ export const runVerifyPresets = async (
   args: string[],
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const flags = parseFlags(args);
-  const databaseUrl = databaseUrlFromEnv(process.env);
+  const env = resolvePresetEnv(flags.cwd);
+  const databaseUrl = databaseUrlFromEnv(env);
   if (databaseUrl === undefined || databaseUrl === '') {
     return {
       json: JSON.stringify({
         ok: false,
-        error: 'DATABASE_URL is required to verify presets.',
+        error:
+          'DATABASE_URL is required to verify presets. Pass --cwd=./your-app if .env lives there.',
       }),
       exitCode: 1,
     };
   }
 
   const presetIds = flags.fix
-    ? expectedPresetsFromEnv(process.env).map((preset) => preset.id)
-    : args.filter((arg) => !arg.startsWith('--'));
+    ? expectedPresetsFromEnv(env).map((preset) => preset.id)
+    : args.filter((arg) => !arg.startsWith('--') && arg !== flags.cwd);
 
   const ids =
-    presetIds.length > 0
-      ? presetIds
-      : expectedPresetsFromEnv(process.env).map((preset) => preset.id);
+    presetIds.length > 0 ? presetIds : expectedPresetsFromEnv(env).map((preset) => preset.id);
 
   if (flags.fix && ids.length > 0) {
-    const provider = resolvePostgresProvider(flags.provider, process.env);
+    const provider = resolvePostgresProvider(flags.provider, env);
     if (provider === undefined) {
       return {
         json: JSON.stringify({

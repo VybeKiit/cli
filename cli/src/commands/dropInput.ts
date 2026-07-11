@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import { filterPositionals, hasBoolFlag } from '../lib/argvFlags';
 import { isTemplateName, TEMPLATES } from '../lib/scaffold';
 import { isInteractive } from '../prompts/tty';
 import {
@@ -19,12 +20,12 @@ import {
  */
 export const parseDropArgs = (args: readonly string[]): ParsedDropArgs => {
   const flags: DropFlags = {
-    force: args.includes('--force'),
-    merge: args.includes('--merge'),
-    dryRun: args.includes('--dry-run'),
-    json: args.includes('--json'),
+    force: hasBoolFlag(args, 'force'),
+    merge: hasBoolFlag(args, 'merge'),
+    dryRun: hasBoolFlag(args, 'dry-run'),
+    json: hasBoolFlag(args, 'json'),
   };
-  const [first, second] = args.filter((arg) => !arg.startsWith('--'));
+  const [first, second] = filterPositionals(args, []);
 
   if (first !== undefined && isTemplateName(first)) {
     if (second !== undefined) {

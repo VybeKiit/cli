@@ -12,6 +12,16 @@ export type PackageJsonLike = {
   readonly packageManager?: string;
 };
 
+/**
+ * Tooling packages always shipped into a scaffolded kit workspace so first-party
+ * MCP servers + browser automations resolve without depending on surface app deps.
+ * Missing entries in a partial fixture index are skipped (not hard errors).
+ */
+export const KIT_ALWAYS_SHIP_PACKAGES = [
+  '@vybekiit/agent-mcp',
+  '@vybekiit/browser-automation',
+] as const;
+
 // Split path segments on either separator: "packages\\tools/a" → ["packages","tools","a"].
 const PATH_SEPARATOR_PATTERN = /[/\\]/;
 
@@ -171,11 +181,18 @@ export const collectRequiredPackageDirs = async (
     throw new ScaffoldError(`Could not read surface package at ${surfacePackageJsonPath}.`);
   }
 
+  const seed = new Set<string>(listWorkspaceVybekiitDeps(surfacePkg));
+  for (const always of KIT_ALWAYS_SHIP_PACKAGES) {
+    if (packageIndex.has(always)) {
+      seed.add(always);
+    }
+  }
+
   const state: VisitState = {
     packageIndex,
     surfaceLabel: surfacePkg.name ?? 'surface',
     required: new Set<string>(),
-    queue: [...listWorkspaceVybekiitDeps(surfacePkg)],
+    queue: [...seed],
   };
 
   while (state.queue.length > 0) {

@@ -1,42 +1,29 @@
 import { spawnSync } from 'node:child_process';
 import process from 'node:process';
+import { readGateIdentity } from '@vybekiit/core';
 
 /**
  * The access gate — VybeKiit's paid wall on the CLI (ADR-0033).
  *
  * A paid purchase invites the buyer's GitHub account to the private delivery repos
- * (see apps/landing gate). Every command except help/version/doctor runs this first:
+ * (see apps/landing AccessGate). Every command except help/version/doctor runs this first:
  * if the signed-in GitHub account is neither a member of the org NOR a collaborator on
  * a delivery repo, we print purchase guidance and exit — re-running re-checks, so once
  * access is granted it simply passes. Set VYBEKIIT_SKIP_GATE=1 to bypass in CI/automation.
+ *
+ * Org/repos SSOT: {@link readGateIdentity} (same defaults as landing grant).
  */
 
-/**
- * Read a configured env value with an explicit fallback.
- *
- * @param key - Environment key to read.
- * @param fallback - Fallback value when the key is absent or blank.
- * @returns Configured or fallback value.
- * @example
- * const org = readEnvValue('VYBEKIIT_GATE_ORG', 'VybeKiit');
- */
-const readEnvValue = (key: string, fallback: string): string => {
-  const value = process.env[key];
+const { org: GATE_ORG, repos: GATE_REPOS } = readGateIdentity(process.env);
+
+/** Where to send an ungated buyer to purchase. Override with VYBEKIIT_SITE_URL. */
+const SITE_URL = (() => {
+  const value = process.env.VYBEKIIT_SITE_URL;
   if (value !== undefined && value.trim() !== '') {
     return value;
   }
-  return fallback;
-};
-
-/** GitHub org that owns the private delivery repos. Override with VYBEKIIT_GATE_ORG. */
-const GATE_ORG = readEnvValue('VYBEKIIT_GATE_ORG', 'VybeKiit');
-/** Private delivery repos; access to ANY one proves a paid license. Override CSV with VYBEKIIT_GATE_REPOS. */
-const GATE_REPOS = readEnvValue('VYBEKIIT_GATE_REPOS', 'web,mobile,extension')
-  .split(',')
-  .map((name) => name.trim())
-  .filter((name) => name.length > 0);
-/** Where to send an ungated buyer to purchase. Override with VYBEKIIT_SITE_URL. */
-const SITE_URL = readEnvValue('VYBEKIIT_SITE_URL', 'https://vybekiit.com');
+  return 'https://vybekiit.com';
+})();
 
 export type GateReason = 'ok' | 'skipped' | 'gh-missing' | 'gh-unauthed' | 'no-access';
 
@@ -52,14 +39,13 @@ export type GateResult = {
  * @param args - `gh` arguments.
  * @returns True when the command exits successfully.
  * @example
- * const ok = ghSucceeds(['auth', 'status']);
+ * const ok = ghSucceeds(['--version']);
  */
 const ghSucceeds = (args: readonly string[]): boolean =>
   spawnSync('gh', [...args], { stdio: 'ignore' }).status === 0;
 
-/** True when the signed-in user is an active member of {@link GATE_ORG}. */
+/** True when the signed-in user is an active member of the gate org. */
 const isOrgMember = (): boolean => {
-  // 200 + state "active" means an accepted membership; pending/404 do not.
   const result = spawnSync('gh', ['api', `user/memberships/orgs/${GATE_ORG}`, '--jq', '.state'], {
     encoding: 'utf8',
   });
@@ -68,17 +54,11 @@ const isOrgMember = (): boolean => {
 };
 
 /** True when the signed-in user can read at least one private delivery repo. */
-const hasRepoAccess = (): boolean => {
-  // GET on a private repo succeeds only for members/collaborators; 404 otherwise.
-  return GATE_REPOS.some((repo) => ghSucceeds(['api', `repos/${GATE_ORG}/${repo}`]));
-};
+const hasRepoAccess = (): boolean =>
+  GATE_REPOS.some((repo) => ghSucceeds(['api', `repos/${GATE_ORG}/${repo}`]));
 
 /**
  * Decide whether the signed-in GitHub account holds a VybeKiit license.
- *
- * Light preflight: confirms `gh` is present + signed in (points at `vybekiit doctor` to
- * install it, never auto-installs on a hot path), then passes if the user is EITHER an org
- * member OR a delivery-repo collaborator.
  *
  * @returns Gate result with allow/deny reason.
  * @example
