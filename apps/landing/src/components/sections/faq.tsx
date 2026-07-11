@@ -55,7 +55,7 @@ const FaqRow = ({ item, open, onToggle, panelId, buttonId, reduced }: FaqRowProp
           onClick={handleClick}
           type="button"
         >
-          <span className="faq-question-rich font-medium text-base leading-[1.45] md:text-[1.05rem]">
+          <span className="faq-question-rich font-medium text-base leading-[1.45] md:text-lg">
             <BrandRichText text={item.question} />
           </span>
           <span

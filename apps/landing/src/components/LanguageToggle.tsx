@@ -4,7 +4,7 @@ import { Languages } from 'lucide-react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLandingLocale } from '@/i18n/LocaleProvider';
-import { LANDING_LOCALES } from '@/i18n/locales';
+import { LANDING_LOCALES, type LandingLocale } from '@/i18n/locales';
 import { cn } from '@/lib/utils';
 
 interface LanguageToggleProps {
@@ -45,6 +45,11 @@ export const LanguageToggle = ({ className }: LanguageToggleProps) => {
     clearCloseTimer();
     setOpen(true);
   }, [clearCloseTimer]);
+
+  const handleSelectLocale = (nextLocale: LandingLocale): void => {
+    setLocale(nextLocale);
+    setOpen(false);
+  };
 
   useEffect(
     () => () => {
@@ -112,10 +117,7 @@ export const LanguageToggle = ({ className }: LanguageToggleProps) => {
                     ? 'bg-accent font-medium text-accent-foreground'
                     : 'text-foreground hover:bg-muted',
                 )}
-                onClick={() => {
-                  setLocale(entry.id);
-                  setOpen(false);
-                }}
+                onClick={() => handleSelectLocale(entry.id)}
                 role="menuitem"
                 type="button"
               >

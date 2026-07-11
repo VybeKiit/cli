@@ -185,7 +185,11 @@ export const registerLsDomain = (registry: CommandRegistry): void => {
           'Verify the money pipeline in test mode: webhook creation + a full fake purchase through the kit checkout UI',
         run: async ({ args, flags }) => {
           const url = readFlag(args, 'url') ?? 'http://localhost:3010/checkout';
-          const apiKey = process.env.LEMONSQUEEZY_API_KEY ?? '';
+          // Prefer the dedicated test key so live LEMONSQUEEZY_API_KEY stays production-only.
+          const apiKey =
+            process.env.LEMONSQUEEZY_TEST_MODE_API_KEY?.trim() ||
+            process.env.LEMONSQUEEZY_API_KEY ||
+            '';
           const guard = await assertLemonSqueezyTestMode(apiKey);
           if (!guard.testMode) {
             if (flags.json) {

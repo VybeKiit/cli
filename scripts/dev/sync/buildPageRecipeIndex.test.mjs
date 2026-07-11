@@ -212,8 +212,10 @@ describe('build page recipe index', () => {
     const index = await validatePageRecipeManifest({ repoRoot, manifest: validManifest });
     const generated = buildGeneratedPageRecipeComponentsSource(index);
 
-    expect(generated).toContain("import { AuthPage as AuthPageRecipe } from '../pageRecipes/AuthPage';");
-    expect(generated).toContain("'auth': AuthPageRecipe");
+    expect(generated).toContain(
+      "import { AuthPage } from '@library/pageRecipes/AuthPage';",
+    );
+    expect(generated).toContain("'auth': AuthPage");
     expect(generated).toContain('export const PAGE_RECIPE_COMPONENTS');
   });
 });

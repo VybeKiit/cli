@@ -75,9 +75,7 @@ export const LoopingPaymentToast = () => {
         </svg>
       </span>
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-[11px] text-muted-foreground leading-none">
-          Payment received
-        </p>
+        <p className="font-medium text-xs text-muted-foreground leading-none">Payment received</p>
         <p className="mt-1 font-semibold text-foreground text-sm tabular-nums tracking-tight">
           <NumberFlow
             format={CURRENCY_FORMAT}

@@ -4,8 +4,6 @@ import type { BrowserContext, Page } from 'playwright';
 import { isGoogleAuthenticatedDom } from './authDom';
 import { isGoogleAuthenticatedUrl } from './authUrl';
 
-export { isGoogleAuthenticatedUrl } from './authUrl';
-
 /**
  * Block until the builder finishes Google sign-in and a Console tab is authenticated.
  *

@@ -47,7 +47,7 @@ const QUICK_WIN_RECIPE_SAMPLES: Array<{
   {
     slug: 'user-settings',
     title: 'User settings page',
-    heading: 'User settings',
+    heading: 'Settings',
     targetRoute: '/settings/profile',
   },
   {
@@ -59,7 +59,7 @@ const QUICK_WIN_RECIPE_SAMPLES: Array<{
   {
     slug: 'cart',
     title: 'Cart page',
-    heading: 'Cart review',
+    heading: 'Your cart',
     targetRoute: '/cart',
   },
   {
@@ -83,7 +83,7 @@ const QUICK_WIN_RECIPE_SAMPLES: Array<{
   {
     slug: 'changelog',
     title: 'Changelog page',
-    heading: 'Product changelog',
+    heading: 'Product updates',
     targetRoute: '/changelog',
   },
 ];
@@ -183,7 +183,8 @@ test('template surface route renders live SaaS previews', async ({ page }) => {
   await expect(page).toHaveURL('/extension-saas/teams');
   await expect(page.getByText('/extension-saas/teams')).toBeVisible();
   const teamsFrame = page.frameLocator('iframe[title="Extension SaaS Teams nested preview"]');
-  const roleSelect = teamsFrame.getByRole('combobox', { name: 'Change role for Maya Chen' });
+  // Maya is the sole Owner and cannot be demoted — use Noah (Editor) for a real role change.
+  const roleSelect = teamsFrame.getByRole('combobox', { name: 'Change role for Noah Green' });
   await expect(roleSelect).toBeVisible();
   await roleSelect.click();
   await expect(teamsFrame.getByRole('option', { name: 'Admin' })).toBeVisible();
@@ -209,7 +210,8 @@ test('quick-win page recipes render across SaaS categories', async ({ page }) =>
   for (const recipe of QUICK_WIN_RECIPE_SAMPLES) {
     await page.goto(`/pages/${recipe.slug}`, routeLoad);
     await expect(page.getByRole('heading', { name: recipe.title })).toBeVisible();
-    await expect(page.getByText(recipe.targetRoute)).toBeVisible();
+    // exact: true — "/products" also appears inside install-note copy and source.
+    await expect(page.getByText(recipe.targetRoute, { exact: true })).toBeVisible();
 
     await page.goto(`/embed/pages/${recipe.slug}`, routeLoad);
     await expect(page.getByRole('heading', { name: recipe.heading })).toBeVisible();
@@ -391,7 +393,9 @@ test('page recipe detail route exposes install notes source and full preview', a
   await expect(page.getByRole('heading', { name: 'Auth page' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Install notes' })).toBeVisible();
   await expect(
-    page.getByText('Connect the form to the active Supabase auth provider.'),
+    page.getByText(
+      'Run the onboarding skill to set SUPABASE_URL and SUPABASE_ANON_KEY, then create the @vybekiit/auth client.',
+    ),
   ).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Source' })).toBeVisible();
   await expect(page.getByText('export const AuthPage')).toBeVisible();
@@ -404,28 +408,34 @@ test('page recipe detail route exposes install notes source and full preview', a
 test('page recipe embed route renders the runnable recipe component', async ({ page }) => {
   await page.goto('/embed/pages/auth');
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Google' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Email' }).first()).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Password' })).toBeVisible();
-  await expect(page.getByText('Loaded', { exact: true })).toBeVisible();
-  await expect(page.getByText('Input error', { exact: true })).toBeVisible();
-  await expect(page.getByText('Success', { exact: true })).toBeVisible();
-  await expect(page.getByLabel('Email with error')).toHaveAttribute('aria-invalid', 'true');
-  const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
-  await expect(continueButton).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Email code' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Phone code' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Continue with Google/ })).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+  // exact: true — "Show password" also matches a loose "Password" label query.
+  await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Use a magic link instead' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Google' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'GitHub' })).toBeVisible();
 
-  await continueButton.click();
-  await expect(page.getByRole('button', { name: 'Working...' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible({
-    timeout: 2000,
-  });
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByText('Enter a valid email address.')).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toHaveAttribute('aria-invalid', 'true');
 });
 
-test('page recipe copy actions write source and prompt to clipboard', async ({ context, page }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+test('page recipe copy actions write source and prompt to clipboard', async ({ page }) => {
+  // In-page clipboard mock — parallel workers race on the real OS clipboard in CI.
+  await page.addInitScript(() => {
+    const store = { text: '' };
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          store.text = text;
+        },
+        readText: async () => store.text,
+      },
+    });
+  });
+
   await page.goto('/pages/auth', routeLoad);
 
   await page.getByRole('button', { name: 'Copy Page recipe source' }).click();

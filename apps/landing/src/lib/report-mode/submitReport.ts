@@ -36,8 +36,12 @@ const submitReportHandoff = async (options: SubmitReportHandoffOptions): Promise
 
   if (openNewChat) {
     const url = buildAssistantDeepLink(options.assistant, options.projectRoot, prompt);
-    window.location.href = url;
-    toast.success('Copied — opening a new chat in your assistant.');
+    if (url !== null) {
+      window.location.href = url;
+      toast.success('Copied — opening a new chat in your assistant.');
+      return;
+    }
+    toast.success('Copied — paste into your assistant (no deeplink for this agent).');
     return;
   }
 

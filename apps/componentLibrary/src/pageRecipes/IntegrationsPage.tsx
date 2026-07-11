@@ -1,8 +1,10 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Switch } from '@vybekiit/ui/switch';
 import {
   CheckCircle2,
@@ -15,10 +17,10 @@ import {
   RefreshCw,
   Webhook,
 } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type ConnectionStatus = 'connected' | 'needs_refresh' | 'disconnected';
 
@@ -240,7 +242,7 @@ export const IntegrationsPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Integrations motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -257,21 +259,28 @@ export const IntegrationsPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0" />
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Kpi label="Connected" value={String(kpis.connected)} />
-          <Kpi label="API keys" value={String(kpis.keys)} />
-          <Kpi label="Webhooks" value={String(kpis.hooks)} />
-          <Kpi
-            label="Failing"
-            value={String(kpis.failing)}
-            valueClassName={kpis.failing > 0 ? 'text-amber-600' : undefined}
-          />
+          {(
+            [
+              { key: 'connected', label: 'Connected', value: String(kpis.connected) },
+              { key: 'api-keys', label: 'API keys', value: String(kpis.keys) },
+              { key: 'webhooks', label: 'Webhooks', value: String(kpis.hooks) },
+              {
+                key: 'failing',
+                label: 'Failing',
+                value: String(kpis.failing),
+                valueClassName: kpis.failing > 0 ? 'text-amber-600' : undefined,
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <section className="mb-6 space-y-3">
@@ -456,60 +465,30 @@ export const IntegrationsPage = () => {
           </div>
         </section>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — connect toggles, key create/rotate/revoke, and
-              webhook retry all work offline. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Store OAuth connections and hashed API keys in your DB; never return full secrets
-                after create.
-              </li>
-              <li>
-                Webhook endpoints + delivery history can sit next to the shipped{' '}
-                <code>webhook_events</code> preset for inbound Lemon Squeezy events.
-              </li>
-              <li>
-                <code>POST /api/integrations/keys</code> creates a key (show once); rotate and
-                revoke invalidate the previous hash.
-              </li>
-              <li>
-                Write every connect, rotate, and revoke action to <code>audit_log</code>.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — connect toggles, key create/rotate/revoke, and
+            webhook retry all work offline. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Store OAuth connections and hashed API keys in your DB; never return full secrets
+              after create.
+            </li>
+            <li>
+              Webhook endpoints + delivery history can sit next to the shipped{' '}
+              <code>webhook_events</code> preset for inbound Lemon Squeezy events.
+            </li>
+            <li>
+              <code>POST /api/integrations/keys</code> creates a key (show once); rotate and revoke
+              invalidate the previous hash.
+            </li>
+            <li>
+              Write every connect, rotate, and revoke action to <code>audit_log</code>.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Integrations motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** Small KPI tile. */
-const Kpi = ({
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className={cn('font-semibold text-2xl tabular-nums', valueClassName)}>{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

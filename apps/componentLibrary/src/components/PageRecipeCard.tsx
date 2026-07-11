@@ -20,8 +20,8 @@ interface PageRecipeCardProps {
  * const element = <PageRecipeCard recipe={recipe} />;
  */
 export const PageRecipeCard = ({ recipe }: PageRecipeCardProps) => (
-  <article className="rounded-lg border bg-card p-4 shadow-sm">
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+  <article className="min-w-0 overflow-hidden rounded-lg border bg-card p-4 shadow-sm">
+    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{recipe.groupLabel}</Badge>

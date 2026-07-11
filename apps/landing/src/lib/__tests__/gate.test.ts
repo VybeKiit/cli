@@ -6,7 +6,7 @@ import { inviteToRepo, removeFromRepo } from '@/lib/gate';
 const gateConfig: GithubGateConfig = {
   GITHUB_GATE_TOKEN: 'test-token',
   GITHUB_GATE_ORG: 'VybeKiit',
-  GITHUB_GATE_REPOS: ['web', 'mobile', 'extension'],
+  GITHUB_GATE_REPOS: ['kit', 'web', 'mobile', 'extension'],
 };
 
 describe('gate multi-mirror invite/remove', () => {
@@ -20,7 +20,7 @@ describe('gate multi-mirror invite/remove', () => {
 
     const result = await Effect.runPromise(Effect.either(inviteToRepo(gateConfig, 'buyer-user')));
     expect(Either.isRight(result)).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     for (const repo of gateConfig.GITHUB_GATE_REPOS) {
       expect(fetchMock).toHaveBeenCalledWith(
         `https://api.github.com/repos/VybeKiit/${repo}/collaborators/buyer-user`,
@@ -35,7 +35,7 @@ describe('gate multi-mirror invite/remove', () => {
 
     const result = await Effect.runPromise(Effect.either(removeFromRepo(gateConfig, 'buyer-user')));
     expect(Either.isRight(result)).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     for (const repo of gateConfig.GITHUB_GATE_REPOS) {
       expect(fetchMock).toHaveBeenCalledWith(
         `https://api.github.com/repos/VybeKiit/${repo}/collaborators/buyer-user`,
@@ -49,6 +49,7 @@ describe('gate multi-mirror invite/remove', () => {
       .fn()
       .mockResolvedValueOnce({ status: 201 })
       .mockResolvedValueOnce({ status: 403 })
+      .mockResolvedValueOnce({ status: 201 })
       .mockResolvedValueOnce({ status: 201 });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -66,6 +67,6 @@ describe('githubGateConfigSchema', () => {
       GITHUB_GATE_TOKEN: 'tok',
     });
     expect(parsed.GITHUB_GATE_ORG).toBe('VybeKiit');
-    expect(parsed.GITHUB_GATE_REPOS).toEqual(['web', 'mobile', 'extension']);
+    expect(parsed.GITHUB_GATE_REPOS).toEqual(['kit', 'web', 'mobile', 'extension']);
   });
 });

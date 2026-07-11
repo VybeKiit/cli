@@ -2,8 +2,21 @@ import { badInput, type HttpResponse, ok as okResponse, upstreamFailed } from '@
 import { isPaymentsUnconfigured } from '@vybekiit/payments/practice';
 import { Payments, resolvePaymentProvider } from '@vybekiit/payments/resolve';
 import type { OrderEvent, PaymentError } from '@vybekiit/payments/types';
-import { Cause, Effect, Exit, Option } from 'effect';
+import { Cause, Effect, Either, Exit, Option, Schema } from 'effect';
 import type { CheckoutBody, PracticeCompleteBody } from './schemas';
+
+/**
+ * Express `express.raw()` body: UTF-8 string or byte buffer.
+ * Buffer is a Uint8Array subclass, so one instance check covers both.
+ */
+const WebhookRawBodySchema = Schema.Union(
+  Schema.String,
+  Schema.transform(Schema.instanceOf(Uint8Array), Schema.String, {
+    decode: (bytes) => Buffer.from(bytes).toString('utf8'),
+    encode: (text) => Buffer.from(text, 'utf8'),
+  }),
+);
+const decodeWebhookRawBody = Schema.decodeUnknownEither(WebhookRawBodySchema);
 
 const practiceCheckoutFallbackUrl = 'http://localhost:3000';
 
@@ -212,6 +225,11 @@ export const handlePracticeComplete = async (
 /**
  * Read a raw webhook body from Express when `express.raw()` is mounted.
  *
+ * Steps:
+ * 1. Decode with {@link WebhookRawBodySchema} (string or Uint8Array/Buffer).
+ * 2. Return the UTF-8 text for signature verification.
+ * 3. Throw when the body is not raw bytes (e.g. already-parsed JSON).
+ *
  * @param body - Raw body value provided by Express.
  * @returns The webhook body as a UTF-8 string.
  * @throws When the body is not a string or Buffer.
@@ -219,13 +237,9 @@ export const handlePracticeComplete = async (
  * const rawBody = readWebhookRawBody(req.body);
  */
 export const readWebhookRawBody = (body: unknown): string => {
-  if (typeof body === 'string') {
-    return body;
+  const parsed = decodeWebhookRawBody(body);
+  if (Either.isLeft(parsed)) {
+    throw new Error('Webhook body must be raw bytes.');
   }
-
-  if (Buffer.isBuffer(body)) {
-    return body.toString('utf8');
-  }
-
-  throw new Error('Webhook body must be raw bytes.');
+  return parsed.right;
 };

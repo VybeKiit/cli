@@ -4,6 +4,7 @@ import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Kpi } from '@vybekiit/ui/kpi';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -15,8 +16,8 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type CheckStatus = 'pass' | 'fail' | 'warn' | 'pending';
 
@@ -178,7 +179,7 @@ export const SafetyPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Safety motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -195,9 +196,20 @@ export const SafetyPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Pass" value={summary.pass} tone="emerald" />
-          <Kpi label="Warn" value={summary.warn} tone="amber" />
-          <Kpi label="Fail" value={summary.fail} tone="red" />
+          {(
+            [
+              {
+                key: 'pass',
+                label: 'Pass',
+                value: summary.pass,
+                valueClassName: 'text-emerald-600',
+              },
+              { key: 'warn', label: 'Warn', value: summary.warn, valueClassName: 'text-amber-600' },
+              { key: 'fail', label: 'Fail', value: summary.fail, valueClassName: 'text-red-600' },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -314,65 +326,27 @@ export const SafetyPage = () => {
           </div>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — Run checks, acknowledge, and severity filters
-              update live. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset audit_log</code> for the audit trail table.
-              </li>
-              <li>
-                Map doctor results from your safety scanner into{' '}
-                <code>{'{ id, label, detail, status }'}</code>.
-              </li>
-              <li>
-                Load incident rows from the error tracking provider; keep the severity chips as
-                query filters.
-              </li>
-              <li>Acknowledge writes an audit_log row so the team sees who cleared a warning.</li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — Run checks, acknowledge, and severity filters
+            update live. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset audit_log</code> for the audit trail table.
+            </li>
+            <li>
+              Map doctor results from your safety scanner into{' '}
+              <code>{'{ id, label, detail, status }'}</code>.
+            </li>
+            <li>
+              Load incident rows from the error tracking provider; keep the severity chips as query
+              filters.
+            </li>
+            <li>Acknowledge writes an audit_log row so the team sees who cleared a warning.</li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Safety motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({
-  label,
-  value,
-  tone,
-}: {
-  readonly label: string;
-  readonly value: number;
-  readonly tone: 'emerald' | 'amber' | 'red';
-}) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p
-        className={cn(
-          'font-semibold text-2xl tabular-nums',
-          tone === 'emerald' && 'text-emerald-600',
-          tone === 'amber' && 'text-amber-600',
-          tone === 'red' && 'text-red-600',
-        )}
-      >
-        {value}
-      </p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

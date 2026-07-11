@@ -1,3 +1,10 @@
+
+## Agent skill (read locally or via MCP)
+
+- Auto-discovered: `.agents/skills/use-kit-mcp/SKILL.md`
+- Platform wrapper: `.vybekiit/platform-skills/mcp-tools-vybekiit.md`
+- Via MCP (when `vybekiit` server is connected): `search_skills({ query: "mcp tools" })` then `get_skill({ id: "use-kit-mcp" })` or `list_platform_skills({ query: "mcp" })`
+
 # MCP setup — Cursor, Claude Desktop, Codex (agent-only)
 
 Merge provider snippets from `.vybekiit/agent/mcp-*.json` into the buyer's AI client config. **Preserve existing servers** — never replace the whole file.
@@ -69,6 +76,7 @@ Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 
 | When | File | Upstream docs |
 |------|------|---------------|
+| VybeKiit agent surface (skills, CLI, doctor, doc-fallback) | `mcp-agent.json` | Local `@vybekiit/agent-mcp` — always merge first |
 | Default data (`DATA_PROVIDER=supabase`) | `mcp-supabase.json` | https://supabase.com/docs/guides/ai-tools/mcp |
 | Stripe payments | `mcp-stripe.json` | https://docs.stripe.com/mcp |
 | PayPal payments | `mcp-paypal.json` | https://docs.paypal.ai/developer/tools/ai/mcp-quickstart |

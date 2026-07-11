@@ -1,5 +1,5 @@
 import { type DataProvider, type DbError, type DbRecord, resolveDataProvider } from '@vybekiit/db';
-import type { OrderEvent } from '@vybekiit/payments';
+import { mapOrderEventToLedgerRow, type OrderEvent } from '@vybekiit/payments';
 import { Cause, Data as EffectData, Effect, Exit, Option } from 'effect';
 
 /** Row shape stored in the practice `orders` collection or Supabase table. */
@@ -98,20 +98,23 @@ const resolveFulfillmentData = (): Effect.Effect<DataProvider, FulfillmentError>
   });
 
 /**
- * Build the stored order record from a payment event.
+ * Build the stored order record from a payment event via shared OrderLedger mapper.
  *
  * @param event - Normalized payment event.
  * @returns Order record ready for the data provider.
  * @example
  * const record = orderRecord(event);
  */
-const orderRecord = (event: OrderEvent): OrderRecord => ({
-  id: event.orderId,
-  order_id: event.orderId,
-  email: event.customerEmail,
-  github_username: event.githubUsername,
-  refunded: event.isRefund,
-});
+const orderRecord = (event: OrderEvent): OrderRecord => {
+  const row = mapOrderEventToLedgerRow(event);
+  return {
+    id: row.orderId,
+    order_id: row.orderId,
+    email: row.email,
+    github_username: row.githubUsername,
+    refunded: row.refunded,
+  };
+};
 
 /**
  * Insert or update an order through the local data provider.

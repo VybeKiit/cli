@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  AgentLogo,
   GlowBadge,
   PulseBeam,
   Sidebar,
@@ -16,16 +15,17 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
   SidebarRail,
-  SidebarTrigger,
   VybeKitMark,
 } from '@vybekiit/ui';
-import { Clock, MessageSquare, Plus, RefreshCw, Trash2 } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
+import { Clock, ExternalLink, MessageSquare, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { type MouseEvent, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
+import { AgentMark } from '@/components/AgentMark';
 import { useAgentSessions } from '@/hooks';
+import type { AgentId } from '@/lib/agents/registry';
 import { cn } from '@/lib/utils';
-import { type AgentId, useAgentStore, useChatStore } from '@/stores';
+import { useAgentStore, useChatStore } from '@/stores';
 
 type ChatSidebarProps = {
   activeId: string | null;
@@ -33,7 +33,13 @@ type ChatSidebarProps = {
 };
 
 const formatTime = (iso: string) => {
+  if (!iso) {
+    return '';
+  }
   const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) {
+    return '';
+  }
   const now = Date.now();
   const diff = now - d.getTime();
   if (diff < 60_000) return 'just now';
@@ -61,23 +67,28 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
   const agentsMap = useAgentStore((s) => s.agents);
   const activeAgent = agentsMap[activeAgentId];
 
-  const { sessions, loading, refresh, createSession } = useAgentSessions();
+  const { sessions, loading, refresh, createSession, resumeSession } = useAgentSessions();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reload sessions when the active agent changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-fetch sessions when the active agent changes
   useEffect(() => {
     refresh();
   }, [activeAgentId, refresh]);
 
   const createNew = useCallback(() => {
-    const c = createConversation(`New chat \u2022 ${activeAgent.name}`, activeAgent.id);
+    const c = createConversation(`New chat · ${activeAgent.name}`, activeAgent.id);
     onSelect(c.id);
   }, [activeAgent, createConversation, onSelect]);
 
   const loadSessionAsConversation = useCallback(
-    async (sessionId: string) => {
-      const res = await fetch(`/api/sessions/${sessionId}`);
+    async (sessionId: string, cwd?: string) => {
+      const res = await fetch(
+        `/api/sessions/${encodeURIComponent(sessionId)}?agent=${activeAgentId}`,
+      );
       if (!res.ok) {
-        throw new Error(`Could not load session ${sessionId}.`);
+        // Still allow resume even if we cannot hydrate messages
+        toast.message('Opening session in terminal…');
+        await resumeSession(sessionId, cwd);
+        return;
       }
 
       const data = (await res.json()) as {
@@ -93,20 +104,48 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
           content: msg.content,
         });
       }
+      addMessage(c.id, {
+        role: 'agent',
+        content: `Resuming this ${activeAgent.name} session in your terminal…`,
+      });
       onSelect(c.id);
+      await resumeSession(sessionId, cwd);
     },
-    [activeAgent, createConversation, addMessage, onSelect],
+    [activeAgent, activeAgentId, createConversation, addMessage, onSelect, resumeSession],
   );
+
+  const handleNewAgentSession = useCallback(async () => {
+    const title = `New project · ${new Date().toLocaleDateString()}`;
+    await createSession(title);
+    const c = createConversation(`${activeAgent.name} · ${title}`, activeAgent.id);
+    addMessage(c.id, {
+      role: 'agent',
+      content: `Starting a new ${activeAgent.name} session in your terminal. Talk there, or come back here to watch workflow steps.`,
+    });
+    onSelect(c.id);
+  }, [createSession, createConversation, addMessage, activeAgent, onSelect]);
+
+  const handleResumeInTerminal = useCallback(
+    (event: MouseEvent, sessionId: string, cwd?: string) => {
+      event.stopPropagation();
+      void resumeSession(sessionId, cwd);
+    },
+    [resumeSession],
+  );
+
+  const handleStartNewAgentSession = useCallback(() => {
+    void handleNewAgentSession();
+  }, [handleNewAgentSession]);
 
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-zinc-800 bg-zinc-950"
+      className="border-r border-border bg-background"
       data-testid="chat-sidebar"
     >
       <SidebarHeader className="gap-4 p-4">
         <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
-          <div className="flex items-center gap-2 text-white">
+          <div className="flex items-center gap-2 text-foreground">
             <VybeKitMark className="h-7 w-7" />
             <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">
               VybeKiit
@@ -118,11 +157,14 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
         </div>
 
         <div className="space-y-2 group-data-[collapsible=icon]:hidden">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Your agent</p>
-          <div className="space-y-1.5">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Your agent
+          </p>
+          <div className="space-y-1.5 max-h-[40vh] overflow-y-auto pr-0.5">
             {(Object.keys(agentsMap) as AgentId[]).map((id) => {
               const agent = agentsMap[id];
               const selected = id === activeAgentId;
+              const installed = agent.installed;
               return (
                 <button
                   key={id}
@@ -134,11 +176,32 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
                     'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all',
                     selected
                       ? 'bg-vybe-600 text-white shadow-lg shadow-vybe-600/20'
-                      : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100',
+                      : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground',
+                    installed === false && !selected && 'opacity-60',
                   )}
                 >
-                  <AgentLogo slug={id} size={20} />
-                  <span>{agent.name}</span>
+                  <AgentMark slug={id} size={20} />
+                  <span className="flex-1 min-w-0 truncate">{agent.name}</span>
+                  {installed === true && (
+                    <span
+                      className={cn(
+                        'text-[10px] uppercase tracking-wide',
+                        selected ? 'text-white/80' : 'text-emerald-500',
+                      )}
+                    >
+                      ready
+                    </span>
+                  )}
+                  {installed === false && (
+                    <span
+                      className={cn(
+                        'text-[10px] uppercase tracking-wide',
+                        selected ? 'text-white/60' : 'text-muted-foreground',
+                      )}
+                    >
+                      missing
+                    </span>
+                  )}
                   {selected && <PulseBeam color="green" size="sm" />}
                 </button>
               );
@@ -149,7 +212,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-zinc-500">
+          <SidebarGroupLabel className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
             {activeAgent.name} sessions
           </SidebarGroupLabel>
@@ -161,14 +224,14 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
               {(() => {
                 if (loading && sessions.length === 0) {
                   return (
-                    <p className="px-3 py-4 text-center text-sm text-zinc-500 group-data-[collapsible=icon]:hidden">
+                    <p className="px-3 py-4 text-center text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
                       Loading sessions&hellip;
                     </p>
                   );
                 }
                 if (sessions.length === 0) {
                   return (
-                    <p className="px-3 py-4 text-center text-sm text-zinc-500 group-data-[collapsible=icon]:hidden">
+                    <p className="px-3 py-4 text-center text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
                       No {activeAgent.name} sessions found
                     </p>
                   );
@@ -178,12 +241,23 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
                     <SidebarMenuButton
                       tooltip={s.title}
                       data-testid={`session-item-${s.session_id}`}
-                      onClick={() => loadSessionAsConversation(s.session_id)}
+                      onClick={() => loadSessionAsConversation(s.session_id, s.cwd || undefined)}
                       className="h-auto flex-col items-start gap-0 py-2.5"
                     >
-                      <span className="line-clamp-1 w-full text-sm text-zinc-200">{s.title}</span>
-                      <span className="text-xs text-zinc-500">{formatTime(s.updated_at)}</span>
+                      <span className="line-clamp-1 w-full text-sm text-foreground">{s.title}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatTime(s.updated_at)}
+                      </span>
                     </SidebarMenuButton>
+                    <SidebarMenuAction
+                      showOnHover={true}
+                      onClick={(event) =>
+                        handleResumeInTerminal(event, s.session_id, s.cwd || undefined)
+                      }
+                      aria-label="Resume in terminal"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </SidebarMenuAction>
                   </SidebarMenuItem>
                 ));
               })()}
@@ -192,7 +266,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-zinc-500">
+          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground">
             Local chats
           </SidebarGroupLabel>
           <SidebarGroupAction onClick={createNew} aria-label="New conversation">
@@ -201,7 +275,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
           <SidebarGroupContent>
             <SidebarMenu>
               {conversations.length === 0 ? (
-                <p className="px-3 py-4 text-center text-sm text-zinc-500 group-data-[collapsible=icon]:hidden">
+                <p className="px-3 py-4 text-center text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
                   No conversations yet
                 </p>
               ) : (
@@ -232,7 +306,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
 
       <SidebarFooter className="space-y-1 p-3">
         <SidebarMenuButton
-          onClick={() => createSession(`New project \u2022 ${new Date().toLocaleDateString()}`)}
+          onClick={handleStartNewAgentSession}
           data-testid="new-agent-session"
           className="group-data-[collapsible=icon]:justify-center"
         >
@@ -242,7 +316,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
         <SidebarMenuButton
           onClick={createNew}
           data-testid="new-local-chat"
-          className="group-data-[collapsible=icon]:justify-center text-zinc-500"
+          className="group-data-[collapsible=icon]:justify-center text-muted-foreground"
         >
           <MessageSquare className="h-4 w-4" />
           <span>New local chat</span>
@@ -253,7 +327,3 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
     </Sidebar>
   );
 };
-
-/** Opens and closes the local development sidebar. */
-export const ChatSidebarTrigger = SidebarTrigger;
-export { SidebarProvider };

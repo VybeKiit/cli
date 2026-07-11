@@ -1,6 +1,7 @@
 import { access, cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
+import { shipFirstPartyMcpConfigs } from './firstPartyMcp';
 import {
   collectRequiredPackageDirs,
   indexPackageDirs,
@@ -8,7 +9,21 @@ import {
   packageRelFromPackagesRoot,
   readPackageJson,
 } from './kitPackageGraph';
+import { pathExists } from './pathExists';
 import { ScaffoldError, shouldCopyScaffoldPath, type TemplateName } from './scaffold';
+
+/**
+ * Monorepo files required so buyer kits can rebuild `@vybekiit/*` packages
+ * (`tsup` configs import `../../scripts/lib/tsupWorkspaceAliases.mjs`).
+ */
+const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json', 'tsup.base.ts'] as const;
+
+/** Shared tsup alias helpers copied into the buyer kit `scripts/lib/`. */
+const KIT_BUILD_SCRIPT_LIBS = [
+  'scripts/lib/tsupWorkspaceAliases.mjs',
+  'scripts/lib/tsupWorkspaceAliases.d.mts',
+  'scripts/lib/repoRoot.mjs',
+] as const;
 
 /** Inputs for {@link scaffoldKitWorkspace}. */
 export type ScaffoldKitOptions = {
@@ -27,9 +42,13 @@ const CATALOG_BLOCK_START = /^catalog:\s*$/m;
  * Build buyer-facing root package.json for the kit workspace.
  *
  * @param kitRootPkg - Optional package.json from the kit source root.
+ * @param template - Surface template id (drives the root `dev` script).
  * @returns JSON string for the destination root package.json.
  */
-const buildRootPackageJson = (kitRootPkg: PackageJsonLike | null): string => {
+const buildRootPackageJson = (
+  kitRootPkg: PackageJsonLike | null,
+  template: TemplateName,
+): string => {
   const packageManager =
     kitRootPkg?.packageManager !== undefined && kitRootPkg.packageManager !== ''
       ? kitRootPkg.packageManager
@@ -40,10 +59,41 @@ const buildRootPackageJson = (kitRootPkg: PackageJsonLike | null): string => {
       name: 'my-vybekiit-kit',
       private: true,
       packageManager,
+      scripts: {
+        // Run the surface from the kit root so agents don't have to discover templates/*.
+        dev: `pnpm --dir templates/${template} dev`,
+        'build:packages': 'pnpm -r --filter "./packages/**" run build',
+      },
     },
     null,
     2,
   )}\n`;
+};
+
+/**
+ * Copy monorepo build roots needed to rebuild packages inside the buyer kit.
+ *
+ * @param kitRoot - Source kit / monorepo root.
+ * @param dest - Buyer kit workspace root.
+ * @returns Promise that resolves after available roots are copied.
+ */
+const copyKitBuildRoots = async (kitRoot: string, dest: string): Promise<void> => {
+  for (const rel of KIT_BUILD_ROOT_FILES) {
+    const src = join(kitRoot, rel);
+    if (await pathExists(src)) {
+      await cp(src, join(dest, rel));
+    }
+  }
+
+  for (const rel of KIT_BUILD_SCRIPT_LIBS) {
+    const src = join(kitRoot, rel);
+    if (!(await pathExists(src))) {
+      continue;
+    }
+    const target = join(dest, rel);
+    await mkdir(dirname(target), { recursive: true });
+    await cp(src, target);
+  }
 };
 
 /**
@@ -170,7 +220,10 @@ export const scaffoldKitWorkspace = async (
   );
 
   const kitRootPkg = await readPackageJson(join(options.kitRoot, 'package.json'));
-  await writeFile(join(options.dest, 'package.json'), buildRootPackageJson(kitRootPkg));
+  await writeFile(
+    join(options.dest, 'package.json'),
+    buildRootPackageJson(kitRootPkg, options.template),
+  );
 
   let sourceWorkspaceYaml: string | null = null;
   try {
@@ -183,8 +236,14 @@ export const scaffoldKitWorkspace = async (
     buildPnpmWorkspaceYaml(options.template, sourceWorkspaceYaml),
   );
 
+  // Let buyers rebuild packages without the monorepo parent tree.
+  await copyKitBuildRoots(options.kitRoot, options.dest);
+
   // Cursor + Claude discover skills via per-agent paths on the OWNED surface.
   await ensureAgentSkillSymlinks(surfaceDest);
+
+  // First-party MCPs always ship: packages (via KIT_ALWAYS_SHIP) + project configs.
+  await shipFirstPartyMcpConfigs({ dest: options.dest, template: options.template });
 
   return { dest: options.dest };
 };

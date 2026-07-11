@@ -2,9 +2,8 @@ import type { VybeAssistant } from '@vybekiit/report-mode';
 
 /**
  * Upgrade / referral link per assistant. Cursor and Claude Code both expose real
- * referral programs (new-user perks, no fabricated commission); Codex has none, so it
- * falls back to a plain pricing URL. A per-assistant slot keeps this honest and lets a
- * different link drop in later without a UI change.
+ * referral programs (new-user perks, no fabricated commission); others fall back to
+ * a plain product/pricing URL when no referral program is known.
  */
 
 /** Cursor referral: a `?code=` query. Overridable via env for a different code. */
@@ -13,6 +12,10 @@ const CURSOR_REFERRAL_DEFAULT = 'UVR8G4POWR7J';
 const CLAUDE_REFERRAL_URL = 'https://claude.ai/referral/P5LD5z3EOQ';
 /** Codex has no referral program, so the upgrade link is the plain pricing page. */
 const CODEX_PRICING_URL = 'https://openai.com/chatgpt/pricing';
+const KIRO_URL = 'https://kiro.dev';
+const KIMI_URL = 'https://www.kimi.com';
+const DEVIN_URL = 'https://devin.ai';
+const GROK_URL = 'https://grok.x.ai';
 
 const resolveCursorReferralCode = (referralCode?: string): string => {
   if (typeof referralCode === 'string') {
@@ -30,6 +33,10 @@ const assistantUpgradeUrlResolvers = {
     url.searchParams.set('code', resolveCursorReferralCode(referralCode));
     return url.toString();
   },
+  kiro: () => KIRO_URL,
+  kimi: () => KIMI_URL,
+  devin: () => DEVIN_URL,
+  grok: () => GROK_URL,
 } satisfies Record<VybeAssistant, (referralCode?: string) => string>;
 
 /**

@@ -1,16 +1,8 @@
 import { resolveAuthProvider } from '@vybekiit/auth/resolve';
 import type { AuthError, AuthProvider } from '@vybekiit/auth/types';
 import type { AuthUser } from '@vybekiit/auth/user';
-import {
-  badInput,
-  created,
-  type HttpResponse,
-  ok,
-  serverError,
-  unauthorized,
-  upstreamFailed,
-} from '@vybekiit/core/http';
-import { Cause, Effect, Exit, Option } from 'effect';
+import { created, type HttpResponse, ok, runEffectHttp, unauthorized } from '@vybekiit/core/http';
+import { Effect } from 'effect';
 import type {
   EmailCodeBody,
   EmailOnlyBody,
@@ -80,31 +72,42 @@ const telemetry = (deps: AuthHttpDeps): AuthHttpTelemetry => {
   return noTelemetry();
 };
 
-const persistSession = async (deps: AuthHttpDeps, sessionToken: string): Promise<void> => {
-  await deps.session.setSession(sessionToken);
-};
+const authDefectCodes = new Set(['auth_config_invalid']);
 
 /**
- * The tagged {@link AuthError} from a failed run's cause, or `null` for an unexpected
- * defect. Handlers treat a tagged failure as an expected rejection (4xx) and re-throw a
- * defect into their `catch` so it surfaces as a 500 — the same split the old `try/catch`
- * around a thrown adapter drew.
+ * Run an auth domain Effect at the HTTP composition root via {@link runEffectHttp}.
+ *
+ * @param deps - Auth HTTP dependencies.
+ * @param useAuth - Domain program given a resolved AuthProvider.
+ * @param options - Success mapper, failure outcome, route id for telemetry.
+ * @returns HTTP response for the route adapter.
  */
-const authError = (cause: Cause.Cause<AuthError>): AuthError | null => {
-  const failure = Option.getOrNull(Cause.failureOption(cause));
-
-  if (failure?.code === 'auth_config_invalid') {
-    return null;
-  }
-
-  return failure;
-};
-
-const runAuth = <A>(
+const runAuthHttp = async <A>(
   deps: AuthHttpDeps,
   useAuth: (provider: AuthProvider) => Effect.Effect<A, AuthError>,
-): Promise<Exit.Exit<A, AuthError>> =>
-  Effect.runPromiseExit(resolveAuth(deps).pipe(Effect.flatMap(useAuth)));
+  options: {
+    readonly onSuccess: (value: A) => AuthHttpResponse | Promise<AuthHttpResponse>;
+    readonly defaultOutcome: 'bad_input' | 'unauthorized' | 'upstream_failed';
+    readonly route: string;
+  },
+): Promise<AuthHttpResponse> => {
+  const tel = telemetry(deps);
+  const response = await runEffectHttp({
+    program: resolveAuth(deps).pipe(Effect.flatMap(useAuth)),
+    onSuccess: options.onSuccess,
+    failurePolicy: {
+      defaultOutcome: options.defaultOutcome,
+      defectCodes: authDefectCodes,
+    },
+    onRejection: (failure) => {
+      tel.captureAuthRejection(failure.message, { code: failure.code, route: options.route });
+    },
+    onDefect: (error) => {
+      tel.captureAuthFailure(error, { route: options.route });
+    },
+  });
+  return response as AuthHttpResponse;
+};
 
 /**
  * Handle an email/password sign-up request.
@@ -120,24 +123,16 @@ export const handleSignUp = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { email, password } = body;
-    const exit = await runAuth(deps, (auth) => auth.signUpWithPassword(email, password));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'signup' });
-      return badInput(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('signup_completed', { method: 'password' });
-    return created(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'signup' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { email, password } = body;
+  return runAuthHttp(deps, (auth) => auth.signUpWithPassword(email, password), {
+    route: 'signup',
+    defaultOutcome: 'bad_input',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('signup_completed', { method: 'password' });
+      return created(session.user);
+    },
+  });
 };
 
 /**
@@ -154,24 +149,16 @@ export const handleSignIn = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { email, password } = body;
-    const exit = await runAuth(deps, (auth) => auth.signInWithPassword(email, password));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'signin' });
-      return unauthorized(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('sign_in_completed', { method: 'password' });
-    return ok(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'signin' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { email, password } = body;
+  return runAuthHttp(deps, (auth) => auth.signInWithPassword(email, password), {
+    route: 'signin',
+    defaultOutcome: 'unauthorized',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('sign_in_completed', { method: 'password' });
+      return ok(session.user);
+    },
+  });
 };
 
 /**
@@ -200,17 +187,11 @@ export const handleMe = async (deps: AuthHttpDeps): Promise<AuthHttpResponse> =>
   if (!token) {
     return unauthorized('Not signed in.');
   }
-  const exit = await runAuth(deps, (auth) => auth.getUser(token));
-  if (Exit.isFailure(exit)) {
-    const failure = authError(exit.cause);
-
-    if (failure === null) {
-      return serverError('Something went wrong. Try again.');
-    }
-
-    return unauthorized(failure.message);
-  }
-  return ok(exit.value);
+  return runAuthHttp(deps, (auth) => auth.getUser(token), {
+    route: 'me',
+    defaultOutcome: 'unauthorized',
+    onSuccess: (user) => ok(user),
+  });
 };
 
 /**
@@ -227,17 +208,11 @@ export const handleSendEmailCode = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const { email } = body;
-  const exit = await runAuth(deps, (auth) => auth.sendEmailCode(email));
-  if (Exit.isFailure(exit)) {
-    const failure = authError(exit.cause);
-
-    if (failure === null) {
-      return serverError('Something went wrong. Try again.');
-    }
-
-    return upstreamFailed(failure.message);
-  }
-  return ok({ ok: true });
+  return runAuthHttp(deps, (auth) => auth.sendEmailCode(email), {
+    route: 'send-email-code',
+    defaultOutcome: 'upstream_failed',
+    onSuccess: () => ok({ ok: true }),
+  });
 };
 
 /**
@@ -254,24 +229,16 @@ export const handleVerifyEmailCode = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { email, code } = body;
-    const exit = await runAuth(deps, (auth) => auth.verifyEmailCode(email, code));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'verify' });
-      return unauthorized(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('sign_in_completed', { method: 'email_code' });
-    return ok(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'verify' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { email, code } = body;
+  return runAuthHttp(deps, (auth) => auth.verifyEmailCode(email, code), {
+    route: 'verify',
+    defaultOutcome: 'unauthorized',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('sign_in_completed', { method: 'email_code' });
+      return ok(session.user);
+    },
+  });
 };
 
 /**
@@ -287,23 +254,12 @@ export const handleForgotPassword = async (
   body: EmailOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
-  const tel = telemetry(deps);
-  try {
-    const { email } = body;
-    const exit = await runAuth(deps, (auth) => auth.requestPasswordReset(email));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'forgot-password' });
-      return badInput(failure.message);
-    }
-    return ok({ ok: true });
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'forgot-password' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { email } = body;
+  return runAuthHttp(deps, (auth) => auth.requestPasswordReset(email), {
+    route: 'forgot-password',
+    defaultOutcome: 'bad_input',
+    onSuccess: () => ok({ ok: true }),
+  });
 };
 
 /**
@@ -320,24 +276,16 @@ export const handleResetPassword = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { token, newPassword } = body;
-    const exit = await runAuth(deps, (auth) => auth.resetPassword(token, newPassword));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'reset-password' });
-      return badInput(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('sign_in_completed', { method: 'password' });
-    return ok(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'reset-password' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { token, newPassword } = body;
+  return runAuthHttp(deps, (auth) => auth.resetPassword(token, newPassword), {
+    route: 'reset-password',
+    defaultOutcome: 'bad_input',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('sign_in_completed', { method: 'password' });
+      return ok(session.user);
+    },
+  });
 };
 
 /**
@@ -353,23 +301,12 @@ export const handleSendMagicLink = async (
   body: EmailOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
-  const tel = telemetry(deps);
-  try {
-    const { email } = body;
-    const exit = await runAuth(deps, (auth) => auth.sendMagicLink(email));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'magic-link' });
-      return badInput(failure.message);
-    }
-    return ok({ ok: true });
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'magic-link' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { email } = body;
+  return runAuthHttp(deps, (auth) => auth.sendMagicLink(email), {
+    route: 'magic-link',
+    defaultOutcome: 'bad_input',
+    onSuccess: () => ok({ ok: true }),
+  });
 };
 
 /**
@@ -386,24 +323,16 @@ export const handleVerifyMagicLink = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { token } = body;
-    const exit = await runAuth(deps, (auth) => auth.verifyMagicLink(token));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'magic-link-verify' });
-      return unauthorized(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('sign_in_completed', { method: 'magic_link' });
-    return ok(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'magic-link-verify' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { token } = body;
+  return runAuthHttp(deps, (auth) => auth.verifyMagicLink(token), {
+    route: 'magic-link-verify',
+    defaultOutcome: 'unauthorized',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('sign_in_completed', { method: 'magic_link' });
+      return ok(session.user);
+    },
+  });
 };
 
 /**
@@ -419,23 +348,12 @@ export const handleSendSmsCode = async (
   body: PhoneOnlyBody,
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
-  const tel = telemetry(deps);
-  try {
-    const { phone } = body;
-    const exit = await runAuth(deps, (auth) => auth.sendSmsCode(phone));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'send-sms-code' });
-      return badInput(failure.message);
-    }
-    return ok({ ok: true });
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'send-sms-code' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { phone } = body;
+  return runAuthHttp(deps, (auth) => auth.sendSmsCode(phone), {
+    route: 'send-sms-code',
+    defaultOutcome: 'bad_input',
+    onSuccess: () => ok({ ok: true }),
+  });
 };
 
 /**
@@ -452,22 +370,14 @@ export const handleVerifySmsCode = async (
   deps: AuthHttpDeps,
 ): Promise<AuthHttpResponse> => {
   const tel = telemetry(deps);
-  try {
-    const { phone, code } = body;
-    const exit = await runAuth(deps, (auth) => auth.verifySmsCode(phone, code));
-    if (Exit.isFailure(exit)) {
-      const failure = authError(exit.cause);
-      if (!failure) {
-        throw Cause.squash(exit.cause);
-      }
-      tel.captureAuthRejection(failure.message, { code: failure.code, route: 'verify-sms-code' });
-      return unauthorized(failure.message);
-    }
-    await persistSession(deps, exit.value.sessionToken);
-    tel.trackAuthEvent('sign_in_completed', { method: 'sms' });
-    return ok(exit.value.user);
-  } catch (error) {
-    tel.captureAuthFailure(error, { route: 'verify-sms-code' });
-    return serverError('Something went wrong. Try again.');
-  }
+  const { phone, code } = body;
+  return runAuthHttp(deps, (auth) => auth.verifySmsCode(phone, code), {
+    route: 'verify-sms-code',
+    defaultOutcome: 'unauthorized',
+    onSuccess: async (session) => {
+      await deps.session.setSession(session.sessionToken);
+      tel.trackAuthEvent('sign_in_completed', { method: 'sms' });
+      return ok(session.user);
+    },
+  });
 };

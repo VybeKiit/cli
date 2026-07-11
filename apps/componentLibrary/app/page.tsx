@@ -1,5 +1,5 @@
 import { CatalogBrowser } from '@library/components/CatalogBrowser';
-import { PreviewLoadingOverlay } from '@library/components/PreviewLoadingSpinner';
+import { PreviewLoadingOverlay } from '@library/components/PreviewLoadingOverlay';
 import { Suspense } from 'react';
 
 const HomePage = () => (

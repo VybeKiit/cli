@@ -1,14 +1,17 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent } from '@vybekiit/ui/card';
+import { Kpi } from '@vybekiit/ui/kpi';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Skeleton } from '@vybekiit/ui/skeleton';
 import { Activity, HeartPulse, Loader2, RefreshCw, RotateCcw, Server } from 'lucide-react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type HealthStatus = 'healthy' | 'degraded' | 'down';
 type JobStatus = 'ok' | 'delayed' | 'failed';
@@ -217,28 +220,38 @@ export const SystemHealthPage = () => {
     healthBody = (
       <>
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Kpi
-            icon={<Server aria-hidden="true" className="h-4 w-4" />}
-            label="Services"
-            value={String(kpis.services)}
-          />
-          <Kpi
-            icon={<HeartPulse aria-hidden="true" className="h-4 w-4" />}
-            label="Degraded"
-            value={String(kpis.degraded)}
-            valueClassName={kpis.degraded > 0 ? 'text-amber-600' : undefined}
-          />
-          <Kpi
-            icon={<Activity aria-hidden="true" className="h-4 w-4" />}
-            label="Queue depth"
-            value={String(kpis.queueDepth)}
-          />
-          <Kpi
-            icon={<RotateCcw aria-hidden="true" className="h-4 w-4" />}
-            label="Failed jobs"
-            value={String(kpis.failedJobs)}
-            valueClassName={kpis.failedJobs > 0 ? 'text-red-600' : undefined}
-          />
+          {(
+            [
+              {
+                key: 'services',
+                icon: <Server aria-hidden="true" className="h-4 w-4" />,
+                label: 'Services',
+                value: String(kpis.services),
+              },
+              {
+                key: 'degraded',
+                icon: <HeartPulse aria-hidden="true" className="h-4 w-4" />,
+                label: 'Degraded',
+                value: String(kpis.degraded),
+                valueClassName: kpis.degraded > 0 ? 'text-amber-600' : undefined,
+              },
+              {
+                key: 'queue-depth',
+                icon: <Activity aria-hidden="true" className="h-4 w-4" />,
+                label: 'Queue depth',
+                value: String(kpis.queueDepth),
+              },
+              {
+                key: 'failed-jobs',
+                icon: <RotateCcw aria-hidden="true" className="h-4 w-4" />,
+                label: 'Failed jobs',
+                value: String(kpis.failedJobs),
+                valueClassName: kpis.failedJobs > 0 ? 'text-red-600' : undefined,
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <section className="mb-6 space-y-3">
@@ -290,22 +303,16 @@ export const SystemHealthPage = () => {
         <section className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-semibold text-lg">Scheduled jobs</h2>
-            <div className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1">
+            <SegmentedControl
+              onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}
+              value={statusFilter}
+            >
               {(['all', 'ok', 'delayed', 'failed'] as const).map((value) => (
-                <button
-                  aria-pressed={statusFilter === value}
-                  className={cn(
-                    'rounded-md px-3 py-1.5 font-medium text-sm capitalize',
-                    statusFilter === value ? 'bg-background shadow-sm' : 'text-muted-foreground',
-                  )}
-                  key={value}
-                  onClick={() => setStatusFilter(value)}
-                  type="button"
-                >
+                <SegmentedControlItem className="capitalize" key={value} value={value}>
                   {value}
-                </button>
+                </SegmentedControlItem>
               ))}
-            </div>
+            </SegmentedControl>
           </div>
           <Card>
             <CardContent className="p-2 sm:p-3">
@@ -331,7 +338,7 @@ export const SystemHealthPage = () => {
                       key={job.id}
                     >
                       <div>
-                        <p className="font-mono font-medium text-sm">{job.name}</p>
+                        <p className="font-medium font-mono text-sm">{job.name}</p>
                         <p className="text-muted-foreground text-xs">
                           Last {job.lastRun} · Next {job.nextRun}
                         </p>
@@ -372,7 +379,7 @@ export const SystemHealthPage = () => {
   }
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="System health motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -409,76 +416,39 @@ export const SystemHealthPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         {healthBody}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — refresh, error, filters, and job retry all work
-              offline. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset job_runs</code> for <code>job_name</code>,{' '}
-                <code>status</code>, <code>started_at</code>, <code>finished_at</code>,{' '}
-                <code>error</code>.
-              </li>
-              <li>
-                <code>GET /api/admin/health</code> aggregates probes + recent job_runs + queue
-                depths from your worker.
-              </li>
-              <li>
-                Retry maps to <code>POST /api/admin/jobs/:id/retry</code> via{' '}
-                <code>@vybekiit/jobs</code> and writes a new job_runs row.
-              </li>
-              <li>
-                Guard this route for operators only; page incidents out to the public Status recipe
-                when thresholds trip.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — refresh, error, filters, and job retry all work
+            offline. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset job_runs</code> for <code>job_name</code>,{' '}
+              <code>status</code>, <code>started_at</code>, <code>finished_at</code>,{' '}
+              <code>error</code>.
+            </li>
+            <li>
+              <code>GET /api/admin/health</code> aggregates probes + recent job_runs + queue depths
+              from your worker.
+            </li>
+            <li>
+              Retry maps to <code>POST /api/admin/jobs/:id/retry</code> via{' '}
+              <code>@vybekiit/jobs</code> and writes a new job_runs row.
+            </li>
+            <li>
+              Guard this route for operators only; page incidents out to the public Status recipe
+              when thresholds trip.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="System health motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** One KPI tile. */
-const Kpi = ({
-  icon,
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly icon: ReactNode;
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="flex items-center gap-3 p-4">
-      <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
-        {icon}
-      </span>
-      <div>
-        <p className="text-muted-foreground text-xs">{label}</p>
-        <p className={cn('font-semibold text-lg tabular-nums', valueClassName)}>{value}</p>
-      </div>
-    </CardContent>
-  </Card>
-);

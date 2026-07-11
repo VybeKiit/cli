@@ -16,9 +16,7 @@ export const ClaudeOctopusMacosDesk = () => (
         <span className="size-2.5 rounded-full bg-[#FF5F57]" />
         <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
         <span className="size-2.5 rounded-full bg-[#28C840]" />
-        <span className="ml-2 font-medium text-[#a1a1a1] text-[10px]">
-          Claude Code — vibe-session
-        </span>
+        <span className="ml-2 font-medium text-[#a1a1a1] text-xs">Claude Code — vibe-session</span>
       </div>
       <div className="space-y-2 px-4 py-5 font-mono text-[#d4d4d4] text-xs leading-relaxed">
         <p>

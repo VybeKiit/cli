@@ -3,12 +3,21 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Separator } from '@vybekiit/ui/separator';
 import { ArrowLeft, BookOpen, Calendar, FilePenLine, Newspaper, UserRound } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type PostStatus = 'draft' | 'published';
 type StatusFilter = 'all' | PostStatus;
@@ -148,7 +157,7 @@ export const BlogPage = () => {
 
   if (openPost !== null) {
     return (
-      <Frame>
+      <DemoRecipeFrame defaultTransition="fade" title="Blog motion pass">
         <main className="mx-auto max-w-3xl px-4 py-10">
           <Button
             className="mb-6"
@@ -206,12 +215,12 @@ export const BlogPage = () => {
             </div>
           </article>
         </main>
-      </Frame>
+      </DemoRecipeFrame>
     );
   }
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Blog motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -239,10 +248,10 @@ export const BlogPage = () => {
           <span className="text-muted-foreground text-sm" id={filterLabelId}>
             Status
           </span>
-          <div
+          <SegmentedControl
             aria-labelledby={filterLabelId}
-            className="flex gap-1 rounded-lg border bg-muted p-1"
-            role="group"
+            onValueChange={(value) => setFilter(value as typeof filter)}
+            value={filter}
           >
             {(
               [
@@ -251,40 +260,30 @@ export const BlogPage = () => {
                 { value: 'draft', label: 'Drafts' },
               ] as const
             ).map((option) => (
-              <button
-                aria-pressed={filter === option.value}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                  filter === option.value
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                key={option.value}
-                onClick={() => setFilter(option.value)}
-                type="button"
-              >
+              <SegmentedControlItem key={option.value} value={option.value}>
                 {option.label}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
         </div>
 
         {visible.length === 0 ? (
-          <div className="flex flex-col items-center rounded-lg border border-dashed px-4 py-16 text-center">
-            <BookOpen aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-            <h2 className="mt-3 font-semibold">No posts in this filter</h2>
-            <p className="mt-1 text-muted-foreground text-sm">
-              Switch to All to see every draft and published article.
-            </p>
-            <Button
-              className="mt-4"
-              onClick={() => setFilter('all')}
-              type="button"
-              variant="outline"
-            >
-              Show all
-            </Button>
-          </div>
+          <Empty variant="dashed">
+            <EmptyHeader>
+              <EmptyMedia>
+                <BookOpen aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>No posts in this filter</EmptyTitle>
+              <EmptyDescription>
+                Switch to All to see every draft and published article.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button onClick={() => setFilter('all')} type="button" variant="outline">
+                Show all
+              </Button>
+            </EmptyContent>
+          </Empty>
         ) : (
           <ul aria-label="Blog posts" className="grid gap-4 sm:grid-cols-2">
             {visible.map((post) => (
@@ -340,43 +339,33 @@ export const BlogPage = () => {
           </ul>
         )}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — status filter recomputes the grid, and clicking a
-              card opens an in-page preview. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset blog_posts</code> for <code>blog_posts</code>,{' '}
-                <code>blog_tags</code>, and <code>blog_post_tags</code>.
-              </li>
-              <li>
-                <code>GET /api/blog/posts?status=published</code> powers the public index; include
-                drafts only for signed-in authors.
-              </li>
-              <li>
-                Route each card to <code>/blog/[slug]</code> instead of the in-page preview — keep
-                the same card layout.
-              </li>
-              <li>
-                Optional: use <code>@vybekiit/cms</code> helpers when you want markdown source
-                instead of DB rows.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — status filter recomputes the grid, and clicking a
+            card opens an in-page preview. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset blog_posts</code> for <code>blog_posts</code>,{' '}
+              <code>blog_tags</code>, and <code>blog_post_tags</code>.
+            </li>
+            <li>
+              <code>GET /api/blog/posts?status=published</code> powers the public index; include
+              drafts only for signed-in authors.
+            </li>
+            <li>
+              Route each card to <code>/blog/[slug]</code> instead of the in-page preview — keep the
+              same card layout.
+            </li>
+            <li>
+              Optional: use <code>@vybekiit/cms</code> helpers when you want markdown source instead
+              of DB rows.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Blog motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

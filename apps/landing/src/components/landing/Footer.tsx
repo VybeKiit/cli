@@ -47,7 +47,7 @@ export const Footer = () => {
               mono={true}
               slug={logo.slug}
             />
-            <span className="text-[22px] font-medium brightness-[2.45] text-[rgba(255,255,255,0.56)]">
+            <span className="text-2xl font-medium brightness-[2.45] text-[rgba(255,255,255,0.56)]">
               {logo.label}
             </span>
           </div>
@@ -64,17 +64,17 @@ export const Footer = () => {
           href="/"
         >
           <VybeBrandMark className="h-10 w-10 shrink-0" />
-          <span className="text-[34px] font-bold leading-none tracking-tight">{BRAND.name}</span>
+          <span className="text-4xl font-bold leading-none tracking-tight">{BRAND.name}</span>
         </Link>
 
-        <p className="justify-self-center text-[24px] leading-8 text-[rgba(255,255,255,0.58)]">
+        <p className="justify-self-center text-2xl leading-8 text-[rgba(255,255,255,0.58)]">
           © 2024 {BRAND.name}. All rights reserved.
         </p>
 
         <nav aria-label="Footer" className="flex items-center justify-end gap-16">
           {FOOTER_LINKS.map((link) => (
             <Link
-              className="text-[24px] leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
+              className="text-2xl leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
               href={link.href}
               key={link.href}
             >
@@ -82,13 +82,13 @@ export const Footer = () => {
             </Link>
           ))}
           <Link
-            className="text-[24px] leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
+            className="text-2xl leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
             href="/terms"
           >
             Refund Policy
           </Link>
           <a
-            className="text-[24px] leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
+            className="text-2xl leading-8 text-[rgba(255,255,255,0.58)] hover:text-[rgba(255,255,255,0.9)]"
             href={`mailto:${SUPPORT.kitEmail}`}
           >
             Contact

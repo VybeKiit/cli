@@ -1,19 +1,16 @@
-import { githubGateConfigSchema, parseEnv } from '@vybekiit/core';
 import { resolvePaymentProvider } from '@vybekiit/payments';
 import { Effect, Either } from 'effect';
 import { NextResponse } from 'next/server';
 import { AnalyticsEvent } from '@/lib/analyticsEvents';
 import { captureServerEvent } from '@/lib/analyticsServer';
-import { inviteToRepo, removeFromRepo } from '@/lib/gate';
-import { recordOrderBestEffort } from '@/lib/orders';
+import { processStorePaymentEvent } from '@/lib/storeOrderPipeline';
 
 /**
- * The VybeKiit store's money pipeline: payment provider → the gate.
+ * The VybeKiit store's money pipeline: payment provider → StoreOrderPipeline.
  *
- * Verifies the signature, records the order in D1 (best-effort — see ADR-0037), then
- * invites the buyer's GitHub account on a paid order or removes it on a refund. This is
- * the v1.0 "stranger pays → gets invited" keystone (see CONTEXT.md → Build order).
- * Provider-agnostic via {@link resolvePaymentProvider} — Lemon Squeezy is the default.
+ * Composition root only: verify signature → process sale → analytics + JSON.
+ * Policy (ledger best-effort, ladder, AccessGate) lives in
+ * {@link processStorePaymentEvent}.
  *
  * @param request - Incoming payment webhook request.
  * @returns JSON response describing whether the order was recorded and gate access changed.
@@ -31,62 +28,42 @@ const POST = async (request: Request): Promise<NextResponse> => {
     return NextResponse.json({ error: webhook.left.message }, { status: 400 });
   }
 
-  const { customerEmail, customerName, githubUsername, isRefund, orderId } = webhook.right;
+  const event = webhook.right;
   const distinctId =
-    customerEmail !== null && customerEmail.length > 0
-      ? customerEmail.trim().toLowerCase()
-      : orderId;
+    event.customerEmail !== null && event.customerEmail.length > 0
+      ? event.customerEmail.trim().toLowerCase()
+      : event.orderId;
 
-  // Record every order in D1 first — a best-effort bookkeeping write that must never block
-  // the gate (Lemon Squeezy stays the source of truth for payments). See ADR-0037.
-  const recorded = await recordOrderBestEffort({
-    orderId,
-    email: customerEmail,
-    customerName,
-    githubUsername,
-    refunded: isRefund,
-  });
-
-  if (!githubUsername) {
-    await captureServerEvent(distinctId, AnalyticsEvent.orderFulfilled, {
-      order_id: orderId,
-      gated: false,
-      recorded,
-      is_refund: isRefund,
-    });
-    return NextResponse.json({ ok: true, gated: false, recorded });
+  const fulfilled = await Effect.runPromise(Effect.either(processStorePaymentEvent(event)));
+  if (Either.isLeft(fulfilled)) {
+    return NextResponse.json({ error: fulfilled.left.message }, { status: 502 });
   }
 
-  const gateConfig = parseEnv(githubGateConfigSchema);
-  const gate = await Effect.runPromise(
-    Effect.either(
-      isRefund
-        ? removeFromRepo(gateConfig, githubUsername)
-        : inviteToRepo(gateConfig, githubUsername),
-    ),
-  );
-
-  if (Either.isLeft(gate)) {
-    return NextResponse.json({ error: gate.left.message }, { status: 502 });
-  }
+  const result = fulfilled.right;
 
   await captureServerEvent(
     distinctId,
-    isRefund ? AnalyticsEvent.orderRefunded : AnalyticsEvent.orderFulfilled,
+    event.isRefund ? AnalyticsEvent.orderRefunded : AnalyticsEvent.orderFulfilled,
     {
-      order_id: orderId,
-      gated: true,
-      recorded,
-      github_username: githubUsername,
-      action: isRefund ? 'removed' : 'invited',
+      order_id: event.orderId,
+      gated: result.gated,
+      recorded: result.recorded,
+      is_refund: event.isRefund,
+      github_username: event.githubUsername,
+      action: result.action,
+      ladder_bumped: result.ladderBumped,
+      ladder_sale_count: result.ladder?.saleCount ?? null,
+      ladder_next_price_usd: result.ladder?.amount ?? null,
     },
   );
 
   return NextResponse.json({
     ok: true,
-    gated: true,
-    action: isRefund ? 'removed' : 'invited',
-    recorded,
+    gated: result.gated,
+    action: result.action === 'skipped' ? undefined : result.action,
+    recorded: result.recorded,
+    ladderBumped: result.ladderBumped,
+    ladder: result.ladder,
   });
 };
 

@@ -7,10 +7,10 @@ import { Label } from '@vybekiit/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { Textarea } from '@vybekiit/ui/textarea';
 import { CircleDot, Clock, LifeBuoy, MessageSquare, Send, UserRound } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type TicketStatus = 'open' | 'pending' | 'resolved';
 type Priority = 'low' | 'normal' | 'high';
@@ -49,6 +49,18 @@ const STATUS_META: Record<TicketStatus, { readonly label: string; readonly class
     className: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600',
   },
 };
+
+/** Ticket statuses for selects (labels from STATUS_META). */
+const TICKET_STATUSES = Object.keys(STATUS_META) as readonly TicketStatus[];
+
+/** Status filter options including "all". */
+const STATUS_FILTER_OPTIONS: readonly {
+  readonly value: 'all' | TicketStatus;
+  readonly label: string;
+}[] = [
+  { value: 'all', label: 'All' },
+  ...TICKET_STATUSES.map((value) => ({ value, label: STATUS_META[value].label })),
+];
 
 const PRIORITY_META: Record<Priority, { readonly label: string; readonly className: string }> = {
   low: { label: 'Low', className: 'text-muted-foreground' },
@@ -253,7 +265,7 @@ export const SupportCenterPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Support motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -292,10 +304,11 @@ export const SupportCenterPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
+                    {STATUS_FILTER_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -326,7 +339,7 @@ export const SupportCenterPage = () => {
                             </p>
                             <Badge
                               className={cn(
-                                'shrink-0 font-normal text-[10px]',
+                                'shrink-0 font-normal text-xs',
                                 STATUS_META[ticket.status].className,
                               )}
                               variant="outline"
@@ -398,9 +411,11 @@ export const SupportCenterPage = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="resolved">Resolved</SelectItem>
+                        {TICKET_STATUSES.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            {STATUS_META[value].label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -455,43 +470,33 @@ export const SupportCenterPage = () => {
           )}
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — status filter, status change, and replies update
-              the inbox live. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset support_tickets</code> for{' '}
-                <code>support_tickets</code> and <code>support_ticket_messages</code>.
-              </li>
-              <li>
-                <code>GET /api/support/tickets</code> lists tickets;{' '}
-                <code>GET /api/support/tickets/:id/messages</code> loads the thread.
-              </li>
-              <li>
-                Status select → <code>PATCH /api/support/tickets/:id</code> with{' '}
-                <code>{'{ status }'}</code>.
-              </li>
-              <li>
-                Send reply → <code>POST /api/support/tickets/:id/messages</code> with{' '}
-                <code>{'{ body }'}</code>; keep the optimistic append shown here.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — status filter, status change, and replies update
+            the inbox live. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset support_tickets</code> for{' '}
+              <code>support_tickets</code> and <code>support_ticket_messages</code>.
+            </li>
+            <li>
+              <code>GET /api/support/tickets</code> lists tickets;{' '}
+              <code>GET /api/support/tickets/:id/messages</code> loads the thread.
+            </li>
+            <li>
+              Status select → <code>PATCH /api/support/tickets/:id</code> with{' '}
+              <code>{'{ status }'}</code>.
+            </li>
+            <li>
+              Send reply → <code>POST /api/support/tickets/:id/messages</code> with{' '}
+              <code>{'{ body }'}</code>; keep the optimistic append shown here.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Support motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

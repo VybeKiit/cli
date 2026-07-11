@@ -31,13 +31,13 @@ export const Header = () => {
       <div className="mx-auto flex h-[96px] w-full max-w-none translate-y-[14px] items-center justify-between px-[72px]">
         <Link className="flex items-center gap-3 text-white" href="/">
           <VybeLogoIcon className="h-10 w-10" />
-          <span className="font-extrabold text-[34px] tracking-tight">{BRAND.name}</span>
+          <span className="font-extrabold text-4xl tracking-tight">{BRAND.name}</span>
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-12 lg:flex">
           {LANDING_NAV.map((link) => (
             <a
-              className="font-semibold text-[20px] text-[var(--text-soft)] transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
+              className="font-semibold text-xl text-[var(--text-soft)] transition-colors hover:text-white hover:underline hover:decoration-[var(--blue)] hover:underline-offset-4"
               href={link.href}
               key={link.label}
             >
@@ -48,7 +48,7 @@ export const Header = () => {
 
         <div className="flex items-center gap-3">
           <Link
-            className="landing-cta-pill hidden min-h-[68px] min-w-[196px] px-9 py-4 font-semibold text-[20px] sm:inline-flex"
+            className="landing-cta-pill hidden min-h-[68px] min-w-[196px] px-9 py-4 font-semibold text-xl sm:inline-flex"
             href="/checkout"
           >
             {LANDING_HERO.ctaLabel}

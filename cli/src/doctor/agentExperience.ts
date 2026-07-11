@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import type { AgentId, DetectedAgent } from '../lib/agentDetection';
 import { getAgentById, listAgents } from '../lib/agentDetection';
 import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
+import { writeFirstPartyMcpConfigFile } from '../lib/firstPartyMcp';
 import {
   createDefaultMcpWireDeps,
   type McpWireDeps,
@@ -28,9 +29,6 @@ export type AgentExperienceDeps = {
   /** Optional MCP wire I/O overrides (tests). */
   readonly mcp?: Partial<McpWireDeps>;
 };
-
-/** Re-export catalog name helper for callers that only need core names. */
-export { readCoreMcpServerNames } from './mcpWire';
 
 /**
  * Probe whether a command is on PATH.
@@ -262,6 +260,38 @@ export const runAgentExperience = async (
       // Pre-create / no catalog — report-only.
       lines.push(
         `✓ assistant tools - ${mcpNames} can use project plug-ins. After create app, core tools (docs + GitHub) ship in the kit catalog.`,
+      );
+    }
+  }
+
+  // First-party VybeKiit MCPs (skills/CLI/automations + UI catalog) when packages are present.
+  const kitRootAgentMcp = join(cwd, 'packages', 'agentMcp');
+  const surfaceAgentMcp = join(cwd, '..', '..', 'packages', 'agentMcp');
+  const hasKitRootMcp = deps.pathExists(kitRootAgentMcp);
+  const hasSurfaceMcp = deps.pathExists(surfaceAgentMcp);
+  if (hasKitRootMcp || hasSurfaceMcp) {
+    try {
+      const layout = hasKitRootMcp ? 'kit-root' : 'surface';
+      const template =
+        layout === 'kit-root'
+          ? (['web', 'mobile', 'extension', 'backend', 'spa'] as const).find((name) =>
+              deps.pathExists(join(cwd, 'templates', name)),
+            )
+          : undefined;
+      const configPaths = [join(cwd, '.cursor', 'mcp.json'), join(cwd, '.mcp.json')];
+      for (const configPath of configPaths) {
+        await writeFirstPartyMcpConfigFile(
+          configPath,
+          layout,
+          template === undefined ? undefined : { template },
+        );
+      }
+      lines.push(
+        '✓ kit tools - first-party assistant tools (skills, commands, automations, UI catalog) are in the project config.',
+      );
+    } catch {
+      lines.push(
+        '→ kit tools - could not refresh first-party assistant tool config. Re-run doctor after pnpm build.',
       );
     }
   }

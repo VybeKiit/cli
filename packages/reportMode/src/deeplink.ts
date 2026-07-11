@@ -1,9 +1,11 @@
-import type { VybeAssistant } from './types';
+import { isVybeAssistantId, type VybeAssistant } from './types';
 
-const ASSISTANTS: readonly VybeAssistant[] = ['cursor', 'claude', 'codex'];
+type AssistantDeepLinkBuilder = (cwd: string, prompt: string) => string | null;
 
-type AssistantDeepLinkBuilder = (cwd: string, prompt: string) => string;
-
+/**
+ * Native URL-scheme builders. Assistants without a known scheme return null so
+ * the host can fall back to opening a real terminal with the CLI instead.
+ */
 const assistantDeepLinkBuilders: Record<VybeAssistant, AssistantDeepLinkBuilder> = {
   cursor: (_cwd, prompt) => {
     const url = new URL('cursor://anysphere.cursor-deeplink/prompt');
@@ -23,6 +25,11 @@ const assistantDeepLinkBuilders: Record<VybeAssistant, AssistantDeepLinkBuilder>
     url.searchParams.set('prompt', prompt);
     return url.toString();
   },
+  // No stable public deeplink schemes for these CLIs yet.
+  kiro: () => null,
+  kimi: () => null,
+  devin: () => null,
+  grok: () => null,
 };
 
 /**
@@ -46,17 +53,6 @@ const readAssistantEnv = (env: Record<string, string | undefined>): string | und
 };
 
 /**
- * Check whether a normalized env value names a supported assistant.
- *
- * @param value - Normalized env value to test.
- * @returns `true` when the value is a supported assistant id.
- * @example
- * const valid = isVybeAssistant('cursor');
- */
-const isVybeAssistant = (value: string): value is VybeAssistant =>
-  ASSISTANTS.includes(value as VybeAssistant);
-
-/**
  * Read `VYBE_ASSISTANT` or template-prefixed variants from env.
  *
  * @param env - Environment variables from a template or extension runtime.
@@ -73,7 +69,7 @@ export const resolveVybeAssistant = (
   }
 
   const normalized = raw.trim().toLowerCase();
-  if (normalized.length === 0 || !isVybeAssistant(normalized)) {
+  if (normalized.length === 0 || !isVybeAssistantId(normalized)) {
     return null;
   }
 
@@ -81,12 +77,23 @@ export const resolveVybeAssistant = (
 };
 
 /**
+ * Whether the assistant has a native URL scheme for one-click handoff.
+ *
+ * @param assistant - Assistant runtime to check.
+ * @returns True when {@link buildAssistantDeepLink} can produce a URL.
+ * @example
+ * supportsAssistantDeepLink('cursor'); // true
+ */
+export const supportsAssistantDeepLink = (assistant: VybeAssistant): boolean =>
+  assistantDeepLinkBuilders[assistant]('', '') !== null;
+
+/**
  * Build a native assistant deeplink URL prefilled with a report prompt.
  *
  * @param assistant - Assistant runtime selected for handoff.
  * @param cwd - Current project directory used by assistants that accept it.
  * @param prompt - Structured report prompt to prefill.
- * @returns A native deeplink URL for the selected assistant.
+ * @returns A native deeplink URL, or null when the assistant has no scheme.
  * @example
  * const url = buildAssistantDeepLink('cursor', cwd, prompt);
  */
@@ -94,7 +101,7 @@ export const buildAssistantDeepLink = (
   assistant: VybeAssistant,
   cwd: string,
   prompt: string,
-): string => assistantDeepLinkBuilders[assistant](cwd, prompt);
+): string | null => assistantDeepLinkBuilders[assistant](cwd, prompt);
 
 /**
  * Infer which assistant doctor should persist for future report handoff.
@@ -108,6 +115,10 @@ export const inferVybeAssistant = (options: {
   readonly cursorSession: boolean;
   readonly claudeInstalled: boolean;
   readonly codexInstalled: boolean;
+  readonly kiroInstalled?: boolean;
+  readonly kimiInstalled?: boolean;
+  readonly grokInstalled?: boolean;
+  readonly devinInstalled?: boolean;
 }): VybeAssistant | null => {
   if (options.cursorSession) {
     return 'cursor';
@@ -117,6 +128,18 @@ export const inferVybeAssistant = (options: {
   }
   if (options.codexInstalled) {
     return 'codex';
+  }
+  if (options.kiroInstalled === true) {
+    return 'kiro';
+  }
+  if (options.kimiInstalled === true) {
+    return 'kimi';
+  }
+  if (options.grokInstalled === true) {
+    return 'grok';
+  }
+  if (options.devinInstalled === true) {
+    return 'devin';
   }
   return null;
 };

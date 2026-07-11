@@ -1,26 +1,7 @@
 import type { CatalogEntry } from '@library/data/catalog';
 import type { PageRecipe } from '@library/data/pageRecipes';
 import { categoryLabelFromSlug } from '@library/lib/categoryLabels';
-
-const SOURCE_LABELS: Record<string, string> = {
-  bundui: 'BundUI',
-  magicui: 'Magic UI',
-  kokonutui: 'Kokonut UI',
-  aceternity: 'Aceternity UI',
-  untitled: 'Untitled UI',
-  gluestack: 'Gluestack UI',
-  'ai-elements': 'AI Elements',
-  kibo: 'Kibo UI',
-  'blocks-21st': '21st.dev',
-  tailark: 'Tailark',
-  cult: 'Cult UI',
-  coss: 'COSS UI',
-  'prompt-kit': 'Prompt Kit',
-  supabase: 'Supabase UI',
-  'blocks-so': 'Blocks.so',
-  evilcharts: 'EvilCharts',
-  shadcnblocks: 'Shadcnblocks',
-};
+import { sourceLabelFor } from '@library/lib/sourceLabels';
 
 const catalogBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
@@ -51,14 +32,6 @@ export const componentPreviewUrl = (entry: CatalogEntry): string =>
 export const pageRecipePreviewUrl = (recipe: PageRecipe): string =>
   `${catalogBaseUrl()}/pages/${encodeURIComponent(recipe.slug)}`;
 
-const sourceLabel = (namespace: string): string => {
-  const label = SOURCE_LABELS[namespace];
-  if (label === undefined) {
-    return namespace;
-  }
-  return label;
-};
-
 /**
  * Build an agent-ready prompt for one mirrored catalog entry.
  *
@@ -69,7 +42,7 @@ const sourceLabel = (namespace: string): string => {
  */
 export const buildComponentAgentPrompt = (entry: CatalogEntry): string => {
   const preview = componentPreviewUrl(entry);
-  const library = sourceLabel(entry.namespace);
+  const library = sourceLabelFor(entry.namespace);
 
   return [
     'Implement this VybeKiit UI component in my app.',
@@ -114,7 +87,7 @@ export const buildBulkAgentPrompt = (entries: CatalogEntry[]): string => {
 
   entries.forEach((entry, index) => {
     lines.push(
-      `${index + 1}. **${entry.name}** (${sourceLabel(entry.namespace)})`,
+      `${index + 1}. **${entry.name}** (${sourceLabelFor(entry.namespace)})`,
       `   - Import: \`${entry.importPath}\``,
       `   - Category: ${categoryLabelFromSlug(entry.category)}`,
       `   - Preview: ${componentPreviewUrl(entry)}`,

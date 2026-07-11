@@ -35,7 +35,7 @@
   "rlsColumn": "user_id",
   "capabilities": ["fullTextSearch"],
   "skills": ["add-search"],
-  "packages": ["@vybekiit/search"],
+  "packages": ["@vybekiit/db"],
   "providers": {
     "supabase": "stable",
     "neon": "stable",

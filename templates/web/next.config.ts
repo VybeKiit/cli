@@ -23,16 +23,12 @@ const nextConfig: NextConfig = {
     '@vybekiit/ai',
     '@vybekiit/analytics',
     '@vybekiit/assets',
-    '@vybekiit/cms',
+    '@vybekiit/content',
     '@vybekiit/compliance',
-    '@vybekiit/email',
+    '@vybekiit/messaging',
     '@vybekiit/i18n',
-    '@vybekiit/jobs',
-    '@vybekiit/kv',
-    '@vybekiit/notifications',
+    '@vybekiit/infra',
     '@vybekiit/realtime',
-    '@vybekiit/search',
-    '@vybekiit/seo',
     '@vybekiit/tenancy',
     '@vybekiit/tokens',
     '@vybekiit/report-mode',
@@ -40,7 +36,7 @@ const nextConfig: NextConfig = {
   ],
   // Node-only packages that must never be webpack-bundled: @sentry/node arrives via the
   // transpiled @vybekiit/core/observability subpath; @aws-sdk/client-sesv2 backs the
-  // template-owned SES email adapter (packages/email).
+  // template-owned SES email adapter (packages/messaging).
   serverExternalPackages: ['@sentry/node', '@aws-sdk/client-sesv2'],
   images: {
     remotePatterns: getNextImageRemotePatterns(process.env),

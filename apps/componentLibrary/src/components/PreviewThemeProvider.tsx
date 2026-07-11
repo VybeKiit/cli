@@ -1,28 +1,13 @@
 'use client';
 
+import { PreviewThemeContext } from '@library/context/previewThemeContext';
 import { applyPrimaryVars, DEFAULT_PRIMARY, PRIMARY_STORAGE_KEY } from '@library/lib/theme';
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-
-interface PreviewThemeValue {
-  readonly primary: string;
-  readonly setPrimary: (hex: string) => void;
-  readonly resetPrimary: () => void;
-}
-
-const PreviewThemeContext = createContext<PreviewThemeValue | null>(null);
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
- * Render the preview theme provider component.
+ * Persist and apply the gallery primary color for live previews.
  *
- * @param props - Props passed to this component.
+ * @param props - Children to wrap with theme context.
  * @returns A React element for the component-library UI.
  * @example
  * const element = <PreviewThemeProvider><App /></PreviewThemeProvider>;
@@ -57,19 +42,4 @@ export const PreviewThemeProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return <PreviewThemeContext.Provider value={value}>{children}</PreviewThemeContext.Provider>;
-};
-
-/**
- * Read preview theme state for the component library.
- *
- * @returns The state or callback exposed by usePreviewTheme.
- * @example
- * const value = usePreviewTheme();
- */
-export const usePreviewTheme = (): PreviewThemeValue => {
-  const value = useContext(PreviewThemeContext);
-  if (!value) {
-    throw new Error('usePreviewTheme must be used within PreviewThemeProvider');
-  }
-  return value;
 };

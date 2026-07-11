@@ -41,14 +41,14 @@ export const ComponentPreviewCard = ({ entry, className }: ComponentPreviewCardP
       )}
     >
       <div className="flex items-center justify-between border-white/10 border-b px-3 py-2">
-        <span className="font-medium text-[10px] text-[var(--text-muted)] uppercase tracking-wide">
+        <span className="font-medium text-xs text-[var(--text-muted)] uppercase tracking-wide">
           {sourceLabel}
         </span>
-        <span className="truncate font-semibold text-[11px] text-white">{entry.name}</span>
+        <span className="truncate font-semibold text-xs text-white">{entry.name}</span>
       </div>
       <div className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-white/[0.04] to-transparent p-3">
         <div className="h-full w-full rounded-lg border border-white/15 border-dashed bg-white/[0.03]" />
-        <span className="absolute right-2 bottom-2 rounded bg-black/60 px-1.5 py-0.5 text-[9px] text-[var(--text-faint)]">
+        <span className="absolute right-2 bottom-2 rounded bg-black/60 px-1.5 py-0.5 text-xs text-[var(--text-faint)]">
           {entry.renderMode === 'live' ? 'live' : 'preview'}
         </span>
       </div>

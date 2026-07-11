@@ -1,13 +1,14 @@
 'use client';
 
-import { IntegrationTodo } from '@/components/saas/integrationTodo';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
-import { cn } from '@/lib/utils';
 import { Download, Eye, Receipt } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { IntegrationTodo } from '@/components/saas/integrationTodo';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { cn } from '@/lib/utils';
 
 type OrderStatus = 'paid' | 'fulfilled' | 'refunded' | 'pending';
 
@@ -79,11 +80,12 @@ const statusClass: Record<OrderStatus, string> = {
  */
 export const OrdersPage = () => {
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [status, setStatus] = useState<'all' | OrderStatus>('all');
   const [selectedId, setSelectedId] = useState<string | null>('VK-1048');
 
   const rows = useMemo(() => {
-    const needle = query.trim().toLowerCase();
+    const needle = debouncedQuery.trim().toLowerCase();
     return ORDERS.filter((order) => {
       if (status !== 'all' && order.status !== status) {
         return false;
@@ -97,7 +99,7 @@ export const OrdersPage = () => {
         order.product.toLowerCase().includes(needle)
       );
     });
-  }, [query, status]);
+  }, [debouncedQuery, status]);
 
   const selected = rows.find((order) => order.id === selectedId) ?? rows[0] ?? null;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@vybekiit/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@vybekiit/ui/tooltip';
 import type { ReactNode } from 'react';
 
 interface LayoutTooltipProps {
@@ -12,26 +12,12 @@ interface LayoutTooltipProps {
 }
 
 /**
- * Render the layout tooltip provider component.
+ * Render a layout tooltip around a control.
  *
- * @param props - Props passed to this component.
+ * @param props - Label, children, side, and optional disable flag.
  * @returns A React element for the component-library UI.
  * @example
- * const element = <LayoutTooltipProvider><App /></LayoutTooltipProvider>;
- */
-export const LayoutTooltipProvider = ({ children = <></> }: { readonly children?: ReactNode }) => (
-  <TooltipProvider delayDuration={250} skipDelayDuration={0}>
-    {children}
-  </TooltipProvider>
-);
-
-/**
- * Render the layout tooltip component.
- *
- * @param props - Props passed to this component.
- * @returns A React element for the component-library UI.
- * @example
- * const element = <LayoutTooltip {...props} />;
+ * const element = <LayoutTooltip label="Copy"><button type="button">Copy</button></LayoutTooltip>;
  */
 export const LayoutTooltip = ({
   label,

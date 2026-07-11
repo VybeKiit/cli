@@ -27,6 +27,10 @@ export type ModelSelectorContentProps = ComponentProps<typeof DialogContent> & {
   title?: ReactNode;
 };
 
+/**
+ * Model picker dialog body. Forwards `overlayClassName` / `overlayStyle` so
+ * hosts with a high z-index floating panel can raise the overlay above it.
+ */
 export const ModelSelectorContent = ({
   className,
   children,

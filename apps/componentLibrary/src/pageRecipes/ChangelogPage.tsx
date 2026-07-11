@@ -1,15 +1,26 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Bell, CheckCircle2, Loader2, Megaphone, Search, Sparkles, Wrench } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type EntryKind = 'feature' | 'fix' | 'improvement' | 'breaking';
 type KindFilter = 'all' | EntryKind;
@@ -121,6 +132,7 @@ export const ChangelogPage = () => {
   const [entries, setEntries] = useState<readonly ChangelogEntry[]>(INITIAL_ENTRIES);
   const [filter, setFilter] = useState<KindFilter>('all');
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [showDrafts, setShowDrafts] = useState(false);
   const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
@@ -131,7 +143,7 @@ export const ChangelogPage = () => {
   const emailValid = EMAIL_PATTERN.test(email);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return entries.filter((entry) => {
       if (!(showDrafts || entry.published)) {
         return false;
@@ -144,7 +156,7 @@ export const ChangelogPage = () => {
         entry.version.includes(q);
       return matchesKind && matchesQuery;
     });
-  }, [entries, filter, query, showDrafts]);
+  }, [entries, filter, debouncedQuery, showDrafts]);
 
   const counts = useMemo(
     () => ({
@@ -178,7 +190,7 @@ export const ChangelogPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Changelog motion pass">
       <main className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -201,10 +213,10 @@ export const ChangelogPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0" />
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <Card className="mb-4">
@@ -260,28 +272,16 @@ export const ChangelogPage = () => {
           <span className="text-muted-foreground text-sm" id={filterLabelId}>
             Type
           </span>
-          <div
-            aria-labelledby={filterLabelId}
-            className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1"
-            role="group"
+          <SegmentedControl
+            onValueChange={(value) => setFilter(value as typeof filter)}
+            value={filter}
           >
             {KIND_FILTERS.map((option) => (
-              <button
-                aria-pressed={filter === option.value}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                  filter === option.value
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                key={option.value}
-                onClick={() => setFilter(option.value)}
-                type="button"
-              >
+              <SegmentedControlItem key={option.value} value={option.value}>
                 {option.label}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
           <Button
             aria-pressed={showDrafts}
             onClick={() => setShowDrafts((v) => !v)}
@@ -294,7 +294,7 @@ export const ChangelogPage = () => {
           <div className="relative ml-auto w-full sm:w-52">
             <Search
               aria-hidden="true"
-              className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground"
+              className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               className="pl-9"
@@ -309,25 +309,32 @@ export const ChangelogPage = () => {
 
         {visible.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center px-4 py-14 text-center">
-              <Megaphone aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-              <h2 className="mt-3 font-semibold">No releases match</h2>
-              <p className="mt-1 text-muted-foreground text-sm">
-                Clear the type filter or search, or turn on drafts.
-              </p>
-              <Button
-                className="mt-4"
-                onClick={() => {
-                  setFilter('all');
-                  setQuery('');
-                  setShowDrafts(true);
-                }}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                Reset filters
-              </Button>
+            <CardContent className="p-0">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia>
+                    <Megaphone aria-hidden="true" />
+                  </EmptyMedia>
+                  <EmptyTitle>No releases match</EmptyTitle>
+                  <EmptyDescription>
+                    Clear the type filter or search, or turn on drafts.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Button
+                    onClick={() => {
+                      setFilter('all');
+                      setQuery('');
+                      setShowDrafts(true);
+                    }}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    Reset filters
+                  </Button>
+                </EmptyContent>
+              </Empty>
             </CardContent>
           </Card>
         ) : (
@@ -336,7 +343,7 @@ export const ChangelogPage = () => {
               <li className="relative" key={entry.id}>
                 <span
                   aria-hidden="true"
-                  className="-left-[1.9rem] absolute top-1 flex h-6 w-6 items-center justify-center rounded-full border bg-background"
+                  className="absolute top-1 -left-[1.9rem] flex h-6 w-6 items-center justify-center rounded-full border bg-background"
                 >
                   {entry.kind === 'fix' ? (
                     <Wrench className="h-3 w-3 text-emerald-600" />
@@ -373,42 +380,32 @@ export const ChangelogPage = () => {
           </ol>
         )}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — filters, drafts, publish, and subscribe all work
-              offline. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Store entries in your CMS (MDX, Contentlayer, or a <code>changelog_entries</code>{' '}
-                table) with <code>kind</code>, <code>version</code>, and <code>publishedAt</code>.
-              </li>
-              <li>
-                <code>GET /api/changelog?kind=</code> returns published rows for the public page;
-                drafts stay admin-only.
-              </li>
-              <li>
-                Publish flips <code>publishedAt</code> and triggers subscriber email via{' '}
-                <code>@vybekiit/email</code> / <code>notifications_log</code>.
-              </li>
-              <li>
-                Expose an RSS feed at <code>/changelog.xml</code> for the same dataset.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — filters, drafts, publish, and subscribe all work
+            offline. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Store entries in your CMS (MDX, Contentlayer, or a <code>changelog_entries</code>{' '}
+              table) with <code>kind</code>, <code>version</code>, and <code>publishedAt</code>.
+            </li>
+            <li>
+              <code>GET /api/changelog?kind=</code> returns published rows for the public page;
+              drafts stay admin-only.
+            </li>
+            <li>
+              Publish flips <code>publishedAt</code> and triggers subscriber email via{' '}
+              <code>@vybekiit/email</code> / <code>notifications_log</code>.
+            </li>
+            <li>
+              Expose an RSS feed at <code>/changelog.xml</code> for the same dataset.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Changelog motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

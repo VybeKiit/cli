@@ -30,7 +30,12 @@ import {
   SelectValue,
 } from '@vybekiit/ui/select';
 import { Spinner } from '@vybekiit/ui/spinner';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@vybekiit/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@vybekiit/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { ChatStatus, FileUIPart, SourceDocumentUIPart } from 'ai';
 import { CornerDownLeftIcon, ImageIcon, Monitor, PlusIcon, SquareIcon, XIcon } from 'lucide-react';
@@ -1065,14 +1070,18 @@ export const PromptInputButton = ({
   const shortcut = typeof tooltip === 'string' ? undefined : tooltip.shortcut;
   const side = typeof tooltip === 'string' ? 'top' : (tooltip.side ?? 'top');
 
+  // Self-contained provider — PromptInput mounts in shells that may sit outside
+  // the app root TooltipProvider (e.g. landing LandingDevShells).
   return (
-    <Tooltip>
-      <TooltipTrigger asChild={true}>{button}</TooltipTrigger>
-      <TooltipContent side={side}>
-        {tooltipContent}
-        {shortcut && <span className="ml-2 text-muted-foreground">{shortcut}</span>}
-      </TooltipContent>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild={true}>{button}</TooltipTrigger>
+        <TooltipContent side={side}>
+          {tooltipContent}
+          {shortcut && <span className="ml-2 text-muted-foreground">{shortcut}</span>}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

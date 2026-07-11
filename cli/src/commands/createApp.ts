@@ -1,3 +1,4 @@
+import { readdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import process from 'node:process';
 import { resolveKitSource } from '../lib/resolveKitSource';
@@ -12,6 +13,21 @@ import {
   isCreateSurface,
   surfaceToTemplate,
 } from './scaffoldOutput';
+
+/**
+ * Whether the destination is missing or empty so a failed scaffold may delete it.
+ *
+ * @param dest - Absolute destination path.
+ * @returns True when cleanup will not destroy pre-existing buyer files.
+ */
+const destIsMissingOrEmpty = async (dest: string): Promise<boolean> => {
+  try {
+    const entries = await readdir(dest);
+    return entries.length === 0;
+  } catch {
+    return true;
+  }
+};
 
 /** Parsed `create app` inputs after flags and optional directory. */
 export type CreateAppInputs = {
@@ -154,6 +170,8 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
   const template = surfaceToTemplate(surface);
   const dest = resolve(process.cwd(), destPath);
   let cleanup: (() => Promise<void>) | undefined;
+  /** Only wipe dest on failure when it was empty/missing before we wrote. */
+  const mayCleanupPartial = await destIsMissingOrEmpty(dest);
 
   try {
     // ADR-0038 Track 2: kit workspace (packages + surface), never an orphan template folder.
@@ -161,6 +179,10 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
     cleanup = resolvedCleanup;
     await scaffoldKitWorkspace({ template, kitRoot, dest });
   } catch (error) {
+    if (mayCleanupPartial) {
+      // Partial create left incomplete packages/templates (dogfood: mobile ENOENT mid-copy).
+      await rm(dest, { recursive: true, force: true }).catch(() => undefined);
+    }
     if (error instanceof ScaffoldError) {
       writeStderr(formatCreateError(error.message));
       return 1;

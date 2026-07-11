@@ -1,14 +1,21 @@
 'use client';
 
-import { Alert, AlertDescription, AlertTitle } from '@vybekiit/ui/alert';
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
 import {
   Check,
-  CircleAlert,
   Filter,
   Loader2,
   PackageSearch,
@@ -17,10 +24,14 @@ import {
   ShoppingCart,
   X,
 } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoErrorState } from './shared/DemoErrorState';
+import { DemoLoadState } from './shared/DemoLoadState';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
+import { formatUsdCents } from './shared/formatUsdCents';
 
 /** Product category used by filter chips. */
 type Category = 'all' | 'digital' | 'physical' | 'service' | 'bundle';
@@ -128,9 +139,6 @@ const CATALOG: readonly Product[] = [
   },
 ];
 
-const usd = (cents: number): string =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
-
 type LoadStatus = 'ready' | 'loading' | 'error';
 
 /**
@@ -150,6 +158,7 @@ export const ProductGridPage = () => {
   const [status, setStatus] = useState<LoadStatus>('ready');
   const [category, setCategory] = useState<Category>('all');
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [sort, setSort] = useState<SortMode>('featured');
   const [cartCount, setCartCount] = useState(0);
   const [addingId, setAddingId] = useState<string | null>(null);
@@ -160,10 +169,10 @@ export const ProductGridPage = () => {
       if (category !== 'all' && product.category !== category) {
         return false;
       }
-      if (query.trim().length === 0) {
+      if (debouncedQuery.trim().length === 0) {
         return true;
       }
-      const needle = query.trim().toLowerCase();
+      const needle = debouncedQuery.trim().toLowerCase();
       return (
         product.name.toLowerCase().includes(needle) ||
         product.description.toLowerCase().includes(needle)
@@ -188,7 +197,7 @@ export const ProductGridPage = () => {
       return a.name.localeCompare(b.name);
     });
     return sorted;
-  }, [category, query, sort]);
+  }, [category, debouncedQuery, sort]);
 
   const reloadCatalog = () => {
     setStatus('loading');
@@ -215,43 +224,31 @@ export const ProductGridPage = () => {
   // ---------- loading ----------
   if (status === 'loading') {
     return (
-      <Frame>
-        <section className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
-          <Loader2 aria-hidden="true" className="h-10 w-10 animate-spin text-muted-foreground" />
-          <h1 className="mt-6 font-bold text-2xl tracking-tight">Loading catalog…</h1>
-          <p className="mt-2 text-muted-foreground text-sm">
-            Fetching products, prices, and categories.
-          </p>
-        </section>
-      </Frame>
+      <DemoRecipeFrame defaultTransition="fade" title="Product grid motion pass">
+        <DemoLoadState
+          detail="Fetching products, prices, and categories."
+          title="Loading catalog…"
+        />
+      </DemoRecipeFrame>
     );
   }
 
   // ---------- error ----------
   if (status === 'error') {
     return (
-      <Frame>
-        <section className="mx-auto max-w-md px-4 py-24">
-          <Alert variant="destructive">
-            <CircleAlert aria-hidden="true" className="h-4 w-4" />
-            <AlertTitle>Catalog could not load</AlertTitle>
-            <AlertDescription>
-              The product list failed to load. Retry once the products API is reachable.
-            </AlertDescription>
-          </Alert>
-          <div className="mt-6 flex justify-center gap-2">
-            <Button onClick={reloadCatalog} type="button">
-              <RefreshCw aria-hidden="true" className="h-4 w-4" /> Retry
-            </Button>
-          </div>
-        </section>
-      </Frame>
+      <DemoRecipeFrame defaultTransition="fade" title="Product grid motion pass">
+        <DemoErrorState
+          detail="The product list failed to load. Retry once the products API is reachable."
+          onRetry={reloadCatalog}
+          title="Catalog could not load"
+        />
+      </DemoRecipeFrame>
     );
   }
 
   // ---------- ready ----------
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Product grid motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
@@ -285,21 +282,20 @@ export const ProductGridPage = () => {
         </div>
 
         {toast ? (
-          <div
-            className="mb-4 flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm"
-            role="status"
-          >
-            <Check aria-hidden="true" className="h-4 w-4 shrink-0" />
-            <span className="flex-1">{toast}</span>
-            <button
-              aria-label="Dismiss"
-              className="text-muted-foreground hover:text-foreground"
-              onClick={() => setToast(null)}
-              type="button"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+          <Alert className="mb-4" variant="success">
+            <Check aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between gap-3">
+              <span>{toast}</span>
+              <button
+                aria-label="Dismiss"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => setToast(null)}
+                type="button"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-6 space-y-4">
@@ -357,26 +353,29 @@ export const ProductGridPage = () => {
         </div>
 
         {products.length === 0 ? (
-          <section className="flex flex-col items-center rounded-lg border border-dashed px-4 py-16 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
-              <PackageSearch aria-hidden="true" className="h-7 w-7" />
-            </span>
-            <h2 className="mt-4 font-semibold text-lg">No products match</h2>
-            <p className="mt-1 max-w-sm text-muted-foreground text-sm">
-              Nothing fits your filters. Clear search or pick another category.
-            </p>
-            <Button
-              className="mt-4"
-              onClick={() => {
-                setQuery('');
-                setCategory('all');
-              }}
-              type="button"
-              variant="outline"
-            >
-              Clear filters
-            </Button>
-          </section>
+          <Empty variant="dashed">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <PackageSearch aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>No products match</EmptyTitle>
+              <EmptyDescription>
+                Nothing fits your filters. Clear search or pick another category.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button
+                onClick={() => {
+                  setQuery('');
+                  setCategory('all');
+                }}
+                type="button"
+                variant="outline"
+              >
+                Clear filters
+              </Button>
+            </EmptyContent>
+          </Empty>
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
@@ -392,11 +391,11 @@ export const ProductGridPage = () => {
                     </div>
                     <CardHeader className="space-y-2 pb-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge className="text-[10px]" variant="outline">
+                        <Badge className="text-xs" variant="outline">
                           {CATEGORY_LABEL[product.category]}
                         </Badge>
                         {product.badge ? (
-                          <Badge className="text-[10px]" variant="secondary">
+                          <Badge className="text-xs" variant="secondary">
                             {product.badge}
                           </Badge>
                         ) : null}
@@ -407,7 +406,9 @@ export const ProductGridPage = () => {
                       <p className="text-muted-foreground text-sm">{product.description}</p>
                     </CardContent>
                     <CardFooter className="flex items-center justify-between gap-2 border-t pt-4">
-                      <span className="font-semibold tabular-nums">{usd(product.priceCents)}</span>
+                      <span className="font-semibold tabular-nums">
+                        {formatUsdCents(product.priceCents)}
+                      </span>
                       <Button
                         aria-busy={isAdding}
                         disabled={isAdding}
@@ -434,48 +435,36 @@ export const ProductGridPage = () => {
           Showing {products.length} of {CATALOG.length} products
         </p>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              This recipe is fully interactive with local React state — no backend needed to demo
-              it. To load a real catalog in your VybeKiit app:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset products</code> so <code>products</code> and{' '}
-                <code>product_variants</code> tables exist.
-              </li>
-              <li>
-                Replace <code>CATALOG</code> with <code>GET /api/products</code> — each row needs{' '}
-                <code>id</code>, <code>name</code>, <code>price_cents</code>, optional{' '}
-                <code>image_url</code>, and category in <code>metadata</code>.
-              </li>
-              <li>
-                On <b>Add</b>, after <code>vybekiit apply-preset cart</code>, upsert into{' '}
-                <code>cart_items</code>:{' '}
-                <code>{'{ cart_id, product_id, name, unit_price_cents, quantity: 1 }'}</code>.
-              </li>
-              <li>
-                Loading / error states should mirror fetch lifecycle for that list endpoint — not a
-                fake spinner with no path to recover.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            This recipe is fully interactive with local React state — no backend needed to demo it.
+            To load a real catalog in your VybeKiit app:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset products</code> so <code>products</code> and{' '}
+              <code>product_variants</code> tables exist.
+            </li>
+            <li>
+              Replace <code>CATALOG</code> with <code>GET /api/products</code> — each row needs{' '}
+              <code>id</code>, <code>name</code>, <code>price_cents</code>, optional{' '}
+              <code>image_url</code>, and category in <code>metadata</code>.
+            </li>
+            <li>
+              On <b>Add</b>, after <code>vybekiit apply-preset cart</code>, upsert into{' '}
+              <code>cart_items</code>:{' '}
+              <code>{'{ cart_id, product_id, name, unit_price_cents, quantity: 1 }'}</code>.
+            </li>
+            <li>
+              Loading / error states should mirror fetch lifecycle for that list endpoint — not a
+              fake spinner with no path to recover.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Wrap a recipe view in the gallery's theme + motion controls. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Product grid motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
 
 // TODO: Load catalog from GET /api/products after vybekiit apply-preset products.
 // TODO: POST add-to-cart to cart_items after vybekiit apply-preset cart.

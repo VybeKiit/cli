@@ -21,8 +21,6 @@ async function dismissOverlays(page: Page): Promise<void> {
   await page.waitForTimeout(250);
 }
 
-export { clickSectionCreate as clickSectionCreateButton, waitForDialogInputs };
-
 /**
  * Open LS create dialogs to expose form fields — opens triggers only, never Save/Create submit.
  */

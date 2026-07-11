@@ -12,4 +12,5 @@ export * from './providers/railway';
 export * from './providers/s3';
 export * from './providers/supabase';
 export * from './resolve';
+export * from './search';
 export * from './types';

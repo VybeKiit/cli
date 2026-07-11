@@ -5,6 +5,11 @@
   pointer-events: auto;
 }
 
+/* Above the landing assistant panel (z ~2_147_483_000) when portaled to body. */
+.vybe-walkthrough.vybe-walkthrough--floating-panel {
+  z-index: 2147483600;
+}
+
 /* Cutout dim — box-shadow spread creates the hole; no separate scrim (that would block the glow). */
 .vybe-walkthrough-hole {
   position: fixed;

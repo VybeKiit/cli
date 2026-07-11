@@ -1,11 +1,15 @@
-import { resolveAuthProvider } from '@vybekiit/auth';
-import { Effect, Exit } from 'effect';
+import { resolveAuthenticatedUser } from '@vybekiit/auth/http';
+import { Either, Schema } from 'effect';
 import type { NextFunction, Request, Response } from 'express';
 import { SESSION_COOKIE } from './session.js';
 
 type AuthenticatedRequest = Request & {
   readonly user?: { readonly id: string; readonly email: string | null };
 };
+
+/** Non-empty session/bearer token accepted by protected routes. */
+const SessionTokenSchema = Schema.String.pipe(Schema.minLength(1));
+const decodeSessionToken = Schema.decodeUnknownEither(SessionTokenSchema);
 
 /**
  * Extract a bearer token from an Authorization header.
@@ -20,7 +24,12 @@ const bearerToken = (header: string | undefined): string | undefined => {
     return;
   }
 
-  return header.replace('Bearer ', '');
+  const token = header.slice('Bearer '.length);
+  const parsed = decodeSessionToken(token);
+  if (Either.isLeft(parsed)) {
+    return;
+  }
+  return parsed.right;
 };
 
 /**
@@ -33,8 +42,9 @@ const bearerToken = (header: string | undefined): string | undefined => {
  */
 const requestToken = (req: Request): string | undefined => {
   const cookieToken = req.cookies?.[SESSION_COOKIE];
-  if (typeof cookieToken === 'string' && cookieToken.length > 0) {
-    return cookieToken;
+  const fromCookie = decodeSessionToken(cookieToken);
+  if (Either.isRight(fromCookie)) {
+    return fromCookie.right;
   }
 
   return bearerToken(req.headers.authorization);
@@ -42,6 +52,9 @@ const requestToken = (req: Request): string | undefined => {
 
 /**
  * Require an authenticated user before an Express route runs.
+ *
+ * OWNED glue only: token extraction stays here; Exit / user resolution lives in
+ * maintained {@link resolveAuthenticatedUser}.
  *
  * @param req - Express request carrying a session cookie or Bearer token.
  * @param res - Express response used for unauthorized failures.
@@ -56,20 +69,15 @@ export const requireAuth = async (
   next: NextFunction,
 ): Promise<void> => {
   const token = requestToken(req);
+  const result = await resolveAuthenticatedUser({
+    readToken: () => token ?? null,
+  });
 
-  if (token === undefined || token.length === 0) {
-    res.status(401).json({ error: 'Sign in required.' });
+  if (!result.ok) {
+    res.status(401).json(result.body);
     return;
   }
 
-  const exit = await Effect.runPromiseExit(
-    resolveAuthProvider().pipe(Effect.flatMap((auth) => auth.getUser(token))),
-  );
-  if (Exit.isFailure(exit)) {
-    res.status(401).json({ error: 'Sign in required.' });
-    return;
-  }
-
-  Object.assign(req as AuthenticatedRequest, { user: exit.value });
+  Object.assign(req as AuthenticatedRequest, { user: result.user });
   next();
 };

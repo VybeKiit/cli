@@ -119,9 +119,9 @@ export const ZIGZAG_ROWS: readonly ZigZagRow[] = [
       problemHeading: 'Payments setup kills momentum.',
       problemBody: "Integrations, webhooks, taxes, invoices—it's a rabbit hole.",
       solutionLabel: 'THE SOLUTION',
-      solutionHeading: 'Take payments in your first session.',
+      solutionHeading: 'Payments foundation is already wired.',
       solutionBody:
-        'VybeKiit connects payments, handles webhooks, and gives you a working flow instantly.',
+        'Checkout, webhooks, and post-payment access ship as a connected base the agent can adapt.',
     },
   },
   {
@@ -205,11 +205,6 @@ export const PRODUCT_STACK_MARKS: readonly ProductStackMark[] = [
   { label: 'App Store', slug: 'appstore', hoverColor: '#FFFFFF' },
   { label: 'Google Play', slug: 'googleplay', hoverColor: '#34A853' },
 ];
-
-/** @deprecated Use PRODUCT_STACK_MARKS */
-export const TECH_STACK_MARKS = PRODUCT_STACK_MARKS;
-
-export { VIBE_HINTS } from './vibeHints';
 
 /** FAQ entry ids to show on the dark cinematic landing (from faq.ts). */
 export const LANDING_FAQ_IDS = [

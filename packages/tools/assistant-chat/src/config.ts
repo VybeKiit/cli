@@ -33,16 +33,25 @@ const readTrimmedEnvValue = (
 };
 
 /**
- * Check whether the assistant chat env flag opts the dev tool in.
+ * Check whether the assistant chat tool is enabled.
+ *
+ * Defaults **on** in `NODE_ENV=development` so vibe coders never hunt for a flag.
+ * Explicit `VYBE_ASSISTANT_CHAT=0` / `false` turns it off; `1` / `true` forces it on.
  *
  * @param env - Environment source to read from.
- * @returns True when `VYBE_ASSISTANT_CHAT` is `1` or `true`.
+ * @returns True when the chat/bridge should run.
  * @example
  * const enabled = isAssistantChatEnabled(process.env);
  */
 export const isAssistantChatEnabled = (env: Record<string, string | undefined>): boolean => {
   const raw = readTrimmedEnvValue(env, ASSISTANT_CHAT_ENABLED_ENV)?.toLowerCase();
-  return raw === '1' || raw === 'true';
+  if (raw === '0' || raw === 'false') {
+    return false;
+  }
+  if (raw === '1' || raw === 'true') {
+    return true;
+  }
+  return env.NODE_ENV === 'development';
 };
 
 /**

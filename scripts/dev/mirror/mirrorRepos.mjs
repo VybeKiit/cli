@@ -4,10 +4,10 @@
 // SHA and force-pushes that SHA to `VybeKiit/<repo>@main`. The monorepo stays the single
 // source of truth; mirrors are derived artifacts and must never be hand-edited.
 //
-// Covers all five delivery repos (ADR-0005): the three OWNED templates (web/mobile/
-// extension), the public `cli` scaffolder, and `infra`. `infra` has no source prefix in
-// the monorepo yet (issue #7 creates it); until then its mirror is skipped, not emptied —
-// a force-push of an absent prefix would clobber the repo with nothing.
+// Covers the delivery repos (ADR-0005 + ADR-0038): the three OWNED templates
+// (web/mobile/extension), the public `cli` scaffolder, `infra`, and the gated kit
+// workspace (`kit` — packages + templates for `create app`). Single-prefix mirrors use
+// `git subtree split`. The kit mirror is multi-path and is staged by `syncKitMirror.mjs`.
 
 import { execFile } from 'node:child_process';
 import { access } from 'node:fs/promises';
@@ -15,6 +15,7 @@ import { join } from 'node:path';
 import process from 'node:process';
 import { promisify } from 'node:util';
 import { repoRootFrom } from '../../lib/repoRoot.mjs';
+import { KIT_MIRROR_REPO, syncKitMirror } from './syncKitMirror.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -31,9 +32,8 @@ const REPO_ROOT = repoRootFrom(import.meta.url);
  * live at the root (`cli`) or under a parent dir (`templates/web`) — the prefix need not
  * match the repo name.
  *
- * `infra` is registered but its `path` does not exist yet (issue #7 creates the Cloudflare
- * + Supabase deploy config); mirrors with an absent path are skipped with a notice rather
- * than force-pushed empty. See {@link resolveRunnable}.
+ * `kit` is **not** in this list: it is multi-path (`packages/` + `templates/`) and is
+ * published by {@link syncKitMirror} after the prefix mirrors run.
  *
  * @typedef {{ repo: string, path: string }} MirrorTarget
  * @type {readonly MirrorTarget[]}
@@ -46,8 +46,11 @@ const MIRRORS = [
   { repo: 'infra', path: 'infra' },
 ];
 
-/** Every known mirror name, for arg validation and help text. */
-const MIRROR_NAMES = MIRRORS.map((m) => m.repo);
+/** Prefix-split mirror names only. */
+const PREFIX_MIRROR_NAMES = MIRRORS.map((m) => m.repo);
+
+/** Every known delivery name (prefix mirrors + kit workspace), for arg validation. */
+const MIRROR_NAMES = [...PREFIX_MIRROR_NAMES, KIT_MIRROR_REPO];
 
 /**
  * Strip the mirror token out of any text before it is logged. A failed `git push`
@@ -130,14 +133,14 @@ async function mirrorOne(target, dryRun) {
 }
 
 /**
- * Resolve the requested names to runnable mirror targets, partitioning out those whose
- * source prefix is absent (e.g. `infra` before issue #7). Absent targets are reported so a
- * run never silently does less than asked.
+ * Resolve the requested names to runnable prefix-mirror targets, partitioning out those
+ * whose source prefix is absent. Kit is handled separately (not a single prefix).
  *
  * @param {readonly string[]} names - mirror names to run
- * @returns {Promise<{ runnable: MirrorTarget[], skipped: MirrorTarget[] }>}
+ * @returns {Promise<{ runnable: MirrorTarget[], skipped: MirrorTarget[], includeKit: boolean }>}
  */
 async function resolveRunnable(names) {
+  const includeKit = names.includes(KIT_MIRROR_REPO);
   const targets = MIRRORS.filter((m) => names.includes(m.repo));
   const runnable = [];
   const skipped = [];
@@ -148,7 +151,7 @@ async function resolveRunnable(names) {
       skipped.push(target);
     }
   }
-  return { runnable, skipped };
+  return { runnable, skipped, includeKit };
 }
 
 /**
@@ -170,14 +173,14 @@ export function parseArgs(argv) {
 /**
  * Mirror each runnable target, isolating failures so one bad push doesn't abort the rest.
  * Logs a redacted reason per failure (the swallowed-error gap the earlier version had) and
- * exits non-zero if any target failed.
+ * exits non-zero if any target failed. Always attempts kit last when requested (ADR-0038).
  */
 async function main() {
   const { dryRun, names } = parseArgs(process.argv.slice(2));
-  const { runnable, skipped } = await resolveRunnable(names);
+  const { runnable, skipped, includeKit } = await resolveRunnable(names);
 
   for (const target of skipped) {
-    console.log(`  ${target.repo}: skipped — no source at ${target.path}/ yet (issue #7)`);
+    console.log(`  ${target.repo}: skipped — no source at ${target.path}/ yet`);
   }
 
   const failed = [];
@@ -188,6 +191,16 @@ async function main() {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`  ${target.repo}: FAILED — ${redact(message)}`);
       failed.push(target.repo);
+    }
+  }
+
+  if (includeKit) {
+    try {
+      await syncKitMirror({ dryRun });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`  ${KIT_MIRROR_REPO}: FAILED — ${redact(message)}`);
+      failed.push(KIT_MIRROR_REPO);
     }
   }
 

@@ -1,12 +1,12 @@
 import { resolveAnalyticsProvider } from '@vybekiit/analytics';
 import { resolveAiProvider } from '@vybekiit/ai';
-import { createCmsFromEnv } from '@vybekiit/cms';
-import { resolveComplianceProvider } from '@vybekiit/compliance';
-import { resolveJobsProvider } from '@vybekiit/jobs';
-import { resolveKvProvider } from '@vybekiit/kv';
-import { resolveNotificationsProvider } from '@vybekiit/notifications';
+import { createCmsFromEnv } from '@vybekiit/content';
+import { createComplianceFromEnv } from '@vybekiit/compliance';
+import { resolveJobsProvider } from '@vybekiit/infra';
+import { resolveKvProvider } from '@vybekiit/infra';
+import { resolveNotificationsProvider } from '@vybekiit/messaging';
 import { resolveRealtimeProvider } from '@vybekiit/realtime';
-import { resolveSearchProvider } from '@vybekiit/search';
+import { resolveSearchProvider } from '@vybekiit/db';
 import { resolveTenancyProvider } from '@vybekiit/tenancy';
 
 /**
@@ -43,7 +43,7 @@ const getCms = () => createCmsFromEnv();
  * @example
  * const compliance = getCompliance();
  */
-const getCompliance = () => resolveComplianceProvider();
+const getCompliance = () => createComplianceFromEnv();
 
 /**
  * Resolve the notification provider for outbound messages.

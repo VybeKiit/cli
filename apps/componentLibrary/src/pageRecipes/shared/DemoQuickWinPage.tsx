@@ -7,8 +7,9 @@ import type { ReactElement } from 'react';
 import { DemoActionButton } from './DemoActionButton';
 import { DemoAppShell, type DemoAppShellSection } from './DemoAppShell';
 import { DemoThemeRandomizer } from './DemoThemeRandomizer';
-import { DemoTransitionStage } from './DemoTransitionStage';
-import { DemoVariantCard, DemoVariantGrid } from './DemoVariantGrid';
+import { type DemoTransition, DemoTransitionStage } from './DemoTransitionStage';
+import { DemoVariantCard } from './DemoVariantCard';
+import { DemoVariantGrid } from './DemoVariantGrid';
 
 interface DemoQuickWinMetric {
   readonly label: string;
@@ -44,7 +45,7 @@ interface DemoQuickWinPageProps {
   readonly secondaryAction: DemoQuickWinAction;
   readonly summary: string;
   readonly title: string;
-  readonly transition?: 'fade' | 'slide' | 'scale' | 'blur';
+  readonly transition?: DemoTransition;
   readonly variantDescription: string;
   readonly variantItems: readonly DemoQuickWinItem[];
   readonly variantTitle: string;

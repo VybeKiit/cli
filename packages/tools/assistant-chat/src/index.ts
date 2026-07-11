@@ -2,6 +2,7 @@ export * from './affiliate';
 export * from './capabilities';
 export * from './config';
 export * from './context';
+export * from './modelMeta';
 export * from './partners';
 export * from './protocol';
 export * from './usage';

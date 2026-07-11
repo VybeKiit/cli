@@ -33,7 +33,7 @@
   "rlsColumn": "user_id",
   "capabilities": ["vectorSearch", "bulkInsert"],
   "skills": ["add-ai"],
-  "packages": ["@vybekiit/search", "@vybekiit/ai"],
+  "packages": ["@vybekiit/db", "@vybekiit/ai"],
   "providers": {
     "supabase": "stable",
     "neon": "stable",

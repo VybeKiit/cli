@@ -52,6 +52,12 @@ export const SettingsScreen = () => {
     }, 600);
   };
 
+  const handleDiscard = (): void => {
+    setForm(saved);
+    setError('');
+    setFlash('');
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <header className="space-y-1">
@@ -124,15 +130,7 @@ export const SettingsScreen = () => {
 
       {dirty ? (
         <div className="grid grid-cols-2 gap-2">
-          <Button
-            onClick={() => {
-              setForm(saved);
-              setError('');
-              setFlash('');
-            }}
-            type="button"
-            variant="outline"
-          >
+          <Button onClick={handleDiscard} type="button" variant="outline">
             Discard
           </Button>
           <Button disabled={pending} onClick={save} type="button">

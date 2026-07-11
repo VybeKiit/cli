@@ -28,6 +28,7 @@ export const SiteHeader = () => {
       [
         { href: '/#features', label: messages.nav.features },
         { href: '/#how-it-works', label: messages.nav.howItWorks },
+        { href: '/compare', label: messages.nav.compare },
         { href: '/#pricing', label: messages.nav.pricing },
         { href: '/#faq', label: messages.nav.faq },
       ] as const,

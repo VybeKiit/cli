@@ -163,7 +163,9 @@ jobs:
         env:
           HUSKY: 0
         run: |
-          git add package.json packages/*/package.json cli/package.json
+          # Nested lanes (packages/tools/*) and top-level packages/* both get version bumps.
+          git add package.json cli/package.json
+          git add packages/*/package.json packages/*/*/package.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "chore(release): ${{ steps.version.outputs.tag }}"
           fi

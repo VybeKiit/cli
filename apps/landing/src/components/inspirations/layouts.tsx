@@ -136,7 +136,7 @@ export const ThreePlatformLayout = ({ direction }: { direction: InspirationDirec
                     <span className="text-3xl">{platform.icon}</span>
                     <p className="mt-2 font-semibold text-sm">{platform.label}</p>
                     <span
-                      className="mt-2 inline-block rounded-full px-2 py-0.5 font-medium text-[10px] uppercase tracking-wide"
+                      className="mt-2 inline-block rounded-full px-2 py-0.5 font-medium text-xs uppercase tracking-wide"
                       style={{
                         background: `${direction.palette.accent}22`,
                         color: direction.palette.accent,
@@ -335,7 +335,7 @@ export const ChecklistLayout = ({ direction }: { direction: InspirationDirection
                 <span className="flex-1">{step}</span>
                 {done ? (
                   <span
-                    className="vybe-line-in rounded px-2 py-0.5 font-bold text-[10px] uppercase tracking-wide"
+                    className="vybe-line-in rounded px-2 py-0.5 font-bold text-xs uppercase tracking-wide"
                     style={{
                       background: `${direction.palette.accent}22`,
                       color: direction.palette.accent,

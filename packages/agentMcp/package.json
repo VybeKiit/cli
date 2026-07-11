@@ -1,0 +1,71 @@
+{
+  "name": "@vybekiit/agent-mcp",
+  "version": "0.3.0",
+  "private": true,
+  "vybekiit": {
+    "kind": "tooling"
+  },
+  "description": "MCP server for VybeKiit agent surface — skills, CLI commands, doctor tools, and doc-fallback. Private tooling.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "vybekiit-agent-mcp": "./dist/bin.js",
+    "vybekiit-ui-catalog-mcp": "./dist/uiCatalog/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./skills.js": {
+      "types": "./dist/skills.d.ts",
+      "import": "./dist/skills.js"
+    },
+    "./commands.js": {
+      "types": "./dist/commands.d.ts",
+      "import": "./dist/commands.js"
+    },
+    "./uiCatalog": {
+      "types": "./dist/uiCatalog/index.d.ts",
+      "import": "./dist/uiCatalog/index.js"
+    },
+    "./uiCatalog/*": {
+      "types": "./dist/uiCatalog/*.d.ts",
+      "import": "./dist/uiCatalog/*.js"
+    },
+    "./catalog.js": {
+      "types": "./dist/uiCatalog/catalog.d.ts",
+      "import": "./dist/uiCatalog/catalog.js"
+    },
+    "./fuzzy.js": {
+      "types": "./dist/uiCatalog/fuzzy.d.ts",
+      "import": "./dist/uiCatalog/fuzzy.js"
+    },
+    "./page.js": {
+      "types": "./dist/uiCatalog/page.d.ts",
+      "import": "./dist/uiCatalog/page.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@vybekiit/agent-kit": "workspace:*",
+    "@vybekiit/browser-automation": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

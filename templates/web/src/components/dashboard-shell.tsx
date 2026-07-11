@@ -2,7 +2,7 @@
 
 import { SiteFooter } from '@/components/site-footer';
 import { SaasIcon } from '@/components/saas-page-view';
-import { DASHBOARD_NAV_LINKS } from '@/data/saasPages';
+import { DASHBOARD_NAV_LINKS } from '@/data/dashboardSaasNav';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { Avatar, AvatarFallback } from '@vybekiit/ui/avatar';
 import { Button } from '@vybekiit/ui/button';

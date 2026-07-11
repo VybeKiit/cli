@@ -60,6 +60,52 @@ async function setPackageVersion(relPath, version) {
   console.log(`  ${relPath} → ${version}`);
 }
 
+/**
+ * Collect every package.json under packages/ (top-level or one nested lane
+ * like packages/tools/*). Skip plain directories with no package.json.
+ *
+ * @param {string} packagesRoot
+ * @returns {Promise<string[]>} Paths relative to REPO_ROOT.
+ */
+async function listPackageJsonPaths(packagesRoot) {
+  const { access, readdir } = await import('node:fs/promises');
+  const { constants } = await import('node:fs');
+  const paths = [];
+
+  /** @param {string} absPath @returns {Promise<boolean>} */
+  const hasPackageJson = async (absPath) => {
+    try {
+      await access(join(absPath, 'package.json'), constants.F_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const topEntries = await readdir(packagesRoot);
+  for (const name of topEntries.sort()) {
+    const abs = join(packagesRoot, name);
+    if (await hasPackageJson(abs)) {
+      paths.push(`packages/${name}/package.json`);
+      continue;
+    }
+    // Nested workspace lane (e.g. packages/tools/assistant-chat) — no package.json on the lane folder.
+    let nested = [];
+    try {
+      nested = await readdir(abs);
+    } catch {
+      nested = [];
+    }
+    for (const child of nested.sort()) {
+      const childAbs = join(abs, child);
+      if (await hasPackageJson(childAbs)) {
+        paths.push(`packages/${name}/${child}/package.json`);
+      }
+    }
+  }
+  return paths;
+}
+
 async function main() {
   const rootPath = join(REPO_ROOT, 'package.json');
   const root = await readJson(rootPath);
@@ -69,10 +115,9 @@ async function main() {
   await writeJson(rootPath, root);
   console.log(`Kit release: ${current} → ${next}`);
 
-  const { readdir } = await import('node:fs/promises');
-  const packages = await readdir(join(REPO_ROOT, 'packages'));
-  for (const name of packages.sort()) {
-    await setPackageVersion(`packages/${name}/package.json`, next);
+  const packageJsonPaths = await listPackageJsonPaths(join(REPO_ROOT, 'packages'));
+  for (const relPath of packageJsonPaths) {
+    await setPackageVersion(relPath, next);
   }
   await setPackageVersion('cli/package.json', next);
 

@@ -42,6 +42,7 @@ describe('writeEnvBlock', () => {
     );
 
     expect(result.keysWritten).toEqual(['CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_API_TOKEN']);
+    expect(result.keysRemoved).toEqual([]);
     const written = await readFile(join(dir, '.env'), 'utf8');
     expect(written).toContain('EXISTING=keep');
     expect(written).toContain('CLOUDFLARE_ACCOUNT_ID=acc123');
@@ -59,5 +60,49 @@ describe('writeEnvBlock', () => {
     expect(written).not.toContain('CLOUDFLARE_API_TOKEN=old');
     expect(written.match(/CLOUDFLARE_API_TOKEN=/g)).toHaveLength(1);
     expect(written).toContain('OTHER=x');
+  });
+
+  it('writes .env.local when fileName is set and can remove stale keys', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'vk-env-'));
+    await writeFile(
+      join(dir, '.env.local'),
+      'CLOUDFLARE_API_TOKEN=stale\nLEMONSQUEEZY_API_KEY=live\n',
+      'utf8',
+    );
+
+    const result = await writeEnvBlock(
+      {
+        LEMONSQUEEZY_TEST_MODE: 'true',
+        LEMONSQUEEZY_TEST_MODE_API_KEY: 'test-key',
+      },
+      dir,
+      { fileName: '.env.local', removeKeys: ['CLOUDFLARE_API_TOKEN'] },
+    );
+
+    expect(result.keysWritten).toEqual([
+      'LEMONSQUEEZY_TEST_MODE',
+      'LEMONSQUEEZY_TEST_MODE_API_KEY',
+    ]);
+    expect(result.keysRemoved).toEqual(['CLOUDFLARE_API_TOKEN']);
+    const written = await readFile(join(dir, '.env.local'), 'utf8');
+    expect(written).toContain('LEMONSQUEEZY_API_KEY=live');
+    expect(written).toContain('LEMONSQUEEZY_TEST_MODE=true');
+    expect(written).not.toContain('CLOUDFLARE_API_TOKEN');
+  });
+
+  it('dedupes duplicate assignment lines for the same key', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'vk-env-'));
+    await writeFile(
+      join(dir, '.env'),
+      'STORE_PRODUCT_ID=old\nFOO=1\nSTORE_PRODUCT_ID=also-old\n',
+      'utf8',
+    );
+
+    await writeEnvBlock({ STORE_PRODUCT_ID: '1855372' }, dir);
+
+    const written = await readFile(join(dir, '.env'), 'utf8');
+    expect(written.match(/STORE_PRODUCT_ID=/g)).toHaveLength(1);
+    expect(written).toContain('STORE_PRODUCT_ID=1855372');
+    expect(written).toContain('FOO=1');
   });
 });

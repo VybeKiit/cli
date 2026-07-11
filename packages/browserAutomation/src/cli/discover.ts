@@ -15,8 +15,6 @@ export type DiscoverResult = {
   readonly store: CwsStoreConfig;
 };
 
-export { parseCwsStoreConfig } from '@vybekiit/browser-automation/domains/extension/cwsStoreSchema';
-
 /**
  * Walk up from a directory until the Chrome Web Store config exists.
  *

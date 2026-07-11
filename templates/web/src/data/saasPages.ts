@@ -42,14 +42,4 @@ const getDashboardSaasPage = (slug: string): SaasPageDefinition | undefined => {
   return page;
 };
 
-export { DASHBOARD_NAV_LINKS } from '@/data/dashboardSaasNav';
-export { DASHBOARD_SAAS_PAGES } from '@/data/dashboardSaasPages';
-export { PUBLIC_SAAS_PAGES } from '@/data/publicSaasPages';
-export type {
-  SaasIconName,
-  SaasMetric,
-  SaasPageAction,
-  SaasPageDefinition,
-  SaasPageItem,
-} from '@/data/saasPageTypes';
 export { getDashboardSaasPage, getPublicSaasPage };

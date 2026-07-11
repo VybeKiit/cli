@@ -5,13 +5,7 @@ import { IntegrationsPage } from '@/components/saas/integrations';
 import { OrdersPage } from '@/components/saas/orders';
 import { TeamsPage } from '@/components/saas/teams';
 import { UserSettingsPage } from '@/components/saas/userSettings';
-import {
-  FEATURE_PAGE_SLUGS,
-  isFeaturePageSlug,
-  type FeaturePageSlug,
-} from '@/data/featurePageSlugs';
-
-export { FEATURE_PAGE_SLUGS, isFeaturePageSlug, type FeaturePageSlug };
+import { isFeaturePageSlug, type FeaturePageSlug } from '@/data/featurePageSlugs';
 
 /**
  * Client page components keyed by dashboard slug. This module stays server-safe

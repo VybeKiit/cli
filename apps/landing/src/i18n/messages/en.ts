@@ -1,6 +1,11 @@
+import { FAQ } from '@/data/faq';
 import type { LandingMessages } from '@/i18n/messages/types';
 
-/** English (source) visitor landing copy. */
+/**
+ * English (source) visitor landing copy.
+ * Positioning: ready infrastructure for AI agents, not “money in session one.”
+ * FAQ items import from `data/faq` so JSON-LD and UI stay one SSOT.
+ */
 export const enMessages: LandingMessages = {
   meta: {
     languageName: 'English',
@@ -8,8 +13,9 @@ export const enMessages: LandingMessages = {
     closeLanguageMenu: 'Close language menu',
   },
   nav: {
-    features: 'Features',
+    features: 'What you get',
     howItWorks: 'How it works',
+    compare: 'Compare',
     pricing: 'Pricing',
     faq: 'FAQ',
     getVybekiit: 'Get VybeKiit',
@@ -20,103 +26,237 @@ export const enMessages: LandingMessages = {
     rights: 'All rights reserved.',
     legal: 'Legal',
     contact: 'Contact',
+    compare: 'Compare kits',
+    brand: 'Brand',
     terms: 'Terms',
     privacy: 'Privacy',
   },
   hero: {
-    eyebrow: 'You direct. The agent builds.',
-    headlineBefore: 'Go live, and take ',
-    headlineHighlight: 'your first payment',
-    headlineAfter: ', in session one.',
+    eyebrow: 'Ready infrastructure for AI agents',
+    headlineBefore: 'From idea to a product you can ',
+    headlineHighlight: 'really launch',
+    headlineAfter: '.',
     subheadBeforePrice:
-      'Describe it in plain language. The agent wires payments, auth, database, and deploy across web, mobile, and a browser extension. One purchase, ',
+      'A code base built for AI agents, with the foundations that usually stop projects before ship: sign-in, database, payments, email, dashboard, monitoring, and deploy already connected in a clear structure. One-time payment, ',
     subheadAfterPrice: '.',
     primaryCta: 'Get VybeKiit',
-    trustMoR: 'Lemon Squeezy · Merchant of Record',
+    trustMoR: 'Secure checkout via Lemon Squeezy',
     trustRefund: 'day refund',
-    trustPlatforms: 'Web · Mobile · Extension',
+    trustPlatforms: 'Lifetime access',
     trustAria: 'Trust promises',
+  },
+  geoLead: {
+    ariaLabel: 'Product definition',
+    brandStrong: 'VybeKiit',
+    beforePrice: ' is a ',
+    afterPrice:
+      ' one-time kit for AI coding agents: owned source with sign-in, database, payments, email, and web + mobile + extension bases.',
+    compareLink: 'Compare kits',
+    midLinks: ' · ',
+    foundersLink: 'For non-technical founders',
+    andWord: ' · ',
+    vibeLink: 'Vibe coding SaaS',
+    end: '',
   },
   builtWith: {
     note: 'this entire landing page was built with VybeKiit',
   },
   techTrust: {
-    agentsHeading: 'Works with the AI coding agents you already use',
-    stackHeading: 'Built with the tools you already trust',
+    agentsHeading: 'Works with the AI tools you already use',
+    stackHeading: 'Built with familiar technologies. The code stays yours.',
   },
   operator: {
-    heading: 'One agent operates the whole stack.',
+    heading: 'You define the product. The agent assembles it.',
     steps: [
       {
         id: 'plan',
-        title: 'Plan',
-        body: 'Turn your idea into a clear plan and data model.',
+        title: 'Describe the idea',
+        body: 'Tell the agent what the product does, who uses it, and what they need to do. No tech document required.',
       },
       {
         id: 'build',
-        title: 'Build',
-        body: 'Generate the full app across web, mobile, and extension.',
+        title: 'Reuse ready pieces',
+        body: 'The agent picks from what is already in VybeKiit: sign-in, database, payments, email, users, dashboard, settings, analytics, monitoring, and deploy.',
       },
       {
         id: 'wire',
-        title: 'Wire',
-        body: 'Connect payments, auth, database, and env config.',
+        title: 'Fit it to your product',
+        body: 'It adapts models, screens, and actions to your idea instead of inventing every feature from a blank page.',
       },
       {
         id: 'verify',
-        title: 'Verify',
-        body: 'Run checks, tests, and security verifications.',
+        title: 'Check before launch',
+        body: 'The structure helps the agent check main flows, access, payments, and important actions. You still review before real users. VybeKiit reduces the work. It does not replace judgment.',
       },
       {
         id: 'live',
-        title: 'Live',
-        body: 'Deploy everything. You go live in session one.',
+        title: 'Go live and keep building',
+        body: 'Ship to supported hosts and keep working on the same base after launch.',
       },
     ],
   },
+  vibeStory: {
+    label: 'THE REALITY',
+    heading: 'Vibe coding starts fast. Shipping is the hard part.',
+    lead: 'AI can draft a first screen in minutes. Real users, payments, permissions, and a stable go-live still stop most projects — not the idea, the missing product base.',
+    stages: [
+      {
+        id: 'magic',
+        title: 'Users and data?',
+        body: 'Who signs in, what is stored, who can see what.',
+      },
+      {
+        id: 'mess',
+        title: 'Payments done right?',
+        body: 'Checkout, webhooks, access after pay.',
+      },
+      {
+        id: 'paste',
+        title: 'Sensitive parts safe?',
+        body: 'Guarded pages and secrets, without leaking keys.',
+      },
+      {
+        id: 'stall',
+        title: 'Ship and stay live?',
+        body: 'Deploy cleanly and notice when something breaks.',
+      },
+    ],
+    bottomLine:
+      'VybeKiit does not replace your agent. It hands the agent a ready base so it builds product, not infrastructure from zero.',
+    softCta: 'You focus on the idea and users. The agent builds on a solid base.',
+    cta: 'Get VybeKiit',
+  },
   problem: {
-    problemLabel: 'THE PROBLEM',
-    problemHeading: 'Boilerplates still leave you holding the bag.',
-    problemBody: 'VybeKiit operates the stack, end to end.',
-    overviewTitle: 'Overview',
-    withoutBadge: 'Without VybeKiit',
+    problemLabel: 'BEFORE VYBEKIIT',
+    problemHeading: 'From a blank page, the agent reinvents the foundation every time.',
+    problemBody:
+      'Sign-in, payments, data, deploy, and checks start as fresh guesses. Each one is another place things break.',
+    overviewTitle: 'From scratch',
+    withoutBadge: 'Blank start',
     rows: [
-      { id: 'payments', label: 'Payments', value: 'Manual' },
-      { id: 'auth', label: 'Auth', value: 'Manual' },
-      { id: 'database', label: 'Database', value: 'Manual' },
+      { id: 'payments', label: 'Payments', value: 'From zero' },
+      { id: 'auth', label: 'Sign-in', value: 'New setup' },
+      { id: 'database', label: 'Database', value: 'From zero' },
       { id: 'deploy', label: 'Deploy', value: 'Manual' },
-      { id: 'you', label: 'You', value: 'Overwhelmed' },
+      { id: 'you', label: 'You', value: 'Guessing' },
     ],
   },
   solution: {
-    solutionLabel: 'THE SOLUTION',
-    solutionHeading: 'Take payments in your first session.',
+    solutionLabel: 'WITH VYBEKIIT',
+    solutionHeading: 'The core features are already built in.',
     solutionBody:
-      'The agent connects payments, handles webhooks, and gives you a working checkout instantly.',
+      'The agent starts from a consistent structure, uses ready features, and focuses on what is unique in your product. Connected payments, clear flows, and room to keep shipping after go-live.',
     toastLabel: 'Payment received',
     revenueLabel: 'Revenue',
     revenueDelta: '+27.4% vs last 7 days',
   },
+  zigZag: {
+    auth: {
+      label: 'SIGN-IN RECIPE',
+      heading: 'Login is already a real product page, not a blank prompt.',
+      body: 'Google OAuth, magic link, and a signed-in session. The agent adapts the screen. You do not rebuild auth from a sketch every project.',
+      welcomeBack: 'Welcome back',
+      signInSubtitle: 'Sign in to your workspace',
+      googleCta: 'Continue with Google',
+      orEmail: 'or email',
+      emailPlaceholder: 'you@studio.com',
+      magicLink: 'Sign in with magic link',
+      signingIn: 'Signing in with Google…',
+      successTitle: 'You are in',
+      successBody: 'Session ready. Protected routes unlock next.',
+      signedInAs: 'ava@studio.com',
+    },
+    settings: {
+      label: 'SETTINGS RECIPE',
+      heading: 'User settings people expect on day one.',
+      body: 'Profile, security, billing, and team rails ship as a connected flow. The agent fills your fields. You are not inventing the account area from zero.',
+      navProfile: 'Profile',
+      navSecurity: 'Security',
+      navBilling: 'Billing',
+      navTeam: 'Team',
+      userName: 'Ava Stone',
+      userEmail: 'ava@studio.com',
+      nameLabel: 'Display name',
+      roleLabel: 'Role',
+      roleValue: 'Product designer',
+      darkMode: 'Dark mode',
+      darkModeHint: 'Match system or force a theme',
+      saveCta: 'Save changes',
+      saved: 'Saved',
+      readyBadge: 'Ready',
+    },
+    race: {
+      label: 'THE BUILD RACE',
+      heading: 'Same vibe coder. Different starting line.',
+      body: 'Without a base, pure vibe coding often surges ahead, then freezes on payments and integrations. With VybeKiit the start is slower, but the path is complete.',
+      withoutTitle: 'Without VybeKiit',
+      withTitle: 'With VybeKiit',
+      building: 'Building',
+      stuck: 'Stuck',
+      finished: 'Shipped',
+      steps: [
+        'First screens look done',
+        'Sign-in and sessions',
+        'Payments and integrations',
+        'Protect sensitive actions',
+        'Deploy and stay live',
+      ],
+    },
+  },
   platforms: {
-    heading: 'One purchase. Web, mobile, and a browser extension.',
-    subhead: 'One agent. Zero plumbing.',
+    heading: 'One base for three product types',
+    subhead:
+      'Not every feature is identical on every platform. VybeKiit gives a shared foundation and examples for each environment.',
     web: 'Web',
     mobile: 'Mobile',
     extension: 'Extension',
+    mockOverview: 'Overview',
+    mockTransactions: 'Transactions',
+    mockCustomers: 'Customers',
+    mockActive: 'Active',
+    mockRefunds: 'Refunds',
+    mockRevenueDelta: '+27.4% vs last 7 days',
+  },
+  pageRecipes: {
+    headline: '{readyCount}+ ready product screens the agent can take and adapt',
+    badge: 'More added over time · One purchase covers included versions',
+    body: 'Not only loose components. Full flows the agent can copy, change, and connect: onboarding, login, dashboard, pricing, checkout, orders, customers, analytics, AI assistant, settings, team, admin, billing, and more. New screens keep landing after you buy.',
+    catalogLabel: 'Full screen catalog · {count} pages',
+    catalogAria: 'Built-in product screen catalog',
+    readyBadge: 'READY',
+  },
+  checkout: {
+    titlePrefix: 'Get VybeKiit',
+    description:
+      'Enter the GitHub account we should invite, then continue to secure payment. Access unlocks when payment goes through.',
+    bulletFull: 'Source code, agent instructions, web + mobile + extension base',
+    bulletOnce: 'One-time price, not a subscription',
+    bulletRefund: 'Money-back window: {days} days',
+    githubLabel: 'GitHub username',
+    githubPlaceholder: 'octocat',
+    githubError: 'Enter a valid GitHub username (letters, numbers, single hyphens).',
+    emailLabel: 'Email',
+    emailPlaceholder: 'you@example.com',
+    emailError: 'Enter a valid email address.',
+    submit: 'Continue to payment',
+    secureNote: 'Secure checkout via Lemon Squeezy.',
+    refundNote: 'Money back within {days} days, per refund terms.',
   },
   compare: {
-    heading: 'Become a software engineer without becoming one.',
+    heading: 'Not an app generator. A ready base packed with features for your agent.',
     subhead:
-      'Other kits hand you code and wish you luck. VybeKiit is the agent that builds, wires, and ships for you.',
+      'Tools like Lovable build inside a managed platform. Classic starters give you code and still expect you to understand and wire everything. VybeKiit sits in the middle: the code is yours, the agent does most of the connection work, the architecture and base features are ready, and you are not locked to one editor or host.',
     footnote:
-      'Need deep multi-tenant B2B on day one (RBAC, admin, jobs)? MakerKit and Supastarter are stronger there. VybeKiit wins when you want the agent to operate the whole product so you never read the code.',
+      'Need a heavy team product with roles and admin tools on day one? MakerKit and Supastarter are stronger there. VybeKiit fits people who build with AI and do not want every project to restart as a new experiment in security, payments, and infrastructure.',
+    optionColumn: 'Option',
+    youBadge: 'You',
     axes: {
       price: 'Price',
-      agentOperates: 'Agent builds it for you',
-      plainLanguage: 'Plain language only',
-      updatesInstall: 'Updates install (no merge)',
-      threePlatforms: 'Web + mobile + extension',
-      taxesHandled: 'Taxes handled (MoR)',
+      agentOperates: 'Agent starts from a ready base',
+      plainLanguage: 'Clear instructions for the agent',
+      updatesInstall: 'Consistent structure for updates',
+      threePlatforms: 'Web + mobile + extension base',
+      taxesHandled: 'Taxes handled on purchase (MoR)',
     },
     coverage: {
       yes: 'Yes',
@@ -125,79 +265,28 @@ export const enMessages: LandingMessages = {
     },
   },
   pricing: {
-    cadence: 'Pay once · yours for life',
+    cadence: 'One-time payment · yours for life',
     savingsBefore: 'Save ',
     savingsAfter:
-      '% vs buying web + mobile + extension kits alone · Every purchase raises the price',
+      '% vs buying site + phone + browser add-on packages alone · Every purchase raises the price',
     bullets: [
-      'AI Operator + Web + Mobile + Extension',
-      'All features. No limits.',
-      'Lifetime access. Yours forever.',
+      'Source code + agent instructions',
+      'Web, mobile, and browser-extension base',
+      'Sign-in, payments, database, email, dashboard, 46+ screens',
     ],
     refundBulletPrefix: '',
-    refundBulletSuffix: '-day money-back guarantee.',
+    refundBulletSuffix: '-day money-back window.',
     cta: 'Get VybeKiit',
   },
   faq: {
-    heading: 'Which package should you get?',
-    items: [
-      {
-        id: 'which-package',
-        question: 'Which package should I get?',
-        answer:
-          'There is only one package. You get the full kit: AI operator + web + mobile + browser extension in a single one-time purchase. No tiers, no “pro” upsell, no picking web-only vs mobile-only. If you only ship a website first, the mobile and extension pieces stay ready for when you need them.',
-      },
-      {
-        id: 'vibe-coder',
-        question: 'I only talk to AI tools. Is this for me?',
-        answer:
-          'Yes. VybeKiit is built for vibe coders: you describe what you want in plain language, and the agent plans, builds, wires payments, verifies, and puts it live. You do not need to read code, fix merges, or learn DevOps. If you already use Claude Code, Cursor, Codex, Kiro, or a similar tool, you are the target buyer.',
-      },
-      {
-        id: 'best-for-non-technical',
-        question: 'What is the best SaaS kit if I am not a developer?',
-        answer:
-          'VybeKiit is the best fit when you want the agent to operate the whole product for you. Other kits hand you code and assume a developer stays in the loop. If you can already ship from a blank repo yourself, a free open-source starter may be enough. If you want “describe it → first payment,” pick VybeKiit.',
-      },
-      {
-        id: 'only-need-web',
-        question: 'I only need a website. Should I still buy the full kit?',
-        answer:
-          'Yes. The price is for the whole kit, and web is the path you start on. Mobile and the browser extension ship in the same purchase so you never pay again when your idea grows. There is no cheaper web-only SKU because the value is one agent that runs the full product, not a pile of half-kits.',
-      },
-      {
-        id: 'vs-shipfast-lovable',
-        question: 'How does this compare to ShipFast, Lovable, or MakerKit?',
-        answer:
-          'ShipFast and MakerKit are great if you are a developer who wants boilerplate and will wire the rest yourself. Lovable and similar AI builders are great for quick UI demos, not for owning a real stack with payments, updates, and three platforms. VybeKiit is the pick when you want one purchase, plain language, and an agent that actually ships and maintains the product.',
-      },
-      {
-        id: 'price-worth-it',
-        question: 'Why is it $29 when other kits cost $199+?',
-        answer:
-          'Because the product is one kit for vibe coders, not a stack of developer tools sold separately. Buying web + mobile + extension from rival kits can run past $600. VybeKiit bundles all three plus the agent operator for a launch price of $29 one-time, with a 14-day refund if it is not for you.',
-      },
-      {
-        id: 'claude-cursor-kiro',
-        question: 'Does it work with Claude Code, Cursor, Codex, and Kiro?',
-        answer:
-          'Yes. VybeKiit is designed so your AI coding tool is the operator: it decides the next step, runs it, and checks the result before moving on. Bring the agent you already pay for. You are not locked into one vendor’s chat UI.',
-      },
-      {
-        id: 'refund-risk',
-        question: 'What if it does not work for me?',
-        answer:
-          'You get a 14-day money-back window. Request a refund and GitHub access to the private repos is revoked. The goal is zero regret: try the flow, see if the agent can take you to a live checkout, and only keep it if it fits how you build.',
-      },
-      {
-        id: 'taxes-payments',
-        question: 'Do I have to handle sales tax and VAT myself?',
-        answer:
-          'No, if you use the default Lemon Squeezy path. Lemon Squeezy is a Merchant of Record, so it files global VAT and sales tax for you. You can still swap payment providers later; the kit is built so the agent wires checkout either way.',
-      },
-    ],
+    heading: 'Common questions',
+    items: FAQ.map((item) => ({
+      id: item.id,
+      question: item.question,
+      answer: item.answer,
+    })),
   },
   brand: {
-    tagline: 'The blueprint for vibe coders. Ship projects like a real software engineer.',
+    tagline: 'Ready infrastructure for products built with AI.',
   },
 };

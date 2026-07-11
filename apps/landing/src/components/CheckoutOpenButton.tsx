@@ -37,22 +37,24 @@ export const CheckoutOpenButton = ({
 }: CheckoutOpenButtonProps) => {
   const { openCheckout } = useCheckoutDialog();
 
+  const handleOpenCheckout = (): void => {
+    trackClient(AnalyticsEvent.ctaClicked, {
+      location,
+      href: '#checkout-dialog',
+      surface: 'CheckoutOpenButton',
+      ...(trackLabel === undefined ? {} : { label: trackLabel }),
+    });
+    onClick?.();
+    openCheckout(location);
+  };
+
   return (
     <Button
       type="button"
       size={size}
       variant={variant}
       className={cn('rounded-full', className)}
-      onClick={() => {
-        trackClient(AnalyticsEvent.ctaClicked, {
-          location,
-          href: '#checkout-dialog',
-          surface: 'CheckoutOpenButton',
-          ...(trackLabel === undefined ? {} : { label: trackLabel }),
-        });
-        onClick?.();
-        openCheckout(location);
-      }}
+      onClick={handleOpenCheckout}
     >
       {children}
     </Button>

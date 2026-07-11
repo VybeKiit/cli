@@ -71,17 +71,17 @@ export const PlatformsBundle = () => {
               url="app.yourapp.com"
             >
               <div className="space-y-3 bg-background p-4">
-                <p className="font-semibold text-xs">Overview</p>
+                <p className="font-semibold text-xs">{platforms.mockOverview}</p>
                 <p className="font-bold text-2xl tracking-tight">$2,841</p>
-                <p className="text-[10px] text-emerald-600">+27.4% vs last 7 days</p>
+                <p className="text-xs text-emerald-600">{platforms.mockRevenueDelta}</p>
                 <Sparkline className="h-16 w-full" id="platform-web-spark" />
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <div className="rounded-md border border-border bg-muted/40 p-2">
-                    <p className="text-[10px] text-muted-foreground">Transactions</p>
+                    <p className="text-xs text-muted-foreground">{platforms.mockTransactions}</p>
                     <p className="font-semibold text-sm">128</p>
                   </div>
                   <div className="rounded-md border border-border bg-muted/40 p-2">
-                    <p className="text-[10px] text-muted-foreground">Customers</p>
+                    <p className="text-xs text-muted-foreground">{platforms.mockCustomers}</p>
                     <p className="font-semibold text-sm">84</p>
                   </div>
                 </div>
@@ -102,21 +102,21 @@ export const PlatformsBundle = () => {
           preview={
             <MiniPhoneShell className="w-[148px] max-w-none">
               <div className="space-y-2.5 px-3 pb-1">
-                <p className="font-semibold text-white text-xs">Overview</p>
+                <p className="font-semibold text-white text-xs">{platforms.mockOverview}</p>
                 <p className="font-bold text-2xl text-white tracking-tight">$2,841</p>
-                <p className="text-[10px] text-emerald-400">+27.4%</p>
+                <p className="text-xs text-emerald-400">+27.4%</p>
                 <Sparkline className="h-12 w-full" id="platform-mobile-spark" />
                 <div className="rounded-lg bg-white/5 p-2">
-                  <p className="text-[10px] text-white/50">Transactions</p>
+                  <p className="text-xs text-white/50">{platforms.mockTransactions}</p>
                   <p className="font-semibold text-sm text-white">128</p>
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   <div className="rounded-md bg-white/5 p-1.5">
-                    <p className="text-[9px] text-white/45">Active</p>
+                    <p className="text-xs text-white/45">{platforms.mockActive}</p>
                     <p className="font-semibold text-white text-xs">84</p>
                   </div>
                   <div className="rounded-md bg-white/5 p-1.5">
-                    <p className="text-[9px] text-white/45">Refunds</p>
+                    <p className="text-xs text-white/45">{platforms.mockRefunds}</p>
                     <p className="font-semibold text-white text-xs">2</p>
                   </div>
                 </div>

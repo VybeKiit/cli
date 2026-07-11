@@ -4,70 +4,49 @@
  * vybekiit-automate — unified dashboard automation CLI (registry dispatch).
  */
 
-import {
-  registerAnthropicDomain,
-  registerOpenAiDomain,
-} from '@vybekiit/browser-automation/domains/ai/cli';
-import { registerSupabaseDomain } from '@vybekiit/browser-automation/domains/dbs/cli';
-import {
-  registerNeonDomain,
-  registerUpstashDomain,
-} from '@vybekiit/browser-automation/domains/dbs/neonUpstash';
-import { registerExtensionDomain } from '@vybekiit/browser-automation/domains/extension/cli';
-import { registerGoogleDomain } from '@vybekiit/browser-automation/domains/google/cli';
-import { registerCfDomain } from '@vybekiit/browser-automation/domains/infra/cli';
-import {
-  registerRailwayDomain,
-  registerVercelDomain,
-} from '@vybekiit/browser-automation/domains/infra/cliAuthProvider';
-import {
-  registerGithubDomain,
-  registerResendDomain,
-  registerSentryDomain,
-} from '@vybekiit/browser-automation/domains/misc/cli';
-import {
-  registerLsDomain,
-  registerLsTopLevelAlias,
-} from '@vybekiit/browser-automation/domains/payments/ls/cli';
-import {
-  registerGdTopLevelAlias,
-  registerGodaddyDomain,
-} from '@vybekiit/browser-automation/domains/registrars/godaddy/cli';
-import {
-  registerNamecheapDomain,
-  registerNcTopLevelAlias,
-} from '@vybekiit/browser-automation/domains/registrars/namecheap/cli';
+import { buildAutomationRegistry } from './buildRegistry';
+import { listAutomationCatalog } from './catalog';
 import { parseGlobalFlags } from './flags';
-import { printError, printLine } from './output';
-import { createRegistry } from './registry';
+import { printError, printJson, printLine } from './output';
 
-const registry = createRegistry();
-registerExtensionDomain(registry);
-registerLsDomain(registry);
-registerLsTopLevelAlias(registry);
-registerNamecheapDomain(registry);
-registerNcTopLevelAlias(registry);
-registerGodaddyDomain(registry);
-registerGdTopLevelAlias(registry);
-registerGoogleDomain(registry);
-registerSupabaseDomain(registry);
-registerCfDomain(registry);
-registerRailwayDomain(registry);
-registerVercelDomain(registry);
-registerNeonDomain(registry);
-registerUpstashDomain(registry);
-registerOpenAiDomain(registry);
-registerAnthropicDomain(registry);
-registerGithubDomain(registry);
-registerResendDomain(registry);
-registerSentryDomain(registry);
+const registry = buildAutomationRegistry();
 
-const main = async (argv: string[]): Promise<number> => {
+/**
+ * Dispatch a catalog list request for agents / MCP.
+ *
+ * @param flagsJson - Whether the caller requested JSON output.
+ * @returns Process exit code.
+ * @example
+ * handleCatalogCommand(true);
+ */
+const handleCatalogCommand = (flagsJson: boolean): number => {
+  const catalog = listAutomationCatalog(registry);
+  if (flagsJson) {
+    printJson({ ok: true, total: catalog.length, items: catalog });
+  } else {
+    printLine(registry.formatHelp());
+  }
+  return 0;
+};
+
+/**
+ * Run the automation CLI against argv (without the binary name).
+ *
+ * @param argv - CLI arguments after `vybekiit-automate`.
+ * @returns Process exit code.
+ * @example
+ * await main(['ls', 'setup', '--json']);
+ */
+export const main = async (argv: string[]): Promise<number> => {
   const { flags, rest } = parseGlobalFlags(argv);
 
   if (rest.length === 0 || rest[0] === '--help' || rest[0] === '-h') {
     printLine(registry.formatHelp());
     return 0;
+  }
+
+  if (rest[0] === 'catalog' || rest[0] === 'list') {
+    return handleCatalogCommand(flags.json || rest.includes('--json'));
   }
 
   const [domainName, commandName, ...commandArgs] = rest;
@@ -120,6 +99,16 @@ const main = async (argv: string[]): Promise<number> => {
   }
 };
 
-main(process.argv.slice(2)).then((code) => {
-  process.exitCode = code;
-});
+/**
+ * CLI entry: run main and exit with its code.
+ *
+ * @returns Never returns after process.exit.
+ * @example
+ * void runCli();
+ */
+const runCli = async (): Promise<void> => {
+  const code = await main(process.argv.slice(2));
+  process.exit(code);
+};
+
+void runCli();

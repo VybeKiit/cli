@@ -6,7 +6,7 @@
 # Never shipped to a buyer's scaffolded repo — a blocking pre-push would trap a non-coder behind red.
 #
 # Gate ONLY pushes to the monorepo itself. `pnpm mirror` force-pushes derived subtree splits to the
-# delivery mirrors (VybeKiit/web|mobile|extension|cli|infra) — those are artifacts, not source, so
+# delivery mirrors (VybeKiit/kit|web|mobile|extension|cli|infra) — those are artifacts, not source, so
 # running the maintainer gate against them is meaningless and was aborting the sync. Git passes the
 # target remote URL as $2; the monorepo repo path ends in `vybekiit`, the mirrors never do.
 remote_url="$2"

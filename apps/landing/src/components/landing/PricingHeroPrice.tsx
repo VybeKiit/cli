@@ -34,7 +34,7 @@ export const PricingHeroPrice = ({
             <span>$</span>
             <span className="pricing-price-amount">{PRICE.amount}</span>
           </span>
-          <span className="pricing-cadence pb-2 text-[32px] text-white">One-time</span>
+          <span className="pricing-cadence pb-2 text-4xl text-white">One-time</span>
         </div>
       </div>
 

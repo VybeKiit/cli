@@ -32,6 +32,3 @@ export const PROFILE_PATHS = {
   godaddy: `${HOME_DIR}/.gd-chrome-profile`,
   supabase: `${HOME_DIR}/.supabase-chrome-profile`,
 } as const;
-
-/** @deprecated Use PROFILE_PATHS.extension */
-export const CWS_PROFILE_PATH = PROFILE_PATHS.extension;

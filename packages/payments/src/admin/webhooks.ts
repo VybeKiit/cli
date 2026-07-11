@@ -114,20 +114,29 @@ export const listStoreWebhooks = async (storeId: string): Promise<readonly Store
 
 /**
  * Find a store webhook by endpoint URL, tolerant of trailing-slash/case differences
- * (via fresh-squeezy's {@link sameWebhookUrl}).
+ * (via fresh-squeezy's {@link sameWebhookUrl}). Optionally require the same test/live
+ * mode so a live webhook never shadows a test-mode registration (or vice versa).
  *
  * @param storeId - Lemon Squeezy store id.
  * @param url - Endpoint URL to match.
+ * @param testMode - When set, only match webhooks in that mode.
  * @returns The matching webhook, or `null`.
  * @example
- * const hook = await findStoreWebhookByUrl('270009', 'https://vybekiit.com/api/webhook');
+ * const hook = await findStoreWebhookByUrl('270009', 'https://vybekiit.com/api/webhook', true);
  */
 export const findStoreWebhookByUrl = async (
   storeId: string,
   url: string,
+  testMode?: boolean,
 ): Promise<StoreWebhook | null> => {
   const webhooks = await listStoreWebhooks(storeId);
-  return webhooks.find((webhook) => sameWebhookUrl(webhook.url, url)) ?? null;
+  return (
+    webhooks.find(
+      (webhook) =>
+        sameWebhookUrl(webhook.url, url) &&
+        (testMode === undefined || webhook.testMode === testMode),
+    ) ?? null
+  );
 };
 
 /** Inputs for creating a store webhook. */
@@ -191,7 +200,8 @@ export type EnsureStoreWebhookResult = {
 export const ensureStoreWebhook = async (
   params: CreateStoreWebhookParams,
 ): Promise<EnsureStoreWebhookResult> => {
-  const existing = await findStoreWebhookByUrl(params.storeId, params.url);
+  const wantTestMode = params.testMode ?? true;
+  const existing = await findStoreWebhookByUrl(params.storeId, params.url, wantTestMode);
   if (existing !== null) {
     return { webhook: existing, created: false };
   }

@@ -96,7 +96,7 @@ export const OperatorConsoleMock = () => (
               </span>
               <span className="text-[var(--light-text)] text-xs">{row.text}</span>
               {row.time ? (
-                <span className="ms-auto text-[10px] text-[var(--light-muted)]">{row.time}</span>
+                <span className="ms-auto text-xs text-[var(--light-muted)]">{row.time}</span>
               ) : null}
             </li>
           ))}

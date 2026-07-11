@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { VIBE_HINTS } from '@/data/vibeHints';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
+import { vibeHintFor } from '@/i18n/vibeHints';
 import { cn } from '@/lib/utils';
 
 export type BrandMarkVibeHintMode = 'tooltip-only' | 'tooltip-and-mobile-subtitle';
@@ -34,7 +35,8 @@ interface BrandMarkVibeHintProps {
  * ```
  */
 export const BrandMarkVibeHintMobile = ({ slug }: { readonly slug: string }) => {
-  const hint = VIBE_HINTS[slug];
+  const { locale } = useLandingLocale();
+  const hint = vibeHintFor(locale, slug);
   if (!hint) {
     return null;
   }
@@ -129,7 +131,8 @@ export const BrandMarkVibeHint = ({
   side = 'top',
   onCascadeInterrupt,
 }: BrandMarkVibeHintProps) => {
-  const hint = VIBE_HINTS[slug];
+  const { locale } = useLandingLocale();
+  const hint = vibeHintFor(locale, slug);
   const labelId = useId();
   const [finePointer, setFinePointer] = useState(true);
   const [hoverOpen, setHoverOpen] = useState(false);

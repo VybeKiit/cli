@@ -47,7 +47,8 @@ VybeKiit это платный стартовый набор для vibe coders:
 После доступа к VybeKiit создайте стартовую точку приложения (помощник может выполнить это за вас):
 
 ```bash
-npx vybekiit new web my-app
+npx vybekiit setup
+npx vybekiit create app --web
 ```
 
 Затем откройте новую папку в AI‑инструменте и вставьте промпт выше или просто скажите:

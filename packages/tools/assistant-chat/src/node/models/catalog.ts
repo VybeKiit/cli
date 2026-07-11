@@ -1,14 +1,20 @@
 import type { AssistantModelOption } from '@vybekiit/assistant-chat/capabilities';
 import type { VybeAssistant } from '@vybekiit/report-mode';
 
-/** Static Claude model aliases used when the live model API is unavailable. */
+/**
+ * Static Claude model aliases used when the live model API is unavailable.
+ * Labels track Claude Code’s alias surface; costs resolve via `modelMeta`.
+ */
 export const CLAUDE_FALLBACK_MODELS: readonly AssistantModelOption[] = [
   { id: 'sonnet', label: 'Sonnet (latest)', default: true },
   { id: 'opus', label: 'Opus (latest)' },
   { id: 'haiku', label: 'Haiku (latest)' },
 ];
 
-/** Static Codex model aliases used when the live model API is unavailable. */
+/**
+ * Static Codex model aliases used when the live model API is unavailable.
+ * Costs resolve via `modelMeta` (OpenAI published API rates).
+ */
 export const CODEX_FALLBACK_MODELS: readonly AssistantModelOption[] = [
   { id: 'gpt-4.1', label: 'GPT-4.1', default: true },
   { id: 'o3', label: 'o3' },

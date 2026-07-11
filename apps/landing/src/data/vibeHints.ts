@@ -1,27 +1,29 @@
-/** Cheeky plain-English vibe hints keyed by brand-mark slug. One string per slug. */
+/**
+ * English SSOT for brand-mark vibe hints (plain language, no coding jargon).
+ * Localized catalogs live under `src/i18n/vibeHints/`.
+ */
 export const VIBE_HINTS: Readonly<Record<string, string>> = {
   // AI coding agents (trust strip top marquee)
   cursor:
-    'Your AI coding buddy. You describe the app in plain words; it types and never asks you to touch plumbing.',
+    'Your AI coding buddy. You describe the app in plain words; it types and never asks you to touch the plumbing.',
   claude:
     'The agent that reads your whole project and actually gets the goal. You talk; it builds.',
   codex:
     'OpenAI coding agent in the terminal. Same VybeKiit skills; pick the agent you already use.',
-  kiro: "Amazon's AI coding agent. Same kit and skills; stay in the agent you like.",
-  kimi: "Moonshot's coding agent. Describe the product; it works the kit for you.",
-  zed: 'Fast editor with its own AI. Still runs the full VybeKiit plan → live flow.',
+  kiro: "Amazon's AI coding agent. Same package and skills; stay in the agent you like.",
+  kimi: "Moonshot's coding agent. Describe the product; it works the package for you.",
+  zed: 'Fast editor with its own AI. Still runs the full VybeKiit path: idea → live app.',
   opencode: 'Open-source coding agent. Same plain-language skills; no lock-in to one vendor.',
-  grok: 'xAI coding agent. Prompt like a vibe coder; ship payments and deploy in session one.',
-  googlegemini: "Google's coding agent. Same stack skills; you never juggle a different playbook.",
-  devin: 'Autonomous software agent. VybeKiit gives it the stack, payments, and ship checklist.',
+  grok: 'xAI coding agent. Talk in plain language; it builds on a ready base instead of inventing infrastructure from zero.',
+  googlegemini: "Google's coding agent. Same skills; you never juggle a different playbook.",
+  devin: 'Autonomous software agent. VybeKiit gives it payments, memory, and the ship checklist.',
 
   // Builder tools / product stack
   github:
-    'Where your code lives online so you never lose a file. Your agent pushes; you never learn git.',
+    'Where your project lives online so you never lose a file. Your agent uploads; you never learn git.',
   figma:
     'Design mockups if you want them. Most vibe coders skip it; the agent builds screens from words.',
-  typescript:
-    'Code with guardrails so things break loudly instead of silently. Your agent writes it.',
+  typescript: 'Guardrails so things break out loud instead of silently. Your agent writes it.',
   nodedotjs:
     "It's a server. Doesn't tell you much, huh? Good news: your agent lives here so you don't have to.",
   playwright:
@@ -36,7 +38,7 @@ export const VIBE_HINTS: Readonly<Record<string, string>> = {
   shadcn:
     'Pre-built screen pieces that look polished. You say "make a dashboard"; the agent picks them.',
   supabase:
-    "Where your app's info lives: users, orders, settings. Agent sets it up; you stay out of admin panels.",
+    'Where your app remembers things: users, orders, settings. Agent sets it up; you stay out of admin panels.',
   cloudflare: 'Where your site lives on the internet: fast, cheap, worldwide. Agent puts it live.',
   lemonsqueezy:
     'The cash register that also handles tax headaches. Paste one key; buyers pay; you get paid.',

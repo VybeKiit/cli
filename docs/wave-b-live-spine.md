@@ -19,7 +19,7 @@ Manual steps when maintainer secrets are available. Code + mocked tests ship in 
 ## 2. GitHub gate (#4)
 
 - Create `GITHUB_GATE_TOKEN` with repo + invite scope on `VybeKiit` org
-- Confirm `GITHUB_GATE_REPOS=web,mobile,extension`
+- Confirm `GITHUB_GATE_REPOS=kit,web,mobile,extension`
 - Test invite: call webhook with test payload or manual API call
 
 ## 3. Cloudflare deploy (#7)
@@ -54,8 +54,8 @@ Workflow filename **must stay `publish.yml`**.
 See [tracer-bullet-runbook.md](./tracer-bullet-runbook.md).
 
 1. Stranger pays $1 on landing
-2. GitHub invited to web + mobile + extension mirrors
-3. `npx vybekiit web` clones template
+2. GitHub invited to kit + web + mobile + extension
+3. `npx vybekiit create app --web` clones kit workspace
 4. `onboarding` skill → live app with payments
 
 Record friction as follow-up issues.

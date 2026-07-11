@@ -39,7 +39,7 @@ export const AgentBadge = ({ agent, pulse = false }: AgentBadgeProps) => (
     </span>
     <span className="hidden text-zinc-200 sm:inline">{agent.name}</span>
     {agent.mcpSupported && (
-      <span className="ml-1 rounded-full bg-vybe-500/15 px-2 py-0.5 font-semibold text-[10px] text-vybe-300 uppercase tracking-wider">
+      <span className="ml-1 rounded-full bg-vybe-500/15 px-2 py-0.5 font-semibold text-xs text-vybe-300 uppercase tracking-wider">
         MCP
       </span>
     )}

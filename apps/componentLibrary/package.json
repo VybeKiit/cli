@@ -9,9 +9,11 @@
     "build": "node ../../scripts/dev/sync/buildComponentLibraryIndex.mjs && node ../../scripts/dev/sync/buildPageRecipeIndex.mjs && next build",
     "start": "next start --port 3002",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test": "vitest run",
     "test:e2e": "node scripts/runE2e.mjs"
   },
   "dependencies": {
+    "@number-flow/react": "^0.6.1",
     "@radix-ui/react-dialog": "^1.1.17",
     "@tanstack/react-virtual": "^3.14.5",
     "@vybekiit/ui": "workspace:*",
@@ -29,12 +31,18 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "jsdom": "^25.0.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "catalog:"
   }
 }

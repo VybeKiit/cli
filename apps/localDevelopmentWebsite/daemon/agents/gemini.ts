@@ -28,5 +28,3 @@ export const spawnGemini = (
 
   return { id: 'gemini', sessionId, process: proc, onOutput, onExit };
 };
-
-export type { AgentProcess };

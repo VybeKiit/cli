@@ -25,6 +25,7 @@ import {
 } from '@tabler/icons-react';
 import { useMail } from '@/components/sidebar-04/mail-context';
 import { NavUser } from '@/components/sidebar-04/nav-user';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 // This is sample data
 const data = {
@@ -158,16 +159,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
   const [mails, setMails] = React.useState(data.mails);
   const [query, setQuery] = React.useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const { setOpen } = useSidebar();
   const { setSelectedMail } = useMail();
 
   const filteredMails = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     if (!q) return mails;
     return mails.filter((m) =>
       [m.name, m.email, m.subject, m.teaser].join('\n').toLowerCase().includes(q),
     );
-  }, [mails, query]);
+  }, [mails, debouncedQuery]);
 
   return (
     <div className="flex">

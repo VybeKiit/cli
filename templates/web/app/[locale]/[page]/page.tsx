@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { SaasPageView } from '@/components/saas-page-view';
-import { getPublicSaasPage, PUBLIC_SAAS_PAGES } from '@/data/saasPages';
+import { PUBLIC_SAAS_PAGES } from '@/data/publicSaasPages';
+import { getPublicSaasPage } from '@/data/saasPages';
 
 interface PublicSaasRoutePageProps {
   readonly params: Promise<{

@@ -22,7 +22,10 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
-import useDebounce from "@/components/kokonutui/use-debounce";
+import {
+  SEARCH_DEBOUNCE_MS,
+  useDebouncedValue,
+} from "@/hooks/useDebouncedValue";
 
 interface Action {
   id: string;
@@ -128,7 +131,7 @@ function ActionSearchBar({
   const [isTyping, setIsTyping] = useState(false);
   const [selectedAction, setSelectedAction] = useState<Action | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const debouncedQuery = useDebounce(query, 200);
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
 
   const filteredActions = useMemo(() => {
     if (!debouncedQuery) return actions;

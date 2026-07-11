@@ -3,13 +3,22 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
 import { BookOpen, FileText, FolderOpen, Search, UserRound, X } from 'lucide-react';
 import { type ReactNode, useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type DocKind = 'doc' | 'customer' | 'ticket' | 'post';
 
@@ -148,10 +157,11 @@ export const SearchPage = () => {
   const resultsLiveId = useId();
 
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [kindFilter, setKindFilter] = useState<'all' | DocKind>('all');
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return CORPUS.filter((doc) => {
       const matchesKind = kindFilter === 'all' || doc.kind === kindFilter;
       const matchesQuery =
@@ -160,7 +170,7 @@ export const SearchPage = () => {
         doc.snippet.toLowerCase().includes(q);
       return matchesKind && matchesQuery;
     });
-  }, [query, kindFilter]);
+  }, [debouncedQuery, kindFilter]);
 
   const clear = () => {
     setQuery('');
@@ -168,7 +178,7 @@ export const SearchPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Search motion pass">
       <main className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -188,11 +198,11 @@ export const SearchPage = () => {
               <div className="relative">
                 <Search
                   aria-hidden="true"
-                  className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground"
+                  className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
                   aria-controls={resultsLiveId}
-                  className="pl-9 pr-9"
+                  className="pr-9 pl-9"
                   id={queryId}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search docs, customers, tickets…"
@@ -202,7 +212,7 @@ export const SearchPage = () => {
                 {query.length > 0 ? (
                   <button
                     aria-label="Clear search"
-                    className="-translate-y-1/2 absolute top-1/2 right-2 rounded-md p-1 text-muted-foreground hover:text-foreground"
+                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:text-foreground"
                     onClick={() => setQuery('')}
                     type="button"
                   >
@@ -243,16 +253,22 @@ export const SearchPage = () => {
         </p>
 
         {results.length === 0 ? (
-          <div className="flex flex-col items-center rounded-lg border border-dashed px-4 py-16 text-center">
-            <Search aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-            <h2 className="mt-3 font-semibold">No matches</h2>
-            <p className="mt-1 max-w-sm text-muted-foreground text-sm">
-              Nothing in the index matches that query and type filter.
-            </p>
-            <Button className="mt-4" onClick={clear} type="button" variant="outline">
-              Clear search
-            </Button>
-          </div>
+          <Empty variant="dashed">
+            <EmptyHeader>
+              <EmptyMedia>
+                <Search aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>No matches</EmptyTitle>
+              <EmptyDescription>
+                Nothing in the index matches that query and type filter.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button onClick={clear} type="button" variant="outline">
+                Clear search
+              </Button>
+            </EmptyContent>
+          </Empty>
         ) : (
           <ul aria-label="Search results" className="space-y-2">
             {results.map((doc) => {
@@ -284,44 +300,34 @@ export const SearchPage = () => {
           </ul>
         )}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — the query and type chips recompute results
-              instantly. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset search_documents</code> for the full-text{' '}
-                <code>search_documents</code> table (tsvector + GIN).
-              </li>
-              <li>
-                Index app records (customers, tickets, docs, posts) into{' '}
-                <code>search_documents.content</code> when they change.
-              </li>
-              <li>
-                <code>GET /api/search?q=&amp;kind=</code> runs <code>to_tsquery</code> against{' '}
-                <code>search_vector</code> via <code>@vybekiit/search</code> /{' '}
-                <code>@vybekiit/db</code>.
-              </li>
-              <li>
-                Swap <code>CORPUS</code> for that response; keep empty-state and live count
-                announcements as-is.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — the query and type chips recompute results
+            instantly. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset search_documents</code> for the full-text{' '}
+              <code>search_documents</code> table (tsvector + GIN).
+            </li>
+            <li>
+              Index app records (customers, tickets, docs, posts) into{' '}
+              <code>search_documents.content</code> when they change.
+            </li>
+            <li>
+              <code>GET /api/search?q=&amp;kind=</code> runs <code>to_tsquery</code> against{' '}
+              <code>search_vector</code> via <code>@vybekiit/search</code> /{' '}
+              <code>@vybekiit/db</code>.
+            </li>
+            <li>
+              Swap <code>CORPUS</code> for that response; keep empty-state and live count
+              announcements as-is.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Search motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

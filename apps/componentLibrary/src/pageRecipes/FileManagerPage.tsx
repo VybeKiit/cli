@@ -3,12 +3,23 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { FileText, FolderOpen, ImageIcon, Search, Trash2, UploadCloud } from 'lucide-react';
 import { type ReactNode, useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type FileType = 'pdf' | 'image' | 'text' | 'other';
 type TypeFilter = 'all' | FileType;
@@ -107,13 +118,14 @@ export const FileManagerPage = () => {
 
   const [files, setFiles] = useState<readonly ManagedFile[]>(INITIAL_FILES);
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [uploading, setUploading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return files.filter((file) => {
       if (typeFilter !== 'all' && file.type !== typeFilter) {
         return false;
@@ -123,7 +135,7 @@ export const FileManagerPage = () => {
       }
       return file.name.toLowerCase().includes(q);
     });
-  }, [files, query, typeFilter]);
+  }, [files, debouncedQuery, typeFilter]);
 
   const totalBytes = files.reduce((sum, file) => sum + file.sizeBytes, 0);
   const selected = files.find((file) => file.id === selectedId) ?? null;
@@ -173,7 +185,7 @@ export const FileManagerPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Files motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -193,9 +205,15 @@ export const FileManagerPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Files" value={String(files.length)} />
-          <Kpi label="Storage" value={formatBytes(totalBytes)} />
-          <Kpi label="Visible" value={String(visible.length)} />
+          {(
+            [
+              { key: 'files', label: 'Files', value: String(files.length) },
+              { key: 'storage', label: 'Storage', value: formatBytes(totalBytes) },
+              { key: 'visible', label: 'Visible', value: String(visible.length) },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
@@ -246,63 +264,64 @@ export const FileManagerPage = () => {
                   value={query}
                 />
               </div>
-              <div className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1">
+              <SegmentedControl
+                onValueChange={(value) => setTypeFilter(value as typeof typeFilter)}
+                size="sm"
+                value={typeFilter}
+              >
                 {TYPE_FILTERS.map((option) => (
-                  <button
-                    aria-pressed={typeFilter === option.value}
-                    className={cn(
-                      'rounded-md px-2.5 py-1.5 font-medium text-xs transition-colors sm:text-sm',
-                      typeFilter === option.value
-                        ? 'bg-background shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                    key={option.value}
-                    onClick={() => setTypeFilter(option.value)}
-                    type="button"
-                  >
+                  <SegmentedControlItem key={option.value} value={option.value}>
                     {option.label}
-                  </button>
+                  </SegmentedControlItem>
                 ))}
-              </div>
+              </SegmentedControl>
             </div>
 
             <Card>
               <CardContent className="p-2 sm:p-3">
                 {visible.length === 0 ? (
-                  <div className="flex flex-col items-center px-4 py-14 text-center">
-                    <FolderOpen aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-                    <h2 className="mt-3 font-semibold">
-                      {files.length === 0 ? 'No files yet' : 'No files match'}
-                    </h2>
-                    <p className="mt-1 text-muted-foreground text-sm">
-                      {files.length === 0
-                        ? 'Upload something above to get started.'
-                        : 'Try another search or type filter.'}
-                    </p>
-                    {files.length === 0 ? null : (
-                      <Button
-                        className="mt-4"
-                        onClick={() => {
-                          setQuery('');
-                          setTypeFilter('all');
-                        }}
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                      >
-                        Clear filters
-                      </Button>
-                    )}
-                  </div>
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia>
+                        <FolderOpen aria-hidden="true" />
+                      </EmptyMedia>
+                      <EmptyTitle>
+                        {files.length === 0 ? 'No files yet' : 'No files match'}
+                      </EmptyTitle>
+                      <EmptyDescription>
+                        {files.length === 0
+                          ? 'Upload something above to get started.'
+                          : 'Try another search or type filter.'}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                    <EmptyContent>
+                      {files.length === 0 ? null : (
+                        <Button
+                          onClick={() => {
+                            setQuery('');
+                            setTypeFilter('all');
+                          }}
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                        >
+                          Clear filters
+                        </Button>
+                      )}
+                    </EmptyContent>
+                  </Empty>
                 ) : (
                   <ul aria-label="File list" className="divide-y">
                     {visible.map((file) => (
-                      <li key={file.id}>
+                      <li
+                        className={cn(
+                          'flex items-center gap-3 px-2 py-3 transition-colors hover:bg-muted/50',
+                          selectedId === file.id && 'bg-primary/5',
+                        )}
+                        key={file.id}
+                      >
                         <button
-                          className={cn(
-                            'flex w-full items-center gap-3 px-2 py-3 text-left transition-colors hover:bg-muted/50',
-                            selectedId === file.id && 'bg-primary/5',
-                          )}
+                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
                           onClick={() => setSelectedId(file.id)}
                           type="button"
                         >
@@ -315,20 +334,17 @@ export const FileManagerPage = () => {
                               {file.type.toUpperCase()} · {file.sizeLabel} · {file.uploadedAt}
                             </p>
                           </div>
-                          <Button
-                            aria-label={`Delete ${file.name}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              removeFile(file.id);
-                            }}
-                            size="icon"
-                            type="button"
-                            variant="ghost"
-                            className="h-8 w-8 shrink-0"
-                          >
-                            <Trash2 aria-hidden="true" className="h-4 w-4" />
-                          </Button>
                         </button>
+                        <Button
+                          aria-label={`Delete ${file.name}`}
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => removeFile(file.id)}
+                          size="icon"
+                          type="button"
+                          variant="ghost"
+                        >
+                          <Trash2 aria-hidden="true" className="h-4 w-4" />
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -349,7 +365,7 @@ export const FileManagerPage = () => {
                 <>
                   <div>
                     <p className="text-muted-foreground text-xs">Name</p>
-                    <p className="font-medium break-all">{selected.name}</p>
+                    <p className="break-all font-medium">{selected.name}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground text-xs">Type</p>
@@ -381,48 +397,26 @@ export const FileManagerPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — upload, search, type filter, and delete recompute
-              the list. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Connect file selection to the configured upload provider (R2 / S3 / Supabase
-                storage).
-              </li>
-              <li>
-                Run <code>vybekiit apply-preset file_metadata</code> and save{' '}
-                <code>{'{ name, mime, size_bytes, url, owner_id }'}</code> after upload.
-              </li>
-              <li>
-                <code>GET /api/files?type=&amp;q=</code> loads the list; delete →{' '}
-                <code>DELETE /api/files/:id</code> plus storage object removal.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — upload, search, type filter, and delete recompute
+            the list. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Connect file selection to the configured upload provider (R2 / S3 / Supabase storage).
+            </li>
+            <li>
+              Run <code>vybekiit apply-preset file_metadata</code> and save{' '}
+              <code>{'{ name, mime, size_bytes, url, owner_id }'}</code> after upload.
+            </li>
+            <li>
+              <code>GET /api/files?type=&amp;q=</code> loads the list; delete →{' '}
+              <code>DELETE /api/files/:id</code> plus storage object removal.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Files motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({ label, value }: { readonly label: string; readonly value: string }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-lg tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

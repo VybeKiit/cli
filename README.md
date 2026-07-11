@@ -21,40 +21,53 @@ VybeKiit is a paid starter kit for vibe coders: people who know what they want t
 
 You describe the product. Your helper follows the kit instructions, sets up the app, fixes what is broken, and walks you through the few steps only you can do.
 
-> **Status:** active kit work. The web app starting point, helper instructions, and kit code are in place. The live purchase and access flow is still being finished.
+## Start here (after you purchase)
+
+You do **not** need the green **Code** button on GitHub, and you should **not** use **Download ZIP**.
+
+1. Accept the GitHub invite email (same account you used at checkout).
+2. Install [Node.js](https://nodejs.org/en) 20 or newer if you do not have it.
+3. In Terminal, run:
+
+```bash
+npx vybekiit setup
+npx vybekiit create app --web
+```
+
+(Mobile: `--mobile`. Browser add-on: `--extension`.)
+
+4. Open the **new folder** the command created in your AI coding tool.
+5. Paste the ready prompt below (or simply say **Set up my app.**).
 
 ## Ready prompt for your AI coding tool
 
-Open this project in [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), or any other AI coding tool, then paste:
+Open your new app folder in [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://developers.openai.com/codex/quickstart), [Cursor](https://cursor.com/docs), Grok, Kimi, Roo, [Zed](https://zed.dev/), Kiro, [GitHub Copilot](https://github.com/features/copilot), or any other AI coding tool, then paste:
 
 ```text
-I am a non-technical vibe coder using VybeKiit.
+Set up my app.
 
-Read AGENTS.md and language.md first.
-Talk to me in plain language. One step at a time. Never give me a wall of commands.
-Do not expect me to understand the code.
+I am a non-technical vibe coder. Read AGENTS.md and language.md.
+Speak plain language. One action at a time. Translate any errors.
+Celebrate progress. Do not dump technical steps on me.
 
-Help me work with this starter kit project:
-1. Explain what this folder is for in one short paragraph.
-2. Tell me the single next thing I should do.
-3. If setup is needed, do it yourself when you can, and guide me only through clicks only I can do.
-
-Start now: set me up so I can build with an AI helper without learning the code.
+Start with first-time setup until I can see my app running on my computer.
 ```
 
-## Start here
+### Prefer the helper to drive from the invite only?
 
-After you have VybeKiit access, create your app's starting point (your helper can run this for you):
+After you accept the invite and have Node installed, paste this anywhere:
 
-```bash
-npx vybekiit new web my-app
+```text
+I just bought VybeKiit. I accepted the GitHub invite. I am non-technical.
+
+Do everything for me:
+1. Check Node is installed (need 20 or newer).
+2. Run: npx vybekiit setup
+3. If GitHub login is needed, tell me the ONE click to do, then continue.
+4. Run: npx vybekiit create app --web
+5. Open the new project and run first-time setup until I can open the app in my browser.
+6. Talk to me in plain language. One step at a time. No jargon.
 ```
-
-Then open the new folder in your AI coding tool and paste the prompt above, or simply say:
-
-> **Set up my app.**
-
-Your helper reads the instructions that shipped with your app and takes it from there, one step at a time.
 
 ## Things you can ask for
 
@@ -70,7 +83,7 @@ VybeKiit is built so the helper can decide the technical steps and explain only 
 
 ## What the kit handles
 
-- A real web app starting point.
+- A real web app starting point (plus mobile and browser add-on when you need them).
 - Instructions for AI coding helpers.
 - Paths for checkout, sign-in, saved information, and going live.
 - A local checkup so the helper can verify the app before moving on.
@@ -80,9 +93,11 @@ You should expect to describe your product, review the result, and approve accou
 
 ## What you need
 
-You need [Node.js](https://nodejs.org/en) 20 or newer. The setup command uses a one-line starter that runs the VybeKiit helper tool for you.
+- [Node.js](https://nodejs.org/en) 20 or newer.
+- A paid VybeKiit invite on GitHub (automatic after checkout at [vybekiit.com](https://vybekiit.com)).
+- An AI coding tool you like.
 
-To get your purchased app files, VybeKiit uses a small access tool from GitHub. If it is not ready yet, the kit tells you what to install or sign in to.
+To download your paid kit pieces, the starter uses a small GitHub access tool. If it is not ready yet, `npx vybekiit setup` / `doctor` tells you what to install or sign in to.
 
 ## For agents and maintainers
 

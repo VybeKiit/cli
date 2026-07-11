@@ -31,13 +31,22 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = ({
   className,
   children,
+  overlayClassName,
+  overlayStyle,
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  /** Optional className for the full-screen overlay (e.g. raise z-index above a floating panel). */
+  readonly overlayClassName?: string;
+  /** Optional style for the full-screen overlay. */
+  readonly overlayStyle?: React.CSSProperties;
   ref?: React.RefObject<React.ElementRef<typeof DialogPrimitive.Content> | null>;
 }) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay
+      {...(overlayClassName === undefined ? {} : { className: overlayClassName })}
+      {...(overlayStyle === undefined ? {} : { style: overlayStyle })}
+    />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
@@ -47,7 +56,7 @@ const DialogContent = ({
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-1.5 text-muted-foreground opacity-70 ring-offset-background transition-opacity hover:bg-muted hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+      <DialogPrimitive.Close className="absolute top-4 end-4 rounded-full p-1.5 text-muted-foreground opacity-70 ring-offset-background transition-opacity hover:bg-muted hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
         <X className="size-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -57,7 +66,10 @@ const DialogContent = ({
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
+  <div
+    className={cn('flex flex-col space-y-1.5 text-center sm:text-start', className)}
+    {...props}
+  />
 );
 DialogHeader.displayName = 'DialogHeader';
 

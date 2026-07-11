@@ -3,98 +3,98 @@
 // biome-ignore-all assist/source/organizeImports: generated registry preserves manifest order.
 import type { ComponentType } from 'react';
 
-import { OnboardingPage as OnboardingPageRecipe } from '../pageRecipes/OnboardingPage';
-import { IdeaPlannerPage as IdeaPlannerPageRecipe } from '../pageRecipes/IdeaPlannerPage';
-import { DashboardHomePage as DashboardHomePageRecipe } from '../pageRecipes/DashboardHomePage';
-import { CommandCenterPage as CommandCenterPageRecipe } from '../pageRecipes/CommandCenterPage';
-import { AuthPage as AuthPageRecipe } from '../pageRecipes/AuthPage';
-import { TermsOfServicePage as TermsOfServicePageRecipe } from '../pageRecipes/TermsOfServicePage';
-import { PrivacyPolicyPage as PrivacyPolicyPageRecipe } from '../pageRecipes/PrivacyPolicyPage';
-import { UserSettingsPage as UserSettingsPageRecipe } from '../pageRecipes/UserSettingsPage';
-import { AccountSecurityPage as AccountSecurityPageRecipe } from '../pageRecipes/AccountSecurityPage';
-import { PricingPage as PricingPageRecipe } from '../pageRecipes/PricingPage';
-import { ProductGridPage as ProductGridPageRecipe } from '../pageRecipes/ProductGridPage';
-import { ProductDetailPage as ProductDetailPageRecipe } from '../pageRecipes/ProductDetailPage';
-import { CartPage as CartPageRecipe } from '../pageRecipes/CartPage';
-import { CheckoutPage as CheckoutPageRecipe } from '../pageRecipes/CheckoutPage';
-import { OrdersPage as OrdersPageRecipe } from '../pageRecipes/OrdersPage';
-import { LaunchChecklistPage as LaunchChecklistPageRecipe } from '../pageRecipes/LaunchChecklistPage';
-import { FileManagerPage as FileManagerPageRecipe } from '../pageRecipes/FileManagerPage';
-import { EmailNotificationsPage as EmailNotificationsPageRecipe } from '../pageRecipes/EmailNotificationsPage';
-import { NotificationsCenterPage as NotificationsCenterPageRecipe } from '../pageRecipes/NotificationsCenterPage';
-import { SupportCenterPage as SupportCenterPageRecipe } from '../pageRecipes/SupportCenterPage';
-import { IntegrationsPage as IntegrationsPageRecipe } from '../pageRecipes/IntegrationsPage';
-import { TeamsPage as TeamsPageRecipe } from '../pageRecipes/TeamsPage';
-import { AnalyticsPage as AnalyticsPageRecipe } from '../pageRecipes/AnalyticsPage';
-import { AdminPanelPage as AdminPanelPageRecipe } from '../pageRecipes/AdminPanelPage';
-import { UserManagementPage as UserManagementPageRecipe } from '../pageRecipes/UserManagementPage';
-import { AuditLogPage as AuditLogPageRecipe } from '../pageRecipes/AuditLogPage';
-import { BillingAdminPage as BillingAdminPageRecipe } from '../pageRecipes/BillingAdminPage';
-import { SystemHealthPage as SystemHealthPageRecipe } from '../pageRecipes/SystemHealthPage';
-import { RolePermissionsPage as RolePermissionsPageRecipe } from '../pageRecipes/RolePermissionsPage';
-import { CustomersPage as CustomersPageRecipe } from '../pageRecipes/CustomersPage';
-import { CustomerDetailPage as CustomerDetailPageRecipe } from '../pageRecipes/CustomerDetailPage';
-import { PipelinePage as PipelinePageRecipe } from '../pageRecipes/PipelinePage';
-import { AiAssistantPage as AiAssistantPageRecipe } from '../pageRecipes/AiAssistantPage';
-import { SearchPage as SearchPageRecipe } from '../pageRecipes/SearchPage';
-import { RealtimePage as RealtimePageRecipe } from '../pageRecipes/RealtimePage';
-import { TasksPage as TasksPageRecipe } from '../pageRecipes/TasksPage';
-import { CalendarPage as CalendarPageRecipe } from '../pageRecipes/CalendarPage';
-import { BlogPage as BlogPageRecipe } from '../pageRecipes/BlogPage';
-import { MediaGalleryPage as MediaGalleryPageRecipe } from '../pageRecipes/MediaGalleryPage';
-import { DocsPage as DocsPageRecipe } from '../pageRecipes/DocsPage';
-import { StatusPage as StatusPageRecipe } from '../pageRecipes/StatusPage';
-import { ChangelogPage as ChangelogPageRecipe } from '../pageRecipes/ChangelogPage';
-import { SafetyPage as SafetyPageRecipe } from '../pageRecipes/SafetyPage';
-import { BrandAssetsPage as BrandAssetsPageRecipe } from '../pageRecipes/BrandAssetsPage';
-import { LanguagePage as LanguagePageRecipe } from '../pageRecipes/LanguagePage';
-import { FeatureFlagsPage as FeatureFlagsPageRecipe } from '../pageRecipes/FeatureFlagsPage';
+import { OnboardingPage } from '@library/pageRecipes/OnboardingPage/OnboardingPage';
+import { IdeaPlannerPage } from '@library/pageRecipes/IdeaPlannerPage';
+import { DashboardHomePage } from '@library/pageRecipes/DashboardHomePage/DashboardHomePage';
+import { CommandCenterPage } from '@library/pageRecipes/CommandCenterPage/CommandCenterPage';
+import { AuthPage } from '@library/pageRecipes/AuthPage/AuthPage';
+import { TermsOfServicePage } from '@library/pageRecipes/TermsOfServicePage';
+import { PrivacyPolicyPage } from '@library/pageRecipes/PrivacyPolicyPage';
+import { UserSettingsPage } from '@library/pageRecipes/UserSettingsPage';
+import { AccountSecurityPage } from '@library/pageRecipes/AccountSecurityPage';
+import { PricingPage } from '@library/pageRecipes/PricingPage/PricingPage';
+import { ProductGridPage } from '@library/pageRecipes/ProductGridPage';
+import { ProductDetailPage } from '@library/pageRecipes/ProductDetailPage/ProductDetailPage';
+import { CartPage } from '@library/pageRecipes/CartPage/CartPage';
+import { CheckoutPage } from '@library/pageRecipes/CheckoutPage/CheckoutPage';
+import { OrdersPage } from '@library/pageRecipes/OrdersPage';
+import { LaunchChecklistPage } from '@library/pageRecipes/LaunchChecklistPage';
+import { FileManagerPage } from '@library/pageRecipes/FileManagerPage';
+import { EmailNotificationsPage } from '@library/pageRecipes/EmailNotificationsPage';
+import { NotificationsCenterPage } from '@library/pageRecipes/NotificationsCenterPage/NotificationsCenterPage';
+import { SupportCenterPage } from '@library/pageRecipes/SupportCenterPage';
+import { IntegrationsPage } from '@library/pageRecipes/IntegrationsPage';
+import { TeamsPage } from '@library/pageRecipes/TeamsPage';
+import { AnalyticsPage } from '@library/pageRecipes/AnalyticsPage/AnalyticsPage';
+import { AdminPanelPage } from '@library/pageRecipes/AdminPanelPage';
+import { UserManagementPage } from '@library/pageRecipes/UserManagementPage';
+import { AuditLogPage } from '@library/pageRecipes/AuditLogPage';
+import { BillingAdminPage } from '@library/pageRecipes/BillingAdminPage/BillingAdminPage';
+import { SystemHealthPage } from '@library/pageRecipes/SystemHealthPage';
+import { RolePermissionsPage } from '@library/pageRecipes/RolePermissionsPage';
+import { CustomersPage } from '@library/pageRecipes/CustomersPage/CustomersPage';
+import { CustomerDetailPage } from '@library/pageRecipes/CustomerDetailPage/CustomerDetailPage';
+import { PipelinePage } from '@library/pageRecipes/PipelinePage/PipelinePage';
+import { AiAssistantPage } from '@library/pageRecipes/AiAssistantPage';
+import { SearchPage } from '@library/pageRecipes/SearchPage';
+import { RealtimePage } from '@library/pageRecipes/RealtimePage';
+import { TasksPage } from '@library/pageRecipes/TasksPage';
+import { CalendarPage } from '@library/pageRecipes/CalendarPage';
+import { BlogPage } from '@library/pageRecipes/BlogPage';
+import { MediaGalleryPage } from '@library/pageRecipes/MediaGalleryPage';
+import { DocsPage } from '@library/pageRecipes/DocsPage/DocsPage';
+import { StatusPage } from '@library/pageRecipes/StatusPage';
+import { ChangelogPage } from '@library/pageRecipes/ChangelogPage';
+import { SafetyPage } from '@library/pageRecipes/SafetyPage';
+import { BrandAssetsPage } from '@library/pageRecipes/BrandAssetsPage';
+import { LanguagePage } from '@library/pageRecipes/LanguagePage';
+import { FeatureFlagsPage } from '@library/pageRecipes/FeatureFlagsPage/FeatureFlagsPage';
 
-export const PAGE_RECIPE_COMPONENTS = {
-  'onboarding': OnboardingPageRecipe,
-  'idea-planner': IdeaPlannerPageRecipe,
-  'dashboard-home': DashboardHomePageRecipe,
-  'command-center': CommandCenterPageRecipe,
-  'auth': AuthPageRecipe,
-  'terms-of-service': TermsOfServicePageRecipe,
-  'privacy-policy': PrivacyPolicyPageRecipe,
-  'user-settings': UserSettingsPageRecipe,
-  'account-security': AccountSecurityPageRecipe,
-  'pricing': PricingPageRecipe,
-  'product-grid': ProductGridPageRecipe,
-  'product-detail': ProductDetailPageRecipe,
-  'cart': CartPageRecipe,
-  'checkout': CheckoutPageRecipe,
-  'orders': OrdersPageRecipe,
-  'launch-checklist': LaunchChecklistPageRecipe,
-  'file-manager': FileManagerPageRecipe,
-  'email-notifications': EmailNotificationsPageRecipe,
-  'notifications-center': NotificationsCenterPageRecipe,
-  'support-center': SupportCenterPageRecipe,
-  'integrations': IntegrationsPageRecipe,
-  'teams': TeamsPageRecipe,
-  'analytics': AnalyticsPageRecipe,
-  'admin-panel': AdminPanelPageRecipe,
-  'user-management': UserManagementPageRecipe,
-  'audit-log': AuditLogPageRecipe,
-  'billing-admin': BillingAdminPageRecipe,
-  'system-health': SystemHealthPageRecipe,
-  'role-permissions': RolePermissionsPageRecipe,
-  'customers': CustomersPageRecipe,
-  'customer-detail': CustomerDetailPageRecipe,
-  'pipeline': PipelinePageRecipe,
-  'ai-assistant': AiAssistantPageRecipe,
-  'search': SearchPageRecipe,
-  'realtime': RealtimePageRecipe,
-  'tasks': TasksPageRecipe,
-  'calendar': CalendarPageRecipe,
-  'blog': BlogPageRecipe,
-  'media-gallery': MediaGalleryPageRecipe,
-  'docs': DocsPageRecipe,
-  'status': StatusPageRecipe,
-  'changelog': ChangelogPageRecipe,
-  'safety': SafetyPageRecipe,
-  'brand-assets': BrandAssetsPageRecipe,
-  'language': LanguagePageRecipe,
-  'feature-flags': FeatureFlagsPageRecipe,
-} as Record<string, ComponentType>;
+export const PAGE_RECIPE_COMPONENTS: Readonly<Record<string, ComponentType>> = {
+  'onboarding': OnboardingPage,
+  'idea-planner': IdeaPlannerPage,
+  'dashboard-home': DashboardHomePage,
+  'command-center': CommandCenterPage,
+  'auth': AuthPage,
+  'terms-of-service': TermsOfServicePage,
+  'privacy-policy': PrivacyPolicyPage,
+  'user-settings': UserSettingsPage,
+  'account-security': AccountSecurityPage,
+  'pricing': PricingPage,
+  'product-grid': ProductGridPage,
+  'product-detail': ProductDetailPage,
+  'cart': CartPage,
+  'checkout': CheckoutPage,
+  'orders': OrdersPage,
+  'launch-checklist': LaunchChecklistPage,
+  'file-manager': FileManagerPage,
+  'email-notifications': EmailNotificationsPage,
+  'notifications-center': NotificationsCenterPage,
+  'support-center': SupportCenterPage,
+  'integrations': IntegrationsPage,
+  'teams': TeamsPage,
+  'analytics': AnalyticsPage,
+  'admin-panel': AdminPanelPage,
+  'user-management': UserManagementPage,
+  'audit-log': AuditLogPage,
+  'billing-admin': BillingAdminPage,
+  'system-health': SystemHealthPage,
+  'role-permissions': RolePermissionsPage,
+  'customers': CustomersPage,
+  'customer-detail': CustomerDetailPage,
+  'pipeline': PipelinePage,
+  'ai-assistant': AiAssistantPage,
+  'search': SearchPage,
+  'realtime': RealtimePage,
+  'tasks': TasksPage,
+  'calendar': CalendarPage,
+  'blog': BlogPage,
+  'media-gallery': MediaGalleryPage,
+  'docs': DocsPage,
+  'status': StatusPage,
+  'changelog': ChangelogPage,
+  'safety': SafetyPage,
+  'brand-assets': BrandAssetsPage,
+  'language': LanguagePage,
+  'feature-flags': FeatureFlagsPage,
+};

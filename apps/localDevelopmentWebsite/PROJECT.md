@@ -58,7 +58,7 @@ MCP tool call renders as a visible card. The user never opens a terminal.
 ## Constraints
 
 - Next.js 15 (App Router), React 19, Tailwind v3, shadcn/ui from `@vybekiit/ui`.
-- Dark-mode only (zinc-950 base, vybe purple accent).
-- Must work with any MCP-capable agent (Claude Code, Cursor, Kiro, Codex).
+- Light + dark theme (toggle in header; default dark, vybe purple accent).
+- Must work with installed agent CLIs (Claude Code, Cursor, Kiro, Codex, Kimi, Grok, Devin, Gemini).
 - UI primitives come from `packages/ui/` (`@vybekiit/ui` workspace dep).
 - No backend persistence yet (localStorage). SQLite reserved for later.

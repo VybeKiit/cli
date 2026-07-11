@@ -72,5 +72,3 @@ export async function runE2eTouch(
 
   return { artifacts, artifactsPath, manualMatches, pages, steps };
 }
-
-export { LS_E2E_PREFIX };

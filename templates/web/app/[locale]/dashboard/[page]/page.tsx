@@ -4,7 +4,8 @@ import { setRequestLocale } from 'next-intl/server';
 import { getFeaturePage } from '@/components/saas/featurePages';
 import { SaasPageView } from '@/components/saas-page-view';
 import { FEATURE_PAGE_SLUGS, isFeaturePageSlug } from '@/data/featurePageSlugs';
-import { DASHBOARD_SAAS_PAGES, getDashboardSaasPage } from '@/data/saasPages';
+import { DASHBOARD_SAAS_PAGES } from '@/data/dashboardSaasPages';
+import { getDashboardSaasPage } from '@/data/saasPages';
 
 interface DashboardSaasRoutePageProps {
   readonly params: Promise<{

@@ -1,6 +1,7 @@
 'use client';
 
 import { BrandRichText } from '@/components/landing/BrandRichText';
+import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import type { VisitorCoverage } from '@/data/visitorLanding';
@@ -63,7 +64,7 @@ export const Comparison = () => {
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="mx-auto max-w-2xl text-center">
           <h2 aria-label={compare.heading} className="text-balance">
-            <code className="compare-code-heading inline-flex min-h-[3.2em] w-full max-w-full items-start justify-center rounded-lg border border-border/70 bg-muted/50 px-3 py-2 text-start font-mono text-[1.05rem] font-semibold leading-snug tracking-tight text-foreground sm:min-h-[2.8em] sm:px-4 sm:py-2.5 sm:text-2xl md:text-[1.7rem]">
+            <code className="compare-code-heading inline-flex min-h-[3.2em] w-full max-w-full items-start justify-center rounded-lg border border-border/70 bg-muted/50 px-3 py-2 text-start font-mono text-lg font-semibold leading-snug tracking-tight text-foreground sm:min-h-[2.8em] sm:px-4 sm:py-2.5 sm:text-2xl md:text-3xl">
               <span className="me-1.5 shrink-0 select-none text-emerald-600/90" aria-hidden={true}>
                 {'>'}
               </span>
@@ -83,7 +84,9 @@ export const Comparison = () => {
           <table className="w-full min-w-[780px] border-collapse text-sm">
             <thead>
               <tr className="border-border border-b bg-muted/40 text-start">
-                <th className="px-4 py-3 text-start font-medium text-muted-foreground">Kit</th>
+                <th className="px-4 py-3 text-start font-medium text-muted-foreground">
+                  {compare.optionColumn}
+                </th>
                 {axes.map((axis) => (
                   <th
                     key={axis.key}
@@ -107,16 +110,19 @@ export const Comparison = () => {
                   )}
                 >
                   <td className="px-4 py-3 text-start">
-                    {row.featured ? (
-                      <span className="inline-flex items-center gap-2">
-                        {row.name}
-                        <span className="rounded-full bg-blue-600 px-2 py-0.5 font-medium text-[10px] text-white tracking-wide">
-                          You
+                    <span className="inline-flex items-center gap-2">
+                      <LogoMarkIcon
+                        className="size-5 shrink-0 rounded-sm"
+                        mono={false}
+                        slug={row.logoSlug}
+                      />
+                      <span>{row.name}</span>
+                      {row.featured ? (
+                        <span className="rounded-full bg-blue-600 px-2 py-0.5 font-medium text-xs text-white tracking-wide">
+                          {compare.youBadge}
                         </span>
-                      </span>
-                    ) : (
-                      row.name
-                    )}
+                      ) : null}
+                    </span>
                   </td>
                   <td className="px-2 py-3 text-start text-muted-foreground sm:px-3">
                     <AnimatedNumber value={row.price} />

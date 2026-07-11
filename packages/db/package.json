@@ -63,7 +63,8 @@
   "devDependencies": {
     "tsup": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@effect/vitest": "catalog:"
   },
   "private": true,
   "vybekiit": {

@@ -1,16 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import type { VybeAssistant } from '@vybekiit/report-mode';
+import { parseAssistantId } from '../capabilities';
 
 import { probeCapabilities, probeModels } from './models/probe';
-
-const parseModelAssistant = (assistantParam: string | null): VybeAssistant | null => {
-  if (assistantParam === 'claude' || assistantParam === 'codex' || assistantParam === 'cursor') {
-    return assistantParam;
-  }
-
-  return null;
-};
+import { buildListSessionsResponse } from './sessions/listSessions';
 
 /**
  * Write the local assistant capability response.
@@ -39,14 +32,47 @@ export const handleModelsRequest = async (
   assistantParam: string | null,
   res: ServerResponse,
 ): Promise<void> => {
-  const assistant = parseModelAssistant(assistantParam);
+  const assistant = parseAssistantId(assistantParam);
   if (assistant === null) {
-    res.writeHead(400).end('assistant must be claude, codex, or cursor');
+    res
+      .writeHead(400)
+      .end('assistant must be a supported id (claude, codex, cursor, kiro, kimi, devin, grok)');
     return;
   }
   const body = JSON.stringify(await probeModels(assistant));
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(body);
+};
+
+/**
+ * Write native CLI sessions for one assistant (Resume sheet).
+ *
+ * @param assistantParam - Raw assistant query parameter.
+ * @param res - HTTP response to write.
+ * @returns A promise that resolves after the response is ended.
+ * @example
+ * await handleSessionsRequest('claude', res);
+ */
+export const handleSessionsRequest = async (
+  assistantParam: string | null,
+  res: ServerResponse,
+): Promise<void> => {
+  const assistant = parseAssistantId(assistantParam);
+  if (assistant === null) {
+    res
+      .writeHead(400)
+      .end('assistant must be a supported id (claude, codex, cursor, kiro, kimi, devin, grok)');
+    return;
+  }
+  try {
+    const body = JSON.stringify(await buildListSessionsResponse(assistant));
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(body);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to list sessions';
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, message }));
+  }
 };
 
 /**

@@ -49,7 +49,8 @@ VybeKiit היא ערכת התחלה בתשלום ל־vibe coders: אנשים ש�
 אחרי שיש לכם גישה ל־VybeKiit, צרו את נקודת ההתחלה של האפליקציה (העוזר יכול להריץ את זה בשבילכם):
 
 ```bash
-npx vybekiit new web my-app
+npx vybekiit setup
+npx vybekiit create app --web
 ```
 
 אחר כך פתחו את התיקייה החדשה בכלי הקידוד והדביקו את הפרומפט למעלה, או פשוט אמרו:

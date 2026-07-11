@@ -1,7 +1,7 @@
 import { cancel, intro, isCancel, select } from '@clack/prompts';
 
 /** Buyer-tier menu choices for bare `vybekiit` (ADR-0038). */
-export type MainMenuChoice = 'setup' | 'create' | 'doctor' | 'help-all';
+export type MainMenuChoice = 'setup' | 'create' | 'doctor' | 'add-piece' | 'help-all';
 
 /**
  * Open the buyer main menu and return the chosen action.
@@ -26,6 +26,11 @@ export const promptMainMenu = async (): Promise<MainMenuChoice | null> => {
         hint: 'Web, mobile, or extension',
       },
       {
+        value: 'add-piece',
+        label: 'Add a ready piece',
+        hint: 'Page recipe, database preset, catalog',
+      },
+      {
         value: 'doctor',
         label: 'Check my tools',
         hint: 'Full toolchain pass',
@@ -43,7 +48,13 @@ export const promptMainMenu = async (): Promise<MainMenuChoice | null> => {
     return null;
   }
 
-  if (picked === 'setup' || picked === 'create' || picked === 'doctor' || picked === 'help-all') {
+  if (
+    picked === 'setup' ||
+    picked === 'create' ||
+    picked === 'doctor' ||
+    picked === 'add-piece' ||
+    picked === 'help-all'
+  ) {
     return picked;
   }
 

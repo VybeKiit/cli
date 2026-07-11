@@ -106,13 +106,12 @@ re-export from `packages/ui/src/index.ts`.
 
 ## Design system
 
-- **Background:** zinc-950 (near-black)
+- **Theme:** light + dark via `next-themes` (`ThemeToggle` in header); semantic tokens (`bg-background`, `text-foreground`, `border-border`)
 - **Accent:** vybe purple (500: #8b5cf6, 600: #7c3aed)
-- **Text:** zinc-100/200/300/400 hierarchy
-- **Borders:** zinc-800
 - **Radius:** rounded-2xl (cards), rounded-xl (inputs), rounded-full (badges)
 - **Font:** Geist Sans (body), Geist Mono (code)
 - **Motion:** Framer Motion for step entries, CSS for carousel
+- **Agents:** registry in `src/lib/agents/` — install probe, session filesystem readers, launch/resume opens Terminal with the real CLI
 
 ## How to run
 

@@ -49,6 +49,6 @@ Cloudflare Workers — ADR-0028).
 
 ## Still to wire (issue #4 — live)
 
-Real checkout + the gate need the store's live Lemon Squeezy keys and `STORE_PRODUCT_ID`, and per
-ADR-0005 the webhook should invite to the per-template **mirrors** (`web` + `mobile` + `extension`),
-not the single repo modeled here. Tracked under issue #4.
+Real checkout + the gate need the store's live Lemon Squeezy keys and `STORE_PRODUCT_ID`.
+Default invite bundle is `kit` + `web` + `mobile` + `extension` (`GITHUB_GATE_REPOS`) so
+`create app` can clone the gated kit workspace (ADR-0038). Tracked under issue #4.

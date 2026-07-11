@@ -26,7 +26,7 @@ const STATUS_DOT = {
 };
 
 const SIZE_MAP = {
-  sm: { ring: 'h-7 w-7', dot: 'h-2 w-2 -right-0 -bottom-0', text: 'text-[10px]' },
+  sm: { ring: 'h-7 w-7', dot: 'h-2 w-2 -right-0 -bottom-0', text: 'text-xs' },
   md: { ring: 'h-9 w-9', dot: 'h-2.5 w-2.5 -right-0.5 -bottom-0.5', text: 'text-xs' },
   lg: { ring: 'h-12 w-12', dot: 'h-3 w-3 -right-0.5 -bottom-0.5', text: 'text-sm' },
 };

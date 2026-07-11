@@ -7,18 +7,20 @@ import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
 import { LogoMarqueeRow } from '@/components/landing/LogoMarqueeRow';
 import { useRandomVibeHintPopups } from '@/components/landing/useRandomVibeHintPopups';
 import { TypewriterText } from '@/components/ui/TypewriterText';
-import { VIBE_HINTS } from '@/data/vibeHints';
 import {
   AI_CODING_AGENTS_STRIP,
   TECH_TRUST_STRIP,
   type TechTrustMark,
 } from '@/data/visitorLanding';
 import { useLandingLocale } from '@/i18n/LocaleProvider';
+import type { LandingLocale } from '@/i18n/locales';
+import { vibeHintFor } from '@/i18n/vibeHints';
 import { cn } from '@/lib/utils';
 
 interface ActiveHintToastProps {
   readonly mark: TechTrustMark | null;
   readonly visible: boolean;
+  readonly locale: LandingLocale;
 }
 
 /**
@@ -29,7 +31,7 @@ interface ActiveHintToastProps {
  * @param props - Active mark and visibility.
  * @returns Floating toast region with fixed reserved height.
  */
-const ActiveHintToast = ({ mark, visible }: ActiveHintToastProps) => {
+const ActiveHintToast = ({ mark, visible, locale }: ActiveHintToastProps) => {
   const [displayMark, setDisplayMark] = useState<TechTrustMark | null>(mark);
   const lastMarkRef = useRef<TechTrustMark | null>(mark);
 
@@ -41,7 +43,7 @@ const ActiveHintToast = ({ mark, visible }: ActiveHintToastProps) => {
   }, [mark]);
 
   const shown = displayMark ?? lastMarkRef.current;
-  const hint = shown === null ? null : (VIBE_HINTS[shown.slug] ?? null);
+  const hint = shown === null ? null : (vibeHintFor(locale, shown.slug) ?? null);
   const hasContent = shown !== null && hint !== null;
   const show = visible && mark !== null && hasContent;
 
@@ -139,7 +141,7 @@ export const TechTrustStrip = () => {
           />
         </div>
 
-        <ActiveHintToast mark={activeMark} visible={activeMark !== null} />
+        <ActiveHintToast locale={locale} mark={activeMark} visible={activeMark !== null} />
 
         <div className="space-y-5">
           <TypewriterText

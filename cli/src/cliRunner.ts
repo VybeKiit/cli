@@ -20,6 +20,8 @@ import { runInit } from './commands/init';
 import { runLintExtensionSkill } from './commands/lintExtensionSkill';
 import { runLocalDev } from './commands/localDev';
 import { runNew } from './commands/new';
+import { runAddPageRecipe, runListPageRecipes, runListPieces } from './commands/piecesCmd';
+import { runAddPiecesInteractive } from './commands/piecesInteractive';
 import { runPlanDataModel } from './commands/planDataModelCmd';
 import { runPlanReadiness } from './commands/planReadiness';
 import { runPlanSetup } from './commands/planSetupCmd';
@@ -27,10 +29,12 @@ import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/pre
 import { runRenderAgentLayer } from './commands/renderAgentLayer';
 import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
+import { runUpdateKitCommand } from './commands/updateKit';
 import { ensureTool, formatEnsureResult } from './doctor/ensureTool';
 import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
 import { runEnvWizard } from './prompts/envWizard';
+import type { MainMenuChoice } from './prompts/mainMenu';
 import { promptMainMenu } from './prompts/mainMenu';
 import { isInteractive } from './prompts/tty';
 
@@ -261,9 +265,7 @@ const wantsFullHelp = (argv: readonly string[]): boolean =>
  * @example
  * const code = await runMainMenuChoice('setup');
  */
-const runMainMenuChoice = async (
-  choice: 'setup' | 'create' | 'doctor' | 'help-all',
-): Promise<number> => {
+const runMainMenuChoice = async (choice: MainMenuChoice): Promise<number> => {
   if (choice === 'help-all') {
     process.stdout.write(`${CLI_HELP_ALL}\n`);
     return 0;
@@ -274,11 +276,46 @@ const runMainMenuChoice = async (
   if (choice === 'doctor') {
     return await runDoctor();
   }
-  // create — still needs license gate
+  // create / add-piece — still need license gate
   if (!ensureAccessOrExit()) {
     return 1;
   }
+  if (choice === 'add-piece') {
+    return await runAddPiecesInteractive();
+  }
   return await runCreateApp([]);
+};
+
+/**
+ * Handle `vybekiit add …` (bridge, page-recipe, or interactive picker).
+ *
+ * @param context - Parsed CLI command context.
+ * @returns Exit code for the add path.
+ * @example
+ * const code = await handleAddCommand(context);
+ */
+const handleAddCommand = async (context: CliCommandContext): Promise<number> => {
+  if (context.subcommand === undefined) {
+    return await runAddPiecesInteractive();
+  }
+  if (context.subcommand === 'bridge') {
+    return await runAddBridge([...context.rest]);
+  }
+  if (context.subcommand === 'page-recipe') {
+    const result = await runAddPageRecipe([...context.rest]);
+    process.stdout.write(`${result.json}\n`);
+    return result.exitCode;
+  }
+  if (context.subcommand === 'preset') {
+    // Alias so agents can use one verb family: add preset | add page-recipe
+    const result = await runApplyPreset([...context.rest]);
+    process.stdout.write(`${result.json}\n`);
+    return result.exitCode;
+  }
+  process.stderr.write(
+    'Unknown add command. Try: vybekiit add page-recipe <id> | add preset <id> | add bridge\n',
+  );
+  return 1;
 };
 
 const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
@@ -294,6 +331,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     writeLines(result.lines);
     return result.exitCode;
   },
+  'update-kit': async (context) => await runUpdateKitCommand([...context.rest]),
   'render-agent-layer': async () => (await runRenderAgentLayer()).exitCode,
   'check-goals': async (context) => {
     const result = await runCheckGoals([...context.rest]);
@@ -321,7 +359,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     return result.exitCode;
   },
   'apply-preset': async (context) => {
-    const result = await runApplyPreset([...context.rest]);
+    const result = await runApplyPreset(commandArgs(context));
     process.stdout.write(`${result.json}\n`);
     return result.exitCode;
   },
@@ -330,8 +368,18 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     process.stdout.write(`${result.json}\n`);
     return result.exitCode;
   },
+  'list-pieces': async (context) => {
+    const result = await runListPieces(commandArgs(context));
+    process.stdout.write(`${result.json}\n`);
+    return result.exitCode;
+  },
+  'list-page-recipes': async (context) => {
+    const result = await runListPageRecipes(commandArgs(context));
+    process.stdout.write(`${result.json}\n`);
+    return result.exitCode;
+  },
   'verify-presets': async (context) => {
-    const result = await runVerifyPresets([...context.rest]);
+    const result = await runVerifyPresets(commandArgs(context));
     process.stdout.write(`${result.json}\n`);
     return result.exitCode;
   },
@@ -352,13 +400,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     }
     return result.exitCode;
   },
-  add: async (context) => {
-    if (context.subcommand !== 'bridge') {
-      process.stderr.write('Unknown add command. Try: vybekiit add bridge\n');
-      return 1;
-    }
-    return await runAddBridge([...context.rest]);
-  },
+  add: handleAddCommand,
   env: handleEnvCommand,
   scaffold: async (context) => {
     if (context.subcommand !== 'backend') {

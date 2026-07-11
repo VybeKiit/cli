@@ -5,6 +5,11 @@ import { routing } from './routing';
 /** Flat `messages/en.json` keys use dots — next-intl expects nested objects. */
 const nestFlatMessages = (flat: Record<string, string>): AbstractIntlMessages => {
   const out: Record<string, unknown> = {};
+  // Nesting flow for each flat key (e.g. `nav.home` → { nav: { home: "…" } }):
+  // 1. Outer loop: every flat key/value from the locale JSON.
+  // 2. Split on `.` into path segments.
+  // 3. Inner loop: walk/create intermediate objects for every segment except the leaf.
+  // 4. Write the string value on the leaf segment.
   for (const [key, value] of Object.entries(flat)) {
     const parts = key.split('.');
     let cursor = out;

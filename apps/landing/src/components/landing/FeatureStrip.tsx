@@ -21,10 +21,10 @@ export const FeatureStrip = () => (
             type={item.icon}
           />
           <div className="min-w-0">
-            <p className="whitespace-nowrap text-[31px] font-extrabold leading-[1.05] tracking-[-0.045em] text-[rgba(255,255,255,0.94)]">
+            <p className="whitespace-nowrap text-4xl font-extrabold leading-[1.05] tracking-[-0.045em] text-[rgba(255,255,255,0.94)]">
               {item.title}
             </p>
-            <p className="mt-2.5 whitespace-nowrap text-[25px] leading-[1.15] tracking-[-0.035em] text-[rgba(255,255,255,0.72)]">
+            <p className="mt-2.5 whitespace-nowrap text-3xl leading-[1.15] tracking-[-0.035em] text-[rgba(255,255,255,0.72)]">
               {item.subtitle}
             </p>
           </div>

@@ -4,13 +4,15 @@ import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Switch } from '@vybekiit/ui/switch';
 import { Check, Globe2, Languages, Search } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type LocaleCode = 'en' | 'he' | 'es' | 'fr' | 'de' | 'pt';
 
@@ -59,12 +61,13 @@ export const LanguagePage = () => {
   const [defaultLocale, setDefaultLocale] = useState<LocaleCode>('en');
   const [previewLocale, setPreviewLocale] = useState<LocaleCode>('en');
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [showEnabledOnly, setShowEnabledOnly] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [saved, setSaved] = useState(true);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return locales.filter((locale) => {
       if (showEnabledOnly && !locale.enabled) {
         return false;
@@ -78,7 +81,7 @@ export const LanguagePage = () => {
         locale.code.includes(q)
       );
     });
-  }, [locales, query, showEnabledOnly]);
+  }, [locales, debouncedQuery, showEnabledOnly]);
 
   const enabledCount = locales.filter((locale) => locale.enabled).length;
 
@@ -114,7 +117,7 @@ export const LanguagePage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Language motion pass">
       <main className="mx-auto max-w-4xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -132,9 +135,15 @@ export const LanguagePage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Enabled" value={String(enabledCount)} />
-          <Kpi label="Default" value={defaultLocale.toUpperCase()} />
-          <Kpi label="Draft" value={saved ? 'Saved' : 'Unsaved'} />
+          {(
+            [
+              { key: 'enabled', label: 'Enabled', value: String(enabledCount) },
+              { key: 'default', label: 'Default', value: defaultLocale.toUpperCase() },
+              { key: 'draft', label: 'Draft', value: saved ? 'Saved' : 'Unsaved' },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="mb-4 grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -293,49 +302,27 @@ export const LanguagePage = () => {
           </div>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — toggles, default locale, preview, and filters all
-              recompute live. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Point locale enable/default at your i18n routing config (middleware or{' '}
-                <code>next-intl</code> / kit locale rules).
-              </li>
-              <li>
-                Replace <code>PREVIEW_PHRASES</code> and UI copy with message files per locale (
-                <code>messages/en.json</code>, etc.).
-              </li>
-              <li>
-                Persist the enabled set via <code>PATCH /api/settings/locales</code> when Save is
-                pressed.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — toggles, default locale, preview, and filters all
+            recompute live. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Point locale enable/default at your i18n routing config (middleware or{' '}
+              <code>next-intl</code> / kit locale rules).
+            </li>
+            <li>
+              Replace <code>PREVIEW_PHRASES</code> and UI copy with message files per locale (
+              <code>messages/en.json</code>, etc.).
+            </li>
+            <li>
+              Persist the enabled set via <code>PATCH /api/settings/locales</code> when Save is
+              pressed.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Language motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** Small count tile. */
-const Kpi = ({ label, value }: { readonly label: string; readonly value: string }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-2xl tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

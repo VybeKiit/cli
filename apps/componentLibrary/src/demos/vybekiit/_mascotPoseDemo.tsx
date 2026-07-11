@@ -32,8 +32,11 @@ export const MascotPoseDemo = ({ pose }: MascotPoseDemoProps) => {
   const meta = resolvePoseMeta(pose);
 
   return (
-    <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 bg-muted/20 p-10">
-      <BuilderAssistantMark assistant="claude" pose={pose} size="xxl" />
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 overflow-visible bg-muted/20 p-12">
+      {/* Room for hop peaks / arm throws so body morphs do not clip at the card edge. */}
+      <div className="flex h-28 w-28 items-center justify-center overflow-visible">
+        <BuilderAssistantMark assistant="claude" pose={pose} size="xxl" />
+      </div>
       <p className="max-w-xs text-center font-medium text-sm">{meta.label}</p>
       <p className="max-w-sm text-center text-muted-foreground text-xs leading-snug">
         {meta.description}

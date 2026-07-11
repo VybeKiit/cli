@@ -1,3 +1,4 @@
+import { resolveLemonSqueezyEnv } from '../config';
 import {
   configureLemonSqueezy,
   createStoreWebhook,
@@ -13,21 +14,14 @@ import {
  * delete), backed by {@link ./webhooks}. Not shipped to buyers (excluded from the build) —
  * run with tsx: `pnpm --filter @vybekiit/payments ls:webhooks <command>`.
  *
- * Reads `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID` (and `LEMONSQUEEZY_WEBHOOK_SECRET`
- * for create/ensure) from the environment — source the repo `.env` first. Secrets are
- * never printed; only the webhook id/url/events/mode are shown.
+ * Reads store credentials via {@link resolveLemonSqueezyEnv} so
+ * `LEMONSQUEEZY_TEST_MODE=true` + `LEMONSQUEEZY_TEST_MODE_*` prefer the test key/secret
+ * and leave live `LEMONSQUEEZY_API_KEY` / `LEMONSQUEEZY_WEBHOOK_SECRET` alone. Source the
+ * repo `.env` first. Secrets are never printed; only id/url/events/mode are shown.
  */
 
 const write = (line: string): void => {
   process.stdout.write(`${line}\n`);
-};
-
-const requireEnv = (name: string): string => {
-  const value = process.env[name];
-  if (value === undefined || value.length === 0) {
-    throw new Error(`Missing required env var ${name} — source the repo .env first.`);
-  }
-  return value;
 };
 
 const readFlag = (argv: readonly string[], name: string): string | undefined => {
@@ -50,23 +44,31 @@ const runEnsureOrCreate = async (
   storeId: string,
   argv: readonly string[],
   mode: 'ensure' | 'create',
+  secret: string,
+  testMode: boolean,
 ): Promise<void> => {
   const url = readFlag(argv, 'url');
   if (url === undefined) {
     throw new Error(`Usage: ${mode} --url <https://.../api/webhook>`);
   }
-  const secret = requireEnv('LEMONSQUEEZY_WEBHOOK_SECRET');
+  if (secret.length === 0) {
+    throw new Error(
+      testMode
+        ? 'Missing LEMONSQUEEZY_TEST_MODE_WEBHOOK_SECRET (required when LEMONSQUEEZY_TEST_MODE=true with a test API key).'
+        : 'Missing LEMONSQUEEZY_WEBHOOK_SECRET — source the repo .env first.',
+    );
+  }
   const events = ORDER_WEBHOOK_EVENTS;
 
   if (mode === 'ensure') {
-    const result = await ensureStoreWebhook({ storeId, url, secret, events });
+    const result = await ensureStoreWebhook({ storeId, url, secret, events, testMode });
     write(result.created ? 'Created webhook:' : 'Webhook already present:');
     write(formatWebhook(result.webhook));
     return;
   }
 
   write('Created webhook:');
-  write(formatWebhook(await createStoreWebhook({ storeId, url, secret, events })));
+  write(formatWebhook(await createStoreWebhook({ storeId, url, secret, events, testMode })));
 };
 
 const runDelete = async (argv: readonly string[]): Promise<void> => {
@@ -82,14 +84,16 @@ const dispatch = (
   command: string | undefined,
   storeId: string,
   rest: readonly string[],
+  secret: string,
+  testMode: boolean,
 ): Promise<void> => {
   switch (command) {
     case 'list':
       return runList(storeId);
     case 'ensure':
-      return runEnsureOrCreate(storeId, rest, 'ensure');
+      return runEnsureOrCreate(storeId, rest, 'ensure', secret, testMode);
     case 'create':
-      return runEnsureOrCreate(storeId, rest, 'create');
+      return runEnsureOrCreate(storeId, rest, 'create', secret, testMode);
     case 'delete':
       return runDelete(rest);
     default:
@@ -103,9 +107,22 @@ const dispatch = (
 
 const run = async (): Promise<void> => {
   const [, , command, ...rest] = process.argv;
-  const storeId = requireEnv('LEMONSQUEEZY_STORE_ID');
-  configureLemonSqueezy(requireEnv('LEMONSQUEEZY_API_KEY'));
-  await dispatch(command, storeId, rest);
+  const resolved = resolveLemonSqueezyEnv(process.env);
+  const storeId = resolved.LEMONSQUEEZY_STORE_ID;
+  const apiKey = resolved.LEMONSQUEEZY_API_KEY;
+  if (storeId === undefined || storeId.length === 0) {
+    throw new Error('Missing required env var LEMONSQUEEZY_STORE_ID — source the repo .env first.');
+  }
+  if (apiKey === undefined || apiKey.length === 0) {
+    throw new Error(
+      'Missing Lemon Squeezy API key — set LEMONSQUEEZY_API_KEY (live) or LEMONSQUEEZY_TEST_MODE_API_KEY when LEMONSQUEEZY_TEST_MODE=true.',
+    );
+  }
+  const secret = resolved.LEMONSQUEEZY_WEBHOOK_SECRET ?? '';
+  const testMode = resolved.LEMONSQUEEZY_TEST_MODE === 'true';
+  configureLemonSqueezy(apiKey);
+  write(`Using ${testMode ? 'TEST' : 'LIVE'} Lemon Squeezy credentials (secrets never printed).`);
+  await dispatch(command, storeId, rest, secret, testMode);
 };
 
 run().catch((error: unknown) => {

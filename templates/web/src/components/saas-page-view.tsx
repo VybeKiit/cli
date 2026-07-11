@@ -29,7 +29,7 @@ import type {
   SaasPageAction,
   SaasPageDefinition,
   SaasPageItem,
-} from '@/data/saasPages';
+} from '@/data/saasPageTypes';
 
 const iconComponents: Readonly<Record<SaasIconName, LucideIcon>> = {
   activity: Activity,

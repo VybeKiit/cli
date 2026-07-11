@@ -31,10 +31,12 @@ export const submitMobileReport = async (payload: ReportPayload): Promise<void> 
 
   if (assistant) {
     const url = buildAssistantDeepLink(assistant, '', prompt);
-    const canOpen = await canOpenURL(url);
-    if (canOpen) {
-      await openURL(url);
-      return;
+    if (url !== null) {
+      const canOpen = await canOpenURL(url);
+      if (canOpen) {
+        await openURL(url);
+        return;
+      }
     }
   }
 

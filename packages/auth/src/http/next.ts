@@ -31,14 +31,6 @@ import {
   TokenOnlyBodySchema,
 } from './schemas';
 
-export type {
-  AuthHttpDeps,
-  AuthHttpMethod,
-  AuthHttpResponse,
-  AuthHttpSession,
-  AuthHttpTelemetry,
-} from './handlers';
-
 const parseBody = async <A, I>(
   request: Request,
   schema: Schema.Schema<A, I, never>,

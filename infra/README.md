@@ -4,6 +4,10 @@
 
 # VybeKiit · Infra
 
+> **Maintainer / advanced only.** Vibe coders: you do not need this folder for day one.
+> After purchase, run `npx vybekiit setup` then `npx vybekiit create app --web` and say
+> **"Set up my app."** to your AI helper. Do not clone or edit this repo by hand.
+
 Deploy and edge configuration for VybeKiit's default target stack: **Cloudflare**
 (Pages/Workers) + **Supabase**. This is where the kit's infrastructure lives — the
 config that runs *in front of* and *underneath* the app, not the app code itself.
@@ -31,7 +35,7 @@ infra/
 └── README.md
 ```
 
-Transactional email worker: **`packages/email/worker/`** (see that README).
+Transactional email worker: **`packages/messaging/worker/`** (see that README).
 
 ## Domain + email setup
 
@@ -39,7 +43,7 @@ All secrets live in the **monorepo root `.env`** (copy from `.env.example`).
 
 ```bash
 DOMAIN=yourdomain.com node infra/scripts/provisionDomain.mjs
-cd packages/email/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET && npm run deploy
+cd packages/messaging/worker && npm i && npx wrangler secret put EMAIL_WORKER_SECRET && npm run deploy
 pnpm email:test-send you@example.com
 ```
 
@@ -92,5 +96,5 @@ non-secret policy toggles only.
 ## Status
 
 - **Shipping now:** the security edge config — `security-worker.ts` + `wrangler.toml`.
-- **Shipping now:** email worker at `packages/email/worker/` + `scripts/provisionDomain.mjs`.
+- **Shipping now:** email worker at `packages/messaging/worker/` + `scripts/provisionDomain.mjs`.
 - **Lands with issue #7:** Supabase SQL migrations and full deploy helper automation.

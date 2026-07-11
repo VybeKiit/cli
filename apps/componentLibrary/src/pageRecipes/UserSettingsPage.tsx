@@ -6,7 +6,7 @@ import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
-import { RadioGroup, RadioGroupItem } from '@vybekiit/ui/radio-group';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { Separator } from '@vybekiit/ui/separator';
 import { Switch } from '@vybekiit/ui/switch';
@@ -22,10 +22,9 @@ import {
   Undo2,
   User,
 } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { type FormEvent, useId, useState } from 'react';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type ThemePref = 'system' | 'light' | 'dark';
 type NotificationKey = 'productUpdates' | 'billingReceipts' | 'securityAlerts' | 'weeklyDigest';
@@ -175,7 +174,7 @@ export const UserSettingsPage = () => {
   const isSaving = status === 'saving';
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Settings motion pass">
       <main className="mx-auto max-w-2xl px-4 py-10">
         <div className="mb-8 space-y-1">
           <h1 className="font-bold text-3xl tracking-tight md:text-4xl">Settings</h1>
@@ -312,32 +311,18 @@ export const UserSettingsPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <RadioGroup
+              <SegmentedControl
                 aria-labelledby={themeLabelId}
-                className="flex gap-1 rounded-lg border bg-muted p-1"
+                className="w-full"
                 onValueChange={(value) => update('theme', value as ThemePref)}
                 value={form.theme}
               >
                 {THEMES.map((option) => (
-                  <Label
-                    className={cn(
-                      'flex flex-1 cursor-pointer items-center justify-center rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                      form.theme === option.id
-                        ? 'bg-background shadow-sm'
-                        : 'text-muted-foreground',
-                    )}
-                    htmlFor={`${themeLabelId}-${option.id}`}
-                    key={option.id}
-                  >
-                    <RadioGroupItem
-                      className="sr-only"
-                      id={`${themeLabelId}-${option.id}`}
-                      value={option.id}
-                    />
+                  <SegmentedControlItem className="flex-1" key={option.id} value={option.id}>
                     {option.label}
-                  </Label>
+                  </SegmentedControlItem>
                 ))}
-              </RadioGroup>
+              </SegmentedControl>
             </CardContent>
           </Card>
 
@@ -396,46 +381,36 @@ export const UserSettingsPage = () => {
         </form>
 
         {/* real integration contract — the point that makes this plug-and-play */}
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — the avatar and bio counter update live, and the
-              save bar only appears while <code>form</code> differs from the saved baseline. To make
-              it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Seed <code>INITIAL_FORM</code> from your account service (server component or a{' '}
-                <code>GET /api/settings</code>) so the page loads already populated.
-              </li>
-              <li>
-                On <b>Save</b>, <code>PATCH /api/settings</code> with the diff, then adopt the
-                server's echoed record into <code>saved</code> — that clears the dirty bar exactly
-                like the demo.
-              </li>
-              <li>
-                Validate the email and (if it changed) kick off your verification flow before
-                trusting it; keep the inline error path.
-              </li>
-              <li>
-                Persist <code>theme</code> to your theme provider and the notification switches to
-                your messaging preferences; <code>Discard</code> already resets to the last saved
-                state.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — the avatar and bio counter update live, and the
+            save bar only appears while <code>form</code> differs from the saved baseline. To make
+            it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Seed <code>INITIAL_FORM</code> from your account service (server component or a{' '}
+              <code>GET /api/settings</code>) so the page loads already populated.
+            </li>
+            <li>
+              On <b>Save</b>, <code>PATCH /api/settings</code> with the diff, then adopt the
+              server's echoed record into <code>saved</code> — that clears the dirty bar exactly
+              like the demo.
+            </li>
+            <li>
+              Validate the email and (if it changed) kick off your verification flow before trusting
+              it; keep the inline error path.
+            </li>
+            <li>
+              Persist <code>theme</code> to your theme provider and the notification switches to
+              your messaging preferences; <code>Discard</code> already resets to the last saved
+              state.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Settings motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

@@ -1,16 +1,15 @@
 'use client';
 
+import { DevicePreviewIcon } from '@library/components/DevicePreviewIcon';
+import { usePreviewScale } from '@library/hooks/usePreviewScale';
+import {
+  DEVICE_LABELS,
+  type PageRecipeDevice,
+  type PageRecipeViewport,
+} from '@library/lib/pageRecipeViewport';
 import { buildPageRecipePreviewSrc } from '@library/lib/theme';
-import type { ReactNode, SVGProps } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-
-export type PageRecipeDevice = 'desktop' | 'tablet' | 'mobile';
-
-export interface PageRecipeViewport {
-  readonly width: number;
-  readonly height: number;
-}
 
 interface PageRecipeFrameProps {
   readonly slug: string;
@@ -21,96 +20,13 @@ interface PageRecipeFrameProps {
   readonly controls?: ReactNode;
 }
 
-const DEVICE_LABELS: Record<PageRecipeDevice, string> = {
-  desktop: 'Desktop',
-  tablet: 'Tablet',
-  mobile: 'Mobile',
-};
-
-const DEVICE_MAX_HEIGHTS: Record<PageRecipeDevice, number> = {
-  desktop: 560,
-  tablet: 500,
-  mobile: 500,
-};
-
-const DevicePreviewIcon = ({
-  device,
-  ...props
-}: SVGProps<SVGSVGElement> & { readonly device: PageRecipeDevice }) => {
-  if (device === 'mobile') {
-    return (
-      <svg aria-label="Mobile preview" fill="none" role="img" viewBox="0 0 24 24" {...props}>
-        <rect height="20" rx="3.5" stroke="currentColor" strokeWidth="1.8" width="12" x="6" y="2" />
-        <path d="M10 5h4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-        <circle cx="12" cy="18" fill="currentColor" r="1" />
-      </svg>
-    );
-  }
-
-  if (device === 'tablet') {
-    return (
-      <svg aria-label="Tablet preview" fill="none" role="img" viewBox="0 0 24 24" {...props}>
-        <rect
-          height="17"
-          rx="2.8"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          width="14"
-          x="5"
-          y="3.5"
-        />
-        <path d="M9 6.5h6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-        <circle cx="12" cy="17.5" fill="currentColor" r="1" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg aria-label="Desktop preview" fill="none" role="img" viewBox="0 0 24 24" {...props}>
-      <rect height="12" rx="2" stroke="currentColor" strokeWidth="1.8" width="18" x="3" y="4" />
-      <path d="M9 20h6M12 16v4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-      <path d="M6.5 7.5h11" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-    </svg>
-  );
-};
-
-const usePreviewScale = (viewport: PageRecipeViewport, device: PageRecipeDevice) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) {
-      return;
-    }
-
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
-  const maxHeight = DEVICE_MAX_HEIGHTS[device];
-  const widthScale = containerWidth > 0 ? containerWidth / viewport.width : 1;
-  const heightScale = maxHeight / viewport.height;
-  const scale = Math.min(1, widthScale, heightScale);
-
-  return {
-    containerRef,
-    scale,
-    visibleWidth: Math.round(viewport.width * scale),
-    visibleHeight: Math.round(viewport.height * scale),
-  };
-};
+/** Outer stage padding (`p-2`) — kept in sync so stage height stays even on every side. */
+const STAGE_PADDING_PX = 8;
 
 /**
  * Render a responsive iframe frame for a Page recipe.
  *
- * @param props - Props passed to this component.
+ * @param props - Recipe slug, device tier, viewport, and optional controls slot.
  * @returns A React element containing a labeled Page recipe iframe.
  * @example
  * const element = (
@@ -131,10 +47,13 @@ export const PageRecipeFrame = ({
   controls = null,
 }: PageRecipeFrameProps) => {
   const src = buildPageRecipePreviewSrc(slug, { thumb: true });
-  const { containerRef, scale, visibleWidth, visibleHeight } = usePreviewScale(viewport, device);
+  const { containerRef, measured, maxHeight, scale, contentWidth, contentHeight } = usePreviewScale(
+    viewport,
+    device,
+  );
 
   return (
-    <figure className={cn('min-w-0', className)} data-preview-device={device}>
+    <figure className={cn('min-w-0 w-full', className)} data-preview-device={device}>
       <figcaption className="mb-2 flex flex-wrap items-center justify-between gap-2 text-muted-foreground text-xs">
         <span className="flex min-w-0 items-center gap-2">
           <DevicePreviewIcon className="h-4 w-4 shrink-0" device={device} />
@@ -149,31 +68,52 @@ export const PageRecipeFrame = ({
         </span>
       </figcaption>
       {controls}
+      {/*
+        Outer shell keeps equal p-2 gutter; inner stage is a fixed maxHeight so mobile and
+        tablet share the same border box. Flex-center keeps the scaled device even on every
+        side when it does not fill the stage (width- or height-limited scale).
+      */}
       <div
-        className="overflow-hidden rounded-lg border bg-muted/30 p-2 shadow-sm"
-        ref={containerRef}
+        className="w-full min-w-0 overflow-hidden rounded-lg border bg-muted/30 shadow-sm"
+        style={{ padding: STAGE_PADDING_PX }}
       >
         <div
-          className="mx-auto overflow-hidden rounded-md border bg-background"
-          style={{ width: visibleWidth, height: visibleHeight }}
+          className="flex w-full min-w-0 items-center justify-center overflow-hidden"
+          ref={containerRef}
+          style={{ height: maxHeight }}
         >
-          <div
-            style={{
-              height: viewport.height,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left',
-              width: viewport.width,
-            }}
-          >
-            <iframe
-              className="border-0 bg-background"
-              height={viewport.height}
-              loading="lazy"
-              src={src}
-              title={`${title} ${DEVICE_LABELS[device]} preview`}
-              width={viewport.width}
-            />
-          </div>
+          {measured ? (
+            <div
+              className="max-w-full shrink-0 overflow-hidden rounded-md border border-border bg-background"
+              style={{
+                // content-box: width/height match the scaled iframe; border sits outside so
+                // top-left scale never clips only the right/bottom edge.
+                boxSizing: 'content-box',
+                height: contentHeight,
+                width: contentWidth,
+              }}
+            >
+              <div
+                style={{
+                  height: viewport.height,
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
+                  width: viewport.width,
+                }}
+              >
+                <iframe
+                  className="block border-0 bg-background"
+                  height={viewport.height}
+                  loading="lazy"
+                  src={src}
+                  title={`${title} ${DEVICE_LABELS[device]} preview`}
+                  width={viewport.width}
+                />
+              </div>
+            </div>
+          ) : (
+            <div aria-hidden={true} className="h-full w-full rounded-md border bg-background" />
+          )}
         </div>
       </div>
     </figure>

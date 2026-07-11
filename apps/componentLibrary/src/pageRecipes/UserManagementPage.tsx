@@ -1,9 +1,11 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { Skeleton } from '@vybekiit/ui/skeleton';
@@ -18,9 +20,10 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type UserRole = 'owner' | 'admin' | 'editor' | 'viewer';
 type UserStatus = 'active' | 'invited' | 'suspended';
@@ -166,6 +169,7 @@ export const UserManagementPage = () => {
   const [users, setUsers] = useState<readonly ManagedUser[]>(INITIAL_USERS);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<UserRole>('viewer');
@@ -187,7 +191,7 @@ export const UserManagementPage = () => {
   }, []);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return users.filter((user) => {
       const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
       const matchesQuery =
@@ -197,7 +201,7 @@ export const UserManagementPage = () => {
         user.role.includes(q);
       return matchesStatus && matchesQuery;
     });
-  }, [users, query, statusFilter]);
+  }, [users, debouncedQuery, statusFilter]);
 
   const kpis = useMemo(() => {
     const active = users.filter((u) => u.status === 'active').length;
@@ -299,11 +303,19 @@ export const UserManagementPage = () => {
         <Table aria-labelledby={tableCaptionId}>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Last active</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {(
+                [
+                  { key: 'user', label: 'User' },
+                  { key: 'role', label: 'Role' },
+                  { key: 'status', label: 'Status' },
+                  { key: 'last-active', label: 'Last active', className: 'hidden md:table-cell' },
+                  { key: 'actions', label: 'Actions', className: 'text-right' },
+                ] as const
+              ).map(({ key, label, ...head }) => (
+                <TableHead key={key} {...head}>
+                  {label}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -381,7 +393,7 @@ export const UserManagementPage = () => {
   }
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="User management motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -413,33 +425,43 @@ export const UserManagementPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <section aria-label="User metrics" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Kpi
-            icon={<UsersRound aria-hidden="true" className="h-4 w-4" />}
-            label="Total"
-            value={String(kpis.total)}
-          />
-          <Kpi
-            icon={<UserCog aria-hidden="true" className="h-4 w-4" />}
-            label="Active"
-            value={String(kpis.active)}
-          />
-          <Kpi
-            icon={<MailPlus aria-hidden="true" className="h-4 w-4" />}
-            label="Invited"
-            value={String(kpis.invited)}
-          />
-          <Kpi
-            icon={<LockKeyhole aria-hidden="true" className="h-4 w-4" />}
-            label="Suspended"
-            value={String(kpis.suspended)}
-            valueClassName={kpis.suspended > 0 ? 'text-amber-600' : undefined}
-          />
+          {(
+            [
+              {
+                key: 'total',
+                icon: <UsersRound aria-hidden="true" className="h-4 w-4" />,
+                label: 'Total',
+                value: String(kpis.total),
+              },
+              {
+                key: 'active',
+                icon: <UserCog aria-hidden="true" className="h-4 w-4" />,
+                label: 'Active',
+                value: String(kpis.active),
+              },
+              {
+                key: 'invited',
+                icon: <MailPlus aria-hidden="true" className="h-4 w-4" />,
+                label: 'Invited',
+                value: String(kpis.invited),
+              },
+              {
+                key: 'suspended',
+                icon: <LockKeyhole aria-hidden="true" className="h-4 w-4" />,
+                label: 'Suspended',
+                value: String(kpis.suspended),
+                valueClassName: kpis.suspended > 0 ? 'text-amber-600' : undefined,
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </section>
 
         <Card className="mb-4">
@@ -519,7 +541,7 @@ export const UserManagementPage = () => {
                 <div className="relative">
                   <Search
                     aria-hidden="true"
-                    className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground"
+                    className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                   />
                   <Input
                     className="pl-9"
@@ -554,68 +576,31 @@ export const UserManagementPage = () => {
           <CardContent>{tableBody}</CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — search, filters, invite, role changes, and
-              suspend all update the table. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset organizations</code> for <code>organizations</code>{' '}
-                and <code>organization_members</code>.
-              </li>
-              <li>
-                <code>GET /api/admin/users?status=&amp;q=</code> lists members; map{' '}
-                <code>role</code> and a status derived from invite / ban flags.
-              </li>
-              <li>
-                Invite → <code>POST /api/admin/users/invite</code>; role →{' '}
-                <code>PATCH /api/admin/users/:id</code>; suspend → ban flag + session revoke.
-              </li>
-              <li>
-                Write every access change to <code>audit_log</code> and never demote or suspend the
-                last Owner.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — search, filters, invite, role changes, and suspend
+            all update the table. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset organizations</code> for <code>organizations</code>{' '}
+              and <code>organization_members</code>.
+            </li>
+            <li>
+              <code>GET /api/admin/users?status=&amp;q=</code> lists members; map <code>role</code>{' '}
+              and a status derived from invite / ban flags.
+            </li>
+            <li>
+              Invite → <code>POST /api/admin/users/invite</code>; role →{' '}
+              <code>PATCH /api/admin/users/:id</code>; suspend → ban flag + session revoke.
+            </li>
+            <li>
+              Write every access change to <code>audit_log</code> and never demote or suspend the
+              last Owner.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="User management motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** One KPI tile. */
-const Kpi = ({
-  icon,
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly icon: ReactNode;
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="flex items-center gap-3 p-4">
-      <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
-        {icon}
-      </span>
-      <div>
-        <p className="text-muted-foreground text-xs">{label}</p>
-        <p className={cn('font-semibold text-lg tabular-nums', valueClassName)}>{value}</p>
-      </div>
-    </CardContent>
-  </Card>
-);

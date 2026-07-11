@@ -30,6 +30,11 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.js",
       "require": "./dist/types.cjs"
+    },
+    "./cli/catalog": {
+      "types": "./dist/cli/catalog.d.ts",
+      "import": "./dist/cli/catalog.js",
+      "require": "./dist/cli/catalog.cjs"
     }
   },
   "files": [

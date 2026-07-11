@@ -1,14 +1,21 @@
 'use client';
 
-import { Alert, AlertDescription, AlertTitle } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
+import { IconBox } from '@vybekiit/ui/icon-box';
 import { Separator } from '@vybekiit/ui/separator';
 import {
   CheckCircle2,
   ChevronRight,
-  CircleAlert,
   Download,
   Loader2,
   Package,
@@ -16,10 +23,13 @@ import {
   RefreshCw,
   Truck,
 } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoErrorState } from './shared/DemoErrorState';
+import { DemoLoadState } from './shared/DemoLoadState';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
+import { formatUsdCents } from './shared/formatUsdCents';
 
 /** Fulfillment / payment status for an order. */
 type OrderStatus = 'paid' | 'shipped' | 'refunded';
@@ -116,9 +126,6 @@ const ORDERS: readonly Order[] = [
   },
 ];
 
-const usd = (cents: number): string =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
-
 const statusVariant = (
   status: OrderStatus,
 ): 'default' | 'secondary' | 'outline' | 'destructive' => {
@@ -199,41 +206,28 @@ export const OrdersPage = () => {
   // ---------- loading ----------
   if (status === 'loading') {
     return (
-      <Frame>
-        <section className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
-          <Loader2 aria-hidden="true" className="h-10 w-10 animate-spin text-muted-foreground" />
-          <h1 className="mt-6 font-bold text-2xl tracking-tight">Loading orders…</h1>
-          <p className="mt-2 text-muted-foreground text-sm">Fetching history and fulfillment.</p>
-        </section>
-      </Frame>
+      <DemoRecipeFrame defaultTransition="fade" title="Orders motion pass">
+        <DemoLoadState detail="Fetching history and fulfillment." title="Loading orders…" />
+      </DemoRecipeFrame>
     );
   }
 
   // ---------- error ----------
   if (status === 'error') {
     return (
-      <Frame>
-        <section className="mx-auto max-w-md px-4 py-24">
-          <Alert variant="destructive">
-            <CircleAlert aria-hidden="true" className="h-4 w-4" />
-            <AlertTitle>Orders could not load</AlertTitle>
-            <AlertDescription>
-              Order history failed to load. Retry once the orders API is reachable.
-            </AlertDescription>
-          </Alert>
-          <div className="mt-6 flex justify-center">
-            <Button onClick={reload} type="button">
-              <RefreshCw aria-hidden="true" className="h-4 w-4" /> Retry
-            </Button>
-          </div>
-        </section>
-      </Frame>
+      <DemoRecipeFrame defaultTransition="fade" title="Orders motion pass">
+        <DemoErrorState
+          detail="Order history failed to load. Retry once the orders API is reachable."
+          onRetry={reload}
+          title="Orders could not load"
+        />
+      </DemoRecipeFrame>
     );
   }
 
   // ---------- ready ----------
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Orders motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
@@ -287,24 +281,23 @@ export const OrdersPage = () => {
         </div>
 
         {filtered.length === 0 ? (
-          <section className="flex flex-col items-center rounded-lg border border-dashed px-4 py-16 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
-              <Package aria-hidden="true" className="h-7 w-7" />
-            </span>
-            <h2 className="mt-4 font-semibold text-lg">No orders in this filter</h2>
-            <p className="mt-1 max-w-sm text-muted-foreground text-sm">
-              Nothing matches <span className="font-medium">{FILTER_LABEL[filter]}</span>. Try
-              another status or clear the filter.
-            </p>
-            <Button
-              className="mt-4"
-              onClick={() => setFilter('all')}
-              type="button"
-              variant="outline"
-            >
-              Show all orders
-            </Button>
-          </section>
+          <Empty variant="dashed">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Package aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>No orders in this filter</EmptyTitle>
+              <EmptyDescription>
+                Nothing matches <span className="font-medium">{FILTER_LABEL[filter]}</span>. Try
+                another status or clear the filter.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button onClick={() => setFilter('all')} type="button" variant="outline">
+                Show all orders
+              </Button>
+            </EmptyContent>
+          </Empty>
         ) : (
           <div className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
             <Card>
@@ -332,13 +325,13 @@ export const OrdersPage = () => {
                           }}
                           type="button"
                         >
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                          <IconBox size="md">
                             <Receipt aria-hidden="true" className="h-4 w-4" />
-                          </span>
+                          </IconBox>
                           <span className="min-w-0 flex-1">
                             <span className="flex flex-wrap items-center gap-2">
                               <span className="font-medium text-sm">{order.orderNumber}</span>
-                              <Badge className="text-[10px]" variant={statusVariant(order.status)}>
+                              <Badge className="text-xs" variant={statusVariant(order.status)}>
                                 {STATUS_LABEL[order.status]}
                               </Badge>
                             </span>
@@ -349,7 +342,7 @@ export const OrdersPage = () => {
                           </span>
                           <span className="flex items-center gap-2">
                             <span className="font-medium text-sm tabular-nums">
-                              {usd(order.totalCents)}
+                              {formatUsdCents(order.totalCents)}
                             </span>
                             <ChevronRight
                               aria-hidden="true"
@@ -389,7 +382,9 @@ export const OrdersPage = () => {
                     </div>
                     <div className="flex justify-between gap-2">
                       <dt className="text-muted-foreground">Total</dt>
-                      <dd className="font-semibold tabular-nums">{usd(selected.totalCents)}</dd>
+                      <dd className="font-semibold tabular-nums">
+                        {formatUsdCents(selected.totalCents)}
+                      </dd>
                     </div>
                     {selected.tracking ? (
                       <div className="flex justify-between gap-2">
@@ -412,10 +407,12 @@ export const OrdersPage = () => {
                         <span>
                           <span className="font-medium">{line.name}</span>
                           <span className="block text-muted-foreground text-xs">
-                            Qty {line.quantity} · {usd(line.unitPrice)} each
+                            Qty {line.quantity} · {formatUsdCents(line.unitPrice)} each
                           </span>
                         </span>
-                        <span className="tabular-nums">{usd(line.unitPrice * line.quantity)}</span>
+                        <span className="tabular-nums">
+                          {formatUsdCents(line.unitPrice * line.quantity)}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -472,49 +469,36 @@ export const OrdersPage = () => {
           </div>
         )}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              This recipe is fully interactive with local React state — no backend needed to demo
-              it. To show real order history:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset orders</code>. Rows are written by the payment
-                webhook at <code>app/api/webhook/route.ts</code> on successful checkout (and refund
-                events).
-              </li>
-              <li>
-                List with <code>GET /api/orders</code> →{' '}
-                <code>{'{ orders: [{ order_id, email, refunded, created_at, … }] }'}</code>. Map{' '}
-                <code>refunded</code> to status; derive shipped from fulfillment metadata if you
-                store tracking.
-              </li>
-              <li>
-                Invoice: generate a PDF / receipt URL from the order id. Reorder: re-insert the
-                original line items into the open cart after <code>apply-preset cart</code>.
-              </li>
-              <li>
-                Keep this route auth-gated — the orders preset is service-role for webhooks; expose
-                only the signed-in buyer's rows via your API.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            This recipe is fully interactive with local React state — no backend needed to demo it.
+            To show real order history:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset orders</code>. Rows are written by the payment webhook
+              at <code>app/api/webhook/route.ts</code> on successful checkout (and refund events).
+            </li>
+            <li>
+              List with <code>GET /api/orders</code> →{' '}
+              <code>{'{ orders: [{ order_id, email, refunded, created_at, … }] }'}</code>. Map{' '}
+              <code>refunded</code> to status; derive shipped from fulfillment metadata if you store
+              tracking.
+            </li>
+            <li>
+              Invoice: generate a PDF / receipt URL from the order id. Reorder: re-insert the
+              original line items into the open cart after <code>apply-preset cart</code>.
+            </li>
+            <li>
+              Keep this route auth-gated — the orders preset is service-role for webhooks; expose
+              only the signed-in buyer's rows via your API.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Wrap a recipe view in the gallery's theme + motion controls. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Orders motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
 
 // TODO: Load order history from GET /api/orders after apply-preset orders (filled by webhook).
 // TODO: Wire invoice download and reorder actions to orders + cart endpoints.

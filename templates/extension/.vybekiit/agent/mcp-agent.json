@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "vybekiit": {
+      "command": "node",
+      "args": [
+        "../../packages/agentMcp/dist/bin.js"
+      ],
+      "env": {
+        "VYBEKIIT_PROJECT_ROOT": "."
+      }
+    }
+  }
+}

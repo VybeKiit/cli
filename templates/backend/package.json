@@ -31,16 +31,12 @@
     "@vybekiit/ai": "workspace:*",
     "@vybekiit/analytics": "workspace:*",
     "@vybekiit/assets": "workspace:*",
-    "@vybekiit/cms": "workspace:*",
+    "@vybekiit/content": "workspace:*",
     "@vybekiit/compliance": "workspace:*",
-    "@vybekiit/email": "workspace:*",
+    "@vybekiit/messaging": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
-    "@vybekiit/jobs": "workspace:*",
-    "@vybekiit/kv": "workspace:*",
-    "@vybekiit/notifications": "workspace:*",
+    "@vybekiit/infra": "workspace:*",
     "@vybekiit/realtime": "workspace:*",
-    "@vybekiit/search": "workspace:*",
-    "@vybekiit/seo": "workspace:*",
     "@vybekiit/tenancy": "workspace:*",
     "@vybekiit/tokens": "workspace:*"
   },
@@ -55,5 +51,9 @@
     "tsx": "^4.19.2",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "optionalDependencies": {
+    "@vybekiit/agent-mcp": "workspace:*",
+    "@vybekiit/browser-automation": "workspace:*"
   }
 }

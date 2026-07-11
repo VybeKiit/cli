@@ -114,5 +114,3 @@ export async function crawlHrefPages(
 
   return { pages, truncated, visitedCount: visited.size };
 }
-
-export { collectHrefsFromPage };

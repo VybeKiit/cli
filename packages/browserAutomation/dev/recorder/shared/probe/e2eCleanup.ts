@@ -123,5 +123,3 @@ export async function loadLatestE2eArtifacts(logDir: string): Promise<LsE2eArtif
   const raw = await readFile(resolve(logDir, files.at(-1)!), 'utf8');
   return JSON.parse(raw) as LsE2eArtifacts;
 }
-
-export { LS_E2E_PREFIX };

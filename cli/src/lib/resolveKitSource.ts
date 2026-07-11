@@ -1,10 +1,11 @@
 import { execFile } from 'node:child_process';
-import { access, mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { pathExists } from './pathExists';
 import { ScaffoldError } from './scaffold';
 
 const execFileAsync = promisify(execFile);
@@ -20,12 +21,12 @@ const MIRROR_ORG = 'VybeKiit';
 /**
  * Gated **kit workspace** delivery repo under the VybeKiit org (ADR-0038 Track 2).
  *
- * Per-template mirrors (`web` / `mobile` / `extension`) remain for advanced `drop` /
- * single-surface flows. `create app` needs packages + surface under one installable root, so
- * it clones this kit repo when not developing inside the monorepo.
+ * Synced by `scripts/dev/mirror/syncKitMirror.mjs` (packages + templates). Per-template
+ * mirrors (`web` / `mobile` / `extension`) remain for advanced `drop` / single-surface
+ * flows. `create app` clones this kit repo when not developing inside the monorepo.
  *
- * Topology may evolve; if the delivery repo name changes, update this constant only — do not
- * invent alternate org names. Gate/invite must grant access to whatever this clones.
+ * Gate invite defaults must include this name (`GITHUB_GATE_REPOS` / `VYBEKIIT_GATE_REPOS`).
+ * If the delivery repo name changes, update this constant only — do not invent alternate orgs.
  */
 export const KIT_MIRROR_REPO = 'kit';
 
@@ -47,23 +48,6 @@ export type ResolvedKitSource = {
   readonly kitRoot: string;
   /** Removes any temp clone created for a published install; absent for in-place sources. */
   readonly cleanup?: () => Promise<void>;
-};
-
-/**
- * Check whether a path exists on disk.
- *
- * @param path - Absolute or relative path to probe.
- * @returns True when the path is accessible.
- * @example
- * await pathExists('/tmp/vybekiit/packages');
- */
-const pathExists = async (path: string): Promise<boolean> => {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 /**

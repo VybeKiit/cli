@@ -1,9 +1,10 @@
 'use client';
 
-import { PreviewLoadingOverlay } from '@library/components/PreviewLoadingSpinner';
-import { CATALOG_BY_KEY, type CatalogEntry, type UnavailableReason } from '@library/data/catalog';
+import { PreviewLoadingOverlay } from '@library/components/PreviewLoadingOverlay';
+import { CATALOG_BY_KEY, type CatalogEntry } from '@library/data/catalog';
 import { resolvePreviewExport } from '@library/lib/resolvePreviewExport';
 import { applyPrimaryVars, DEFAULT_PRIMARY } from '@library/lib/theme';
+import { EMBED_UNAVAILABLE, unavailableReasonOf } from '@library/lib/unavailableReasons';
 import { useSearchParams } from 'next/navigation';
 import {
   Component,
@@ -53,14 +54,6 @@ class PreviewErrorBoundary extends Component<
     return this.props.children;
   }
 }
-
-/** Short, honest fallback shown if the embed URL is opened for a non-previewable entry. */
-const EMBED_UNAVAILABLE: Record<UnavailableReason, string> = {
-  env: 'Needs API keys or a live backend — run it inside your app.',
-  deps: 'Needs extra packages the starter does not install by default.',
-  native: 'Native/WebGL component — renders in your app, not the gallery.',
-  nodemo: 'Live preview is coming soon.',
-};
 
 const EmbedPageFallback = () => {
   const isInteractive =
@@ -180,11 +173,7 @@ const EmbedPreviewInner = ({
     }
 
     if (!entry.buildSafe) {
-      let unavailableReason = entry.unavailableReason;
-      if (unavailableReason === undefined) {
-        unavailableReason = entry.requiresEnv ? 'env' : 'nodemo';
-      }
-      setError(EMBED_UNAVAILABLE[unavailableReason]);
+      setError(EMBED_UNAVAILABLE[unavailableReasonOf(entry)]);
       setLoading(false);
       return;
     }

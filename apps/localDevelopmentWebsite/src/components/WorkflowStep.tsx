@@ -153,7 +153,7 @@ export const WorkflowStepItem = ({ step, index, compact = false }: WorkflowStepI
                 {subHasIcon && (
                   <StepIcon stepId={sub.id} className={cn('h-4 w-4', subIconColor(sub.status))} />
                 )}
-                <span className={cn('text-zinc-300', compact ? 'text-[11px]' : 'text-xs')}>
+                <span className={cn('text-zinc-300', compact ? 'text-xs' : 'text-xs')}>
                   {sub.label}
                 </span>
               </div>

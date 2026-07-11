@@ -3,14 +3,16 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Textarea } from '@vybekiit/ui/textarea';
 import { Check, Lightbulb, Plus, Save, Trash2 } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 /** One suggested data entity derived from the idea. */
 type Entity = {
@@ -125,7 +127,7 @@ export const IdeaPlannerPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Idea planner motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -142,9 +144,15 @@ export const IdeaPlannerPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Entities" value={entities.length} />
-          <Kpi label="Approved" value={approvedCount} />
-          <Kpi label="Idea" value={ideaDirty ? 0 : 1} />
+          {(
+            [
+              { key: 'entities', label: 'Entities', value: entities.length },
+              { key: 'approved', label: 'Approved', value: approvedCount },
+              { key: 'idea', label: 'Idea', value: ideaDirty ? 0 : 1 },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
@@ -229,11 +237,15 @@ export const IdeaPlannerPage = () => {
               </form>
 
               {visible.length === 0 ? (
-                <div className="flex flex-col items-center py-10 text-center">
-                  <Lightbulb aria-hidden="true" className="h-7 w-7 text-muted-foreground" />
-                  <p className="mt-2 font-medium text-sm">No entities here</p>
-                  <p className="mt-1 text-muted-foreground text-xs">Add one above or show all.</p>
-                </div>
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia>
+                      <Lightbulb aria-hidden="true" />
+                    </EmptyMedia>
+                    <EmptyTitle>No entities here</EmptyTitle>
+                    <EmptyDescription>Add one above or show all.</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               ) : (
                 <ul aria-label="Data entities" className="space-y-2">
                   {visible.map((entity) => (
@@ -280,48 +292,27 @@ export const IdeaPlannerPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — approve, add, filter, and save recompute the
-              plan. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Save idea notes to the configured app data store (<code>POST /api/plans</code> or
-                equivalent).
-              </li>
-              <li>
-                On Save, turn approved entities into the active database schema plan (preset
-                suggestions or migration draft).
-              </li>
-              <li>
-                Keep the empty filter state when every entity is removed so the builder can start
-                over.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — approve, add, filter, and save recompute the plan.
+            To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Save idea notes to the configured app data store (<code>POST /api/plans</code> or
+              equivalent).
+            </li>
+            <li>
+              On Save, turn approved entities into the active database schema plan (preset
+              suggestions or migration draft).
+            </li>
+            <li>
+              Keep the empty filter state when every entity is removed so the builder can start
+              over.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Idea planner motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({ label, value }: { readonly label: string; readonly value: number }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-2xl tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

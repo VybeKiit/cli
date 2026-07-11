@@ -1,3 +1,4 @@
+import { readinessToChecks } from './doctorPipeline';
 import type { ToolReport } from './toolchain';
 
 /** Inputs to the pure doctor readiness policy — test surface for exit codes. */
@@ -14,21 +15,24 @@ export type DoctorReadinessInput = {
 /**
  * Compute the doctor process exit code from readiness checks.
  *
+ * Folds the same {@link readinessToChecks} adapters the DoctorPipeline uses so
+ * exit policy and check inventory stay one module.
+ *
  * @param input - Boolean readiness checks collected by the doctor runner.
  * @returns Zero when every gate passes, otherwise one.
  * @example
  * const code = computeDoctorExitCode({ cloudReady: true, r2Ok: true, agentReady: true, skillsReady: true, projectHealthOk: true });
  */
 export const computeDoctorExitCode = (input: DoctorReadinessInput): number => {
-  const mobileOk = input.mobilePublishOk === undefined ? true : input.mobilePublishOk;
-  const ready =
-    input.cloudReady &&
-    input.r2Ok &&
-    input.agentReady &&
-    input.skillsReady &&
-    input.projectHealthOk &&
-    mobileOk;
-  return ready ? 0 : 1;
+  const checks = readinessToChecks(input);
+  const blocked = checks.some((check) => {
+    if (!check.blocksExit) {
+      return false;
+    }
+    const result = check.run();
+    return result === false;
+  });
+  return blocked ? 1 : 0;
 };
 
 /** Injectable seams for the side-effecting doctor executor. */

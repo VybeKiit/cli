@@ -5,10 +5,10 @@ import { CatalogGridLayoutPicker } from '@library/components/CatalogGridLayoutPi
 import { CatalogPaginationBar } from '@library/components/CatalogPaginationBar';
 import { CatalogScrollModeToggle } from '@library/components/CatalogScrollModeToggle';
 import { CatalogSidebar } from '@library/components/CatalogSidebar';
+import { GlobalThemeControls } from '@library/components/GlobalThemeControls';
 import { LibraryTutorial } from '@library/components/LibraryTutorial';
 import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
 import { SelectionTray } from '@library/components/SelectionTray';
-import { GlobalThemeControls } from '@library/components/ThemeToolbar';
 import { useCatalogData, useCatalogReady } from '@library/context/CatalogDataContext';
 import { useCatalogGridLayout } from '@library/context/CatalogGridLayoutContext';
 import {
@@ -17,7 +17,6 @@ import {
   COMPONENT_CATALOG_COUNT,
 } from '@library/data/catalog.meta';
 import { useCatalogPool } from '@library/hooks/useCatalogPool';
-import { useDebouncedValue } from '@library/hooks/useDebouncedValue';
 import { CATALOG_PAGE_SIZE, loadInfiniteScrollEnabled } from '@library/lib/catalogScrollMode';
 import { matchesCatalogQuery } from '@library/lib/catalogSearch';
 import { categoryLabelFromSlug } from '@library/lib/categoryLabels';
@@ -27,6 +26,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/side
 import { CircleHelp } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 type TabKind = 'all' | 'components' | 'examples';
 
@@ -71,7 +71,7 @@ export const CatalogBrowser = () => {
   const initialLibrary = libraryParam === null ? 'all' : libraryParam;
 
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebouncedValue(query, 250);
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [category, setCategory] = useState<string>(initialCategory);
   const [library, setLibrary] = useState<string>(initialLibrary);
   const [tab, setTab] = useState<TabKind>(initialTab);
@@ -115,6 +115,11 @@ export const CatalogBrowser = () => {
     },
     [category, library, router, tab],
   );
+
+  const handleSelectTab = (id: TabKind): void => {
+    setTab(id);
+    syncUrl({ tab: id });
+  };
 
   const poolForTab = useMemo(() => {
     if (tab === 'components') {
@@ -304,10 +309,7 @@ export const CatalogBrowser = () => {
                 <LayoutTooltip key={id} label={TAB_TIPS[id]}>
                   <button
                     className={`rounded-full px-3 py-1 text-sm ${tab === id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-                    onClick={() => {
-                      setTab(id);
-                      syncUrl({ tab: id });
-                    }}
+                    onClick={() => handleSelectTab(id)}
                     type="button"
                   >
                     {label} ({count})

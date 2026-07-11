@@ -23,9 +23,14 @@ const RootLayout = ({
 }>) => (
   <html lang="en" suppressHydrationWarning={true}>
     <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem={false}
+        storageKey="vybekiit-local-dev-theme"
+      >
         {children}
-        <Toaster position="bottom-right" richColors={true} />
+        <Toaster position="bottom-right" richColors={true} theme="system" />
       </ThemeProvider>
     </body>
   </html>

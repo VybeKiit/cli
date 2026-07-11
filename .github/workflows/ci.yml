@@ -1,13 +1,14 @@
 name: ci
 
 # CI gate — composes the single-purpose reusable legs (biome / typecheck / test /
-# build / checks) via local `./` refs; each is `on: workflow_call`. Together they
-# are the same set `pnpm verify` runs locally, split so a red leg is easy to spot.
+# build / checks / e2e) via local `./` refs; each is `on: workflow_call` (pure one
+# job per yml — dufflebag ADR-0009). Together they are the same set `pnpm verify`
+# runs locally, split so a red leg is easy to spot.
 #
 # - `CI Gate` is the single aggregated status check: require it in branch
 #   protection so any red leg blocks the merge.
-# - `ci-failure-issue.yml` (separate, `workflow_run`-triggered) opens a deduped
-#   issue when this workflow fails on main — never for PRs.
+# - `report-failure` opens/updates a ci-failure issue when main goes red (never
+#   for PRs — dufflebag ADR 0005).
 
 on:
   push:
@@ -33,17 +34,31 @@ jobs:
   checks:
     uses: ./.github/workflows/checks.yml
 
+  e2e:
+    uses: ./.github/workflows/e2e.yml
+
   gate:
     name: CI Gate
-    needs: [biome, typecheck, test, build, checks]
+    needs: [biome, typecheck, test, build, checks, e2e]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Require every leg to pass
         run: |
-          echo "biome=${{ needs.biome.result }} typecheck=${{ needs.typecheck.result }} test=${{ needs.test.result }} build=${{ needs.build.result }} checks=${{ needs.checks.result }}"
+          echo "biome=${{ needs.biome.result }} typecheck=${{ needs.typecheck.result }} test=${{ needs.test.result }} build=${{ needs.build.result }} checks=${{ needs.checks.result }} e2e=${{ needs.e2e.result }}"
           test "${{ needs.biome.result }}" = "success" \
             && test "${{ needs.typecheck.result }}" = "success" \
             && test "${{ needs.test.result }}" = "success" \
             && test "${{ needs.build.result }}" = "success" \
-            && test "${{ needs.checks.result }}" = "success"
+            && test "${{ needs.checks.result }}" = "success" \
+            && test "${{ needs.e2e.result }}" = "success"
+
+  report-failure:
+    name: Open issue on main failure
+    needs: [biome, typecheck, test, build, checks, e2e]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      issues: write
+      actions: read
+    uses: ./.github/workflows/report-failure.yml

@@ -65,16 +65,59 @@ MDB_MCP_READ_ONLY = "true"
 
 Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 
+## VybeKiit first-party MCPs
+
+## Agent skill (read locally or via MCP)
+
+- Auto-discovered: `.agents/skills/use-kit-mcp/SKILL.md`
+- Platform wrapper: `.vybekiit/platform-skills/mcp-tools-vybekiit.md`
+- Via MCP (when `vybekiit` server is connected): `search_skills({ query: "mcp tools" })` then `get_skill({ id: "use-kit-mcp" })` or `list_platform_skills({ query: "mcp" })`
+
+
+
+After `pnpm build` in the monorepo (or a workspace that includes these packages):
+
+| Server | Tools | Context controls |
+|--------|-------|------------------|
+| `vybekiit` (`mcp-agent.json`) | `search_skills`, `get_skill`, `list_platform_skills`, `search_commands`, `get_command`, `search_doctor_tools`, `search_tech_ids`, `doc_fallback`, `search_automations`, `get_automation`, `run_automation` | Cursor pagination (`limit`/`cursor`/`nextCursor`), slim rows, fuzzy rank |
+| `vybekiit-ui-catalog` (`mcp-ui-catalog.json`) | `search_ui_components`, `get_ui_component`, `suggest_ui_blend`, `list_ui_sources` | Same page envelope; `fields=slim\|full` (default slim) |
+
+Env:
+
+- `VYBEKIIT_PROJECT_ROOT` — project root for skill file reads + automation cwd (default `cwd`)
+- `VYBEKIIT_UI_CATALOG_PATH` — path to `ui-catalog-index.json`
+- `VYBEKIIT_AUTOMATE_BIN` — optional absolute path to `vybekiit-automate` (otherwise package bin / monorepo dist / PATH)
+
+Prefer **search → get** (list slim, then detail) so tool responses stay small.
+
+### Browser automations (from any folder)
+
+```
+search_automations({ query: "lemon squeezy" })
+run_automation({ domain: "ls", command: "setup", dryRun: true })   # preview argv
+run_automation({ domain: "ls", command: "standby" })                # real browser
+```
+
+Shell equivalent (anywhere the monorepo or package is installed):
+
+```
+vybekiit-automate catalog --json
+vybekiit-automate ls setup --json --yes --name=Kit --price-cents=2900 --mode=test --webhook-url=…
+```
+
+`run_automation` resolves the bin automatically (env → package → monorepo dist → PATH) and runs with `cwd=VYBEKIIT_PROJECT_ROOT`.
+
 ## Provider snippets (merge one or more)
 
 | When | File | Upstream docs |
 |------|------|---------------|
+| VybeKiit agent surface (skills, CLI, doctor, doc-fallback) | `mcp-agent.json` | Local `@vybekiit/agent-mcp` — always merge first |
 | Default data (`DATA_PROVIDER=supabase`) | `mcp-supabase.json` | https://supabase.com/docs/guides/ai-tools/mcp |
 | Stripe payments | `mcp-stripe.json` | https://docs.stripe.com/mcp |
 | PayPal payments | `mcp-paypal.json` | https://docs.paypal.ai/developer/tools/ai/mcp-quickstart |
 | Neon data | `mcp-neon.json` | https://neon.tech/docs/ai/neon-mcp-server |
 | Firebase data | `mcp-firebase.json` | Firebase MCP via `firebase-tools mcp` |
-| UI catalog | `mcp-ui-catalog.json` | VybeKiit local catalog |
+| UI catalog | `mcp-ui-catalog.json` | VybeKiit local `@vybekiit/ui-catalog-mcp` |
 | Twilio SMS / Verify | `mcp-twilio-docs.json` | https://mcp.twilio.com/docs |
 | Twilio API (optional alpha) | `mcp-twilio-alpha.json` | `@twilio-alpha/mcp` stdio bridge |
 | Sentry error alerts | `mcp-sentry.json` | https://mcp.sentry.dev/mcp |

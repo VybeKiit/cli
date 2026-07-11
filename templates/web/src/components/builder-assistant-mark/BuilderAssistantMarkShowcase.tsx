@@ -1,12 +1,11 @@
 'use client';
 
 import {
-  ASSISTANT_LABELS,
-  BuilderAssistantMark,
   BUILDER_ASSISTANT_MARK_SIZE_LABELS,
   BUILDER_ASSISTANT_MARK_SIZES,
   type BuilderAssistantMarkSize,
-} from './BuilderAssistantMark';
+} from './builderAssistantMarkSizes';
+import { ASSISTANT_LABELS, BuilderAssistantMark } from './BuilderAssistantMark';
 import { CLAUDE_OCTOPUS_POSES, type ClaudeOctopusPose } from './claudeOctopusPoses';
 import { ClaudeOctopusScene } from './ClaudeOctopusScene';
 import { CLAUDE_OCTOPUS_SCENES } from './claudeOctopusScenes';
@@ -14,7 +13,15 @@ import { ClaudeOctopusJump } from './octopusRig';
 import type { VybeAssistant } from '@vybekiit/report-mode';
 import { cn } from '@/lib/utils';
 
-const ASSISTANTS: readonly VybeAssistant[] = ['cursor', 'claude', 'codex'];
+const ASSISTANTS: readonly VybeAssistant[] = [
+  'claude',
+  'codex',
+  'cursor',
+  'kiro',
+  'kimi',
+  'devin',
+  'grok',
+];
 
 /** A diverse hand-picked sample of the sharp rig (the full set is in the grid below). */
 const RIG_SAMPLE: readonly ClaudeOctopusPose[] = [
@@ -56,7 +63,7 @@ const PoseCard = ({
           {meta?.description}
         </p>
       </div>
-      <code className="rounded bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+      <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">
         pose=&quot;{pose}&quot;
       </code>
     </div>
@@ -86,7 +93,7 @@ export const BuilderAssistantMarkShowcase = () => (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         <h2 className="font-semibold text-lg">Sharp integer-grid rig</h2>
-        <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-[10px] text-primary uppercase tracking-wide">
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 font-medium text-xs text-primary uppercase tracking-wide">
           New
         </span>
       </div>
@@ -108,7 +115,7 @@ export const BuilderAssistantMarkShowcase = () => (
             {RIG_SAMPLE.map((id) => (
               <div className="flex flex-col items-center gap-1.5" key={id}>
                 <BuilderAssistantMark assistant="claude" pose={id} size="xl" />
-                <code className="font-mono text-[10px] text-muted-foreground">{id}</code>
+                <code className="font-mono text-xs text-muted-foreground">{id}</code>
               </div>
             ))}
           </div>
@@ -122,10 +129,8 @@ export const BuilderAssistantMarkShowcase = () => (
         {BUILDER_ASSISTANT_MARK_SIZES.map((size: BuilderAssistantMarkSize) => (
           <div className="flex flex-col items-center gap-2" key={size}>
             <BuilderAssistantMark assistant="claude" pose="alive" size={size} />
-            <code className="font-mono text-[10px] text-muted-foreground">
-              size=&quot;{size}&quot;
-            </code>
-            <span className="text-[10px] text-muted-foreground">
+            <code className="font-mono text-xs text-muted-foreground">size=&quot;{size}&quot;</code>
+            <span className="text-xs text-muted-foreground">
               {BUILDER_ASSISTANT_MARK_SIZE_LABELS[size]}
             </span>
           </div>
@@ -163,7 +168,7 @@ export const BuilderAssistantMarkShowcase = () => (
               <p className="font-semibold text-sm">{scene.label}</p>
               <p className="mt-1 text-muted-foreground text-xs leading-snug">{scene.description}</p>
             </div>
-            <code className="w-fit rounded bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+            <code className="w-fit rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">
               scene=&quot;{scene.id}&quot;
             </code>
           </div>
@@ -186,7 +191,7 @@ export const BuilderAssistantMarkShowcase = () => (
               {...(assistant === 'claude' ? { pose: 'alive' as const } : {})}
             />
             <p className="font-semibold text-sm">{ASSISTANT_LABELS[assistant]}</p>
-            <code className="rounded bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+            <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">
               assistant=&quot;{assistant}&quot;
             </code>
           </div>

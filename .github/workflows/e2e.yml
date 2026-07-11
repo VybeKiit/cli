@@ -1,0 +1,64 @@
+name: E2E
+
+# Single-purpose, reusable (workflow_call): the end-to-end suite. Pure one-job
+# yml (dufflebag ADR-0009 template shape). Wired into ci.yml so a red e2e blocks
+# the CI Gate.
+#
+# Covers:
+#   - apps/localDevelopmentWebsite Playwright (default local-dev console)
+#   - apps/componentLibrary Playwright (catalog smoke + every page-recipe route)
+#
+# Template buyer e2e stays opt-in via `pnpm test:e2e:templates` (PLAYWRIGHT_ENABLED).
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E tests
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # corepack activates the pinned pnpm from package.json#packageManager (act-compatible).
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Templates/apps resolve @vybekiit/* exports to package dist/; cold checkout has no dist.
+      # Match build.yml: tsup DTS OOMs under default heap when many packages build in parallel.
+      - name: Build workspace packages
+        run: pnpm exec turbo run build --filter="./packages/**" --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Install Playwright browsers (component library)
+        run: pnpm --filter vybekiit-component-library exec playwright install --with-deps chromium
+
+      - name: Install Playwright browsers (local development website)
+        run: pnpm --filter vybekiit-local-development-website exec playwright install --with-deps chromium
+
+      # componentLibrary playwright webServer runs `pnpm start` — needs a production build.
+      - name: Build component library
+        run: pnpm --filter vybekiit-component-library build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_ENABLED: true
+          NODE_OPTIONS: --max-old-space-size=8192

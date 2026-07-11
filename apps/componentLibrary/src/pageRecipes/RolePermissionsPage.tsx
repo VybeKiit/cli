@@ -1,15 +1,16 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Switch } from '@vybekiit/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@vybekiit/ui/table';
 import { CheckCircle2, Loader2, LockKeyhole, Save, ShieldCheck } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type RoleId = 'owner' | 'admin' | 'editor' | 'viewer';
 
@@ -137,7 +138,7 @@ export const RolePermissionsPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Role permissions motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -169,10 +170,10 @@ export const RolePermissionsPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0" />
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -282,43 +283,33 @@ export const RolePermissionsPage = () => {
           <p className="mt-3 text-amber-600 text-sm">You have unsaved permission changes.</p>
         ) : null}
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — matrix toggles, invite policy, and save all work
-              offline. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset organizations</code> for orgs +{' '}
-                <code>organization_members.role</code>.
-              </li>
-              <li>
-                Store the capability matrix as config or a <code>role_permissions</code> table;
-                evaluate grants server-side on every admin route.
-              </li>
-              <li>
-                <code>PUT /api/admin/roles</code> saves the matrix; always append to{' '}
-                <code>audit_log</code> with actor and diff.
-              </li>
-              <li>
-                Never allow removing the last Owner or revoking Owner billing/role rights from the
-                UI or API.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — matrix toggles, invite policy, and save all work
+            offline. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset organizations</code> for orgs +{' '}
+              <code>organization_members.role</code>.
+            </li>
+            <li>
+              Store the capability matrix as config or a <code>role_permissions</code> table;
+              evaluate grants server-side on every admin route.
+            </li>
+            <li>
+              <code>PUT /api/admin/roles</code> saves the matrix; always append to{' '}
+              <code>audit_log</code> with actor and diff.
+            </li>
+            <li>
+              Never allow removing the last Owner or revoking Owner billing/role rights from the UI
+              or API.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Role permissions motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

@@ -104,20 +104,16 @@
     "@vybekiit/assets": "workspace:*",
     "@vybekiit/auth": "workspace:*",
     "@vybekiit/client-state": "workspace:*",
-    "@vybekiit/cms": "workspace:*",
+    "@vybekiit/content": "workspace:*",
     "@vybekiit/compliance": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
-    "@vybekiit/email": "workspace:*",
+    "@vybekiit/messaging": "workspace:*",
     "@vybekiit/i18n": "workspace:*",
-    "@vybekiit/jobs": "workspace:*",
-    "@vybekiit/kv": "workspace:*",
-    "@vybekiit/notifications": "workspace:*",
+    "@vybekiit/infra": "workspace:*",
     "@vybekiit/payments": "workspace:*",
     "@vybekiit/realtime": "workspace:*",
     "@vybekiit/report-mode": "workspace:*",
-    "@vybekiit/search": "workspace:*",
-    "@vybekiit/seo": "workspace:*",
     "@vybekiit/tenancy": "workspace:*",
     "@vybekiit/tokens": "workspace:*",
     "@vybekiit/walkthrough": "workspace:*",
@@ -229,5 +225,9 @@
     "typescript": "catalog:",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "catalog:"
+  },
+  "optionalDependencies": {
+    "@vybekiit/agent-mcp": "workspace:*",
+    "@vybekiit/browser-automation": "workspace:*"
   }
 }

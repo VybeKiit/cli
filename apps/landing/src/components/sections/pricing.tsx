@@ -3,9 +3,8 @@
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { CheckoutOpenButton } from '@/components/CheckoutOpenButton';
+import { useLivePricing } from '@/components/LivePricingProvider';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { PRICE_VALUE_STACK } from '@/data/site';
-import { VISITOR_PRICING } from '@/data/visitorLanding';
 import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +12,7 @@ import { cn } from '@/lib/utils';
  * One-price CTA block for the visitor homepage.
  * Sale price and compare-at both roll from 0 in sync when the section enters view.
  * Compare-at gets a short diagonal markdown pencil strike once the roll finishes.
- * Savings / scarcity lines are static (no letter wave).
+ * Live amount comes from the rising ladder (`/api/pricing`).
  *
  * @returns The rendered pricing section.
  * @example
@@ -22,9 +21,10 @@ import { cn } from '@/lib/utils';
 export const Pricing = () => {
   const [priceDone, setPriceDone] = useState(false);
   const { messages } = useLandingLocale();
+  const { pricing: live } = useLivePricing();
   const pricing = messages.pricing;
-  const discount = `${PRICE_VALUE_STACK.savingsPercent}%`;
-  const ctaLabel = `${pricing.cta} · ${VISITOR_PRICING.display}`;
+  const discount = `${live.savingsPercent}%`;
+  const ctaLabel = `${pricing.cta} · ${live.display}`;
 
   return (
     <section id="pricing" className="border-border/60 border-t">
@@ -37,13 +37,13 @@ export const Pricing = () => {
             )}
             onAnimationsFinish={() => setPriceDone(true)}
             threshold={0.35}
-            value={VISITOR_PRICING.display}
+            value={live.display}
           />
           <span className={cn('pricing-compare-wrap', priceDone && 'pricing-compare-wrap--struck')}>
             <AnimatedNumber
               className="pricing-compare-amount font-bold text-3xl tracking-tight text-muted-foreground sm:text-4xl"
               threshold={0.35}
-              value={VISITOR_PRICING.compareAt}
+              value={live.compareAtDisplay}
             />
             <span aria-hidden={true} className="pricing-pencil-strike">
               <span className="pricing-pencil-strike__line" />
@@ -72,13 +72,16 @@ export const Pricing = () => {
         </div>
         {priceDone ? (
           <div className="mt-4 space-y-2">
-            <p className="pricing-fomo-line pricing-fomo-line--savings mx-auto max-w-lg text-[11px] sm:text-xs">
+            <p className="pricing-fomo-line pricing-fomo-line--savings mx-auto max-w-lg text-xs sm:text-xs">
               {pricing.savingsBefore}
               <span className="pricing-fomo-discount">{discount}</span>
               {pricing.savingsAfter}
             </p>
             <p className="font-medium text-muted-foreground text-xs tracking-wide">
               {pricing.cadence}
+              {live.isAtCeiling ? null : (
+                <span className="text-muted-foreground/80"> · next buyer {live.nextDisplay}</span>
+              )}
             </p>
           </div>
         ) : (
@@ -105,10 +108,10 @@ export const Pricing = () => {
           className="mt-10 w-full px-8 sm:w-auto"
           trackLabel={ctaLabel}
         >
-          {pricing.cta} · <AnimatedNumber value={VISITOR_PRICING.display} />
+          {pricing.cta} · <AnimatedNumber value={live.display} />
         </CheckoutOpenButton>
         <p className="sr-only">
-          Compare at {VISITOR_PRICING.compareAt}, now {VISITOR_PRICING.display}. {pricing.cadence}.
+          Compare at {live.compareAtDisplay}, now {live.display}. {pricing.cadence}.
         </p>
       </div>
     </section>

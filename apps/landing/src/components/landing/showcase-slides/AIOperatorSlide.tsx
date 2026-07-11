@@ -63,14 +63,14 @@ export const AIOperatorSlide = () => (
 
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-2 border-white/8 border-b px-3 py-2.5">
-          <span className="font-semibold text-[13px] text-white">Operator</span>
-          <Badge className="border-emerald-500/20 bg-emerald-500/10 text-[10px] text-emerald-400">
+          <span className="font-semibold text-sm text-white">Operator</span>
+          <Badge className="border-emerald-500/20 bg-emerald-500/10 text-xs text-emerald-400">
             Live
           </Badge>
         </div>
 
         <div className="px-3 pt-2.5 pb-1.5">
-          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[10px] text-white/40">
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-white/40">
             <Search className="h-3 w-3" strokeWidth={2} />
             Search tasks...
           </div>
@@ -81,14 +81,14 @@ export const AIOperatorSlide = () => (
             <li key={ticket.title}>
               <Card className="gap-0 border-white/8 bg-white/[0.03] py-0 shadow-none">
                 <CardContent className="flex items-start gap-2.5 px-2.5 py-2">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/8 font-semibold text-[10px] text-white/70">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/8 font-semibold text-xs text-white/70">
                     {ticket.icon}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-[11px] text-white leading-tight">
+                    <p className="truncate font-medium text-xs text-white leading-tight">
                       {ticket.title}
                     </p>
-                    <p className="mt-0.5 truncate text-[9px] text-white/45 leading-tight">
+                    <p className="mt-0.5 truncate text-xs text-white/45 leading-tight">
                       {ticket.body}
                     </p>
                   </div>

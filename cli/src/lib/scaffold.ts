@@ -1,6 +1,7 @@
 import { access, cp, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
+import { shouldCopyScaffoldPath } from './deliveryCopyPolicy';
 
 /** Templates the CLI can scaffold. Mobile/extension ship in v2/v3. Backend is API-only for mobile/ext clients. */
 export const TEMPLATES = ['web', 'spa', 'mobile', 'extension', 'backend'] as const;
@@ -16,33 +17,7 @@ export class ScaffoldError extends Error {
   }
 }
 
-/**
- * Directories never copied into a buyer's repo (build artifacts / installed deps).
- * `.git` is here because a published install scaffolds from a *cloned* mirror — the
- * buyer must start a clean project, not inherit the mirror's shallow history + remote
- * (ADR-0005). `dev` skips maintainer-only `scripts/dev/` scratch (ADR-0027).
- */
-const SKIP_DIR_NAMES = new Set(['node_modules', '.next', 'dist', '.turbo', '.git', 'dev']);
-
-// Split path separators: "scripts/dev/foo" -> ["scripts", "dev", "foo"].
-const PATH_SEPARATOR_PATTERN = /[/\\]/;
-
-/**
- * Check whether a source path should be copied into a scaffolded app.
- *
- * @param src - Source path currently being considered by `fs.cp`.
- * @returns True when the path is safe to copy into the buyer project.
- * @example
- * shouldCopyScaffoldPath('templates/web/src/app/page.tsx');
- */
-export const shouldCopyScaffoldPath = (src: string): boolean => {
-  const parts = src.split(PATH_SEPARATOR_PATTERN);
-  if (parts.some((part) => SKIP_DIR_NAMES.has(part))) {
-    return false;
-  }
-
-  return !parts.some((part, index) => part === 'scripts' && parts[index + 1] === 'dev');
-};
+export { shouldCopyScaffoldPath };
 
 /**
  * Check whether a string is one of the supported template names.

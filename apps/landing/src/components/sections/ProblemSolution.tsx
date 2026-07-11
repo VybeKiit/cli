@@ -1,8 +1,11 @@
 'use client';
 
 import { Sparkline } from '@/components/landing/kit/Sparkline';
+import { LoginRecipeMock } from '@/components/sections/LoginRecipeMock';
 import { LoopingPaymentToast } from '@/components/sections/LoopingPaymentToast';
 import { ProblemRowIcon, type ProblemRowId } from '@/components/sections/ProblemRowIcons';
+import { UserSettingsMock } from '@/components/sections/UserSettingsMock';
+import { VibeRaceFlow } from '@/components/sections/VibeRaceFlow';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { PROBLEM_OVERVIEW, SOLUTION_PAYMENTS } from '@/data/visitorLanding';
 import { useLandingLocale } from '@/i18n/LocaleProvider';
@@ -15,9 +18,9 @@ const RECENT_TX = [
 ] as const;
 
 /**
- * Problem + overview table, then a realistic payments dashboard mock + solution copy.
+ * Problem + overview, payments mock, login recipe, settings recipe, then without/with race.
  *
- * @returns The rendered problem/solution blocks.
+ * @returns The rendered problem/solution zig-zag blocks.
  * @example
  * <ProblemSolution />
  */
@@ -25,6 +28,7 @@ export const ProblemSolution = () => {
   const { messages } = useLandingLocale();
   const problem = messages.problem;
   const solution = messages.solution;
+  const { auth, settings } = messages.zigZag;
 
   return (
     <section id="how-it-works" className="mx-auto max-w-5xl space-y-16 px-6 py-8">
@@ -40,7 +44,7 @@ export const ProblemSolution = () => {
         <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm">
           <div className="flex items-center justify-between border-border/70 border-b bg-muted/30 px-5 py-3">
             <p className="font-semibold text-sm">{problem.overviewTitle}</p>
-            <span className="rounded-full bg-amber-500/12 px-2 py-0.5 font-medium text-[10px] text-amber-700 tracking-wide dark:text-amber-400">
+            <span className="rounded-full bg-amber-500/12 px-2 py-0.5 font-medium text-xs text-amber-700 tracking-wide dark:text-amber-400">
               {problem.withoutBadge}
             </span>
           </div>
@@ -80,7 +84,6 @@ export const ProblemSolution = () => {
       </div>
 
       <div className="grid items-center gap-10 lg:grid-cols-2">
-        {/* Realistic revenue dashboard mock */}
         <div className="order-2 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm lg:order-1">
           <div className="relative border-border/70 border-b bg-gradient-to-b from-muted/40 to-card px-4 pt-4 pb-3">
             <div className="mb-3 flex items-center justify-between gap-2 pe-2">
@@ -97,12 +100,12 @@ export const ProblemSolution = () => {
                 </span>
                 <div>
                   <p className="font-semibold text-sm leading-none">Payments</p>
-                  <p className="mt-1 text-[11px] text-muted-foreground leading-none">
+                  <p className="mt-1 text-xs text-muted-foreground leading-none">
                     Live · last 7 days
                   </p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-1 font-medium text-xs text-emerald-700 dark:text-emerald-400">
                 <span className="size-1.5 rounded-full bg-emerald-500" />
                 Connected
               </span>
@@ -131,7 +134,7 @@ export const ProblemSolution = () => {
                 </p>
               </div>
               <Sparkline className="h-24 w-full" id="visitor-revenue-spark" />
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Mon</span>
                 <span>Wed</span>
                 <span>Fri</span>
@@ -146,7 +149,7 @@ export const ProblemSolution = () => {
               <ul className="space-y-3">
                 {RECENT_TX.map((tx) => (
                   <li key={tx.id} className="flex items-center gap-2.5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-[11px] text-muted-foreground">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted font-semibold text-xs text-muted-foreground">
                       {tx.name
                         .split(' ')
                         .map((part) => part[0])
@@ -154,7 +157,7 @@ export const ProblemSolution = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium text-sm leading-tight">{tx.name}</p>
-                      <p className="truncate text-[11px] text-muted-foreground leading-tight">
+                      <p className="truncate text-xs text-muted-foreground leading-tight">
                         {tx.plan} · {tx.time}
                       </p>
                     </div>
@@ -174,6 +177,34 @@ export const ProblemSolution = () => {
           <p className="mt-3 text-muted-foreground leading-relaxed">{solution.solutionBody}</p>
         </div>
       </div>
+
+      {/* Login recipe + Google OAuth simulate */}
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-widest">
+            {auth.label}
+          </p>
+          <h2 className="mt-3 font-bold text-3xl tracking-tight">{auth.heading}</h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">{auth.body}</p>
+        </div>
+        <LoginRecipeMock />
+      </div>
+
+      {/* User settings recipe */}
+      <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="order-2 lg:order-1">
+          <UserSettingsMock />
+        </div>
+        <div className="order-1 lg:order-2">
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-widest">
+            {settings.label}
+          </p>
+          <h2 className="mt-3 font-bold text-3xl tracking-tight">{settings.heading}</h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">{settings.body}</p>
+        </div>
+      </div>
+
+      <VibeRaceFlow />
     </section>
   );
 };

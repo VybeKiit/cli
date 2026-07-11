@@ -4,10 +4,12 @@
 
 # vybekiit
 
-Scaffold a VybeKiit template into your own repo, then build it by describing what you
-want to your AI coding agent (Claude Code, Codex, or Cursor) — it does the heavy lift.
+Scaffold a VybeKiit kit workspace into your own folder, then build by describing what you
+want to your AI coding agent (Claude Code, Codex, or Cursor). It does the heavy lift.
 
 ## Get started
+
+After you purchase and accept the GitHub invite:
 
 ```sh
 npx vybekiit setup
@@ -16,9 +18,11 @@ npx vybekiit create app --web
 
 Or run `npx vybekiit` in a terminal for the interactive menu.
 
-`create app --web|--mobile|--extension` builds a kit workspace + that surface (not an
-app-only folder). Open the folder in your AI coding tool and say `"Set up my app."` —
-the agent walks you through the rest one step at a time.
+`create app --web|--mobile|--extension` builds a **kit workspace** (shared pieces + that
+surface), not an app-only folder. Open the folder in your AI coding tool and say
+`"Set up my app."` — the agent walks you through the rest one step at a time.
+
+You do **not** need Download ZIP or the green Code button on GitHub for day-one setup.
 
 `setup` / `doctor` install and check the full toolchain (agents, `gh`, cloud CLIs, skills,
 assistant tools):
@@ -32,7 +36,7 @@ vybekiit doctor
 | Layer | Tools |
 | ----- | ----- |
 | Agent | `claude` (Claude Code), `codex` (OpenAI Codex), `skills` (platform skills installer) |
-| Base | `gh` (download templates + GitHub login) |
+| Base | `gh` (download kit + GitHub login) |
 | Default cloud | `supabase` (database), `wrangler` (hosting) |
 | When configured | `aws`, `gcloud` (Google sign-in), `vercel`, `eas` + `launch` (mobile) |
 
@@ -62,6 +66,8 @@ vybekiit create app --mobile
 vybekiit doctor
 ```
 
+`vybekiit new` is deprecated; use `create app` instead.
+
 ## Maintainer contract
 
 CLI command cores should return a structured result and let the entrypoint render once. Human output
@@ -82,11 +88,13 @@ follows to set up, build, and ship your app.
 
 ## How delivery works
 
-Templates are proprietary and live in gated mirror repos; the published npm package ships
-**no** template files. When you run `vybekiit new`, the CLI uses GitHub's `gh` CLI to access
-the mirror you've purchased access to — one browser login, no tokens to create or paste.
-The scaffold keeps the workspace dependency model from the gated monorepo; maintained
-`@vybekiit/*` packages are private workspace code, not public npm packages rewritten at copy time.
+The paid product lives in gated private repos. The public npm package ships **no** template
+files. When you run `create app`, the CLI uses GitHub's `gh` tool to download the gated
+**kit** workspace (`VybeKiit/kit`: packages + templates), then writes your app folder.
+One browser login via `gh auth login --web` — no tokens to create or paste.
+
+Template-only mirrors (`web` / `mobile` / `extension`) remain for advanced flows; day-one
+buyers always get a kit workspace so shared pieces resolve locally.
 
 If you haven't signed in yet, the CLI tells you exactly what to run:
 `gh auth login --web`. `doctor` installs `gh` for you.

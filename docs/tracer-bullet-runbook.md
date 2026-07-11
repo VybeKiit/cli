@@ -2,6 +2,8 @@
 
 Run as a **stranger** — fresh GitHub account, clean machine. Record friction as GitHub issues.
 
+**Automated multi-agent dogfood:** for Claude Code / Codex / Grok in isolated Docker environments (open-ended product, FEEDBACK.md + gallery), see [agent-eval-dogfood.md](./agent-eval-dogfood.md) (`pnpm agent-eval`).
+
 ## Prerequisites
 
 - [ ] Wave B complete ([wave-b-live-spine.md](./wave-b-live-spine.md))
