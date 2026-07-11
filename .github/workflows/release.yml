@@ -114,16 +114,27 @@ jobs:
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "Release tag will be ${TAG}"
 
+      # Cap turbo concurrency + heap: full-parallel typecheck/build OOMs GH-hosted
+      # runners (runner shutdown signal → "operation was canceled").
       - run: pnpm lint
         if: steps.skip_check.outputs.skip != 'true'
-      - run: pnpm typecheck
+      - name: Typecheck
         if: steps.skip_check.outputs.skip != 'true'
-      - run: pnpm test
+        run: pnpm exec turbo run typecheck --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+      - name: Test
         if: steps.skip_check.outputs.skip != 'true'
+        run: pnpm exec turbo run test --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
       - run: pnpm test:scripts
         if: steps.skip_check.outputs.skip != 'true'
-      - run: pnpm build
+      - name: Build
         if: steps.skip_check.outputs.skip != 'true'
+        run: pnpm exec turbo run build --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Build release notes from commits
         if: steps.skip_check.outputs.skip != 'true'
