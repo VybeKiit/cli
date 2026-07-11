@@ -107,5 +107,3 @@ export async function runLsProbeE2eCleanup(page: Page): Promise<void> {
   await cleanupAllE2eByPrefix(page);
   console.log('[ls-probe-e2e] cleanup complete');
 }
-
-export { LS_E2E_PREFIX } from './e2eNames';

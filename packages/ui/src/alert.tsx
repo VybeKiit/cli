@@ -11,6 +11,11 @@ const alertVariants = cva(
         default: 'bg-background text-foreground',
         destructive:
           'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+        /** Saved / success notices — prefer over hand-rolled emerald borders. */
+        success:
+          'border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:border-emerald-500/40 dark:text-emerald-400 [&>svg]:text-emerald-700 dark:[&>svg]:text-emerald-400',
+        warning:
+          'border-amber-500/30 bg-amber-500/5 text-amber-800 dark:border-amber-500/40 dark:text-amber-400 [&>svg]:text-amber-800 dark:[&>svg]:text-amber-400',
       },
     },
     defaultVariants: {

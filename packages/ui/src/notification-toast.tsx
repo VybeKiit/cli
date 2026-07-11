@@ -43,6 +43,11 @@ export const NotificationToast = (props: NotificationToastProps) => {
     return () => clearTimeout(timer);
   }, [duration, onDismiss]);
 
+  const handleDismiss = (): void => {
+    setVisible(false);
+    onDismiss?.();
+  };
+
   return (
     <div
       className={cn(
@@ -57,10 +62,7 @@ export const NotificationToast = (props: NotificationToastProps) => {
       {onDismiss && (
         <button
           type="button"
-          onClick={() => {
-            setVisible(false);
-            onDismiss();
-          }}
+          onClick={handleDismiss}
           className="ml-auto rounded p-0.5 text-zinc-500 hover:text-zinc-300"
         >
           <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none">

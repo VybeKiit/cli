@@ -12,14 +12,21 @@ const InputGroup = ({ className, ...props }: React.ComponentProps<'div'>) => (
     data-slot="input-group"
     role="group"
     className={cn(
-      'group/input-group border-input dark:bg-input/30 shadow-xs relative flex w-full items-center rounded-md border outline-none transition-[color,box-shadow]',
+      // Base is a full-width row. Do NOT put items-center here — when the group
+      // switches to flex-col for block addons, a leftover items-center shrinks
+      // the textarea to ~1ch and stacks the placeholder letter-by-letter.
+      'group/input-group border-input dark:bg-input/30 shadow-xs relative flex w-full min-w-0 flex-row items-stretch rounded-md border outline-none transition-[color,box-shadow]',
       'h-9 has-[>textarea]:h-auto',
 
       // Variants based on alignment.
       'has-[>[data-align=inline-start]]:[&>input]:pl-2',
       'has-[>[data-align=inline-end]]:[&>input]:pr-2',
-      'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3',
-      'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
+      // block-* stacks header/footer; force column + full-width stretch (! so it
+      // cannot lose to any later items-center utility).
+      'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:!flex-col has-[>[data-align=block-start]]:!items-stretch has-[>[data-align=block-start]]:[&>input]:pb-3',
+      'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:!flex-col has-[>[data-align=block-end]]:!items-stretch has-[>[data-align=block-end]]:[&>input]:pt-3',
+      // Any textarea child must own the full width of the group.
+      '[&>textarea]:min-w-0 [&>textarea]:w-full [&>textarea]:flex-1',
 
       // Focus state.
       'has-[[data-slot=input-group-control]:focus-visible]:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-1',
@@ -128,7 +135,7 @@ const InputGroupTextarea = ({ className, ...props }: React.ComponentProps<'texta
   <Textarea
     data-slot="input-group-control"
     className={cn(
-      'flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent',
+      'min-w-0 w-full flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent',
       className,
     )}
     {...props}

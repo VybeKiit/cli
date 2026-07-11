@@ -1,8 +1,8 @@
 // biome-ignore-all lint/suspicious/noUnnecessaryConditions: SelectorEntry is shared across generated inventories, even when the current LS snapshot is CSS-only.
 
 import { SelectorMissingError } from '@vybekiit/browser-automation/core/errors';
+import type { SelectorEntry } from '@vybekiit/browser-automation/core/selectors';
 import type { VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
-import type { SelectorEntry } from '@vybekiit/browser-automation/domains/extension/selectors';
 import type { LsDraftFieldKey } from '@vybekiit/browser-automation/domains/payments/ls/selectors/fields';
 import { resolveLsSelectorEntry } from '@vybekiit/browser-automation/domains/payments/ls/selectors/registry';
 import type { Locator, Page } from 'playwright';
@@ -191,5 +191,3 @@ export const lsFieldLocator = (page: Page, fieldKey: LsDraftFieldKey): Locator =
   const entry = resolveLsSelectorEntry(fieldKey);
   return locatorFromEntry(page, entry).first();
 };
-
-export type { LsFieldFallback } from './fieldFallbacks';

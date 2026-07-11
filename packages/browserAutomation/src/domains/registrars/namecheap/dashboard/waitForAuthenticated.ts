@@ -4,8 +4,6 @@ import type { BrowserContext, Page } from 'playwright';
 import { isNcAuthenticatedDom } from './authDom';
 import { isNcAuthenticatedUrl } from './authUrl';
 
-export { isNcAuthenticatedUrl, NC_AUTH_URL_HINT, NC_AUTHENTICATED_URL } from './authUrl';
-
 /**
  * Wait For Nc Authenticated.
  *

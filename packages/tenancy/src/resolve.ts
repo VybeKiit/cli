@@ -6,8 +6,6 @@ import { createBetterAuthTenancy, type ResolveTenancyInjections } from './provid
 import { createLocalTenancy } from './providers/local';
 import { TenancyError, type TenancyProvider, type TenancyService } from './types';
 
-export type { ResolveTenancyInjections } from './providers/betterAuth';
-
 /** The tenancy provider as an injectable service for Effect composition roots. */
 export class Tenancy extends Context.Tag('@vybekiit/tenancy/Tenancy')<Tenancy, TenancyService>() {}
 

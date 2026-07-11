@@ -70,5 +70,3 @@ export type VerbContext = {
   /** Absolute path to the monorepo root. */
   readonly repoRoot: string;
 };
-
-export type { CwsListing } from './schema';

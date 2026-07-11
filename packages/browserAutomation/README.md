@@ -22,6 +22,8 @@ Your template already imports this package. Settings live in your **secret setti
 
 - **Do not edit** node_modules/@vybekiit/browser-automation — fix bugs upstream or bump the package version.
 - **Entry point:** CWS verbs, `runLsSetup`, `standbyLogin`, `vybekiit-automate` CLI
+- **Discover from anywhere:** `vybekiit-automate catalog --json` or MCP `search_automations` / `run_automation` on the `vybekiit` agent MCP (`@vybekiit/agent-mcp`)
+- **Run from anywhere:** `run_automation({ domain, command, args, dryRun? })` resolves the bin via `VYBEKIIT_AUTOMATE_BIN` → package dist → monorepo path → PATH; cwd = `VYBEKIIT_PROJECT_ROOT`
 - **Config:** Chrome profiles: `$HOME/.ls-chrome-profile`, `$HOME/.cws-chrome-profile`
 - **Related skills:** setup-payments, publish-extension
 - **Pattern:** resolve*Provider() reads env via @vybekiit/core and returns a headless adapter.

@@ -42,7 +42,7 @@ export const TerminalBlock = ({
           <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
           <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
         </div>
-        <span className="ml-2 font-mono text-[10px] text-zinc-500">{title}</span>
+        <span className="ml-2 font-mono text-xs text-zinc-500">{title}</span>
       </div>
       <div className="p-3 font-mono text-xs leading-relaxed">
         {rows.map(({ id, line }) => (

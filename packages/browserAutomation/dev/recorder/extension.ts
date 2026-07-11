@@ -1,8 +1,8 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
+import { ensureChromeWithCdp } from '@vybekiit/browser-automation/core/launchChrome';
 import { PROFILE_PATHS } from '@vybekiit/browser-automation/core/types';
-import { ensureChromeWithCdp, profileDirFor } from './shared/chrome';
+import { profileDirFor } from './shared/chrome';
 import { applyDraft, ensureDraftTemplate, type ParsedEntry, renderGenerated } from './shared/draft';
 import { CWS_DRAFT_FIELDS } from './shared/fields';
 import { appendRecorderLog } from './shared/log';

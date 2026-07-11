@@ -95,7 +95,7 @@ export const StepIndicator = ({
               <span
                 className={cn(
                   'text-center',
-                  size === 'sm' ? 'text-[10px]' : 'text-xs',
+                  size === 'sm' ? 'text-xs' : 'text-xs',
                   step.status === 'done'
                     ? 'text-emerald-400'
                     : step.status === 'running'

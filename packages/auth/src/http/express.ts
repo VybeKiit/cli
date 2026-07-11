@@ -29,14 +29,6 @@ import {
   TokenOnlyBodySchema,
 } from './schemas';
 
-export type {
-  AuthHttpDeps,
-  AuthHttpMethod,
-  AuthHttpResponse,
-  AuthHttpSession,
-  AuthHttpTelemetry,
-} from './handlers';
-
 type ExpressDeps = AuthHttpDeps | ((req: Request, res: Response) => AuthHttpDeps);
 
 const resolveDeps = (deps: ExpressDeps, req: Request, res: Response): AuthHttpDeps =>

@@ -65,22 +65,30 @@ describe('formatReportPrompt', () => {
 describe('buildAssistantDeepLink', () => {
   it('builds cursor deeplink with encoded text', () => {
     const url = buildAssistantDeepLink('cursor', '/proj', 'hello world');
+    expect(url).not.toBeNull();
     expect(url).toMatch(cursorDeepLinkPattern);
-    expect(new URL(url).searchParams.get('text')).toBe('hello world');
+    expect(new URL(url as string).searchParams.get('text')).toBe('hello world');
   });
 
   it('builds claude-cli deeplink with cwd and q', () => {
     const url = buildAssistantDeepLink('claude', '/my/project', 'fix it');
-    expect(url.startsWith('claude-cli://open?')).toBe(true);
-    const parsed = new URL(url);
+    expect(url).not.toBeNull();
+    expect((url as string).startsWith('claude-cli://open?')).toBe(true);
+    const parsed = new URL(url as string);
     expect(parsed.searchParams.get('q')).toBe('fix it');
     expect(parsed.searchParams.get('cwd')).toBe('/my/project');
   });
 
   it('builds codex deeplink', () => {
     const url = buildAssistantDeepLink('codex', '/proj', 'fix it');
-    expect(url.startsWith('codex://new?')).toBe(true);
-    expect(new URL(url).searchParams.get('prompt')).toBe('fix it');
+    expect(url).not.toBeNull();
+    expect((url as string).startsWith('codex://new?')).toBe(true);
+    expect(new URL(url as string).searchParams.get('prompt')).toBe('fix it');
+  });
+
+  it('returns null for terminal-only assistants', () => {
+    expect(buildAssistantDeepLink('kiro', '/proj', 'hi')).toBeNull();
+    expect(buildAssistantDeepLink('grok', '/proj', 'hi')).toBeNull();
   });
 });
 

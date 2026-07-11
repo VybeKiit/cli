@@ -4,8 +4,6 @@ import type { BrowserContext, Page } from 'playwright';
 import { isGdAuthenticatedDom } from './authDom';
 import { isGdAuthenticatedUrl } from './authUrl';
 
-export { GD_AUTH_URL_HINT, GD_AUTHENTICATED_URL, isGdAuthenticatedUrl } from './authUrl';
-
 /**
  * Wait For Gd Authenticated.
  *

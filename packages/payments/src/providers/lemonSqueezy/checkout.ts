@@ -30,6 +30,9 @@ export const createLemonSqueezyCheckout = (
       try: () =>
         createLemonSqueezyHostedCheckout(config.LEMONSQUEEZY_STORE_ID, params.productId, {
           testMode,
+          ...(params.customPriceCents === undefined
+            ? {}
+            : { customPrice: params.customPriceCents }),
           productOptions: {
             enabledVariants: [variantId],
             ...(params.successUrl ? { redirectUrl: params.successUrl } : {}),

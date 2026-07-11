@@ -28,6 +28,12 @@ export type CheckoutParams = {
   readonly successUrl?: string;
   /** Where the provider sends the buyer if they cancel (Stripe/PayPal). */
   readonly cancelUrl?: string;
+  /**
+   * Optional one-time price override in US cents.
+   * Lemon Squeezy maps this to checkout `custom_price` so a rising ladder can
+   * charge the live tier without mutating the catalog variant for every sale.
+   */
+  readonly customPriceCents?: number;
 };
 
 /** A created checkout the caller redirects the buyer to. */

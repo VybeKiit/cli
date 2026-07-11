@@ -4,6 +4,7 @@ import {
   LemonSqueezyConfigSchema,
   PaymentsConfigSchema,
   PaypalConfigSchema,
+  resolveLemonSqueezyEnv,
   StripeConfigSchema,
 } from './config';
 import { createLemonSqueezyProvider } from './providers/lemonSqueezy';
@@ -17,6 +18,9 @@ import type { PaymentProvider } from './types';
  * `PAYMENTS_PROVIDER` (defaults to `lemon-squeezy`) and parses only that provider's
  * credentials, so an app configured for one provider never trips on another's
  * blank keys. The agent swaps providers by changing one env value.
+ *
+ * Lemon Squeezy test mode prefers `LEMONSQUEEZY_TEST_MODE_API_KEY` +
+ * `LEMONSQUEEZY_TEST_MODE_WEBHOOK_SECRET` so live keys stay for production.
  *
  * @param env - Environment variables used to select and configure the provider.
  * @returns The configured payment provider.
@@ -32,7 +36,9 @@ export const resolvePaymentProvider = (env: EnvSource = process.env): PaymentPro
       stripe: (source) => createStripeProvider(parseEnv(StripeConfigSchema, source)),
       paypal: (source) => createPayPalProvider(parseEnv(PaypalConfigSchema, source)),
       'lemon-squeezy': (source) =>
-        createLemonSqueezyProvider(parseEnv(LemonSqueezyConfigSchema, source)),
+        createLemonSqueezyProvider(
+          parseEnv(LemonSqueezyConfigSchema, resolveLemonSqueezyEnv(source)),
+        ),
     },
     env,
     'lemon-squeezy',

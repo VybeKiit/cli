@@ -41,6 +41,13 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  /** Optional className for the full-screen overlay (e.g. elevate z-index above a floating panel). */
+  readonly overlayClassName?: string;
+  /** Optional style for the full-screen overlay. */
+  readonly overlayStyle?: React.CSSProperties;
+};
+
 /**
  * Render the Dialog Content component.
  *
@@ -51,10 +58,13 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
  */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, overlayClassName, overlayStyle, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay
+      {...(overlayClassName === undefined ? {} : { className: overlayClassName })}
+      {...(overlayStyle === undefined ? {} : { style: overlayStyle })}
+    />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

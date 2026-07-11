@@ -23,12 +23,17 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof badgeVariants> {}
 
-/** Badge label with shared variant styling. */
+/**
+ * Badge label with shared variant styling.
+ *
+ * Renders a `span` (not `div`) so it is valid inside paragraphs and other phrasing content —
+ * a `div` badge inside `<p>` causes React hydration error #418.
+ */
 const Badge = ({ className, variant, ...props }: BadgeProps) => (
-  <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  <span className={cn(badgeVariants({ variant }), className)} {...props} />
 );
 
 export { Badge, badgeVariants };

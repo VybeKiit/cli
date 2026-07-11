@@ -1,12 +1,9 @@
 'use client';
 
-import type { VybeAssistant } from '@vybekiit/report-mode';
+import { isVybeAssistantId, type VybeAssistant } from '@vybekiit/report-mode';
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'vybe-assistant-choice';
-
-const isAssistantChoice = (value: string | null): value is VybeAssistant =>
-  value === 'claude' || value === 'codex' || value === 'cursor';
 
 const readStoredAssistant = (): VybeAssistant | null => {
   if (typeof globalThis.sessionStorage === 'undefined') {
@@ -16,7 +13,7 @@ const readStoredAssistant = (): VybeAssistant | null => {
   try {
     const stored = globalThis.sessionStorage.getItem(STORAGE_KEY);
 
-    if (isAssistantChoice(stored)) {
+    if (stored !== null && isVybeAssistantId(stored)) {
       return stored;
     }
   } catch {

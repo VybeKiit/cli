@@ -8,6 +8,7 @@ export default defineConfig({
     schema: 'src/schema.ts',
     types: 'src/types.ts',
     'cli/index': 'src/cli/main.ts',
+    'cli/catalog': 'src/cli/catalog.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,

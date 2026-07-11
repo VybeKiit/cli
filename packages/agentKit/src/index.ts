@@ -1,6 +1,7 @@
 export * from './catalogs/agentRuntimeDocSources';
 export * from './catalogs/backendCapabilities';
 export * from './catalogs/goalCatalog';
+export * from './catalogs/mcpToolsCatalog';
 export * from './catalogs/pageRecipeInstall';
 export * from './catalogs/platformSkillsAudit';
 export * from './catalogs/platformSkillsMerge';
@@ -22,6 +23,7 @@ export * from './planners/planFeatureReadiness';
 export * from './planners/planGoalRouting';
 export * from './planners/planSetup';
 export * from './planners/updateKit';
+export * from './planners/updateKitPipeline';
 export * from './planners/updatePlatformSkills';
 export * from './render/agentLayer';
 export * from './render/buyerSkillStubs';

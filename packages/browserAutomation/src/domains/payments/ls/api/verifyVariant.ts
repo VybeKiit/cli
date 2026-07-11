@@ -145,11 +145,26 @@ export const verifyVariantViaApi = async (
 export const lsSetupEnvBlock = (
   result: LsSetupResult,
   mode: LsSetupMode,
-): Record<string, string> => ({
-  LEMONSQUEEZY_API_KEY: result.apiKey,
-  LEMONSQUEEZY_STORE_ID: result.storeId,
-  STORE_PRODUCT_ID: result.variantId,
-  LEMONSQUEEZY_WEBHOOK_SECRET: result.webhookSecret,
-  LEMONSQUEEZY_TEST_MODE: mode === 'test' ? 'true' : 'false',
-  PAYMENTS_PROVIDER: 'lemon-squeezy',
-});
+): Record<string, string> => {
+  if (mode === 'test') {
+    // Dual-key layout: keep live slots free for production; runtime prefers these when
+    // LEMONSQUEEZY_TEST_MODE=true (see resolveLemonSqueezyEnv in @vybekiit/payments).
+    return {
+      LEMONSQUEEZY_TEST_MODE_API_KEY: result.apiKey,
+      LEMONSQUEEZY_STORE_ID: result.storeId,
+      LEMONSQUEEZY_TEST_MODE_STORE_PRODUCT_ID: result.variantId,
+      LEMONSQUEEZY_TEST_MODE_WEBHOOK_SECRET: result.webhookSecret,
+      LEMONSQUEEZY_TEST_MODE: 'true',
+      PAYMENTS_PROVIDER: 'lemon-squeezy',
+    };
+  }
+
+  return {
+    LEMONSQUEEZY_API_KEY: result.apiKey,
+    LEMONSQUEEZY_STORE_ID: result.storeId,
+    STORE_PRODUCT_ID: result.variantId,
+    LEMONSQUEEZY_WEBHOOK_SECRET: result.webhookSecret,
+    LEMONSQUEEZY_TEST_MODE: 'false',
+    PAYMENTS_PROVIDER: 'lemon-squeezy',
+  };
+};

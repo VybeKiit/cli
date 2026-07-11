@@ -1,6 +1,6 @@
 import process from 'node:process';
-import { type EnvSource, parseEnv } from '@vybekiit/core';
-import { Context, Effect, Layer, type Schema } from 'effect';
+import { type EnvSource, resolveProviderEffect } from '@vybekiit/core';
+import { Context, Effect, Layer } from 'effect';
 import {
   ComplianceConfig,
   type ComplianceConfigType,
@@ -15,42 +15,13 @@ export class Compliance extends Context.Tag('@vybekiit/compliance/Compliance')<
   ComplianceService
 >() {}
 
-type ComplianceFactory = (config: ComplianceConfigType) => ComplianceService;
-
-const complianceFactories = {
-  local: createLocalCompliance,
-} satisfies Partial<Record<ComplianceProviderNameType, ComplianceFactory>>;
-
-const complianceErrorMessage = (caught: unknown): string =>
-  caught instanceof Error ? caught.message : String(caught);
-
-const parseComplianceConfigSlice = <A, I>(
-  schema: Schema.Schema<A, I>,
-  source: EnvSource,
-): Effect.Effect<A, ComplianceError> =>
-  Effect.try({
-    try: () => parseEnv(schema, source),
-    catch: (caught) =>
-      new ComplianceError({
-        code: 'COMPLIANCE_CONFIG_INVALID',
-        message: complianceErrorMessage(caught),
-      }),
-  });
-
-const findComplianceFactory = (
-  provider: ComplianceProviderNameType,
-): Effect.Effect<ComplianceFactory, ComplianceError> => {
-  const createProvider = complianceFactories[provider];
-  if (createProvider === undefined) {
-    return Effect.fail(
-      new ComplianceError({
-        code: 'COMPLIANCE_PROVIDER_UNSUPPORTED',
-        message: `No compliance provider is registered for ${provider}.`,
-      }),
-    );
-  }
-
-  return Effect.succeed(createProvider);
+const complianceFactories: Partial<
+  Record<
+    ComplianceProviderNameType,
+    (source: EnvSource, config: ComplianceConfigType) => ComplianceService
+  >
+> = {
+  local: (_source, config) => createLocalCompliance(config),
 };
 
 /**
@@ -64,13 +35,20 @@ const findComplianceFactory = (
 export const resolveComplianceService = (
   source: EnvSource = process.env,
 ): Effect.Effect<ComplianceService, ComplianceError> =>
-  parseComplianceConfigSlice(ComplianceConfig, source).pipe(
-    Effect.flatMap((config) =>
-      findComplianceFactory(config.COMPLIANCE_PROVIDER).pipe(
-        Effect.map((createProvider) => createProvider(config)),
-      ),
-    ),
-  );
+  resolveProviderEffect({
+    source,
+    configSchema: ComplianceConfig,
+    providerKey: 'COMPLIANCE_PROVIDER',
+    factories: complianceFactories,
+    toError: (input) =>
+      new ComplianceError({
+        code:
+          input.code === 'PROVIDER_UNSUPPORTED'
+            ? 'COMPLIANCE_PROVIDER_UNSUPPORTED'
+            : 'COMPLIANCE_CONFIG_INVALID',
+        message: input.message,
+      }),
+  });
 
 /**
  * Build the configured Compliance Layer from environment values.
@@ -95,6 +73,3 @@ export const makeComplianceLive = (
  */
 export const createComplianceFromEnv = (source: EnvSource = process.env): ComplianceProvider =>
   Effect.runSync(resolveComplianceService(source));
-
-/** @deprecated Use {@link createComplianceFromEnv}; kept for existing template imports. */
-export const resolveComplianceProvider = createComplianceFromEnv;

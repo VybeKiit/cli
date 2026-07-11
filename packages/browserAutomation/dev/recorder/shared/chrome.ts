@@ -1,11 +1,5 @@
-import { execSync, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { homedir } from 'node:os';
-
-export {
-  ensureChromeWithCdp,
-  getChromeUserDataDirForPort,
-  isCdpReachable,
-} from '@vybekiit/browser-automation/core/launchChrome';
 
 export function profileDirFor(domain: 'extension' | 'ls'): string {
   return domain === 'extension'
@@ -21,22 +15,4 @@ export function stopChromeDetachedMac(port: number, profileDir: string): Promise
     child.on('error', () => resolveStop());
     child.on('close', () => resolveStop());
   });
-}
-
-/** @deprecated Use getChromeUserDataDirForPort */
-export function chromeProfileForPort(port: number): string | null {
-  try {
-    const out = execSync('ps aux', { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
-    const mainLine = out
-      .split('\n')
-      .find(
-        (line) =>
-          line.includes('/MacOS/Google Chrome ') &&
-          line.includes(`--remote-debugging-port=${port}`),
-      );
-    const match = mainLine?.match(/--user-data-dir=(\S+)/);
-    return match?.[1] ?? null;
-  } catch {
-    return null;
-  }
 }

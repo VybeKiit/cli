@@ -417,7 +417,10 @@ export const vercelConfigSchema = Schema.Struct({
 export const githubGateConfigSchema = Schema.Struct({
   GITHUB_GATE_TOKEN: NonEmpty,
   GITHUB_GATE_ORG: Schema.optionalWith(NonEmpty, { default: () => 'VybeKiit' }),
-  /** CSV of mirror repo names under `GITHUB_GATE_ORG` — ADR-0005 bundle invite. */
+  /**
+   * CSV of delivery repo names under `GITHUB_GATE_ORG`.
+   * `kit` is required for `create app` (ADR-0038); template mirrors remain for drop/update.
+   */
   GITHUB_GATE_REPOS: Schema.optionalWith(
     Schema.transform(Schema.String, Schema.Array(Schema.String), {
       strict: true,
@@ -428,7 +431,7 @@ export const githubGateConfigSchema = Schema.Struct({
           .filter((name) => name.length > 0),
       encode: (repos) => repos.join(','),
     }),
-    { default: () => ['web', 'mobile', 'extension'] as readonly string[] },
+    { default: () => ['kit', 'web', 'mobile', 'extension'] as readonly string[] },
   ),
 });
 
@@ -456,14 +459,14 @@ export const sentryConfigSchema = Schema.Struct({
   SENTRY_DSN: Schema.optional(NonEmpty),
 });
 
-/** Which background-jobs adapter `@vybekiit/jobs` constructs. */
+/** Which background-jobs adapter `@vybekiit/infra` (jobs) constructs. */
 export const jobsConfigSchema = Schema.Struct({
   JOBS_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'trigger', 'qstash', 'local'), {
     default: () => 'cloudflare' as const,
   }),
 });
 
-/** Cloudflare queue/cron bindings for `@vybekiit/jobs`. */
+/** Cloudflare queue/cron bindings for `@vybekiit/infra` jobs. */
 export const cloudflareJobsConfigSchema = Schema.Struct({
   CLOUDFLARE_QUEUE_NAME: Schema.optional(NonEmpty),
   CLOUDFLARE_CRON_SECRET: Schema.optional(NonEmpty),
@@ -527,7 +530,7 @@ export const openrouterConfigSchema = Schema.Struct({
   OPENROUTER_MODEL: Schema.optionalWith(NonEmpty, { default: () => 'openai/gpt-4o-mini' }),
 });
 
-/** Which search adapter `@vybekiit/search` constructs. */
+/** Which search adapter `@vybekiit/db` (search) constructs. */
 export const searchConfigSchema = Schema.Struct({
   SEARCH_PROVIDER: Schema.optionalWith(
     Schema.Literal('supabase', 'typesense', 'algolia', 'local'),
@@ -553,7 +556,7 @@ export const realtimeConfigSchema = Schema.Struct({
   }),
 });
 
-/** Which content adapter `@vybekiit/cms` constructs. */
+/** Which content adapter `@vybekiit/content` (cms) constructs. */
 export const cmsConfigSchema = Schema.Struct({
   CMS_PROVIDER: Schema.optionalWith(Schema.Literal('mdx', 'local'), {
     default: () => 'mdx' as const,
@@ -572,7 +575,7 @@ export const complianceConfigSchema = Schema.Struct({
   COOKIE_CONSENT_ENABLED: Schema.optionalWith(onOff, { default: () => 'on' as const }),
 });
 
-/** SEO helpers — `@vybekiit/seo`. */
+/** SEO helpers — `@vybekiit/content` (seo). */
 export const seoConfigSchema = Schema.Struct({
   SEO_PROVIDER: Schema.optionalWith(Schema.Literal('local'), { default: () => 'local' as const }),
 });
@@ -584,7 +587,7 @@ export const tenancyConfigSchema = Schema.Struct({
   }),
 });
 
-/** Fast storage — `@vybekiit/kv`. */
+/** Fast storage — `@vybekiit/infra` (kv). */
 export const kvConfigSchema = Schema.Struct({
   KV_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'upstash', 'local'), {
     default: () => 'cloudflare' as const,

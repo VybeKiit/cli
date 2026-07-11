@@ -1,5 +1,27 @@
-/** Supported AI assistant runtimes for Report Mode deeplink handoff. */
-export type VybeAssistant = 'cursor' | 'claude' | 'codex';
+/** Supported AI assistant runtimes for Report Mode deeplink handoff and dev chat. */
+export type VybeAssistant = 'cursor' | 'claude' | 'codex' | 'kiro' | 'kimi' | 'devin' | 'grok';
+
+/** Canonical ordered list of assistant ids (switchers, probes, validation). */
+export const VYBE_ASSISTANTS: readonly VybeAssistant[] = [
+  'claude',
+  'codex',
+  'cursor',
+  'kiro',
+  'kimi',
+  'devin',
+  'grok',
+] as const;
+
+/**
+ * Type guard for a VybeAssistant id string.
+ *
+ * @param value - Candidate id.
+ * @returns True when the value is a known assistant.
+ * @example
+ * isVybeAssistantId('claude'); // true
+ */
+export const isVybeAssistantId = (value: string): value is VybeAssistant =>
+  (VYBE_ASSISTANTS as readonly string[]).includes(value);
 
 /** Which template surface produced the report. */
 export type ReportPlatform = 'web' | 'mobile' | 'extension';

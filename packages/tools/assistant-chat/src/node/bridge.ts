@@ -6,11 +6,16 @@ import type { VybeAssistant } from '@vybekiit/report-mode';
 import { Schema } from 'effect';
 import { buildSpawnPlan, type LiveAssistant, mapCliEvent } from './adapters';
 import { type AttachmentInput, persistAttachments } from './attachmentFiles';
-import { handleCapabilitiesRequest, handleModelsRequest, readJsonBody } from './routes';
+import {
+  handleCapabilitiesRequest,
+  handleModelsRequest,
+  handleSessionsRequest,
+  readJsonBody,
+} from './routes';
 
 const decodePageContext = Schema.decodeUnknownOption(PageContext);
 
-const LIVE: readonly VybeAssistant[] = ['claude', 'codex'];
+const LIVE: readonly VybeAssistant[] = ['claude', 'codex', 'kimi', 'grok'];
 const DEFAULT_ALLOW_ORIGIN = '*';
 const DEFAULT_SESSION_ID = 'default';
 const DEFAULT_REQUEST_PATH = '/';
@@ -24,6 +29,10 @@ type SendPayload = {
   readonly context?: unknown;
   readonly assistant?: VybeAssistant;
   readonly model?: string;
+  /** Native agent CLI session id — resume that conversation on this turn. */
+  readonly agentSessionId?: string;
+  /** Project folder for this turn (CLI session cwd). Falls back to bridge cwd. */
+  readonly cwd?: string;
   readonly attachments?: readonly AttachmentInput[];
 };
 
@@ -118,6 +127,10 @@ export const startAssistantChatBridge = (options: BridgeOptions): Server => {
       void handleModelsRequest(url.searchParams.get('assistant'), res);
       return;
     }
+    if (req.method === 'GET' && url.pathname === '/sessions') {
+      void handleSessionsRequest(url.searchParams.get('assistant'), res);
+      return;
+    }
     if (req.method === 'POST' && url.pathname === '/send') {
       void handleSend(req, res, sessions, options);
       return;
@@ -179,7 +192,8 @@ const runTurn = (
   if (!isLive(assistant)) {
     emit(session, {
       type: 'error',
-      message: 'No live agent - pick Claude or Codex (Cursor is deeplink-only).',
+      message:
+        'No live agent for in-panel stream — pick Claude, Codex, Kimi, or Grok (others open in Terminal).',
     });
     emit(session, { type: 'done' });
     return;
@@ -187,14 +201,22 @@ const runTurn = (
 
   const attachmentPaths = persistAttachments(payload.attachments);
   const prompt = buildPrompt(resolveTurnText(payload), payload.context, attachmentPaths);
+  const agentSessionId =
+    typeof payload.agentSessionId === 'string' && payload.agentSessionId.length > 0
+      ? payload.agentSessionId
+      : undefined;
   const plan = buildSpawnPlan(assistant, prompt, {
     ...(payload.model ? { model: payload.model } : {}),
+    ...(agentSessionId === undefined ? {} : { agentSessionId }),
   });
   emit(session, { type: 'status', state: 'starting' });
 
+  const turnCwd =
+    typeof payload.cwd === 'string' && payload.cwd.length > 0 ? payload.cwd : options.cwd;
+
   // Ignore stdin - the prompt is passed as argv, and an open stdin makes the CLI wait ~3s.
   const child = spawn(plan.command, [...plan.args], {
-    cwd: options.cwd,
+    cwd: turnCwd,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let buffer = '';

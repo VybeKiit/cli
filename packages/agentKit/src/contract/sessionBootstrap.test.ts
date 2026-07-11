@@ -10,6 +10,8 @@ describe('renderAgentSessionBootstrap', () => {
     expect(body).toContain('## Project skill discovery');
     expect(body).toContain('.agents/skills/<goal>/SKILL.md');
     expect(body).toContain('.vybekiit/skills/<goal>.md');
+    expect(body).toContain('use-kit-mcp');
+    expect(body).toContain('mcp-tools-vybekiit.md');
     expect(body).toContain('goal-index.md');
   });
 });

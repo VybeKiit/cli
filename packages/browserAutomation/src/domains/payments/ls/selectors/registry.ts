@@ -49,5 +49,3 @@ export const resolveLsSelectorEntry = (
     },
     today,
   );
-
-export type { SelectorEntry } from '@vybekiit/browser-automation/core/selectors';

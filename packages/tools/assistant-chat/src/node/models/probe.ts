@@ -1,10 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { CapabilitiesResponse, ModelsResponse } from '@vybekiit/assistant-chat/capabilities';
 import type { VybeAssistant } from '@vybekiit/report-mode';
 
+import { resolveCodexHome } from '../sessions/agentHomes';
 import {
   CLAUDE_FALLBACK_MODELS,
   CODEX_FALLBACK_MODELS,
@@ -43,16 +43,6 @@ const readTrimmedEnvValue = (env: NodeJS.ProcessEnv, key: string): string | unde
   return trimmed;
 };
 
-const resolveCodexHome = (env: NodeJS.ProcessEnv): string => {
-  const configuredHome = readTrimmedEnvValue(env, 'CODEX_HOME');
-
-  if (typeof configuredHome === 'string') {
-    return configuredHome;
-  }
-
-  return join(homedir(), '.codex');
-};
-
 /**
  * Probe which assistant CLIs are available on the local machine.
  *
@@ -64,7 +54,12 @@ export const probeCapabilities = (): CapabilitiesResponse => {
   const claudeInstalled = isInstalled('claude');
   const codexInstalled = isInstalled('codex');
   const cursorTraceId = readTrimmedEnvValue(process.env, CURSOR_TRACE_ID_ENV);
-  const cursorInstalled = isInstalled('cursor') || typeof cursorTraceId === 'string';
+  const cursorInstalled =
+    isInstalled('cursor') || isInstalled('agent') || typeof cursorTraceId === 'string';
+  const kiroInstalled = isInstalled('kiro-cli') || isInstalled('kiro');
+  const kimiInstalled = isInstalled('kimi');
+  const grokInstalled = isInstalled('grok');
+  const devinInstalled = isInstalled('devin');
 
   return {
     assistants: [
@@ -73,6 +68,7 @@ export const probeCapabilities = (): CapabilitiesResponse => {
         streaming: claudeInstalled,
         modelPicker: claudeInstalled,
         installed: claudeInstalled,
+        openMode: 'stream',
         ...(claudeInstalled ? {} : { reason: 'Install Claude Code CLI' }),
       },
       {
@@ -80,6 +76,7 @@ export const probeCapabilities = (): CapabilitiesResponse => {
         streaming: codexInstalled,
         modelPicker: codexInstalled,
         installed: codexInstalled,
+        openMode: 'stream',
         ...(codexInstalled ? {} : { reason: 'Install Codex CLI' }),
       },
       {
@@ -87,7 +84,42 @@ export const probeCapabilities = (): CapabilitiesResponse => {
         streaming: false,
         modelPicker: false,
         installed: cursorInstalled,
-        reason: 'Deeplink-only - opens in Cursor',
+        openMode: 'deeplink',
+        reason: cursorInstalled
+          ? 'Opens in Cursor via deeplink (or Terminal for resume)'
+          : 'Install Cursor CLI',
+      },
+      {
+        id: 'kiro',
+        streaming: false,
+        modelPicker: false,
+        installed: kiroInstalled,
+        openMode: 'terminal',
+        reason: kiroInstalled ? 'Opens kiro-cli in Terminal' : 'Install Kiro CLI',
+      },
+      {
+        id: 'kimi',
+        streaming: kimiInstalled,
+        modelPicker: false,
+        installed: kimiInstalled,
+        openMode: 'stream',
+        ...(kimiInstalled ? {} : { reason: 'Install Kimi CLI' }),
+      },
+      {
+        id: 'devin',
+        streaming: false,
+        modelPicker: false,
+        installed: devinInstalled,
+        openMode: 'terminal',
+        reason: devinInstalled ? 'Opens devin in Terminal' : 'Install Devin CLI',
+      },
+      {
+        id: 'grok',
+        streaming: grokInstalled,
+        modelPicker: grokInstalled,
+        installed: grokInstalled,
+        openMode: 'stream',
+        ...(grokInstalled ? {} : { reason: 'Install Grok CLI' }),
       },
     ],
   };
@@ -164,6 +196,14 @@ const probeCodexModels = async (env: NodeJS.ProcessEnv): Promise<ModelsResponse>
   };
 };
 
+/** Empty model catalog for assistants without a live model list. */
+const emptyModelsResponse = (assistant: VybeAssistant): ModelsResponse => ({
+  assistant,
+  models: [],
+  source: 'fallback',
+  fetchedAt: new Date().toISOString(),
+});
+
 /**
  * Probe available models for one assistant.
  *
@@ -182,6 +222,10 @@ export const probeModels = async (
       ...cursorModelsResponse(),
       fetchedAt: new Date().toISOString(),
     };
+  }
+
+  if (assistant !== 'claude' && assistant !== 'codex') {
+    return emptyModelsResponse(assistant);
   }
 
   const cacheKey = assistant;

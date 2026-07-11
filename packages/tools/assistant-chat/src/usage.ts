@@ -1,6 +1,8 @@
 import type { VybeAssistant } from '@vybekiit/report-mode';
 import { Schema } from 'effect';
 
+import { VybeAssistantSchema } from './capabilities';
+
 /**
  * Usage / plan contract. There is NO public usage API from Claude Code or Codex, so
  * every field is best-effort: whatever the bridge can observe (rate-limit lines the CLI
@@ -8,7 +10,7 @@ import { Schema } from 'effect';
  * renders as "unavailable". We never fabricate a number.
  */
 export const AssistantUsage = Schema.Struct({
-  assistant: Schema.Literal('cursor', 'claude', 'codex'),
+  assistant: VybeAssistantSchema,
   /** Reset cadence of the quota, when known. */
   window: Schema.optional(Schema.Literal('5h', 'weekly')),
   used: Schema.optional(Schema.Number),
@@ -33,6 +35,10 @@ const USAGE_WINDOW: Record<VybeAssistant, '5h' | 'weekly' | undefined> = {
   claude: '5h',
   codex: '5h',
   cursor: 'weekly',
+  kiro: undefined,
+  kimi: undefined,
+  devin: undefined,
+  grok: undefined,
 };
 
 /**
