@@ -14,6 +14,7 @@
 export const readFlagValue = (args: readonly string[], name: string): string | undefined => {
   const eqPrefix = `--${name}=`;
   const bare = `--${name}`;
+  let found: string | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === undefined) {
@@ -22,17 +23,19 @@ export const readFlagValue = (args: readonly string[], name: string): string | u
       // `--to=./app` → `./app`
       const value = arg.slice(eqPrefix.length);
       if (value !== '') {
-        return value;
+        found = value;
+        break;
       }
     } else if (arg === bare) {
       // value of `--to <dir>` is the next non-flag token
       const next = args[index + 1];
       if (next !== undefined && !next.startsWith('--') && next !== '') {
-        return next;
+        found = next;
+        break;
       }
     }
   }
-  return undefined;
+  return found;
 };
 
 /**
