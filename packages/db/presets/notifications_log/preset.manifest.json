@@ -31,7 +31,7 @@
   "rlsColumn": "user_id",
   "capabilities": ["bulkInsert"],
   "skills": ["add-notifications"],
-  "packages": ["@vybekiit/notifications"],
+  "packages": ["@vybekiit/messaging"],
   "providers": {
     "supabase": "stable",
     "neon": "stable",

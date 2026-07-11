@@ -90,7 +90,7 @@
   "rlsColumn": "user_id",
   "capabilities": ["upsert"],
   "skills": ["add-blog"],
-  "packages": ["@vybekiit/cms"],
+  "packages": ["@vybekiit/content"],
   "providers": {
     "supabase": "stable",
     "neon": "stable",
