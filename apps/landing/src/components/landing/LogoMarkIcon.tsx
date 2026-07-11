@@ -36,6 +36,12 @@ export type LogoMarkIconData = Pick<SimpleIcon, 'title' | 'slug' | 'path'> & {
  * Codex uses the inline SVG cloud mark when mono — not the OpenAI blossom raster.
  */
 
+/**
+ * Pure-black (or near-black) brand glyphs that disappear on dark surfaces.
+ * Invert when a `.dark` ancestor is present so the silhouette stays readable.
+ */
+const INVERT_ON_DARK_SLUGS = new Set(['kimi', 'devin']);
+
 export const LOGO_MARK_RASTERS: Record<string, string> = {
   openai: '/brand-marks/openai.webp',
   amazonaws: '/brand-marks/aws.webp',
@@ -90,6 +96,13 @@ export const LOGO_MARK_RASTERS: Record<string, string> = {
   shadcn: '/brand-marks/shadcn.webp',
   kimi: '/brand-marks/kimi.webp',
   grok: '/brand-marks/grok.webp',
+  // Compare-table product marks
+  vybekiit: '/brand-marks/vybekiit.webp',
+  shipfast: '/brand-marks/shipfast.webp',
+  lovable: '/brand-marks/lovable.webp',
+  makerkit: '/brand-marks/makerkit.webp',
+  supastarter: '/brand-marks/supastarter.webp',
+  'open-saas': '/brand-marks/open-saas.webp',
 };
 
 const customSvgMarks: Record<string, LogoMarkIconData> = {
@@ -199,7 +212,11 @@ export const LogoMarkIcon = ({ slug, className, mono = false }: LogoMarkIconProp
       <img
         alt=""
         aria-hidden="true"
-        className={cn('logo-mark-icon object-contain', className)}
+        className={cn(
+          'logo-mark-icon object-contain',
+          INVERT_ON_DARK_SLUGS.has(slug) && 'dark:invert',
+          className,
+        )}
         data-mark-slug={slug}
         decoding="async"
         // Marquee / trust-strip marks are below the LCP hero text. Eager load +
@@ -207,6 +224,16 @@ export const LogoMarkIcon = ({ slug, className, mono = false }: LogoMarkIconProp
         draggable={false}
         height={24}
         loading="lazy"
+        // Prefer CDN; if the object is missing on R2 (new mark not uploaded yet),
+        // fall back to same-origin `/public` so the table never shows a broken icon.
+        onError={(event) => {
+          const img = event.currentTarget;
+          if (img.dataset.localFallback === '1') {
+            return;
+          }
+          img.dataset.localFallback = '1';
+          img.src = rasterSrc;
+        }}
         src={cdnAssetUrl(rasterSrc)}
         width={24}
       />

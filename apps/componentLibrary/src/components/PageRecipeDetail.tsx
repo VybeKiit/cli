@@ -4,7 +4,8 @@ import { CatalogSidebar } from '@library/components/CatalogSidebar';
 import { CopyPageRecipePromptButton } from '@library/components/CopyPageRecipePromptButton';
 import { CopyPageRecipeSourceButton } from '@library/components/CopyPageRecipeSourceButton';
 import { PageRecipePreviewGrid } from '@library/components/PageRecipePreviewGrid';
-import { PAGE_RECIPE_GROUPS, PAGE_RECIPES, type PageRecipe } from '@library/data/pageRecipes';
+import type { PageRecipe } from '@library/data/pageRecipes';
+import { PAGE_RECIPE_GROUP_SUMMARIES } from '@library/lib/pageRecipeGroupSummaries';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
@@ -16,12 +17,6 @@ import { useCallback } from 'react';
 interface PageRecipeDetailProps {
   readonly recipe: PageRecipe;
 }
-
-const groupSummaries = PAGE_RECIPE_GROUPS.map((group) => ({
-  id: group.id,
-  label: group.label,
-  count: PAGE_RECIPES.filter((recipe) => recipe.groupId === group.id).length,
-}));
 
 /**
  * Render the Page recipe detail route.
@@ -45,16 +40,16 @@ export const PageRecipeDetail = ({ recipe }: PageRecipeDetailProps) => {
       <CatalogSidebar
         activePageGroup={recipe.groupId}
         onPageGroupChange={handleGroupChange}
-        pageGroups={groupSummaries}
+        pageGroups={PAGE_RECIPE_GROUP_SUMMARIES}
         surface="pages"
       />
-      <SidebarInset className="pb-24">
+      <SidebarInset className="min-w-0 overflow-x-clip pb-24">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
           <SidebarTrigger className="-ms-1" />
           <span className="font-semibold text-sm">Pages</span>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl p-6 md:p-8">
+        <main className="mx-auto w-full min-w-0 max-w-7xl p-6 md:p-8">
           <Link
             className="inline-flex items-center gap-2 text-muted-foreground text-sm"
             href="/pages"

@@ -1,11 +1,11 @@
 'use client';
 
 import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
-import { PreviewModeToggle, PrimaryPicker } from '@library/components/ThemeToolbar';
+import { PreviewModeToggle } from '@library/components/PreviewModeToggle';
+import { PrimaryPicker } from '@library/components/PrimaryPicker';
 import {
   PREVIEW_SIZE_LABELS,
   type PreviewSize,
-  SIZE_SCALES,
   type ViewportPreset,
 } from '@library/lib/previewViewport';
 import type { PreviewMode } from '@library/lib/theme';
@@ -166,5 +166,3 @@ export const PreviewControlsBar = ({
     </div>
   );
 };
-
-export { SIZE_SCALES };

@@ -1,4 +1,5 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { mapOrderEventToLedgerRow, type OrderEvent, splitCustomerName } from '@vybekiit/payments';
 
 /**
  * The single prepared-statement surface this module uses, declared structurally so the
@@ -35,32 +36,32 @@ ON CONFLICT(order_id) DO UPDATE SET
   updated_at = datetime('now')`;
 
 /**
- * Split a provider's single full-name field into first and last name: the first
- * whitespace token is the first name, the remainder the last name. A mononym keeps a
- * null last name; an empty/absent name yields two nulls.
+ * Split a provider's single full-name field into first and last name.
+ * Delegates to the shared OrderLedger mapper in `@vybekiit/payments`.
  *
  * @param fullName - Buyer name as the provider captured it, or null.
  * @returns The first and last name, each nullable.
  * @example
  * const { firstName, lastName } = splitName('Ada Lovelace'); // 'Ada', 'Lovelace'
  */
-export const splitName = (
-  fullName: string | null,
-): { firstName: string | null; lastName: string | null } => {
-  const trimmed = fullName?.trim() ?? '';
-  if (trimmed.length === 0) {
-    return { firstName: null, lastName: null };
-  }
+export const splitName = splitCustomerName;
 
-  const firstSpace = trimmed.indexOf(' ');
-  if (firstSpace === -1) {
-    return { firstName: trimmed, lastName: null };
-  }
-
-  const lastName = trimmed.slice(firstSpace + 1).trim();
+/**
+ * Map a verified OrderEvent into the landing OrderRecord shape.
+ *
+ * @param event - Normalized payment event.
+ * @returns Landing order record for D1 upsert.
+ * @example
+ * const record = orderRecordFromEvent(event);
+ */
+export const orderRecordFromEvent = (event: OrderEvent): OrderRecord => {
+  const row = mapOrderEventToLedgerRow(event);
   return {
-    firstName: trimmed.slice(0, firstSpace),
-    lastName: lastName.length > 0 ? lastName : null,
+    orderId: row.orderId,
+    email: row.email,
+    customerName: row.customerName,
+    githubUsername: row.githubUsername,
+    refunded: row.refunded,
   };
 };
 

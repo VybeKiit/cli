@@ -3,6 +3,7 @@
  * route (server) so both judge the same input by one rule — the server is the
  * authority, the client is for instant inline feedback.
  */
+import { Schema } from 'effect';
 
 /**
  * GitHub's real username rule: 1–39 characters, alphanumeric or single hyphens,
@@ -23,20 +24,41 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * True when `username` is a syntactically valid GitHub username.
  *
  * @param username - Input value.
- * @returns The computed result.
+ * @returns Whether the username matches GitHub's public rules.
  * @example
- * const result = isValidGithubUsername(username);
+ * isValidGithubUsername('octocat'); // true
  */
-
 export const isValidGithubUsername = (username: string): boolean => GITHUB_USERNAME.test(username);
 
 /**
  * True when `email` looks like a usable email address.
  *
  * @param email - Input value.
- * @returns The computed result.
+ * @returns Whether the email has a local part, `@`, and dotted domain.
  * @example
- * const result = isValidEmail(email);
+ * isValidEmail('you@example.com'); // true
  */
-
 export const isValidEmail = (email: string): boolean => EMAIL.test(email);
+
+/** Effect Schema field for a GitHub username accepted by checkout. */
+export const GithubUsernameSchema = Schema.String.pipe(
+  Schema.filter((username) => isValidGithubUsername(username), {
+    message: () => 'Enter a valid GitHub username.',
+  }),
+);
+
+/** Effect Schema field for a checkout email address. */
+export const CheckoutEmailSchema = Schema.String.pipe(
+  Schema.filter((email) => isValidEmail(email), {
+    message: () => 'Enter a valid email address.',
+  }),
+);
+
+/** POST body for the landing store checkout route. */
+export const LandingCheckoutBodySchema = Schema.Struct({
+  githubUsername: GithubUsernameSchema,
+  email: CheckoutEmailSchema,
+});
+
+/** Static type inferred from {@link LandingCheckoutBodySchema}. */
+export type LandingCheckoutBody = typeof LandingCheckoutBodySchema.Type;

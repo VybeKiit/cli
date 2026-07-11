@@ -237,6 +237,31 @@ export const ShieldCheckIcon = ({ className, ...props }: IconProps) => (
 );
 
 /**
+ * Warning triangle for the assistant chat privacy strip (dev-only, not public).
+ *
+ * @param props - Component props.
+ * @returns The rendered ChatPrivateWarningIcon element.
+ * @example
+ * ```tsx
+ * <ChatPrivateWarningIcon className="size-3.5" />
+ * ```
+ */
+export const ChatPrivateWarningIcon = ({ className, ...props }: IconProps) => (
+  <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24" {...props}>
+    <path
+      d="M12 3.4 L21.2 19.2 C21.55 19.8 21.12 20.55 20.42 20.55 H3.58 C2.88 20.55 2.45 19.8 2.8 19.2 L12 3.4 Z"
+      fill="currentColor"
+      fillOpacity="0.14"
+      stroke="currentColor"
+      strokeLinejoin="round"
+      strokeWidth="1.7"
+    />
+    <path d="M12 9.2 V13.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.9" />
+    <circle cx="12" cy="16.6" fill="currentColor" r="1.15" />
+  </svg>
+);
+
+/**
  * Circle check — pricing bullets (filled terminal green via CSS).
  *
  * @param props - Component props.
@@ -258,6 +283,30 @@ export const CheckCircleIcon = ({ className, ...props }: IconProps) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.8"
+    />
+  </svg>
+);
+
+/**
+ * Active-agent check — solid disc + tick for the coding-agent menu.
+ * Pair with a ping ring for the heartbeam pulse.
+ *
+ * @param props - Component props.
+ * @returns The rendered ActiveAgentCheckIcon element.
+ * @example
+ * ```tsx
+ * <ActiveAgentCheckIcon className="size-3.5 text-emerald-600" />
+ * ```
+ */
+export const ActiveAgentCheckIcon = ({ className, ...props }: IconProps) => (
+  <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24" {...props}>
+    <circle cx="12" cy="12" fill="currentColor" r="10" />
+    <path
+      d="M7.6 12.2 L10.5 15.1 L16.6 8.8"
+      stroke="white"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.2"
     />
   </svg>
 );

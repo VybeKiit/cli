@@ -1,63 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { AGENTS, type AgentDefinition, type AgentId } from '@/lib/agents/registry';
 import { STORE_KEYS } from '@/lib/keys';
 
-export type AgentId = 'kiro' | 'claude-code' | 'cursor' | 'gemini' | 'codex';
-
-export type DetectedAgent = {
-  id: AgentId;
-  name: string;
-  /** Brand color for glow effects */
-  color: string;
-  brandSrc: string;
-  command: string;
-  mcpSupported: boolean;
-  resumeFlag?: string;
-};
-
-const AGENTS: Record<AgentId, DetectedAgent> = {
-  kiro: {
-    id: 'kiro',
-    name: 'Kiro',
-    color: '#FF6B00',
-    brandSrc: '/brand-marks/kiro.webp',
-    command: 'kiro-cli',
-    mcpSupported: true,
-    resumeFlag: '--resume-id',
-  },
-  'claude-code': {
-    id: 'claude-code',
-    name: 'Claude Code',
-    color: '#D97757',
-    brandSrc: '/brand-marks/claude.webp',
-    command: 'claude',
-    mcpSupported: true,
-    resumeFlag: '--continue',
-  },
-  cursor: {
-    id: 'cursor',
-    name: 'Cursor',
-    color: '#00D4AA',
-    brandSrc: '/brand-marks/cursor.webp',
-    command: 'cursor',
-    mcpSupported: true,
-  },
-  gemini: {
-    id: 'gemini',
-    name: 'Gemini CLI',
-    color: '#4285F4',
-    brandSrc: '/brand-marks/googlegemini.webp',
-    command: 'gemini',
-    mcpSupported: false,
-  },
-  codex: {
-    id: 'codex',
-    name: 'Codex',
-    color: '#10A37F',
-    brandSrc: '/brand-marks/openai.webp',
-    command: 'codex',
-    mcpSupported: false,
-  },
+export type DetectedAgent = AgentDefinition & {
+  installed?: boolean;
+  resolvedCommand?: string | null;
 };
 
 type AgentState = {
@@ -65,16 +13,53 @@ type AgentState = {
   agents: Record<AgentId, DetectedAgent>;
   setActive: (id: AgentId) => void;
   getActive: () => DetectedAgent;
+  setInstalled: (
+    statuses: Array<{ id: AgentId; installed: boolean; resolvedCommand: string | null }>,
+  ) => void;
 };
+
+const baseAgents = Object.fromEntries(
+  (Object.keys(AGENTS) as AgentId[]).map((id) => [
+    id,
+    { ...AGENTS[id], resolvedCommand: null as string | null },
+  ]),
+) as unknown as Record<AgentId, DetectedAgent>;
 
 export const useAgentStore = create<AgentState>()(
   persist(
     (set, get) => ({
-      activeAgentId: 'kiro',
-      agents: AGENTS,
+      activeAgentId: 'claude-code',
+      agents: baseAgents,
       setActive: (id) => set({ activeAgentId: id }),
-      getActive: () => AGENTS[get().activeAgentId],
+      getActive: () => get().agents[get().activeAgentId],
+      setInstalled: (statuses) =>
+        set((state) => {
+          const next = { ...state.agents };
+          for (const status of statuses) {
+            const existing = next[status.id];
+            if (existing === undefined) {
+              continue;
+            }
+            next[status.id] = {
+              ...existing,
+              installed: status.installed,
+              resolvedCommand: status.resolvedCommand,
+            };
+          }
+          return { agents: next };
+        }),
     }),
-    { name: STORE_KEYS.agents },
+    {
+      name: STORE_KEYS.agents,
+      // Only persist the active selection — install status is re-probed.
+      partialize: (state) => ({ activeAgentId: state.activeAgentId }),
+      merge: (persisted, current) => {
+        const p = persisted as { activeAgentId?: AgentId } | undefined;
+        if (p?.activeAgentId && p.activeAgentId in current.agents) {
+          return { ...current, activeAgentId: p.activeAgentId };
+        }
+        return current;
+      },
+    },
   ),
 );

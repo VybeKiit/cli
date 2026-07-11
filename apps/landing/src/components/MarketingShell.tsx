@@ -2,6 +2,7 @@
 
 import { memo, type ReactNode } from 'react';
 import { CheckoutDialogProvider } from '@/components/CheckoutDialog';
+import { LivePricingProvider } from '@/components/LivePricingProvider';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -43,7 +44,9 @@ MarketingChrome.displayName = 'MarketingChrome';
 export const MarketingShell = ({ children }: MarketingShellProps) => (
   <ThemeProvider>
     <LocaleProvider>
-      <MarketingChrome>{children}</MarketingChrome>
+      <LivePricingProvider>
+        <MarketingChrome>{children}</MarketingChrome>
+      </LivePricingProvider>
     </LocaleProvider>
   </ThemeProvider>
 );

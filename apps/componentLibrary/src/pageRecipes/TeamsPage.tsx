@@ -3,14 +3,23 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { MailPlus, ShieldCheck, Trash2, UserCog, UsersRound } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type Role = 'Owner' | 'Admin' | 'Editor' | 'Viewer';
 type MemberStatus = 'active' | 'invited';
@@ -170,7 +179,7 @@ export const TeamsPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Teams motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -187,9 +196,15 @@ export const TeamsPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Active" value={counts.active} />
-          <Kpi label="Invited" value={counts.invited} />
-          <Kpi label="Seats" value={members.length} />
+          {(
+            [
+              { key: 'active', label: 'Active', value: counts.active },
+              { key: 'invited', label: 'Invited', value: counts.invited },
+              { key: 'seats', label: 'Seats', value: members.length },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
@@ -273,26 +288,31 @@ export const TeamsPage = () => {
             </CardHeader>
             <CardContent className="p-2 sm:p-3">
               {visible.length === 0 ? (
-                <div className="flex flex-col items-center px-4 py-14 text-center">
-                  <UsersRound aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-                  <h2 className="mt-3 font-semibold">No members here</h2>
-                  <p className="mt-1 text-muted-foreground text-sm">
-                    {statusFilter === 'all'
-                      ? 'Invite someone to fill this workspace.'
-                      : 'Nothing matches this status — try All.'}
-                  </p>
-                  {statusFilter === 'all' ? null : (
-                    <Button
-                      className="mt-4"
-                      onClick={() => setStatusFilter('all')}
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      Show all
-                    </Button>
-                  )}
-                </div>
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia>
+                      <UsersRound aria-hidden="true" />
+                    </EmptyMedia>
+                    <EmptyTitle>No members here</EmptyTitle>
+                    <EmptyDescription>
+                      {statusFilter === 'all'
+                        ? 'Invite someone to fill this workspace.'
+                        : 'Nothing matches this status — try All.'}
+                    </EmptyDescription>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    {statusFilter === 'all' ? null : (
+                      <Button
+                        onClick={() => setStatusFilter('all')}
+                        size="sm"
+                        type="button"
+                        variant="outline"
+                      >
+                        Show all
+                      </Button>
+                    )}
+                  </EmptyContent>
+                </Empty>
               ) : (
                 <ul aria-label="Team members" className="divide-y">
                   {visible.map((member) => (
@@ -376,51 +396,30 @@ export const TeamsPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — invite validation, role changes, and remove all
-              recompute seats. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset organizations</code> for orgs, memberships, and
-                invites.
-              </li>
-              <li>
-                Load memberships from the active teams data model via{' '}
-                <code>GET /api/team/members</code>.
-              </li>
-              <li>
-                Send invite → configured team invitation action (<code>POST /api/team/invites</code>{' '}
-                with <code>{'{ email, role }'}</code>).
-              </li>
-              <li>
-                Role select → <code>PATCH /api/team/members/:id</code>; keep the last-owner guard.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — invite validation, role changes, and remove all
+            recompute seats. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset organizations</code> for orgs, memberships, and
+              invites.
+            </li>
+            <li>
+              Load memberships from the active teams data model via{' '}
+              <code>GET /api/team/members</code>.
+            </li>
+            <li>
+              Send invite → configured team invitation action (<code>POST /api/team/invites</code>{' '}
+              with <code>{'{ email, role }'}</code>).
+            </li>
+            <li>
+              Role select → <code>PATCH /api/team/members/:id</code>; keep the last-owner guard.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Teams motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({ label, value }: { readonly label: string; readonly value: number }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-2xl tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

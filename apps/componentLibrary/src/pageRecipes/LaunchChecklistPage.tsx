@@ -4,12 +4,14 @@ import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Checkbox } from '@vybekiit/ui/checkbox';
+import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '@vybekiit/ui/empty';
 import { Progress } from '@vybekiit/ui/progress';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { ArrowRight, CheckCircle2, Circle, Clock, Rocket, Server } from 'lucide-react';
-import { type ReactNode, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type ItemStatus = 'todo' | 'doing' | 'done';
 type ItemCategory = 'backup' | 'domain' | 'deploy' | 'jobs';
@@ -172,7 +174,7 @@ export const LaunchChecklistPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Launch motion pass">
       <main className="mx-auto max-w-4xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -216,42 +218,39 @@ export const LaunchChecklistPage = () => {
           </CardContent>
         </Card>
 
-        <div className="mb-3 flex flex-wrap gap-1 rounded-lg border bg-muted p-1">
+        <SegmentedControl
+          onValueChange={(value) => setFilter(value as typeof filter)}
+          value={filter}
+        >
           {CATEGORY_FILTERS.map((option) => (
-            <button
-              aria-pressed={filter === option.value}
-              className={cn(
-                'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                filter === option.value
-                  ? 'bg-background shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
-              key={option.value}
-              onClick={() => setFilter(option.value)}
-              type="button"
-            >
+            <SegmentedControlItem key={option.value} value={option.value}>
               {option.label}
-            </button>
+            </SegmentedControlItem>
           ))}
-        </div>
+        </SegmentedControl>
 
         <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
           <Card>
             <CardContent className="p-2 sm:p-3">
               {visible.length === 0 ? (
-                <div className="flex flex-col items-center px-4 py-12 text-center">
-                  <Circle aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-                  <h2 className="mt-3 font-semibold">Nothing in this category</h2>
-                  <Button
-                    className="mt-4"
-                    onClick={() => setFilter('all')}
-                    size="sm"
-                    type="button"
-                    variant="outline"
-                  >
-                    Show all
-                  </Button>
-                </div>
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia>
+                      <Circle aria-hidden="true" />
+                    </EmptyMedia>
+                    <EmptyTitle>Nothing in this category</EmptyTitle>
+                  </EmptyHeader>
+                  <EmptyContent>
+                    <Button
+                      onClick={() => setFilter('all')}
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                    >
+                      Show all
+                    </Button>
+                  </EmptyContent>
+                </Empty>
               ) : (
                 <ul aria-label="Launch checklist" className="divide-y">
                   {visible.map((item) => {
@@ -340,36 +339,25 @@ export const LaunchChecklistPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — checkboxes recompute progress and job Retry flips
-              health. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Map deploy/domain status from the configured hosting provider API into checklist
-                rows.
-              </li>
-              <li>
-                Run <code>vybekiit apply-preset job_runs</code> (or your jobs feature) and load
-                last-run health into the sidebar.
-              </li>
-              <li>Persist checkbox state per workspace so the team shares one launch list.</li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — checkboxes recompute progress and job Retry flips
+            health. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Map deploy/domain status from the configured hosting provider API into checklist rows.
+            </li>
+            <li>
+              Run <code>vybekiit apply-preset job_runs</code> (or your jobs feature) and load
+              last-run health into the sidebar.
+            </li>
+            <li>Persist checkbox state per workspace so the team shares one launch list.</li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Launch motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

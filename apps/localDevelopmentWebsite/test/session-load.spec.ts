@@ -6,6 +6,8 @@ test.describe('session loading', () => {
 
     const sidebar = page.getByTestId('chat-sidebar');
 
+    // Force a known agent so labels are stable regardless of localStorage.
+    await sidebar.getByTestId('agent-button-kiro').click();
     await expect(sidebar.getByText('Kiro sessions', { exact: true })).toBeVisible();
 
     const sessionButtons = sidebar.locator('[data-testid^="session-item"]');

@@ -2,43 +2,14 @@
 
 import { ComponentCard } from '@library/components/ComponentCard';
 import type { CatalogEntry } from '@library/data/catalog';
+import { useColumnCount } from '@library/hooks/useColumnCount';
+import { chunkRows } from '@library/lib/chunkRows';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 const CARD_ROW_ESTIMATE = 420;
 const VIRTUALIZE_THRESHOLD = 32;
-
-const chunkRows = <T,>(items: readonly T[], columnCount: number): T[][] => {
-  if (columnCount < 1) {
-    return [items.slice()];
-  }
-  const rows: T[][] = [];
-  for (let index = 0; index < items.length; index += columnCount) {
-    rows.push(items.slice(index, index + columnCount));
-  }
-  return rows;
-};
-
-const useColumnCount = (gridClassName: string): number =>
-  useMemo(() => {
-    if (gridClassName.includes('grid-cols-6')) {
-      return 6;
-    }
-    if (gridClassName.includes('2xl:grid-cols-5') || gridClassName.includes('xl:grid-cols-5')) {
-      return 5;
-    }
-    if (gridClassName.includes('2xl:grid-cols-4') || gridClassName.includes('xl:grid-cols-4')) {
-      return 4;
-    }
-    if (gridClassName.includes('lg:grid-cols-3') || gridClassName.includes('md:grid-cols-3')) {
-      return 3;
-    }
-    if (gridClassName.includes('md:grid-cols-2') || gridClassName.includes('sm:grid-cols-2')) {
-      return 2;
-    }
-    return 1;
-  }, [gridClassName]);
 
 interface CatalogEntryGridProps {
   readonly entries: readonly CatalogEntry[];

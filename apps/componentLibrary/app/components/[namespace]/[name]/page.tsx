@@ -1,4 +1,4 @@
-import { ComponentDetail } from '@library/components/PreviewFrame';
+import { ComponentDetail } from '@library/components/ComponentDetail';
 import { CATALOG_ENTRIES } from '@library/data/catalog';
 import { notFound } from 'next/navigation';
 

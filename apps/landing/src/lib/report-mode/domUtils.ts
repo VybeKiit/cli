@@ -274,6 +274,11 @@ const countElementsWithExactLabel = (text: string): number => {
 const getShortestUniqueLabel = (element: Element): string => {
   const tiers = collectCandidatesInTiers(element);
 
+  // Label pick flow:
+  // 1. Walk candidate tiers outer→inner (specificity order from collectCandidatesInTiers).
+  // 2. For each tier, try every candidate; return the first label that matches exactly one DOM node.
+  // 3. If nothing is unique, take the shortest candidate from the first non-empty tier.
+  // 4. Fall back to accessible name / visible text / tag (below).
   for (const candidates of tiers) {
     for (const candidate of candidates) {
       if (countElementsWithExactLabel(candidate) === 1) {

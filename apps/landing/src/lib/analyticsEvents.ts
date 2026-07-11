@@ -46,6 +46,7 @@ export type CtaLocation =
   | 'hero_secondary'
   | 'header'
   | 'pricing'
+  | 'vibe_story'
   | 'cancel_retry'
   | 'dialog';
 

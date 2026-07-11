@@ -22,26 +22,26 @@ export const MarketingBlocksSlide = () => (
     <Card className="w-full gap-0 border-black/8 bg-white py-0 shadow-2xl">
       <CardContent className="p-5">
         <div className="mb-5 flex items-center justify-between">
-          <span className="flex items-center gap-1.5 font-semibold text-[11px] text-[#0b1220]">
+          <span className="flex items-center gap-1.5 font-semibold text-xs text-[#0b1220]">
             <span className="h-3.5 w-3.5 rounded-md bg-gradient-to-br from-[#62a1ff] to-[#1e6bff]" />
             SaaSTrack
           </span>
           <Button
-            className="h-6 rounded-full bg-[#0b1220] px-2.5 text-[8px] text-white hover:bg-[#0b1220]/90"
+            className="h-6 rounded-full bg-[#0b1220] px-2.5 text-xs text-white hover:bg-[#0b1220]/90"
             size="sm"
           >
             Start Free Trial
           </Button>
         </div>
 
-        <h4 className="font-bold text-[#0b1220] text-[26px] leading-[1.08] tracking-tight">
+        <h4 className="font-bold text-[#0b1220] text-3xl leading-[1.08] tracking-tight">
           Ship <span className="text-[#7c3aed]">your</span> SaaS
           <br />
           in <span className="text-[#9aa3b2] line-through decoration-[#c7ccd6]">months</span>{' '}
           <span className="text-[#0b1220]">days</span>
         </h4>
 
-        <p className="mt-3 max-w-[240px] text-[#526070] text-[10px] leading-relaxed">
+        <p className="mt-3 max-w-[240px] text-[#526070] text-xs leading-relaxed">
           Ship one product with one team. Move from idea to traction in a weekend, not a quarter.
         </p>
 
@@ -61,20 +61,17 @@ export const MarketingBlocksSlide = () => (
                 <Star className="h-3 w-3" fill="currentColor" key={index} strokeWidth={0} />
               ))}
             </div>
-            <p className="mt-0.5 text-[#8b95a7] text-[8px]">Loved by 2,000+ builders</p>
+            <p className="mt-0.5 text-[#8b95a7] text-xs">Loved by 2,000+ builders</p>
           </div>
         </div>
 
         <div className="mt-5 flex items-center gap-2">
-          <Button
-            className="h-8 gap-1.5 rounded-lg bg-[#0b1220] px-3 text-[10px] text-white"
-            size="sm"
-          >
+          <Button className="h-8 gap-1.5 rounded-lg bg-[#0b1220] px-3 text-xs text-white" size="sm">
             <Play className="h-3 w-3" fill="currentColor" strokeWidth={0} />
             Tour in 3s
           </Button>
           <Button
-            className="h-8 gap-1.5 rounded-lg border-black/10 px-3 text-[#0b1220] text-[10px]"
+            className="h-8 gap-1.5 rounded-lg border-black/10 px-3 text-[#0b1220] text-xs"
             size="sm"
             variant="outline"
           >

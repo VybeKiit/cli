@@ -46,7 +46,7 @@ export const MiniBrowserChrome = ({
       </span>
       <div
         className={cn(
-          'min-w-0 flex-1 truncate rounded-md px-2 py-1 text-[10px]',
+          'min-w-0 flex-1 truncate rounded-md px-2 py-1 text-xs',
           dark ? 'bg-white/[0.05] text-white/45' : 'bg-black/[0.04] text-[#526070]',
         )}
       >

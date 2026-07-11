@@ -1,8 +1,11 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { IconBox } from '@vybekiit/ui/icon-box';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Switch } from '@vybekiit/ui/switch';
 import {
   CheckCircle2,
@@ -15,10 +18,10 @@ import {
   Smartphone,
   Trash2,
 } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type SessionKind = 'desktop' | 'mobile';
 
@@ -156,7 +159,7 @@ export const AccountSecurityPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Account security motion pass">
       <main className="mx-auto max-w-4xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -173,25 +176,33 @@ export const AccountSecurityPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0" />
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Kpi
-            label="2FA"
-            value={twoFaEnabled ? 'On' : 'Off'}
-            valueClassName={twoFaEnabled ? 'text-emerald-600' : 'text-amber-600'}
-          />
-          <Kpi label="Sessions" value={String(kpis.sessions)} />
-          <Kpi label="Trusted" value={String(kpis.trusted)} />
-          <Kpi
-            label="Codes left"
-            value={String(codesRemaining)}
-            valueClassName={codesRemaining < 5 ? 'text-amber-600' : undefined}
-          />
+          {(
+            [
+              {
+                key: '2fa',
+                label: '2FA',
+                value: twoFaEnabled ? 'On' : 'Off',
+                valueClassName: twoFaEnabled ? 'text-emerald-600' : 'text-amber-600',
+              },
+              { key: 'sessions', label: 'Sessions', value: String(kpis.sessions) },
+              { key: 'trusted', label: 'Trusted', value: String(kpis.trusted) },
+              {
+                key: 'codes-left',
+                label: 'Codes left',
+                value: String(codesRemaining),
+                valueClassName: codesRemaining < 5 ? 'text-amber-600' : undefined,
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -243,9 +254,9 @@ export const AccountSecurityPage = () => {
                           key={session.id}
                         >
                           <div className="flex min-w-0 items-start gap-3">
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                            <IconBox>
                               <Icon aria-hidden="true" className="h-4 w-4" />
-                            </span>
+                            </IconBox>
                             <div className="min-w-0">
                               <p className="font-medium text-sm">
                                 {session.device}
@@ -379,61 +390,31 @@ export const AccountSecurityPage = () => {
           </div>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — 2FA, session revoke, trust flags, and recovery
-              codes all update live. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Load sessions from your auth provider (<code>@vybekiit/auth</code> list-sessions /
-                revoke-session).
-              </li>
-              <li>
-                Run <code>vybekiit apply-preset audit_log</code> and write security actions (revoke,
-                rotate codes, policy flips) as append-only rows.
-              </li>
-              <li>
-                <code>GET /api/account/security</code> returns sessions + 2FA + codes-remaining;{' '}
-                <code>POST /api/account/security/codes</code> rotates recovery codes.
-              </li>
-              <li>
-                Keep revoke of the current session blocked (or force re-login) and never show
-                recovery codes after the first download.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — 2FA, session revoke, trust flags, and recovery
+            codes all update live. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Load sessions from your auth provider (<code>@vybekiit/auth</code> list-sessions /
+              revoke-session).
+            </li>
+            <li>
+              Run <code>vybekiit apply-preset audit_log</code> and write security actions (revoke,
+              rotate codes, policy flips) as append-only rows.
+            </li>
+            <li>
+              <code>GET /api/account/security</code> returns sessions + 2FA + codes-remaining;{' '}
+              <code>POST /api/account/security/codes</code> rotates recovery codes.
+            </li>
+            <li>
+              Keep revoke of the current session blocked (or force re-login) and never show recovery
+              codes after the first download.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Account security motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** Small KPI tile. */
-const Kpi = ({
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className={cn('font-semibold text-2xl tabular-nums', valueClassName)}>{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

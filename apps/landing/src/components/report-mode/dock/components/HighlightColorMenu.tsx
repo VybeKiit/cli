@@ -37,14 +37,26 @@ export const ReportHighlightColorMenu = ({
   const { open, openMenu, scheduleClose, closeMenu } = useReportHoverMenu();
   const flyoutStyle = useReportFlyoutPosition(open, triggerRef, 'center', flyoutRef);
 
+  const handleMouseLeave = (): void => {
+    scheduleClose();
+  };
+
+  const handleSelectPreset = (preset: string): void => {
+    onChange(preset);
+    closeMenu();
+  };
+
+  const handleResetColor = (): void => {
+    onReset();
+    closeMenu();
+  };
+
   return (
     <div
       className={cn('report-mode-highlight-color', open && 'report-mode-highlight-color--open')}
       data-report-mode-control={true}
       onMouseEnter={openMenu}
-      onMouseLeave={() => {
-        scheduleClose();
-      }}
+      onMouseLeave={handleMouseLeave}
     >
       <ReportControlHint
         disabled={open || tutorialActive}
@@ -90,10 +102,7 @@ export const ReportHighlightColorMenu = ({
               )}
               data-testid={`report-mode-highlight-preset-${preset.slice(1)}`}
               key={preset}
-              onClick={() => {
-                onChange(preset);
-                closeMenu();
-              }}
+              onClick={() => handleSelectPreset(preset)}
               style={{ backgroundColor: preset }}
               type="button"
             />
@@ -116,10 +125,7 @@ export const ReportHighlightColorMenu = ({
           <button
             className="report-mode-highlight-reset"
             data-testid="report-mode-highlight-reset"
-            onClick={() => {
-              onReset();
-              closeMenu();
-            }}
+            onClick={handleResetColor}
             type="button"
           >
             Reset

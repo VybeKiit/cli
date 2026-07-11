@@ -1,15 +1,19 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { AlertTriangle, FileImage, ImageIcon, Loader2, Search, Upload, X } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type MediaKind = 'image' | 'document' | 'video';
 type KindFilter = 'all' | MediaKind;
@@ -124,6 +128,7 @@ export const MediaGalleryPage = () => {
 
   const [assets, setAssets] = useState<readonly MediaAsset[]>(INITIAL_ASSETS);
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [kind, setKind] = useState<KindFilter>('all');
   const [needsAltOnly, setNeedsAltOnly] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(INITIAL_ASSETS[0]?.id ?? null);
@@ -132,7 +137,7 @@ export const MediaGalleryPage = () => {
   const [notice, setNotice] = useState<string | null>(null);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return assets.filter((asset) => {
       const matchesKind = kind === 'all' || asset.kind === kind;
       const matchesAlt = !needsAltOnly || (asset.kind === 'image' && asset.alt === null);
@@ -142,7 +147,7 @@ export const MediaGalleryPage = () => {
         asset.tags.some((tag) => tag.includes(q));
       return matchesKind && matchesAlt && matchesQuery;
     });
-  }, [assets, query, kind, needsAltOnly]);
+  }, [assets, debouncedQuery, kind, needsAltOnly]);
 
   const selected = assets.find((a) => a.id === selectedId) ?? null;
 
@@ -202,7 +207,7 @@ export const MediaGalleryPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="slide" title="Media gallery motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -229,47 +234,43 @@ export const MediaGalleryPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Assets" value={String(kpis.total)} />
-          <Kpi label="Images" value={String(kpis.images)} />
-          <Kpi
-            label="Missing alt"
-            value={String(kpis.missingAlt)}
-            valueClassName={kpis.missingAlt > 0 ? 'text-amber-600' : undefined}
-          />
+          {(
+            [
+              { key: 'assets', label: 'Assets', value: String(kpis.total) },
+              { key: 'images', label: 'Images', value: String(kpis.images) },
+              {
+                key: 'missing-alt',
+                label: 'Missing alt',
+                value: String(kpis.missingAlt),
+                valueClassName: kpis.missingAlt > 0 ? 'text-amber-600' : undefined,
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="text-muted-foreground text-sm" id={filterLabelId}>
             Type
           </span>
-          <div
+          <SegmentedControl
             aria-labelledby={filterLabelId}
-            className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1"
-            role="group"
+            onValueChange={(value) => setKind(value as typeof kind)}
+            value={kind}
           >
             {KIND_FILTERS.map((option) => (
-              <button
-                aria-pressed={kind === option.value}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                  kind === option.value
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                key={option.value}
-                onClick={() => setKind(option.value)}
-                type="button"
-              >
+              <SegmentedControlItem key={option.value} value={option.value}>
                 {option.label}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
           <Button
             aria-pressed={needsAltOnly}
             onClick={() => setNeedsAltOnly((v) => !v)}
@@ -282,7 +283,7 @@ export const MediaGalleryPage = () => {
           <div className="relative ml-auto w-full sm:w-56">
             <Search
               aria-hidden="true"
-              className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground"
+              className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               className="pl-9"
@@ -434,60 +435,30 @@ export const MediaGalleryPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — filters, upload, selection, and alt edits all
-              recompute the gallery. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset file_metadata</code> for the{' '}
-                <code>file_metadata</code> table (bucket, key, content_type, size_bytes).
-              </li>
-              <li>
-                Upload to object storage (R2 / S3), then <code>POST /api/media</code> inserts the
-                metadata row.
-              </li>
-              <li>
-                <code>GET /api/media?kind=&amp;q=</code> lists assets; store alt/tags in metadata
-                JSON or extra columns.
-              </li>
-              <li>
-                Surface images with empty alt in an accessibility queue (the “Needs alt” filter).
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — filters, upload, selection, and alt edits all
+            recompute the gallery. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset file_metadata</code> for the{' '}
+              <code>file_metadata</code> table (bucket, key, content_type, size_bytes).
+            </li>
+            <li>
+              Upload to object storage (R2 / S3), then <code>POST /api/media</code> inserts the
+              metadata row.
+            </li>
+            <li>
+              <code>GET /api/media?kind=&amp;q=</code> lists assets; store alt/tags in metadata JSON
+              or extra columns.
+            </li>
+            <li>
+              Surface images with empty alt in an accessibility queue (the “Needs alt” filter).
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="slide" title="Media gallery motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** Small KPI tile. */
-const Kpi = ({
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className={cn('font-semibold text-2xl tabular-nums', valueClassName)}>{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

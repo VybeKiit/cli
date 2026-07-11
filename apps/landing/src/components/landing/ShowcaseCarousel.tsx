@@ -31,10 +31,10 @@ const ShowcaseCard = ({ slide }: { slide: ShowcaseSlideMeta }) => {
       }}
     >
       <div className="mb-[18px] shrink-0">
-        <h3 className="text-[18px] font-extrabold leading-[1.1] tracking-[-0.03em] text-[#f8fafc]">
+        <h3 className="text-lg font-extrabold leading-[1.1] tracking-[-0.03em] text-[#f8fafc]">
           {slide.title}
         </h3>
-        <p className="mt-1.5 text-[13px] font-medium leading-[1.3] text-[rgba(226,232,240,0.7)]">
+        <p className="mt-1.5 text-sm font-medium leading-[1.3] text-[rgba(226,232,240,0.7)]">
           {slide.subtitle}
         </p>
       </div>
@@ -113,7 +113,7 @@ export const ShowcaseCarousel = () => {
           aria-hidden="true"
           className="mt-[28px] flex h-[24px] items-center justify-center gap-[14px]"
         >
-          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
+          <span className="text-lg leading-none text-[rgba(255,255,255,0.42)]">∞</span>
           <div className="flex w-[280px] items-center gap-[5px]">
             <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
             <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
@@ -121,7 +121,7 @@ export const ShowcaseCarousel = () => {
             <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
             <span className="h-[5px] flex-1 rounded-full bg-[rgba(255,255,255,0.16)]" />
           </div>
-          <span className="text-[18px] leading-none text-[rgba(255,255,255,0.42)]">∞</span>
+          <span className="text-lg leading-none text-[rgba(255,255,255,0.42)]">∞</span>
         </div>
       </div>
     </section>

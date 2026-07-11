@@ -12,9 +12,6 @@ export interface HeroStackMarkEntry {
   readonly floatPhase: number;
 }
 
-/** @deprecated Use HERO_STACK_MARKS */
-export type BrandMark3DEntry = HeroStackMarkEntry;
-
 export const HERO_STACK_MARKS: readonly HeroStackMarkEntry[] = [
   {
     slug: 'nextdotjs',
@@ -395,6 +392,3 @@ export const HERO_STACK_MARKS: readonly HeroStackMarkEntry[] = [
     floatPhase: 0.2,
   },
 ];
-
-/** @deprecated Use HERO_STACK_MARKS */
-export const BRAND_MARKS_3D = HERO_STACK_MARKS;

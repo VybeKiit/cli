@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutTooltipProvider } from '@library/components/layout/LayoutTooltip';
+import { LayoutTooltipProvider } from '@library/components/layout/LayoutTooltipProvider';
 import { PreviewThemeProvider } from '@library/components/PreviewThemeProvider';
 import { CatalogDataProvider } from '@library/context/CatalogDataContext';
 import { CatalogGridLayoutProvider } from '@library/context/CatalogGridLayoutContext';

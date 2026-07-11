@@ -3,11 +3,14 @@
 import { Effect, Either } from 'effect';
 import { type FormEvent, useRef, useState } from 'react';
 import { FormField } from '@/components/FormField';
+import { useLivePricing } from '@/components/LivePricingProvider';
 import { BrandRichText } from '@/components/landing/BrandRichText';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { PRICE } from '@/data/site';
+import { fillTemplate } from '@/i18n/fillTemplate';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
 import { identifyClient, trackClient } from '@/lib/analyticsClient';
 import { AnalyticsEvent } from '@/lib/analyticsEvents';
 import { postJson } from '@/lib/fetchJson';
@@ -16,6 +19,8 @@ import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
 /** The JSON the checkout route returns on success. */
 interface CheckoutResponse {
   readonly url: string;
+  readonly priceUsd?: number;
+  readonly priceDisplay?: string;
 }
 
 /** Per-field inline errors; empty string means no error (no `undefined` under EOPT). */
@@ -39,12 +44,17 @@ const NO_FIELD_ERRORS: FieldErrors = { githubUsername: '', email: '' };
  * <CheckoutForm />
  */
 const CheckoutForm = () => {
+  const { messages } = useLandingLocale();
+  const { pricing: live } = useLivePricing();
+  const checkout = messages.checkout;
   const [githubUsername, setGithubUsername] = useState('');
   const [email, setEmail] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>(NO_FIELD_ERRORS);
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const formStartedRef = useRef(false);
+  const priceUsd = live.amount > 0 ? live.amount : PRICE.amount;
+  const priceDisplay = live.display || PRICE.display;
 
   const markFormStarted = (field: 'githubUsername' | 'email'): void => {
     if (formStartedRef.current) {
@@ -55,10 +65,8 @@ const CheckoutForm = () => {
   };
 
   const validate = (): FieldErrors => ({
-    githubUsername: isValidGithubUsername(githubUsername)
-      ? ''
-      : 'Enter a valid GitHub username (letters, numbers, single hyphens).',
-    email: isValidEmail(email) ? '' : 'Enter a valid email address.',
+    githubUsername: isValidGithubUsername(githubUsername) ? '' : checkout.githubError,
+    email: isValidEmail(email) ? '' : checkout.emailError,
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -80,7 +88,8 @@ const CheckoutForm = () => {
 
     identifyClient(email, { github_username: githubUsername.trim() });
     trackClient(AnalyticsEvent.checkoutSubmitted, {
-      price_usd: PRICE.amount,
+      price_usd: priceUsd,
+      sale_count: live.saleCount,
     });
 
     setSubmitting(true);
@@ -89,7 +98,8 @@ const CheckoutForm = () => {
     );
     if (Either.isRight(result)) {
       trackClient(AnalyticsEvent.checkoutSessionCreated, {
-        price_usd: PRICE.amount,
+        price_usd: result.right.priceUsd ?? priceUsd,
+        sale_count: live.saleCount,
       });
       // Leave `submitting` true: we are navigating away to the hosted checkout.
       window.location.assign(result.right.url);
@@ -106,9 +116,10 @@ const CheckoutForm = () => {
     <form onSubmit={handleSubmit} noValidate={true} className="flex flex-col gap-5">
       <FormField
         id="githubUsername"
-        label="GitHub username"
+        label={checkout.githubLabel}
         autoComplete="username"
-        placeholder="octocat"
+        dir="ltr"
+        placeholder={checkout.githubPlaceholder}
         value={githubUsername}
         onChange={(event) => setGithubUsername(event.target.value)}
         onFocus={() => markFormStarted('githubUsername')}
@@ -116,10 +127,11 @@ const CheckoutForm = () => {
       />
       <FormField
         id="email"
-        label="Email"
+        label={checkout.emailLabel}
         type="email"
         autoComplete="email"
-        placeholder="you@example.com"
+        dir="ltr"
+        placeholder={checkout.emailPlaceholder}
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         onFocus={() => markFormStarted('email')}
@@ -137,12 +149,21 @@ const CheckoutForm = () => {
         aria-busy={submitting}
         className="w-full rounded-full"
       >
-        {submitting ? <Spinner className="size-5" /> : `Continue to payment · ${PRICE.display}`}
+        {submitting ? (
+          <Spinner className="size-5" />
+        ) : (
+          <span className="inline-flex flex-wrap items-baseline justify-center gap-x-1.5">
+            <span>{checkout.submit}</span>
+            <span className="tabular-nums" dir="ltr">
+              · {priceDisplay}
+            </span>
+          </span>
+        )}
       </Button>
       <p className="text-center text-muted-foreground text-xs leading-relaxed">
-        <BrandRichText text="Secure checkout via Lemon Squeezy." />{' '}
+        <BrandRichText text={checkout.secureNote} />{' '}
         <strong className="font-semibold text-foreground">
-          Refundable for {PRICE.refundDays} days, no questions asked.
+          {fillTemplate(checkout.refundNote, { days: PRICE.refundDays })}
         </strong>
       </p>
     </form>

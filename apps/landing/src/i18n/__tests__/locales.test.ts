@@ -24,8 +24,16 @@ describe('landing locales', () => {
       const messages = LANDING_MESSAGES[entry.id];
       expect(messages.nav.getVybekiit.length).toBeGreaterThan(0);
       expect(messages.hero.headlineHighlight.length).toBeGreaterThan(0);
+      expect(messages.compare.optionColumn.length).toBeGreaterThan(0);
+      expect(messages.compare.youBadge.length).toBeGreaterThan(0);
+      expect(messages.pageRecipes.headline.includes('{readyCount}')).toBe(true);
+      expect(messages.checkout.titlePrefix.length).toBeGreaterThan(0);
+      expect(messages.platforms.mockOverview.length).toBeGreaterThan(0);
       expect(messages.faq.items.length).toBe(LANDING_MESSAGES.en.faq.items.length);
       expect(messages.operator.steps.length).toBe(LANDING_MESSAGES.en.operator.steps.length);
+      expect(messages.zigZag.race.steps.length).toBe(LANDING_MESSAGES.en.zigZag.race.steps.length);
+      expect(messages.zigZag.auth.googleCta.length).toBeGreaterThan(0);
+      expect(messages.zigZag.settings.saveCta.length).toBeGreaterThan(0);
     }
   });
 });

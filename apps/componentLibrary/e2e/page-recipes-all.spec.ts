@@ -155,7 +155,8 @@ test('pages catalog lists every page recipe', async ({ page }) => {
 
   await Promise.all(
     PAGE_RECIPES.map((recipe) =>
-      expect(page.getByRole('heading', { name: recipe.title })).toBeVisible(),
+      // exact: true — "Notifications page" must not also match "Email notifications page".
+      expect(page.getByRole('heading', { name: recipe.title, exact: true })).toBeVisible(),
     ),
   );
 

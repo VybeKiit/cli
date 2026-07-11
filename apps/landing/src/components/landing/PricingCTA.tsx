@@ -38,7 +38,7 @@ export const PricingCTA = () => (
           <ul className="mt-8 space-y-[22px]">
             {PRICING_BULLETS.map((bullet) => (
               <li
-                className="flex items-start gap-6 text-[29px] leading-[1.25] text-[rgba(226,232,240,0.88)]"
+                className="flex items-start gap-6 text-3xl leading-[1.25] text-[rgba(226,232,240,0.88)]"
                 key={bullet}
               >
                 <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#60a5fa] text-[#06101e]">
@@ -54,10 +54,10 @@ export const PricingCTA = () => (
           <CheckoutCTA icon="lock" size="pricing">
             Get VybeKiit Now
           </CheckoutCTA>
-          <p className="mt-[76px] text-center text-[32px] font-medium leading-[1.25] text-white">
+          <p className="mt-[76px] text-center text-4xl font-medium leading-[1.25] text-white">
             One payment. Lifetime access.
           </p>
-          <p className="mt-[84px] flex items-center justify-center gap-7 text-[32px] leading-[1.2] text-white">
+          <p className="mt-[84px] flex items-center justify-center gap-7 text-4xl leading-[1.2] text-white">
             <span className="landing-trust-shimmer inline-flex shrink-0 rounded-full">
               <ShieldCheckIcon className="h-[46px] w-[46px] text-[var(--blue-soft)]" />
             </span>

@@ -24,5 +24,11 @@
     "src/lib/theme.ts",
     "next-env.d.ts"
   ],
-  "exclude": ["node_modules", "src/lib/loadPreview.client.ts", "src/demos/**"]
+  "exclude": [
+    "node_modules",
+    "src/lib/loadPreview.client.ts",
+    "src/demos/**",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
 }

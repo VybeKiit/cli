@@ -65,5 +65,3 @@ export const ReportModeTutorial = ({
     />
   );
 };
-
-export { REPORT_TUTORIAL_STEPS };

@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MiniBrowserChrome } from '@/components/landing/kit/MiniBrowserChrome';
 import { LogoMarkIcon } from '@/components/landing/LogoMarkIcon';
 import type { PageRecipePreview } from '@/data/pageRecipes';
+import { useLandingLocale } from '@/i18n/LocaleProvider';
+import { recipeTitleFor } from '@/i18n/pageRecipes';
 import { cdnAssetUrl } from '@/lib/cdnAssets';
 import { cn } from '@/lib/utils';
 
@@ -226,7 +228,7 @@ const Pill = ({
     violet: 'bg-violet-50 text-violet-700',
   } as const;
   return (
-    <span className={cn('rounded px-1 py-0.5 font-medium text-[7px] leading-none', tones[tone])}>
+    <span className={cn('rounded px-1 py-0.5 font-medium text-xs leading-none', tones[tone])}>
       {children}
     </span>
   );
@@ -236,21 +238,21 @@ const Pill = ({
 const SCREENS: Record<string, () => ReactNode> = {
   auth: () => (
     <Shell className="items-center justify-center gap-1 bg-gradient-to-b from-slate-50 to-white p-2">
-      <div className="flex size-6 items-center justify-center rounded-lg bg-blue-600 font-bold text-[9px] text-white shadow-sm">
+      <div className="flex size-6 items-center justify-center rounded-lg bg-blue-600 font-bold text-xs text-white shadow-sm">
         V
       </div>
-      <p className="font-semibold text-[10px] leading-none">Welcome back</p>
-      <p className="text-[7px] text-slate-500">Sign in to your workspace</p>
+      <p className="font-semibold text-xs leading-none">Welcome back</p>
+      <p className="text-xs text-slate-500">Sign in to your workspace</p>
       <div className="mt-0.5 w-full max-w-[168px] space-y-1">
         <button
-          className="flex w-full items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left font-medium text-[8px] shadow-sm"
+          className="flex w-full items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left font-medium text-xs shadow-sm"
           type="button"
         >
           <MiniBrand className="size-3.5" slug="google" />
           <span className="min-w-0 flex-1 truncate">Continue with Google</span>
         </button>
         <button
-          className="flex w-full items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left font-medium text-[8px] shadow-sm"
+          className="flex w-full items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left font-medium text-xs shadow-sm"
           type="button"
         >
           <MiniBrand className="size-3.5" slug="github" />
@@ -258,13 +260,13 @@ const SCREENS: Record<string, () => ReactNode> = {
         </button>
         <div className="flex items-center gap-1 py-0.5">
           <span className="h-px flex-1 bg-slate-200" />
-          <span className="shrink-0 text-[7px] text-slate-400">or email</span>
+          <span className="shrink-0 text-xs text-slate-400">or email</span>
           <span className="h-px flex-1 bg-slate-200" />
         </div>
-        <div className="rounded-md border border-slate-200 px-2 py-1 text-[8px] text-slate-400">
+        <div className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-400">
           you@studio.com
         </div>
-        <div className="rounded-md bg-blue-600 py-1.5 text-center font-medium text-[8px] text-white">
+        <div className="rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
           Sign in with magic link
         </div>
       </div>
@@ -281,8 +283,8 @@ const SCREENS: Record<string, () => ReactNode> = {
           />
         ))}
       </div>
-      <p className="truncate font-semibold text-[10px]">What are you shipping?</p>
-      <p className="mb-1.5 truncate text-[8px] text-slate-500">
+      <p className="truncate font-semibold text-xs">What are you shipping?</p>
+      <p className="mb-1.5 truncate text-xs text-slate-500">
         Pick a starter — agent wires the rest.
       </p>
       <div className="grid min-h-0 flex-1 grid-cols-2 content-start gap-1">
@@ -301,12 +303,12 @@ const SCREENS: Record<string, () => ReactNode> = {
                 : 'border-slate-200',
             )}
           >
-            <p className="truncate font-medium text-[9px]">{card.t}</p>
-            <p className="truncate text-[7px] text-slate-500">{card.d}</p>
+            <p className="truncate font-medium text-xs">{card.t}</p>
+            <p className="truncate text-xs text-slate-500">{card.d}</p>
           </div>
         ))}
       </div>
-      <div className="mt-auto shrink-0 rounded-md bg-blue-600 py-1.5 text-center font-medium text-[9px] text-white">
+      <div className="mt-auto shrink-0 rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
         Continue →
       </div>
     </Shell>
@@ -315,20 +317,20 @@ const SCREENS: Record<string, () => ReactNode> = {
   'idea-planner': () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Idea planner</p>
+        <p className="font-semibold text-xs">Idea planner</p>
         <Pill tone="violet">AI</Pill>
       </div>
       <div className="mb-1.5 rounded-md border border-violet-200 bg-violet-50/60 p-1.5">
-        <p className="text-[8px] text-violet-900 leading-snug">
+        <p className="text-xs text-violet-900 leading-snug">
           “Course platform with cohort chat + Stripe”
         </p>
       </div>
       <div className="space-y-1">
         {['Auth + seats', 'Checkout + tax', 'Lesson player', 'Cohort chat'].map((item, i) => (
-          <div key={item} className="flex items-center gap-1.5 text-[8px]">
+          <div key={item} className="flex items-center gap-1.5 text-xs">
             <span
               className={cn(
-                'flex size-3.5 items-center justify-center rounded border text-[7px]',
+                'flex size-3.5 items-center justify-center rounded border text-xs',
                 i < 3 ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-300',
               )}
             >
@@ -340,7 +342,7 @@ const SCREENS: Record<string, () => ReactNode> = {
       </div>
       <div className="mt-auto flex gap-1">
         <div className="h-6 flex-1 rounded border border-slate-200 bg-slate-50" />
-        <div className="h-6 rounded bg-violet-600 px-2 font-medium text-[8px] text-white leading-6">
+        <div className="h-6 rounded bg-violet-600 px-2 font-medium text-xs text-white leading-6">
           Build plan
         </div>
       </div>
@@ -357,7 +359,7 @@ const SCREENS: Record<string, () => ReactNode> = {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-2">
         <div className="flex items-center justify-between">
-          <p className="font-semibold text-[10px]">Good morning, Ava</p>
+          <p className="font-semibold text-xs">Good morning, Ava</p>
           <Pill tone="green">Live</Pill>
         </div>
         <div className="grid grid-cols-3 gap-1">
@@ -367,8 +369,8 @@ const SCREENS: Record<string, () => ReactNode> = {
             { l: 'Churn', v: '1.2%', c: 'text-amber-600' },
           ].map((s) => (
             <div key={s.l} className="rounded-md border border-slate-100 bg-slate-50/80 p-1">
-              <p className="text-[7px] text-slate-500">{s.l}</p>
-              <p className={cn('font-semibold text-[10px] tabular-nums', s.c)}>{s.v}</p>
+              <p className="text-xs text-slate-500">{s.l}</p>
+              <p className={cn('font-semibold text-xs tabular-nums', s.c)}>{s.v}</p>
             </div>
           ))}
         </div>
@@ -405,7 +407,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   'command-center': () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Command center</p>
+        <p className="font-semibold text-xs">Command center</p>
         <Pill tone="blue">3 live</Pill>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-1">
@@ -417,11 +419,11 @@ const SCREENS: Record<string, () => ReactNode> = {
         ].map((c) => (
           <div key={c.t} className="rounded-md border border-slate-100 p-1.5">
             <div className="mb-0.5 flex items-center justify-between">
-              <span className="text-[7px] text-slate-500">{c.t}</span>
+              <span className="text-xs text-slate-500">{c.t}</span>
               <Dot className={dotToneClass(c.tone)} />
             </div>
-            <p className="font-bold text-[12px] tabular-nums leading-none">{c.v}</p>
-            <p className="text-[7px] text-slate-400">{c.sub}</p>
+            <p className="font-bold text-xs tabular-nums leading-none">{c.v}</p>
+            <p className="text-xs text-slate-400">{c.sub}</p>
           </div>
         ))}
       </div>
@@ -430,9 +432,9 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'terms-of-service': () => (
     <Shell className="p-2">
-      <p className="font-semibold text-[10px]">Terms of service</p>
-      <p className="mb-1 text-[7px] text-slate-400">Last updated · Jun 2026</p>
-      <div className="space-y-1 text-[8px] text-slate-600 leading-snug">
+      <p className="font-semibold text-xs">Terms of service</p>
+      <p className="mb-1 text-xs text-slate-400">Last updated · Jun 2026</p>
+      <div className="space-y-1 text-xs text-slate-600 leading-snug">
         <p className="font-medium text-slate-800">1. Acceptance</p>
         <p className="line-clamp-2">By using VybeKiit you agree to these terms…</p>
         <p className="font-medium text-slate-800">2. License</p>
@@ -444,7 +446,7 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'privacy-policy': () => (
     <Shell className="p-2">
-      <p className="font-semibold text-[10px]">Privacy policy</p>
+      <p className="font-semibold text-xs">Privacy policy</p>
       <div className="mt-1 space-y-1">
         {[
           { t: 'Data we collect', i: 'Account, usage, payments' },
@@ -452,8 +454,8 @@ const SCREENS: Record<string, () => ReactNode> = {
           { t: 'Your rights', i: 'Export · delete · opt-out' },
         ].map((row) => (
           <div key={row.t} className="rounded-md border border-slate-100 px-1.5 py-1">
-            <p className="font-medium text-[8px]">{row.t}</p>
-            <p className="text-[7px] text-slate-500">{row.i}</p>
+            <p className="font-medium text-xs">{row.t}</p>
+            <p className="text-xs text-slate-500">{row.i}</p>
           </div>
         ))}
       </div>
@@ -467,7 +469,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           <div
             key={item}
             className={cn(
-              'rounded px-1 py-1 text-[7px]',
+              'rounded px-1 py-1 text-xs',
               i === 0 ? 'bg-white font-medium text-blue-700 shadow-sm' : 'text-slate-500',
             )}
           >
@@ -477,19 +479,19 @@ const SCREENS: Record<string, () => ReactNode> = {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-2">
         <div className="flex items-center gap-1.5">
-          <div className="flex size-8 items-center justify-center rounded-full bg-blue-100 font-semibold text-[10px] text-blue-700">
+          <div className="flex size-8 items-center justify-center rounded-full bg-blue-100 font-semibold text-xs text-blue-700">
             AS
           </div>
           <div>
-            <p className="font-semibold text-[9px]">Ava Stone</p>
-            <p className="text-[7px] text-slate-500">ava@studio.com</p>
+            <p className="font-semibold text-xs">Ava Stone</p>
+            <p className="text-xs text-slate-500">ava@studio.com</p>
           </div>
         </div>
-        <div className="rounded border border-slate-200 px-1.5 py-1 text-[8px]">Ava Stone</div>
-        <div className="rounded border border-slate-200 px-1.5 py-1 text-[8px] text-slate-400">
+        <div className="rounded border border-slate-200 px-1.5 py-1 text-xs">Ava Stone</div>
+        <div className="rounded border border-slate-200 px-1.5 py-1 text-xs text-slate-400">
           Product designer
         </div>
-        <div className="mt-auto h-5 rounded bg-blue-600 text-center font-medium text-[8px] text-white leading-5">
+        <div className="mt-auto h-5 rounded bg-blue-600 text-center font-medium text-xs text-white leading-5">
           Save changes
         </div>
       </div>
@@ -498,12 +500,12 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'account-security': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Security</p>
+      <p className="mb-1.5 font-semibold text-xs">Security</p>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between rounded-md border border-slate-100 p-1.5">
           <div>
-            <p className="font-medium text-[8px]">Two-factor auth</p>
-            <p className="text-[7px] text-slate-500">Authenticator app</p>
+            <p className="font-medium text-xs">Two-factor auth</p>
+            <p className="text-xs text-slate-500">Authenticator app</p>
           </div>
           <div className="h-3.5 w-6 rounded-full bg-emerald-500 p-0.5">
             <div className="ml-auto size-2.5 rounded-full bg-white" />
@@ -511,14 +513,14 @@ const SCREENS: Record<string, () => ReactNode> = {
         </div>
         <div className="flex items-center justify-between rounded-md border border-slate-100 p-1.5">
           <div>
-            <p className="font-medium text-[8px]">Passkeys</p>
-            <p className="text-[7px] text-slate-500">2 devices</p>
+            <p className="font-medium text-xs">Passkeys</p>
+            <p className="text-xs text-slate-500">2 devices</p>
           </div>
           <Pill tone="blue">Manage</Pill>
         </div>
         <div className="rounded-md border border-slate-100 p-1.5">
-          <p className="mb-1 font-medium text-[8px]">Sessions</p>
-          <div className="flex items-center gap-1 text-[7px] text-slate-500">
+          <p className="mb-1 font-medium text-xs">Sessions</p>
+          <div className="flex items-center gap-1 text-xs text-slate-500">
             <Dot className="bg-emerald-500" /> Mac · Chrome · Now
           </div>
         </div>
@@ -528,25 +530,25 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   pricing: () => (
     <Shell className="p-2">
-      <p className="mb-1 text-center font-semibold text-[10px]">Simple pricing</p>
+      <p className="mb-1 text-center font-semibold text-xs">Simple pricing</p>
       <div className="grid grid-cols-2 gap-1">
         <div className="rounded-md border border-slate-200 p-1.5">
-          <p className="font-medium text-[8px]">Starter</p>
-          <p className="font-bold text-[12px]">$0</p>
-          <p className="text-[7px] text-slate-500">Hobby</p>
+          <p className="font-medium text-xs">Starter</p>
+          <p className="font-bold text-xs">$0</p>
+          <p className="text-xs text-slate-500">Hobby</p>
         </div>
         <div className="rounded-md border-2 border-blue-500 bg-blue-50/50 p-1.5 ring-1 ring-blue-500/20">
           <div className="mb-0.5 flex items-center justify-between">
-            <p className="font-medium text-[8px]">Pro</p>
+            <p className="font-medium text-xs">Pro</p>
             <Pill tone="blue">Popular</Pill>
           </div>
-          <p className="font-bold text-[12px]">
-            $29<span className="font-normal text-[7px] text-slate-500">/mo</span>
+          <p className="font-bold text-xs">
+            $29<span className="font-normal text-xs text-slate-500">/mo</span>
           </p>
-          <p className="text-[7px] text-slate-500">Unlimited seats</p>
+          <p className="text-xs text-slate-500">Unlimited seats</p>
         </div>
       </div>
-      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-[9px] text-white">
+      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
         Start Pro trial
       </div>
     </Shell>
@@ -559,7 +561,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           <div
             key={item}
             className={cn(
-              'rounded px-1 py-0.5 text-[6px]',
+              'rounded px-1 py-0.5 text-xs',
               i === 0 ? 'bg-white font-medium text-blue-700 shadow-sm' : 'text-slate-500',
             )}
           >
@@ -569,7 +571,7 @@ const SCREENS: Record<string, () => ReactNode> = {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1 p-1.5">
         <div className="flex items-center gap-1">
-          <div className="min-w-0 flex-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[7px] text-slate-400">
+          <div className="min-w-0 flex-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-xs text-slate-400">
             Search products…
           </div>
           <Pill tone="muted">12</Pill>
@@ -588,14 +590,14 @@ const SCREENS: Record<string, () => ReactNode> = {
             <div key={p.n} className="overflow-hidden rounded-md border border-slate-100">
               <div className={cn('relative h-6 bg-gradient-to-br', p.c)}>
                 {p.tag ? (
-                  <span className="absolute end-0.5 top-0.5 rounded bg-white/90 px-0.5 font-semibold text-[5px] text-slate-700">
+                  <span className="absolute end-0.5 top-0.5 rounded bg-white/90 px-0.5 font-semibold text-xs text-slate-700">
                     {p.tag}
                   </span>
                 ) : null}
               </div>
               <div className="p-1">
-                <p className="truncate font-medium text-[7px]">{p.n}</p>
-                <p className="font-semibold text-[8px] tabular-nums">{p.p}</p>
+                <p className="truncate font-medium text-xs">{p.n}</p>
+                <p className="font-semibold text-xs tabular-nums">{p.p}</p>
               </div>
             </div>
           ))}
@@ -613,15 +615,15 @@ const SCREENS: Record<string, () => ReactNode> = {
             <Pill tone="blue">Lifetime</Pill>
             <Pill tone="green">In stock</Pill>
           </div>
-          <p className="font-semibold text-[10px] leading-tight">VybeKiit Lifetime</p>
-          <p className="text-[7px] text-slate-500">Web · mobile · extension</p>
+          <p className="font-semibold text-xs leading-tight">VybeKiit Lifetime</p>
+          <p className="text-xs text-slate-500">Web · mobile · extension</p>
           <div className="flex items-baseline gap-1">
-            <span className="font-bold text-[13px] tabular-nums">$29</span>
-            <span className="text-[7px] text-slate-400 line-through">$655</span>
+            <span className="font-bold text-sm tabular-nums">$29</span>
+            <span className="text-xs text-slate-400 line-through">$655</span>
           </div>
         </div>
       </div>
-      <ul className="mb-1 space-y-0.5 text-[7px] text-slate-600">
+      <ul className="mb-1 space-y-0.5 text-xs text-slate-600">
         <li className="flex items-center gap-1">
           <span className="text-emerald-600">✓</span> AI operator wired
         </li>
@@ -633,12 +635,12 @@ const SCREENS: Record<string, () => ReactNode> = {
         </li>
       </ul>
       <div className="mt-auto flex gap-1">
-        <div className="flex items-center rounded border border-slate-200 text-[8px]">
+        <div className="flex items-center rounded border border-slate-200 text-xs">
           <span className="px-1.5 text-slate-400">−</span>
           <span className="border-slate-200 border-x px-1.5 font-medium tabular-nums">1</span>
           <span className="px-1.5 text-slate-400">+</span>
         </div>
-        <div className="flex-1 rounded-md bg-blue-600 py-1.5 text-center font-medium text-[9px] text-white">
+        <div className="flex-1 rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
           Add to cart
         </div>
       </div>
@@ -648,7 +650,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   cart: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Cart</p>
+        <p className="font-semibold text-xs">Cart</p>
         <Pill tone="muted">2 items</Pill>
       </div>
       {[
@@ -661,18 +663,18 @@ const SCREENS: Record<string, () => ReactNode> = {
         >
           <div className={cn('size-7 shrink-0 rounded bg-gradient-to-br', item.c)} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-[8px]">{item.n}</p>
+            <p className="truncate font-medium text-xs">{item.n}</p>
             <div className="mt-0.5 flex items-center gap-1">
-              <span className="rounded border border-slate-200 px-1 text-[6px] text-slate-500 tabular-nums">
+              <span className="rounded border border-slate-200 px-1 text-xs text-slate-500 tabular-nums">
                 qty {item.q}
               </span>
-              <span className="font-semibold text-[8px] tabular-nums">{item.p}</span>
+              <span className="font-semibold text-xs tabular-nums">{item.p}</span>
             </div>
           </div>
-          <span className="text-[9px] text-slate-300">×</span>
+          <span className="text-xs text-slate-300">×</span>
         </div>
       ))}
-      <div className="mt-auto space-y-0.5 border-slate-100 border-t pt-1.5 text-[7px]">
+      <div className="mt-auto space-y-0.5 border-slate-100 border-t pt-1.5 text-xs">
         <div className="flex justify-between text-slate-500">
           <span>Subtotal</span>
           <span className="tabular-nums">$48</span>
@@ -682,11 +684,11 @@ const SCREENS: Record<string, () => ReactNode> = {
           <span className="tabular-nums">Included</span>
         </div>
         <div className="flex items-center justify-between pt-0.5">
-          <span className="font-medium text-[8px]">Total</span>
-          <span className="font-bold text-[11px] tabular-nums">$48</span>
+          <span className="font-medium text-xs">Total</span>
+          <span className="font-bold text-xs tabular-nums">$48</span>
         </div>
       </div>
-      <div className="rounded-md bg-blue-600 py-1.5 text-center font-medium text-[9px] text-white">
+      <div className="rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
         Checkout
       </div>
     </Shell>
@@ -695,32 +697,32 @@ const SCREENS: Record<string, () => ReactNode> = {
   checkout: () => (
     <Shell className="p-2">
       <div className="mb-1 flex min-w-0 items-center justify-between gap-1">
-        <p className="min-w-0 truncate font-semibold text-[10px]">Checkout</p>
+        <p className="min-w-0 truncate font-semibold text-xs">Checkout</p>
         <div className="flex shrink-0 items-center gap-1">
           <MiniBrand className="size-3" slug="stripe" />
           <Pill tone="green">Secure</Pill>
         </div>
       </div>
       <div className="mb-1.5 rounded-md border border-slate-100 bg-slate-50 p-1.5">
-        <p className="truncate font-medium text-[8px]">VybeKiit Lifetime</p>
-        <p className="font-bold text-[12px] tabular-nums leading-tight">$29.00</p>
-        <p className="truncate text-[7px] text-slate-500">Tax handled · MoR</p>
+        <p className="truncate font-medium text-xs">VybeKiit Lifetime</p>
+        <p className="font-bold text-xs tabular-nums leading-tight">$29.00</p>
+        <p className="truncate text-xs text-slate-500">Tax handled · MoR</p>
       </div>
       <div className="space-y-1">
-        <div className="flex min-w-0 items-center gap-1 rounded border border-slate-200 px-1.5 py-1 text-[8px]">
-          <span className="shrink-0 rounded bg-slate-800 px-1 text-[6px] text-white">VISA</span>
+        <div className="flex min-w-0 items-center gap-1 rounded border border-slate-200 px-1.5 py-1 text-xs">
+          <span className="shrink-0 rounded bg-slate-800 px-1 text-xs text-white">VISA</span>
           <span className="truncate tabular-nums">···· 4242</span>
         </div>
         <div className="grid grid-cols-2 gap-1">
-          <div className="min-w-0 truncate rounded border border-slate-200 px-1.5 py-1 text-[8px] text-slate-400">
+          <div className="min-w-0 truncate rounded border border-slate-200 px-1.5 py-1 text-xs text-slate-400">
             12 / 28
           </div>
-          <div className="min-w-0 truncate rounded border border-slate-200 px-1.5 py-1 text-[8px] text-slate-400">
+          <div className="min-w-0 truncate rounded border border-slate-200 px-1.5 py-1 text-xs text-slate-400">
             CVC
           </div>
         </div>
       </div>
-      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-[8px] text-white">
+      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
         Pay $29.00
       </div>
     </Shell>
@@ -729,7 +731,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   orders: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between gap-1">
-        <p className="min-w-0 truncate font-semibold text-[10px]">Orders</p>
+        <p className="min-w-0 truncate font-semibold text-xs">Orders</p>
         <div className="flex items-center gap-0.5">
           <Pill tone="muted">This week</Pill>
           <Pill tone="blue">Export</Pill>
@@ -742,12 +744,12 @@ const SCREENS: Record<string, () => ReactNode> = {
           { l: 'MRR', v: '$348', c: '' },
         ].map((s) => (
           <div key={s.l} className="min-w-0 rounded-md border border-slate-100 bg-slate-50/80 p-1">
-            <p className="truncate text-[6px] text-slate-500">{s.l}</p>
-            <p className={cn('truncate font-semibold text-[9px] tabular-nums', s.c)}>{s.v}</p>
+            <p className="truncate text-xs text-slate-500">{s.l}</p>
+            <p className={cn('truncate font-semibold text-xs tabular-nums', s.c)}>{s.v}</p>
           </div>
         ))}
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded border border-slate-100 text-[7px]">
+      <div className="min-h-0 flex-1 overflow-hidden rounded border border-slate-100 text-xs">
         <div className="grid grid-cols-[auto_1fr_auto_auto] gap-1 bg-slate-50 px-1.5 py-1 font-medium text-slate-500">
           <span>ID</span>
           <span>Customer</span>
@@ -775,7 +777,7 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'launch-checklist': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Launch checklist</p>
+      <p className="mb-1.5 font-semibold text-xs">Launch checklist</p>
       {[
         { t: 'Domain connected', d: true },
         { t: 'Payments live', d: true },
@@ -783,10 +785,10 @@ const SCREENS: Record<string, () => ReactNode> = {
         { t: 'Email domain', d: false },
         { t: 'Analytics pixel', d: false },
       ].map((item) => (
-        <div key={item.t} className="mb-1 flex items-center gap-1.5 text-[8px]">
+        <div key={item.t} className="mb-1 flex items-center gap-1.5 text-xs">
           <span
             className={cn(
-              'flex size-3.5 items-center justify-center rounded-full text-[7px]',
+              'flex size-3.5 items-center justify-center rounded-full text-xs',
               item.d ? 'bg-emerald-500 text-white' : 'border border-slate-300',
             )}
           >
@@ -795,7 +797,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           <span className={item.d ? 'text-slate-700' : 'text-slate-400'}>{item.t}</span>
         </div>
       ))}
-      <p className="mt-auto text-[7px] text-slate-400">3 of 5 ready · 60%</p>
+      <p className="mt-auto text-xs text-slate-400">3 of 5 ready · 60%</p>
       <div className="h-1 overflow-hidden rounded-full bg-slate-100">
         <div className="h-full w-3/5 rounded-full bg-blue-600" />
       </div>
@@ -805,7 +807,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   'file-manager': () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Files</p>
+        <p className="font-semibold text-xs">Files</p>
         <Pill tone="blue">Upload</Pill>
       </div>
       <div className="grid grid-cols-3 gap-1">
@@ -819,7 +821,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         ].map((f) => (
           <div key={f.n} className="overflow-hidden rounded border border-slate-100">
             <div className={cn('h-8 bg-gradient-to-br', f.c)} />
-            <p className="truncate px-0.5 py-0.5 text-[6px] text-slate-600">{f.n}</p>
+            <p className="truncate px-0.5 py-0.5 text-xs text-slate-600">{f.n}</p>
           </div>
         ))}
       </div>
@@ -828,14 +830,14 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'email-notifications': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Email notifications</p>
+      <p className="mb-1.5 font-semibold text-xs">Email notifications</p>
       {[
         { t: 'Welcome series', on: true },
         { t: 'Payment receipts', on: true },
         { t: 'Weekly digest', on: false },
         { t: 'Product tips', on: true },
       ].map((row) => (
-        <div key={row.t} className="mb-1 flex items-center justify-between text-[8px]">
+        <div key={row.t} className="mb-1 flex items-center justify-between text-xs">
           <span>{row.t}</span>
           <div
             className={cn('h-3.5 w-6 rounded-full p-0.5', row.on ? 'bg-blue-600' : 'bg-slate-200')}
@@ -851,7 +853,7 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'notifications-center': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Notifications</p>
+      <p className="mb-1.5 font-semibold text-xs">Notifications</p>
       {[
         { t: 'New payment · $29', m: '2m', tone: 'green' as const },
         { t: 'Deploy succeeded', m: '14m', tone: 'blue' as const },
@@ -860,8 +862,8 @@ const SCREENS: Record<string, () => ReactNode> = {
         <div key={n.t} className="mb-1 flex gap-1.5 rounded-md border border-slate-100 p-1.5">
           <Dot className={dotToneClass(n.tone, 'mt-1')} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-[8px]">{n.t}</p>
-            <p className="text-[7px] text-slate-400">{n.m} ago</p>
+            <p className="truncate font-medium text-xs">{n.t}</p>
+            <p className="text-xs text-slate-400">{n.m} ago</p>
           </div>
         </div>
       ))}
@@ -870,8 +872,8 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'support-center': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Support</p>
-      <div className="mb-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1.5 text-[8px] text-slate-400">
+      <p className="mb-1.5 font-semibold text-xs">Support</p>
+      <div className="mb-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs text-slate-400">
         Search help articles…
       </div>
       <div className="space-y-1">
@@ -879,7 +881,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           (a) => (
             <div
               key={a}
-              className="flex items-center justify-between rounded border border-slate-100 px-1.5 py-1 text-[8px]"
+              className="flex items-center justify-between rounded border border-slate-100 px-1.5 py-1 text-xs"
             >
               <span>{a}</span>
               <span className="text-slate-300">›</span>
@@ -893,7 +895,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   integrations: () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between gap-1">
-        <p className="min-w-0 truncate font-semibold text-[10px]">Integrations</p>
+        <p className="min-w-0 truncate font-semibold text-xs">Integrations</p>
         <Pill tone="muted">4 apps</Pill>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-1">
@@ -912,10 +914,10 @@ const SCREENS: Record<string, () => ReactNode> = {
             <div className="mb-1 flex size-6 items-center justify-center rounded-md border border-slate-100 bg-white shadow-sm">
               <MiniBrand className="size-3.5" slug={app.slug} />
             </div>
-            <p className="truncate font-medium text-[8px] leading-tight">{app.n}</p>
+            <p className="truncate font-medium text-xs leading-tight">{app.n}</p>
             <p
               className={cn(
-                'mt-0.5 truncate font-medium text-[7px] leading-none',
+                'mt-0.5 truncate font-medium text-xs leading-none',
                 app.s === 'Connected' ? 'text-emerald-600' : 'text-blue-600',
               )}
             >
@@ -930,8 +932,8 @@ const SCREENS: Record<string, () => ReactNode> = {
   teams: () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Team</p>
-        <span className="rounded bg-blue-600 px-1.5 py-0.5 font-medium text-[7px] text-white">
+        <p className="font-semibold text-xs">Team</p>
+        <span className="rounded bg-blue-600 px-1.5 py-0.5 font-medium text-xs text-white">
           Invite
         </span>
       </div>
@@ -944,11 +946,11 @@ const SCREENS: Record<string, () => ReactNode> = {
           key={m.n}
           className="mb-1 flex items-center gap-1.5 rounded-md border border-slate-100 px-1.5 py-1"
         >
-          <span className="flex size-5 items-center justify-center rounded-full bg-slate-100 font-semibold text-[7px]">
+          <span className="flex size-5 items-center justify-center rounded-full bg-slate-100 font-semibold text-xs">
             {m.a}
           </span>
-          <span className="min-w-0 flex-1 truncate font-medium text-[8px]">{m.n}</span>
-          <span className="text-[7px] text-slate-400">{m.r}</span>
+          <span className="min-w-0 flex-1 truncate font-medium text-xs">{m.n}</span>
+          <span className="text-xs text-slate-400">{m.r}</span>
         </div>
       ))}
     </Shell>
@@ -957,7 +959,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   analytics: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Analytics</p>
+        <p className="font-semibold text-xs">Analytics</p>
         <Pill tone="muted">7d</Pill>
       </div>
       <div className="mb-1 grid grid-cols-3 gap-1">
@@ -967,8 +969,8 @@ const SCREENS: Record<string, () => ReactNode> = {
           { l: 'Conv.', v: '3.8%' },
         ].map((s) => (
           <div key={s.l} className="rounded border border-slate-100 p-1">
-            <p className="text-[6px] text-slate-500">{s.l}</p>
-            <p className="font-semibold text-[10px] tabular-nums">{s.v}</p>
+            <p className="text-xs text-slate-500">{s.l}</p>
+            <p className="font-semibold text-xs tabular-nums">{s.v}</p>
           </div>
         ))}
       </div>
@@ -994,7 +996,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         <div className="mt-auto h-1.5 w-full rounded bg-white/20" />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1 p-2">
-        <p className="font-semibold text-[10px]">Admin overview</p>
+        <p className="font-semibold text-xs">Admin overview</p>
         <div className="grid grid-cols-2 gap-1">
           {[
             { l: 'Users', v: '4,201' },
@@ -1003,8 +1005,8 @@ const SCREENS: Record<string, () => ReactNode> = {
             { l: 'Flags', v: '12' },
           ].map((c) => (
             <div key={c.l} className="rounded border border-slate-100 bg-slate-50 p-1">
-              <p className="text-[6px] text-slate-500">{c.l}</p>
-              <p className="font-semibold text-[10px]">{c.v}</p>
+              <p className="text-xs text-slate-500">{c.l}</p>
+              <p className="font-semibold text-xs">{c.v}</p>
             </div>
           ))}
         </div>
@@ -1015,12 +1017,12 @@ const SCREENS: Record<string, () => ReactNode> = {
   'user-management': () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Users</p>
-        <div className="rounded border border-slate-200 px-1.5 py-0.5 text-[7px] text-slate-400">
+        <p className="font-semibold text-xs">Users</p>
+        <div className="rounded border border-slate-200 px-1.5 py-0.5 text-xs text-slate-400">
           Search…
         </div>
       </div>
-      <div className="overflow-hidden rounded border border-slate-100 text-[7px]">
+      <div className="overflow-hidden rounded border border-slate-100 text-xs">
         <div className="grid grid-cols-[1fr_auto_auto] gap-1 bg-slate-50 px-1.5 py-1 font-medium text-slate-500">
           <span>Email</span>
           <span>Role</span>
@@ -1046,14 +1048,14 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'audit-log': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Audit log</p>
+      <p className="mb-1.5 font-semibold text-xs">Audit log</p>
       {[
         { a: 'role.changed', u: 'ava@…', t: '2m' },
         { a: 'user.invited', u: 'system', t: '18m' },
         { a: 'flag.enabled', u: 'noah@…', t: '1h' },
         { a: 'billing.updated', u: 'ava@…', t: '3h' },
       ].map((row) => (
-        <div key={row.a + row.t} className="mb-1 flex items-center gap-1 font-mono text-[7px]">
+        <div key={row.a + row.t} className="mb-1 flex items-center gap-1 font-mono text-xs">
           <span className="text-slate-400">{row.t}</span>
           <span className="rounded bg-slate-100 px-1 text-slate-700">{row.a}</span>
           <span className="ms-auto truncate text-slate-500">{row.u}</span>
@@ -1064,13 +1066,13 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'billing-admin': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Billing admin</p>
+      <p className="mb-1.5 font-semibold text-xs">Billing admin</p>
       <div className="mb-1.5 rounded-md border border-emerald-200 bg-emerald-50/60 p-1.5">
-        <p className="text-[7px] text-emerald-700">MRR</p>
-        <p className="font-bold text-[14px] text-emerald-800 tabular-nums">$84,220</p>
-        <p className="text-[7px] text-emerald-600">+12.4% vs last month</p>
+        <p className="text-xs text-emerald-700">MRR</p>
+        <p className="font-bold text-sm text-emerald-800 tabular-nums">$84,220</p>
+        <p className="text-xs text-emerald-600">+12.4% vs last month</p>
       </div>
-      <div className="space-y-1 text-[8px]">
+      <div className="space-y-1 text-xs">
         <div className="flex justify-between">
           <span className="text-slate-500">Failed charges</span>
           <span className="font-medium text-amber-700">3</span>
@@ -1086,7 +1088,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   'system-health': () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">System health</p>
+        <p className="font-semibold text-xs">System health</p>
         <Pill tone="green">All green</Pill>
       </div>
       {[
@@ -1095,7 +1097,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         { n: 'Workers', ms: 'ok', ok: true },
         { n: 'CDN', ms: '18ms', ok: true },
       ].map((s) => (
-        <div key={s.n} className="mb-1 flex items-center gap-1.5 text-[8px]">
+        <div key={s.n} className="mb-1 flex items-center gap-1.5 text-xs">
           <Dot className="bg-emerald-500" />
           <span className="font-medium">{s.n}</span>
           <span className="ms-auto text-slate-400 tabular-nums">{s.ms}</span>
@@ -1106,8 +1108,8 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'role-permissions': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Roles</p>
-      <div className="overflow-hidden rounded border border-slate-100 text-[7px]">
+      <p className="mb-1.5 font-semibold text-xs">Roles</p>
+      <div className="overflow-hidden rounded border border-slate-100 text-xs">
         <div className="grid grid-cols-4 gap-0.5 bg-slate-50 px-1 py-1 font-medium text-slate-500">
           <span />
           <span>Read</span>
@@ -1131,10 +1133,10 @@ const SCREENS: Record<string, () => ReactNode> = {
   customers: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between gap-1">
-        <p className="font-semibold text-[10px]">Customers</p>
+        <p className="font-semibold text-xs">Customers</p>
         <div className="flex items-center gap-0.5">
           <Pill tone="muted">248</Pill>
-          <span className="rounded bg-blue-600 px-1.5 py-0.5 font-medium text-[6px] text-white">
+          <span className="rounded bg-blue-600 px-1.5 py-0.5 font-medium text-xs text-white">
             Add
           </span>
         </div>
@@ -1144,7 +1146,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         <Pill tone="muted">Pro</Pill>
         <Pill tone="muted">Trial</Pill>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded border border-slate-100 text-[7px]">
+      <div className="min-h-0 flex-1 overflow-hidden rounded border border-slate-100 text-xs">
         <div className="grid grid-cols-[1fr_auto_auto] gap-1 bg-slate-50 px-1.5 py-1 font-medium text-slate-500">
           <span>Account</span>
           <span>Plan</span>
@@ -1160,7 +1162,7 @@ const SCREENS: Record<string, () => ReactNode> = {
             className="grid grid-cols-[1fr_auto_auto] items-center gap-1 border-slate-50 border-t px-1.5 py-1"
           >
             <div className="flex min-w-0 items-center gap-1">
-              <span className="flex size-4 shrink-0 items-center justify-center rounded bg-slate-100 font-bold text-[6px]">
+              <span className="flex size-4 shrink-0 items-center justify-center rounded bg-slate-100 font-bold text-xs">
                 {c.n[0]}
               </span>
               <span className="truncate font-medium">{c.n}</span>
@@ -1176,12 +1178,12 @@ const SCREENS: Record<string, () => ReactNode> = {
   'customer-detail': () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center gap-1.5">
-        <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 font-bold text-[10px] text-indigo-700">
+        <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 font-bold text-xs text-indigo-700">
           A
         </span>
         <div>
-          <p className="font-semibold text-[10px]">Acme Labs</p>
-          <p className="text-[7px] text-slate-500">billing@acme.io · Pro</p>
+          <p className="font-semibold text-xs">Acme Labs</p>
+          <p className="text-xs text-slate-500">billing@acme.io · Pro</p>
         </div>
       </div>
       <div className="mb-1 grid grid-cols-3 gap-1 text-center">
@@ -1191,21 +1193,21 @@ const SCREENS: Record<string, () => ReactNode> = {
           { l: 'NPS', v: '72' },
         ].map((s) => (
           <div key={s.l} className="rounded border border-slate-100 p-1">
-            <p className="text-[6px] text-slate-500">{s.l}</p>
-            <p className="font-semibold text-[9px]">{s.v}</p>
+            <p className="text-xs text-slate-500">{s.l}</p>
+            <p className="font-semibold text-xs">{s.v}</p>
           </div>
         ))}
       </div>
-      <p className="mb-0.5 font-medium text-[7px] text-slate-500">Activity</p>
-      <p className="text-[7px] text-slate-600">Upgraded to Pro · 3d ago</p>
-      <p className="text-[7px] text-slate-600">Invited 4 seats · 1w ago</p>
+      <p className="mb-0.5 font-medium text-xs text-slate-500">Activity</p>
+      <p className="text-xs text-slate-600">Upgraded to Pro · 3d ago</p>
+      <p className="text-xs text-slate-600">Invited 4 seats · 1w ago</p>
     </Shell>
   ),
 
   pipeline: () => (
     <Shell className="p-1.5">
       <div className="mb-1 flex items-center justify-between px-0.5">
-        <p className="font-semibold text-[10px]">Pipeline</p>
+        <p className="font-semibold text-xs">Pipeline</p>
         <div className="flex items-center gap-0.5">
           <Pill tone="muted">$42k</Pill>
           <Pill tone="green">4 deals</Pill>
@@ -1234,16 +1236,16 @@ const SCREENS: Record<string, () => ReactNode> = {
         ].map((col) => (
           <div key={col.col} className="flex min-h-0 flex-col gap-1 rounded-md bg-slate-50 p-1">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-[7px] text-slate-500">{col.col}</p>
-              <span className="text-[6px] text-slate-400 tabular-nums">{col.n}</span>
+              <p className="font-medium text-xs text-slate-500">{col.col}</p>
+              <span className="text-xs text-slate-400 tabular-nums">{col.n}</span>
             </div>
             {col.cards.map((card) => (
               <div
                 key={card.t}
                 className="rounded border border-slate-200 bg-white px-1 py-1 shadow-sm"
               >
-                <p className="truncate font-medium text-[7px]">{card.t}</p>
-                <p className="text-[6px] text-slate-400 tabular-nums">{card.v}</p>
+                <p className="truncate font-medium text-xs">{card.t}</p>
+                <p className="text-xs text-slate-400 tabular-nums">{card.v}</p>
               </div>
             ))}
           </div>
@@ -1256,14 +1258,14 @@ const SCREENS: Record<string, () => ReactNode> = {
     <Shell className="p-2">
       <div className="mb-1 flex items-center gap-1">
         <span className="size-4 rounded-full bg-gradient-to-br from-violet-500 to-blue-500" />
-        <p className="font-semibold text-[10px]">AI assistant</p>
+        <p className="font-semibold text-xs">AI assistant</p>
         <Pill tone="violet">Online</Pill>
       </div>
       <div className="me-auto max-w-[88%] rounded-2xl rounded-bl-sm bg-slate-100 px-2 py-1.5">
-        <p className="text-[8px]">Generate a hero image for my SaaS landing</p>
+        <p className="text-xs">Generate a hero image for my SaaS landing</p>
       </div>
       <div className="ms-auto max-w-[90%] rounded-2xl rounded-br-sm bg-blue-600 px-2 py-1.5 text-white">
-        <p className="text-[8px]">On it — drafting 3 variants…</p>
+        <p className="text-xs">On it — drafting 3 variants…</p>
       </div>
       <div className="me-auto mt-0.5 flex max-w-[90%] gap-1">
         {[
@@ -1275,7 +1277,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         ))}
       </div>
       <div className="mt-auto flex items-center gap-1 rounded-full border border-slate-200 px-2 py-1">
-        <span className="flex-1 text-[7px] text-slate-400">Message or /generate…</span>
+        <span className="flex-1 text-xs text-slate-400">Message or /generate…</span>
         <span className="size-4 rounded-full bg-blue-600" />
       </div>
     </Shell>
@@ -1284,15 +1286,13 @@ const SCREENS: Record<string, () => ReactNode> = {
   search: () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/40 px-2 py-1.5 shadow-sm ring-2 ring-blue-500/15">
-        <span className="text-[9px] text-slate-400">⌕</span>
-        <span className="text-[9px] text-slate-800">checkout flow</span>
-        <span className="ms-auto rounded bg-white/80 px-1 font-medium text-[6px] text-slate-400">
+        <span className="text-xs text-slate-400">⌕</span>
+        <span className="text-xs text-slate-800">checkout flow</span>
+        <span className="ms-auto rounded bg-white/80 px-1 font-medium text-xs text-slate-400">
           ⌘K
         </span>
       </div>
-      <p className="mb-0.5 font-semibold text-[6px] text-slate-400 uppercase tracking-wide">
-        Pages
-      </p>
+      <p className="mb-0.5 font-semibold text-xs text-slate-400 uppercase tracking-wide">Pages</p>
       {[
         { t: 'Checkout page', g: 'Commerce', h: 'Pay $29 securely' },
         { t: 'Orders list', g: 'Commerce', h: 'Paid · refunds' },
@@ -1302,19 +1302,17 @@ const SCREENS: Record<string, () => ReactNode> = {
           className="mb-1 flex items-center gap-1.5 rounded-md border border-slate-100 bg-slate-50/50 px-1.5 py-1"
         >
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-[8px]">{r.t}</p>
-            <p className="truncate text-[6px] text-slate-400">{r.h}</p>
+            <p className="truncate font-medium text-xs">{r.t}</p>
+            <p className="truncate text-xs text-slate-400">{r.h}</p>
           </div>
           <Pill tone="muted">{r.g}</Pill>
         </div>
       ))}
-      <p className="mb-0.5 font-semibold text-[6px] text-slate-400 uppercase tracking-wide">
-        Admin
-      </p>
+      <p className="mb-0.5 font-semibold text-xs text-slate-400 uppercase tracking-wide">Admin</p>
       <div className="flex items-center gap-1.5 rounded-md border border-slate-100 px-1.5 py-1">
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-[8px]">Billing admin</p>
-          <p className="truncate text-[6px] text-slate-400">MRR · failed charges</p>
+          <p className="truncate font-medium text-xs">Billing admin</p>
+          <p className="truncate text-xs text-slate-400">MRR · failed charges</p>
         </div>
         <Pill tone="blue">Admin</Pill>
       </div>
@@ -1324,8 +1322,8 @@ const SCREENS: Record<string, () => ReactNode> = {
   realtime: () => (
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Live activity</p>
-        <span className="flex items-center gap-1 text-[7px] text-emerald-600">
+        <p className="font-semibold text-xs">Live activity</p>
+        <span className="flex items-center gap-1 text-xs text-emerald-600">
           <Dot className="animate-pulse bg-emerald-500" /> Live
         </span>
       </div>
@@ -1335,7 +1333,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         { e: 'deploy.finished', t: '12s' },
         { e: 'agent.step_done', t: '21s' },
       ].map((row) => (
-        <div key={row.e} className="mb-1 flex items-center gap-1 font-mono text-[7px]">
+        <div key={row.e} className="mb-1 flex items-center gap-1 font-mono text-xs">
           <Dot className="bg-blue-500" />
           <span className="text-slate-700">{row.e}</span>
           <span className="ms-auto text-slate-400">{row.t}</span>
@@ -1347,7 +1345,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   tasks: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Tasks</p>
+        <p className="font-semibold text-xs">Tasks</p>
         <div className="flex items-center gap-0.5">
           <Pill tone="muted">4</Pill>
           <Pill tone="amber">2 open</Pill>
@@ -1365,11 +1363,11 @@ const SCREENS: Record<string, () => ReactNode> = {
       ].map((task) => (
         <div
           key={task.t}
-          className="mb-1 flex items-center gap-1.5 rounded-md border border-slate-100 px-1.5 py-1 text-[8px]"
+          className="mb-1 flex items-center gap-1.5 rounded-md border border-slate-100 px-1.5 py-1 text-xs"
         >
           <span
             className={cn(
-              'flex size-3.5 shrink-0 items-center justify-center rounded border text-[7px]',
+              'flex size-3.5 shrink-0 items-center justify-center rounded border text-xs',
               task.d ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-300',
             )}
           >
@@ -1392,16 +1390,16 @@ const SCREENS: Record<string, () => ReactNode> = {
   calendar: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">March 2026</p>
+        <p className="font-semibold text-xs">March 2026</p>
         <Pill tone="blue">Today</Pill>
       </div>
-      <div className="mb-1 grid grid-cols-7 gap-0.5 text-center text-[6px] text-slate-400">
+      <div className="mb-1 grid grid-cols-7 gap-0.5 text-center text-xs text-slate-400">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static weekday labels
           <span key={i}>{d}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-0.5 text-center text-[7px]">
+      <div className="grid grid-cols-7 gap-0.5 text-center text-xs">
         {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
           <span
             key={day}
@@ -1415,7 +1413,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           </span>
         ))}
       </div>
-      <div className="mt-1 rounded border border-blue-100 bg-blue-50/50 px-1.5 py-1 text-[7px]">
+      <div className="mt-1 rounded border border-blue-100 bg-blue-50/50 px-1.5 py-1 text-xs">
         <span className="font-medium text-blue-800">10:00</span> Launch review
       </div>
     </Shell>
@@ -1424,16 +1422,16 @@ const SCREENS: Record<string, () => ReactNode> = {
   blog: () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Blog</p>
+        <p className="font-semibold text-xs">Blog</p>
         <div className="flex gap-0.5">
           <Pill tone="blue">Product</Pill>
           <Pill tone="muted">Guides</Pill>
         </div>
       </div>
       <div className="mb-1.5 h-12 rounded-md bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-700 p-1.5">
-        <p className="font-medium text-[6px] text-white/60 uppercase tracking-wide">Featured</p>
-        <p className="font-semibold text-[9px] text-white leading-tight">Ship like an engineer</p>
-        <p className="mt-0.5 text-[6px] text-white/55">8 min · Ava Stone</p>
+        <p className="font-medium text-xs text-white/60 uppercase tracking-wide">Featured</p>
+        <p className="font-semibold text-xs text-white leading-tight">Ship like an engineer</p>
+        <p className="mt-0.5 text-xs text-white/55">8 min · Ava Stone</p>
       </div>
       {[
         { t: 'Session one to first $', m: '4 min', tag: 'Story' },
@@ -1445,10 +1443,10 @@ const SCREENS: Record<string, () => ReactNode> = {
         >
           <div className="size-6 shrink-0 rounded bg-gradient-to-br from-slate-200 to-slate-300" />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium text-[8px] leading-tight">{post.t}</p>
+            <p className="truncate font-medium text-xs leading-tight">{post.t}</p>
             <div className="mt-0.5 flex items-center gap-1">
               <Pill tone="muted">{post.tag}</Pill>
-              <span className="text-[6px] text-slate-400">{post.m}</span>
+              <span className="text-xs text-slate-400">{post.m}</span>
             </div>
           </div>
         </div>
@@ -1459,7 +1457,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   'media-gallery': () => (
     <Shell className="p-2">
       <div className="mb-1 flex items-center justify-between">
-        <p className="font-semibold text-[10px]">Media</p>
+        <p className="font-semibold text-xs">Media</p>
         <Pill tone="violet">Generate</Pill>
       </div>
       <div className="grid grid-cols-3 gap-1">
@@ -1484,7 +1482,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           <div
             key={item}
             className={cn(
-              'rounded px-1 py-0.5 text-[7px]',
+              'rounded px-1 py-0.5 text-xs',
               i === 1 ? 'bg-white font-medium text-blue-700 shadow-sm' : 'text-slate-500',
             )}
           >
@@ -1493,11 +1491,11 @@ const SCREENS: Record<string, () => ReactNode> = {
         ))}
       </div>
       <div className="min-w-0 flex-1 p-2">
-        <p className="font-semibold text-[10px]">Authentication</p>
-        <p className="mt-1 text-[7px] text-slate-500 leading-snug">
+        <p className="font-semibold text-xs">Authentication</p>
+        <p className="mt-1 text-xs text-slate-500 leading-snug">
           Wire OAuth providers in one skill. Google, GitHub, and magic link ship ready.
         </p>
-        <div className="mt-1.5 rounded bg-slate-900 p-1.5 font-mono text-[6px] text-emerald-400">
+        <div className="mt-1.5 rounded bg-slate-900 p-1.5 font-mono text-xs text-emerald-400">
           pnpm vybekiit auth add google
         </div>
       </div>
@@ -1508,7 +1506,7 @@ const SCREENS: Record<string, () => ReactNode> = {
     <Shell className="p-2">
       <div className="mb-1.5 flex items-center gap-1.5">
         <Dot className="size-2 bg-emerald-500" />
-        <p className="font-semibold text-[10px]">All systems operational</p>
+        <p className="font-semibold text-xs">All systems operational</p>
       </div>
       {[
         { n: 'API', u: '99.99%' },
@@ -1516,7 +1514,7 @@ const SCREENS: Record<string, () => ReactNode> = {
         { n: 'Checkout', u: '100%' },
         { n: 'Webhooks', u: '99.95%' },
       ].map((s) => (
-        <div key={s.n} className="mb-1 flex items-center gap-1.5 text-[8px]">
+        <div key={s.n} className="mb-1 flex items-center gap-1.5 text-xs">
           <Dot className="bg-emerald-500" />
           <span>{s.n}</span>
           <span className="ms-auto text-slate-400 tabular-nums">{s.u}</span>
@@ -1527,7 +1525,7 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   changelog: () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Changelog</p>
+      <p className="mb-1.5 font-semibold text-xs">Changelog</p>
       {[
         { v: 'v1.4.0', n: 'Page recipes + mobile polish', d: 'Mar 8' },
         { v: 'v1.3.2', n: 'Faster checkout webhooks', d: 'Mar 1' },
@@ -1536,9 +1534,9 @@ const SCREENS: Record<string, () => ReactNode> = {
         <div key={c.v} className="mb-1.5 border-blue-500 border-s-2 ps-1.5">
           <div className="flex items-center gap-1">
             <Pill tone="blue">{c.v}</Pill>
-            <span className="text-[7px] text-slate-400">{c.d}</span>
+            <span className="text-xs text-slate-400">{c.d}</span>
           </div>
-          <p className="mt-0.5 text-[8px] text-slate-700">{c.n}</p>
+          <p className="mt-0.5 text-xs text-slate-700">{c.n}</p>
         </div>
       ))}
     </Shell>
@@ -1546,17 +1544,17 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   safety: () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Safety & abuse</p>
+      <p className="mb-1.5 font-semibold text-xs">Safety & abuse</p>
       <div className="mb-1 rounded-md border border-emerald-200 bg-emerald-50/50 p-1.5">
-        <p className="font-medium text-[8px] text-emerald-800">Risk score · Low</p>
-        <p className="text-[7px] text-emerald-700">No open flags</p>
+        <p className="font-medium text-xs text-emerald-800">Risk score · Low</p>
+        <p className="text-xs text-emerald-700">No open flags</p>
       </div>
       {[
         { t: 'Rate limits', s: 'On' },
         { t: 'Content filter', s: 'On' },
         { t: 'PII redaction', s: 'On' },
       ].map((r) => (
-        <div key={r.t} className="mb-0.5 flex justify-between text-[8px]">
+        <div key={r.t} className="mb-0.5 flex justify-between text-xs">
           <span>{r.t}</span>
           <span className="font-medium text-emerald-600">{r.s}</span>
         </div>
@@ -1566,22 +1564,22 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'brand-assets': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Brand kit</p>
+      <p className="mb-1.5 font-semibold text-xs">Brand kit</p>
       <div className="mb-1.5 flex gap-1">
         {['#2563EB', '#0F172A', '#10B981', '#F59E0B'].map((hex) => (
           <div key={hex} className="flex-1">
             <div className="mb-0.5 h-6 rounded" style={{ backgroundColor: hex }} />
-            <p className="text-center font-mono text-[6px] text-slate-500">{hex}</p>
+            <p className="text-center font-mono text-xs text-slate-500">{hex}</p>
           </div>
         ))}
       </div>
       <div className="flex items-center gap-2 rounded border border-slate-100 p-1.5">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-blue-600 font-bold text-[11px] text-white">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-blue-600 font-bold text-xs text-white">
           V
         </div>
         <div>
-          <p className="font-medium text-[8px]">Logo mark</p>
-          <p className="text-[7px] text-slate-400">SVG · PNG · 2x</p>
+          <p className="font-medium text-xs">Logo mark</p>
+          <p className="text-xs text-slate-400">SVG · PNG · 2x</p>
         </div>
       </div>
     </Shell>
@@ -1589,7 +1587,7 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   language: () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Language</p>
+      <p className="mb-1.5 font-semibold text-xs">Language</p>
       {[
         { l: 'English', n: 'Default', on: true },
         { l: 'Español', n: 'Spanish', on: false },
@@ -1599,13 +1597,13 @@ const SCREENS: Record<string, () => ReactNode> = {
         <div
           key={lang.l}
           className={cn(
-            'mb-1 flex items-center justify-between rounded-md border px-1.5 py-1 text-[8px]',
+            'mb-1 flex items-center justify-between rounded-md border px-1.5 py-1 text-xs',
             lang.on ? 'border-blue-500 bg-blue-50/50' : 'border-slate-100',
           )}
         >
           <div>
             <p className="font-medium">{lang.l}</p>
-            <p className="text-[7px] text-slate-400">{lang.n}</p>
+            <p className="text-xs text-slate-400">{lang.n}</p>
           </div>
           {lang.on ? <Pill tone="blue">Active</Pill> : null}
         </div>
@@ -1615,14 +1613,14 @@ const SCREENS: Record<string, () => ReactNode> = {
 
   'feature-flags': () => (
     <Shell className="p-2">
-      <p className="mb-1.5 font-semibold text-[10px]">Feature flags</p>
+      <p className="mb-1.5 font-semibold text-xs">Feature flags</p>
       {[
         { f: 'new-checkout', on: true, p: '100%' },
         { f: 'ai-image-gen', on: true, p: '25%' },
         { f: 'mobile-v2', on: false, p: '0%' },
         { f: 'dark-mode', on: true, p: '100%' },
       ].map((flag) => (
-        <div key={flag.f} className="mb-1 flex items-center gap-1.5 text-[8px]">
+        <div key={flag.f} className="mb-1 flex items-center gap-1.5 text-xs">
           <div
             className={cn(
               'h-3.5 w-6 shrink-0 rounded-full p-0.5',
@@ -1631,7 +1629,7 @@ const SCREENS: Record<string, () => ReactNode> = {
           >
             <div className={cn('size-2.5 rounded-full bg-white', flag.on && 'ml-auto')} />
           </div>
-          <span className="min-w-0 flex-1 truncate font-mono text-[7px]">{flag.f}</span>
+          <span className="min-w-0 flex-1 truncate font-mono text-xs">{flag.f}</span>
           <span className="text-slate-400 tabular-nums">{flag.p}</span>
         </div>
       ))}
@@ -1654,9 +1652,9 @@ const RecipeScreen = ({ recipe }: { readonly recipe: PageRecipePreview }) => {
   // Fallback only if a new recipe is added without a screen
   return (
     <Shell className="p-2">
-      <p className="font-semibold text-[10px]">{recipe.title}</p>
-      <p className="mt-1 text-[8px] text-slate-500">{recipe.group}</p>
-      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-[9px] text-white">
+      <p className="font-semibold text-xs">{recipe.title}</p>
+      <p className="mt-1 text-xs text-slate-500">{recipe.group}</p>
+      <div className="mt-auto rounded-md bg-blue-600 py-1.5 text-center font-medium text-xs text-white">
         Open
       </div>
     </Shell>
@@ -1698,46 +1696,49 @@ const RecipeCardBody = ({
   readonly pose: RecipeCardPose;
   readonly featured: boolean;
   readonly visible: boolean;
-}) => (
-  <div className={cn('relative flex flex-col', !featured && 'h-full')}>
-    {recipe.ready ? (
-      <span
-        className={cn(
-          'absolute end-2 top-2 z-10 rounded-full border border-emerald-500/25 bg-emerald-500/95 font-semibold text-white shadow-sm',
-          featured ? 'px-2 py-0.5 text-[9px] tracking-wide' : 'px-1.5 py-0.5 text-[7px]',
-        )}
-      >
-        READY
-      </span>
-    ) : null}
-    <div className="min-h-0" style={{ height: pose.height }}>
-      <MiniBrowserChrome
-        className={cn(
-          'h-full shadow-md transition-shadow duration-300 hover:shadow-xl',
-          featured && 'shadow-lg',
-        )}
-        dark={pose.darkChrome}
-        url={`app.vybekiit.com${recipe.route}`}
-      >
-        <div className={cn('h-full min-h-0 overflow-hidden', !visible && 'bg-white')}>
-          {visible ? <RecipeScreen recipe={recipe} /> : <RecipeScreenSkeleton />}
-        </div>
-      </MiniBrowserChrome>
-    </div>
-    {featured ? (
-      <div className="mt-1.5 min-w-0 px-0.5">
-        <p className="truncate font-semibold text-[12px] leading-tight tracking-tight">
-          {recipe.title}
-        </p>
-        {recipe.blurb ? (
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground leading-snug">
-            {recipe.blurb}
-          </p>
-        ) : null}
+}) => {
+  const { locale, messages } = useLandingLocale();
+  const localized = recipeTitleFor(locale, recipe.id);
+  const title = localized.title;
+  const blurb = localized.blurb ?? recipe.blurb;
+
+  return (
+    <div className={cn('relative flex flex-col', !featured && 'h-full')}>
+      {recipe.ready ? (
+        <span
+          className={cn(
+            'absolute end-2 top-2 z-10 rounded-full border border-emerald-500/25 bg-emerald-500/95 font-semibold text-white shadow-sm',
+            featured ? 'px-2 py-0.5 text-xs tracking-wide' : 'px-1.5 py-0.5 text-xs',
+          )}
+        >
+          {messages.pageRecipes.readyBadge}
+        </span>
+      ) : null}
+      <div className="min-h-0" style={{ height: pose.height }}>
+        <MiniBrowserChrome
+          className={cn(
+            'h-full shadow-md transition-shadow duration-300 hover:shadow-xl',
+            featured && 'shadow-lg',
+          )}
+          dark={pose.darkChrome}
+          url={`app.vybekiit.com${recipe.route}`}
+        >
+          <div className={cn('h-full min-h-0 overflow-hidden', !visible && 'bg-white')}>
+            {visible ? <RecipeScreen recipe={recipe} /> : <RecipeScreenSkeleton />}
+          </div>
+        </MiniBrowserChrome>
       </div>
-    ) : null}
-  </div>
-);
+      {featured ? (
+        <div className="mt-1.5 min-w-0 px-0.5">
+          <p className="truncate font-semibold text-xs leading-tight tracking-tight">{title}</p>
+          {blurb ? (
+            <p className="mt-0.5 truncate text-xs text-muted-foreground leading-snug">{blurb}</p>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+};
 
 /**
  * One page-recipe preview card. Catalog cards lazy-mount near the viewport;

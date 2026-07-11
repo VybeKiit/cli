@@ -18,7 +18,7 @@ export const Hero = () => (
       <span className="block">{LANDING_HERO.headlineLines[0]}</span>
       <span className="block">{LANDING_HERO.headlineLines[1]}</span>
     </h1>
-    <p className="hero-subtext mx-auto mt-12 max-w-[940px] text-[28px] leading-[1.42] text-[#B9BDC6]">
+    <p className="hero-subtext mx-auto mt-12 max-w-[940px] text-3xl leading-[1.42] text-[#B9BDC6]">
       {LANDING_HERO.subhead}
     </p>
   </SectionShell>

@@ -3,11 +3,21 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@vybekiit/ui/empty';
+import { Kpi } from '@vybekiit/ui/kpi';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Activity, Pause, Play, RadioTower, RefreshCcw, Trash2, Wifi, WifiOff } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type ChannelId = 'orders' | 'presence' | 'support';
 type ConnState = 'connected' | 'connecting' | 'disconnected';
@@ -162,28 +172,36 @@ export const RealtimePage = () => {
   let feedBody: ReactNode;
   if (connection === 'disconnected') {
     feedBody = (
-      <div className="flex flex-col items-center px-4 py-14 text-center">
-        <WifiOff aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-        <h2 className="mt-3 font-semibold">Channel offline</h2>
-        <p className="mt-1 text-muted-foreground text-sm">
-          Reconnect to stream publication events again.
-        </p>
-        <Button className="mt-4" onClick={reconnect} size="sm" type="button">
-          Reconnect
-        </Button>
-      </div>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia>
+            <WifiOff aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyTitle>Channel offline</EmptyTitle>
+          <EmptyDescription>Reconnect to stream publication events again.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button onClick={reconnect} size="sm" type="button">
+            Reconnect
+          </Button>
+        </EmptyContent>
+      </Empty>
     );
   } else if (visible.length === 0) {
     feedBody = (
-      <div className="flex flex-col items-center px-4 py-14 text-center">
-        <RadioTower aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-        <h2 className="mt-3 font-semibold">Waiting for events</h2>
-        <p className="mt-1 text-muted-foreground text-sm">
-          {channelFilter === 'all'
-            ? 'Resume listening or wait for the next publication.'
-            : 'Nothing on this channel yet — try All.'}
-        </p>
-      </div>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia>
+            <RadioTower aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyTitle>Waiting for events</EmptyTitle>
+          <EmptyDescription>
+            {channelFilter === 'all'
+              ? 'Resume listening or wait for the next publication.'
+              : 'Nothing on this channel yet — try All.'}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   } else {
     feedBody = (
@@ -210,7 +228,7 @@ export const RealtimePage = () => {
   }
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Realtime motion pass">
       <main className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -260,52 +278,53 @@ export const RealtimePage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi
-            icon={
-              connection === 'connected' ? (
-                <Wifi className="h-4 w-4 text-emerald-600" />
-              ) : (
-                <WifiOff className="h-4 w-4 text-muted-foreground" />
-              )
-            }
-            label="Connection"
-            value={connectionDisplay}
-          />
-          <Kpi
-            icon={<Activity className="h-4 w-4 text-blue-600" />}
-            label="Events"
-            value={String(events.length)}
-          />
-          <Kpi
-            icon={<RadioTower className="h-4 w-4 text-amber-600" />}
-            label="Listening"
-            value={listening && connection === 'connected' ? 'Yes' : 'No'}
-          />
+          {(
+            [
+              {
+                key: 'connection',
+                icon:
+                  connection === 'connected' ? (
+                    <Wifi className="h-4 w-4 text-emerald-600" />
+                  ) : (
+                    <WifiOff className="h-4 w-4 text-muted-foreground" />
+                  ),
+                label: 'Connection',
+                value: connectionDisplay,
+              },
+              {
+                key: 'events',
+                icon: <Activity className="h-4 w-4 text-blue-600" />,
+                label: 'Events',
+                value: String(events.length),
+              },
+              {
+                key: 'listening',
+                icon: <RadioTower className="h-4 w-4 text-amber-600" />,
+                label: 'Listening',
+                value: listening && connection === 'connected' ? 'Yes' : 'No',
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="text-muted-foreground text-sm" id={filterLabelId}>
             Channel
           </span>
-          <div
+          <SegmentedControl
             aria-labelledby={filterLabelId}
-            className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1"
-            role="group"
+            onValueChange={(value) => setChannelFilter(value as typeof channelFilter)}
+            value={channelFilter}
           >
-            <FilterChip
-              active={channelFilter === 'all'}
-              label="All"
-              onClick={() => setChannelFilter('all')}
-            />
+            <SegmentedControlItem value="all">All</SegmentedControlItem>
             {CHANNELS.map((channel) => (
-              <FilterChip
-                active={channelFilter === channel.id}
-                key={channel.id}
-                label={channel.label}
-                onClick={() => setChannelFilter(channel.id)}
-              />
+              <SegmentedControlItem key={channel.id} value={channel.id}>
+                {channel.label}
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
           <Button
             className="ml-auto"
             disabled={events.length === 0}
@@ -332,85 +351,31 @@ export const RealtimePage = () => {
           <CardContent className="p-2 sm:p-3">{feedBody}</CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — the demo interval stands in for a socket. To make
-              it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset realtime_publications</code> for publication
-                registry rows.
-              </li>
-              <li>
-                Subscribe with your realtime client to each topic (<code>public:orders</code>, etc.)
-                on connect.
-              </li>
-              <li>
-                Map each payload to <code>{'{ id, channel, title, detail, at }'}</code> and prepend
-                to the feed (keep Pause / Clear).
-              </li>
-              <li>
-                Disconnect should leave the channel; Reconnect re-subscribes and optionally
-                backfills recent rows from the DB.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — the demo interval stands in for a socket. To make
+            it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset realtime_publications</code> for publication registry
+              rows.
+            </li>
+            <li>
+              Subscribe with your realtime client to each topic (<code>public:orders</code>, etc.)
+              on connect.
+            </li>
+            <li>
+              Map each payload to <code>{'{ id, channel, title, detail, at }'}</code> and prepend to
+              the feed (keep Pause / Clear).
+            </li>
+            <li>
+              Disconnect should leave the channel; Reconnect re-subscribes and optionally backfills
+              recent rows from the DB.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-const FilterChip = ({
-  label,
-  active,
-  onClick,
-}: {
-  readonly label: string;
-  readonly active: boolean;
-  readonly onClick: () => void;
-}) => (
-  <button
-    aria-pressed={active}
-    className={cn(
-      'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-      active ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground',
-    )}
-    onClick={onClick}
-    type="button"
-  >
-    {label}
-  </button>
-);
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Realtime motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({
-  icon,
-  label,
-  value,
-}: {
-  readonly icon: ReactNode;
-  readonly label: string;
-  readonly value: string;
-}) => (
-  <Card>
-    <CardContent className="flex items-center gap-3 p-3">
-      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">{icon}</span>
-      <div>
-        <p className="font-semibold text-lg tabular-nums">{value}</p>
-        <p className="text-muted-foreground text-xs">{label}</p>
-      </div>
-    </CardContent>
-  </Card>
-);

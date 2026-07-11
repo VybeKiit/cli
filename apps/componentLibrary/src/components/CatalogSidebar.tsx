@@ -3,6 +3,7 @@
 import { CATALOG_CATEGORIES, COMPONENT_CATALOG_COUNT } from '@library/data/catalog.meta';
 import { TEMPLATE_SURFACE_NAV_ITEMS, type TemplateSurfaceId } from '@library/data/templateSurfaces';
 import { prefetchCategoryShard } from '@library/lib/catalogFetch';
+import { pageGroupHref } from '@library/lib/pageGroupHref';
 import {
   Sidebar,
   SidebarContent,
@@ -79,9 +80,6 @@ const SidebarBrand = () => {
     </Link>
   );
 };
-
-const pageGroupHref = (groupId: string): string =>
-  groupId === 'all' ? '/pages' : `/pages?group=${groupId}`;
 
 const PageGroupMenuLink = ({
   groupId,

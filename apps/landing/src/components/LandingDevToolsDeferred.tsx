@@ -6,6 +6,7 @@ import { type ComponentType, type ReactNode, useEffect, useState } from 'react';
 interface LandingDevToolsDeferredProps {
   readonly showReport: boolean;
   readonly showChat: boolean;
+  /** Null only when report-mode mounts alone with no configured assistant. */
   readonly assistant: VybeAssistant | null;
   readonly projectRoot: string;
   readonly bridgeUrl: string;
@@ -81,7 +82,7 @@ export const LandingDevToolsDeferred = ({
           }
         }
 
-        if (showChat && assistant !== null) {
+        if (showChat) {
           const { AssistantChatLauncher: Launcher } = await import(
             '@/components/tools/assistant-chat/AssistantChatLauncher'
           );
@@ -105,7 +106,7 @@ export const LandingDevToolsDeferred = ({
       cancelled = true;
       globalThis.clearTimeout(timer);
     };
-  }, [assistant, showChat, showReport]);
+  }, [showChat, showReport]);
 
   return (
     <>
@@ -115,9 +116,9 @@ export const LandingDevToolsDeferred = ({
           <ReportModeDev assistant={assistant} projectRoot={projectRoot} />
         </TooltipProvider>
       ) : null}
-      {showChat && assistant !== null && AssistantChatLauncher ? (
+      {showChat && AssistantChatLauncher ? (
         <AssistantChatLauncher
-          assistant={assistant}
+          assistant={assistant ?? 'claude'}
           bridgeUrl={bridgeUrl}
           {...(referralCode !== undefined && referralCode.length > 0 ? { referralCode } : {})}
         />

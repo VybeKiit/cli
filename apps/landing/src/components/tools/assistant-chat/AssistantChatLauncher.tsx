@@ -2,7 +2,7 @@
 
 import type { VybeAssistant } from '@vybekiit/report-mode';
 import { assistantLabel } from '@vybekiit-template-web/components/builder-assistant-mark';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { VybeLogoIcon } from '@/components/ui/CustomIcons';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,13 @@ export const AssistantChatLauncher = ({
 }: AssistantChatLauncherProps) => {
   const [open, setOpen] = useState(false);
 
+  // Warm the coding helper as soon as the launcher mounts so open feels instant.
+  useEffect(() => {
+    void fetch('/api/dev/ensure-bridge', { method: 'POST' }).catch(() => {
+      // Panel will retry / show offline empty if this fails.
+    });
+  }, []);
+
   if (open) {
     return (
       <AssistantChatPanel
@@ -36,9 +43,11 @@ export const AssistantChatLauncher = ({
 
   return (
     <button
+      aria-label={`Open chat with ${assistantLabel(assistant)}`}
       className={cn(
         'fixed right-4 bottom-4 z-[2147483000] flex items-center gap-2 rounded-full',
-        'border border-border bg-background px-3 py-2 font-medium text-foreground text-sm shadow-lg hover:shadow-xl',
+        'border border-border bg-background px-4 py-2.5 font-medium text-foreground text-sm',
+        'shadow-lg transition-shadow hover:shadow-xl',
       )}
       onClick={() => setOpen(true)}
       type="button"

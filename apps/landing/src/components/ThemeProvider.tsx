@@ -11,9 +11,9 @@ interface ThemeProviderProps {
  * Class-based theme provider for the visitor marketing shell.
  * Default is light; the navbar toggle switches `html.dark` without following OS.
  *
- * `disableTransitionOnChange` is required for snappy toggles: next-themes
- * briefly suppresses CSS transitions while flipping the class so every
- * `transition: color/background` on the page does not animate together.
+ * `disableTransitionOnChange` stays on so individual elements do not all tween
+ * color at once. The soft page fade is handled by the View Transitions API in
+ * `ThemeToggle` instead.
  *
  * @param props - Provider children.
  * @returns Themed children.

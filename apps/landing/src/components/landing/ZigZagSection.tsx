@@ -24,7 +24,7 @@ const PROBLEM_HEADING_LINES = {
 } as const satisfies Record<string, readonly string[]>;
 
 const SOLUTION_HEADING_LINES = {
-  'Take payments in your first session.': ['Take payments in your', 'first session.'],
+  'Payments foundation is already wired.': ['Payments foundation is', 'already wired.'],
 } as const satisfies Record<string, readonly string[]>;
 
 const resolveHeadingLines = (
@@ -56,32 +56,32 @@ const CopyBlock = ({
       )}
     >
       <div>
-        <p className="text-[18px] font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
+        <p className="text-lg font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
           {copy.problemLabel}
         </p>
-        <h3 className="mt-5 max-w-[620px] text-[48px] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#f8fafc]">
+        <h3 className="mt-5 max-w-[620px] text-5xl font-extrabold leading-[1.08] tracking-[-0.045em] text-[#f8fafc]">
           {problemLines.map((line) => (
             <span className="block" key={line}>
               {line}
             </span>
           ))}
         </h3>
-        <p className="mt-7 max-w-[600px] text-[24px] leading-[1.35] text-[rgba(226,232,240,0.78)]">
+        <p className="mt-7 max-w-[600px] text-2xl leading-[1.35] text-[rgba(226,232,240,0.78)]">
           {copy.problemBody}
         </p>
       </div>
       <div>
-        <p className="text-[18px] font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
+        <p className="text-lg font-bold uppercase tracking-[0.08em] text-[#4ea5ff]">
           {copy.solutionLabel}
         </p>
-        <h3 className="mt-5 max-w-[640px] bg-gradient-to-b from-[#57a9ff] to-[#1f7aff] bg-clip-text text-[46px] font-extrabold leading-[1.08] tracking-[-0.045em] text-transparent">
+        <h3 className="mt-5 max-w-[640px] bg-gradient-to-b from-[#57a9ff] to-[#1f7aff] bg-clip-text text-5xl font-extrabold leading-[1.08] tracking-[-0.045em] text-transparent">
           {solutionLines.map((line) => (
             <span className="block" key={line}>
               {line}
             </span>
           ))}
         </h3>
-        <p className="mt-7 max-w-[600px] text-[24px] leading-[1.35] text-[rgba(226,232,240,0.78)]">
+        <p className="mt-7 max-w-[600px] text-2xl leading-[1.35] text-[rgba(226,232,240,0.78)]">
           {copy.solutionBody}
         </p>
       </div>

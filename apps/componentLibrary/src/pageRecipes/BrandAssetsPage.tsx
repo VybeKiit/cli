@@ -4,12 +4,13 @@ import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { ImageIcon, Palette, Save, Upload, X } from 'lucide-react';
-import { type ReactNode, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type AssetSlot = 'logo' | 'hero' | 'icon';
 
@@ -121,7 +122,7 @@ export const BrandAssetsPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Brand motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -139,9 +140,19 @@ export const BrandAssetsPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Assets filled" value={`${filledCount}/${assets.length}`} />
-          <Kpi label="Radius" value={`${radius}px`} />
-          <Kpi label="Draft" value={dirty ? 'Unsaved' : 'Saved'} />
+          {(
+            [
+              {
+                key: 'assets-filled',
+                label: 'Assets filled',
+                value: `${filledCount}/${assets.length}`,
+              },
+              { key: 'radius', label: 'Radius', value: `${radius}px` },
+              { key: 'draft', label: 'Draft', value: dirty ? 'Unsaved' : 'Saved' },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
@@ -280,47 +291,24 @@ export const BrandAssetsPage = () => {
           </div>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — color, radius, and slots update the preview live.
-              To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Wire Upload to your asset storage and replace default logo / hero / icon slots with
-                the returned URLs.
-              </li>
-              <li>
-                Persist name, primary color, and radius through the design token source (CSS vars or
-                theme JSON).
-              </li>
-              <li>
-                Keep the live preview bound to the same tokens so marketing pages stay in sync.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — color, radius, and slots update the preview live.
+            To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Wire Upload to your asset storage and replace default logo / hero / icon slots with
+              the returned URLs.
+            </li>
+            <li>
+              Persist name, primary color, and radius through the design token source (CSS vars or
+              theme JSON).
+            </li>
+            <li>Keep the live preview bound to the same tokens so marketing pages stay in sync.</li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Brand motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({ label, value }: { readonly label: string; readonly value: string }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-lg tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

@@ -1,15 +1,18 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Activity, Bell, CheckCircle2, CircleAlert, Loader2, MonitorCheck } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type ServiceStatus = 'operational' | 'degraded' | 'outage';
 
@@ -217,7 +220,7 @@ export const StatusPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Status motion pass">
       <main className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -234,10 +237,10 @@ export const StatusPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0" />
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <Card
@@ -323,39 +326,28 @@ export const StatusPage = () => {
         <section className="mb-6 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-semibold text-lg">Incidents</h2>
-            <div className="flex gap-1 rounded-lg border bg-muted p-1">
-              <button
-                aria-pressed={filter === 'all'}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm',
-                  filter === 'all' ? 'bg-background shadow-sm' : 'text-muted-foreground',
-                )}
-                onClick={() => setFilter('all')}
-                type="button"
-              >
-                All
-              </button>
-              <button
-                aria-pressed={filter === 'active'}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm',
-                  filter === 'active' ? 'bg-background shadow-sm' : 'text-muted-foreground',
-                )}
-                onClick={() => setFilter('active')}
-                type="button"
-              >
-                Active
-              </button>
-            </div>
+            <SegmentedControl
+              onValueChange={(value) => setFilter(value as typeof filter)}
+              value={filter}
+            >
+              <SegmentedControlItem value="all">All</SegmentedControlItem>
+              <SegmentedControlItem value="active">Active</SegmentedControlItem>
+            </SegmentedControl>
           </div>
           {visibleIncidents.length === 0 ? (
             <Card>
-              <CardContent className="flex flex-col items-center px-4 py-12 text-center">
-                <Activity aria-hidden="true" className="h-8 w-8 text-muted-foreground" />
-                <h3 className="mt-3 font-semibold">No active incidents</h3>
-                <p className="mt-1 text-muted-foreground text-sm">
-                  Use Simulate outage to open a demo incident.
-                </p>
+              <CardContent className="p-0">
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia>
+                      <Activity aria-hidden="true" />
+                    </EmptyMedia>
+                    <EmptyTitle>No active incidents</EmptyTitle>
+                    <EmptyDescription>
+                      Use Simulate outage to open a demo incident.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               </CardContent>
             </Card>
           ) : (
@@ -440,43 +432,33 @@ export const StatusPage = () => {
           </CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — overall status rolls up from services, and
-              simulate/resolve update the incident list. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Derive service health from probes or <code>job_runs</code> / queue depth; never
-                expose internal hostnames.
-              </li>
-              <li>
-                Store incidents in a public-safe table; <code>GET /api/status</code> returns
-                services + active incidents only.
-              </li>
-              <li>
-                Subscribe stores emails; on status change, send via <code>@vybekiit/email</code> and
-                log to <code>notifications_log</code>.
-              </li>
-              <li>
-                Keep a separate admin tool for posting incident updates — this page is read-only for
-                visitors.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — overall status rolls up from services, and
+            simulate/resolve update the incident list. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Derive service health from probes or <code>job_runs</code> / queue depth; never expose
+              internal hostnames.
+            </li>
+            <li>
+              Store incidents in a public-safe table; <code>GET /api/status</code> returns services
+              + active incidents only.
+            </li>
+            <li>
+              Subscribe stores emails; on status change, send via <code>@vybekiit/email</code> and
+              log to <code>notifications_log</code>.
+            </li>
+            <li>
+              Keep a separate admin tool for posting incident updates — this page is read-only for
+              visitors.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Status motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

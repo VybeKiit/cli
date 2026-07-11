@@ -48,11 +48,11 @@ export const CodeSnippets = ({ active }: CodeSnippetsProps) => {
           <div className="h-2 w-2 rounded-full bg-yellow-500/60" />
           <div className="h-2 w-2 rounded-full bg-green-500/60" />
         </div>
-        <span className="text-[9px] font-mono text-zinc-500">{snippet.lang}</span>
+        <span className="text-xs font-mono text-zinc-500">{snippet.lang}</span>
       </div>
       <pre
         className={cn(
-          'px-3 py-2 font-mono text-[11px] leading-relaxed text-vybe-300/80 transition-opacity duration-300',
+          'px-3 py-2 font-mono text-xs leading-relaxed text-vybe-300/80 transition-opacity duration-300',
           'animate-in fade-in slide-in-from-bottom-1',
         )}
         key={index}

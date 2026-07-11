@@ -18,6 +18,8 @@ const COPYRIGHT_YEAR = new Date().getFullYear();
 export const SiteFooter = () => {
   const { messages } = useLandingLocale();
   const footerLinks = [
+    { href: '/compare', label: messages.footer.compare },
+    { href: '/brand', label: messages.footer.brand },
     { href: '/terms', label: messages.footer.terms },
     { href: '/privacy', label: messages.footer.privacy },
   ] as const;

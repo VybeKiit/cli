@@ -3,15 +3,17 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Switch } from '@vybekiit/ui/switch';
 import { Textarea } from '@vybekiit/ui/textarea';
 import { Bell, Check, Mail, Send, Trash2 } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 /** One notification preference row. */
 type Preference = {
@@ -146,7 +148,7 @@ export const EmailNotificationsPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Email notifications motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -163,9 +165,15 @@ export const EmailNotificationsPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="Prefs on" value={enabledCount} />
-          <Kpi label="Log rows" value={log.length} />
-          <Kpi label="Dirty" value={prefsDirty ? 1 : 0} />
+          {(
+            [
+              { key: 'prefs-on', label: 'Prefs on', value: enabledCount },
+              { key: 'log-rows', label: 'Log rows', value: log.length },
+              { key: 'dirty', label: 'Dirty', value: prefsDirty ? 1 : 0 },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
@@ -247,9 +255,11 @@ export const EmailNotificationsPage = () => {
                 ))}
               </div>
               {visiblePrefs.length === 0 ? (
-                <p className="py-8 text-center text-muted-foreground text-sm">
-                  No preferences match this filter.
-                </p>
+                <Empty className="border-0 bg-transparent py-8" variant="compact">
+                  <EmptyHeader>
+                    <EmptyDescription>No preferences match this filter.</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               ) : (
                 <ul aria-label="Notification preferences" className="space-y-2">
                   {visiblePrefs.map((pref) => (
@@ -289,13 +299,17 @@ export const EmailNotificationsPage = () => {
           </CardHeader>
           <CardContent className="p-3">
             {log.length === 0 ? (
-              <div className="flex flex-col items-center py-10 text-center">
-                <Bell aria-hidden="true" className="h-7 w-7 text-muted-foreground" />
-                <p className="mt-2 font-medium text-sm">No activity yet</p>
-                <p className="mt-1 text-muted-foreground text-xs">
-                  Send a test or save preferences to fill this log.
-                </p>
-              </div>
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia>
+                    <Bell aria-hidden="true" />
+                  </EmptyMedia>
+                  <EmptyTitle>No activity yet</EmptyTitle>
+                  <EmptyDescription>
+                    Send a test or save preferences to fill this log.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
             ) : (
               <ul aria-label="Activity log" className="divide-y">
                 {log.map((entry) => (
@@ -314,47 +328,26 @@ export const EmailNotificationsPage = () => {
           </CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — validation, toggles, dirty save, and log all work
-              offline. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset notifications_log</code> for delivery history.
-              </li>
-              <li>
-                Send test → <code>POST /api/email/test</code> through the configured email provider;
-                append the response to the log.
-              </li>
-              <li>
-                Save prefs → <code>PUT /api/notification-preferences</code>; keep the dirty guard so
-                Save stays disabled when nothing changed.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — validation, toggles, dirty save, and log all work
+            offline. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset notifications_log</code> for delivery history.
+            </li>
+            <li>
+              Send test → <code>POST /api/email/test</code> through the configured email provider;
+              append the response to the log.
+            </li>
+            <li>
+              Save prefs → <code>PUT /api/notification-preferences</code>; keep the dirty guard so
+              Save stays disabled when nothing changed.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Email notifications motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-const Kpi = ({ label, value }: { readonly label: string; readonly value: number }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-2xl tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

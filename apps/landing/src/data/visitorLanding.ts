@@ -8,21 +8,20 @@ import { PRICE, PRICE_VALUE_STACK } from '@/data/site';
 
 /** Hero section copy for the light marketing homepage. */
 export const VISITOR_HERO = {
-  eyebrow: 'You direct. The agent builds.',
+  eyebrow: 'Ready infrastructure for AI agents',
   /**
-   * Plain-text headline for analytics / a11y. The hero renders a marker highlight
-   * on “your first payment” so vibe coders see the money outcome first.
+   * Plain-text headline for analytics / a11y. The hero highlights the launch outcome.
    */
-  headline: 'Go live, and take your first payment, in session one.',
+  headline: 'From idea to a product you can really launch.',
   /** Phrase painted with the marker animation inside the h1. */
-  headlineHighlight: 'your first payment',
+  headlineHighlight: 'really launch',
   subhead:
-    'Describe it in plain language. The agent wires payments, auth, database, and deploy across web, mobile, and a browser extension. One purchase, $29.',
+    'A code base built for AI agents, with the foundations that usually stop projects before ship. One-time payment, $29.',
   primaryCtaLabel: `Get VybeKiit · ${PRICE.display}`,
   trustChips: [
-    'Lemon Squeezy · Merchant of Record',
+    'Secure checkout via Lemon Squeezy',
     `${PRICE.refundDays}-day refund`,
-    'Web · Mobile · Extension',
+    'Lifetime access',
   ] as const,
 } as const;
 
@@ -119,40 +118,40 @@ export interface OperatorStep {
 }
 
 export const OPERATOR_STEPS_SECTION = {
-  heading: 'One agent operates the whole stack.',
+  heading: 'You define the product. The agent assembles it.',
   steps: [
     {
       id: 'plan',
-      title: 'Plan',
-      body: 'Turn your idea into a clear plan and data model.',
+      title: 'Describe the idea',
+      body: 'Tell the agent what the product does, who uses it, and what they need to do.',
       icon: 'plan',
       featured: false,
     },
     {
       id: 'build',
-      title: 'Build',
-      body: 'Generate the full app across web, mobile, and extension.',
+      title: 'Reuse ready pieces',
+      body: 'The agent picks from sign-in, database, payments, email, dashboard, and deploy already in the kit.',
       icon: 'build',
       featured: false,
     },
     {
       id: 'wire',
-      title: 'Wire',
-      body: 'Connect payments, auth, database, and env config.',
+      title: 'Fit it to your product',
+      body: 'It adapts models, screens, and actions to your idea instead of inventing every feature from zero.',
       icon: 'wire',
       featured: false,
     },
     {
       id: 'verify',
-      title: 'Verify',
-      body: 'Run checks, tests, and security verifications.',
+      title: 'Check before launch',
+      body: 'Structure that helps check main flows. You still review before real users.',
       icon: 'verify',
       featured: false,
     },
     {
       id: 'live',
-      title: 'Live',
-      body: 'Deploy everything. You go live in session one.',
+      title: 'Go live and keep building',
+      body: 'Ship to supported hosts and keep working on the same base after launch.',
       icon: 'live',
       featured: true,
     },
@@ -161,25 +160,26 @@ export const OPERATOR_STEPS_SECTION = {
 
 /** Problem / overview block copy. */
 export const PROBLEM_OVERVIEW = {
-  problemLabel: 'THE PROBLEM',
-  problemHeading: 'Boilerplates still leave you holding the bag.',
-  problemBody: 'VybeKiit operates the stack, end to end.',
-  overviewTitle: 'Overview',
+  problemLabel: 'BEFORE VYBEKIIT',
+  problemHeading: 'From a blank page, the agent reinvents the foundation every time.',
+  problemBody:
+    'Structure, sign-in, payments, webhooks, database, protected actions, deploy, and checks all become fresh decisions.',
+  overviewTitle: 'From scratch',
   rows: [
-    { id: 'payments', label: 'Payments', value: 'Manual', tone: 'muted' as const },
-    { id: 'auth', label: 'Auth', value: 'Manual', tone: 'muted' as const },
-    { id: 'database', label: 'Database', value: 'Manual', tone: 'muted' as const },
+    { id: 'payments', label: 'Payments', value: 'From zero', tone: 'muted' as const },
+    { id: 'auth', label: 'Sign-in', value: 'New setup', tone: 'muted' as const },
+    { id: 'database', label: 'Database', value: 'From zero', tone: 'muted' as const },
     { id: 'deploy', label: 'Deploy', value: 'Manual', tone: 'muted' as const },
-    { id: 'you', label: 'You', value: 'Overwhelmed', tone: 'danger' as const },
+    { id: 'you', label: 'You', value: 'Guessing', tone: 'danger' as const },
   ] as const,
 } as const;
 
 /** Solution / payments block copy. */
 export const SOLUTION_PAYMENTS = {
-  solutionLabel: 'THE SOLUTION',
-  solutionHeading: 'Take payments in your first session.',
+  solutionLabel: 'WITH VYBEKIIT',
+  solutionHeading: 'The base decisions are already made.',
   solutionBody:
-    'The agent connects payments, handles webhooks, and gives you a working checkout instantly.',
+    'The agent starts from a consistent structure, uses ready features, and focuses on what is unique in your product.',
   toastLabel: 'Payment received',
   revenueLabel: 'Revenue',
   revenueValue: '$2,841',
@@ -188,8 +188,8 @@ export const SOLUTION_PAYMENTS = {
 
 /** Three-platform bundle section. */
 export const PLATFORMS_BUNDLE = {
-  heading: 'One purchase. Web, mobile, and a browser extension.',
-  subhead: 'One agent. Zero plumbing.',
+  heading: 'One base for three product types',
+  subhead: 'Shared foundation and examples for each environment.',
   platforms: [
     { id: 'web', label: 'Web' },
     { id: 'mobile', label: 'Mobile' },
@@ -204,6 +204,8 @@ export type VisitorCoverage = 'yes' | 'partial' | 'no';
 export interface VisitorCompareRow {
   readonly id: string;
   readonly name: string;
+  /** LogoMarkIcon / brand-marks slug for the product mark. */
+  readonly logoSlug: string;
   readonly price: string;
   readonly agentOperates: VisitorCoverage;
   readonly plainLanguage: VisitorCoverage;
@@ -218,11 +220,11 @@ export interface VisitorCompareRow {
  * Scores are honest; rivals win on some axes (see footnote).
  */
 export const VISITOR_COMPARE = {
-  heading: 'Become a software engineer without becoming one.',
+  heading: 'Not an app generator. A professional base for the agent that builds them.',
   subhead:
-    'Other kits hand you code and wish you luck. VybeKiit is the agent that builds, wires, and ships for you.',
+    'Tools like Lovable build inside a managed platform. Classic starters hand you code and still expect you to wire it. VybeKiit sits in the middle: your code, a ready base, and instructions so the agent connects real foundations without reinventing them every project.',
   footnote:
-    'Need deep multi-tenant B2B on day one (RBAC, admin, jobs)? MakerKit and Supastarter are stronger there. VybeKiit wins when you want the agent to operate the whole product so you never read the code.',
+    'Need a heavy team product with roles and admin tools on day one? MakerKit and Supastarter are stronger there. VybeKiit fits people who build with AI and do not want every project to restart as a new experiment in security, payments, and infrastructure.',
   axes: [
     { key: 'price' as const, label: 'Price' },
     { key: 'agentOperates' as const, label: 'Agent builds it for you' },
@@ -235,6 +237,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'vybekiit',
       name: 'VybeKiit',
+      logoSlug: 'vybekiit',
       price: PRICE.display,
       agentOperates: 'yes',
       plainLanguage: 'yes',
@@ -246,6 +249,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'shipfast',
       name: 'ShipFast',
+      logoSlug: 'shipfast',
       price: '$199+',
       agentOperates: 'no',
       plainLanguage: 'no',
@@ -257,6 +261,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'lovable',
       name: 'Lovable',
+      logoSlug: 'lovable',
       price: '$20/mo',
       agentOperates: 'partial',
       plainLanguage: 'yes',
@@ -268,6 +273,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'makerkit',
       name: 'MakerKit',
+      logoSlug: 'makerkit',
       price: '$299+',
       agentOperates: 'no',
       plainLanguage: 'no',
@@ -279,6 +285,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'supastarter',
       name: 'Supastarter',
+      logoSlug: 'supastarter',
       price: '$349+',
       agentOperates: 'no',
       plainLanguage: 'no',
@@ -290,6 +297,7 @@ export const VISITOR_COMPARE = {
     {
       id: 'open-saas',
       name: 'Open SaaS',
+      logoSlug: 'open-saas',
       price: '$0',
       agentOperates: 'no',
       plainLanguage: 'no',
@@ -312,15 +320,15 @@ export const VISITOR_PRICING = {
   /** Substring of savingsLine to paint bold red (the discount itself). */
   savingsDiscount: `${PRICE_VALUE_STACK.savingsPercent}%`,
   bullets: [
-    'AI Operator + Web + Mobile + Extension',
-    'All features. No limits.',
-    'Lifetime access. Yours forever.',
-    '14-day money-back guarantee.',
+    'Source code + agent instructions',
+    'Web, mobile, and browser-extension base',
+    'Sign-in, payments, database, email, dashboard, 46+ screens',
+    '14-day money-back window.',
   ] as const,
   ctaLabel: `Get VybeKiit · ${PRICE.display}`,
 } as const;
 
 /** FAQ section heading for the visitor homepage. */
 export const VISITOR_FAQ = {
-  heading: 'Which package should you get?',
+  heading: 'Common questions',
 } as const;

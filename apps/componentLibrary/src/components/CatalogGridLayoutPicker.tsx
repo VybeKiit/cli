@@ -1,143 +1,15 @@
 'use client';
 
+import { LayoutOptionsList } from '@library/components/layout/LayoutOptionsList';
 import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
 import { LibraryDialogContent } from '@library/components/layout/LibraryDialogContent';
 import { Z_LAYOUT_POPOVER } from '@library/components/layout/layoutChrome';
 import { useCatalogGridLayout } from '@library/context/CatalogGridLayoutContext';
-import {
-  CATALOG_GRID_PRESETS,
-  type CatalogGridLayoutId,
-  type CatalogGridPreset,
-} from '@library/lib/catalogGridLayout';
 import { Button } from '@vybekiit/ui/button';
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@vybekiit/ui/dialog';
 import { LayoutGrid } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '@/lib/utils';
-
-const LayoutPreviewIcon = ({
-  cols,
-  rows,
-  active,
-}: {
-  cols: number;
-  rows: number;
-  active?: boolean;
-}) => {
-  const cappedCols = Math.min(cols, 5);
-  const cells = cappedCols * Math.min(rows, 4);
-
-  return (
-    <div
-      className={cn(
-        'grid w-14 shrink-0 gap-0.5 rounded-md border p-1.5',
-        active ? 'border-primary bg-primary/5' : 'border-border/60 bg-muted/30',
-      )}
-      style={{ gridTemplateColumns: `repeat(${cappedCols}, minmax(0, 1fr))` }}
-    >
-      {Array.from({ length: cells }).map((_, index) => (
-        <div
-          className={cn(
-            'aspect-square rounded-[2px]',
-            active ? 'bg-primary/50' : 'bg-muted-foreground/25',
-          )}
-          key={index}
-        />
-      ))}
-    </div>
-  );
-};
-
-const LayoutOption = ({
-  preset,
-  active,
-  onSelect,
-}: {
-  preset:
-    | CatalogGridPreset
-    | {
-        id: 'custom';
-        label: string;
-        description: string;
-        previewCols: number;
-        previewRows: number;
-      };
-  active: boolean;
-  onSelect: () => void;
-}) => (
-  <button
-    className={cn(
-      'flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors',
-      active
-        ? 'border-primary bg-primary/5'
-        : 'border-transparent hover:border-border hover:bg-muted/40',
-    )}
-    onClick={onSelect}
-    type="button"
-  >
-    <LayoutPreviewIcon active={active} cols={preset.previewCols} rows={preset.previewRows} />
-    <div className="min-w-0 flex-1">
-      <p className="font-medium text-sm">{preset.label}</p>
-      <p className="text-muted-foreground text-xs leading-snug">{preset.description}</p>
-    </div>
-  </button>
-);
-
-const LayoutOptionsList = ({ onPresetPick }: { onPresetPick?: () => void }) => {
-  const { layoutId, customCols, setLayout } = useCatalogGridLayout();
-
-  const pickPreset = (id: CatalogGridLayoutId) => {
-    setLayout(id);
-    onPresetPick?.();
-  };
-
-  const pickCustomCols = (cols: number) => {
-    setLayout('custom', cols);
-  };
-
-  return (
-    <div className="flex flex-col gap-1">
-      {CATALOG_GRID_PRESETS.map((preset) => (
-        <LayoutOption
-          active={layoutId === preset.id}
-          key={preset.id}
-          onSelect={() => pickPreset(preset.id)}
-          preset={preset}
-        />
-      ))}
-      <LayoutOption
-        active={layoutId === 'custom'}
-        onSelect={() => pickPreset('custom')}
-        preset={{
-          id: 'custom',
-          label: `Custom · ${customCols} columns`,
-          description: 'Set an exact column count for your monitor.',
-          previewCols: customCols,
-          previewRows: 2,
-        }}
-      />
-      <label className="mt-2 flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-3">
-        <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-          Custom columns
-        </span>
-        <div className="flex items-center gap-3">
-          <input
-            className="h-8 flex-1 cursor-pointer accent-primary"
-            max={6}
-            min={1}
-            onChange={(event) => pickCustomCols(Number(event.target.value))}
-            onPointerDown={(event) => event.stopPropagation()}
-            step={1}
-            type="range"
-            value={customCols}
-          />
-          <span className="w-6 font-mono text-sm tabular-nums">{customCols}</span>
-        </div>
-      </label>
-    </div>
-  );
-};
 
 /**
  * Render the catalog grid layout picker component.
@@ -178,6 +50,11 @@ export const CatalogGridLayoutPicker = () => {
     closeTimerRef.current = setTimeout(() => setPopoverOpen(false), 280);
   }, [clearCloseTimer]);
 
+  const handleOpenFullPicker = (): void => {
+    setPopoverOpen(false);
+    setDialogOpen(true);
+  };
+
   useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
 
   useEffect(() => {
@@ -203,29 +80,28 @@ export const CatalogGridLayoutPicker = () => {
   const popoverPanel =
     popoverOpen && popoverStyle && !dialogOpen ? (
       <div
-        className="fixed w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-xl"
+        className="fixed isolate w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-white text-foreground shadow-2xl dark:bg-zinc-950"
         onMouseEnter={clearCloseTimer}
         onMouseLeave={scheduleClose}
         style={{
           top: popoverStyle.top,
           right: popoverStyle.right,
           zIndex: Z_LAYOUT_POPOVER,
+          // Hard opaque fallback — theme tokens alone still lost to card iframes.
+          backgroundColor: 'hsl(var(--background, 0 0% 100%))',
         }}
       >
-        <div className="border-border border-b px-3 py-2">
+        <div className="border-border border-b bg-white px-3 py-2 dark:bg-zinc-950">
           <p className="font-medium text-sm">Grid layout</p>
           <p className="text-muted-foreground text-xs">Quick pick — scroll for more</p>
         </div>
-        <div className="max-h-72 overflow-y-auto p-2">
+        <div className="max-h-72 overflow-y-auto bg-white p-2 dark:bg-zinc-950">
           <LayoutOptionsList onPresetPick={() => setPopoverOpen(false)} />
         </div>
-        <div className="border-border border-t p-2">
+        <div className="border-border border-t bg-white p-2 dark:bg-zinc-950">
           <Button
             className="w-full"
-            onClick={() => {
-              setPopoverOpen(false);
-              setDialogOpen(true);
-            }}
+            onClick={handleOpenFullPicker}
             size="sm"
             type="button"
             variant="secondary"

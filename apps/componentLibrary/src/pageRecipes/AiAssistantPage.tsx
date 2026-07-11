@@ -5,10 +5,10 @@ import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
 import { Bot, FileUp, Paperclip, Send, Sparkles, Trash2, User } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useRef, useState } from 'react';
+import { type FormEvent, useId, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type Role = 'user' | 'assistant';
 
@@ -81,7 +81,7 @@ export const AiAssistantPage = () => {
 
   const sendMessage = (text: string) => {
     const body = text.trim();
-    if (body.length < 1 || sending) {
+    if (body.length === 0 || sending) {
       return;
     }
     const userMsg: ChatMessage = {
@@ -143,7 +143,7 @@ export const AiAssistantPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="AI workspace motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -200,7 +200,7 @@ export const AiAssistantPage = () => {
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <p className="font-medium text-xs text-muted-foreground">Suggestions</p>
+                  <p className="font-medium text-muted-foreground text-xs">Suggestions</p>
                   {SUGGESTIONS.map((suggestion) => (
                     <button
                       className="w-full rounded-md border px-2.5 py-2 text-left text-xs transition-colors hover:bg-muted"
@@ -243,7 +243,7 @@ export const AiAssistantPage = () => {
                     ) : null}
                     <div
                       className={cn(
-                        'max-w-[85%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap',
+                        'max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 text-sm',
                         message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted',
                       )}
                     >
@@ -327,42 +327,32 @@ export const AiAssistantPage = () => {
           </Card>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — send, suggestions, attachments, and clear work
-              without calling a model. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset ai_conversations</code> for conversation + message
-                tables.
-              </li>
-              <li>
-                Connect Send to the configured AI provider; persist turns with{' '}
-                <code>POST /api/ai/messages</code>.
-              </li>
-              <li>
-                When knowledge search is on, run <code>vybekiit apply-preset embeddings</code> and
-                retrieve chunks before the completion call.
-              </li>
-              <li>
-                Upload attachments to storage first, then pass their URLs / ids with the prompt.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — send, suggestions, attachments, and clear work
+            without calling a model. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset ai_conversations</code> for conversation + message
+              tables.
+            </li>
+            <li>
+              Connect Send to the configured AI provider; persist turns with{' '}
+              <code>POST /api/ai/messages</code>.
+            </li>
+            <li>
+              When knowledge search is on, run <code>vybekiit apply-preset embeddings</code> and
+              retrieve chunks before the completion call.
+            </li>
+            <li>
+              Upload attachments to storage first, then pass their URLs / ids with the prompt.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="AI workspace motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

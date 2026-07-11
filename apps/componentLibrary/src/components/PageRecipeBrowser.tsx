@@ -1,76 +1,20 @@
 'use client';
 
 import { CatalogSidebar } from '@library/components/CatalogSidebar';
-import { PageRecipeCard } from '@library/components/PageRecipeCard';
-import { PAGE_RECIPE_GROUPS, PAGE_RECIPES, type PageRecipe } from '@library/data/pageRecipes';
+import { PageRecipeSections } from '@library/components/PageRecipeSections';
+import { PAGE_RECIPE_GROUPS, PAGE_RECIPES } from '@library/data/pageRecipes';
 import { useClientReady } from '@library/hooks/useClientReady';
-import { useDebouncedValue } from '@library/hooks/useDebouncedValue';
+import { PAGE_RECIPE_GROUP_SUMMARIES } from '@library/lib/pageRecipeGroupSummaries';
+import { recipeMatchesQuery } from '@library/lib/recipeMatchesQuery';
+import { safeInitialGroupId } from '@library/lib/safeInitialGroupId';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
 import { useRouter } from 'next/navigation';
 import { type ChangeEvent, useCallback, useMemo, useState } from 'react';
-
-const groupSummaries = PAGE_RECIPE_GROUPS.map((group) => ({
-  id: group.id,
-  label: group.label,
-  count: PAGE_RECIPES.filter((recipe) => recipe.groupId === group.id).length,
-}));
-
-const recipeMatchesQuery = (recipe: PageRecipe, query: string): boolean => {
-  if (query.trim() === '') {
-    return true;
-  }
-  const haystack = [
-    recipe.title,
-    recipe.summary,
-    recipe.groupLabel,
-    recipe.targetRoute,
-    recipe.exportName,
-    ...recipe.todos,
-    ...recipe.installNotes.map((note) => note.note),
-  ].join(' ');
-  return haystack.toLowerCase().includes(query.trim().toLowerCase());
-};
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 interface PageRecipeBrowserProps {
   readonly initialGroupId?: string;
 }
-
-type PageRecipeBrowserGroup = (typeof PAGE_RECIPE_GROUPS)[number];
-
-interface GroupedPageRecipes {
-  readonly group: PageRecipeBrowserGroup;
-  readonly recipes: readonly PageRecipe[];
-}
-
-const safeInitialGroupId = (groupId: string | undefined): string => {
-  if (groupId !== undefined && groupSummaries.some((group) => group.id === groupId)) {
-    return groupId;
-  }
-  return 'all';
-};
-
-const PageRecipeSections = ({ grouped }: { readonly grouped: readonly GroupedPageRecipes[] }) => (
-  <div className="space-y-8">
-    {grouped.map(({ group, recipes }) => (
-      <section key={group.id}>
-        <div className="mb-3">
-          <h2 className="font-semibold text-xl">{group.label}</h2>
-          <p className="text-muted-foreground text-sm">{group.description}</p>
-        </div>
-        <div className="grid gap-4">
-          {recipes.map((recipe) => (
-            <PageRecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
-      </section>
-    ))}
-    {grouped.length === 0 ? (
-      <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
-        No page recipes match this search.
-      </div>
-    ) : null}
-  </div>
-);
 
 /**
  * Render the Page recipe catalog browser.
@@ -84,7 +28,7 @@ export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) =>
   const router = useRouter();
   const ready = useClientReady();
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebouncedValue(query, 250);
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [groupId, setGroupId] = useState(safeInitialGroupId(initialGroupId));
 
   const handleGroupChange = useCallback(
@@ -126,16 +70,19 @@ export const PageRecipeBrowser = ({ initialGroupId }: PageRecipeBrowserProps) =>
       <CatalogSidebar
         activePageGroup={groupId}
         onPageGroupChange={handleGroupChange}
-        pageGroups={groupSummaries}
+        pageGroups={PAGE_RECIPE_GROUP_SUMMARIES}
         surface="pages"
       />
-      <SidebarInset className="pb-24">
+      <SidebarInset className="min-w-0 overflow-x-clip pb-24">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
           <SidebarTrigger className="-ms-1" />
           <span className="font-semibold text-sm">Pages</span>
         </header>
 
-        <main className="flex-1 p-6 md:p-8" data-page-recipes-ready={ready ? 'true' : 'false'}>
+        <main
+          className="min-w-0 flex-1 p-6 md:p-8"
+          data-page-recipes-ready={ready ? 'true' : 'false'}
+        >
           <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="font-medium text-muted-foreground text-sm">

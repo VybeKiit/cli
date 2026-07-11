@@ -67,7 +67,7 @@ export const PricingPlanSlide = () => {
   return (
     <div className="flex h-full flex-col bg-[var(--light-card)] p-3">
       <div className="mb-2 text-center">
-        <Badge className="text-[9px]" variant="secondary">
+        <Badge className="text-xs" variant="secondary">
           Demo pricing
         </Badge>
         <p className="mt-1 font-bold text-[var(--light-text)] text-sm">Pick your plan</p>
@@ -83,7 +83,7 @@ export const PricingPlanSlide = () => {
             key={plan.name}
           >
             <CardHeader className="p-2 pb-0">
-              <CardTitle className="text-[10px] text-[var(--light-text)]">{plan.name}</CardTitle>
+              <CardTitle className="text-xs text-[var(--light-text)]">{plan.name}</CardTitle>
               <p className="font-bold text-[var(--light-text)] text-base">
                 <AnimatedNumber value={plan.price} />
               </p>
@@ -92,14 +92,14 @@ export const PricingPlanSlide = () => {
               <Separator className="mb-2 bg-black/8" />
               <ul className="flex-1 space-y-1">
                 {plan.features.map((feature) => (
-                  <li className="text-[8px] text-[var(--light-muted)]" key={feature}>
+                  <li className="text-xs text-[var(--light-muted)]" key={feature}>
                     • {feature}
                   </li>
                 ))}
               </ul>
               <Button
                 className={cn(
-                  'mt-2 h-6 w-full text-[8px]',
+                  'mt-2 h-6 w-full text-xs',
                   plan.highlighted && 'bg-[var(--blue)] hover:bg-[var(--blue-strong)]',
                 )}
                 onClick={handleConfetti}

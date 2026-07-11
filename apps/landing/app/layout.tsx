@@ -3,7 +3,11 @@ import type { ReactNode } from 'react';
 import { JsonLd } from '@/components/JsonLd';
 import { VisitorScripts } from '@/components/VisitorScripts';
 import { BRAND, SEO_KEYWORDS } from '@/data/site';
-import { organizationJsonLd, websiteJsonLd } from '@/data/structuredData';
+import {
+  organizationJsonLd,
+  softwareApplicationJsonLd,
+  websiteJsonLd,
+} from '@/data/structuredData';
 import { cdnAssetUrl } from '@/lib/cdnAssets';
 import { resolveDirection } from '@/lib/direction';
 import './globals.css';
@@ -52,6 +56,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  other: {
+    // Hint for tools that look for AI documentation maps (also served at /llms.txt).
+    'llms-txt': `${BRAND.url}/llms.txt`,
+  },
 };
 
 /**
@@ -73,7 +81,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <html lang={lang} dir={dir} suppressHydrationWarning={true}>
       <body suppressHydrationWarning={true}>
-        <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
+        <JsonLd data={[organizationJsonLd, websiteJsonLd, softwareApplicationJsonLd]} />
         <VisitorScripts />
         {children}
         {DevShells ? <DevShells /> : null}

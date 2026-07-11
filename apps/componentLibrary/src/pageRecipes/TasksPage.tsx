@@ -5,13 +5,15 @@ import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Checkbox } from '@vybekiit/ui/checkbox';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
+import { SegmentedControl, SegmentedControlItem } from '@vybekiit/ui/segmented-control';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { CheckCircle2, Circle, ListTodo, Plus, Trash2 } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type TaskStatus = 'todo' | 'doing' | 'done';
 type Priority = 'low' | 'normal' | 'high';
@@ -35,6 +37,9 @@ const PRIORITY_META: Record<Priority, { readonly label: string; readonly classNa
     className: 'border-red-500/40 bg-red-500/10 text-red-600',
   },
 };
+
+/** Priority options for the create-task select (labels from PRIORITY_META). */
+const PRIORITY_OPTIONS = Object.keys(PRIORITY_META) as readonly Priority[];
 
 const STATUS_FILTERS: readonly { readonly value: StatusFilter; readonly label: string }[] = [
   { value: 'all', label: 'All' },
@@ -182,7 +187,7 @@ export const TasksPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Tasks motion pass">
       <main className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-6 space-y-1">
           <Badge className="w-fit" variant="secondary">
@@ -199,9 +204,15 @@ export const TasksPage = () => {
         </p>
 
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <Kpi label="To do" value={counts.todo} />
-          <Kpi label="Doing" value={counts.doing} />
-          <Kpi label="Done" value={counts.done} />
+          {(
+            [
+              { key: 'to-do', label: 'To do', value: counts.todo },
+              { key: 'doing', label: 'Doing', value: counts.doing },
+              { key: 'done', label: 'Done', value: counts.done },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </div>
 
         <Card className="mb-4">
@@ -241,9 +252,11 @@ export const TasksPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
+                    {PRIORITY_OPTIONS.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {PRIORITY_META[value].label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -258,28 +271,17 @@ export const TasksPage = () => {
           <span className="text-muted-foreground text-sm" id={filterLabelId}>
             Show
           </span>
-          <div
+          <SegmentedControl
             aria-labelledby={filterLabelId}
-            className="flex flex-wrap gap-1 rounded-lg border bg-muted p-1"
-            role="group"
+            onValueChange={(value) => setFilter(value as typeof filter)}
+            value={filter}
           >
             {STATUS_FILTERS.map((option) => (
-              <button
-                aria-pressed={filter === option.value}
-                className={cn(
-                  'rounded-md px-3 py-1.5 font-medium text-sm transition-colors',
-                  filter === option.value
-                    ? 'bg-background shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                key={option.value}
-                onClick={() => setFilter(option.value)}
-                type="button"
-              >
+              <SegmentedControlItem key={option.value} value={option.value}>
                 {option.label}
-              </button>
+              </SegmentedControlItem>
             ))}
-          </div>
+          </SegmentedControl>
         </div>
 
         <Card>
@@ -370,54 +372,32 @@ export const TasksPage = () => {
           </CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — complete toggles, filters, add, and delete all
-              recompute the list. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset tasks</code> for <code>task_lists</code> and{' '}
-                <code>tasks</code>.
-              </li>
-              <li>
-                <code>GET /api/tasks?status=</code> loads rows; map <code>status</code> to{' '}
-                <code>todo</code> / <code>doing</code> / <code>done</code>.
-              </li>
-              <li>
-                Checkbox → <code>PATCH /api/tasks/:id</code> with{' '}
-                <code>{'{ status: "done" }'}</code> (or back to <code>todo</code>).
-              </li>
-              <li>
-                Add form → <code>POST /api/tasks</code> with{' '}
-                <code>{'{ title, priority, listId }'}</code>; delete →{' '}
-                <code>DELETE /api/tasks/:id</code>.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — complete toggles, filters, add, and delete all
+            recompute the list. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset tasks</code> for <code>task_lists</code> and{' '}
+              <code>tasks</code>.
+            </li>
+            <li>
+              <code>GET /api/tasks?status=</code> loads rows; map <code>status</code> to{' '}
+              <code>todo</code> / <code>doing</code> / <code>done</code>.
+            </li>
+            <li>
+              Checkbox → <code>PATCH /api/tasks/:id</code> with <code>{'{ status: "done" }'}</code>{' '}
+              (or back to <code>todo</code>).
+            </li>
+            <li>
+              Add form → <code>POST /api/tasks</code> with{' '}
+              <code>{'{ title, priority, listId }'}</code>; delete →{' '}
+              <code>DELETE /api/tasks/:id</code>.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Tasks motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** Small count tile above the task list. */
-const Kpi = ({ label, value }: { readonly label: string; readonly value: number }) => (
-  <Card>
-    <CardContent className="p-3 text-center">
-      <p className="font-semibold text-2xl tabular-nums">{value}</p>
-      <p className="text-muted-foreground text-xs">{label}</p>
-    </CardContent>
-  </Card>
-);

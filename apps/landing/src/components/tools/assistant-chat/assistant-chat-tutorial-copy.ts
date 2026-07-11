@@ -13,25 +13,32 @@ export const ASSISTANT_TUTORIAL_STEPS: readonly WalkthroughStep[] = [
   },
   {
     id: 'switch-agent',
-    title: 'Switch your agent',
-    body: 'Flip between Claude, Codex, and Cursor here — each one keeps its own chat and model choice.',
+    title: 'Pick your agent',
+    body: 'Choose Claude, Codex, Cursor, or another installed agent. The name in the bar is who you are talking to.',
     target: '[data-walkthrough="switch-agent"]',
+  },
+  {
+    id: 'resume',
+    title: 'Resume past chats',
+    body: 'Open Resume to see every conversation for the agent you picked — including chats from other project folders on your computer (Claude Code is usually the longest list). Each row shows a small folder path so you know which project it belongs to. Pick one and keep going from here.',
+    target: '[data-walkthrough="resume"]',
   },
   {
     id: 'upload',
     title: 'Attach files & images',
-    body: 'Add screenshots, docs, or links. Images show up right in the chat so you can point at exactly what you mean.',
+    body: 'Add screenshots or docs. Images show up in the chat so you can point at exactly what you mean.',
     target: '[data-walkthrough="upload"]',
   },
   {
     id: 'send',
     title: 'Send your message',
-    body: 'Hit send to hand your note — and any attachments — straight to your agent.',
+    body: 'Hit send to hand your note and any attachments straight to your agent.',
     target: '[data-walkthrough="send"]',
   },
   {
     id: 'production-note',
-    title: 'This is just for building',
-    body: 'Relax — this dev chat and the agent names (Claude / Codex / Cursor) are just your building tools. The people who use your live app or extension never see any of this.',
+    title: 'Only you see this',
+    body: 'This chat and the agent names are building tools. People who visit your live site never see any of this.',
+    target: '[data-walkthrough="privacy-notice"]',
   },
 ];

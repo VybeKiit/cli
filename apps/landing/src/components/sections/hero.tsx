@@ -22,7 +22,7 @@ export const Hero = () => {
     <section className="mx-auto grid max-w-5xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:py-20">
       <div className="flex flex-col items-start gap-6">
         <p className="text-muted-foreground text-sm">{hero.eyebrow}</p>
-        <h1 className="text-balance font-bold text-4xl tracking-tight sm:text-5xl">
+        <h1 className="text-balance font-bold text-4xl leading-[1.4] tracking-tight sm:text-5xl sm:leading-[1.38]">
           {hero.headlineBefore}
           <span className="marker-highlight">{hero.headlineHighlight}</span>
           {hero.headlineAfter}

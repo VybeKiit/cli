@@ -37,7 +37,7 @@ export const ReportControlHint = ({
       <TooltipTrigger asChild={true}>{children}</TooltipTrigger>
       <TooltipContent
         className={cn(
-          'max-w-[11rem] border border-white/12 bg-[#080b12] px-2 py-1.5 text-center font-medium text-[0.62rem] text-white/88 leading-snug shadow-lg',
+          'max-w-[11rem] border border-white/12 bg-[#080b12] px-2 py-1.5 text-center font-medium text-xs text-white/88 leading-snug shadow-lg',
           className,
         )}
         side="top"

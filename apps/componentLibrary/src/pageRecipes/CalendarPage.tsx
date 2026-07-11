@@ -3,13 +3,14 @@
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@vybekiit/ui/empty';
 import { Input } from '@vybekiit/ui/input';
 import { Label } from '@vybekiit/ui/label';
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, MapPin, Plus } from 'lucide-react';
-import { type FormEvent, type ReactNode, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 /** One calendar event (mirrors calendar_events). `day` is 1–31 in the demo month. */
 type CalEvent = {
@@ -168,7 +169,7 @@ export const CalendarPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="scale" title="Calendar motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -280,12 +281,14 @@ export const CalendarPage = () => {
               </CardHeader>
               <CardContent>
                 {dayEvents.length === 0 ? (
-                  <div className="rounded-lg border border-dashed px-3 py-8 text-center">
-                    <p className="font-medium text-sm">No events</p>
-                    <p className="mt-1 text-muted-foreground text-xs">
-                      Add one below for this day.
-                    </p>
-                  </div>
+                  <Empty variant="compact">
+                    <EmptyHeader>
+                      <EmptyTitle className="text-sm">No events</EmptyTitle>
+                      <EmptyDescription className="text-xs">
+                        Add one below for this day.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 ) : (
                   <ul aria-label="Events for selected day" className="space-y-2">
                     {dayEvents.map((ev) => (
@@ -372,43 +375,33 @@ export const CalendarPage = () => {
           </div>
         </div>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — day selection lists events, and the form appends
-              onto the selected day with live dots on the grid. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset calendar_events</code> for{' '}
-                <code>calendar_events</code> and <code>calendar_event_attendees</code>.
-              </li>
-              <li>
-                <code>GET /api/calendar/events?from=&amp;to=</code> loads the visible range (
-                <code>starts_at</code> / <code>ends_at</code> timestamptz).
-              </li>
-              <li>
-                Add form → <code>POST /api/calendar/events</code> with{' '}
-                <code>{'{ title, startsAt, endsAt, location }'}</code>.
-              </li>
-              <li>
-                Enable month navigation by swapping the fixed demo month for real date math and
-                re-fetching on range change.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — day selection lists events, and the form appends
+            onto the selected day with live dots on the grid. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset calendar_events</code> for{' '}
+              <code>calendar_events</code> and <code>calendar_event_attendees</code>.
+            </li>
+            <li>
+              <code>GET /api/calendar/events?from=&amp;to=</code> loads the visible range (
+              <code>starts_at</code> / <code>ends_at</code> timestamptz).
+            </li>
+            <li>
+              Add form → <code>POST /api/calendar/events</code> with{' '}
+              <code>{'{ title, startsAt, endsAt, location }'}</code>.
+            </li>
+            <li>
+              Enable month navigation by swapping the fixed demo month for real date math and
+              re-fetching on range change.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper (matches the other recipes). */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="scale" title="Calendar motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);

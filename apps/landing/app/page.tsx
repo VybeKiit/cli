@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import { HomeGeoLead } from '@/components/discoverability/HomeGeoLead';
 import { JsonLd } from '@/components/JsonLd';
 import { MarketingShell } from '@/components/MarketingShell';
 import { Hero } from '@/components/sections/hero';
@@ -15,6 +16,7 @@ const TechTrustStrip = dynamic(() =>
 const OperatorSteps = dynamic(() =>
   import('@/components/sections/OperatorSteps').then((m) => m.OperatorSteps),
 );
+const VibeStory = dynamic(() => import('@/components/sections/VibeStory').then((m) => m.VibeStory));
 const ProblemSolution = dynamic(() =>
   import('@/components/sections/ProblemSolution').then((m) => m.ProblemSolution),
 );
@@ -44,9 +46,11 @@ export const metadata: Metadata = {
 const HomePage = () => (
   <MarketingShell>
     <JsonLd data={[productJsonLd, faqJsonLd]} />
+    <HomeGeoLead />
     <Hero />
     <TechTrustStrip />
     <OperatorSteps />
+    <VibeStory />
     <ProblemSolution />
     <PlatformsBundle />
     <PageRecipesCarousel />

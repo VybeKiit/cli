@@ -1,9 +1,11 @@
 'use client';
 
+import { Alert, AlertDescription } from '@vybekiit/ui/alert';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Input } from '@vybekiit/ui/input';
+import { Kpi } from '@vybekiit/ui/kpi';
 import { Label } from '@vybekiit/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vybekiit/ui/select';
 import { Skeleton } from '@vybekiit/ui/skeleton';
@@ -18,9 +20,10 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react';
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoPlugInPanel } from './shared/DemoPlugInPanel';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 type Severity = 'info' | 'warning' | 'critical';
 type SeverityFilter = 'all' | Severity;
@@ -147,6 +150,7 @@ export const AuditLogPage = () => {
   const [events] = useState<readonly AuditEvent[]>(INITIAL_EVENTS);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const [severity, setSeverity] = useState<SeverityFilter>('all');
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -163,7 +167,7 @@ export const AuditLogPage = () => {
   }, []);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return events.filter((event) => {
       const matchesSeverity = severity === 'all' || event.severity === severity;
       const matchesQuery =
@@ -173,7 +177,7 @@ export const AuditLogPage = () => {
         event.resource.toLowerCase().includes(q);
       return matchesSeverity && matchesQuery;
     });
-  }, [events, query, severity]);
+  }, [events, debouncedQuery, severity]);
 
   const kpis = useMemo(() => {
     const critical = events.filter((e) => e.severity === 'critical').length;
@@ -234,11 +238,19 @@ export const AuditLogPage = () => {
         <Table aria-labelledby={tableCaptionId}>
           <TableHeader>
             <TableRow>
-              <TableHead>When</TableHead>
-              <TableHead>Actor</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead className="hidden md:table-cell">Resource</TableHead>
-              <TableHead>Severity</TableHead>
+              {(
+                [
+                  { key: 'when', label: 'When' },
+                  { key: 'actor', label: 'Actor' },
+                  { key: 'action', label: 'Action' },
+                  { key: 'resource', label: 'Resource', className: 'hidden md:table-cell' },
+                  { key: 'severity', label: 'Severity' },
+                ] as const
+              ).map(({ key, label, ...head }) => (
+                <TableHead key={key} {...head}>
+                  {label}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -271,7 +283,7 @@ export const AuditLogPage = () => {
   }
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Audit log motion pass">
       <main className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
@@ -317,34 +329,44 @@ export const AuditLogPage = () => {
           {notice ?? ''}
         </p>
         {notice ? (
-          <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-emerald-700 text-sm">
-            {notice}
-          </div>
+          <Alert className="mb-4" variant="success">
+            <AlertDescription>{notice}</AlertDescription>
+          </Alert>
         ) : null}
 
         <section aria-label="Audit metrics" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Kpi
-            icon={<FileClock aria-hidden="true" className="h-4 w-4" />}
-            label="Events"
-            value={String(kpis.total)}
-          />
-          <Kpi
-            icon={<ShieldAlert aria-hidden="true" className="h-4 w-4" />}
-            label="Critical"
-            value={String(kpis.critical)}
-            valueClassName={kpis.critical > 0 ? 'text-red-600' : undefined}
-          />
-          <Kpi
-            icon={<ShieldCheck aria-hidden="true" className="h-4 w-4" />}
-            label="Warnings"
-            value={String(kpis.warning)}
-            valueClassName={kpis.warning > 0 ? 'text-amber-600' : undefined}
-          />
-          <Kpi
-            icon={<Search aria-hidden="true" className="h-4 w-4" />}
-            label="Actors"
-            value={String(kpis.actors)}
-          />
+          {(
+            [
+              {
+                key: 'events',
+                icon: <FileClock aria-hidden="true" className="h-4 w-4" />,
+                label: 'Events',
+                value: String(kpis.total),
+              },
+              {
+                key: 'critical',
+                icon: <ShieldAlert aria-hidden="true" className="h-4 w-4" />,
+                label: 'Critical',
+                value: String(kpis.critical),
+                valueClassName: kpis.critical > 0 ? 'text-red-600' : undefined,
+              },
+              {
+                key: 'warnings',
+                icon: <ShieldCheck aria-hidden="true" className="h-4 w-4" />,
+                label: 'Warnings',
+                value: String(kpis.warning),
+                valueClassName: kpis.warning > 0 ? 'text-amber-600' : undefined,
+              },
+              {
+                key: 'actors',
+                icon: <Search aria-hidden="true" className="h-4 w-4" />,
+                label: 'Actors',
+                value: String(kpis.actors),
+              },
+            ] as const
+          ).map(({ key, ...tile }) => (
+            <Kpi key={key} {...tile} />
+          ))}
         </section>
 
         <Card>
@@ -363,7 +385,7 @@ export const AuditLogPage = () => {
                 <div className="relative">
                   <Search
                     aria-hidden="true"
-                    className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground"
+                    className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                   />
                   <Input
                     className="pl-9"
@@ -398,68 +420,31 @@ export const AuditLogPage = () => {
           <CardContent>{tableBody}</CardContent>
         </Card>
 
-        <details className="mt-8 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-medium">Plug this into your app</summary>
-          <div className="mt-3 space-y-2 text-muted-foreground">
-            <p>
-              Fully interactive with local state — search and severity filters recompute the table,
-              and Export builds a demo CSV. To make it real:
-            </p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Run <code>vybekiit apply-preset audit_log</code> for the append-only{' '}
-                <code>audit_log</code> table.
-              </li>
-              <li>
-                <code>GET /api/admin/audit-log?severity=&amp;q=</code> reads rows via{' '}
-                <code>@vybekiit/db</code> (
-                <code>{'{ actor_id, action, resource_type, resource_id, created_at }'}</code>).
-              </li>
-              <li>
-                Write security-sensitive actions from auth, admin, and payments into this table —
-                never update or delete rows.
-              </li>
-              <li>
-                Export streams the filtered set as CSV from an admin-guarded compliance endpoint.
-              </li>
-            </ol>
-          </div>
-        </details>
+        <DemoPlugInPanel>
+          <p>
+            Fully interactive with local state — search and severity filters recompute the table,
+            and Export builds a demo CSV. To make it real:
+          </p>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>
+              Run <code>vybekiit apply-preset audit_log</code> for the append-only{' '}
+              <code>audit_log</code> table.
+            </li>
+            <li>
+              <code>GET /api/admin/audit-log?severity=&amp;q=</code> reads rows via{' '}
+              <code>@vybekiit/db</code> (
+              <code>{'{ actor_id, action, resource_type, resource_id, created_at }'}</code>).
+            </li>
+            <li>
+              Write security-sensitive actions from auth, admin, and payments into this table —
+              never update or delete rows.
+            </li>
+            <li>
+              Export streams the filtered set as CSV from an admin-guarded compliance endpoint.
+            </li>
+          </ol>
+        </DemoPlugInPanel>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
-
-/** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Audit log motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
-
-/** One KPI tile. */
-const Kpi = ({
-  icon,
-  label,
-  value,
-  valueClassName,
-}: {
-  readonly icon: ReactNode;
-  readonly label: string;
-  readonly value: string;
-  readonly valueClassName?: string;
-}) => (
-  <Card>
-    <CardContent className="flex items-center gap-3 p-4">
-      <span className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
-        {icon}
-      </span>
-      <div>
-        <p className="text-muted-foreground text-xs">{label}</p>
-        <p className={cn('font-semibold text-lg tabular-nums', valueClassName)}>{value}</p>
-      </div>
-    </CardContent>
-  </Card>
-);

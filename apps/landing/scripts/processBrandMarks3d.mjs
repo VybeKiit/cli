@@ -293,15 +293,9 @@ export interface HeroStackMarkEntry {
   readonly floatPhase: number;
 }
 
-/** @deprecated Use HERO_STACK_MARKS */
-export type BrandMark3DEntry = HeroStackMarkEntry;
-
 export const HERO_STACK_MARKS: readonly HeroStackMarkEntry[] = [
 ${lines.join('\n')}
 ];
-
-/** @deprecated Use HERO_STACK_MARKS */
-export const BRAND_MARKS_3D = HERO_STACK_MARKS;
 `;
 };
 

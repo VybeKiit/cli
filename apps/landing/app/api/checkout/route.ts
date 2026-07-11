@@ -1,16 +1,12 @@
 import { type AppConfig, appConfigSchema, parseEnv, storeConfigSchema } from '@vybekiit/core';
 import { decodeJsonBody, readRequestJson } from '@vybekiit/core/http';
-import { resolvePaymentProvider } from '@vybekiit/payments';
-import { Effect, Either, Schema } from 'effect';
+import { resolvePaymentProvider, resolveStoreProductId } from '@vybekiit/payments';
+import { Effect, Either } from 'effect';
 import { NextResponse } from 'next/server';
 import { AnalyticsEvent } from '@/lib/analyticsEvents';
 import { captureServerEvent } from '@/lib/analyticsServer';
-import { isValidEmail, isValidGithubUsername } from '@/lib/validation';
-
-const LandingCheckoutBodySchema = Schema.Struct({
-  githubUsername: Schema.String,
-  email: Schema.String,
-});
+import { getPriceLadderSnapshot } from '@/lib/priceLadderStore';
+import { LandingCheckoutBodySchema } from '@/lib/validation';
 
 /**
  * Start a purchase of VybeKiit itself.
@@ -21,7 +17,7 @@ const LandingCheckoutBodySchema = Schema.Struct({
  * checkout `{ url }` for the client to redirect to. Provider-agnostic via
  * {@link resolvePaymentProvider} — Lemon Squeezy is the default Merchant of Record.
  *
- * POST body: `{ githubUsername: string, email: string }`.
+ * POST body: `{ githubUsername: string, email: string }` (Effect Schema validated).
  *
  * @param request - Incoming checkout request.
  * @returns JSON response with a hosted checkout URL or an error.
@@ -33,6 +29,8 @@ const POST = async (request: Request): Promise<NextResponse> => {
   if (!json.ok) {
     return NextResponse.json(json.response.body, { status: json.response.status });
   }
+
+  // Shape + domain rules (GitHub username, email) live in LandingCheckoutBodySchema.
   const parsed = decodeJsonBody(
     json.body,
     LandingCheckoutBodySchema,
@@ -44,17 +42,12 @@ const POST = async (request: Request): Promise<NextResponse> => {
   const { githubUsername, email } = parsed.body;
   const distinctId = email.trim().toLowerCase();
 
-  if (!isValidGithubUsername(githubUsername)) {
-    return NextResponse.json({ error: 'Enter a valid GitHub username.' }, { status: 400 });
-  }
-  if (!isValidEmail(email)) {
-    return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
-  }
-
   let productId: string;
   let app: AppConfig;
   try {
-    productId = parseEnv(storeConfigSchema).STORE_PRODUCT_ID;
+    // Prefer LEMONSQUEEZY_TEST_MODE_STORE_PRODUCT_ID when test-mode keys are active so
+    // production STORE_PRODUCT_ID stays the live variant.
+    productId = resolveStoreProductId() ?? parseEnv(storeConfigSchema).STORE_PRODUCT_ID;
     app = parseEnv(appConfigSchema);
   } catch {
     await captureServerEvent(distinctId, AnalyticsEvent.checkoutSessionFailed, {
@@ -64,6 +57,10 @@ const POST = async (request: Request): Promise<NextResponse> => {
     return NextResponse.json({ error: 'Checkout is not available right now.' }, { status: 500 });
   }
 
+  // Lock the live ladder price onto this checkout (LS custom_price) so the buyer
+  // pays the rung they saw — concurrent sales do not change an open session.
+  const ladder = await getPriceLadderSnapshot();
+
   const checkout = await Effect.runPromise(
     Effect.either(
       resolvePaymentProvider().createCheckout({
@@ -72,6 +69,7 @@ const POST = async (request: Request): Promise<NextResponse> => {
         email,
         successUrl: `${app.APP_URL}/success`,
         cancelUrl: `${app.APP_URL}/cancel`,
+        customPriceCents: ladder.amountCents,
       }),
     ),
   );
@@ -89,9 +87,15 @@ const POST = async (request: Request): Promise<NextResponse> => {
     source: 'server',
     product_id: productId,
     github_username: githubUsername.trim(),
+    price_usd: ladder.amount,
+    sale_count: ladder.saleCount,
   });
 
-  return NextResponse.json({ url: checkout.right.url });
+  return NextResponse.json({
+    url: checkout.right.url,
+    priceUsd: ladder.amount,
+    priceDisplay: ladder.display,
+  });
 };
 
 export { POST };

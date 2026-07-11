@@ -1,7 +1,16 @@
-/* Hide walkthrough overlay on landing page */
-.vybe-walkthrough {
+/*
+ * App-wide host policy: hide walkthrough chrome on the marketing site by default
+ * (report-mode / accidental first-run tours). Assistant chat opts in with
+ * `.vybe-walkthrough--floating-panel` (portaled above the dock via the ? button).
+ */
+.vybe-walkthrough:not(.vybe-walkthrough--floating-panel) {
   display: none !important;
 }
+
+.vybe-walkthrough.vybe-walkthrough--floating-panel {
+  display: block !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -83,11 +92,9 @@
  * Visitor marketing shell: mockup accents only. Light/dark tokens come from
  * `:root` / `html.dark` so the navbar theme toggle actually switches the page.
  *
- * Theme flips are INSTANT (CSS variables on `html.dark`). Do not add page-wide
- * color/background transitions or View Transitions here — they force style
- * recalc + compositing across the whole tree and feel laggy on mobile.
- * next-themes `disableTransitionOnChange` also suppresses transitions during
- * the class flip as a belt-and-suspenders guard.
+ * Theme flips use a soft root crossfade via the View Transitions API
+ * (see ThemeToggle). Element-level color transitions stay off so the whole
+ * tree does not tween and feel laggy on mobile.
  */
 .visitor-light {
   /* Sparkline + accent used by mockups */
@@ -101,13 +108,70 @@ html.dark .visitor-light {
   color-scheme: dark;
 }
 
-/* Theme toggle: short icon swap only (page surfaces stay instant). */
+/*
+ * Soft vibe fade for light ↔ dark. Snapshots the page, fades the old root out
+ * and the new root in. Scoped with data-theme-vt so other VTs stay untouched.
+ */
+html[data-theme-vt="fade"]::view-transition-old(root),
+html[data-theme-vt="fade"]::view-transition-new(root) {
+  animation-duration: 0.48s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+html[data-theme-vt="fade"]::view-transition-old(root) {
+  animation-name: theme-fade-out;
+  z-index: 1;
+}
+
+html[data-theme-vt="fade"]::view-transition-new(root) {
+  animation-name: theme-fade-in;
+  z-index: 2;
+}
+
+@keyframes theme-fade-out {
+  0% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(6px) brightness(0.92);
+    transform: scale(1.012);
+  }
+}
+
+@keyframes theme-fade-in {
+  0% {
+    opacity: 0;
+    filter: blur(8px) brightness(1.06);
+    transform: scale(0.988);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme-vt="fade"]::view-transition-old(root),
+  html[data-theme-vt="fade"]::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+/* Theme toggle: icon swap rides the page fade. */
 .visitor-light .theme-toggle-btn {
   position: relative;
   overflow: visible;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+    background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .visitor-light .theme-toggle-btn::after {
@@ -117,7 +181,7 @@ html.dark .visitor-light {
   border-radius: inherit;
   opacity: 0;
   background: radial-gradient(circle at center, hsl(var(--foreground) / 0.14) 0%, transparent 70%);
-  transition: opacity 0.15s ease;
+  transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -130,12 +194,13 @@ html.dark .visitor-light {
   display: inline-block;
   width: 1rem;
   height: 1rem;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .visitor-light .theme-toggle-icon {
   transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
+    opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: center;
 }
 
@@ -146,13 +211,12 @@ html.dark .visitor-light {
 
 .visitor-light .theme-toggle-icon--out {
   opacity: 0;
-  transform: rotate(-90deg) scale(0.5);
+  transform: rotate(-100deg) scale(0.45);
   pointer-events: none;
 }
 
 .visitor-light .theme-toggle-btn:active .theme-toggle-icon-wrap {
-  transform: scale(0.9);
-  transition: transform 0.1s ease;
+  transform: scale(0.88);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -576,45 +640,47 @@ html.dark .visitor-light {
 }
 
 /*
- * Highlighter-marker sweep for hero phrases vibe coders must notice
- * (e.g. "your first payment"). Pure CSS so the LCP headline stays SSR.
+ * Highlighter-marker sweep for hero phrases vibe coders must notice.
+ * Light: black pad + white type. Dark: inverted (white pad + black type).
+ * `box-decoration-break: clone` paints each wrapped line as its own chip —
+ * roomy padding + line-height keep chips from stacking tight.
  */
 .visitor-light .marker-highlight {
   position: relative;
   display: inline;
   font-weight: 800;
-  padding: 0 0.14em;
-  margin: 0 -0.04em;
-  border-radius: 0.18em;
+  padding: 0.2em 0.42em;
+  margin-inline: 0.08em;
+  border-radius: 0.28em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  background-image: linear-gradient(
-    105deg,
-    rgba(250, 204, 21, 0.72) 0%,
-    rgba(253, 224, 71, 0.58) 55%,
-    rgba(251, 191, 36, 0.65) 100%
-  );
+  background-image: linear-gradient(#0a0a0a, #0a0a0a);
   background-repeat: no-repeat;
-  background-size: 0% 92%;
-  background-position: 0% 72%;
-  color: inherit;
+  background-size: 0% 100%;
+  background-position: 0% 50%;
+  color: #ffffff;
   animation: marker-highlight-sweep 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+
+html.dark .visitor-light .marker-highlight {
+  background-image: linear-gradient(#fafafa, #fafafa);
+  color: #0a0a0a;
 }
 
 @keyframes marker-highlight-sweep {
   0% {
-    background-size: 0% 92%;
+    background-size: 0% 100%;
   }
 
   100% {
-    background-size: 100% 92%;
+    background-size: 100% 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .visitor-light .marker-highlight {
     animation: none;
-    background-size: 100% 92%;
+    background-size: 100% 100%;
   }
 }
 

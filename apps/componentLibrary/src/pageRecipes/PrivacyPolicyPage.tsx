@@ -5,10 +5,9 @@ import { Button } from '@vybekiit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@vybekiit/ui/card';
 import { Checkbox } from '@vybekiit/ui/checkbox';
 import { CheckCircle2, Mail, ShieldCheck } from 'lucide-react';
-import { type ReactNode, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { DemoThemeRandomizer } from './shared/DemoThemeRandomizer';
-import { DemoTransitionStage } from './shared/DemoTransitionStage';
+import { DemoRecipeFrame } from './shared/DemoRecipeFrame';
 
 const companyProfile = {
   name: 'Example Company',
@@ -86,7 +85,7 @@ export const PrivacyPolicyPage = () => {
   };
 
   return (
-    <Frame>
+    <DemoRecipeFrame defaultTransition="fade" title="Privacy motion pass">
       <main className="mx-auto max-w-5xl px-4 py-10">
         <header className="mb-8 space-y-4">
           <Badge className="w-fit" variant="secondary">
@@ -154,7 +153,7 @@ export const PrivacyPolicyPage = () => {
             aria-label="Privacy sections"
             className="h-fit rounded-lg border bg-card p-3 lg:sticky lg:top-4"
           >
-            <p className="mb-2 font-medium text-xs text-muted-foreground">On this page</p>
+            <p className="mb-2 font-medium text-muted-foreground text-xs">On this page</p>
             <ul className="space-y-1">
               <li>
                 <button
@@ -254,15 +253,8 @@ export const PrivacyPolicyPage = () => {
           </div>
         </div>
       </main>
-    </Frame>
+    </DemoRecipeFrame>
   );
 };
 
 /** Gallery theme + motion wrapper. */
-const Frame = ({ children }: { readonly children: ReactNode }) => (
-  <DemoThemeRandomizer>
-    <DemoTransitionStage defaultTransition="fade" title="Privacy motion pass">
-      <div className="min-h-screen bg-background text-foreground">{children}</div>
-    </DemoTransitionStage>
-  </DemoThemeRandomizer>
-);
