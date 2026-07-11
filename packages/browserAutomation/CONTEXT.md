@@ -34,17 +34,31 @@ vybekiit-automate gd setup --json
 vybekiit-automate google standby --json
 vybekiit-automate google oauth --project=<id> --app-name=<name> --support-email=<email> \
     --app-url=https://example.com --redirect=https://example.com/api/auth/callback/google \
+    --redirect=http://localhost:3000/api/auth/callback/google \
+    [--js-origin=http://localhost:3000] \
     [--privacy=url] [--terms=url] [--logo=/path/to/120x120.png] \
     [--scope=openid --scope=email --scope=profile] [--publish] [--reset-secret] --json
 ```
 
+**When to use `google oauth`:** local or prod sign-in shows Google **Error 400: `redirect_uri_mismatch`**
+(Auth.js / Better Auth / any OAuth client). Agents should **not** hand-drive Chrome DevTools on the
+Console — pass the args (or MCP `run_automation({ domain: "google", command: "oauth", args })`) from
+**any** consumer cwd. The verb is **idempotent**: if `{appName} Web` already exists it **patches**
+Authorized redirect URIs + JavaScript origins in place and does **not** mint another secret unless
+`--reset-secret`. JS origins default to the origins of `--redirect` URIs (include localhost for local
+Auth.js). JSON output includes `clientId`, `reusedExisting`, `redirectsApplied`, `originsApplied`,
+`secretRotated`.
+
 **Google console specifics (redesigned Auth Platform, 2026):** the OAuth setup is a single-page
 stepper at `/auth/overview/create` (App Information → Audience → Contact → Finish), with forms built
-on Angular Material `cfc-*` controls. Two gotchas the verbs handle: (1) a floating `cfc-page-overlay-cover`
-intercepts real pointer clicks, so every click goes through `pacedDispatchClick` (a dispatched DOM
-event) while text/file inputs use fill/`setInputFiles`; (2) client secrets are **view-once** — the
-console no longer shows or downloads an existing secret, so `--reset-secret` (reuse) opens the client's
-"Information and summary" panel and clicks **Add secret** to mint a fresh readable `GOCSPX-` value.
+on Angular Material `cfc-*` controls. Gotchas the verbs handle: (1) a floating `cfc-page-overlay-cover`
+intercepts real pointer clicks → `pacedDispatchClick`; (2) empty/static `main` after navigate →
+`waitForAuthPlatformForm` reloads until fields paint; (3) URI inputs (`formcontrolname="uri"`) corrupt
+naive fill → `angularSafeFill` (native value setter + input/change/blur); (4) **two** URI stacks
+(JavaScript origins vs redirect URIs) — never write callback paths into origins; (5) empty URI rows
+block Save → merge/fill then clear empties; (6) client secrets are **view-once** — only
+`--reset-secret` (or first-time create) opens "Information and summary" → **Add secret** for a
+readable `GOCSPX-` value. Prefer URI-only patch to avoid dual-secret warnings.
 `--support-email` must be the signed-in Google account or a group it owns (a forwarded/aliased address
 is not selectable). `--logo` uploads a square PNG/JPG/BMP ≤1MB on the branding page. The verb also
 fills the **App domain** links (home page = `--app-url`; privacy/terms default to `${app-url}/privacy`

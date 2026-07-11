@@ -2,7 +2,10 @@ import { resolveVerbLogger } from '@vybekiit/browser-automation/core/verbLogger'
 import { connectToGoogleChrome } from '@vybekiit/browser-automation/domains/google/connect';
 import { waitForGoogleAuthenticated } from '@vybekiit/browser-automation/domains/google/dashboard/waitForAuthenticated';
 import { ensureProject } from '@vybekiit/browser-automation/domains/google/ensureProject';
-import { validateGoogleCredentials } from '@vybekiit/browser-automation/domains/google/scrape';
+import {
+  isValidClientId,
+  validateGoogleCredentials,
+} from '@vybekiit/browser-automation/domains/google/scrape';
 import type {
   GoogleOAuthParams,
   GoogleOAuthResult,
@@ -40,7 +43,11 @@ export const standbyGoogleLogin = async (
 };
 
 /**
- * One-shot Google OAuth setup: ensure the GCP project (gcloud), then drive the Console once to configure the consent screen and create/reset the Web OAuth client, returning credentials.
+ * One-shot Google OAuth setup: ensure the GCP project (gcloud), then drive the Console once to
+ * configure the consent screen and create/patch the Web OAuth client.
+ *
+ * Re-runs with the same `--app-name` **patch** redirects + JS origins in place (fixes
+ * `redirect_uri_mismatch` without minting another secret unless `--reset-secret`).
  *
  * @param ctx - Shared verb context for automation side effects.
  * @param params - Validated automation parameters for the operation.
@@ -59,7 +66,15 @@ export const runGoogleOAuthSetup = async (
   try {
     await configureConsent(session.page, params, session.context, log);
     const result = await createOAuthClient(session.page, params, session.context, log);
-    if (!validateGoogleCredentials(result.clientId, result.clientSecret)) {
+    if (!isValidClientId(result.clientId)) {
+      throw new Error(
+        'Read a client id from the Console but it is not a well-formed Google OAuth client ID. Re-run, or copy it manually into .env.',
+      );
+    }
+    if (
+      result.clientSecret !== undefined &&
+      !validateGoogleCredentials(result.clientId, result.clientSecret)
+    ) {
       throw new Error(
         'Read credentials from the Console but they are not well-formed Google OAuth values. Re-run, or copy them manually into .env.',
       );

@@ -258,16 +258,23 @@ const tools = [
   {
     name: 'run_automation',
     description:
-      'Run a vybekiit-automate verb from any project root (resolves the bin automatically). Always passes --json. Use dryRun=true first to preview argv. Opens a real browser for many verbs — only when the builder is ready to sign in.',
+      'Run a vybekiit-automate verb from ANY project root (resolves bin via VYBEKIIT_AUTOMATE_BIN → package dist → monorepo → PATH). Always --json. Prefer dryRun=true first. For Google Error 400 redirect_uri_mismatch / Auth.js localhost: domain=google command=oauth with --project --app-name --support-email --app-url and repeated --redirect=… (include http://localhost:3000/api/auth/callback/google). Do not hand-drive Google Console with chrome-devtools — this verb patches existing Web clients idempotently. Opens a real browser when not dryRun.',
     inputSchema: {
       type: 'object',
       properties: {
-        domain: { type: 'string', description: 'Domain or alias, e.g. ls, nc, extension, cf' },
-        command: { type: 'string', description: 'Verb, e.g. setup, standby' },
+        domain: {
+          type: 'string',
+          description: 'Domain or alias, e.g. google, ls, nc, extension, cf',
+        },
+        command: {
+          type: 'string',
+          description: 'Verb, e.g. oauth, setup, standby',
+        },
         args: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Extra CLI args, e.g. ["--name=Kit","--price-cents=2900","--mode=test"]',
+          description:
+            'Extra CLI args, e.g. ["--project=my-app","--app-name=MyApp","--support-email=you@gmail.com","--app-url=https://example.com","--redirect=http://localhost:3000/api/auth/callback/google"]',
         },
         dryRun: {
           type: 'boolean',

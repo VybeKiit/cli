@@ -17,6 +17,11 @@ export type GoogleOAuthParams = {
   appUrl: string;
   /** Authorized redirect URIs registered on the Web client. */
   redirectUris: readonly string[];
+  /**
+   * Optional Authorized JavaScript origins. When omitted, origins are derived from
+   * `redirectUris` (scheme + host + port) so localhost Auth.js logins work without extra flags.
+   */
+  jsOrigins?: readonly string[];
   /** Privacy policy URL (defaults to `${appUrl}/privacy`). */
   privacyUrl?: string;
   /** Terms of service URL (defaults to `${appUrl}/terms`). */
@@ -27,7 +32,10 @@ export type GoogleOAuthParams = {
   scopes?: readonly string[];
   /** Publish the app to Production (any Google user can sign in) instead of leaving it in Testing. */
   publish?: boolean;
-  /** Add a fresh secret to a same-named existing client instead of failing (secrets are view-once). */
+  /**
+   * Mint a fresh client secret on an existing client (secrets are view-once).
+   * URI/origin patching does **not** rotate secrets unless this is set.
+   */
   resetSecret?: boolean;
 };
 
@@ -42,30 +50,45 @@ export const DEFAULT_OAUTH_SCOPES: readonly string[] = [
   'https://www.googleapis.com/auth/userinfo.profile',
 ];
 
-/** Credentials read back after the Web OAuth client is created or its secret reset. */
+/** Credentials / patch result after the Web OAuth client is created or updated. */
 export type GoogleOAuthResult = {
   clientId: string;
-  clientSecret: string;
+  /**
+   * Present when a secret was created or rotated (`--reset-secret` / first-time create).
+   * Omitted on URI-only patches so agents do not churn dual secrets.
+   */
+  clientSecret?: string;
   projectId: string;
-  /** True when an existing client was reused (secret reset) rather than created fresh. */
+  /** True when an existing same-named client was patched rather than created fresh. */
   reusedExisting: boolean;
+  /** Redirect URIs written to the form after merge. */
+  redirectsApplied?: readonly string[];
+  /** JavaScript origins written to the form after merge. */
+  originsApplied?: readonly string[];
 };
 
-/** `.env` block Better Auth reads for the Google social provider. */
+/** `.env` block Auth.js / Better Auth reads for the Google social provider. */
 export type GoogleEnvBlock = {
   GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CLIENT_SECRET?: string;
 };
 
 /**
  * Map a setup result to the `.env` keys the buyer pastes in.
  *
+ * Omits `GOOGLE_CLIENT_SECRET` when the run only patched URIs (no rotation).
+ *
  * @param result - Operation result to convert.
- * @returns Computed value for downstream automation.
+ * @returns Env key map for `.env` / agent output.
  * @example
- * const result = googleEnvBlock(result);
+ * const env = googleEnvBlock(result);
  */
-export const googleEnvBlock = (result: GoogleOAuthResult): GoogleEnvBlock => ({
-  GOOGLE_CLIENT_ID: result.clientId,
-  GOOGLE_CLIENT_SECRET: result.clientSecret,
-});
+export const googleEnvBlock = (result: GoogleOAuthResult): GoogleEnvBlock => {
+  const block: GoogleEnvBlock = {
+    GOOGLE_CLIENT_ID: result.clientId,
+  };
+  if (result.clientSecret !== undefined && result.clientSecret.length > 0) {
+    block.GOOGLE_CLIENT_SECRET = result.clientSecret;
+  }
+  return block;
+};

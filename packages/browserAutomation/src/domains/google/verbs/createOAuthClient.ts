@@ -4,7 +4,14 @@ import {
   resolvePaceMs,
 } from '@vybekiit/browser-automation/core/pace';
 import { DEFAULT_VERB_LOGGER, type VerbLogger } from '@vybekiit/browser-automation/core/verbLogger';
+import {
+  fillJsOrigins,
+  fillRedirectUris,
+  saveAuthPlatformClientForm,
+  waitForAuthPlatformForm,
+} from '@vybekiit/browser-automation/domains/google/dashboard/authPlatformForm';
 import { waitForGoogleAuthenticated } from '@vybekiit/browser-automation/domains/google/dashboard/waitForAuthenticated';
+import { resolveJsOrigins } from '@vybekiit/browser-automation/domains/google/oauthUris';
 import {
   parseClientId,
   parseClientSecret,
@@ -44,50 +51,39 @@ const pollForSecret = async (
 };
 
 /**
- * Add the two authorized redirect URIs.
+ * Find the same-named Web client on the clients list, if any.
  *
- * The Web-client form has TWO repeatable URI sections — "JavaScript origins" and "redirect
- * URIs" — both rendering `input[formcontrolname="uri"]`. We scope strictly to the redirect
- * container so origins (which reject paths) never receive a callback URL.
+ * @param page - Playwright page (navigated to clients list).
+ * @param appName - App name used to build `{appName} Web`.
+ * @returns Link locator or null.
  */
-const fillRedirectUris = async (
-  page: Page,
-  redirectUris: readonly string[],
-  log: Pick<VerbLogger, 'log' | 'warn'>,
-): Promise<void> => {
-  const redirectSection = page
-    .locator('.cfc-form-stack-container', { hasText: /redirect uris/i })
-    .filter({ hasNot: page.locator('text=/javascript origins/i') })
-    .first();
-  const scope = (await redirectSection.count()) > 0 ? redirectSection : page.locator('body');
+const findExistingClientLink = async (page: Page, appName: string): Promise<Locator | null> =>
+  firstPresent([page.getByRole('link', { name: new RegExp(`^${clientName(appName)}$`, 'i') })]);
 
-  const addUri = scope.getByRole('button', { name: /add uri/i }).first();
-  for (let i = 0; i < redirectUris.length; i++) {
-    if ((await addUri.count()) > 0) await pacedDispatchClick(addUri);
-  }
-
-  const inputs = scope.locator('input[formcontrolname="uri"]');
-  const count = await inputs.count();
-  for (let i = 0; i < redirectUris.length && i < count; i++) {
-    const uri = redirectUris[i]!;
-    await pacedFill(inputs.nth(i), uri);
-  }
-  if (count < redirectUris.length) {
-    log.warn(
-      `[google] only ${count} redirect field(s) available for ${redirectUris.length} URI(s) — add the rest manually if needed`,
-    );
-  }
+/**
+ * Read client ID from the clients list or detail page HTML.
+ *
+ * @param page - Playwright page.
+ * @returns Parsed client id or null.
+ */
+const readClientIdFromPage = async (page: Page): Promise<string | null> => {
+  const html = await page
+    .locator('body')
+    .innerHTML()
+    .catch(() => '');
+  return parseClientId(html);
 };
 
 /**
- * Add a fresh secret to an existing same-named client and read it back.
+ * Open the existing client detail and apply redirect URIs + JS origins (no secret).
  *
- * Google's redesigned console no longer lets you view or download a client's secret after
- * creation — the only way to obtain a readable secret is to add a new one on the client's
- * detail page ("Information and summary" panel → "Add secret"). Returns null if no matching
- * client exists so the caller can fall through to creating one.
+ * @param page - Playwright page.
+ * @param params - OAuth params.
+ * @param context - Browser context.
+ * @param log - Verb logger.
+ * @returns Patch result, or null when the client does not exist.
  */
-const addSecretToExistingClient = async (
+const patchExistingClient = async (
   page: Page,
   params: GoogleOAuthParams,
   context: BrowserContext,
@@ -97,22 +93,74 @@ const addSecretToExistingClient = async (
   page = await waitForGoogleAuthenticated(page, log, context);
   await page.waitForTimeout(resolvePaceMs());
 
-  const link = await firstPresent([
-    page.getByRole('link', { name: new RegExp(`^${clientName(params.appName)}$`, 'i') }),
-  ]);
+  const link = await findExistingClientLink(page, params.appName);
   if (!link) return null;
 
-  log.log('[google] existing OAuth client found — adding a new secret');
-  const clientId = parseClientId(
-    await page
-      .locator('body')
-      .innerHTML()
-      .catch(() => ''),
-  );
+  log.log(`[google] existing OAuth client "${clientName(params.appName)}" — patching URIs/origins`);
   await pacedDispatchClick(link);
   await page.waitForTimeout(resolvePaceMs());
+  page = await waitForAuthPlatformForm(page);
 
-  // Open the info/summary panel that hosts the "Client secrets" section.
+  // Some shells show a read-only summary; click Edit when present.
+  const edit = await firstPresent([
+    page.getByRole('button', { name: /^edit$/i }),
+    page.getByRole('link', { name: /^edit$/i }),
+  ]);
+  if (edit) {
+    await pacedDispatchClick(edit);
+    await page.waitForTimeout(resolvePaceMs());
+    page = await waitForAuthPlatformForm(page);
+  }
+
+  const origins = resolveJsOrigins(params.redirectUris, params.jsOrigins);
+  const originsApplied = await fillJsOrigins(page, origins, log);
+  const redirectsApplied = await fillRedirectUris(page, params.redirectUris, log);
+  await saveAuthPlatformClientForm(page, log);
+
+  const clientId = await readClientIdFromPage(page);
+  if (clientId === null) {
+    throw new Error(
+      'Patched OAuth client URIs but could not read the Client ID from the Console. Copy it manually into .env if needed.',
+    );
+  }
+
+  let clientSecret: string | undefined;
+  if (params.resetSecret === true) {
+    log.log('[google] --reset-secret: minting a fresh client secret on existing client');
+    const { clientSecret: minted } = await addSecretOnOpenClient(
+      page,
+      clientId,
+      params.projectId,
+      log,
+    );
+    clientSecret = minted;
+  }
+
+  return {
+    clientId,
+    ...(clientSecret === undefined ? {} : { clientSecret }),
+    projectId: params.projectId,
+    reusedExisting: true,
+    redirectsApplied,
+    originsApplied,
+  };
+};
+
+/**
+ * Add a fresh secret on an already-open client detail page.
+ *
+ * @param page - Client detail page.
+ * @param fallbackClientId - Client id if the dialog omits it.
+ * @param projectId - GCP project id.
+ * @param log - Verb logger.
+ * @returns Credentials with secret.
+ */
+const addSecretOnOpenClient = async (
+  page: Page,
+  fallbackClientId: string,
+  projectId: string,
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<{ clientId: string; clientSecret: string; projectId: string }> => {
   const infoPanel = await firstPresent([
     page.getByRole('button', { name: /information and summary/i }),
   ]);
@@ -126,7 +174,6 @@ const addSecretToExistingClient = async (
     );
   }
   await pacedDispatchClick(addSecret);
-  // A confirmation dialog may re-present an "Add secret" button.
   const confirm = await firstPresent([
     page.getByRole('button', { name: /^add secret$/i }),
     page.getByRole('button', { name: /^add$/i }),
@@ -134,16 +181,60 @@ const addSecretToExistingClient = async (
   if (confirm) await pacedDispatchClick(confirm);
 
   const creds = await pollForSecret(page);
-  if (!creds) return null;
-  const resolvedClientId = creds.clientId === null ? clientId : creds.clientId;
-  if (resolvedClientId === null) {
+  if (!creds) {
+    throw new Error(
+      'Added a client secret but could not read the GOCSPX- value. Copy it from the Console into .env.',
+    );
+  }
+  const resolvedClientId = creds.clientId === null ? fallbackClientId : creds.clientId;
+  log.log('[google] new client secret captured');
+  return {
+    clientId: resolvedClientId,
+    clientSecret: creds.clientSecret,
+    projectId,
+  };
+};
+
+/**
+ * Add a fresh secret to an existing same-named client (list → open → add secret).
+ *
+ * Used after create when the first secret dialog is unreliable, or when `--reset-secret`
+ * is set without a prior patch path.
+ *
+ * @param page - Playwright page.
+ * @param params - OAuth params.
+ * @param context - Browser context.
+ * @param log - Verb logger.
+ * @returns Result with secret, or null if the client is missing.
+ */
+const addSecretToExistingClient = async (
+  page: Page,
+  params: GoogleOAuthParams,
+  context: BrowserContext,
+  log: Pick<VerbLogger, 'log' | 'warn'>,
+): Promise<GoogleOAuthResult | null> => {
+  await page.goto(clientsUrl(params.projectId), { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  page = await waitForGoogleAuthenticated(page, log, context);
+  await page.waitForTimeout(resolvePaceMs());
+
+  const link = await findExistingClientLink(page, params.appName);
+  if (!link) return null;
+
+  log.log('[google] existing OAuth client found — adding a new secret');
+  const listClientId = await readClientIdFromPage(page);
+  await pacedDispatchClick(link);
+  await page.waitForTimeout(resolvePaceMs());
+
+  const fallbackId = listClientId === null ? '' : listClientId;
+  const creds = await addSecretOnOpenClient(page, fallbackId, params.projectId, log);
+  if (creds.clientId.length === 0) {
     throw new Error(
       'Google showed a new OAuth secret but no client ID. Open the client details, copy the Client ID, and paste it into .env.',
     );
   }
 
   return {
-    clientId: resolvedClientId,
+    clientId: creds.clientId,
     clientSecret: creds.clientSecret,
     projectId: params.projectId,
     reusedExisting: true,
@@ -151,36 +242,27 @@ const addSecretToExistingClient = async (
 };
 
 /**
- * Create a Web OAuth client (or add a secret to a same-named existing one) and read back the credentials. Secrets are shown once and unreadable afterwards, so "reuse" adds a new secret.
+ * Create a new Web OAuth client with redirects + JS origins, then capture a secret.
  *
- * @param page - Playwright page to inspect or mutate.
- * @param params - Validated automation parameters for the operation.
- * @param context - Browser context used for authenticated waits.
- * @param log - Input value for log.
- * @returns Promise resolving with the automation result.
- * @example
- * const result = await createOAuthClient(page, params, context, log);
+ * @param page - Playwright page.
+ * @param params - OAuth params.
+ * @param context - Browser context.
+ * @param log - Verb logger.
+ * @returns Create result with secret and applied URIs.
  */
-export const createOAuthClient = async (
+const createNewOAuthClient = async (
   page: Page,
   params: GoogleOAuthParams,
-  context?: BrowserContext,
-  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+  context: BrowserContext,
+  log: Pick<VerbLogger, 'log' | 'warn'>,
 ): Promise<GoogleOAuthResult> => {
-  const ctx = context === undefined ? page.context() : context;
-
-  if (params.resetSecret) {
-    const reused = await addSecretToExistingClient(page, params, ctx, log);
-    if (reused) return reused;
-    log.log('[google] no existing client to reuse — creating a new one');
-  }
-
   await page.goto(createClientUrl(params.projectId), {
     waitUntil: 'domcontentloaded',
     timeout: 60_000,
   });
-  page = await waitForGoogleAuthenticated(page, log, ctx);
+  page = await waitForGoogleAuthenticated(page, log, context);
   await page.waitForTimeout(resolvePaceMs());
+  page = await waitForAuthPlatformForm(page);
 
   // Application type → "Web application" (a cfc-select).
   const typeSelect = await firstPresent([page.locator('[formcontrolname="typeControl"]')]);
@@ -200,7 +282,9 @@ export const createOAuthClient = async (
   }
   await pacedFill(nameField, clientName(params.appName));
 
-  await fillRedirectUris(page, params.redirectUris, log);
+  const origins = resolveJsOrigins(params.redirectUris, params.jsOrigins);
+  const originsApplied = await fillJsOrigins(page, origins, log);
+  const redirectsApplied = await fillRedirectUris(page, params.redirectUris, log);
 
   const create = await firstPresent([page.getByRole('button', { name: /^create$/i })]);
   if (!create) {
@@ -212,10 +296,16 @@ export const createOAuthClient = async (
 
   // The client now exists, but its first secret is not reliably capturable from the transient
   // dialog. Reopen it and add a secret to read a fresh, well-formed value.
-  const withSecret = await addSecretToExistingClient(page, params, ctx, log);
-  if (withSecret) return { ...withSecret, reusedExisting: false };
+  const withSecret = await addSecretToExistingClient(page, params, context, log);
+  if (withSecret) {
+    return {
+      ...withSecret,
+      reusedExisting: false,
+      redirectsApplied,
+      originsApplied,
+    };
+  }
 
-  // Fallback: try to read whatever the create dialog left on the page.
   const creds = await pollForSecret(page, 5);
   if (creds === null || creds.clientId === null) {
     throw new Error(
@@ -227,5 +317,38 @@ export const createOAuthClient = async (
     clientSecret: creds.clientSecret,
     projectId: params.projectId,
     reusedExisting: false,
+    redirectsApplied,
+    originsApplied,
   };
+};
+
+/**
+ * Create or idempotently patch a Web OAuth client and optionally mint a secret.
+ *
+ * Happy path for agents hitting `redirect_uri_mismatch`: re-run with the same
+ * `--app-name` and full `--redirect` list (incl. localhost). Existing clients are
+ * patched in place — **no new secret** unless `--reset-secret`.
+ *
+ * @param page - Playwright page to inspect or mutate.
+ * @param params - Validated automation parameters for the operation.
+ * @param context - Browser context used for authenticated waits.
+ * @param log - Verb logger.
+ * @returns Promise resolving with client id, optional secret, and applied URIs.
+ * @example
+ * const result = await createOAuthClient(page, params, context, log);
+ */
+export const createOAuthClient = async (
+  page: Page,
+  params: GoogleOAuthParams,
+  context?: BrowserContext,
+  log: Pick<VerbLogger, 'log' | 'warn'> = DEFAULT_VERB_LOGGER,
+): Promise<GoogleOAuthResult> => {
+  const ctx = context === undefined ? page.context() : context;
+
+  // Prefer patch when a same-named client exists (fixes redirect_uri_mismatch without secret churn).
+  const patched = await patchExistingClient(page, params, ctx, log);
+  if (patched) return patched;
+
+  log.log('[google] no existing client — creating a new Web OAuth client');
+  return createNewOAuthClient(page, params, ctx, log);
 };

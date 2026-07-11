@@ -1,7 +1,8 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { accessSync, constants, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   type AutomationCatalogEntry,
   getAutomation,
@@ -10,7 +11,7 @@ import {
 import { type PageResult, paginate, scoreQuery } from './uiCatalog';
 
 /**
- * Extra search tokens so agents can find domains by product name.
+ * Extra search tokens so agents can find domains by product name / symptom.
  *
  * @param domain - Registry domain name.
  * @returns Synonym tokens for fuzzy search.
@@ -49,7 +50,17 @@ const domainSearchHints = (domain: string): readonly string[] => {
     return ['github', 'gh', 'token'];
   }
   if (domain.includes('google')) {
-    return ['google', 'oauth', 'cloud', 'console'];
+    return [
+      'google',
+      'oauth',
+      'cloud',
+      'console',
+      'redirect_uri_mismatch',
+      'authjs',
+      'auth.js',
+      'localhost',
+      'sign-in',
+    ];
   }
   return [];
 };
@@ -107,8 +118,42 @@ const pathReadable = (path: string): boolean => {
   }
 };
 
+/** How `vybekiit-automate` was resolved for from-anywhere runs. */
+export type AutomateBinSource = 'env' | 'package' | 'monorepo' | 'path';
+
+/** Detailed bin resolution so dry-run / errors can tell agents how to fix missing installs. */
+export type AutomateBinResolution = {
+  readonly bin: string;
+  readonly source: AutomateBinSource;
+  /** True when the resolved path exists (or PATH has the bare command). */
+  readonly available: boolean;
+  /** Human-readable fix steps when `available` is false. */
+  readonly fixSteps: readonly string[];
+};
+
+const AUTOMATE_BIN_FIX_STEPS: readonly string[] = [
+  'Set VYBEKIIT_AUTOMATE_BIN to the absolute path of packages/browserAutomation/dist/cli/index.cjs',
+  'Or open the agent MCP from a vybekiit monorepo / kit workspace after `pnpm --filter @vybekiit/browser-automation build`',
+  'Or put `vybekiit-automate` on PATH (CLI / kit install)',
+];
+
 /**
- * Resolve the `vybekiit-automate` binary so agents can run it from any workspace.
+ * True when a bare command name resolves on PATH (`which` / `where`).
+ *
+ * @param command - Bare binary name.
+ * @returns Whether the command is findable on PATH.
+ */
+const pathHasCommand = (command: string): boolean => {
+  if (command.includes('/') || command.includes('\\')) {
+    return pathReadable(command);
+  }
+  const whichBin = process.platform === 'win32' ? 'where' : 'which';
+  const result = spawnSync(whichBin, [command], { encoding: 'utf8' });
+  return result.status === 0 && (result.stdout ?? '').trim().length > 0;
+};
+
+/**
+ * Resolve the `vybekiit-automate` binary with source + availability metadata.
  *
  * Resolution order:
  * 1. `VYBEKIIT_AUTOMATE_BIN`
@@ -117,42 +162,128 @@ const pathReadable = (path: string): boolean => {
  * 4. bare `vybekiit-automate` (PATH)
  *
  * @param projectRoot - Project root used for monorepo-relative fallback.
- * @returns Absolute path or bare command name.
+ * @returns Detailed resolution for dry-run and structured errors.
  * @example
- * resolveAutomateBin(process.cwd());
+ * resolveAutomateBinDetailed(process.cwd());
  */
-export const resolveAutomateBin = (projectRoot: string = resolveProjectRoot()): string => {
+/**
+ * Resolve the browser-automation package root from this module graph.
+ *
+ * `@vybekiit/browser-automation/package.json` is not always exportable (exports map),
+ * so we resolve a published subpath and walk up to the package root.
+ *
+ * @returns Absolute package directory, or null when the package is not linked.
+ */
+const resolveBrowserAutomationPackageDir = (): string | null => {
+  try {
+    const require = createRequire(import.meta.url);
+    try {
+      return dirname(require.resolve('@vybekiit/browser-automation/package.json'));
+    } catch {
+      // package.json not in exports — resolve catalog subpath (always exported).
+      const catalogEntry = require.resolve('@vybekiit/browser-automation/cli/catalog');
+      // …/dist/cli/catalog.js → package root is two levels up from dist/cli
+      return join(dirname(catalogEntry), '..', '..');
+    }
+  } catch {
+    return null;
+  }
+};
+
+export const resolveAutomateBinDetailed = (
+  projectRoot: string = resolveProjectRoot(),
+): AutomateBinResolution => {
   if (
     process.env.VYBEKIIT_AUTOMATE_BIN !== undefined &&
     process.env.VYBEKIIT_AUTOMATE_BIN.length > 0
   ) {
-    return process.env.VYBEKIIT_AUTOMATE_BIN;
+    const bin = process.env.VYBEKIIT_AUTOMATE_BIN;
+    return {
+      bin,
+      source: 'env',
+      available: pathReadable(bin),
+      fixSteps: AUTOMATE_BIN_FIX_STEPS,
+    };
   }
 
-  try {
-    const require = createRequire(import.meta.url);
-    const pkgJson = require.resolve('@vybekiit/browser-automation/package.json');
-    const binPath = join(dirname(pkgJson), 'dist', 'cli', 'index.cjs');
+  const pkgDir = resolveBrowserAutomationPackageDir();
+  if (pkgDir !== null) {
+    const binPath = join(pkgDir, 'dist', 'cli', 'index.cjs');
     if (pathReadable(binPath)) {
-      return binPath;
+      return {
+        bin: binPath,
+        source: 'package',
+        available: true,
+        fixSteps: AUTOMATE_BIN_FIX_STEPS,
+      };
     }
-  } catch {
-    /* package not resolvable from this module graph */
   }
 
+  // Sibling monorepo paths: from consumer cwd AND from this agent-mcp package location
+  // so dry-run works even when cwd is a throwaway folder outside the monorepo.
+  const thisDir = dirname(fileURLToPath(import.meta.url));
   const monorepoCandidates = [
     join(projectRoot, 'packages', 'browserAutomation', 'dist', 'cli', 'index.cjs'),
     join(projectRoot, '..', 'packages', 'browserAutomation', 'dist', 'cli', 'index.cjs'),
     join(projectRoot, '../..', 'packages', 'browserAutomation', 'dist', 'cli', 'index.cjs'),
+    // agentMcp/dist → ../../browserAutomation/dist/cli/index.cjs
+    join(thisDir, '..', '..', 'browserAutomation', 'dist', 'cli', 'index.cjs'),
+    // agentMcp/src during vitest → same
+    join(thisDir, '..', '..', '..', 'browserAutomation', 'dist', 'cli', 'index.cjs'),
   ];
   for (const candidate of monorepoCandidates) {
     if (existsSync(candidate) && pathReadable(candidate)) {
-      return candidate;
+      return {
+        bin: candidate,
+        source: 'monorepo',
+        available: true,
+        fixSteps: AUTOMATE_BIN_FIX_STEPS,
+      };
     }
   }
 
-  return 'vybekiit-automate';
+  const bare = 'vybekiit-automate';
+  return {
+    bin: bare,
+    source: 'path',
+    available: pathHasCommand(bare),
+    fixSteps: AUTOMATE_BIN_FIX_STEPS,
+  };
 };
+
+/**
+ * Resolve the `vybekiit-automate` binary so agents can run it from any workspace.
+ *
+ * @param projectRoot - Project root used for monorepo-relative fallback.
+ * @returns Absolute path or bare command name.
+ * @example
+ * resolveAutomateBin(process.cwd());
+ */
+export const resolveAutomateBin = (projectRoot: string = resolveProjectRoot()): string =>
+  resolveAutomateBinDetailed(projectRoot).bin;
+
+/**
+ * Structured error payload when the automate bin cannot be executed.
+ *
+ * @param resolution - Bin resolution metadata.
+ * @returns JSON-serializable error object for stderr / MCP.
+ */
+export const automateBinNotFoundError = (
+  resolution: AutomateBinResolution,
+): {
+  readonly error: 'automate_bin_not_found';
+  readonly message: string;
+  readonly bin: string;
+  readonly source: AutomateBinSource;
+  readonly fix: readonly string[];
+} => ({
+  error: 'automate_bin_not_found',
+  message:
+    'vybekiit-automate binary is not available from this workspace. Browser automations cannot run until the bin is resolved.',
+  bin: resolution.bin,
+  source: resolution.source,
+  fix: resolution.fixSteps,
+});
 
 /**
  * Fuzzy-search automation verbs with cursor pagination.
@@ -291,13 +422,17 @@ export const runAutomation = async (
   },
 ): Promise<AutomationRunResult> => {
   const entry = getAutomation(domain, command);
+  const cwd = options?.cwd === undefined ? resolveProjectRoot() : options.cwd;
+  const resolution = resolveAutomateBinDetailed(cwd);
+  const { bin } = resolution;
+
   if (entry === undefined) {
     return {
       ok: false,
       dryRun: options?.dryRun === true,
       argv: [],
-      cwd: options?.cwd ?? resolveProjectRoot(),
-      bin: resolveAutomateBin(options?.cwd ?? resolveProjectRoot()),
+      cwd,
+      bin,
       exitCode: 1,
       stdout: '',
       stderr: `Unknown automation: ${domain} ${command}. Use search_automations first.`,
@@ -305,8 +440,6 @@ export const runAutomation = async (
     };
   }
 
-  const cwd = options?.cwd ?? resolveProjectRoot();
-  const bin = resolveAutomateBin(cwd);
   // Prefer the caller's domain/alias so short forms (ls, nc) still work.
   // Catalog entry already validated domain+command exist.
   const runArgv = buildAutomationArgv(domain, entry.command, options?.args ?? [], {
@@ -323,13 +456,40 @@ export const runAutomation = async (
       cwd,
       bin,
       exitCode: 0,
-      stdout: JSON.stringify({ planned: true, bin, cwd, argv: runArgv }, null, 2),
+      stdout: JSON.stringify(
+        {
+          planned: true,
+          bin,
+          binSource: resolution.source,
+          binAvailable: resolution.available,
+          cwd,
+          argv: runArgv,
+          ...(resolution.available ? {} : { warning: automateBinNotFoundError(resolution) }),
+        },
+        null,
+        2,
+      ),
       stderr: '',
       timedOut: false,
     };
   }
 
-  const timeoutMs = options?.timeoutMs ?? DEFAULT_RUN_TIMEOUT_MS;
+  if (!resolution.available) {
+    const err = automateBinNotFoundError(resolution);
+    return {
+      ok: false,
+      dryRun: false,
+      argv: runArgv,
+      cwd,
+      bin,
+      exitCode: 1,
+      stdout: '',
+      stderr: JSON.stringify(err, null, 2),
+      timedOut: false,
+    };
+  }
+
+  const timeoutMs = options?.timeoutMs === undefined ? DEFAULT_RUN_TIMEOUT_MS : options.timeoutMs;
   const isJsBin = bin.endsWith('.js') || bin.endsWith('.cjs') || bin.endsWith('.mjs');
   const spawnCommand = isJsBin ? process.execPath : bin;
   const spawnArgs = isJsBin ? [bin, ...runArgv] : [...runArgv];
@@ -363,6 +523,14 @@ export const runAutomation = async (
 
     child.on('error', (error) => {
       clearTimeout(timer);
+      const message = error instanceof Error ? error.message : String(error);
+      const enoent =
+        error instanceof Error &&
+        'code' in error &&
+        (error as NodeJS.ErrnoException).code === 'ENOENT';
+      const structured = enoent
+        ? JSON.stringify(automateBinNotFoundError(resolution), null, 2)
+        : message;
       resolve({
         ok: false,
         dryRun: false,
@@ -371,16 +539,19 @@ export const runAutomation = async (
         bin,
         exitCode: 1,
         stdout: truncateCapture(stdout),
-        stderr: truncateCapture(
-          `${stderr}\n${error instanceof Error ? error.message : String(error)}`.trim(),
-        ),
+        stderr: truncateCapture(`${stderr}\n${structured}`.trim()),
         timedOut,
       });
     });
 
     child.on('close', (code) => {
       clearTimeout(timer);
-      const exitCode = code ?? (timedOut ? 124 : 1);
+      let exitCode = 1;
+      if (code !== null && code !== undefined) {
+        exitCode = code;
+      } else if (timedOut) {
+        exitCode = 124;
+      }
       resolve({
         ok: exitCode === 0 && !timedOut,
         dryRun: false,

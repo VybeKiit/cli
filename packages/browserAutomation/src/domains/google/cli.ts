@@ -26,6 +26,7 @@ export const parseGoogleOAuthArgs = (
 } => {
   const params: Partial<GoogleOAuthParams> = {};
   const redirectUris: string[] = [];
+  const jsOrigins: string[] = [];
   const scopes: string[] = [];
   for (const arg of args) {
     if (arg.startsWith('--project=')) params.projectId = arg.slice('--project='.length);
@@ -34,6 +35,7 @@ export const parseGoogleOAuthArgs = (
       params.supportEmail = arg.slice('--support-email='.length);
     else if (arg.startsWith('--app-url=')) params.appUrl = arg.slice('--app-url='.length);
     else if (arg.startsWith('--redirect=')) redirectUris.push(arg.slice('--redirect='.length));
+    else if (arg.startsWith('--js-origin=')) jsOrigins.push(arg.slice('--js-origin='.length));
     else if (arg.startsWith('--privacy=')) params.privacyUrl = arg.slice('--privacy='.length);
     else if (arg.startsWith('--terms=')) params.termsUrl = arg.slice('--terms='.length);
     else if (arg.startsWith('--logo=')) params.logoPath = arg.slice('--logo='.length);
@@ -42,6 +44,7 @@ export const parseGoogleOAuthArgs = (
     else if (arg === '--reset-secret') params.resetSecret = true;
   }
   if (redirectUris.length > 0) params.redirectUris = redirectUris;
+  if (jsOrigins.length > 0) params.jsOrigins = jsOrigins;
   if (scopes.length > 0) params.scopes = scopes;
 
   const missing: string[] = [];
@@ -78,7 +81,7 @@ export const registerGoogleDomain = (registry: CommandRegistry): void => {
       },
       oauth: {
         description:
-          'Configure OAuth consent screen and create Web OAuth client (--project --app-name --support-email --app-url --redirect... [--privacy=url] [--terms=url] [--logo=path] [--scope=... ] [--publish] [--reset-secret])',
+          'Fix Google OAuth redirect_uri_mismatch / Auth.js localhost: idempotent patch of existing Web client redirects + JS origins (no secret churn); creates client if missing. Flags: --project --app-name --support-email --app-url --redirect... [--js-origin=...] [--privacy=url] [--terms=url] [--logo=path] [--scope=...] [--publish] [--reset-secret]',
         run: async ({ args, flags }) => {
           const { params, missing } = parseGoogleOAuthArgs(args);
           if (missing.length > 0) {
@@ -95,11 +98,25 @@ export const registerGoogleDomain = (registry: CommandRegistry): void => {
               ok: true,
               env,
               projectId: result.projectId,
+              clientId: result.clientId,
               reusedExisting: result.reusedExisting,
+              redirectsApplied: result.redirectsApplied ?? [],
+              originsApplied: result.originsApplied ?? [],
+              secretRotated: result.clientSecret !== undefined,
             });
           } else {
-            printLine('OK: Google OAuth client ready.');
-            printLine('Write these to .env:');
+            printLine(
+              result.reusedExisting
+                ? 'OK: Google OAuth client patched (redirects + JS origins).'
+                : 'OK: Google OAuth client ready.',
+            );
+            if (result.redirectsApplied !== undefined && result.redirectsApplied.length > 0) {
+              printLine(`Redirects: ${result.redirectsApplied.join(', ')}`);
+            }
+            if (result.originsApplied !== undefined && result.originsApplied.length > 0) {
+              printLine(`JS origins: ${result.originsApplied.join(', ')}`);
+            }
+            printLine('Write these to .env (secret only present after create/--reset-secret):');
             for (const [key, value] of Object.entries(env)) {
               printLine(`${key}=${value}`);
             }
