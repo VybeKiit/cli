@@ -1,3 +1,15 @@
+import { Schema } from 'effect';
+
+/**
+ * Schema SSOT for the normalized authenticated user (ADR-0043). The typed client
+ * and the OpenAPI document both derive from this, so the shape the frontend
+ * assumes cannot drift from the shape the server emits.
+ */
+export const AuthUserSchema = Schema.Struct({
+  id: Schema.String,
+  email: Schema.NullOr(Schema.String),
+});
+
 /**
  * VybeKiit's normalized authenticated user.
  *
@@ -5,10 +17,7 @@
  * agent) depends on a small, stable contract — if the auth provider ever changes,
  * only this mapping moves.
  */
-export type AuthUser = {
-  readonly id: string;
-  readonly email: string | null;
-};
+export type AuthUser = typeof AuthUserSchema.Type;
 
 /** The subset of a provider user object we map from. */
 type RawUser = {

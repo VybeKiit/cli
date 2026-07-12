@@ -67,3 +67,66 @@ export const verifyEmailCode = (email: string, code: string) => client.verifyEma
  * const signedOut = signOut();
  */
 export const signOut = () => client.signOut();
+
+/**
+ * Request a password-reset link or code.
+ *
+ * @param email - Email address to send the reset to.
+ * @returns An Effect that succeeds with true or fails with MobileClientError.
+ * @example
+ * const sent = requestPasswordReset(email);
+ */
+export const requestPasswordReset = (email: string) => client.requestPasswordReset(email);
+
+/**
+ * Complete a password reset with a token and new password.
+ *
+ * @param token - Reset token from the email link.
+ * @param newPassword - New password entered by the user.
+ * @returns An Effect that succeeds with the signed-in user or fails with MobileClientError.
+ * @example
+ * const user = resetPassword(token, newPassword);
+ */
+export const resetPassword = (token: string, newPassword: string) =>
+  client.resetPassword(token, newPassword);
+
+/**
+ * Send a magic sign-in link.
+ *
+ * @param email - Email address that should receive the link.
+ * @returns An Effect that succeeds with true or fails with MobileClientError.
+ * @example
+ * const sent = sendMagicLink(email);
+ */
+export const sendMagicLink = (email: string) => client.sendMagicLink(email);
+
+/**
+ * Verify a magic-link token and sign in.
+ *
+ * @param token - Magic-link token from the email.
+ * @returns An Effect that succeeds with the signed-in user or fails with MobileClientError.
+ * @example
+ * const user = verifyMagicLink(token);
+ */
+export const verifyMagicLink = (token: string) => client.verifyMagicLink(token);
+
+/**
+ * Send a one-time SMS sign-in code.
+ *
+ * @param phone - Phone number in E.164 format.
+ * @returns An Effect that succeeds with true or fails with MobileClientError.
+ * @example
+ * const sent = sendSmsCode(phone);
+ */
+export const sendSmsCode = (phone: string) => client.sendSmsCode(phone);
+
+/**
+ * Verify a one-time SMS code and sign in.
+ *
+ * @param phone - Phone number the code was sent to.
+ * @param code - Verification code entered by the user.
+ * @returns An Effect that succeeds with the signed-in user or fails with MobileClientError.
+ * @example
+ * const user = verifySmsCode(phone, code);
+ */
+export const verifySmsCode = (phone: string, code: string) => client.verifySmsCode(phone, code);

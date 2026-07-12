@@ -1,10 +1,23 @@
-import type { HttpOutcomeCode } from './outcomes';
+import { Schema } from 'effect';
+import { HTTP_OUTCOMES, type HttpOutcomeCode } from './outcomes';
+
+/** The semantic outcome codes as Schema literals, derived from {@link HTTP_OUTCOMES}. */
+const OutcomeCodeSchema = Schema.Literal(
+  ...(Object.keys(HTTP_OUTCOMES) as [HttpOutcomeCode, ...HttpOutcomeCode[]]),
+);
+
+/**
+ * Schema SSOT for the JSON error envelope (ADR-0043). The OpenAPI document and
+ * typed client derive from this, so every failure carries the same
+ * `{ code, error }` shape wherever a route is served.
+ */
+export const HttpErrorBodySchema = Schema.Struct({
+  code: OutcomeCodeSchema,
+  error: Schema.String,
+});
 
 /** Standard JSON error body returned by HTTP helpers. */
-export type HttpErrorBody = {
-  readonly code: HttpOutcomeCode;
-  readonly error: string;
-};
+export type HttpErrorBody = typeof HttpErrorBodySchema.Type;
 
 /** Typed HTTP response union shared by route adapters. */
 export type HttpResponse<TSuccess = unknown> =
