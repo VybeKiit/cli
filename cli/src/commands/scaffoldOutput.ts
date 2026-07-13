@@ -1,18 +1,18 @@
 import type { TemplateName } from '../lib/scaffold';
 
 /** App surfaces buyers can create via `create app`. */
-export type CreateSurface = 'web' | 'mobile' | 'extension';
+export type CreateSurface = 'web' | 'mobile' | 'extension' | 'backend';
 
 /**
  * Check whether a template name is a buyer create-app surface.
  *
  * @param value - Candidate surface id.
- * @returns True when the value is web, mobile, or extension.
+ * @returns True when the value is web, mobile, extension, or backend.
  * @example
  * isCreateSurface('web');
  */
 export const isCreateSurface = (value: string): value is CreateSurface =>
-  value === 'web' || value === 'mobile' || value === 'extension';
+  value === 'web' || value === 'mobile' || value === 'extension' || value === 'backend';
 
 /**
  * Build the post-create success lines for a scaffolded app.
@@ -55,6 +55,7 @@ export const formatCreateUsage = (): readonly string[] => [
   '  vybekiit create app --web [directory]',
   '  vybekiit create app --mobile [directory]',
   '  vybekiit create app --extension [directory]',
+  '  vybekiit create app --backend [directory]',
   '',
 ];
 

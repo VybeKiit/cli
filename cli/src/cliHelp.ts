@@ -8,6 +8,7 @@ Getting started:
   vybekiit create app --web [directory]
   vybekiit create app --mobile [directory]
   vybekiit create app --extension [directory]
+  vybekiit create app --backend [directory]
 
 After your app exists (your AI coding tool drives these):
   vybekiit list-pieces · list-page-recipes · list-presets
@@ -20,6 +21,7 @@ Surfaces:
   --web         Next.js + agent layer
   --mobile      Expo + agent layer
   --extension   WXT + agent layer
+  --backend     Express API + typed routes
 
 Examples:
   vybekiit setup
@@ -42,7 +44,7 @@ Buyer journey:
   vybekiit setup
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
-  vybekiit create app --web|--mobile|--extension [directory]
+  vybekiit create app --web|--mobile|--extension|--backend [directory]
 
 Create / project:
   vybekiit new [template] [directory]     (deprecated → create app)

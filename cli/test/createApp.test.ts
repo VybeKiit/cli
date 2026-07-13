@@ -20,6 +20,14 @@ describe('parseCreateAppArgs', () => {
     });
   });
 
+  it('parses --backend with default directory', () => {
+    const parsed = parseCreateAppArgs(['--backend']);
+    expect(parsed).toEqual({
+      ok: true,
+      inputs: { surface: 'backend', destPath: './backend' },
+    });
+  });
+
   it('rejects multiple surfaces', () => {
     const parsed = parseCreateAppArgs(['--web', '--mobile']);
     expect(parsed.ok).toBe(false);
@@ -40,9 +48,10 @@ describe('parseCreateAppArgs', () => {
 });
 
 describe('isCreateSurface', () => {
-  it('accepts buyer surfaces only', () => {
+  it('accepts buyer create surfaces, rejects non-create templates', () => {
     expect(isCreateSurface('web')).toBe(true);
-    expect(isCreateSurface('backend')).toBe(false);
+    expect(isCreateSurface('backend')).toBe(true);
+    expect(isCreateSurface('spa')).toBe(false);
   });
 });
 

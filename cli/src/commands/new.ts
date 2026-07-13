@@ -14,7 +14,7 @@ export const runNew = async (args: string[]): Promise<number> => {
   const [template, dir] = args;
 
   process.stderr.write(
-    'Note: `vybekiit new` is deprecated. Use `vybekiit create app --web|--mobile|--extension`.\n',
+    'Note: `vybekiit new` is deprecated. Use `vybekiit create app --web|--mobile|--extension|--backend`.\n',
   );
 
   if (template !== undefined && template !== '' && isCreateSurface(template)) {
@@ -27,7 +27,7 @@ export const runNew = async (args: string[]): Promise<number> => {
   }
 
   process.stderr.write(
-    `Unknown surface "${template}". Use --web, --mobile, or --extension (spa/backend are not create-app surfaces).\n`,
+    `Unknown surface "${template}". Use --web, --mobile, --extension, or --backend (spa is not a create-app surface).\n`,
   );
   process.stderr.write(
     'Examples:\n  vybekiit create app --web my-app\n  vybekiit create app --mobile\n',

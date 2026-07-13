@@ -52,14 +52,14 @@ export const parseCreateAppArgs = (
   const positionals: string[] = [];
 
   for (const arg of args) {
-    if (arg === '--web' || arg === '--mobile' || arg === '--extension') {
+    if (arg === '--web' || arg === '--mobile' || arg === '--extension' || arg === '--backend') {
       surfaces.push(arg.slice(2) as CreateSurface);
       continue;
     }
     if (arg.startsWith('--')) {
       return {
         ok: false,
-        error: `Unknown flag: ${arg}. Use --web, --mobile, or --extension.`,
+        error: `Unknown flag: ${arg}. Use --web, --mobile, --extension, or --backend.`,
       };
     }
     positionals.push(arg);
@@ -69,7 +69,10 @@ export const parseCreateAppArgs = (
     return { ok: false, error: 'missing-surface' };
   }
   if (surfaces.length > 1) {
-    return { ok: false, error: 'Pick one surface for now (--web, --mobile, or --extension).' };
+    return {
+      ok: false,
+      error: 'Pick one surface for now (--web, --mobile, --extension, or --backend).',
+    };
   }
 
   const surface = surfaces[0];
@@ -99,6 +102,7 @@ export const promptCreateSurface = async (): Promise<CreateSurface | null> => {
       { value: 'web', label: 'Web app', hint: 'Next.js + dashboard + marketing' },
       { value: 'mobile', label: 'Mobile app', hint: 'Expo' },
       { value: 'extension', label: 'Browser extension', hint: 'WXT' },
+      { value: 'backend', label: 'Backend API', hint: 'Express + typed routes' },
     ],
   });
   if (isCancel(picked) || typeof picked !== 'string' || !isCreateSurface(picked)) {
