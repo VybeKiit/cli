@@ -3,10 +3,12 @@
   "ui": "stream",
   "globalPassThroughEnv": [
     "APP_URL",
+    "AUTH_PROVIDER",
     "CI",
     "CODEX_HOME",
     "CORS_ORIGIN",
     "FRONTEND_URL",
+    "LIVE_AUTH_E2E",
     "NEXT_PUBLIC_POSTHOG_HOST",
     "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
     "NEXT_PUBLIC_SENTRY_DSN",

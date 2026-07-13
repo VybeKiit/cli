@@ -64,7 +64,9 @@ export const toAuthSession = (
   if (user === null || token === undefined || token.length === 0) {
     return failAuth('no_user', noUserMessage);
   }
-  return Effect.succeed({ user, sessionToken: token });
+  return Schema.decode(AuthSessionSchema)({ user, sessionToken: token }).pipe(
+    Effect.mapError(() => authError('no_user', noUserMessage)),
+  );
 };
 
 /**

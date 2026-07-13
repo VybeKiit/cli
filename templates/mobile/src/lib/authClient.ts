@@ -6,7 +6,7 @@ import { postJson } from '@/lib/fetchJson';
  * Buyer-facing auth wire points — the ONE file the `connect-account` skill edits.
  *
  * POSTs to `/api/auth/*` on the builder's web backend (via `APP_URL`). Mirrors
- * the web template's `auth-client.ts` so both platforms behave identically.
+ * the web template's `authClient.ts` so both platforms behave identically.
  */
 
 const postJsonEffect = <A>(url: string, body: unknown) =>
