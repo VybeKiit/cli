@@ -1,13 +1,20 @@
-import { Effect } from 'effect';
+import { Effect, Schema } from 'effect';
 import { AuthError } from './types';
-import { type AuthUser, normalizeAuthUser } from './user';
+import { type AuthUser, AuthUserSchema, normalizeAuthUser } from './user';
+
+/**
+ * Schema SSOT for signed-in state returned by session-establishing
+ * {@link AuthProvider} methods (ADR-0043). `sessionToken` is persisted in the
+ * session cookie and passed to {@link AuthProvider.getUser}; only `user` is ever
+ * returned to clients (see {@link userFromSession}).
+ */
+export const AuthSessionSchema = Schema.Struct({
+  user: AuthUserSchema,
+  sessionToken: Schema.String,
+});
 
 /** Signed-in state returned by session-establishing {@link AuthProvider} methods. */
-export type AuthSession = {
-  readonly user: AuthUser;
-  /** Value persisted in the session cookie and passed to {@link AuthProvider.getUser}. */
-  readonly sessionToken: string;
-};
+export type AuthSession = typeof AuthSessionSchema.Type;
 
 /** Fixed session marker for the local dev adapter (ADR-0008). */
 export const LOCAL_DEV_SESSION_TOKEN = 'local-dev-session';
@@ -57,7 +64,9 @@ export const toAuthSession = (
   if (user === null || token === undefined || token.length === 0) {
     return failAuth('no_user', noUserMessage);
   }
-  return Effect.succeed({ user, sessionToken: token });
+  return Schema.decode(AuthSessionSchema)({ user, sessionToken: token }).pipe(
+    Effect.mapError(() => authError('no_user', noUserMessage)),
+  );
 };
 
 /**

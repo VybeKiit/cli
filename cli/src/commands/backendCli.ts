@@ -1,5 +1,7 @@
+import { execFile } from 'node:child_process';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { scaffold } from '../lib/scaffold';
 
@@ -362,4 +364,47 @@ uploadRouter.post('/', uploadSingle, uploadFile);
   await writeFile(appPath, appSource, 'utf8');
 
   return { message: 'Added POST /api/upload with multer limits.', exitCode: 0 };
+};
+
+const execFileAsync = promisify(execFile);
+
+/** Runs a package script in a directory; injectable so tests never spawn a process. */
+export type CommandRunner = (
+  command: string,
+  args: readonly string[],
+  cwd: string,
+) => Promise<void>;
+
+const defaultRunner: CommandRunner = async (command, args, cwd) => {
+  await execFileAsync(command, [...args], { cwd });
+};
+
+/**
+ * Generate the backend's OpenAPI document (ADR-0043) by running its `gen:contract`
+ * script, which derives the spec from the route registry in `backend/src/contract.ts`.
+ *
+ * @param cwd - Project directory containing the backend.
+ * @param runner - Command runner; defaults to spawning the script, injected in tests.
+ * @returns Plain message plus the process exit code.
+ * @example
+ * const result = await runBackendGenContract(process.cwd());
+ */
+export const runBackendGenContract = async (
+  cwd: string = process.cwd(),
+  runner: CommandRunner = defaultRunner,
+): Promise<{ readonly message: string; readonly exitCode: number }> => {
+  if (!(await ensureBackendDir(cwd))) {
+    return { message: 'No backend/ found. Run vybekiit scaffold backend first.', exitCode: 1 };
+  }
+
+  try {
+    await runner('npm', ['run', 'gen:contract'], join(cwd, 'backend'));
+    return { message: 'Generated backend/openapi.json from your route registry.', exitCode: 0 };
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'unknown error';
+    return {
+      message: `Could not generate the contract (${detail}). Install backend deps and retry.`,
+      exitCode: 1,
+    };
+  }
 };

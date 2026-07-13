@@ -1,3 +1,4 @@
+export * from './contract';
 export * from './express';
 export * from './handlers';
 export * from './next';
