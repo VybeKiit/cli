@@ -4,7 +4,7 @@ The builder never picks a UI library. You choose from this catalog, then **norma
 
 **Local mirror:** `src/components/{bundui,magicui,kokonutui,aceternity,untitled,gluestack,ai-elements,kibo,blocks/21st,tailark,cult,coss,prompt-kit,supabase,blocks-so,evilcharts,shadcnblocks}/` — synced via `pnpm sync:ui` from [`scripts/data/ui-registry-manifest.json`](../../../../scripts/data/ui-registry-manifest.json).
 
-**MCP:** Merge `.vybekiit/agent/mcp-ui-catalog.json`, `mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`, and (by provider) `mcp-stripe.json` or `mcp-paypal.json` into buyer MCP config — see `mcp-setup.md` for Cursor, Claude Desktop, and Codex paths. Use `suggest_ui_blend` for intent-based routing.
+**MCP:** Merge `.vybekiit/agent/mcp-agent.json`, `mcp-supabase.json`, `mcp-neon.json`, `mcp-firebase.json`, and (by provider) `mcp-stripe.json` or `mcp-paypal.json` into buyer MCP config — see `mcp-setup.md` for Cursor, Claude Desktop, and Codex paths. Use `suggest_ui_blend` for intent-based routing.
 
 See also: `ui-routing-vybekiit.md` · `ui-consistency-vybekiit.md` · `shadcn-vybekiit.md` · `ui-sources.mobile.md` (mobile port rules).
 

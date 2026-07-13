@@ -164,7 +164,7 @@ describe('scaffoldKitWorkspace happy path', () => {
       await readFile(join(emptyDest, 'templates', 'web', '.cursor', 'mcp.json'), 'utf8'),
     ) as { readonly mcpServers?: Record<string, unknown> };
     expect(surfaceMcp.mcpServers?.vybekiit).toBeDefined();
-    expect(surfaceMcp.mcpServers?.['vybekiit-ui-catalog']).toBeDefined();
+    expect(surfaceMcp.mcpServers?.['vybekiit-ui-catalog']).toBeUndefined();
 
     const rootMcp = JSON.parse(await readFile(join(emptyDest, '.cursor', 'mcp.json'), 'utf8')) as {
       readonly mcpServers?: {
