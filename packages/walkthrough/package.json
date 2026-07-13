@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/walkthrough",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Reusable first-run walkthrough engine — one headless hook, owned coach-mark UI (spotlight or dialog) across every VybeKiit surface.",
   "license": "MIT",
   "type": "module",

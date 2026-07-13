@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/browser-automation",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Unified Playwright dashboard automation for Chrome Web Store, Lemon Squeezy, and registrar API key setup — typed verb allowlists plus vybekiit-automate CLI.",
   "license": "MIT",
   "type": "module",

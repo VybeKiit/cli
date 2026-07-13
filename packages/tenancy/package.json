@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/tenancy",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Multi-tenancy provider adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",

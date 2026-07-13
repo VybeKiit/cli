@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/auth",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Headless auth for VybeKiit — one AuthProvider interface: Supabase Auth (default), better-auth (Postgres/Mongo), and Cognito (AWS), returned as an Effect. No UI.",
   "license": "MIT",
   "type": "module",

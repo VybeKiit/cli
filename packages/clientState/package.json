@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/client-state",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Unified client cache and UI prefs for VybeKiit web, mobile, and extension templates — TanStack Query + Zustand/MMKV via resolveClientState().",
   "license": "MIT",
   "type": "module",
