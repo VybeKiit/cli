@@ -1,6 +1,6 @@
 {
   "name": "vybekiit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Paid, agent-driven monorepo starter kit that lets non-technical builders ship real, money-making products by describing them to an AI agent.",
   "license": "SEE LICENSE IN LICENSE.md",

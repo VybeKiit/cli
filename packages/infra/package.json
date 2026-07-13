@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/infra",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Jobs + KV provider adapters for VybeKiit.",
   "license": "MIT",
   "type": "module",

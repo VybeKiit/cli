@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/assistant-chat",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Dev-only vibe-coder chat bridge — talk to Claude Code / Codex / Cursor from a sidebar, with live page context and usage.",
   "license": "MIT",
   "type": "module",
