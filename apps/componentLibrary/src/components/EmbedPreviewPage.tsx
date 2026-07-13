@@ -1,7 +1,7 @@
 'use client';
 
 import { PreviewLoadingOverlay } from '@library/components/PreviewLoadingOverlay';
-import { CATALOG_BY_KEY, type CatalogEntry } from '@library/data/catalog';
+import type { CatalogEntry } from '@library/data/catalog';
 import { resolvePreviewExport } from '@library/lib/resolvePreviewExport';
 import { applyPrimaryVars, DEFAULT_PRIMARY } from '@library/lib/theme';
 import { EMBED_UNAVAILABLE, unavailableReasonOf } from '@library/lib/unavailableReasons';
@@ -109,14 +109,15 @@ const PreviewHost = ({
 };
 
 const EmbedPreviewInner = ({
+  entry,
   previewKey,
   loadPreviewModule,
 }: {
+  readonly entry: CatalogEntry | null;
   readonly previewKey: string;
   readonly loadPreviewModule: (entry: CatalogEntry) => Promise<Record<string, unknown>>;
 }) => {
   const searchParams = useSearchParams();
-  const entry = CATALOG_BY_KEY[previewKey];
 
   const [Preview, setPreview] = useState<ComponentType | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -286,13 +287,19 @@ const EmbedPreviewInner = ({
  * const element = <EmbedPreviewPage {...props} />;
  */
 export const EmbedPreviewPage = ({
+  entry,
   previewKey,
   loadPreviewModule,
 }: {
+  readonly entry: CatalogEntry | null;
   readonly previewKey: string;
   readonly loadPreviewModule: (entry: CatalogEntry) => Promise<Record<string, unknown>>;
 }) => (
   <Suspense fallback={<EmbedPageFallback />}>
-    <EmbedPreviewInner loadPreviewModule={loadPreviewModule} previewKey={previewKey} />
+    <EmbedPreviewInner
+      entry={entry}
+      loadPreviewModule={loadPreviewModule}
+      previewKey={previewKey}
+    />
   </Suspense>
 );

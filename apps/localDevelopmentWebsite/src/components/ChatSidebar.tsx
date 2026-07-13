@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SkeletonPulse,
   VybeKitMark,
 } from '@vybekiit/ui';
 import { Clock, ExternalLink, MessageSquare, Plus, RefreshCw, Trash2 } from 'lucide-react';
@@ -24,6 +25,7 @@ import { toast } from 'sonner';
 import { AgentMark } from '@/components/AgentMark';
 import { useAgentSessions } from '@/hooks';
 import type { AgentId } from '@/lib/agents/registry';
+import { isAgentId } from '@/lib/agents/registry';
 import { cn } from '@/lib/utils';
 import { useAgentStore, useChatStore } from '@/stores';
 
@@ -224,9 +226,29 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
               {(() => {
                 if (loading && sessions.length === 0) {
                   return (
-                    <p className="px-3 py-4 text-center text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
-                      Loading sessions&hellip;
-                    </p>
+                    <div
+                      data-testid="sessions-skeleton"
+                      className="space-y-2 px-1 group-data-[collapsible=icon]:hidden"
+                      aria-busy={true}
+                      aria-label="Loading sessions"
+                    >
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <div
+                          key={`session-skel-${index}`}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+                        >
+                          <SkeletonPulse width="20px" height="20px" rounded="md" />
+                          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                            <SkeletonPulse
+                              width={index % 2 === 0 ? '88%' : '72%'}
+                              height="12px"
+                              rounded="sm"
+                            />
+                            <SkeletonPulse width="36%" height="10px" rounded="sm" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   );
                 }
                 if (sessions.length === 0) {
@@ -242,11 +264,16 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
                       tooltip={s.title}
                       data-testid={`session-item-${s.session_id}`}
                       onClick={() => loadSessionAsConversation(s.session_id, s.cwd || undefined)}
-                      className="h-auto flex-col items-start gap-0 py-2.5"
+                      className="h-auto gap-3 py-2.5"
                     >
-                      <span className="line-clamp-1 w-full text-sm text-foreground">{s.title}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatTime(s.updated_at)}
+                      <AgentMark slug={activeAgentId} size={20} className="shrink-0" />
+                      <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+                        <span className="line-clamp-1 w-full text-sm text-foreground">
+                          {s.title}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatTime(s.updated_at)}
+                        </span>
                       </span>
                     </SidebarMenuButton>
                     <SidebarMenuAction
@@ -279,25 +306,30 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
                   No conversations yet
                 </p>
               ) : (
-                conversations.map((c) => (
-                  <SidebarMenuItem key={c.id}>
-                    <SidebarMenuButton
-                      isActive={c.id === activeId}
-                      tooltip={c.title}
-                      onClick={() => onSelect(c.id)}
-                    >
-                      <MessageSquare className="h-4 w-4 shrink-0" />
-                      <span>{c.title}</span>
-                    </SidebarMenuButton>
-                    <SidebarMenuAction
-                      showOnHover={true}
-                      onClick={() => deleteConversation(c.id)}
-                      aria-label="Delete conversation"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </SidebarMenuAction>
-                  </SidebarMenuItem>
-                ))
+                conversations.map((c) => {
+                  const chatAgentId: AgentId = isAgentId(c.agentId) ? c.agentId : activeAgentId;
+                  return (
+                    <SidebarMenuItem key={c.id}>
+                      <SidebarMenuButton
+                        isActive={c.id === activeId}
+                        tooltip={c.title}
+                        data-testid={`local-chat-${c.id}`}
+                        onClick={() => onSelect(c.id)}
+                        className="gap-3"
+                      >
+                        <AgentMark slug={chatAgentId} size={18} className="shrink-0" />
+                        <span className="line-clamp-1">{c.title}</span>
+                      </SidebarMenuButton>
+                      <SidebarMenuAction
+                        showOnHover={true}
+                        onClick={() => deleteConversation(c.id)}
+                        aria-label="Delete conversation"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </SidebarMenuAction>
+                    </SidebarMenuItem>
+                  );
+                })
               )}
             </SidebarMenu>
           </SidebarGroupContent>

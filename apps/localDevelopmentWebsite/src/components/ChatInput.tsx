@@ -13,8 +13,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { AgentMark } from '@/components/AgentMark';
 import type { AgentId } from '@/lib/agents/registry';
+import { getOpenableScenario, scenarioIdFromSearch } from '@/lib/openableScenarios';
+import { runJourneyFixtures, shouldUseJourneyFixtures } from '@/lib/runJourneyFixtures';
 import { cn } from '@/lib/utils';
-import { useAgentStore, useChatStore } from '@/stores';
+import { useAgentStore, useChatStore, useJourneyStore } from '@/stores';
 
 type ChatInputProps = {
   conversationId: string | null;
@@ -233,68 +235,147 @@ export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: C
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autoScenarioRan = useRef(false);
   const addMessage = useChatStore((s) => s.addMessage);
+  const seedFromMessage = useJourneyStore((s) => s.seedFromMessage);
+  const applyTool = useJourneyStore((s) => s.applyTool);
+  const setSimulating = useJourneyStore((s) => s.setSimulating);
   const activeAgentId = useAgentStore((s) => s.activeAgentId);
   const agentsMap = useAgentStore((s) => s.agents);
   const activeAgent = agentsMap[activeAgentId];
 
-  const submit = useCallback(async () => {
-    const trimmed = text.trim();
-    if (!trimmed || disabled || !conversationId) return;
+  const submitPrompt = useCallback(
+    async (prompt: string) => {
+      const trimmed = prompt.trim();
+      if (!trimmed || disabled || !conversationId) return;
 
-    setIsSending(true);
-    addMessage(conversationId, { role: 'user', content: trimmed });
-    setText('');
+      setIsSending(true);
+      addMessage(conversationId, { role: 'user', content: trimmed });
+      setText('');
 
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
-
-    // Open the real agent CLI with this prompt so the message actually reaches the agent.
-    try {
-      const res = await fetch('/api/agents/launch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agent: activeAgentId,
-          mode: 'new',
-          prompt: trimmed,
-        }),
-      });
-      const data = (await res.json()) as {
-        ok?: boolean;
-        launched?: boolean;
-        command?: string;
-        message?: string;
-        error?: string;
-      };
-      if (!res.ok) {
-        throw new Error(data.error ?? 'Launch failed');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
       }
-      addMessage(conversationId, {
-        role: 'agent',
-        content: data.launched
-          ? `Opened ${activeAgent.name} in your terminal with that message.\n\`${data.command}\``
-          : `${data.message ?? 'Could not open Terminal automatically.'}\n\nRun:\n\`${data.command}\``,
-      });
-      if (data.command) {
-        try {
-          await navigator.clipboard.writeText(data.command);
-        } catch {
-          // optional
+
+      // Domain journeys (auth / db / payments / deploy) — seed rail from plain words.
+      const seeded = seedFromMessage(trimmed);
+      const useFixtures =
+        typeof window !== 'undefined' &&
+        shouldUseJourneyFixtures(window.location.search, {
+          NEXT_PUBLIC_ASSISTANT_FIXTURE: process.env.NEXT_PUBLIC_ASSISTANT_FIXTURE,
+          PLAYWRIGHT: process.env.PLAYWRIGHT,
+          CI: process.env.CI,
+        });
+
+      if (seeded.length > 0 && useFixtures) {
+        runJourneyFixtures(
+          seeded,
+          applyTool,
+          () => setSimulating(true),
+          () => setSimulating(false),
+        );
+        addMessage(conversationId, {
+          role: 'agent',
+          content: `Working on: ${seeded.map((j) => j.title).join(', ')}. Watch the Live work cards update as tools run.`,
+        });
+        setIsSending(false);
+        return;
+      }
+
+      if (seeded.length > 0) {
+        addMessage(conversationId, {
+          role: 'agent',
+          content: `Got it — ${seeded.map((j) => j.title).join(', ')}. Opening ${activeAgent.name} so it can run the real tools.`,
+        });
+      }
+
+      // Open the real agent CLI with this prompt so the message actually reaches the agent.
+      try {
+        const res = await fetch('/api/agents/launch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agent: activeAgentId,
+            mode: 'new',
+            prompt: trimmed,
+          }),
+        });
+        const data = (await res.json()) as {
+          ok?: boolean;
+          launched?: boolean;
+          command?: string;
+          message?: string;
+          error?: string;
+        };
+        if (!res.ok) {
+          throw new Error(data.error ?? 'Launch failed');
         }
+        addMessage(conversationId, {
+          role: 'agent',
+          content: data.launched
+            ? `Opened ${activeAgent.name} in your terminal with that message.\n\`${data.command}\``
+            : `${data.message ?? 'Could not open Terminal automatically.'}\n\nRun:\n\`${data.command}\``,
+        });
+        if (data.command) {
+          try {
+            await navigator.clipboard.writeText(data.command);
+          } catch {
+            // optional
+          }
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Could not reach agent';
+        addMessage(conversationId, {
+          role: 'agent',
+          content: `Could not launch ${activeAgent.name}: ${message}`,
+        });
+        toast.error(message);
+      } finally {
+        setIsSending(false);
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Could not reach agent';
-      addMessage(conversationId, {
-        role: 'agent',
-        content: `Could not launch ${activeAgent.name}: ${message}`,
-      });
-      toast.error(message);
-    } finally {
-      setIsSending(false);
+    },
+    [
+      disabled,
+      addMessage,
+      conversationId,
+      activeAgentId,
+      activeAgent.name,
+      seedFromMessage,
+      applyTool,
+      setSimulating,
+    ],
+  );
+
+  const submit = useCallback(async () => {
+    await submitPrompt(text);
+  }, [submitPrompt, text]);
+
+  // Auto-run openable scenario from ?fixture=1&scenario=<id> so maintainers can open each URL.
+  // Prefer /scenarios for click demos; this path is for deep-links into chat.
+  useEffect(() => {
+    if (autoScenarioRan.current || disabled || !conversationId) {
+      return;
     }
-  }, [disabled, addMessage, conversationId, text, activeAgentId, activeAgent.name]);
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const scenarioId = scenarioIdFromSearch(window.location.search);
+    if (scenarioId === null) {
+      return;
+    }
+    const scenario = getOpenableScenario(scenarioId);
+    if (scenario === undefined) {
+      toast.error(`Unknown scenario: ${scenarioId}`);
+      return;
+    }
+    autoScenarioRan.current = true;
+    // Next tick: chat store may still be creating the first conversation on the same frame.
+    const timer = window.setTimeout(() => {
+      void submitPrompt(scenario.prompt);
+      toast.message(`Running scenario: ${scenario.label}`);
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, [conversationId, disabled, submitPrompt]);
 
   const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -316,6 +397,7 @@ export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: C
 
         <textarea
           ref={textareaRef}
+          data-testid="chat-input"
           value={text}
           onChange={autoResize}
           onKeyDown={(e) => {

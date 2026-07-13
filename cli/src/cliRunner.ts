@@ -8,6 +8,7 @@ import {
   runBackendAddCrud,
   runBackendAddRoute,
   runBackendAddUpload,
+  runBackendGenContract,
   runScaffoldBackend,
 } from './commands/backendCli';
 import { runCheckAgentLayer } from './commands/checkAgentLayer';
@@ -18,6 +19,9 @@ import { runDocFallback } from './commands/docFallback';
 import { runDrop } from './commands/drop';
 import { runInit } from './commands/init';
 import { runLintExtensionSkill } from './commands/lintExtensionSkill';
+import { runLiveWorkData } from './commands/liveWorkDataCmd';
+import { runLiveWorkHost } from './commands/liveWorkHostCmd';
+import { runLiveWorkPayments } from './commands/liveWorkPaymentsCmd';
 import { runLocalDev } from './commands/localDev';
 import { runNew } from './commands/new';
 import { runAddPageRecipe, runListPageRecipes, runListPieces } from './commands/piecesCmd';
@@ -206,7 +210,14 @@ const handleBackendCommand = async (context: CliCommandContext): Promise<number>
     process.stdout.write(`${result.message}\n`);
     return result.exitCode;
   }
-  process.stderr.write('Unknown backend command. Try: backend add-route | add-crud | add-upload\n');
+  if (context.subcommand === 'gen-contract') {
+    const result = await runBackendGenContract();
+    process.stdout.write(`${result.message}\n`);
+    return result.exitCode;
+  }
+  process.stderr.write(
+    'Unknown backend command. Try: backend add-route | add-crud | add-upload | gen-contract\n',
+  );
   return 1;
 };
 
@@ -392,6 +403,27 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     const result = runDocFallback([...context.rest]);
     process.stdout.write(`${result.json}\n`);
     return result.exitCode;
+  },
+  'live-work': async (context) => {
+    if (context.subcommand === 'data') {
+      const result = await runLiveWorkData([...context.rest]);
+      process.stdout.write(`${result.json}\n`);
+      return result.exitCode;
+    }
+    if (context.subcommand === 'host') {
+      const result = await runLiveWorkHost([...context.rest]);
+      process.stdout.write(`${result.json}\n`);
+      return result.exitCode;
+    }
+    if (context.subcommand === 'payments') {
+      const result = await runLiveWorkPayments([...context.rest]);
+      process.stdout.write(`${result.json}\n`);
+      return result.exitCode;
+    }
+    process.stderr.write(
+      'Usage: vybekiit live-work data|host|payments [--mode=demo|dogfood|buyer] [--vendor=…] [--cwd=dir] [--no-pin] [--fresh]\n',
+    );
+    return 1;
   },
   dedup: async (context) => {
     const result = await runDedup(commandArgs(context));

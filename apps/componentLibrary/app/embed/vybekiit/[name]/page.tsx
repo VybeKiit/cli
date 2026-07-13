@@ -1,19 +1,29 @@
-'use client';
+import { CATALOG_BY_KEY } from '@library/data/catalog';
+import { VybeKiitEmbedPreview } from './VybeKiitEmbedPreview';
 
-import { EmbedPreviewPage } from '@library/components/EmbedPreviewPage';
-import { loadVybeKiitDemo } from '@library/lib/loadPreview.demo.vybekiit';
-import { useParams } from 'next/navigation';
+interface VybeKiitEmbedPreviewRouteProps {
+  readonly params: Promise<{
+    readonly name: string;
+  }>;
+}
 
-const VybeKiitEmbedPreviewRoute = () => {
-  const params = useParams<{ name: string }>();
-  const name = decodeURIComponent(params.name);
-  const previewKey = `vybekiit/${name}`;
+/**
+ * Render a chrome-less VybeKiit mascot preview for iframe embedding.
+ *
+ * The single catalog entry is resolved here on the server so the 849 KB catalog stays out of the
+ * embed client chunk.
+ *
+ * @param props - Route params supplied by Next.js.
+ * @returns The VybeKiit embed preview for the requested mascot.
+ * @example
+ * const element = await VybeKiitEmbedPreviewRoute({ params });
+ */
+const VybeKiitEmbedPreviewRoute = async ({ params }: VybeKiitEmbedPreviewRouteProps) => {
+  const { name } = await params;
+  const previewKey = `vybekiit/${decodeURIComponent(name)}`;
 
   return (
-    <EmbedPreviewPage
-      loadPreviewModule={(entry) => loadVybeKiitDemo(entry.name)}
-      previewKey={previewKey}
-    />
+    <VybeKiitEmbedPreview entry={CATALOG_BY_KEY[previewKey] ?? null} previewKey={previewKey} />
   );
 };
 

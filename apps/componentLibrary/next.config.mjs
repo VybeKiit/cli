@@ -19,7 +19,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  webpack: (config) => {
+  webpack: (config, { dev, isServer }) => {
     const existingAlias = config.resolve.alias === undefined ? {} : config.resolve.alias;
     const existingModules =
       config.resolve.modules === undefined ? ['node_modules'] : config.resolve.modules;
@@ -39,6 +39,18 @@ const nextConfig = {
       path.join(__dirname, 'node_modules'),
       ...existingModules,
     ];
+
+    // Dev-only: compile dynamically-imported modules on first request instead of eagerly
+    // with the route. The design-system `[slug]` route references a registry of ~51 lazy
+    // per-primitive story chunks (recharts/embla/cmdk/vaul/day-picker); without this, webpack
+    // compiles all ~4.4k modules on the first design-system visit. With it, only the visited
+    // primitive's chunk compiles. Client build only (the story galleries are `ssr:false`).
+    if (dev && !isServer) {
+      config.experiments = {
+        ...(config.experiments ?? {}),
+        lazyCompilation: { entries: false, imports: true },
+      };
+    }
     return config;
   },
 };

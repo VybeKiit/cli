@@ -40,6 +40,7 @@
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
     "@vybekiit/deploy": "workspace:*",
+    "@vybekiit/payments": "workspace:*",
     "@vybekiit/report-mode": "workspace:*"
   }
 }

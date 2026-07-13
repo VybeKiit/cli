@@ -41,6 +41,12 @@ describe('resolveHosting', () => {
     expect(provider.name).toBe('railway');
   });
 
+  it('constructs the github-pages adapter without required token keys', async () => {
+    const provider = await Effect.runPromise(resolveHosting({ HOSTING_PROVIDER: 'github-pages' }));
+
+    expect(provider.name).toBe('github-pages');
+  });
+
   it('fails loud when the vercel adapter is selected without its token', async () => {
     const error = await Effect.runPromise(
       Effect.flip(resolveHosting({ HOSTING_PROVIDER: 'vercel' })),

@@ -4,11 +4,11 @@ import { CatalogEntryGrid } from '@library/components/CatalogEntryGrid';
 import { CatalogGridLayoutPicker } from '@library/components/CatalogGridLayoutPicker';
 import { CatalogPaginationBar } from '@library/components/CatalogPaginationBar';
 import { CatalogScrollModeToggle } from '@library/components/CatalogScrollModeToggle';
-import { CatalogSidebar } from '@library/components/CatalogSidebar';
-import { GlobalThemeControls } from '@library/components/GlobalThemeControls';
 import { LibraryTutorial } from '@library/components/LibraryTutorial';
 import { LayoutTooltip } from '@library/components/layout/LayoutTooltip';
 import { SelectionTray } from '@library/components/SelectionTray';
+import { PageContainer } from '@library/components/shell/PageContainer';
+import { PageHeader } from '@library/components/shell/PageHeader';
 import { useCatalogData, useCatalogReady } from '@library/context/CatalogDataContext';
 import { useCatalogGridLayout } from '@library/context/CatalogGridLayoutContext';
 import {
@@ -22,8 +22,8 @@ import { matchesCatalogQuery } from '@library/lib/catalogSearch';
 import { categoryLabelFromSlug } from '@library/lib/categoryLabels';
 import { groupCatalogEntries } from '@library/lib/groupCatalogEntries';
 import { Button } from '@vybekiit/ui/button';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@vybekiit/ui/sidebar';
 import { CircleHelp } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -72,7 +72,7 @@ export const CatalogBrowser = () => {
 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
-  const [category, setCategory] = useState<string>(initialCategory);
+  const category = initialCategory;
   const [library, setLibrary] = useState<string>(initialLibrary);
   const [tab, setTab] = useState<TabKind>(initialTab);
   const { pool, poolReady } = useCatalogPool(category, debouncedQuery, ready);
@@ -209,37 +209,12 @@ export const CatalogBrowser = () => {
     setVisibleCount(CATALOG_PAGE_SIZE);
   }, []);
 
-  const handleCategoryChange = useCallback(
-    (slug: string) => {
-      setCategory(slug);
-      syncUrl({ category: slug });
-    },
-    [syncUrl],
-  );
-
   return (
-    <SidebarProvider defaultOpen={true}>
-      <CatalogSidebar category={category} onCategoryChange={handleCategoryChange} />
-
-      <SidebarInset className="pb-24">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4 md:hidden">
-          <SidebarTrigger className="-ms-1" />
-          <span className="font-semibold text-sm">Categories</span>
-        </header>
-
-        <main className="flex-1 p-6 md:p-8">
-          <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="font-medium text-muted-foreground text-sm">
-                VybeKiit · ui.vybekiit.com
-              </p>
-              <h1 className="mt-1 font-bold text-3xl tracking-tight">Component Library</h1>
-              <p className="mt-2 max-w-2xl text-muted-foreground">
-                {COMPONENT_CATALOG_COUNT} mirrored blocks from AI Elements, Magic UI, BundUI, and
-                more — plus VybeKiit mascots — browse by category or source library.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
+    <>
+      <PageContainer size="wide">
+        <PageHeader
+          actions={
+            <>
               <LayoutTooltip label="Walk through search, previews, and how to copy prompts for your AI editor.">
                 <Button onClick={() => setTourOpen(true)} size="sm" type="button" variant="outline">
                   <CircleHelp className="h-4 w-4" />
@@ -247,141 +222,152 @@ export const CatalogBrowser = () => {
                 </Button>
               </LayoutTooltip>
               <CatalogGridLayoutPicker />
-              <div data-tour="theme-controls">
-                <GlobalThemeControls />
-              </div>
-            </div>
-          </header>
+            </>
+          }
+          description={`${COMPONENT_CATALOG_COUNT} mirrored blocks from AI Elements, Magic UI, BundUI, and more — plus VybeKiit mascots — browse by category or source library.`}
+          eyebrow="VybeKiit · ui.vybekiit.com"
+          title="Component Library"
+        />
 
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <input
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-              data-tour="search"
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search components…"
-              type="search"
-              value={query}
-            />
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            data-tour="search"
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search components…"
+            type="search"
+            value={query}
+          />
+          <select
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm md:hidden"
+            onChange={(e) => {
+              syncUrl({ category: e.target.value });
+            }}
+            value={category}
+          >
+            <option value="all">All categories</option>
+            {catalog.categories.map((item) => (
+              <option key={item.slug} value={item.slug}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <LayoutTooltip label="Filter by source library — Magic UI, Kibo, 21st.dev, BundUI, and more.">
             <select
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm md:hidden"
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+              data-tour="library-filter"
               onChange={(e) => {
-                setCategory(e.target.value);
-                syncUrl({ category: e.target.value });
+                setLibrary(e.target.value);
+                syncUrl({ library: e.target.value });
               }}
-              value={category}
+              value={library}
             >
-              <option value="all">All categories</option>
-              {catalog.categories.map((item) => (
-                <option key={item.slug} value={item.slug}>
-                  {item.label}
+              <option value="all">All libraries</option>
+              {catalog.namespaces.map((ns) => (
+                <option key={ns} value={ns}>
+                  {ns}
                 </option>
               ))}
             </select>
-            <LayoutTooltip label="Filter by source library — Magic UI, Kibo, 21st.dev, BundUI, and more.">
-              <select
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                data-tour="library-filter"
-                onChange={(e) => {
-                  setLibrary(e.target.value);
-                  syncUrl({ library: e.target.value });
-                }}
-                value={library}
-              >
-                <option value="all">All libraries</option>
-                {catalog.namespaces.map((ns) => (
-                  <option key={ns} value={ns}>
-                    {ns}
-                  </option>
-                ))}
-              </select>
-            </LayoutTooltip>
-          </div>
+          </LayoutTooltip>
+        </div>
 
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
-              {(
-                [
-                  ['all', 'All', catalog.count || COMPONENT_CATALOG_COUNT],
-                  ['components', 'Components', catalog.componentCount || CATALOG_COMPONENT_COUNT],
-                  ['examples', 'Examples', catalog.exampleCount || CATALOG_EXAMPLE_COUNT],
-                ] as const
-              ).map(([id, label, count]) => (
-                <LayoutTooltip key={id} label={TAB_TIPS[id]}>
-                  <button
-                    className={`rounded-full px-3 py-1 text-sm ${tab === id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-                    onClick={() => handleSelectTab(id)}
-                    type="button"
-                  >
-                    {label} ({count})
-                  </button>
-                </LayoutTooltip>
-              ))}
-            </div>
-            <CatalogScrollModeToggle
-              enabled={infiniteScroll}
-              onEnabledChange={handleInfiniteScrollChange}
-            />
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                ['all', 'All', catalog.count || COMPONENT_CATALOG_COUNT],
+                ['components', 'Components', catalog.componentCount || CATALOG_COMPONENT_COUNT],
+                ['examples', 'Examples', catalog.exampleCount || CATALOG_EXAMPLE_COUNT],
+              ] as const
+            ).map(([id, label, count]) => (
+              <LayoutTooltip key={id} label={TAB_TIPS[id]}>
+                <button
+                  className={`rounded-full px-3 py-1 text-sm ${tab === id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                  onClick={() => handleSelectTab(id)}
+                  type="button"
+                >
+                  {label} ({count})
+                </button>
+              </LayoutTooltip>
+            ))}
+            <Link
+              className="rounded-full border border-primary/40 bg-primary/5 px-3 py-1 font-medium text-primary text-sm hover:bg-primary/10"
+              href="/design-system"
+            >
+              Design system →
+            </Link>
+            <Link
+              className="rounded-full border border-primary/40 bg-primary/5 px-3 py-1 font-medium text-primary text-sm hover:bg-primary/10"
+              href="/changelog"
+            >
+              Changelog →
+            </Link>
           </div>
-
-          <p className="mb-4 text-muted-foreground text-sm">
-            {(() => {
-              if (catalogReady) {
-                return (
-                  <>
-                    Showing {visibleEntries.length} of {orderedFiltered.length}
-                    {!infiniteScroll && orderedFiltered.length > CATALOG_PAGE_SIZE
-                      ? ` · page ${page} of ${pageCount}`
-                      : null}
-                  </>
-                );
-              }
-              if (error) {
-                return <>Catalog failed to load: {error}</>;
-              }
-              return <>Loading catalog…</>;
-            })()}
-          </p>
-
-          <div className="flex flex-col gap-10" ref={gridTopRef}>
-            {catalogReady ? (
-              visibleGrouped.map(({ slug, entries }) => (
-                <section key={slug}>
-                  {category === 'all' ? (
-                    <div className="sticky top-0 z-10 mb-4 border-border border-b bg-background/95 py-2 backdrop-blur">
-                      <h2 className="font-semibold text-lg">
-                        {categoryLabelFromSlug(slug)}{' '}
-                        <span className="font-normal text-muted-foreground text-sm">
-                          ({entries.length})
-                        </span>
-                      </h2>
-                    </div>
-                  ) : null}
-                  <CatalogEntryGrid
-                    entries={entries}
-                    gridClassName={gridClassName}
-                    tourAnchorKey={slug === visibleGrouped[0]?.slug ? tourAnchorKey : undefined}
-                    virtualize={infiniteScroll}
-                  />
-                </section>
-              ))
-            ) : (
-              <CatalogGridSkeleton count={CATALOG_PAGE_SIZE} />
-            )}
-            {hasMore ? <div aria-hidden="true" className="h-8" ref={loadMoreRef} /> : null}
-          </div>
-        </main>
-        {infiniteScroll ? null : (
-          <CatalogPaginationBar
-            onPageChange={handlePageChange}
-            page={page}
-            pageCount={pageCount}
-            pageSize={CATALOG_PAGE_SIZE}
-            total={orderedFiltered.length}
+          <CatalogScrollModeToggle
+            enabled={infiniteScroll}
+            onEnabledChange={handleInfiniteScrollChange}
           />
-        )}
-        <SelectionTray />
-        <LibraryTutorial forceOpen={tourOpen} onForceClose={() => setTourOpen(false)} />
-      </SidebarInset>
-    </SidebarProvider>
+        </div>
+
+        <p className="mb-4 text-muted-foreground text-sm">
+          {(() => {
+            if (catalogReady) {
+              return (
+                <>
+                  Showing {visibleEntries.length} of {orderedFiltered.length}
+                  {!infiniteScroll && orderedFiltered.length > CATALOG_PAGE_SIZE
+                    ? ` · page ${page} of ${pageCount}`
+                    : null}
+                </>
+              );
+            }
+            if (error) {
+              return <>Catalog failed to load: {error}</>;
+            }
+            return <>Loading catalog…</>;
+          })()}
+        </p>
+
+        <div className="flex flex-col gap-10" ref={gridTopRef}>
+          {catalogReady ? (
+            visibleGrouped.map(({ slug, entries }) => (
+              <section key={slug}>
+                {category === 'all' ? (
+                  <div className="sticky top-0 z-10 mb-4 border-border border-b bg-background/95 py-2 backdrop-blur">
+                    <h2 className="font-semibold text-lg">
+                      {categoryLabelFromSlug(slug)}{' '}
+                      <span className="font-normal text-muted-foreground text-sm">
+                        ({entries.length})
+                      </span>
+                    </h2>
+                  </div>
+                ) : null}
+                <CatalogEntryGrid
+                  entries={entries}
+                  gridClassName={gridClassName}
+                  tourAnchorKey={slug === visibleGrouped[0]?.slug ? tourAnchorKey : undefined}
+                  virtualize={infiniteScroll}
+                />
+              </section>
+            ))
+          ) : (
+            <CatalogGridSkeleton count={CATALOG_PAGE_SIZE} />
+          )}
+          {hasMore ? <div aria-hidden="true" className="h-8" ref={loadMoreRef} /> : null}
+        </div>
+      </PageContainer>
+      {infiniteScroll ? null : (
+        <CatalogPaginationBar
+          onPageChange={handlePageChange}
+          page={page}
+          pageCount={pageCount}
+          pageSize={CATALOG_PAGE_SIZE}
+          total={orderedFiltered.length}
+        />
+      )}
+      <SelectionTray />
+      <LibraryTutorial forceOpen={tourOpen} onForceClose={() => setTourOpen(false)} />
+    </>
   );
 };

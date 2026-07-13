@@ -5,11 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import { ChatInput } from '@/components/ChatInput';
 import { ChatMessage } from '@/components/ChatMessage';
 import { ChatSidebar } from '@/components/ChatSidebar';
+import { DomainJourneyPanel } from '@/components/DomainJourneyPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { WorkflowRunner } from '@/components/WorkflowRunner';
 import { useDaemon } from '@/hooks';
 import { useInstalledAgents } from '@/hooks/useInstalledAgents';
-import { useAgentStore, useChatStore } from '@/stores';
+import { useAgentStore, useChatStore, useJourneyStore } from '@/stores';
 
 const WELCOME_MESSAGE = `Hi — I'm your VybeKiit assistant. Pick an installed agent on the left, then either resume a past session or send a message here. I'll open the real CLI in your terminal so the agent can work.`;
 
@@ -24,6 +25,7 @@ export const ChatInterface = () => {
   const conversations = useChatStore((s) => s.conversations);
   const createConversation = useChatStore((s) => s.createConversation);
   const addMessage = useChatStore((s) => s.addMessage);
+  const journeyCount = useJourneyStore((s) => s.journeys.length);
   const activeAgentId = useAgentStore((s) => s.activeAgentId);
   const agentsMap = useAgentStore((s) => s.agents);
   const activeAgent = agentsMap[activeAgentId];
@@ -94,31 +96,47 @@ export const ChatInterface = () => {
         </header>
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <ScrollArea className="flex-1">
-            <div className="mx-auto max-w-3xl px-4 pb-6 pt-4 sm:px-6">
-              <section className="mb-6 rounded-2xl border border-border bg-card/40 p-4 sm:p-5">
-                <WorkflowRunner />
-              </section>
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              <ScrollArea className="flex-1">
+                <div className="mx-auto max-w-3xl px-4 pb-6 pt-4 sm:px-6">
+                  {/* Workflow board only mounts after a user request seeds steps. */}
+                  <WorkflowRunner />
 
-              {activeConversation ? (
-                <div className="space-y-1">
-                  {activeConversation.messages.map((msg) => (
-                    <ChatMessage key={msg.id} message={msg} />
-                  ))}
-                  <div ref={bottomRef} />
+                  {activeConversation ? (
+                    <div className="space-y-1">
+                      {activeConversation.messages.map((msg) => (
+                        <ChatMessage
+                          key={msg.id}
+                          message={msg}
+                          conversationAgentId={activeConversation.agentId}
+                        />
+                      ))}
+                      <div ref={bottomRef} />
+                    </div>
+                  ) : (
+                    <div className="flex h-full items-center justify-center px-4 py-12 text-center text-muted-foreground">
+                      Select or start a conversation.
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="flex h-full items-center justify-center px-4 py-12 text-center text-muted-foreground">
-                  Select or start a conversation.
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+              </ScrollArea>
 
-          <div className="border-t border-border bg-background px-4 py-4 sm:px-6">
-            <div className="mx-auto w-full max-w-3xl">
-              <ChatInput conversationId={activeId} disabled={!activeConversation} />
+              <div className="border-t border-border bg-background px-4 py-4 sm:px-6">
+                <div className="mx-auto w-full max-w-3xl">
+                  <ChatInput conversationId={activeId} disabled={!activeConversation} />
+                </div>
+              </div>
             </div>
+
+            {journeyCount > 0 ? (
+              <aside
+                data-testid="journey-rail-host"
+                className="w-full max-h-[40vh] shrink-0 overflow-y-auto border-t border-border bg-background/80 p-4 lg:max-h-none lg:w-[22rem] lg:border-l lg:border-t-0"
+              >
+                <DomainJourneyPanel />
+              </aside>
+            ) : null}
           </div>
         </main>
       </div>

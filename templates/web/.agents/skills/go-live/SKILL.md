@@ -15,10 +15,11 @@ metadata:
 translate every error · celebrate. You handle the deploy; the builder only approves/pastes when
 asked.
 
-> (Under the hood — agent-only) Put the app online via `@vybekiit/deploy`'s `resolveHosting()` —
-> Cloudflare by default, Vercel or AWS (Amplify) when the builder's setup uses them. Follow the
-> matching platform wrapper in `.vybekiit/platform-skills/` (`deploy-cloudflare-vybekiit.md`,
-> `deploy-vercel-vybekiit.md`, or `deploy-railway-vybekiit.md`). Pick the host from their settings; don't make the builder choose
+> (Under the hood — agent-only) Prefer **Live work host** (ADR-0039): run
+> `vybekiit live-work host` so preference ladder, free-tier hop, and pin live in `@vybekiit/deploy`
+> — never reimplement hop here. Fallback only: `resolveHosting()` + platform wrappers in
+> `.vybekiit/platform-skills/` (`deploy-cloudflare-vybekiit.md`, `deploy-vercel-vybekiit.md`,
+> `deploy-railway-vybekiit.md`). Pick the host from their settings; don't make the builder choose
 > or hear the host's name (unless they ask).
 
 ## Steps
@@ -46,26 +47,32 @@ asked.
 
 2. **Explain in one line.** *"I'm going to put your app online now. You'll click 'approve' once."*
 
-3. **Sign in + connect the app's home.** If `vybekiit doctor` said the deploy tool isn't signed in,
-   have the builder run the one sign-in command it printed — a browser window opens, they click
-   "approve," and that's the only thing they do (this works the same whichever host their setup
-   uses). Then you create the project and connect the app.
-   **Verify:** the deploy tool reports they're signed in, and the project shows up.
-
-4. **Move the secret settings over.** Copy the needed secret settings into the app's home for them
-   (never paste secrets into chat or commit them).
-   **Verify:** the required settings are present.
-
-5. **Publish.** Put the app online.
-   **Verify:** publishing finishes green and the live URL loads. Open it and confirm the page shows.
+3. **Put the app online.** Prefer the shared Live work path (ADR-0039) so preference ladder,
+   free-tier hop, and pin stay in one place:
+   - Run `vybekiit live-work host --mode=buyer --cwd=.` (add `--vendor=<name>` only when the
+     builder named Cloudflare, Render, Railway, or Vercel; add `--build-dir=<path>` when a static
+     export is ready for a first create).
+   - On success, read the JSON `buyerMessage` out loud and share the live `url` when present.
+     Pin keys are already written (`pinKeys` lists which names were written — never print values).
+   - If it fails with missing credentials / ladder exhausted, fall back to `vybekiit doctor` and
+     the matching platform wrapper in `.vybekiit/platform-skills/`. If doctor said the deploy tool
+     isn't signed in, have the builder run the one sign-in command it printed — a browser window
+     opens, they click "approve," and that's the only thing they do. Then create/connect/publish
+     via the wrapper. Copy needed secret settings into the app's home (never paste secrets into
+     chat or commit them).
+   - If Live work returned an existing pin (`url` present) but the builder needs the **latest
+     code** online, follow the platform wrapper for the pinned host to publish that build — Live
+     work owns ladder/pin; wrappers own re-deploy of app code when create adapters don't cover it.
+   **Verify:** Live work JSON has `"ok": true` and `"verified": true` and the live URL loads, or
+   the platform wrapper finishes green and the URL loads.
    🎉 *Celebrate* — their app is live; give them the link to share.
 
-5b. **Verify the app's memory is up to date.** If the app saves data (`save-data` was run before),
+4. **Verify the app's memory is up to date.** If the app saves data (`save-data` was run before),
    confirm the live database has the same structure as the local one — run the migration status check
    via `@vybekiit/db`'s `checkMigrationStatus()`. If pending migrations exist, apply them now.
    **Verify:** migration status shows all applied; no pending.
 
-6. **Want their own web address?** If they'd like to use their own domain instead of the temporary
+5. **Want their own web address?** If they'd like to use their own domain instead of the temporary
    address, run `buy-domain` next.
 
 ## If anything breaks
@@ -77,6 +84,8 @@ again.
 
 - Never offer a preview/staging deploy. The builder's "deploy" always means production. A preview URL confuses non-technical builders ("which one is real?") and wastes time.
 - Never say "fixed" or "done" after a code change without deploying (contract rule ⑧). If the app is already live, ask to deploy or confirm the builder wants to wait.
+- Never reimplement preference ladder / free-tier hop in this skill — always `vybekiit live-work host`
+  (or package runner) first.
 
 ## Definition of done
 

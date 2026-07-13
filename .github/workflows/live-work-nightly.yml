@@ -1,0 +1,359 @@
+# Live work nightly — real create/verify on vendor platforms (ADR-0039 §6).
+#
+# Not part of the PR CI Gate. PR CI stays secret-free; this workflow is the
+# maintainer gate that claimable Neon + (optional) host create/delete actually
+# work on the network.
+#
+# Secrets (all optional — missing ones skip that job with a notice):
+#   CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID  → host Cloudflare Pages live
+#   RAILWAY_TOKEN                                → host Railway live (A12b)
+#   VERCEL_TOKEN                                 → host Vercel live (A12b)
+#   RENDER_API_KEY (+ optional RENDER_STATIC_REPO) → host Render live (A12b)
+#   LEMONSQUEEZY_* / STRIPE_* / PAYPAL_*         → payments credential verify
+#   SUPABASE_URL + SUPABASE_ANON_KEY             → auth real-provider round-trip
+name: Live work nightly
+
+on:
+  schedule:
+    # 06:15 UTC daily — off the top-of-hour stampede
+    - cron: '15 6 * * *'
+  workflow_dispatch:
+    inputs:
+      run_host:
+        description: 'Run host live e2e jobs when vendor secrets exist'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-work-nightly
+  cancel-in-progress: false
+
+jobs:
+  # ── Data: claimable Neon (no secrets) ─────────────────────────────────────
+  live-data-claimable:
+    name: Live data (claimable Neon)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build db package deps
+        run: pnpm exec turbo run build --filter=@vybekiit/db^... --filter=@vybekiit/db --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Claimable Neon Live work e2e
+        run: pnpm --filter @vybekiit/db test src/liveWork/liveE2e.test.ts
+        env:
+          LIVE_WORK_E2E: '1'
+          CI: true
+
+  # ── Host: Cloudflare Pages when secrets present ───────────────────────────
+  live-host-cloudflare:
+    name: Live host (Cloudflare Pages)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.run_host != 'false'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect Cloudflare secrets
+        id: cf
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping CF host live — set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID."
+          fi
+
+      - name: Build deploy package deps
+        if: steps.cf.outputs.ready == 'true'
+        run: pnpm exec turbo run build --filter=@vybekiit/deploy^... --filter=@vybekiit/deploy --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Install wrangler
+        if: steps.cf.outputs.ready == 'true'
+        run: pnpm add -g wrangler@4
+
+      - name: Cloudflare Pages Live work e2e
+        if: steps.cf.outputs.ready == 'true'
+        run: pnpm --filter @vybekiit/deploy test src/liveWork/liveHostE2e.test.ts
+        env:
+          LIVE_WORK_HOST_E2E: '1'
+          CI: true
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # ── Host A12b: Railway / Vercel / Render (optional secrets) ───────────────
+  live-host-vendors:
+    name: Live host (Railway / Vercel / Render)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.run_host != 'false'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect vendor secrets
+        id: vendors
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          any=false
+          if [ -n "$RAILWAY_TOKEN" ]; then
+            echo "railway=true" >> "$GITHUB_OUTPUT"
+            any=true
+          else
+            echo "railway=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "vercel=true" >> "$GITHUB_OUTPUT"
+            any=true
+          else
+            echo "vercel=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -n "$RENDER_API_KEY" ]; then
+            echo "render=true" >> "$GITHUB_OUTPUT"
+            any=true
+          else
+            echo "render=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "$any" = true ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping A12b host live — set RAILWAY_TOKEN / VERCEL_TOKEN / RENDER_API_KEY as available."
+          fi
+
+      - name: Build deploy package deps
+        if: steps.vendors.outputs.ready == 'true'
+        run: pnpm exec turbo run build --filter=@vybekiit/deploy^... --filter=@vybekiit/deploy --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Install Railway CLI
+        if: steps.vendors.outputs.railway == 'true'
+        run: npm i -g @railway/cli
+
+      - name: Install Vercel CLI
+        if: steps.vendors.outputs.vercel == 'true'
+        run: npm i -g vercel
+
+      - name: Railway host live e2e
+        if: steps.vendors.outputs.railway == 'true'
+        run: pnpm --filter @vybekiit/deploy test src/liveWork/liveHostVendorsE2e.test.ts
+        env:
+          LIVE_WORK_HOST_RAILWAY: '1'
+          CI: true
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Vercel host live e2e
+        if: steps.vendors.outputs.vercel == 'true'
+        run: pnpm --filter @vybekiit/deploy test src/liveWork/liveHostVendorsE2e.test.ts
+        env:
+          LIVE_WORK_HOST_VERCEL: '1'
+          CI: true
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Render host live e2e
+        if: steps.vendors.outputs.render == 'true'
+        run: pnpm --filter @vybekiit/deploy test src/liveWork/liveHostVendorsE2e.test.ts
+        env:
+          LIVE_WORK_HOST_RENDER: '1'
+          CI: true
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_STATIC_REPO: ${{ secrets.RENDER_STATIC_REPO }}
+
+  # ── Payments credential verify (optional secrets) ─────────────────────────
+  live-payments-verify:
+    name: Live payments (credential verify)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect payment secrets
+        id: pay
+        env:
+          LEMONSQUEEZY_API_KEY: ${{ secrets.LEMONSQUEEZY_API_KEY }}
+          LEMONSQUEEZY_TEST_MODE_API_KEY: ${{ secrets.LEMONSQUEEZY_TEST_MODE_API_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+        run: |
+          if [ -n "$LEMONSQUEEZY_API_KEY" ] || [ -n "$LEMONSQUEEZY_TEST_MODE_API_KEY" ] || [ -n "$STRIPE_SECRET_KEY" ] || [ -n "$PAYPAL_CLIENT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping payments live verify — set LEMONSQUEEZY_* / STRIPE_* / PAYPAL_* secrets."
+          fi
+
+      - name: Build payments package deps
+        if: steps.pay.outputs.ready == 'true'
+        run: pnpm exec turbo run build --filter=@vybekiit/payments^... --filter=@vybekiit/payments --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Payments Live work ladder with secrets
+        if: steps.pay.outputs.ready == 'true'
+        run: pnpm --filter @vybekiit/payments test src/liveWork/
+        env:
+          CI: true
+          LEMONSQUEEZY_API_KEY: ${{ secrets.LEMONSQUEEZY_API_KEY }}
+          LEMONSQUEEZY_STORE_ID: ${{ secrets.LEMONSQUEEZY_STORE_ID }}
+          LEMONSQUEEZY_WEBHOOK_SECRET: ${{ secrets.LEMONSQUEEZY_WEBHOOK_SECRET }}
+          LEMONSQUEEZY_TEST_MODE: ${{ secrets.LEMONSQUEEZY_TEST_MODE }}
+          LEMONSQUEEZY_TEST_MODE_API_KEY: ${{ secrets.LEMONSQUEEZY_TEST_MODE_API_KEY }}
+          LEMONSQUEEZY_TEST_MODE_WEBHOOK_SECRET: ${{ secrets.LEMONSQUEEZY_TEST_MODE_WEBHOOK_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          PAYPAL_WEBHOOK_ID: ${{ secrets.PAYPAL_WEBHOOK_ID }}
+
+  # ── Auth: real-provider password round-trip (optional secrets) ────────────
+  live-auth:
+    name: Live auth (real provider)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect Supabase auth secrets
+        id: auth
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping live auth — set SUPABASE_URL + SUPABASE_ANON_KEY."
+          fi
+
+      - name: Build auth package deps
+        if: steps.auth.outputs.ready == 'true'
+        run: pnpm exec turbo run build --filter=@vybekiit/auth^... --filter=@vybekiit/auth --concurrency=2
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Auth Live work e2e (Supabase)
+        if: steps.auth.outputs.ready == 'true'
+        run: pnpm --filter @vybekiit/auth test src/liveWork/liveAuthE2e.test.ts
+        env:
+          LIVE_AUTH_E2E: '1'
+          AUTH_PROVIDER: supabase
+          CI: true
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+  # ── Unit matrix guard (always, no secrets) ────────────────────────────────
+  live-work-unit-matrix:
+    name: Live work unit matrix (ladders + dogfood apex)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Data + host + payments liveWork unit suites
+        run: |
+          pnpm --filter @vybekiit/db test src/liveWork/
+          pnpm --filter @vybekiit/deploy test src/liveWork/
+          pnpm --filter @vybekiit/payments test src/liveWork/
+
+      - name: Env matrix documents all three ladders + dogfood apex
+        run: |
+          set -euo pipefail
+          f=.env.example
+          rg -q 'supabase → neon → railway' "$f"
+          rg -q 'cloudflare → render → railway → vercel' "$f"
+          rg -q 'lemon-squeezy → stripe → paypal' "$f"
+          rg -q 'DOGFOOD_APEX' "$f"
+          rg -q 'RENDER_API_KEY' "$f"
+          rg -q 'yosefhayimsabag\.dev' "$f"
+          echo "env matrix comment block OK"

@@ -195,7 +195,7 @@ See ADR-0002/0003/0004.
 | Monorepo | pnpm workspaces + Turborepo | — |
 | Web UI | shadcn/ui (web + extension share it) | MUI etc. — can't mix design systems; shadcn is best for agents |
 | Mobile UI | plain RN `StyleSheet` primitives (Button/Input/Card/Label/Alert) reading shared `@vybekiit/tokens` | NativeWind dropped (too buggy) + react-native-reusables (depends on it); React Native Paper (Material clashes with shadcn) — ADR-0004 |
-| Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · vercel · aws (Amplify/SST) · **railway** (coupled stack) | Vercel is opt-in (ADR-0006); Railway is opt-in (ADR-0017); AWS never the default — ADR-0002 |
+| Hosting/deploy | `@vybekiit/deploy`: **cloudflare⭐** · vercel · aws (Amplify/SST) · **railway** (coupled stack) · **github-pages** (free static) | Vercel/Railway opt-in (ADR-0006/0017); GitHub Pages is the free static host (ADR-0040); AWS never the default — ADR-0002 |
 | Data | `@vybekiit/db` (`DataProvider`): **supabase⭐** (Postgres) · **neon** (serverless Postgres) · **firebase** (Firestore) · **railway** (Railway Postgres) · mongodb (Atlas) · aws (DynamoDB/DocumentDB) | single-stack — kept Supabase batteries as default; Mongo/AWS opt-in — ADR-0002 |
 | Auth | `@vybekiit/auth` (`AuthProvider`): **better-auth⭐** bound to the chosen DB (Postgres/Mongo) · Cognito for AWS | "auth = Supabase-only" — new DB adapters have no built-in auth — ADR-0003 |
 | Storage | `StorageProvider`: **supabase/R2⭐** · s3 | R2 implemented; doctor provisions on CF stack (ADR-0010) |
@@ -291,6 +291,11 @@ unused-vars / `any` / unreachable so tsconfig doesn't double-own them.
   agent skills `harden` and `check-safety` confirm coverage before ship.
 - Moat is **not** code secrecy (boilerplate is always pirateable) — it's updates + the agent
   layer + convenience + brand.
+- **Kit changelog (ADR-0041)** — each release's contents are recorded in an auto-generated
+  root `CHANGELOG.md` (SSOT) plus a `/changelog` maintainer board in `apps/componentLibrary`, produced
+  by `scripts/dev/changelog/generateChangelog.mjs` from git commits + filtered GitHub Issues (status
+  marks reuse the live-work legend). It backs the **Release line**; buyers are unaffected (they track
+  updates via `update-kit`). Distinct from the buyer `ChangelogPage` **surface recipe** — see LANGUAGE.md.
 
 ## Business model
 
@@ -466,6 +471,7 @@ matches.
 | Deploy — Cloudflare ⭐ | [developers.cloudflare.com](https://developers.cloudflare.com) · cloudflare/skills | `deploy-cloudflare-vybekiit.md` | `wrangler`, `workers-best-practices` pinned |
 | Deploy — Vercel | [vercel.com/docs](https://vercel.com/docs) | `deploy-vercel-vybekiit.md` | `vercel` CLI via `doctor` when `HOSTING_PROVIDER=vercel` |
 | Deploy — Railway | [docs.railway.com](https://docs.railway.com) | `deploy-railway-vybekiit.md` | `railway` CLI + MCP via `doctor` when `HOSTING_PROVIDER=railway` |
+| Deploy — GitHub Pages | [docs.github.com/pages](https://docs.github.com/en/pages) | `deploy-github-pages-vybekiit.md` | `gh` via `doctor` when `HOSTING_PROVIDER=github-pages` (free static, ADR-0040) |
 | Supabase ⭐ | [supabase.com/docs](https://supabase.com/docs) · supabase/agent-skills | `supabase-vybekiit.md` | `supabase`, `supabase-postgres-best-practices` pinned |
 | better-auth ⭐ | [better-auth.com/docs](https://www.better-auth.com/docs) · better-auth/skills | `better-auth-vybekiit.md` | `better-auth-best-practices`, `create-auth-skill`, `better-auth-security-best-practices` pinned |
 | Lemon Squeezy ⭐ | [docs.lemonsqueezy.com](https://docs.lemonsqueezy.com) | `lemon-squeezy-vybekiit.md` + `browser-automation-vybekiit.md` (`ls`) | **docs-only** — SDK stale (Nov 2024); no vendor skills repo |
@@ -530,3 +536,26 @@ PRs. This file keeps the *shape* and *decisions*; LANGUAGE.md keeps the *names*.
 - **AWS/Mongo adapter maintenance surface** (watch) — each opt-in adapter is real drift + its own
   tests; a vendor SDK change can break an adapter without touching the default. Cost of breadth,
   accepted in ADR-0002.
+- **Live work + preference ladder (ADR-0039)** — decided (grill 2026-07-12); **tracker:**
+  [docs/live-work-wiring-checklist.md](./docs/live-work-wiring-checklist.md) (tick only after confirm).
+  **Data vertical live:** `@vybekiit/db` `liveWork/` + CLI `live-work data` + save-data skill +
+  console `POST /api/live-work/data` + journey events (`?live=1` scenarios). Claimable Neon e2e green.
+  **Host vertical:** `@vybekiit/deploy` `liveWork/` + CLI `live-work host` (Cloudflare Pages create
+  + pin + e2e green; Render/Railway/Vercel create adapters unit-green) + `go-live` skills
+  thin-client the host verb + console `POST /api/live-work/host` (public JSON, demo teardown).
+  **Payments ladder (A13):** `@vybekiit/payments` `liveWork/` — LS → Stripe → PayPal, hop on
+  onboarding-blocked / missing credentials, public pin only (`PAYMENTS_PROVIDER`), unit-green.
+  **Railway data live (A9):** logged-in CLI path green — auto-init when unlinked, public URL
+  verify via `pg`, dogfood teardown.
+  **Payments CLI + skills (B6/C4):** `vybekiit live-work payments` + setup-payments / wire-payments
+  thin-client the verb (no hop reimplementation).
+  **Ops (E2–E4):** root `.env.example` full ladder matrix (data/host/payments + Render + claimable);
+  `DOGFOOD_APEX` allowed pool + subdomain-only in `@vybekiit/deploy` `dogfoodApex`; nightly
+  workflow `.github/workflows/live-work-nightly.yml` (claimable Neon always; CF/Railway/Vercel/Render/
+  payments when secrets).
+  **A12b live:** Railway host create+verify green; CF host re-green; Render/Vercel suites gated on
+  env flags + credentials.
+  **D6:** console `POST /api/live-work/payments` + client; public JSON only; scenarios wire
+  payments/host when `?live=1`.
+  **Campaign complete** — optional only: repo Actions secrets + Vercel/Render full-create dogfood
+  when those vendor keys exist.

@@ -12,6 +12,9 @@ export default defineConfig({
   },
   format: ['esm'],
   platform: 'node',
+  // Keep bin self-contained. Code-splitting moved top-level await into a chunk whose
+  // import.meta.url no longer matches process.argv[1], so the CLI exited as a no-op.
+  splitting: false,
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
   // Every @vybekiit/* package is private (ADR-0033) — never on npm — so the published CLI

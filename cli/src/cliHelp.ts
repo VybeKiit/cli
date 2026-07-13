@@ -14,7 +14,7 @@ After your app exists (your AI coding tool drives these):
   vybekiit list-pieces · list-page-recipes · list-presets
   vybekiit add page-recipe <id> [--to=dir] [--dry-run] [--force]
   vybekiit apply-preset <id> [--cwd=dir] · verify-presets
-  vybekiit scaffold backend · backend add-route|add-crud|add-upload
+  vybekiit scaffold backend · backend add-route|add-crud|add-upload|gen-contract
   vybekiit env wizard · sync-agent-layer · update path via your agent
 
 Surfaces:
@@ -68,6 +68,9 @@ Agent / kit:
   vybekiit add                              (interactive: pick a ready piece)
   vybekiit apply-preset <feature> [--provider=supabase|neon|railway|mongodb|firebase|aws] [--cwd=dir] [--dry-run]
   vybekiit verify-presets [--fix] [--cwd=dir] [preset...]
+  vybekiit live-work data [--mode=demo|dogfood|buyer] [--vendor=supabase|neon|railway] [--cwd=dir] [--no-pin] [--fresh]
+  vybekiit live-work host [--mode=demo|dogfood|buyer] [--vendor=cloudflare|render|railway|vercel|netlify|github-pages] [--cwd=dir] [--no-pin] [--fresh]
+  vybekiit live-work payments [--mode=demo|dogfood|buyer] [--vendor=lemon-squeezy|stripe|paypal] [--cwd=dir] [--no-pin] [--fresh]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
   vybekiit dedup [--intent <desc>] [--target <file>] [--scope <dir>] [--index] [--json]
@@ -76,6 +79,7 @@ Agent / kit:
   vybekiit backend add-route <name>
   vybekiit backend add-crud <resource>
   vybekiit backend add-upload
+  vybekiit backend gen-contract           (emit backend/openapi.json from the route registry)
 
 Options:
   -h, --help       Buyer help

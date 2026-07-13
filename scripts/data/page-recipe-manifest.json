@@ -586,6 +586,7 @@
           "sourcePath": "apps/componentLibrary/src/pageRecipes/CheckoutPage/CheckoutPage.tsx",
           "exportName": "CheckoutPage",
           "targetRoute": "/checkout",
+          "statesCovered": ["empty", "loading", "error", "success"],
           "suggestedComponents": [
             "bundui/pricing-sections-01",
             "bundui/input",

@@ -117,6 +117,7 @@ describe('renderPostgresPreset', () => {
     const sql = renderPostgresPreset(manifest, 'neon');
     expect(sql).toContain('create extension if not exists vector');
     expect(sql).toContain('embedding vector');
+    expect(sql).toContain('using hnsw (embedding vector_cosine_ops)');
   });
 
   it('renders products catalog with variants and user-owned RLS', () => {
@@ -139,6 +140,18 @@ describe('renderPostgresPreset', () => {
     const sql = renderPostgresPreset(manifest, 'neon');
     expect(sql).toContain('create table if not exists public.blog_posts');
     expect(sql).toContain('create table if not exists public.blog_post_tags');
+  });
+
+  it('omits Supabase authenticated policies on neon and railway', () => {
+    const manifest = requirePreset('customers');
+    const neonSql = renderPostgresPreset(manifest, 'neon');
+    const railwaySql = renderPostgresPreset(manifest, 'railway');
+    const supabaseSql = renderPostgresPreset(manifest, 'supabase');
+    expect(neonSql).toContain('enable row level security');
+    expect(neonSql).not.toContain('to authenticated');
+    expect(neonSql).not.toContain('auth.uid()');
+    expect(railwaySql).not.toContain('to authenticated');
+    expect(supabaseSql).toContain('to authenticated');
   });
 });
 

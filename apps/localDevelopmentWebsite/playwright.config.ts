@@ -20,6 +20,12 @@ export default defineConfig({
   use: {
     baseURL,
     headless: process.env.PLAYWRIGHT_HEADLESS !== 'false',
+    // PLAYWRIGHT_SLOW_MO=ms slows each action so a headed run is watchable.
+    launchOptions: {
+      ...(process.env.PLAYWRIGHT_SLOW_MO !== undefined && process.env.PLAYWRIGHT_SLOW_MO !== ''
+        ? { slowMo: Number(process.env.PLAYWRIGHT_SLOW_MO) }
+        : {}),
+    },
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -32,6 +38,9 @@ export default defineConfig({
     timeout: 180_000,
     env: {
       NEXT_PUBLIC_E2E: '1',
+      // Fixture tool stream for Live work e2e (no real agent / secrets).
+      NEXT_PUBLIC_ASSISTANT_FIXTURE: '1',
+      PLAYWRIGHT: '1',
       PORT: port,
     },
   },

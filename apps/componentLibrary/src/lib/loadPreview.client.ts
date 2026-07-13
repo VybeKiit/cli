@@ -11,7 +11,9 @@ import type { CatalogEntry } from '@library/data/catalog';
  * @example
  * const mod = await loadPreviewModule(entry);
  */
-export const loadPreviewModule = async (entry: CatalogEntry): Promise<Record<string, unknown>> => {
+export const loadPreviewModule = async (
+  entry: CatalogEntry,
+): Promise<Record<string, unknown>> => {
   if (
     entry.namespace === 'vybekiit' &&
     entry.name.startsWith('claude-octopus-') &&

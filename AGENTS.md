@@ -237,6 +237,7 @@ you can take $1 and auto-invite yourself, the business is real.
 - Dev UI library: `pnpm dev:ui-library` → `http://localhost:3002`.
 - Local dev console: `pnpm dev:local` → `http://localhost:3005` (or `vybekiit local-dev`). A visual sidecar for vibe coders that detects the active agent and animates the agent's workflow steps.
 - Gallery previews cache compiled embeds in-session; card hover enables interactive iframes for hover effects without opening the detail page.
+- **Design system view** (the `@vybekiit/ui` primitives, ADR-0041): after touching a primitive or a story override, regenerate the index — `node scripts/dev/sync/buildDesignSystemIndex.mjs` — and run `pnpm check:component-stories` (in `verify`). Variant/size options **derive from `cva`** (never hand-listed); behavioral primitives (Dialog, Select, Table…) need a live override under `apps/componentLibrary/src/stories/vybekiit/` — authoring bar in [COMPONENT-STORY-AUTHORING.md](./apps/componentLibrary/COMPONENT-STORY-AUTHORING.md). States (primitive + recipe) come only from `apps/componentLibrary/src/lib/componentStates.ts`.
 
 <!-- vybekiit:generated:start contract -->
 ## The contract: Decide + Guide

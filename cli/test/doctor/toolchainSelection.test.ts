@@ -92,6 +92,12 @@ describe('selectToolchain hosting and auxiliary providers', () => {
     expect(names).toEqual(['gh', 'vercel', 'supabase']);
   });
 
+  it('uses only gh for GitHub Pages hosting (free static, ADR-0040)', () => {
+    const names = selectToolchain({ HOSTING_PROVIDER: 'github-pages' }).map((tool) => tool.name);
+
+    expect(names).toEqual(['gh', 'supabase']);
+  });
+
   it('dedupes AWS when hosting and data are both AWS', () => {
     const names = selectToolchain({ HOSTING_PROVIDER: 'aws', DATA_PROVIDER: 'aws' }).map(
       (tool) => tool.name,

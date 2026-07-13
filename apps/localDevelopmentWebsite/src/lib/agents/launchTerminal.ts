@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process';
-import { platform } from 'node:os';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { platform, tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { resolveAgentBinary } from './detectInstalled';
 import { type AgentId, buildNewSessionCommand, buildResumeCommand, shellQuote } from './registry';
 
@@ -38,11 +40,9 @@ const withResolvedBinary = (command: string, binary: string, defaultName: string
   if (command.startsWith(`${defaultName} `) || command === defaultName) {
     return `${shellQuote(binary)}${command.slice(defaultName.length)}`;
   }
-  // cursor agent / kiro-cli multi-word defaults
   if (defaultName.includes(' ')) {
     return command;
   }
-  // kiro-cli chat ...
   if (command.startsWith('kiro-cli ') && binary !== 'kiro-cli') {
     return `${shellQuote(binary)}${command.slice('kiro-cli'.length)}`;
   }
@@ -53,49 +53,82 @@ const withResolvedBinary = (command: string, binary: string, defaultName: string
 };
 
 /**
- * Open a macOS Terminal (or iTerm) window running a command.
+ * Run osascript and resolve whether it exited 0.
  *
- * @param fullCommand - Shell command including optional `cd`.
- * @returns Whether the open request was accepted.
- * @example
- * await openMacTerminal('cd ~/Code && claude');
+ * @param script - AppleScript source.
+ * @returns True when osascript exits 0.
  */
-const openMacTerminal = async (fullCommand: string): Promise<boolean> => {
-  const escaped = fullCommand.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
-
-  // Prefer iTerm when present; fall back to Terminal.app.
-  const script = `
-    set cmd to "${escaped}"
-    if application "iTerm" is running or application "iTerm2" is running then
-      tell application "iTerm"
-        activate
-        try
-          tell current window
-            create tab with default profile
-            tell current session to write text cmd
-          end tell
-        on error
-          create window with default profile
-          tell current window
-            tell current session to write text cmd
-          end tell
-        end try
-      end tell
-    else
-      tell application "Terminal"
-        activate
-        do script cmd
-      end tell
-    end if
-  `;
-
-  return new Promise((resolve) => {
+const runOsascript = (script: string): Promise<boolean> =>
+  new Promise((resolve) => {
     const child = spawn('osascript', ['-e', script], {
       stdio: ['ignore', 'ignore', 'pipe'],
     });
     child.on('error', () => resolve(false));
     child.on('close', (code) => resolve(code === 0));
   });
+
+/**
+ * Open a macOS Terminal (or iTerm) window running a command.
+ * Falls back to a temporary .command file via `open` when AppleScript fails
+ * (common when the Node host lacks Automation permission).
+ *
+ * @param fullCommand - Shell command including optional `cd`.
+ * @returns Whether any open path succeeded.
+ * @example
+ * await openMacTerminal('cd ~/Code && claude');
+ */
+const openMacTerminal = async (fullCommand: string): Promise<boolean> => {
+  const escaped = fullCommand.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+
+  const iTermScript = `
+    set cmd to "${escaped}"
+    tell application "iTerm"
+      activate
+      try
+        tell current window
+          create tab with default profile
+          tell current session to write text cmd
+        end tell
+      on error
+        create window with default profile
+        tell current window
+          tell current session to write text cmd
+        end tell
+      end try
+    end tell
+  `;
+
+  const terminalScript = `
+    set cmd to "${escaped}"
+    tell application "Terminal"
+      activate
+      do script cmd
+    end tell
+  `;
+
+  // Prefer Terminal.app first — more reliable Automation grants for GUI hosts.
+  if (await runOsascript(terminalScript)) {
+    return true;
+  }
+  if (await runOsascript(iTermScript)) {
+    return true;
+  }
+
+  // Fallback: open a double-clickable .command script (no Automation permission needed).
+  try {
+    const dir = await mkdtemp(join(tmpdir(), 'vybekiit-agent-'));
+    const scriptPath = join(dir, 'launch.command');
+    const body = `#!/bin/zsh\n${fullCommand}\nexec zsh\n`;
+    await writeFile(scriptPath, body, { mode: 0o755 });
+    const opened = await new Promise<boolean>((resolve) => {
+      const child = spawn('open', [scriptPath], { stdio: 'ignore' });
+      child.on('error', () => resolve(false));
+      child.on('close', (code) => resolve(code === 0));
+    });
+    return opened;
+  } catch {
+    return false;
+  }
 };
 
 /**
@@ -123,7 +156,6 @@ export const buildLaunchShellCommand = async (
     displayCommand = buildNewSessionCommand(request.agentId, request.prompt);
   }
 
-  // Binary names may differ from AgentId (e.g. kiro → kiro-cli, claude-code → claude).
   let defaultBin: string = request.agentId;
   if (request.agentId === 'kiro') {
     defaultBin = 'kiro-cli';
@@ -170,11 +202,11 @@ export const launchAgentInTerminal = async (request: LaunchRequest): Promise<Lau
       command: displayCommand,
       cwd,
       launched: false,
-      message: 'Could not open Terminal automatically. Copy the command and run it yourself.',
+      message:
+        'Could not open Terminal automatically. The command is copied — paste it into Terminal yourself.',
     };
   }
 
-  // Linux/Windows: copy-friendly command only (no reliable terminal open without deps).
   return {
     ok: true,
     command: displayCommand,

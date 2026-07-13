@@ -1,0 +1,58 @@
+[
+  {
+    "id": "default",
+    "label": "Default",
+    "description": "The resting state, with nothing applied.",
+    "tone": "neutral",
+    "recipeLevel": false
+  },
+  {
+    "id": "disabled",
+    "label": "Disabled",
+    "description": "Non-interactive: dimmed and removed from the tab order.",
+    "tone": "muted",
+    "recipeLevel": false
+  },
+  {
+    "id": "loading",
+    "label": "Loading",
+    "description": "Awaiting data or an in-flight action.",
+    "tone": "info",
+    "recipeLevel": true
+  },
+  {
+    "id": "error",
+    "label": "Error",
+    "description": "Invalid input or a failed action.",
+    "tone": "destructive",
+    "recipeLevel": true
+  },
+  {
+    "id": "success",
+    "label": "Success",
+    "description": "A completed action or valid input.",
+    "tone": "success",
+    "recipeLevel": true
+  },
+  {
+    "id": "empty",
+    "label": "Empty",
+    "description": "No data yet: the zero state.",
+    "tone": "muted",
+    "recipeLevel": true
+  },
+  {
+    "id": "readonly",
+    "label": "Read-only",
+    "description": "Shown but not editable (form controls).",
+    "tone": "muted",
+    "recipeLevel": false
+  },
+  {
+    "id": "selected",
+    "label": "Selected",
+    "description": "Chosen, checked, or on (toggles, checkbox, tabs).",
+    "tone": "info",
+    "recipeLevel": false
+  }
+]
