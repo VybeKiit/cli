@@ -9,6 +9,13 @@ import confetti from 'canvas-confetti';
  * celebrate();
  */
 export const celebrate = (): void => {
+  if (
+    typeof globalThis.matchMedia === 'function' &&
+    globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return;
+  }
+
   const defaults = {
     origin: { y: 0.7 },
     zIndex: 100,
