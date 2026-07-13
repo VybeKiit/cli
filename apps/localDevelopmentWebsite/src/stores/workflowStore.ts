@@ -10,6 +10,8 @@ type WorkflowState = {
   markStepRunning: (stepId: string) => void;
   markStepDone: (stepId: string) => void;
   reset: (workflow: Workflow) => void;
+  /** Drop the active workflow so the board hides until the next user request. */
+  clearWorkflow: () => void;
   setRunning: (running: boolean) => void;
 };
 
@@ -73,8 +75,11 @@ export const useWorkflowStore = create<WorkflowState>()(
         set({ workflow: { ...workflow, steps: workflow.steps.map(resetStep) }, isRunning: false });
       },
 
+      clearWorkflow: () => set({ workflow: null, isRunning: false }),
+
       setRunning: (running) => set({ isRunning: running }),
     }),
-    { name: STORE_KEYS.workflow },
+    // v2: do not rehydrate the old always-on default SaaS board.
+    { name: `${STORE_KEYS.workflow}:v2` },
   ),
 );

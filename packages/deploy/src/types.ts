@@ -4,9 +4,10 @@ import { Data, type Effect } from 'effect';
  * The hosting backends VybeKiit ships an adapter for. One runs at a time (chosen
  * via `HOSTING_PROVIDER`); the agent swaps by changing that one env value, because
  * the go-live skill talks to the {@link Hosting} interface rather than a specific
- * vendor. Cloudflare is the v1 default; `vercel` and `aws` (Amplify/SST) are opt-in (ADR-0002/0006).
+ * vendor. Cloudflare is the v1 default; `vercel`, `aws` (Amplify/SST), `railway`, and
+ * `github-pages` (free static, ADR-0040) are opt-in (ADR-0002/0006/0017/0040).
  */
-export type HostingProviderName = 'cloudflare' | 'vercel' | 'aws' | 'railway';
+export type HostingProviderName = 'cloudflare' | 'vercel' | 'aws' | 'railway' | 'github-pages';
 
 /**
  * Inputs for a deploy, normalized across hosts. Kept minimal: the go-live skill

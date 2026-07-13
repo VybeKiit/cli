@@ -16,9 +16,16 @@ metadata:
 
 ## Steps
 
-1. Run `vybekiit plan-setup deploy`.
-2. Deploy via `@vybekiit/deploy`'s `resolveHosting()` — follow `.vybekiit/platform-skills/deploy-railway-vybekiit.md` when `HOSTING_PROVIDER=railway`, or the matching wrapper for other hosts.
-3. **Verify:** public `/health` responds.
+1. Put the API online via shared Live work host (ADR-0039): `vybekiit live-work host --mode=buyer --cwd=.`
+   (add `--vendor=…` only if the builder named Cloudflare, Render, Railway, or Vercel).
+   Read the JSON `buyerMessage` out loud and share `url` when present. Pin keys are written already
+   (`pinKeys` = names only).
+2. If Live work fails with missing credentials / ladder exhausted, run `vybekiit plan-setup deploy`
+   and deploy via `@vybekiit/deploy`'s `resolveHosting()` — follow
+   `.vybekiit/platform-skills/deploy-railway-vybekiit.md` when `HOSTING_PROVIDER=railway`, or the
+   matching wrapper for other hosts. Never reimplement the preference ladder in this skill.
+3. **Verify:** public `/health` responds (or Live work JSON has `"ok": true` and `"verified": true`
+   and the live URL loads).
 
 ## After completing this skill
 

@@ -1,9 +1,9 @@
 'use client';
 
 import { ZoomControls } from '@library/components/ZoomControls';
-import type { PageRecipe } from '@library/data/pageRecipes';
 import type { TemplateSurfacePreview } from '@library/data/templateSurfaces';
 import { usePreviewZoom } from '@library/hooks/usePreviewZoom';
+import type { TemplateSurfaceRecipeRef } from '@library/lib/surfaceRecipeMap';
 import { iframeZoomStyle, viewportWrapperStyle } from '@library/lib/templateSurfaceZoom';
 import { Badge } from '@vybekiit/ui/badge';
 import { Button } from '@vybekiit/ui/button';
@@ -13,7 +13,7 @@ import { useMemo } from 'react';
 
 interface TemplateSurfacePreviewCardProps {
   readonly preview: TemplateSurfacePreview;
-  readonly recipe: PageRecipe;
+  readonly recipe: TemplateSurfaceRecipeRef;
 }
 
 /**

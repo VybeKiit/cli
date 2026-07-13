@@ -4,7 +4,7 @@ import { ZoomControls } from '@library/components/ZoomControls';
 import type { TemplateSurface, TemplateSurfaceAppRoute } from '@library/data/templateSurfaces';
 import { usePersistedNavScroll } from '@library/hooks/usePersistedNavScroll';
 import { usePreviewZoom } from '@library/hooks/usePreviewZoom';
-import { recipeBySlug } from '@library/lib/recipeBySlug';
+import type { TemplateSurfaceRecipeRef } from '@library/lib/surfaceRecipeMap';
 import { surfaceRouteHref } from '@library/lib/surfaceRouteHref';
 import { iframeZoomStyle, viewportWrapperStyle } from '@library/lib/templateSurfaceZoom';
 import { Badge } from '@vybekiit/ui/badge';
@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 interface TemplateSurfaceAppPreviewProps {
   readonly surface: TemplateSurface;
   readonly activeRoute: TemplateSurfaceAppRoute;
+  readonly activeRecipe: TemplateSurfaceRecipeRef;
 }
 
 /**
@@ -27,12 +28,12 @@ interface TemplateSurfaceAppPreviewProps {
  * const element = <TemplateSurfaceAppPreview surface={surface} activeRoute={route} />;
  */
 export const TemplateSurfaceAppPreview = ({
+  activeRecipe,
   activeRoute,
   surface,
 }: TemplateSurfaceAppPreviewProps) => {
   const { zoom, zoomIn, zoomOut } = usePreviewZoom(0.65);
   const navRef = usePersistedNavScroll(surface.id);
-  const activeRecipe = recipeBySlug(activeRoute.recipeSlug);
   const wrapperStyle = useMemo(
     () => viewportWrapperStyle(activeRoute.width, activeRoute.height, zoom),
     [activeRoute.height, activeRoute.width, zoom],

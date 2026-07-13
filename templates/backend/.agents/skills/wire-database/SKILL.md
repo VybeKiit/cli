@@ -16,10 +16,13 @@ metadata:
 
 ## Steps
 
-1. Run `vybekiit plan-setup database` for the checklist.
-2. Run `vybekiit plan-data-model entities.json` (not eval from node_modules).
-3. Wire `@vybekiit/db` via `resolveDataProvider()`.
-4. **Verify:** save and read back a record.
+1. Make sure storage is ready: `vybekiit live-work data --mode=buyer --cwd=.`
+   (add `--vendor=…` only if the builder named Supabase, Neon, or Railway).
+   Read the JSON `buyerMessage` out loud. Secrets are pinned already (`pinKeys` = names only).
+2. Run `vybekiit plan-setup database` for the checklist when more platform steps remain.
+3. Run `vybekiit plan-data-model entities.json` (not eval from node_modules).
+4. Wire `@vybekiit/db` via `resolveDataProvider()`.
+5. **Verify:** save and read back a record.
 
 ## After completing this skill
 

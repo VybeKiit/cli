@@ -1,13 +1,21 @@
 'use client';
 
 import { PageRecipeCard } from '@library/components/PageRecipeCard';
-import type { PAGE_RECIPE_GROUPS, PageRecipe } from '@library/data/pageRecipes';
+import type { PageRecipe } from '@library/data/pageRecipes';
 import { Empty, EmptyDescription, EmptyHeader } from '@vybekiit/ui/empty';
 
-type PageRecipeBrowserGroup = (typeof PAGE_RECIPE_GROUPS)[number];
+/**
+ * The group-header fields the Pages browser renders. Kept free of nested recipes so the server
+ * route can pass group headers without double-serializing the recipe list into the RSC payload.
+ */
+export interface PageRecipeGroupHeader {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+}
 
 export interface GroupedPageRecipes {
-  readonly group: PageRecipeBrowserGroup;
+  readonly group: PageRecipeGroupHeader;
   readonly recipes: readonly PageRecipe[];
 }
 

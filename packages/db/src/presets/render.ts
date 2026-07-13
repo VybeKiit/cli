@@ -242,11 +242,16 @@ const renderIndex = (
   _manifest: PresetManifest,
   index: PresetManifest['indexes'][number],
 ): string => {
-  const cols = index.columns.join(', ');
   const idxName = `${index.table}_${index.columns.join('_')}_idx`;
   const unique = index.unique ? 'unique ' : '';
   const method = index.method ? ` using ${index.method}` : '';
   const where = index.where ? ` where ${index.where}` : '';
+  // pgvector HNSW/IVFFlat require an operator class (cosine / L2 / ip).
+  // Plain `(embedding)` fails: "data type vector has no default operator class".
+  const isVectorAnn = index.method === 'hnsw' || index.method === 'ivfflat';
+  const cols = isVectorAnn
+    ? index.columns.map((column) => `${column} vector_cosine_ops`).join(', ')
+    : index.columns.join(', ');
   return `-- ${index.reason}\ncreate ${unique}index if not exists ${idxName} on public.${index.table}${method} (${cols})${where};`;
 };
 
@@ -382,11 +387,16 @@ export const renderPostgresPreset = (
     parts.push('create extension if not exists vector;');
   }
 
+  // Supabase helpers (is_admin, realtime) call auth.uid() / supabase_realtime —
+  // only inject them when the target actually has those roles/objects.
+  const supabaseOnly = provider === 'supabase';
   const helpers = manifest.helpers === undefined ? [] : manifest.helpers;
-  for (const helper of helpers) {
-    const sql = PRESET_HELPERS[helper];
-    if (sql !== undefined) {
-      parts.push(sql);
+  if (supabaseOnly) {
+    for (const helper of helpers) {
+      const sql = PRESET_HELPERS[helper];
+      if (sql !== undefined) {
+        parts.push(sql);
+      }
     }
   }
 
@@ -399,13 +409,26 @@ export const renderPostgresPreset = (
   }
 
   for (const entity of manifest.entities) {
-    const rls = renderRls(manifest, entity.name);
-    if (rls) {
-      parts.push(rls);
+    if (supabaseOnly) {
+      const rls = renderRls(manifest, entity.name);
+      if (rls) {
+        parts.push(rls);
+      }
+      continue;
+    }
+    // Neon / Railway: tables + indexes only for authz; skip policies that target
+    // the Supabase `authenticated` role (that role does not exist on plain Postgres).
+    if (manifest.rls !== 'none') {
+      parts.push(
+        [
+          `alter table public.${entity.name} enable row level security;`,
+          `-- RLS on; Supabase role policies omitted for ${provider} (no authenticated/auth.uid).`,
+        ].join('\n'),
+      );
     }
   }
 
-  if (manifest.id === 'realtime_publications') {
+  if (supabaseOnly && manifest.id === 'realtime_publications') {
     parts.push(renderRealtimeGrants(REALTIME_TABLES));
   }
 

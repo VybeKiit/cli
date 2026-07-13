@@ -17,7 +17,10 @@ translate every error · celebrate. You wire all the code; the builder only sign
 > Why Lemon Squeezy is the default: it's the "merchant of record", which means **it handles sales
 > tax/VAT for the builder** automatically.
 >
-> (Agent-only) Read `PAYMENTS_PROVIDER` and follow the matching platform wrapper:
+> (Under the hood — agent-only) Prefer **Live work payments** (ADR-0039): run
+> `vybekiit live-work payments` so preference ladder, free-tier / onboarding hop, and pin live in
+> `@vybekiit/payments` — never reimplement hop here. Read `PAYMENTS_PROVIDER` and follow the matching
+> platform wrapper when Live work needs keys first:
 > - default / `lemon-squeezy` → `platform-skills/lemon-squeezy-vybekiit.md`
 > - `stripe` → `platform-skills/stripe-vybekiit.md`
 > - `paypal` → `platform-skills/paypal-vybekiit.md`
@@ -38,42 +41,62 @@ translate every error · celebrate. You wire all the code; the builder only sign
 1. **Explain the plan in one line.** *"I'll connect a payment service so you can charge people. I'll do
    the setup — you'll sign in once when I ask."* (Never name Lemon Squeezy, Stripe, or PayPal.)
 
-2. **Lemon Squeezy (default) — sign-in only.**
+2. **Connect taking money (Live work first).** Prefer the shared Live work path (ADR-0039) so
+   preference ladder, onboarding hop, and pin stay in one place:
+   - Run `vybekiit live-work payments --mode=buyer --cwd=.` (add `--vendor=<name>` only when the
+     builder named Lemon Squeezy, Stripe, or PayPal).
+   - On success, read the JSON `buyerMessage` out loud and celebrate. Pin keys are already written
+     (`pinKeys` lists which names were written — never print values).
+   - If it fails with missing credentials / ladder exhausted, collect keys **once** via the steps
+     below (sign-in + platform wrapper), then re-run `vybekiit live-work payments --mode=buyer --cwd=.`
+     so the pin and hop policy stay in the package runner.
+   **Verify:** Live work JSON has `"ok": true` and `"verified": true`.
+
+3. **Lemon Squeezy (default) — sign-in only when Live work needs keys.**
    - Run `vybekiit-automate ls standby` (or wizard mode without `--json`).
    - Builder signs in at the payment dashboard (only manual step).
    - Builder says *"I'm in, proceed"*.
    - Run `vybekiit-automate ls setup --json` with name, price, mode, webhook URL from the conversation.
    - Write JSON output to `.env` (`LEMONSQUEEZY_STORE_ID`, variant ID, API key, webhook secret).
-   **Verify:** values saved; product exists in test mode.
+   - Re-run Live work payments (step 2) to pin.
+   **Verify:** values saved; product exists in test mode; Live work green.
 
-3. **Stripe (opt-in).** Merge `mcp-stripe.json` via `agent/mcp-setup.md`; builder OAuth once.
+4. **Stripe (opt-in).** Merge `mcp-stripe.json` via `agent/mcp-setup.md`; builder OAuth once.
    Agent creates product/price via Stripe MCP; write restricted API key to `.env`.
-   **Verify:** test mode product visible in Stripe dashboard.
+   Re-run Live work payments (step 2) to pin when Stripe is the named or winning rail.
+   **Verify:** test mode product visible in Stripe dashboard; Live work green when pinned to Stripe.
 
-4. **PayPal (opt-in).** Merge `mcp-paypal.json` via `agent/mcp-setup.md`; builder OAuth once (sandbox).
+5. **PayPal (opt-in).** Merge `mcp-paypal.json` via `agent/mcp-setup.md`; builder OAuth once (sandbox).
    Agent provisions via PayPal MCP; write client id/secret and webhook id to `.env`.
-   **Verify:** sandbox checkout completes.
+   Re-run Live work payments (step 2) to pin when PayPal is the named or winning rail.
+   **Verify:** sandbox checkout completes; Live work green when pinned to PayPal.
 
-5. **Connect the automatic payment message (webhook).** Webhook URL is `/api/webhook` on the deployed app
+6. **Connect the automatic payment message (webhook).** Webhook URL is `/api/webhook` on the deployed app
    (`app/api/webhook/route.ts` → `src/lib/fulfillment.ts`). For LS, `ls setup` configures this when given
    `--webhook-url`.
    **Apply DB presets:** run `vybekiit apply-preset orders` and `vybekiit apply-preset webhook_events`
    (see `platform-skills/db-presets-vybekiit.md`). **Verify:** `vybekiit verify-presets orders webhook_events`.
    **Verify:** provider shows webhook connected.
 
-6. **Test a purchase.** Use test mode for a fake purchase.
+7. **Test a purchase.** Use test mode for a fake purchase.
    **Verify:** order recorded (webhook success). 🎉 *Celebrate* — they can take money.
 
-7. **Customize what a purchase does.** Ask what should happen when someone pays. Implement in
+8. **Customize what a purchase does.** Ask what should happen when someone pays. Implement in
    `src/lib/fulfillment.ts`. Write a quick test and keep it green.
 
 ## If anything breaks
 
 Run `doctor`. Common cause: webhook secret mismatch or values with extra spaces — fix it for them.
 
+## Never
+
+- Never reimplement preference ladder / free-tier hop / onboarding hop in this skill — always
+  `vybekiit live-work payments` (or the package runner) first.
+
 ## Definition of done
 
-A test purchase completes and does the right thing, with secrets saved and a passing test covering the flow.
+A test purchase completes and does the right thing, with secrets saved, Live work pin green, and a
+passing test covering the flow.
 
 ## After completing this skill
 

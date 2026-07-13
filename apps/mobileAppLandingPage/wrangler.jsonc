@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vybekiit-mobile-app-landing",
+  "account_id": "b0ba5fea46c96d72bfc6f12e1dafaf7b",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "mobile-landing-page.vybekiit.com",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "APP_URL": "https://mobile-landing-page.vybekiit.com"
+  }
+}

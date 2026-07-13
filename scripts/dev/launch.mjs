@@ -22,6 +22,16 @@ const APPS = [
   { key: 'landing', filter: 'vybekiit-landing', hint: 'The vybekiit.com store' },
   { key: 'ui', filter: 'vybekiit-component-library', hint: 'UI library browser (ui.vybekiit.com)' },
   { key: 'local', filter: 'vybekiit-local-development-website', hint: 'Local dev console' },
+  {
+    key: 'mobile-landing',
+    filter: 'vybekiit-mobile-app-landing',
+    hint: 'Mobile-app landing page (mobile-landing-page.vybekiit.com)',
+  },
+  {
+    key: 'ext-landing',
+    filter: 'vybekiit-extension-landing',
+    hint: 'Extension landing page (extension-landing-page.vybekiit.com)',
+  },
   { key: 'all', filter: null, hint: 'Every dev server at once (turbo run dev)' },
 ];
 

@@ -39,6 +39,14 @@ export const CORE_DISCOVERABILITY_PAGES: readonly DiscoverabilityPage[] = [
     changeFrequency: 'weekly',
   },
   {
+    path: '/faq',
+    title: 'FAQ',
+    summary:
+      'Answer-first FAQ: best SaaS boilerplate for a non-technical founder, ShipFast alternatives, taxes and VAT, Claude Code + Cursor, web + mobile + extension, and pricing.',
+    priority: 0.8,
+    changeFrequency: 'monthly',
+  },
+  {
     path: '/brand',
     title: 'Brand and media',
     summary:

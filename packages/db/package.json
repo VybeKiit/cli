@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/db",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Typed Supabase data client for VybeKiit — server-side client factory and a health check. No UI.",
   "license": "MIT",
   "type": "module",
@@ -58,9 +58,11 @@
     "@vybekiit/core": "workspace:*",
     "effect": "catalog:",
     "firebase-admin": "^13.0.2",
-    "mongodb": "^7.4.0"
+    "mongodb": "^7.4.0",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.10",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",

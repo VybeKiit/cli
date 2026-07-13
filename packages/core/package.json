@@ -1,6 +1,6 @@
 {
   "name": "@vybekiit/core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "VybeKiit core — env + Effect Schema-validated config (the single source of truth), a Result type, and shared constants.",
   "license": "MIT",
   "type": "module",

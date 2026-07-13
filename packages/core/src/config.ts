@@ -197,12 +197,14 @@ export const storageConfigSchema = Schema.Struct({
 
 /**
  * Which hosting adapter `@vybekiit/deploy` constructs at go-live. Cloudflare is the
- * default; `vercel` and `aws` are opt-in (ADR-0002/0006). The go-live skill drives it.
+ * default; `vercel`, `aws`, `railway`, and `github-pages` are opt-in (ADR-0002/0006/0017/0040).
+ * The go-live skill drives it.
  */
 export const hostingConfigSchema = Schema.Struct({
-  HOSTING_PROVIDER: Schema.optionalWith(Schema.Literal('cloudflare', 'vercel', 'aws', 'railway'), {
-    default: () => 'cloudflare' as const,
-  }),
+  HOSTING_PROVIDER: Schema.optionalWith(
+    Schema.Literal('cloudflare', 'vercel', 'aws', 'railway', 'github-pages'),
+    { default: () => 'cloudflare' as const },
+  ),
 });
 
 /**
@@ -290,6 +292,16 @@ export const railwayConfigSchema = Schema.Struct({
 export const railwayHostingConfigSchema = Schema.Struct({
   RAILWAY_PROJECT_ID: Schema.optional(NonEmpty),
   RAILWAY_SERVICE_ID: Schema.optional(NonEmpty),
+});
+
+/**
+ * GitHub Pages hosting — used by `@vybekiit/deploy` (github-pages adapter, ADR-0040).
+ * The free, zero-cold-start static host tied to the buyer's own repo. Auth is token-native
+ * (`GITHUB_TOKEN`/`GH_TOKEN` or `gh auth`), never a `.env` key (ADR-0001); `GITHUB_PAGES_OWNER`
+ * optionally overrides the repo owner, defaulting to the authenticated login.
+ */
+export const githubPagesHostingConfigSchema = Schema.Struct({
+  GITHUB_PAGES_OWNER: Schema.optional(NonEmpty),
 });
 
 /**
@@ -641,6 +653,7 @@ export type SupabaseConfig = Schema.Schema.Type<typeof supabaseConfigSchema>;
 export type NeonConfig = Schema.Schema.Type<typeof neonConfigSchema>;
 export type RailwayConfig = Schema.Schema.Type<typeof railwayConfigSchema>;
 export type RailwayHostingConfig = Schema.Schema.Type<typeof railwayHostingConfigSchema>;
+export type GithubPagesHostingConfig = Schema.Schema.Type<typeof githubPagesHostingConfigSchema>;
 export type FirebaseConfig = Schema.Schema.Type<typeof firebaseConfigSchema>;
 export type BetterAuthConfig = Schema.Schema.Type<typeof betterAuthConfigSchema>;
 export type CognitoConfig = Schema.Schema.Type<typeof cognitoConfigSchema>;

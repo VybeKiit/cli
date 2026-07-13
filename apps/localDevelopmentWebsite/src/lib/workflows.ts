@@ -6,6 +6,13 @@ export type WorkflowStep = {
   description: string;
   status: WorkflowStepStatus;
   subSteps?: WorkflowStep[];
+  /**
+   * Brand for the action (neon, stripe, lemon squeezy, cloudflare, …).
+   * Drives the dynamic logo when the step runs / completes.
+   */
+  provider?: string;
+  /** Journey-style domain used when provider is missing (domain default logo). */
+  domain?: 'auth' | 'database' | 'payments' | 'deploy' | 'crud';
 };
 
 export type Workflow = {

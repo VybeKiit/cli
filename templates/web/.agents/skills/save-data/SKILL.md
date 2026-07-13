@@ -25,12 +25,19 @@ or describes, in plain words, what the app should remember.
 
 ## Steps
 
-1. **Make sure the database is ready.** Run the database tool via `vybekiit doctor`. For MCP-tier providers
-   (Supabase, Neon, Firebase), merge the matching `agent/mcp-*.json` via `agent/mcp-setup.md` and use
-   login-once onboarding. If MCP fails once, run `vybekiit doc-fallback supabase` (or `neon` /
-   `firebase`) and tell the builder you're checking the official setup guide (plain phrase only).
-   Collect any access keys **one at a time** and save them to the secret settings file.
-   **Verify:** the database is reachable (`@vybekiit/db`'s `pingDatabase`).
+1. **Make sure the database is ready.** Prefer the shared Live work path (ADR-0039) so preference
+   ladder, free-tier hop, and pin stay in one place:
+   - Run `vybekiit live-work data --mode=buyer --cwd=.` (add `--vendor=<name>` only when the
+     builder named Supabase, Neon, or Railway).
+   - On success, read the JSON `buyerMessage` out loud and celebrate. Secrets are already pinned to
+     the secret settings file (`pinKeys` lists which names were written — never print values).
+   - If it fails with missing credentials / ladder exhausted, fall back to `vybekiit doctor` and
+     MCP-tier login-once onboarding (Supabase, Neon, Firebase) via `agent/mcp-setup.md`. Collect any
+     access keys **one at a time**. If MCP fails once, run `vybekiit doc-fallback supabase` (or
+     `neon` / `firebase`) and tell the builder you're checking the official setup guide (plain
+     phrase only).
+   **Verify:** Live work JSON has `"ok": true` and `"verified": true`, or `@vybekiit/db`'s
+   `pingDatabase` succeeds after keys are present.
 
 2. **Agree on what to remember, in plain words.** If no prior `design-my-data` session, run that skill first
    (or run `vybekiit plan-data-model entities.json` for a single simple entity). Ask what the app

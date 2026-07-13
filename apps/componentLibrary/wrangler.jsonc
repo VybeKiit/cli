@@ -1,0 +1,19 @@
+{
+  // Cloudflare Worker for apps/componentLibrary — the maintainer component-library browser + the
+  // /changelog board (ADR-0041). Deployed via OpenNext, mirroring apps/landing (ADR-0028, ADR-0044).
+  // ui.vybekiit.com maps to this Worker and is gated by Cloudflare Access (GitHub) — a maintainer
+  // surface, not public. The gallery needs no runtime bindings (no D1/R2/KV/vars).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vybekiit-ui",
+  "account_id": "b0ba5fea46c96d72bfc6f12e1dafaf7b",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

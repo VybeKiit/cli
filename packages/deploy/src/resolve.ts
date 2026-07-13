@@ -3,6 +3,7 @@ import {
   awsHostingConfigSchema,
   cloudflareConfigSchema,
   type EnvSource,
+  githubPagesHostingConfigSchema,
   hostingConfigSchema,
   parseEnv,
   railwayHostingConfigSchema,
@@ -12,6 +13,7 @@ import { Context, Effect, Layer, type Schema } from 'effect';
 import { caughtMessage, deployError, failDeploy } from './deployEffect';
 import { type AmplifyRunner, createAwsHosting } from './providers/aws';
 import { type CloudflareRunner, createCloudflareHosting } from './providers/cloudflare';
+import { createGithubPagesHosting, type GithubPagesRunner } from './providers/githubPages';
 import { createRailwayHosting, type RailwayRunner } from './providers/railway';
 import { createVercelHosting, type VercelRunner } from './providers/vercel';
 import type { DeployError, Hosting, HostingProviderName } from './types';
@@ -31,6 +33,8 @@ export type HostingRunners = {
   readonly railway?: RailwayRunner;
   /** AWS Amplify client used to start/inspect deploy jobs. */
   readonly aws?: AmplifyRunner;
+  /** GitHub Pages deploy executor; defaults to the shared Live-work provision boundary. */
+  readonly 'github-pages'?: GithubPagesRunner;
 };
 
 type HostingFactory = (source: EnvSource) => Effect.Effect<Hosting, DeployError>;
@@ -82,6 +86,10 @@ const makeHostingFactories = (
   cloudflare: (source) =>
     parseDeployConfigSlice(cloudflareConfigSchema, source).pipe(
       Effect.map((config) => createCloudflareHosting(config, runners.cloudflare)),
+    ),
+  'github-pages': (source) =>
+    parseDeployConfigSlice(githubPagesHostingConfigSchema, source).pipe(
+      Effect.map((config) => createGithubPagesHosting(config, source, runners['github-pages'])),
     ),
 });
 

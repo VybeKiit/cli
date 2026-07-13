@@ -113,6 +113,7 @@ const resolveHostingTool = (provider: string, env: EnvSource): Tool =>
       vercel: () => VERCEL,
       railway: () => RAILWAY,
       cloudflare: () => WRANGLER,
+      'github-pages': () => GH,
     },
     env,
     'cloudflare',

@@ -31,6 +31,8 @@ packages:
   - "apps/landing"
   - "apps/componentLibrary"
   - "apps/localDevelopmentWebsite"
+  - "apps/mobileAppLandingPage"
+  - "apps/extensionLandingPage"
 
 # Shared external dependency SSOT. Workspace manifests use `catalog:` for these rather than
 # repeating ranges. Exact latest stable is the default; peer/framework exceptions are documented.
