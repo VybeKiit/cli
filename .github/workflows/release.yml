@@ -123,6 +123,12 @@ jobs:
         run: pnpm exec turbo run typecheck --concurrency=2
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+      # browser-automation's field-locator suite launches a real Chromium; the
+      # release Test leg must install it too (parity with test.yml), else it fails
+      # "Executable doesn't exist" and blocks every release. Only chromium is needed.
+      - name: Install Chromium for browser-automation test
+        if: steps.skip_check.outputs.skip != 'true'
+        run: pnpm --filter @vybekiit/browser-automation exec playwright install --with-deps chromium
       - name: Test
         if: steps.skip_check.outputs.skip != 'true'
         run: pnpm exec turbo run test --concurrency=2
