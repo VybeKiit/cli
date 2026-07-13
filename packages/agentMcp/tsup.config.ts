@@ -11,7 +11,6 @@ export default defineConfig({
     'src/doctorTools.ts',
     'src/techSearch.ts',
     'src/uiCatalog/index.ts',
-    'src/uiCatalog/bin.ts',
     'src/uiCatalog/catalog.ts',
     'src/uiCatalog/fuzzy.ts',
     'src/uiCatalog/page.ts',

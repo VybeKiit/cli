@@ -5,12 +5,11 @@
   "vybekiit": {
     "kind": "tooling"
   },
-  "description": "MCP server for VybeKiit agent surface — skills, CLI commands, doctor tools, and doc-fallback. Private tooling.",
+  "description": "Single MCP server for the VybeKiit agent surface — skills, CLI commands, doctor tools, doc-fallback, browser automations, and the mirrored UI catalog. Private tooling.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "vybekiit-agent-mcp": "./dist/bin.js",
-    "vybekiit-ui-catalog-mcp": "./dist/uiCatalog/bin.js"
+    "vybekiit-agent-mcp": "./dist/bin.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

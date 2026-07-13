@@ -21,12 +21,13 @@ describe('FIRST_PARTY_MCP_PACKAGES', () => {
 });
 
 describe('FIRST_PARTY_MCP_TOOLS', () => {
-  it('covers both first-party servers with unique tool names', () => {
+  it('exposes all tools on the single vybekiit server with unique names', () => {
     const names = FIRST_PARTY_MCP_TOOLS.map((tool) => tool.name);
     expect(new Set(names).size).toBe(names.length);
+    expect(names).toHaveLength(15);
     expect(toolsForServer('vybekiit')).toContain('search_skills');
     expect(toolsForServer('vybekiit')).toContain('run_automation');
-    expect(toolsForServer('vybekiit-ui-catalog')).toContain('search_ui_components');
+    expect(toolsForServer('vybekiit')).toContain('search_ui_components');
   });
 });
 
@@ -42,9 +43,8 @@ describe('firstPartyMcpBinPath / buildFirstPartyMcpConfig', () => {
     const config = buildFirstPartyMcpConfig('kit-root', { template: 'web' });
     expect(config.mcpServers.vybekiit.args[0]).toBe('packages/agentMcp/dist/bin.js');
     expect(config.mcpServers.vybekiit.env?.VYBEKIIT_PROJECT_ROOT).toBe('templates/web');
-    expect(config.mcpServers['vybekiit-ui-catalog'].env?.VYBEKIIT_UI_CATALOG_PATH).toContain(
-      'templates/web/',
-    );
+    expect(config.mcpServers.vybekiit.env?.VYBEKIIT_UI_CATALOG_PATH).toContain('templates/web/');
+    expect(Object.keys(config.mcpServers)).toEqual(['vybekiit']);
   });
 });
 
