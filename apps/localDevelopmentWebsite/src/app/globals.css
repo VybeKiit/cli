@@ -149,6 +149,35 @@
   }
 }
 
+.go-live-dot {
+  position: relative;
+  display: inline-flex;
+  height: 0.625rem;
+  width: 0.625rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.go-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+}
+
+.go-live-dot--active {
+  background-color: rgb(34 197 94);
+}
+
+.go-live-dot--active::after {
+  background-color: rgb(34 197 94 / 0.7);
+  animation: dot-beam-pulse 1.5s ease-in-out infinite;
+}
+
+.go-live-dot--pending {
+  background-color: rgb(249 115 22);
+}
+
 .voice-bar {
   height: var(--bar-height, 40%);
   animation: voice-bar-pulse var(--bar-duration, 0.5s) ease-in-out infinite;
@@ -179,4 +208,21 @@
 
 .animate-ping-once {
   animation: ping-once 0.3s ease-out;
+}
+
+/* Respect users who prefer reduced motion — calm the looping beams,
+   waveforms and marquee for a gentler experience. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
