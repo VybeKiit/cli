@@ -113,13 +113,13 @@
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-feature-flags/SKILL.md",
-      "computedHash": "aad7d5397aad03d63bfb04883108611d487ced835f3357361b730b53dd1b1027"
+      "computedHash": "5efb63f98cf49486edddfc0dab13a7a53b1b2c305ee5b33b689f5ee0b987f63a"
     },
     "instrument-product-analytics": {
       "source": "posthog/ai-plugin",
       "sourceType": "github",
       "skillPath": "skills/instrument-product-analytics/SKILL.md",
-      "computedHash": "11a1319aa73fb1406a2e1b8e374cbae9acf28c8c0cc8add7af313cc9c4fd2c01"
+      "computedHash": "d964f959b0bf1b8a11883b93ee0935d5466c76afd6d557cb9df6e00587ba5411"
     },
     "mongodb-atlas-stream-processing": {
       "source": "mongodb/agent-skills",
@@ -179,7 +179,7 @@
       "source": "neondatabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/neon-functions/SKILL.md",
-      "computedHash": "ce76c15d530e611775e6145929cab36f1f6a003636b3e97fbcc8997e10b89c50"
+      "computedHash": "5d2eddcea4f0ac4201b7963a6671ca6b477e7651eaa1b22a9da714012725f7dc"
     },
     "neon-object-storage": {
       "source": "neondatabase/agent-skills",
@@ -214,14 +214,14 @@
     "sentry-sdk-setup": {
       "source": "getsentry/sentry-for-ai",
       "sourceType": "github",
-      "skillPath": "skills/sentry-sdk-setup/SKILL.md",
+      "skillPath": "skills-legacy/sentry-sdk-setup/SKILL.md",
       "computedHash": "d7fb017bcc2e3eb93280843b3343cc3aa8040a8667208c1ee083738be6420b7a"
     },
     "sentry-workflow": {
       "source": "getsentry/sentry-for-ai",
       "sourceType": "github",
-      "skillPath": "skills/sentry-workflow/SKILL.md",
-      "computedHash": "219e8f7bd0de395531b28974272859a5df2c9f52271152aeb3d4b0cd07a20f76"
+      "skillPath": "src/skills/sentry-workflow/SKILL.md",
+      "computedHash": "8e90763bb84a7f4b94488f38412333dcb6e5048337d84c5f0b93a1714d22125b"
     },
     "stripe-best-practices": {
       "source": "docs.stripe.com",
