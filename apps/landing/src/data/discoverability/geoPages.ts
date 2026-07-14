@@ -447,6 +447,50 @@ const wedgePages: readonly GeoPageContent[] = [
   },
 ];
 
+/**
+ * GEO long-form body for the core `/faq` page.
+ * Rendered on `/faq` and surfaced to answer engines. `/faq` keeps its own static
+ * route, so this lives outside {@link GEO_PAGES} (the dynamic-spoke set whose length
+ * is asserted to equal the root + compare slug lists).
+ */
+export const faqGeoPage: GeoPageContent = {
+  path: '/faq',
+  title: `${n} FAQ — SaaS boilerplate questions answered`,
+  metaDescription:
+    'Answer-first FAQ for founders choosing a SaaS boilerplate: best kit for a non-technical founder, taxes and VAT, Claude Code and Cursor, web + mobile + extension, pricing, and where rivals win.',
+  lead: `Short answer: ${n} is a ${price} one-time SaaS starter kit an AI coding agent operates for you — owned source with sign-in, database, payments, email, and web + mobile + extension bases, plus Lemon Squeezy as Merchant of Record by default. This FAQ answers what founders actually ask answer engines before buying: which kit fits a non-technical founder, how taxes and VAT are handled, whether it works with Claude Code and Cursor, what you still do yourself, and where rival kits such as ShipFast still win.`,
+  sections: [
+    {
+      heading: 'Who it is for, and who it is not',
+      body: `${n} is for non-technical and semi-technical founders who drive Claude Code, Cursor, or Codex and want the agent to operate a real product base instead of reinventing auth, payments, and deploy wiring every session. It is not the best pick for a senior engineer who wants to read and own every line daily — developer-first kits such as ShipFast, MakerKit, or Supastarter serve that buyer better. A kit removes plumbing invention, not product judgment.`,
+    },
+    {
+      heading: 'What you still do yourself',
+      body: `No kit removes the human decisions. You create provider accounts (hosting, database, payments, email), add API keys, describe your product, test the sign-in and checkout flows, and approve go-live. ${n} shortens the path with connected foundations and agent instructions, but there is no money-in-session-one promise: a real product still needs real testing before you launch.`,
+    },
+    {
+      heading: 'Taxes, payments, and platforms',
+      body: `${n} defaults to Lemon Squeezy as Merchant of Record, so VAT and sales tax on software can be handled by the MoR instead of you filing every jurisdiction. Stripe and PayPal stay available when you want them. One purchase covers three surfaces — web (Next.js), mobile (Expo), and a browser extension (WXT) — and you can ship the web base first. Outside services (hosting, database, email, AI) still bill by usage.`,
+    },
+    {
+      heading: 'Pricing, refunds, and updates',
+      body: `${n} is ${price} one-time at launch, and the price may rise later. Maintained kit packages are designed to update as installable version bumps rather than manual git merges, so a non-developer is not stuck resolving conflicts. If it is not for you, request a refund within ${refund} days per the refund terms; access to the private project material is revoked when a refund is issued.`,
+    },
+  ],
+  related: [
+    compareHub,
+    {
+      href: '/saas-boilerplate-for-non-technical-founders',
+      label: 'For non-technical founders',
+    },
+    { href: '/shipfast-alternative', label: 'ShipFast alternative' },
+    home,
+  ],
+};
+
+/** Core informational GEO pages that keep their own static route (not dynamic spokes). */
+const coreGeoPages: readonly GeoPageContent[] = [faqGeoPage];
+
 /** All GEO long-form pages. */
 export const GEO_PAGES: readonly GeoPageContent[] = [
   ...alternativePages,
@@ -463,7 +507,7 @@ export const GEO_PAGES: readonly GeoPageContent[] = [
  * findGeoPage('/shipfast-alternative')?.title
  */
 export const findGeoPage = (path: string): GeoPageContent | undefined =>
-  GEO_PAGES.find((page) => page.path === path);
+  GEO_PAGES.find((page) => page.path === path) ?? coreGeoPages.find((page) => page.path === path);
 
 /**
  * Find GEO page by root slug (no leading slash).
