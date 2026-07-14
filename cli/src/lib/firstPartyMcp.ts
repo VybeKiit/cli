@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
   buildFirstPartyMcpConfig,
+  formatFirstPartyMcpConfigJson,
   type FirstPartyMcpPathLayout,
   type FirstPartyMcpServersConfig,
 } from '@vybekiit/agent-kit';
@@ -125,7 +126,7 @@ export const writeFirstPartyMcpConfigFile = async (
   }
   const { config, written } = mergeFirstPartyMcpServers(existing, firstParty);
   await mkdir(dirname(configPath), { recursive: true });
-  await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  await writeFile(configPath, formatFirstPartyMcpConfigJson(config));
   return written;
 };
 
