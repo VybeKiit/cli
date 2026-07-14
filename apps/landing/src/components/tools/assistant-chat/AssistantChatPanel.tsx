@@ -47,6 +47,7 @@ import {
   SEARCH_DEBOUNCE_MS,
   useDebouncedValue,
 } from '@vybekiit-template-web/hooks/useDebouncedValue';
+import { Effect } from 'effect';
 import {
   ArrowLeftIcon,
   BoxesIcon,
@@ -138,6 +139,7 @@ import {
   touchConversation,
   writeResumeListMode,
 } from './conversationStore';
+import { loadSessionTranscript } from './sessionTranscript';
 
 /** Shared light-red close/delete affordance (no tooltip — color signals danger). */
 const DESTRUCTIVE_ICON_BUTTON_CLASS =
@@ -1389,8 +1391,8 @@ const AssistantChatPanelBody = ({
     bridgeUrl,
     sessionId,
   });
-  /** Bumps when Resume opens a new native session so late fetches cannot overwrite a newer pick. */
-  const hydrateGenerationRef = useRef(0);
+  /** Cancels an older transcript request before a newer Resume selection can replace it. */
+  const transcriptRequestRef = useRef<AbortController | null>(null);
   /** True while loading CLI history into the panel after Resume. */
   const [transcriptLoading, setTranscriptLoading] = useState(false);
   const { data: capabilities } = useAssistantCapabilities(bridgeUrl);
@@ -1728,34 +1730,38 @@ const AssistantChatPanelBody = ({
     });
   };
 
-  const openInTerminal = async (
-    mode: 'new' | 'resume',
-    prompt?: string,
-    terminalSessionId?: string,
-    launchAssistant: VybeAssistant = assistant,
-    cwd?: string,
-  ): Promise<void> => {
+  const openInTerminal = async (input: {
+    readonly mode: 'new' | 'resume';
+    readonly prompt?: string;
+    readonly terminalSessionId?: string;
+    readonly launchAssistant?: VybeAssistant;
+    readonly cwd?: string;
+  }): Promise<void> => {
     setLaunching(true);
     setLaunchNote(null);
-    const result = await launchAgentViaApi({
-      assistant: launchAssistant,
-      mode,
-      ...(prompt !== undefined && prompt.length > 0 ? { prompt } : {}),
-      ...(terminalSessionId !== undefined && terminalSessionId.length > 0
-        ? { sessionId: terminalSessionId }
-        : {}),
-      ...(cwd !== undefined && cwd.length > 0 ? { cwd } : {}),
+    const launchResponse = await launchAgentViaApi({
+      assistant: input.launchAssistant || assistant,
+      mode: input.mode,
+      ...(input.prompt ? { prompt: input.prompt } : {}),
+      ...(input.terminalSessionId ? { sessionId: input.terminalSessionId } : {}),
+      ...(input.cwd ? { cwd: input.cwd } : {}),
     });
     setLaunching(false);
-    if (result.ok) {
-      const detail =
-        result.launched === true
-          ? (result.message ?? 'Opened in Terminal.')
-          : `${result.message ?? 'Could not auto-open Terminal.'}${result.command ? ` Run: ${result.command}` : ''}`;
-      setLaunchNote(detail);
+    if (!launchResponse.ok) {
+      setLaunchNote(launchResponse.message || 'Launch failed.');
       return;
     }
-    setLaunchNote(result.message ?? 'Launch failed.');
+
+    if (launchResponse.launched) {
+      setLaunchNote(launchResponse.message || 'Opened in Terminal.');
+      return;
+    }
+
+    let launchMessage = launchResponse.message || 'Could not auto-open Terminal.';
+    if (launchResponse.command) {
+      launchMessage += ` Run: ${launchResponse.command}`;
+    }
+    setLaunchNote(launchMessage);
   };
 
   const handleStartNewInPanel = (): void => {
@@ -1779,7 +1785,7 @@ const AssistantChatPanelBody = ({
     setSessionId(row.id);
     refreshConversations();
     setNewChatOpen(false);
-    void openInTerminal('new');
+    void openInTerminal({ mode: 'new' });
   };
 
   /**
@@ -1795,43 +1801,39 @@ const AssistantChatPanelBody = ({
       readonly sourcePath?: string;
       readonly folderHint: string;
     }): Promise<void> => {
-      const generation = ++hydrateGenerationRef.current;
+      if (transcriptRequestRef.current) {
+        transcriptRequestRef.current.abort();
+      }
+      const requestController = new AbortController();
+      transcriptRequestRef.current = requestController;
       setTranscriptLoading(true);
       setLaunchNote(`Loading full conversation${input.folderHint}…`);
       try {
-        const params = new URLSearchParams({
-          assistant: input.assistant,
-          sessionId: input.terminalSessionId,
-        });
-        if (input.sourcePath !== undefined && input.sourcePath.length > 0) {
-          params.set('sourcePath', input.sourcePath);
-        }
         // Wait a tick so useAssistantChat can clear for the new panel session id first.
         await new Promise<void>((resolve) => {
           globalThis.setTimeout(() => resolve(), 0);
         });
-        const response = await fetch(`/api/dev/session-transcript?${params.toString()}`);
-        if (generation !== hydrateGenerationRef.current) {
+        const transcriptEither = await Effect.runPromise(
+          Effect.either(
+            loadSessionTranscript(
+              input.terminalSessionId,
+              input.assistant,
+              requestController.signal,
+              input.sourcePath,
+            ),
+          ),
+        );
+        if (requestController.signal.aborted) {
           return;
         }
-        if (!response.ok) {
+        if (transcriptEither._tag === 'Left') {
           setLaunchNote(
             `Could not load past messages${input.folderHint}. Send a message to continue this session in chat.`,
           );
           return;
         }
-        const body = await parseJsonResponse<{
-          readonly ok?: boolean;
-          readonly messages?: readonly {
-            readonly role: 'user' | 'assistant';
-            readonly text: string;
-          }[];
-          readonly title?: string;
-        }>(response);
-        if (generation !== hydrateGenerationRef.current) {
-          return;
-        }
-        const loaded = body?.messages ?? [];
+        const transcript = transcriptEither.right;
+        const loaded = transcript.messages;
         if (loaded.length === 0) {
           setLaunchNote(
             `No past messages found${input.folderHint}. Send a message to continue in chat.`,
@@ -1842,7 +1844,7 @@ const AssistantChatPanelBody = ({
         const lastUser = [...loaded].reverse().find((message) => message.role === 'user');
         if (lastUser !== undefined) {
           touchConversation(input.panelSessionId, {
-            title: conversationTitleFromHydrate(body?.title, lastUser.text),
+            title: conversationTitleFromHydrate(transcript.title, lastUser.text),
             preview: lastUser.text,
             assistant: input.assistant,
           });
@@ -1852,14 +1854,14 @@ const AssistantChatPanelBody = ({
           `Loaded ${String(loaded.length)} messages${input.folderHint}. Send to continue where you left off.`,
         );
       } catch {
-        if (generation !== hydrateGenerationRef.current) {
+        if (requestController.signal.aborted) {
           return;
         }
         setLaunchNote(
           `Could not load past messages${input.folderHint}. Send a message to continue this session in chat.`,
         );
       } finally {
-        if (generation === hydrateGenerationRef.current) {
+        if (transcriptRequestRef.current === requestController) {
           setTranscriptLoading(false);
         }
       }
@@ -2132,14 +2134,14 @@ const AssistantChatPanelBody = ({
         clearStagedFiles();
         return;
       }
-      void openInTerminal('new', text);
+      void openInTerminal({ mode: 'new', prompt: text });
       setDraft('');
       clearStagedFiles();
       return;
     }
 
     if (openMode === 'terminal') {
-      void openInTerminal('new', text);
+      void openInTerminal({ mode: 'new', prompt: text });
       setDraft('');
       clearStagedFiles();
       return;
