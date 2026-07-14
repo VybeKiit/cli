@@ -10,6 +10,8 @@ export type ChatMessage = {
   content: string;
   timestamp: number;
   workflowStepId?: string;
+  /** True while an agent message is still being streamed in token by token. */
+  streaming?: boolean;
 };
 
 export type Conversation = {
@@ -24,6 +26,10 @@ export type Conversation = {
 type ChatState = {
   conversations: Conversation[];
   addMessage: (conversationId: string, message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
+  /** Append a streamed agent chunk, growing the in-flight agent bubble (or starting one). */
+  appendAssistantDelta: (conversationId: string, text: string) => void;
+  /** Mark the in-flight agent bubble complete so the next turn starts a fresh one. */
+  finalizeAssistant: (conversationId: string) => void;
   createConversation: (title: string, agentId: string) => Conversation;
   deleteConversation: (conversationId: string) => void;
 };
@@ -59,6 +65,45 @@ export const useChatStore = create<ChatState>()(
                 }
               : c,
           ),
+        }));
+      },
+
+      appendAssistantDelta: (conversationId, text) => {
+        set((s) => ({
+          conversations: s.conversations.map((c) => {
+            if (c.id !== conversationId) {
+              return c;
+            }
+            const last = c.messages.at(-1);
+            if (last !== undefined && last.role === 'agent' && last.streaming === true) {
+              const grown: ChatMessage = { ...last, content: last.content + text };
+              return { ...c, updatedAt: Date.now(), messages: [...c.messages.slice(0, -1), grown] };
+            }
+            const started: ChatMessage = {
+              id: uid(),
+              role: 'agent',
+              content: text,
+              timestamp: Date.now(),
+              streaming: true,
+            };
+            return { ...c, updatedAt: Date.now(), messages: [...c.messages, started] };
+          }),
+        }));
+      },
+
+      finalizeAssistant: (conversationId) => {
+        set((s) => ({
+          conversations: s.conversations.map((c) => {
+            if (c.id !== conversationId) {
+              return c;
+            }
+            const last = c.messages.at(-1);
+            if (last === undefined || last.role !== 'agent' || last.streaming !== true) {
+              return c;
+            }
+            const done: ChatMessage = { ...last, streaming: false };
+            return { ...c, messages: [...c.messages.slice(0, -1), done] };
+          }),
         }));
       },
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useWorkflowStore } from '@/stores';
+import { useAgentStore, useChatStore, useWorkflowStore } from '@/stores';
 
 type DaemonStatus = 'connecting' | 'connected' | 'disconnected';
 
@@ -41,62 +41,63 @@ const detectStepFromOutput = (chunk: string): string | null => {
 };
 
 type DaemonMessage =
-  | { type: 'agent.output'; sessionId: string; chunk: string }
-  | { type: 'agent.step'; sessionId: string; stepId: string; status: 'running' | 'done' | 'error' }
-  | { type: 'agent.status'; sessionId: string; status: 'running' | 'idle' | 'error' }
+  | { type: 'agent.output'; chunk: string }
+  | { type: 'agent.tool'; name: string }
+  | { type: 'agent.step'; stepId: string; status: 'running' | 'done' | 'error' }
+  | { type: 'agent.status'; status: 'running' | 'idle' | 'error' }
   | { type: 'error'; message: string };
 
 /**
- * WebSocket client to the local daemon. Wires real agent output to the chat
- * store and workflow store so steps advance from actual agent activity.
- */
-/**
- * Read daemon state.
+ * WebSocket client to the local daemon. Streams real agent output into the
+ * active conversation (token by token) and advances the workflow board — so the
+ * agent works inside the browser tab instead of a spawned terminal window.
  *
- * @returns The state and actions exposed by useDaemon.
+ * @returns Connection status plus `sendPrompt` / `stop` actions.
  * @example
- * const value = useDaemon();
+ * const { status, sendPrompt } = useDaemon();
  */
 export const useDaemon = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<DaemonStatus>('disconnected');
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastStepRef = useRef<string | null>(null);
+  const activeConversationRef = useRef<string | null>(null);
+
   const markStepRunning = useWorkflowStore((s) => s.markStepRunning);
   const markStepDone = useWorkflowStore((s) => s.markStepDone);
   const setRunning = useWorkflowStore((s) => s.setRunning);
-  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastStepRef = useRef<string | null>(null);
+  const appendAssistantDelta = useChatStore((s) => s.appendAssistantDelta);
+  const finalizeAssistant = useChatStore((s) => s.finalizeAssistant);
 
-  const connect = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+  const advanceStep = useCallback(
+    (stepId: string) => {
+      if (stepId === lastStepRef.current) {
+        return;
+      }
+      if (lastStepRef.current !== null) {
+        markStepDone(lastStepRef.current);
+      }
+      markStepRunning(stepId);
+      lastStepRef.current = stepId;
+    },
+    [markStepDone, markStepRunning],
+  );
 
-    setStatus('connecting');
-    const ws = new WebSocket(DAEMON_URL);
-
-    ws.onopen = () => {
-      setStatus('connected');
-    };
-
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data) as DaemonMessage;
-
+  const handleMessage = useCallback(
+    (msg: DaemonMessage) => {
       switch (msg.type) {
         case 'agent.output': {
-          setSessionId(msg.sessionId);
-          // Log agent output into the active conversation (if any)
-          // In a full implementation this would route to the correct conversation
+          const conversationId = activeConversationRef.current;
+          if (conversationId !== null) {
+            appendAssistantDelta(conversationId, msg.chunk);
+          }
           const stepId = detectStepFromOutput(msg.chunk);
-          if (stepId && stepId !== lastStepRef.current) {
-            if (lastStepRef.current) {
-              markStepDone(lastStepRef.current);
-            }
-            markStepRunning(stepId);
-            lastStepRef.current = stepId;
+          if (stepId !== null) {
+            advanceStep(stepId);
           }
           break;
         }
         case 'agent.step': {
-          setSessionId(msg.sessionId);
           if (msg.status === 'running') {
             markStepRunning(msg.stepId);
             setRunning(true);
@@ -107,33 +108,59 @@ export const useDaemon = () => {
         }
         case 'agent.status': {
           if (msg.status === 'running') {
-            setSessionId(msg.sessionId);
             setRunning(true);
-          } else {
-            setRunning(false);
-            setSessionId(null);
+            break;
+          }
+          setRunning(false);
+          if (lastStepRef.current !== null) {
+            markStepDone(lastStepRef.current);
+            lastStepRef.current = null;
+          }
+          const conversationId = activeConversationRef.current;
+          if (conversationId !== null) {
+            finalizeAssistant(conversationId);
           }
           break;
         }
-        case 'error': {
-          setStatus('disconnected');
+        default:
+          // agent.tool / error: reserved for richer cards; no-op for now.
           break;
-        }
+      }
+    },
+    [
+      advanceStep,
+      appendAssistantDelta,
+      finalizeAssistant,
+      markStepDone,
+      markStepRunning,
+      setRunning,
+    ],
+  );
+
+  const connect = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      return;
+    }
+    setStatus('connecting');
+    const ws = new WebSocket(DAEMON_URL);
+
+    ws.onopen = () => setStatus('connected');
+    ws.onmessage = (event) => {
+      try {
+        handleMessage(JSON.parse(event.data) as DaemonMessage);
+      } catch {
+        // Ignore malformed frames.
       }
     };
-
     ws.onclose = () => {
       setStatus('disconnected');
       wsRef.current = null;
       reconnectTimer.current = setTimeout(connect, RECONNECT_DELAY);
     };
-
-    ws.onerror = () => {
-      ws.close();
-    };
+    ws.onerror = () => ws.close();
 
     wsRef.current = ws;
-  }, [markStepRunning, markStepDone, setRunning]);
+  }, [handleMessage]);
 
   useEffect(() => {
     connect();
@@ -145,23 +172,31 @@ export const useDaemon = () => {
     };
   }, [connect]);
 
-  const spawn = useCallback((agent: string) => {
+  /**
+   * Send a user turn to the daemon, routing streamed output into this
+   * conversation. Returns false when the daemon isn't connected so callers can
+   * fall back to the terminal launcher.
+   */
+  const sendPrompt = useCallback((conversationId: string, content: string): boolean => {
+    const ws = wsRef.current;
+    if (ws === null || ws.readyState !== WebSocket.OPEN) {
+      return false;
+    }
+    activeConversationRef.current = conversationId;
     lastStepRef.current = null;
-    wsRef.current?.send(JSON.stringify({ type: 'agent.spawn', agent }));
+    ws.send(
+      JSON.stringify({
+        type: 'agent.send',
+        agent: useAgentStore.getState().activeAgentId,
+        content,
+      }),
+    );
+    return true;
   }, []);
 
-  const sendMessage = useCallback(
-    (content: string) => {
-      if (!sessionId) return;
-      wsRef.current?.send(JSON.stringify({ type: 'agent.send', sessionId, content }));
-    },
-    [sessionId],
-  );
-
   const stop = useCallback(() => {
-    if (!sessionId) return;
-    wsRef.current?.send(JSON.stringify({ type: 'agent.stop', sessionId }));
-  }, [sessionId]);
+    wsRef.current?.send(JSON.stringify({ type: 'agent.stop' }));
+  }, []);
 
-  return { status, sessionId, spawn, sendMessage, stop };
+  return { status, sendPrompt, stop };
 };
