@@ -2,7 +2,11 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { checkSource, validateRuleCatalog } from './dev/checks/checkCodeStyleRules.mjs';
+import {
+  checkPackageExportMap,
+  checkSource,
+  validateRuleCatalog,
+} from './dev/checks/checkCodeStyleRules.mjs';
 
 const temporaryDirectories = [];
 
@@ -19,6 +23,7 @@ describe('code style rule catalog', () => {
     const violations = validateRuleCatalog({
       version: 1,
       exceptions: [],
+      packageExportWildcardExceptions: [],
       rules: [
         {
           id: 'naming.domain-terms',
@@ -36,6 +41,7 @@ describe('code style rule catalog', () => {
     const violations = validateRuleCatalog({
       version: 1,
       exceptions: [],
+      packageExportWildcardExceptions: [],
       rules: [
         { id: 'naming.domain-terms', summary: 'First.', scope: 'authored', enforcedBy: [] },
         {
@@ -85,5 +91,35 @@ describe('authored source checks', () => {
     );
 
     expect(violations).toHaveLength(1);
+  });
+});
+
+describe('package surface checks', () => {
+  it('rejects wildcard package entrypoints', () => {
+    expect(
+      checkPackageExportMap('@vybekiit/example', {
+        '.': './src/index.ts',
+        './*': './src/*.ts',
+      }),
+    ).toEqual([
+      '@vybekiit/example architecture.no-wildcard-package-exports wildcard entrypoint ./*',
+    ]);
+  });
+
+  it('accepts deliberate package entrypoints', () => {
+    expect(
+      checkPackageExportMap('@vybekiit/example', {
+        '.': './src/index.ts',
+        './client': './src/client.ts',
+      }),
+    ).toEqual([]);
+  });
+
+  it('keeps each legacy wildcard exception explicit', () => {
+    expect(
+      checkPackageExportMap('@vybekiit/example', { './*': './src/*.ts' }, [
+        '@vybekiit/example:./*',
+      ]),
+    ).toEqual([]);
   });
 });

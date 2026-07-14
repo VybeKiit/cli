@@ -139,6 +139,7 @@ import {
   touchConversation,
   writeResumeListMode,
 } from './conversationStore';
+import { planSessionSelection } from './sessionSelection';
 import { loadSessionTranscript } from './sessionTranscript';
 
 /** Shared light-red close/delete affordance (no tooltip — color signals danger). */
@@ -1870,73 +1871,49 @@ const AssistantChatPanelBody = ({
   );
 
   const handleOpenConversation = (row: ResumeListItem | StoredConversation): void => {
-    const source = 'source' in row ? row.source : 'saved';
-    if (source === 'cli') {
-      const terminalSessionId = row.terminalSessionId;
-      if (terminalSessionId === undefined || terminalSessionId.length === 0) {
-        setLaunchNote('This CLI session is missing an id — open a new chat instead.');
-        return;
-      }
-      // Track as a local row linked to the CLI session so every send carries agentSessionId.
-      const existing = readConversations().find(
-        (chat) => chat.terminalSessionId === terminalSessionId && chat.assistant === row.assistant,
-      );
-      const sessionCwd = row.cwd;
-      const sourcePath = 'sourcePath' in row ? row.sourcePath : undefined;
-      const linked =
-        existing ??
-        createConversation({
-          assistant: row.assistant,
-          title: row.title,
-          preview: row.preview,
-          terminalSessionId,
-          ...(sessionCwd !== undefined && sessionCwd.length > 0 ? { cwd: sessionCwd } : {}),
-          ...(sourcePath !== undefined && sourcePath.length > 0 ? { sourcePath } : {}),
-        });
-      refreshConversations();
-      setAssistant(row.assistant);
-      setSessionId(linked.id);
-      setResumeOpen(false);
-      setNewChatOpen(false);
-
-      // Every agent: load full history into the panel. Stream agents continue here on send;
-      // terminal/deeplink agents open their CLI when you send (not on Resume click).
-      const folderHint =
-        sessionCwd !== undefined && sessionCwd.length > 0
-          ? ` (${formatFolderPathLabel(sessionCwd)})`
-          : '';
-      if (assistantStreamsInPanel(row.assistant)) {
-        void fetch('/api/dev/ensure-bridge', { method: 'POST' }).catch(() => undefined);
-      }
-      void hydrateNativeTranscript({
-        assistant: row.assistant,
-        terminalSessionId,
-        panelSessionId: linked.id,
-        folderHint,
-        ...(sourcePath !== undefined && sourcePath.length > 0 ? { sourcePath } : {}),
-      });
+    const selection = planSessionSelection(
+      row,
+      readConversations(),
+      assistantStreamsInPanel(row.assistant),
+    );
+    if (!selection.ok) {
+      setLaunchNote(selection.message);
       return;
     }
-    setAssistant(row.assistant);
-    setSessionId(row.id);
+
+    let linked: StoredConversation;
+    if (selection.conversation.kind === 'create') {
+      linked = createConversation(selection.conversation.input);
+    } else {
+      linked = selection.conversation.row;
+    }
+    if (selection.refreshConversations) {
+      refreshConversations();
+    }
+    setAssistant(selection.assistant);
+    setSessionId(linked.id);
     setLaunchNote(null);
     setResumeOpen(false);
     setNewChatOpen(false);
-    // Saved row already linked to a CLI session → reload history from disk.
-    const linkedId = row.terminalSessionId;
-    if (linkedId !== undefined && linkedId.length > 0 && assistantStreamsInPanel(row.assistant)) {
-      const folderHint =
-        row.cwd !== undefined && row.cwd.length > 0 ? ` (${formatFolderPathLabel(row.cwd)})` : '';
-      void hydrateNativeTranscript({
-        assistant: row.assistant,
-        terminalSessionId: linkedId,
-        panelSessionId: row.id,
-        folderHint,
-        ...(row.sourcePath !== undefined && row.sourcePath.length > 0
-          ? { sourcePath: row.sourcePath }
-          : {}),
-      });
+
+    const transcript = selection.transcript;
+    if (!transcript) {
+      return;
     }
+    if (transcript.ensureBridge) {
+      void fetch('/api/dev/ensure-bridge', { method: 'POST' }).catch(() => undefined);
+    }
+    let folderHint = '';
+    if (transcript.cwd) {
+      folderHint = ` (${formatFolderPathLabel(transcript.cwd)})`;
+    }
+    void hydrateNativeTranscript({
+      assistant: selection.assistant,
+      terminalSessionId: transcript.terminalSessionId,
+      panelSessionId: linked.id,
+      folderHint,
+      ...(transcript.sourcePath ? { sourcePath: transcript.sourcePath } : {}),
+    });
   };
 
   const handleRequestDeleteConversation = (row: {

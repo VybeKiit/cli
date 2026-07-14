@@ -23,11 +23,11 @@
 - Modify: package source imports exposed by the final consumer inventory
 - Test: existing auth, deploy, DB, CLI, and template contract suites
 
-- [ ] Build a complete import inventory excluding each package's own source. Record template and CLI consumers separately from tests.
-- [ ] For auth, retain the observed root, client, HTTP, HTTP/Next, and HTTP/Express contracts; replace `./*`, `./http/*`, and `./providers/*` with only proven public paths.
-- [ ] For deploy and DB, distinguish provider contracts used by templates/CLI from self-imports. Replace provider, registrar, preset, and root wildcards with explicit exports.
-- [ ] Convert package-internal `@vybekiit/*` self-imports to relative imports where they exist only to satisfy a public wildcard.
-- [ ] Add manifest contract tests that fail when an undocumented wildcard is reintroduced.
+- [x] Build a complete import inventory excluding each package's own source. Record template and CLI consumers separately from tests.
+- [x] For auth, retain the observed root, client, HTTP, HTTP/Next, and HTTP/Express contracts; replace `./*`, `./http/*`, and `./providers/*` with only proven public paths.
+- [x] For deploy and DB, distinguish provider contracts used by templates/CLI from self-imports. Replace provider, registrar, preset, and root wildcards with explicit exports.
+- [x] Review package self-imports. Retain those that express the package boundary required by ADR-0026, with exact runtime exports where Vite resolves them through the manifest.
+- [x] Add manifest contract tests that fail when an undocumented wildcard is reintroduced.
 
 ### Task 2: Extract assistant conversation selection and resume behavior
 
@@ -36,10 +36,10 @@
 - Create: `apps/landing/src/components/tools/assistant-chat/sessionSelection.test.ts`
 - Modify: `apps/landing/src/components/tools/assistant-chat/AssistantChatPanel.tsx`
 
-- [ ] Characterize the current open/resume decision table, including missing sessions, active sessions, transcript loading, and stale selection.
-- [ ] Move the business decision and request orchestration out of `handleOpenConversation`; keep React rendering and state application in the panel.
-- [ ] Delete the replaced inline branch. Do not leave a forwarding hook or wrapper.
-- [ ] Verify the extracted capability and the full assistant-chat test set. Record the panel's new line and complexity counts.
+- [x] Characterize the current open/resume decision table, including missing sessions, active sessions, transcript loading, and stale selection.
+- [x] Move the business decision and request orchestration out of `handleOpenConversation`; keep React rendering and state application in the panel.
+- [x] Delete the replaced inline branch. Do not leave a forwarding hook or wrapper.
+- [x] Verify the extracted capability and the full assistant-chat test set. Record the panel's new line and complexity counts.
 
 ### Task 3: Generate first-party MCP configuration from Agent Kit
 
@@ -49,10 +49,10 @@
 - Modify: the existing scaffold writer that emits template `.mcp.json` files
 - Regenerate: `templates/{web,backend,extension}/.mcp.json` and any other verified buyer copies
 
-- [ ] Inventory every checked-in MCP configuration and classify it as source, generated buyer copy, or unrelated third-party catalog.
-- [ ] Keep `mcpToolsCatalog.ts` as the first-party server source and expose one serializer for the scaffold layout.
-- [ ] Make scaffolding and checked-in template fixtures consume that serializer instead of maintaining hand-written copies.
-- [ ] Add drift tests comparing generated output with every committed buyer copy.
+- [x] Inventory every checked-in MCP configuration and classify it as source, generated buyer copy, or unrelated third-party catalog.
+- [x] Keep `mcpToolsCatalog.ts` as the first-party server source and expose one serializer for the scaffold layout.
+- [x] Make scaffolding and checked-in template fixtures consume that serializer instead of maintaining hand-written copies.
+- [x] Add drift tests comparing generated output with every committed buyer copy.
 
 ### Task 4: Enforce the remaining orphan rules with evidence
 
@@ -62,8 +62,8 @@
 - Modify: `code-style.rules.json` only when the rule can be checked deterministically
 - Modify: `apps/componentLibrary` lint configuration if alias inspection confirms a false dependency warning
 
-- [ ] Add a deterministic check rejecting wildcard exports in workspace package manifests unless allowlisted with a documented public contract.
-- [ ] Audit barrels and registries by current consumers; delete confirmed orphans in cohesive package slices rather than by filename pattern.
-- [ ] Resolve the `@library/*` alias diagnostics as configuration, or replace the aliases if they are not a supported boundary.
-- [ ] Triage authored files over 500 lines by responsibility count. Do not split files solely to satisfy a line threshold.
-- [ ] Run `pnpm verify` and commit the Wave 3 completion report only after exit 0.
+- [x] Add a deterministic check rejecting wildcard exports in workspace package manifests unless allowlisted with a documented public contract.
+- [x] Audit barrels and registries by current consumers; delete confirmed orphans in cohesive package slices rather than by filename pattern.
+- [x] Resolve the `@library/*` alias diagnostics as configuration, or replace the aliases if they are not a supported boundary.
+- [x] Triage authored files over 500 lines by responsibility count. Do not split files solely to satisfy a line threshold.
+- [x] Run `pnpm verify` and commit the Wave 3 completion report only after exit 0.

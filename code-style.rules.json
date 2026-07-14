@@ -8,6 +8,24 @@
     "apps/componentLibrary/src/data/catalog.meta.ts",
     "apps/componentLibrary/src/lib/loadPreview.client.ts"
   ],
+  "packageExportWildcardExceptions": [
+    "@vybekiit/agent-mcp:./uiCatalog/*",
+    "@vybekiit/ai:./*",
+    "@vybekiit/analytics:./*",
+    "@vybekiit/assets:./*",
+    "@vybekiit/compliance:./*",
+    "@vybekiit/content:./*",
+    "@vybekiit/i18n:./*",
+    "@vybekiit/infra:./*",
+    "@vybekiit/messaging:./*",
+    "@vybekiit/payments:./providers/*",
+    "@vybekiit/payments:./providers/*/checkout",
+    "@vybekiit/payments:./providers/*/webhook",
+    "@vybekiit/realtime:./*",
+    "@vybekiit/tenancy:./*",
+    "@vybekiit/tokens:./*",
+    "@vybekiit/ui:./*"
+  ],
   "rules": [
     {
       "id": "architecture.real-boundaries",
@@ -26,6 +44,12 @@
       "summary": "Every export, entrypoint, registry, and compatibility alias has a current consumer or documented public contract.",
       "scope": "maintained",
       "enforcedBy": ["usage scan", "tests", "review"]
+    },
+    {
+      "id": "architecture.no-wildcard-package-exports",
+      "summary": "Package export maps name every supported entrypoint explicitly.",
+      "scope": "maintained",
+      "enforcedBy": ["scripts/dev/checks/checkCodeStyleRules.mjs", "tests"]
     },
     {
       "id": "naming.no-vague-local",

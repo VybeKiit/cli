@@ -88,12 +88,15 @@ Rule: `absence.explicit-boundary-defaults`.
 - Split large files by business responsibility, not line count. Do not create one-export-per-file
   fragmentation.
 - Package entrypoints are deliberate public surfaces. Do not use a root barrel to expose internals
-  accidentally.
+  accidentally, and do not use wildcard package exports.
+- Existing wildcard entrypoints are frozen in `code-style.rules.json`. Do not add exceptions; remove
+  each one after replacing it with the exact entrypoints its current consumers use.
 - Every entrypoint export has a current consumer or a documented public contract. Delete orphaned
   exports, files, registries, and compatibility aliases instead of preserving them speculatively.
 - Keep provider folders only for multiple real providers or a genuine provider boundary.
 
-Rules: `architecture.real-boundaries`, `architecture.singular-contract`.
+Rules: `architecture.real-boundaries`, `architecture.singular-contract`,
+`architecture.no-orphan-surface`, `architecture.no-wildcard-package-exports`.
 
 ## Repository invariants
 

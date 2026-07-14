@@ -4,6 +4,7 @@ import {
   buildFirstPartyMcpConfig,
   type FirstPartyMcpPathLayout,
   type FirstPartyMcpServersConfig,
+  formatFirstPartyMcpConfigJson,
 } from '@vybekiit/agent-kit';
 
 /** Parsed project MCP config with optional env on stdio entries. */
@@ -125,7 +126,7 @@ export const writeFirstPartyMcpConfigFile = async (
   }
   const { config, written } = mergeFirstPartyMcpServers(existing, firstParty);
   await mkdir(dirname(configPath), { recursive: true });
-  await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  await writeFile(configPath, formatFirstPartyMcpConfigJson(config));
   return written;
 };
 

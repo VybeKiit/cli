@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import {
   buildFirstPartyMcpConfig,
@@ -10,6 +11,9 @@ import {
   toolsForServer,
   USE_KIT_MCP_SKILL_STEM,
 } from './mcpToolsCatalog';
+
+const readWorkspaceJson = async (path: string): Promise<unknown> =>
+  JSON.parse(await readFile(new URL(`../../../../${path}`, import.meta.url), 'utf8')) as unknown;
 
 describe('FIRST_PARTY_MCP_PACKAGES', () => {
   it('ships agent-mcp and browser-automation', () => {
@@ -45,6 +49,21 @@ describe('firstPartyMcpBinPath / buildFirstPartyMcpConfig', () => {
     expect(config.mcpServers.vybekiit.env?.VYBEKIIT_PROJECT_ROOT).toBe('templates/web');
     expect(config.mcpServers.vybekiit.env?.VYBEKIIT_UI_CATALOG_PATH).toContain('templates/web/');
     expect(Object.keys(config.mcpServers)).toEqual(['vybekiit']);
+  });
+
+  it('keeps checked-in MCP configs derived from the catalog', async () => {
+    const surfaceConfig = buildFirstPartyMcpConfig('surface');
+    const templateNames = ['backend', 'extension', 'mobile', 'spa', 'web'];
+    for (const templateName of templateNames) {
+      expect(await readWorkspaceJson(`templates/${templateName}/.mcp.json`)).toEqual(surfaceConfig);
+      expect(await readWorkspaceJson(`templates/${templateName}/.cursor/mcp.json`)).toEqual(
+        surfaceConfig,
+      );
+    }
+
+    const rootConfig = buildFirstPartyMcpConfig('kit-root', { template: 'web' });
+    expect(await readWorkspaceJson('.mcp.json')).toEqual(rootConfig);
+    expect(await readWorkspaceJson('.cursor/mcp.json')).toEqual(rootConfig);
   });
 });
 
