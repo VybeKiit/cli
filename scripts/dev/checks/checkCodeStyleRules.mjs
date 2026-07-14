@@ -43,10 +43,11 @@ export const validateRuleCatalog = (ruleCatalog) => {
 
 export const checkSource = (source) => {
   const violations = [];
+  const conditionalSource = source.replaceAll('?.', '..').replaceAll('??', '||');
   const nestedTernaryPattern = /\?[^:\n]*\?/g;
   const vagueDeclarationPattern = /\b(?:const|let)\s+(data|result|temp)\b/g;
 
-  for (const match of source.matchAll(nestedTernaryPattern)) {
+  for (const match of conditionalSource.matchAll(nestedTernaryPattern)) {
     violations.push({
       line: lineNumberAt(source, match.index),
       ruleId: 'control-flow.no-nested-ternary',
