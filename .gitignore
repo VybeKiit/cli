@@ -47,6 +47,7 @@ out/cli-banner-inspirations/
 # (never tracked). Ignoring the whole dir also keeps Biome's useIgnoreFile from
 # walking nested worktree configs into the lint gate.
 .claude/
+.worktrees/
 # But DO track .claude/ inside templates — those hooks ship to the buyer
 !templates/**/.claude/
 !templates/**/.claude/**
