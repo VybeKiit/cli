@@ -2,7 +2,8 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { callTool, tools } from './server.js';
 
 const sampleCatalog = {
   version: 1,
@@ -31,15 +32,11 @@ const sampleCatalog = {
   ],
 };
 
-/** Re-import the server module with a fresh, uncached lazy catalog for each test. */
-const loadServer = async () => {
-  vi.resetModules();
-  return import('./server.js');
-};
+const unknownToolErrorPattern = /Unknown tool/;
 
 /** Read the first text block from an MCP tool result. */
 const textOf = (result: CallToolResult): string => {
-  const first = result.content[0];
+  const [first] = result.content;
   if (first === undefined || first.type !== 'text') {
     throw new Error('expected a text content block');
   }
@@ -57,8 +54,7 @@ describe('vybekiit MCP server (merged agent + UI catalog)', () => {
     }
   });
 
-  it('lists all 15 tools on one server, including the 4 UI catalog tools', async () => {
-    const { tools } = await loadServer();
+  it('lists all 15 tools on one server, including the 4 UI catalog tools', () => {
     const names = tools.map((tool) => tool.name);
     expect(tools).toHaveLength(15);
     expect(names).toEqual(
@@ -88,7 +84,6 @@ describe('vybekiit MCP server (merged agent + UI catalog)', () => {
     await writeFile(catalogPath, JSON.stringify(sampleCatalog), 'utf8');
     process.env.VYBEKIIT_UI_CATALOG_PATH = catalogPath;
 
-    const { callTool } = await loadServer();
     const result = await callTool('search_ui_components', { query: 'hero' });
 
     expect(result.isError).toBeUndefined();
@@ -100,8 +95,6 @@ describe('vybekiit MCP server (merged agent + UI catalog)', () => {
 
   it('isolates a missing UI catalog: UI tool errors, agent tools keep working', async () => {
     process.env.VYBEKIIT_UI_CATALOG_PATH = join(tmpdir(), 'vybekiit-missing', 'nope.json');
-    const { callTool } = await loadServer();
-
     const uiResult = await callTool('list_ui_sources', {});
     expect(uiResult.isError).toBe(true);
     expect(textOf(uiResult)).toContain('UI catalog unavailable');
@@ -112,7 +105,6 @@ describe('vybekiit MCP server (merged agent + UI catalog)', () => {
   });
 
   it('rejects an unknown tool name', async () => {
-    const { callTool } = await loadServer();
-    await expect(callTool('not_a_tool', {})).rejects.toThrow(/Unknown tool/);
+    await expect(callTool('not_a_tool', {})).rejects.toThrow(unknownToolErrorPattern);
   });
 });

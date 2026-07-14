@@ -410,7 +410,7 @@ export const tools = [
  * @example
  * resolveProjectRoot();
  */
-const resolveProjectRoot = (): string => process.env.VYBEKIIT_PROJECT_ROOT ?? process.cwd();
+const resolveProjectRoot = (): string => process.env.VYBEKIIT_PROJECT_ROOT || process.cwd();
 
 /**
  * Resolve the mirrored UI catalog index path.
@@ -419,11 +419,20 @@ const resolveProjectRoot = (): string => process.env.VYBEKIIT_PROJECT_ROOT ?? pr
  * @example
  * resolveCatalogPath();
  */
-const resolveCatalogPath = (): string =>
-  process.env.VYBEKIIT_UI_CATALOG_PATH ??
-  join(resolveProjectRoot(), '.vybekiit/agent/ui-catalog-index.json');
+const resolveCatalogPath = (): string => {
+  const configuredCatalogPath = process.env.VYBEKIIT_UI_CATALOG_PATH;
+  if (configuredCatalogPath) {
+    return configuredCatalogPath;
+  }
+  return join(resolveProjectRoot(), '.vybekiit/agent/ui-catalog-index.json');
+};
 
-let cachedCatalog: UiCatalogIndex | undefined;
+interface CachedCatalog {
+  readonly path: string;
+  readonly catalog: UiCatalogIndex;
+}
+
+let cachedCatalog: CachedCatalog | undefined;
 
 /**
  * Lazily load + cache the UI catalog on first UI-tool call.
@@ -437,13 +446,15 @@ let cachedCatalog: UiCatalogIndex | undefined;
  * if ('error' in catalog) return errorText(catalog.error);
  */
 const loadUiCatalog = async (): Promise<UiCatalogIndex | { readonly error: string }> => {
-  if (cachedCatalog !== undefined) {
-    return cachedCatalog;
+  const catalogPath = resolveCatalogPath();
+  if (cachedCatalog !== undefined && cachedCatalog.path === catalogPath) {
+    return cachedCatalog.catalog;
   }
   try {
-    const json = await readFile(resolveCatalogPath(), 'utf8');
-    cachedCatalog = loadCatalog(json);
-    return cachedCatalog;
+    const json = await readFile(catalogPath, 'utf8');
+    const catalog = loadCatalog(json);
+    cachedCatalog = { path: catalogPath, catalog };
+    return catalog;
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }
@@ -605,7 +616,7 @@ export const callTool = async (toolName: string, args: unknown): Promise<CallToo
     }
     case 'run_automation': {
       const params = decodeToolArgs(RunAutomationArgsSchema, toolName, args);
-      const result = await runAutomation(params.domain, params.command, {
+      const automationResult = await runAutomation(params.domain, params.command, {
         ...(params.args === undefined ? {} : { args: params.args }),
         ...(params.dryRun === undefined ? {} : { dryRun: params.dryRun }),
         ...(params.yes === undefined ? {} : { yes: params.yes }),
@@ -614,7 +625,7 @@ export const callTool = async (toolName: string, args: unknown): Promise<CallToo
         ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs }),
         cwd: resolveProjectRoot(),
       });
-      return jsonText(result);
+      return jsonText(automationResult);
     }
     case 'search_ui_components': {
       const catalog = await loadUiCatalog();
