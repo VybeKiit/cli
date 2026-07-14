@@ -87,15 +87,18 @@ rg "@mui/|@chakra-ui/|antd|nativewind|@heroui/" app/ src/components/auth-shell.t
 | [Magic UI](https://magicui.design) | Animated marketing, marquees, beams, bento | npx shadcn@latest add @magicui/<name> | Mirror in components/magicui/; normalize buttons/inputs to kit primitives |
 | [Kokonut UI](https://kokonutui.com) | Interactive marketing, modern layouts | npx shadcn@latest add @kokonutui/<name> | Mirror in components/kokonutui/; shadcn + Motion; strip custom button sizes |
 | [21st.dev](https://21st.dev) | Community blocks, agent templates | npx shadcn add <registry-url> | Mirror curated blocks in components/blocks/21st/; reject blocks that bypass primitives |
-| [Origin UI](https://originui.com) | Extra shadcn-style primitives | Registry CLI | Merge into src/components/ui/ once |
 | [Aceternity UI](https://ui.aceternity.com) | High-motion landing sections | npx shadcn@latest add https://ui.aceternity.com/registry/<name>.json | Mirror in components/aceternity/; free tier only; no OSS GitHub |
 | [Untitled UI React](https://www.untitledui.com/react) | Enterprise admin, dense application UI | npx untitledui@latest add <name> | Mirror in components/untitled/; React Aria — never merge into ui/ |
 | [Gluestack UI](https://gluestack.io/ui) | Cross-platform patterns (web mirror only in VybeKiit) | npx gluestack-ui@latest add <name> | Mirror web subset in components/gluestack/; mobile ports via kit StyleSheet only |
-| [Cult UI](https://cult-ui.com) | AI chat / agent UI patterns | Copy-paste / registry | Map to kit forms |
-| [Tailark](https://tailark.com) | Marketing blocks, conversion layouts | Copy-paste / registry | Keep token colors |
-| [Tremor](https://tremor.so) | Dashboards, KPI cards, charts | npm @tremor/react or blocks | Dashboard-only; wrap in kit Card |
-| [shadcn/ui Charts](https://ui.shadcn.com/charts) | Charts (Recharts) | npx shadcn@latest add chart | Preferred over random chart libs |
-| [shadcn.io blocks](https://shadcn.io/blocks) | Large block marketplace | Registry browse | Normalize before merge |
-| [Shadcnblocks](https://shadcnblocks.com) | Figma-aligned blocks | Registry / copy | Free blocks OK; paid agent-only |
-| [ReUI / Skiper UI / MynaUI](https://reui.io) | Additional shadcn-style sets | Registry | Secondary when official shadcn lacks a pattern |
+| [AI Elements](https://elements.ai-sdk.dev) | AI chat, agents, streaming, tool UI | npx shadcn@latest add @aielements/<name> | Mirror in components/ai-elements/; normalize to kit forms |
+| [Kibo UI](https://www.kibo-ui.com) | Application UI: kanban, editor, gantt, data viz | npx shadcn@latest add @kibo/<name> | Mirror in components/kibo/; never replace ui/ primitives |
+| [Tailark](https://tailark.com) | Marketing blocks, conversion layouts (Dusk + Mist kits) | npx shadcn@latest add @tailark/<name> | Mirror in components/tailark/; keep token colors |
+| [Cult UI](https://www.cult-ui.com) | Tasteful motion + AI SDK agent patterns | npx shadcn@latest add @cult/<name> | Mirror in components/cult/; map to kit forms; skip Cult Pro |
+| [COSS UI](https://coss.com/ui) | Advanced primitives and application blocks (Origin UI successor) | npx shadcn@latest add @coss/<name> | Mirror in components/coss/; never merge into ui/ wholesale |
+| [Prompt Kit](https://www.prompt-kit.com) | AI prompt input, chat shells, streaming UX | npx shadcn@latest add @prompt-kit/<name> | Mirror in components/prompt-kit/; pairs with AI Elements |
+| [Supabase UI](https://supabase.com/ui) | Auth blocks, Supabase-connected patterns | npx shadcn@latest add @supabase/<name> | Mirror in components/supabase/; default stack adapter is Supabase |
+| [Blocks.so](https://blocks.so) | Login, sidebar, dialog, app shell blocks | npx shadcn@latest add @blocks-so/<name> | Mirror in components/blocks-so/ |
+| [EvilCharts](https://evilcharts.com) | Animated Recharts dashboards | npx shadcn@latest add @evilcharts/<name> | Mirror in components/evilcharts/; wrap in kit Card |
+| [Shadcnblocks (free)](https://shadcnblocks.com) | Figma-aligned marketing blocks (free tier only) | npx shadcn@latest add @shadcnblocks/<name> | Mirror reachable free blocks in components/shadcnblocks/; never sync Pro tier |
+| [shadcn/ui Charts](https://ui.shadcn.com/charts) | Charts (Recharts) | npx shadcn@latest add chart | Preferred baseline chart primitive in ui/ |
 <!-- vybekiit:generated:end web-ui-sources -->
