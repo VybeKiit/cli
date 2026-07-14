@@ -1,85 +1,46 @@
 {
   "name": "vybekiit",
   "version": "0.5.0",
-  "private": true,
-  "description": "Paid, agent-driven monorepo starter kit that lets non-technical builders ship real, money-making products by describing them to an AI agent.",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "description": "Set up tools and create a VybeKiit app: `npx vybekiit setup` then `npx vybekiit create app --web`.",
+  "license": "MIT",
   "packageManager": "pnpm@10.33.2",
-  "engines": {
-    "node": ">=20",
-    "pnpm": ">=10"
+  "publishConfig": {
+    "access": "public"
   },
+  "type": "module",
+  "bin": {
+    "vybekiit": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "preinstall": "node scripts/preflight.mjs",
-    "preflight": "node scripts/preflight.mjs --fix",
-    "build": "turbo run build",
-    "dev": "node scripts/dev/launch.mjs",
-    "test": "turbo run test",
-    "test:e2e": "pnpm test:e2e:local && pnpm test:e2e:ui",
-    "test:e2e:local": "pnpm --filter vybekiit-local-development-website test:e2e",
-    "test:e2e:ui": "pnpm --filter vybekiit-component-library test:e2e",
-    "typecheck": "turbo run typecheck",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "check:ci": "biome ci .",
-    "verify": "pnpm lint && pnpm check:code-style && pnpm typecheck && pnpm test && pnpm test:scripts && pnpm build && pnpm check:platform-skills-audit && pnpm check:agent-configs && pnpm check:skill-discovery && pnpm check:templates && pnpm check:safety && pnpm check:provider-dispatch && pnpm check:packages && pnpm check:page-recipes && pnpm check:component-stories && pnpm check:single-component && pnpm test:e2e",
-    "check:code-style": "node scripts/dev/checks/checkCodeStyleRules.mjs",
-    "check:provider-dispatch": "node scripts/dev/checks/checkProviderDispatch.mjs",
-    "check:packages": "node scripts/dev/checks/checkPackages.mjs",
-    "check:single-component": "node scripts/dev/checks/checkSingleComponentPerFile.mjs",
-    "check:platform-skills-audit": "node scripts/dev/checks/auditPlatformSkills.mjs",
-    "check:agent-configs": "node scripts/dev/checks/lintAgentConfigs.mjs",
-    "check:agent-configs:fix": "agnix --fix-safe .",
-    "check:skill-discovery": "node scripts/dev/checks/validateAgentSkillDiscovery.mjs",
-    "check:templates": "node scripts/dev/checks/checkTemplateAgentLayer.mjs",
-    "check:safety": "node scripts/dev/safety/sync.mjs --check && node scripts/dev/checks/safetyScan.mjs",
-    "check:page-recipes": "node scripts/dev/checks/checkPageRecipes.mjs",
-    "check:component-stories": "node scripts/dev/checks/checkComponentStories.mjs",
-    "safety:sync": "node scripts/dev/safety/sync.mjs",
-    "mirror": "node scripts/dev/mirror/mirrorRepos.mjs",
-    "sync:ui": "node scripts/dev/sync/syncUiRegistries.mjs",
-    "sync:ui:dry-run": "node scripts/dev/sync/syncUiRegistries.mjs --dry-run",
-    "sync:brand": "node scripts/dev/sync/syncBrandAssets.mjs",
-    "sync:brand:dry-run": "node scripts/dev/sync/syncBrandAssets.mjs --dry-run",
-    "dev:ui-library": "pnpm --filter vybekiit-component-library dev",
-    "dev:local": "pnpm --filter vybekiit-local-development-website dev",
-    "dev:preview": "node scripts/dev/preview/devBuyerPreview.mjs",
-    "verify:docker": "node scripts/dev/checks/verifyNativeDepsDocker.mjs",
-    "preflight:docker": "node scripts/preflight-docker-test.mjs",
-    "preflight:docker:quick": "node scripts/preflight-docker-test.mjs --quick",
-    "agent-eval": "node scripts/dev/agent-eval/run.mjs",
-    "agent-eval:bootstrap": "node scripts/dev/agent-eval/run.mjs --mode bootstrap-only --kit-mode local-kit",
-    "dogfood:vibe": "node --experimental-strip-types scripts/dev/checks/dogfoodVibeScenarios.mjs",
-    "dogfood:vibe:offline": "node --experimental-strip-types scripts/dev/checks/dogfoodVibeScenarios.mjs --offline",
-    "bump-kit-version": "node scripts/dev/publish/bumpKitVersion.mjs",
-    "changelog": "node scripts/dev/changelog/generateChangelog.mjs",
-    "tag-mirrors": "node scripts/dev/mirror/tagMirrorRepos.mjs",
-    "test:scripts": "vitest run --root scripts",
-    "test:e2e:templates": "node scripts/dev/preview/runTemplateE2e.mjs",
-    "codemod:cnfast": "node scripts/dev/codmods/migrateCnfast.mjs",
-    "prepare": "husky",
-    "dev:all": "turbo run dev",
-    "perf:lab": "npx --yes @lhci/cli@0.14.x autorun --config=./lighthouserc.json",
-    "perf:lab:desktop": "npx --yes @lhci/cli@0.14.x autorun --config=./lighthouserc.desktop.json",
-    "perf:field": "node .github/perf/runCrux.mjs",
-    "perf:psi": "node .github/perf/runPagespeed.mjs"
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1075.0",
+    "@aws-sdk/client-s3": "^3.1075.0",
+    "@aws-sdk/lib-dynamodb": "^3.1075.0",
+    "@clack/prompts": "catalog:",
+    "@neondatabase/serverless": "^0.10.4",
+    "@supabase/supabase-js": "^2.47.10",
+    "effect": "catalog:",
+    "firebase-admin": "^13.0.2",
+    "mongodb": "^7.4.0",
+    "open": "catalog:"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
     "@types/node": "catalog:",
-    "agnix": "catalog:",
-    "husky": "catalog:",
     "tsup": "catalog:",
-    "turbo": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "agnix",
-      "esbuild"
-    ]
+    "vitest": "catalog:",
+    "@vybekiit/agent-kit": "workspace:*",
+    "@vybekiit/core": "workspace:*",
+    "@vybekiit/db": "workspace:*",
+    "@vybekiit/deploy": "workspace:*",
+    "@vybekiit/payments": "workspace:*",
+    "@vybekiit/report-mode": "workspace:*"
   }
 }
