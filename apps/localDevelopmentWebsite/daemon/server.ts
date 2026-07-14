@@ -2,8 +2,8 @@ import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { type WebSocket, WebSocketServer } from 'ws';
+import type { AgentId, ClientMessage, DaemonMessage } from '@/daemon/contract';
 import { type Agent, createClaudeAgent } from './agents';
-import type { AgentId, ClientMessage, DaemonMessage } from './protocol';
 
 const PORT = 3006;
 
@@ -14,9 +14,9 @@ const PORT = 3006;
  * @param msg - Message to serialize.
  * @returns Nothing.
  */
-const send = (ws: WebSocket, msg: DaemonMessage): void => {
+const send = (ws: WebSocket, daemonMessage: DaemonMessage): void => {
   if (ws.readyState === ws.OPEN) {
-    ws.send(JSON.stringify(msg));
+    ws.send(JSON.stringify(daemonMessage));
   }
 };
 
@@ -28,9 +28,10 @@ const send = (ws: WebSocket, msg: DaemonMessage): void => {
  * @returns Absolute working directory for agent turns.
  */
 const resolveAgentCwd = (): string => {
-  const dir = process.env.VYBEKIIT_AGENT_CWD ?? join(homedir(), 'vybekiit-agent-workspace');
-  mkdirSync(dir, { recursive: true });
-  return dir;
+  const agentWorkingDirectory =
+    process.env.VYBEKIIT_AGENT_CWD || join(homedir(), 'vybekiit-agent-workspace');
+  mkdirSync(agentWorkingDirectory, { recursive: true });
+  return agentWorkingDirectory;
 };
 
 /**
@@ -71,16 +72,16 @@ const handleConnection = (ws: WebSocket): void => {
   };
 
   ws.on('message', (data) => {
-    let msg: ClientMessage;
+    let clientMessage: ClientMessage;
     try {
-      msg = JSON.parse(data.toString()) as ClientMessage;
+      clientMessage = JSON.parse(data.toString()) as ClientMessage;
     } catch {
       send(ws, { type: 'error', message: 'Invalid JSON' });
       return;
     }
-    if (msg.type === 'agent.send') {
-      runTurn(msg.agent, msg.content);
-    } else if (msg.type === 'agent.stop') {
+    if (clientMessage.type === 'agent.send') {
+      runTurn(clientMessage.agent, clientMessage.content);
+    } else if (clientMessage.type === 'agent.stop') {
       agent?.stop();
       send(ws, { type: 'agent.status', status: 'idle' });
     }

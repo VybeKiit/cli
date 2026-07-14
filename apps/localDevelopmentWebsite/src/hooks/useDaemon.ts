@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ClientMessage, DaemonMessage } from '@/daemon/contract';
 import { useAgentStore, useChatStore, useWorkflowStore } from '@/stores';
 
 type DaemonStatus = 'connecting' | 'connected' | 'disconnected';
@@ -31,21 +32,14 @@ const STEP_KEYWORDS: Record<string, string> = {
 };
 
 const detectStepFromOutput = (chunk: string): string | null => {
-  const lower = chunk.toLowerCase();
+  const normalizedChunk = chunk.toLowerCase();
   for (const [keyword, stepId] of Object.entries(STEP_KEYWORDS)) {
-    if (lower.includes(keyword)) {
+    if (normalizedChunk.includes(keyword)) {
       return stepId;
     }
   }
   return null;
 };
-
-type DaemonMessage =
-  | { type: 'agent.output'; chunk: string }
-  | { type: 'agent.tool'; name: string }
-  | { type: 'agent.step'; stepId: string; status: 'running' | 'done' | 'error' }
-  | { type: 'agent.status'; status: 'running' | 'idle' | 'error' }
-  | { type: 'error'; message: string };
 
 /**
  * WebSocket client to the local daemon. Streams real agent output into the
@@ -84,40 +78,40 @@ export const useDaemon = () => {
   );
 
   const handleMessage = useCallback(
-    (msg: DaemonMessage) => {
-      switch (msg.type) {
+    (daemonMessage: DaemonMessage) => {
+      switch (daemonMessage.type) {
         case 'agent.output': {
           const conversationId = activeConversationRef.current;
-          if (conversationId !== null) {
-            appendAssistantDelta(conversationId, msg.chunk);
+          if (conversationId) {
+            appendAssistantDelta(conversationId, daemonMessage.chunk);
           }
-          const stepId = detectStepFromOutput(msg.chunk);
-          if (stepId !== null) {
+          const stepId = detectStepFromOutput(daemonMessage.chunk);
+          if (stepId) {
             advanceStep(stepId);
           }
           break;
         }
         case 'agent.step': {
-          if (msg.status === 'running') {
-            markStepRunning(msg.stepId);
+          if (daemonMessage.status === 'running') {
+            markStepRunning(daemonMessage.stepId);
             setRunning(true);
-          } else if (msg.status === 'done') {
-            markStepDone(msg.stepId);
+          } else if (daemonMessage.status === 'done') {
+            markStepDone(daemonMessage.stepId);
           }
           break;
         }
         case 'agent.status': {
-          if (msg.status === 'running') {
+          if (daemonMessage.status === 'running') {
             setRunning(true);
             break;
           }
           setRunning(false);
-          if (lastStepRef.current !== null) {
+          if (lastStepRef.current) {
             markStepDone(lastStepRef.current);
             lastStepRef.current = null;
           }
           const conversationId = activeConversationRef.current;
-          if (conversationId !== null) {
+          if (conversationId) {
             finalizeAssistant(conversationId);
           }
           break;
@@ -147,7 +141,8 @@ export const useDaemon = () => {
     ws.onopen = () => setStatus('connected');
     ws.onmessage = (event) => {
       try {
-        handleMessage(JSON.parse(event.data) as DaemonMessage);
+        const daemonMessage = JSON.parse(event.data) as DaemonMessage;
+        handleMessage(daemonMessage);
       } catch {
         // Ignore malformed frames.
       }
@@ -179,23 +174,23 @@ export const useDaemon = () => {
    */
   const sendPrompt = useCallback((conversationId: string, content: string): boolean => {
     const ws = wsRef.current;
-    if (ws === null || ws.readyState !== WebSocket.OPEN) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
       return false;
     }
     activeConversationRef.current = conversationId;
     lastStepRef.current = null;
-    ws.send(
-      JSON.stringify({
-        type: 'agent.send',
-        agent: useAgentStore.getState().activeAgentId,
-        content,
-      }),
-    );
+    const clientMessage = {
+      type: 'agent.send',
+      agent: useAgentStore.getState().activeAgentId,
+      content,
+    } satisfies ClientMessage;
+    ws.send(JSON.stringify(clientMessage));
     return true;
   }, []);
 
   const stop = useCallback(() => {
-    wsRef.current?.send(JSON.stringify({ type: 'agent.stop' }));
+    const clientMessage = { type: 'agent.stop' } satisfies ClientMessage;
+    wsRef.current?.send(JSON.stringify(clientMessage));
   }, []);
 
   return { status, sendPrompt, stop };

@@ -1,4 +1,4 @@
-import type { AgentId } from '../protocol';
+import type { AgentId } from '@/daemon/contract';
 
 /** Callbacks a running agent uses to report streamed activity for one turn. */
 export type TurnHandlers = {
