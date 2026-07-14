@@ -175,7 +175,12 @@ function renderReport(result, meta) {
   if (meta.period) lines.push(`Collection period: ${meta.period}`);
   lines.push('', 'Real-user Core Web Vitals (p75):');
   for (const row of result.rows) {
-    const flag = row.failed ? '  ✗ FAIL' : row.rating === 'needs-improvement' ? '  ! warn' : '';
+    let flag = '';
+    if (row.failed) {
+      flag = '  ✗ FAIL';
+    } else if (row.rating === 'needs-improvement') {
+      flag = '  ! warn';
+    }
     lines.push(
       `  ${row.id.padEnd(5)} ${formatValue(row, row.value).padEnd(9)} ${row.rating.padEnd(18)} (budget ≤ ${formatValue(row, row.budget)})${flag}`,
     );
