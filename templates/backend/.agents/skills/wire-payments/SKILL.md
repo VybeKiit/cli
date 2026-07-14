@@ -16,16 +16,8 @@ metadata:
 
 ## Steps
 
-1. **Connect taking money (Live work first).** Prefer the shared Live work path (ADR-0039):
-   - Run `vybekiit live-work payments --mode=buyer --cwd=.` (add `--vendor=<name>` only when the
-     builder named a payment brand).
-   - On success, read the JSON `buyerMessage` out loud. Pin keys are already written (`pinKeys` —
-     never print values).
-   - If missing credentials / ladder exhausted, run `vybekiit plan-setup payments` and collect keys
-     via the matching platform wrapper, then re-run Live work payments.
-   **Verify:** Live work JSON has `"ok": true` and `"verified": true`.
-
-2. Wire `@vybekiit/payments` checkout routes (`resolvePaymentProvider()`).
+1. Run `vybekiit plan-setup payments`.
+2. Wire `@vybekiit/payments` checkout routes.
 3. **Verify:** practice checkout completes.
 
 ## After completing this skill
