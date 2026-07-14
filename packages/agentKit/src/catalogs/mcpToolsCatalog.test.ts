@@ -5,7 +5,6 @@ import {
   FIRST_PARTY_MCP_PACKAGES,
   FIRST_PARTY_MCP_TOOLS,
   firstPartyMcpBinPath,
-  formatFirstPartyMcpConfigJson,
   MCP_TOOLS_PLATFORM_SKILL_STEM,
   renderMcpToolsPlatformSkill,
   renderUseKitMcpSkillMd,
@@ -13,8 +12,8 @@ import {
   USE_KIT_MCP_SKILL_STEM,
 } from './mcpToolsCatalog';
 
-const readWorkspaceFile = (path: string): Promise<string> =>
-  readFile(new URL(`../../../../${path}`, import.meta.url), 'utf8');
+const readWorkspaceJson = async (path: string): Promise<unknown> =>
+  JSON.parse(await readFile(new URL(`../../../../${path}`, import.meta.url), 'utf8')) as unknown;
 
 describe('FIRST_PARTY_MCP_PACKAGES', () => {
   it('ships agent-mcp and browser-automation', () => {
@@ -53,20 +52,18 @@ describe('firstPartyMcpBinPath / buildFirstPartyMcpConfig', () => {
   });
 
   it('keeps checked-in MCP configs derived from the catalog', async () => {
-    const surfaceConfig = formatFirstPartyMcpConfigJson(buildFirstPartyMcpConfig('surface'));
+    const surfaceConfig = buildFirstPartyMcpConfig('surface');
     const templateNames = ['backend', 'extension', 'mobile', 'spa', 'web'];
     for (const templateName of templateNames) {
-      expect(await readWorkspaceFile(`templates/${templateName}/.mcp.json`)).toBe(surfaceConfig);
-      expect(await readWorkspaceFile(`templates/${templateName}/.cursor/mcp.json`)).toBe(
+      expect(await readWorkspaceJson(`templates/${templateName}/.mcp.json`)).toEqual(surfaceConfig);
+      expect(await readWorkspaceJson(`templates/${templateName}/.cursor/mcp.json`)).toEqual(
         surfaceConfig,
       );
     }
 
-    const rootConfig = formatFirstPartyMcpConfigJson(
-      buildFirstPartyMcpConfig('kit-root', { template: 'web' }),
-    );
-    expect(await readWorkspaceFile('.mcp.json')).toBe(rootConfig);
-    expect(await readWorkspaceFile('.cursor/mcp.json')).toBe(rootConfig);
+    const rootConfig = buildFirstPartyMcpConfig('kit-root', { template: 'web' });
+    expect(await readWorkspaceJson('.mcp.json')).toEqual(rootConfig);
+    expect(await readWorkspaceJson('.cursor/mcp.json')).toEqual(rootConfig);
   });
 });
 

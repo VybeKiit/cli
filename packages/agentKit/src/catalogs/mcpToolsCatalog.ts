@@ -390,5 +390,4 @@ export const renderUseKitMcpSkillMd = (): string => {
  */
 export const formatFirstPartyMcpConfigJson = (config: {
   readonly mcpServers: Readonly<Record<string, unknown>>;
-}): string =>
-  `${JSON.stringify(config, null, 2)}\n`;
+}): string => `${JSON.stringify(config, null, 2)}\n`;

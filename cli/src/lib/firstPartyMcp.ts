@@ -2,9 +2,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
   buildFirstPartyMcpConfig,
-  formatFirstPartyMcpConfigJson,
   type FirstPartyMcpPathLayout,
   type FirstPartyMcpServersConfig,
+  formatFirstPartyMcpConfigJson,
 } from '@vybekiit/agent-kit';
 
 /** Parsed project MCP config with optional env on stdio entries. */

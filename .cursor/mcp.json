@@ -2,9 +2,7 @@
   "mcpServers": {
     "vybekiit": {
       "command": "node",
-      "args": [
-        "packages/agentMcp/dist/bin.js"
-      ],
+      "args": ["packages/agentMcp/dist/bin.js"],
       "env": {
         "VYBEKIIT_PROJECT_ROOT": "templates/web",
         "VYBEKIIT_UI_CATALOG_PATH": "templates/web/.vybekiit/agent/ui-catalog-index.json"
