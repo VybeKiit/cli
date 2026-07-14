@@ -71,7 +71,7 @@
         "noJsxLiterals": "off",
         "useComponentExportOnlyModules": "off",
         "noTernary": "off",
-        "noNestedTernary": "warn",
+        "noNestedTernary": "error",
         "useNamingConvention": "off",
         "useConsistentTypeDefinitions": "off",
         "noMagicNumbers": "off",

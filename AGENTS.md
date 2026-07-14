@@ -39,23 +39,18 @@ When you add code, first decide which bucket it belongs to. Logic the buyer shou
 
 <!-- rules digest — full guide in CODE-STYLE.md; edit there -->
 
-Follow the author's global standards (KISS, YAGNI, ruthless DRY; junior-readable, boring,
-traceable code). **Two refactors in flight, sequenced: (1) the publish-surface collapse — now settled
-as ADR-0033 (0 published packages; the CLI is the only public artifact, superseding ADR-0025's 5-spine);
-(2) the Effect migration (ADR-0023)** — Effect + `Schema` + `Layer`
-replace `Result` / zod / factory-wiring end-to-end, one gate-green slice at a time, **in progress not
-complete**. The load-bearing rules — **full guide with before/after in [CODE-STYLE.md](./CODE-STYLE.md)**:
+Write code that is boring to trace and easy to delete. The full daily contract and examples live in
+[CODE-STYLE.md](./CODE-STYLE.md); `code-style.rules.json` names every enforcement channel. The
+Effect migration (ADR-0023) remains incremental and every touched slice must stay gate-green.
 
 - **Nothing under `packages/` is published (ADR-0033).** Every `packages/*` is `private: true` (no
   `publishConfig`); the `vybekiit` CLI is the only public npm package and bundles the `@vybekiit/*`
   it uses (`tsup` `noExternal: [/^@vybekiit\//]`). A new module is either **template-owned code** or a
   **private workspace package** — there is **no public tier** and **no `shared/` tier** (plumbing
   folds into `core`). Buyers get the maintained logic via the gated monorepo clone, never `npm i @vybekiit/*`.
-- **Concern-package skeleton (Effect DI, ADR-0023):** `types.ts` (`Schema.Struct` DTOs +
-  `Schema.Schema.Type<>` aliases + tagged `*Error` + service type) · `config.ts` (`Schema.Struct` +
-  Config `Tag`/`Layer` when needed) · `resolve.ts` (service `Tag` + `Live` `Layer`) ·
-  `providers/<name>/index.ts` (Effect-returning adapter) · `index.ts` pure wildcard barrel. `core`
-  is the exempt library package.
+- **Boundaries must earn their place.** A package, service, `Layer`, interface, helper, folder, or
+  wrapper must name a real domain concept or have multiple real callers. No `helpers`, `common`,
+  `misc`, or `managers` buckets. Split large files by business responsibility, not line count.
 - **Provider dispatch (ADR-0018, now Effect):** wire each provider as a `Live` `Layer`; the
   concern selector picks the adapter from `*_PROVIDER`. Schema config owns defaults; a missing runtime
   adapter/map returns a typed error before construction. Never `new` a provider at a call site, never
@@ -112,11 +107,18 @@ complete**. The load-bearing rules — **full guide with before/after in [CODE-S
   interfaces mainly for component props; fields `readonly`; `unknown` over `any`; no casts except a
   vendor-type seam. Named exports only; no `export default` in package source (except a Worker
   handler / `tsup.config.ts`).
-- **Exports:** package `index.ts` files are pure wildcard barrels (`export * from './types'`) for
-  cleaner imports. No implementation code, constants, side effects, or wiring in `index.ts`.
-- **Functions + docs:** authored functions are const-arrow only (`function*` allowed inside
-  `Effect.gen`). Every exported function has TSDoc summary, `@param`, `@returns`, and `@example`;
-  durable rationale goes in an ADR / `CONTEXT.md`.
+- **Exports:** package entrypoints expose deliberate contracts. Do not use wildcard barrels to leak
+  package internals. Entrypoints contain no implementation, side effects, or wiring.
+- **Functions + flow:** authored functions are const-arrow only (`function*` allowed inside
+  `Effect.gen`). Prefer guards, one named fact per condition, and explicit business loops. No nested
+  ternaries or dense parenthesized decisions.
+- **Names + absence:** use domain nouns such as `bodyRequest`, `checkoutResponse`, and
+  `selectedSurface`, not `data`, `result`, or `temp`. Prefer `!value` when all falsy values are
+  invalid; use explicit checks when `0`, `false`, or `''` is valid. Defaults belong at decoded input
+  and configuration boundaries, not internal `??` fallback chains.
+- **Docs:** public and domain contracts receive useful TSDoc. Obvious internals do not receive
+  boilerplate `@param`, `@returns`, or fabricated examples. Durable rationale goes in an ADR or
+  `CONTEXT.md`.
 - **Component props:** component prop contracts remain interfaces; optional props get safe defaults
   at the boundary (`children` defaults to `null` or an empty render by case).
 - **Tests:** colocate `*.test.ts` next to source (not a per-package `test/` dir). Effectful code uses
