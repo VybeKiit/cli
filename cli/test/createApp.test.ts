@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { CLI_HELP, CLI_HELP_ALL } from '../src/cliHelp';
 import { parseCreateAppArgs } from '../src/commands/createApp';
-import { formatCreateSuccess, isCreateSurface } from '../src/commands/scaffoldOutput';
+import {
+  CREATE_SURFACE_PROMPT_OPTIONS,
+  CREATE_SURFACES,
+  isCreateSurface,
+} from '../src/commands/createSurfaceRegistry';
+import { formatCreateSuccess, formatCreateUsage } from '../src/commands/scaffoldOutput';
 import { formatSetupNextStep } from '../src/commands/setupNextStep';
 
 describe('parseCreateAppArgs', () => {
@@ -30,10 +36,10 @@ describe('parseCreateAppArgs', () => {
 
   it('rejects multiple surfaces', () => {
     const parsed = parseCreateAppArgs(['--web', '--mobile']);
-    expect(parsed.ok).toBe(false);
-    if (!parsed.ok) {
-      expect(parsed.error).toContain('Pick one surface');
-    }
+    expect(parsed).toEqual({
+      ok: false,
+      error: 'Pick one surface for now (--web, --mobile, --extension, or --backend).',
+    });
   });
 
   it('reports missing surface', () => {
@@ -43,7 +49,10 @@ describe('parseCreateAppArgs', () => {
 
   it('rejects unknown flags', () => {
     const parsed = parseCreateAppArgs(['--spa']);
-    expect(parsed.ok).toBe(false);
+    expect(parsed).toEqual({
+      ok: false,
+      error: 'Unknown flag: --spa. Use --web, --mobile, --extension, or --backend.',
+    });
   });
 });
 
@@ -52,6 +61,50 @@ describe('isCreateSurface', () => {
     expect(isCreateSurface('web')).toBe(true);
     expect(isCreateSurface('backend')).toBe(true);
     expect(isCreateSurface('spa')).toBe(false);
+  });
+});
+
+describe('create surface registry', () => {
+  it('keeps every create-app surface in one buyer-facing order', () => {
+    expect(CREATE_SURFACES.map((surface) => surface.id)).toEqual([
+      'web',
+      'mobile',
+      'extension',
+      'backend',
+    ]);
+  });
+
+  it('preserves the interactive labels and hints', () => {
+    expect(CREATE_SURFACE_PROMPT_OPTIONS).toEqual([
+      { value: 'web', label: 'Web app', hint: 'Next.js + dashboard + marketing' },
+      { value: 'mobile', label: 'Mobile app', hint: 'Expo' },
+      { value: 'extension', label: 'Browser extension', hint: 'WXT' },
+      { value: 'backend', label: 'Backend API', hint: 'Express + typed routes' },
+    ]);
+  });
+
+  it('keeps usage and help output complete', () => {
+    const buyerHelp = `${formatCreateUsage().join('\n')}\n${CLI_HELP}\n${CLI_HELP_ALL}`;
+
+    for (const surface of CREATE_SURFACES) {
+      expect(buyerHelp).toContain(`--${surface.id}`);
+    }
+  });
+
+  it('preserves buyer-facing flag formatting', () => {
+    expect(formatCreateUsage()).toEqual([
+      'Pick one surface for your app:',
+      '  vybekiit create app --web [directory]',
+      '  vybekiit create app --mobile [directory]',
+      '  vybekiit create app --extension [directory]',
+      '  vybekiit create app --backend [directory]',
+      '',
+    ]);
+    expect(CLI_HELP).toContain('  --web         Next.js + agent layer');
+    expect(CLI_HELP).toContain('  --backend     Express API + typed routes');
+    expect(CLI_HELP_ALL).toContain(
+      'vybekiit create app --web|--mobile|--extension|--backend [directory]',
+    );
   });
 });
 

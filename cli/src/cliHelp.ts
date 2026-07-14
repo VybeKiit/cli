@@ -1,3 +1,14 @@
+import { CREATE_SURFACE_PIPE_FLAGS, CREATE_SURFACES } from './commands/createSurfaceRegistry';
+
+const createSurfaceUsage = CREATE_SURFACES.map(
+  (surface) => `  vybekiit create app --${surface.id} [directory]`,
+).join('\n');
+
+const createSurfaceHelp = CREATE_SURFACES.map((surface) => {
+  const surfaceFlag = `--${surface.id}`.padEnd(14);
+  return `  ${surfaceFlag}${surface.help}`;
+}).join('\n');
+
 /** Buyer-tier help printed by `vybekiit --help` and bare non-TTY (ADR-0038). */
 export const CLI_HELP = `vybekiit — set up tools and create your app
 
@@ -5,10 +16,7 @@ Getting started:
   vybekiit                 Interactive menu (terminal only)
   vybekiit setup           Welcome + install/check the tools your app needs
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
-  vybekiit create app --web [directory]
-  vybekiit create app --mobile [directory]
-  vybekiit create app --extension [directory]
-  vybekiit create app --backend [directory]
+${createSurfaceUsage}
 
 After your app exists (your AI coding tool drives these):
   vybekiit list-pieces · list-page-recipes · list-presets
@@ -18,10 +26,7 @@ After your app exists (your AI coding tool drives these):
   vybekiit env wizard · sync-agent-layer · update path via your agent
 
 Surfaces:
-  --web         Next.js + agent layer
-  --mobile      Expo + agent layer
-  --extension   WXT + agent layer
-  --backend     Express API + typed routes
+${createSurfaceHelp}
 
 Examples:
   vybekiit setup
@@ -44,7 +49,7 @@ Buyer journey:
   vybekiit setup
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
-  vybekiit create app --web|--mobile|--extension|--backend [directory]
+  vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]
 
 Create / project:
   vybekiit new [template] [directory]     (deprecated → create app)
