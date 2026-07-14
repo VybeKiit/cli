@@ -13,40 +13,25 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    },
     "./http": {
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.js",
       "require": "./dist/http/index.cjs"
-    },
-    "./http/*": {
-      "types": "./dist/http/*.d.ts",
-      "import": "./dist/http/*.js",
-      "require": "./dist/http/*.cjs"
-    },
-    "./http/next": {
-      "types": "./dist/http/next.d.ts",
-      "import": "./dist/http/next.js",
-      "require": "./dist/http/next.cjs"
     },
     "./http/express": {
       "types": "./dist/http/express.d.ts",
       "import": "./dist/http/express.js",
       "require": "./dist/http/express.cjs"
     },
-    "./client": {
-      "types": "./dist/client.d.ts",
-      "import": "./dist/client.js",
-      "require": "./dist/client.cjs"
-    },
-    "./providers/*": {
-      "types": "./dist/providers/*.d.ts",
-      "import": "./dist/providers/*.js",
-      "require": "./dist/providers/*.cjs"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.js",
-      "require": "./dist/*.cjs"
+    "./http/next": {
+      "types": "./dist/http/next.d.ts",
+      "import": "./dist/http/next.js",
+      "require": "./dist/http/next.cjs"
     }
   },
   "files": [
