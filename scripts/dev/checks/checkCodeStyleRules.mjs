@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +19,9 @@ export const validateRuleCatalog = (ruleCatalog) => {
   }
   if (!Array.isArray(ruleCatalog.exceptions)) {
     violations.push('code-style.rules.json exceptions must be an array');
+  }
+  if (!Array.isArray(ruleCatalog.packageExportWildcardExceptions)) {
+    violations.push('code-style.rules.json packageExportWildcardExceptions must be an array');
   }
   if (!Array.isArray(ruleCatalog.rules)) {
     return [...violations, 'code-style.rules.json rules must be an array'];
@@ -65,6 +68,54 @@ export const checkSource = (source) => {
   return violations;
 };
 
+export const checkPackageExportMap = (packageName, packageExports, wildcardExceptions = []) => {
+  if (!packageExports || typeof packageExports !== 'object' || Array.isArray(packageExports)) {
+    return [];
+  }
+  return Object.keys(packageExports)
+    .filter(
+      (entrypoint) =>
+        entrypoint.includes('*') && !wildcardExceptions.includes(`${packageName}:${entrypoint}`),
+    )
+    .map(
+      (entrypoint) =>
+        `${packageName} architecture.no-wildcard-package-exports wildcard entrypoint ${entrypoint}`,
+    );
+};
+
+const checkPackageManifests = async (wildcardExceptions) => {
+  const packagesPath = resolve(repositoryRoot, 'packages');
+  const packageDirectories = await readdir(packagesPath, { withFileTypes: true });
+  const violations = [];
+  let packageCount = 0;
+  // A package surface exists only at a direct package.json; grouping folders such as tools are skipped.
+  for (const packageDirectory of packageDirectories) {
+    if (!packageDirectory.isDirectory()) {
+      continue;
+    }
+    const manifestPath = resolve(packagesPath, packageDirectory.name, 'package.json');
+    let manifestSource;
+    try {
+      manifestSource = await readFile(manifestPath, 'utf8');
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+        continue;
+      }
+      throw error;
+    }
+    packageCount += 1;
+    const packageManifest = JSON.parse(manifestSource);
+    violations.push(
+      ...checkPackageExportMap(
+        packageManifest.name || packageDirectory.name,
+        packageManifest.exports,
+        wildcardExceptions,
+      ),
+    );
+  }
+  return { packageCount, violations };
+};
+
 const parseFileArguments = (commandArguments) => {
   const filesIndex = commandArguments.indexOf('--files');
   if (filesIndex === -1) {
@@ -76,6 +127,7 @@ const parseFileArguments = (commandArguments) => {
 const main = async () => {
   const ruleCatalog = JSON.parse(await readFile(ruleCatalogPath, 'utf8'));
   const catalogViolations = validateRuleCatalog(ruleCatalog);
+  const packageCheck = await checkPackageManifests(ruleCatalog.packageExportWildcardExceptions);
   const sourcePaths = parseFileArguments(process.argv.slice(2));
   const sourceViolations = [];
 
@@ -93,14 +145,14 @@ const main = async () => {
     }
   }
 
-  const violations = [...catalogViolations, ...sourceViolations];
+  const violations = [...catalogViolations, ...packageCheck.violations, ...sourceViolations];
   if (violations.length > 0) {
     process.stderr.write(`${violations.join('\n')}\n`);
     process.exitCode = 1;
     return;
   }
   process.stdout.write(
-    `Code-style catalog valid${sourcePaths.length > 0 ? `; checked ${sourcePaths.length} file(s)` : ''}.\n`,
+    `Code-style catalog valid; checked ${packageCheck.packageCount} package surface(s)${sourcePaths.length > 0 ? ` and ${sourcePaths.length} file(s)` : ''}.\n`,
   );
 };
 

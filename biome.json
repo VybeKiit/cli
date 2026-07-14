@@ -201,6 +201,16 @@
       }
     },
     {
+      "includes": ["apps/componentLibrary/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUndeclaredDependencies": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/templates/web/instrumentation.ts"],
       "assist": {
         "enabled": false
