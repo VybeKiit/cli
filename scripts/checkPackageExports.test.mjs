@@ -21,8 +21,25 @@ describe('private package entrypoints', () => {
     ]);
   });
 
-  it.each(['deploy', 'db'])('%s exposes only its root contract', (packageName) => {
-    expect(readExportPaths(packageName)).toEqual(['.']);
+  it('exposes the deploy entrypoints used by its runtime self-imports', () => {
+    expect(readExportPaths('deploy')).toEqual([
+      '.',
+      './deployEffect',
+      './liveWork/githubPagesProvision',
+      './providers/aws',
+      './providers/cloudflare',
+      './providers/githubPages',
+      './providers/railway',
+      './providers/vercel',
+      './registrar/godaddy',
+      './registrar/namecheap',
+      './resolve',
+      './types',
+    ]);
+  });
+
+  it('exposes only the db root contract', () => {
+    expect(readExportPaths('db')).toEqual(['.']);
   });
 
   it.each(['auth', 'deploy', 'db'])('%s has no wildcard export', (packageName) => {
