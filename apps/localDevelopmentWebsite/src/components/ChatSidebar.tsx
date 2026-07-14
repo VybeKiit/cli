@@ -229,6 +229,7 @@ export const ChatSidebar = ({ activeId, onSelect }: ChatSidebarProps) => {
                     <div
                       data-testid="sessions-skeleton"
                       className="space-y-2 px-1 group-data-[collapsible=icon]:hidden"
+                      role="status"
                       aria-busy={true}
                       aria-label="Loading sessions"
                     >

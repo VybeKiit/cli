@@ -76,15 +76,16 @@ export const defaultWranglerCliRunner: WranglerCliRunner = async (args, options 
       stderr?: string;
       message?: string;
     };
+    let stderr = 'wrangler failed';
+    if (typeof err.stderr === 'string') {
+      stderr = err.stderr;
+    } else if (typeof err.message === 'string') {
+      stderr = err.message;
+    }
     return {
       code: typeof err.code === 'number' ? err.code : 1,
       stdout: typeof err.stdout === 'string' ? err.stdout : '',
-      stderr:
-        typeof err.stderr === 'string'
-          ? err.stderr
-          : typeof err.message === 'string'
-            ? err.message
-            : 'wrangler failed',
+      stderr,
     };
   }
 };

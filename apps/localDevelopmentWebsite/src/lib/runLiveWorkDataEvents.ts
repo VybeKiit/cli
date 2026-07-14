@@ -83,6 +83,7 @@ export const vendorFromScenario = (
   if (haystack.includes('railway')) {
     return 'railway';
   }
+  return undefined;
 };
 
 /**
@@ -108,6 +109,7 @@ export const paymentsVendorFromScenario = (
   if (haystack.includes('stripe')) {
     return 'stripe';
   }
+  return undefined;
 };
 
 /**
@@ -136,4 +138,5 @@ export const hostVendorFromScenario = (
   if (haystack.includes('cloudflare')) {
     return 'cloudflare';
   }
+  return undefined;
 };

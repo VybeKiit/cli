@@ -76,15 +76,16 @@ export const defaultVercelCliRunner: VercelCliRunner = async (args, options = {}
       stderr?: string;
       message?: string;
     };
+    let stderr = 'vercel failed';
+    if (typeof err.stderr === 'string') {
+      stderr = err.stderr;
+    } else if (typeof err.message === 'string') {
+      stderr = err.message;
+    }
     return {
       code: typeof err.code === 'number' ? err.code : 1,
       stdout: typeof err.stdout === 'string' ? err.stdout : '',
-      stderr:
-        typeof err.stderr === 'string'
-          ? err.stderr
-          : typeof err.message === 'string'
-            ? err.message
-            : 'vercel failed',
+      stderr,
     };
   }
 };
