@@ -6,13 +6,12 @@ import { ScaffoldError } from '../lib/scaffold';
 import { scaffoldKitWorkspace } from '../lib/scaffoldKitWorkspace';
 import { isInteractive } from '../prompts/tty';
 import {
+  CREATE_SURFACE_LIST_FLAGS,
+  CREATE_SURFACE_PROMPT_OPTIONS,
   type CreateSurface,
-  formatCreateError,
-  formatCreateSuccess,
-  formatCreateUsage,
   isCreateSurface,
-  surfaceToTemplate,
-} from './scaffoldOutput';
+} from './createSurfaceRegistry';
+import { formatCreateError, formatCreateSuccess, formatCreateUsage } from './scaffoldOutput';
 
 /**
  * Whether the destination is missing or empty so a failed scaffold may delete it.
@@ -44,46 +43,46 @@ export type CreateAppInputs = {
  * const parsed = parseCreateAppArgs(['--web', 'my-app']);
  */
 export const parseCreateAppArgs = (
-  args: readonly string[],
+  argumentsToParse: readonly string[],
 ):
   | { readonly ok: true; readonly inputs: CreateAppInputs }
   | { readonly ok: false; readonly error: string } => {
-  const surfaces: CreateSurface[] = [];
-  const positionals: string[] = [];
+  const selectedSurfaces: CreateSurface[] = [];
+  const destinationArguments: string[] = [];
 
-  for (const arg of args) {
-    if (arg === '--web' || arg === '--mobile' || arg === '--extension' || arg === '--backend') {
-      surfaces.push(arg.slice(2) as CreateSurface);
-      continue;
-    }
-    if (arg.startsWith('--')) {
+  // A create command selects exactly one buyer surface; all other flags fail before scaffolding.
+  for (const argument of argumentsToParse) {
+    const surfaceFlag = argument.startsWith('--') ? argument.slice(2) : '';
+    if (isCreateSurface(surfaceFlag)) {
+      selectedSurfaces.push(surfaceFlag);
+    } else if (argument.startsWith('--')) {
       return {
         ok: false,
-        error: `Unknown flag: ${arg}. Use --web, --mobile, --extension, or --backend.`,
+        error: `Unknown flag: ${argument}. Use ${CREATE_SURFACE_LIST_FLAGS}.`,
       };
+    } else {
+      destinationArguments.push(argument);
     }
-    positionals.push(arg);
   }
 
-  if (surfaces.length === 0) {
+  if (selectedSurfaces.length === 0) {
     return { ok: false, error: 'missing-surface' };
   }
-  if (surfaces.length > 1) {
+  if (selectedSurfaces.length > 1) {
     return {
       ok: false,
-      error: 'Pick one surface for now (--web, --mobile, --extension, or --backend).',
+      error: `Pick one surface for now (${CREATE_SURFACE_LIST_FLAGS}).`,
     };
   }
 
-  const surface = surfaces[0];
-  if (surface === undefined || !isCreateSurface(surface)) {
+  const [selectedSurface] = selectedSurfaces;
+  if (!selectedSurface) {
     return { ok: false, error: 'missing-surface' };
   }
 
-  const destPath =
-    positionals[0] !== undefined && positionals[0] !== '' ? positionals[0] : `./${surface}`;
+  const destinationPath = destinationArguments[0] || `./${selectedSurface}`;
 
-  return { ok: true, inputs: { surface, destPath } };
+  return { ok: true, inputs: { surface: selectedSurface, destPath: destinationPath } };
 };
 
 /**
@@ -98,12 +97,7 @@ export const promptCreateSurface = async (): Promise<CreateSurface | null> => {
   intro('VybeKiit — create an app');
   const picked = await select({
     message: 'What are you building?',
-    options: [
-      { value: 'web', label: 'Web app', hint: 'Next.js + dashboard + marketing' },
-      { value: 'mobile', label: 'Mobile app', hint: 'Expo' },
-      { value: 'extension', label: 'Browser extension', hint: 'WXT' },
-      { value: 'backend', label: 'Backend API', hint: 'Express + typed routes' },
-    ],
+    options: CREATE_SURFACE_PROMPT_OPTIONS,
   });
   if (isCancel(picked) || typeof picked !== 'string' || !isCreateSurface(picked)) {
     cancel('Cancelled.');
@@ -171,7 +165,7 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
   }
 
   const { destPath, surface } = parsed.inputs;
-  const template = surfaceToTemplate(surface);
+  const template = surface;
   const dest = resolve(process.cwd(), destPath);
   let cleanup: (() => Promise<void>) | undefined;
   /** Only wipe dest on failure when it was empty/missing before we wrote. */

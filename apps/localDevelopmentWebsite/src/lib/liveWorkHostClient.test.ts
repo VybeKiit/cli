@@ -1,5 +1,23 @@
-import { describe, expect, it } from 'vitest';
-import { shouldUseLiveWorkHost } from './liveWorkHostClient';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { postLiveWorkHost, shouldUseLiveWorkHost } from './liveWorkHostClient';
+
+afterEach(() => vi.unstubAllGlobals());
+
+it('returns a stable failure for a malformed API response', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(Response.json({ ok: true }))),
+  );
+
+  const apiResult = await postLiveWorkHost({});
+
+  expect(apiResult).toEqual({
+    ok: false,
+    code: 'invalid_response',
+    message: 'The local Live Work API returned an invalid response.',
+    events: [],
+  });
+});
 
 describe('shouldUseLiveWorkHost', () => {
   it('is false by default (fixture path)', () => {

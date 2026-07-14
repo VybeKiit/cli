@@ -152,12 +152,11 @@ const DOMAIN_META: Record<
 > = {
   auth: {
     title: (p) => (p.provider === 'google' ? 'Sign in with Google' : 'Add sign-in for your people'),
-    skillIntent: (p) =>
-      p.provider === 'google'
-        ? 'sign-in-with-google'
-        : p.provider === 'phone'
-          ? 'sign-in-with-phone'
-          : 'add-signin',
+    skillIntent: (p) => {
+      if (p.provider === 'google') return 'sign-in-with-google';
+      if (p.provider === 'phone') return 'sign-in-with-phone';
+      return 'add-signin';
+    },
     steps: AUTH_STEPS,
   },
   database: {

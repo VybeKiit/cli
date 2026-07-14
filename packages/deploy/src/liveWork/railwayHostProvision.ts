@@ -74,15 +74,16 @@ export const defaultRailwayHostCliRunner: RailwayHostCliRunner = async (args, op
       stderr?: string;
       message?: string;
     };
+    let stderr = 'railway failed';
+    if (typeof err.stderr === 'string') {
+      stderr = err.stderr;
+    } else if (typeof err.message === 'string') {
+      stderr = err.message;
+    }
     return {
       code: typeof err.code === 'number' ? err.code : 1,
       stdout: typeof err.stdout === 'string' ? err.stdout : '',
-      stderr:
-        typeof err.stderr === 'string'
-          ? err.stderr
-          : typeof err.message === 'string'
-            ? err.message
-            : 'railway failed',
+      stderr,
     };
   }
 };

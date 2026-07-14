@@ -8,6 +8,14 @@ const run = <A, E>(effect: Effect.Effect<A, E>): Promise<A> => Effect.runPromise
 
 const runExit = <A, E>(effect: Effect.Effect<A, E>) => Effect.runPromiseExit(effect);
 
+const verifiedDatabaseUrls: string[] = [];
+const verifyProvisioned = (provisioned: { readonly databaseUrl?: string }) => {
+  if (provisioned.databaseUrl) {
+    verifiedDatabaseUrls.push(provisioned.databaseUrl);
+  }
+  return Effect.succeed(true as const);
+};
+
 // "Data preference ladder exhausted" -> match end-of-ladder failure
 const LADDER_EXHAUSTED_PATTERN = /Data preference ladder exhausted/;
 
@@ -48,6 +56,7 @@ vi.mock('@neondatabase/serverless', () => ({
 
 describe('runDataLiveWork existing primary', () => {
   it('uses existing healthy DATABASE_URL without re-provisioning', async () => {
+    verifiedDatabaseUrls.length = 0;
     const steps = [failStep('supabase', 'should_not_run', 'hard_stop')];
     const writePin = vi.fn(() => Effect.void);
 
@@ -57,6 +66,7 @@ describe('runDataLiveWork existing primary', () => {
         env: { DATA_PROVIDER: 'neon', DATABASE_URL: 'postgresql://existing/db' },
         steps,
         writePin,
+        verifyProvisioned,
       }),
     );
 
@@ -66,11 +76,13 @@ describe('runDataLiveWork existing primary', () => {
     expect(result.verified).toBe(true);
     expect(result.pin.DATA_PROVIDER).toBe('neon');
     expect(writePin).toHaveBeenCalledOnce();
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://existing/db']);
   });
 });
 
 describe('runDataLiveWork ladder hop', () => {
   it('hops supabase missing_credentials → neon success', async () => {
+    verifiedDatabaseUrls.length = 0;
     const steps = [
       failStep('supabase', 'missing_credentials', 'missing_credentials'),
       okStep('neon'),
@@ -83,6 +95,7 @@ describe('runDataLiveWork ladder hop', () => {
         env: {},
         steps,
         preferExisting: false,
+        verifyProvisioned,
       }),
     );
 
@@ -93,9 +106,11 @@ describe('runDataLiveWork ladder hop', () => {
     expect(result.skipped).toEqual(['supabase']);
     expect(result.buyerMessage).toContain('Neon');
     expect(result.buyerMessage).not.toMatch(/free plan was full/);
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://test/db']);
   });
 
   it('hops on quota then pins the winner with auth companion', async () => {
+    verifiedDatabaseUrls.length = 0;
     const written: Record<string, string>[] = [];
     const steps = [
       failStep('supabase', 'quota_exceeded', 'quota', 'Free tier project limit'),
@@ -112,6 +127,7 @@ describe('runDataLiveWork ladder hop', () => {
           written.push(keys);
           return Effect.void;
         },
+        verifyProvisioned,
       }),
     );
 
@@ -124,9 +140,11 @@ describe('runDataLiveWork ladder hop', () => {
       AUTH_PROVIDER: 'better-auth',
       DATABASE_URL: 'postgresql://neon/winner',
     });
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://neon/winner']);
   });
 
   it('cleans orphans attached to hop failures (A10)', async () => {
+    verifiedDatabaseUrls.length = 0;
     const steps: DataLadderStep[] = [
       {
         provider: 'supabase',
@@ -154,15 +172,18 @@ describe('runDataLiveWork ladder hop', () => {
         env: {},
         steps,
         preferExisting: false,
+        verifyProvisioned,
       }),
     );
 
     expect(result.provider).toBe('neon');
     expect(result.hopped).toBe(true);
     expect(result.fromProvider).toBe('supabase');
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://neon/after-orphan']);
   });
 
   it('preserves explicit AUTH_PROVIDER on pin (A14)', async () => {
+    verifiedDatabaseUrls.length = 0;
     const written: Record<string, string>[] = [];
     const result = await run(
       runDataLiveWork({
@@ -174,12 +195,14 @@ describe('runDataLiveWork ladder hop', () => {
           written.push(keys);
           return Effect.void;
         },
+        verifyProvisioned,
       }),
     );
 
     expect(result.provider).toBe('neon');
     expect(written[0]?.AUTH_PROVIDER).toBeUndefined();
     expect(written[0]?.DATA_PROVIDER).toBe('neon');
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://test/db']);
   });
 });
 
@@ -241,6 +264,7 @@ describe('runDataLiveWork hard rules', () => {
   });
 
   it('starts at pin neon and does not retry supabase', async () => {
+    verifiedDatabaseUrls.length = 0;
     const tried: string[] = [];
     const steps: DataLadderStep[] = [
       {
@@ -276,10 +300,12 @@ describe('runDataLiveWork hard rules', () => {
         env: { DATA_PROVIDER: 'neon' },
         steps,
         preferExisting: false,
+        verifyProvisioned,
       }),
     );
 
     expect(result.provider).toBe('neon');
     expect(tried).toEqual(['neon']);
+    expect(verifiedDatabaseUrls).toEqual(['postgresql://pinned/db']);
   });
 });

@@ -4,14 +4,13 @@
 
 Never name MCP, tool ids, or package paths to the builder. Prefer **search → get** (slim pages, then detail).
 
-## Servers
+## Server
 
 | Server key | Package | Bin | Purpose |
 |------------|---------|-----|---------|
-| `vybekiit` | `@vybekiit/agent-mcp` | `vybekiit-agent-mcp` | Skills, CLI catalog, doctor tools, doc-fallback, browser automations |
-| `vybekiit-ui-catalog` | `@vybekiit/ui-catalog-mcp` | `vybekiit-ui-catalog-mcp` | Mirrored UI component search / blend |
+| `vybekiit` | `@vybekiit/agent-mcp` | `vybekiit-agent-mcp` | Skills, CLI catalog, doctor tools, doc-fallback, browser automations, mirrored UI catalog |
 
-Snippets: `.vybekiit/agent/mcp-agent.json`, `mcp-ui-catalog.json`. Setup: `.vybekiit/agent/mcp-setup.md`.
+Snippet: `.vybekiit/agent/mcp-agent.json`. Setup: `.vybekiit/agent/mcp-setup.md`.
 Auto-discovered skill: `.agents/skills/use-kit-mcp/SKILL.md`.
 
 ## Env
@@ -22,13 +21,13 @@ Auto-discovered skill: `.agents/skills/use-kit-mcp/SKILL.md`.
 | `VYBEKIIT_UI_CATALOG_PATH` | Path to `ui-catalog-index.json` |
 | `VYBEKIIT_AUTOMATE_BIN` | Optional absolute path to `vybekiit-automate` |
 
-## Context controls (both servers)
+## Context controls
 
 - Cursor pagination: `limit` / `cursor` / response `nextCursor` + `hasMore` + `total`
 - Prefer slim rows; request full detail only when needed (`fields=slim|full` on UI tools)
 - Automations: `run_automation({ dryRun: true })` before a real browser session
 
-## Server: `vybekiit`
+## Tools
 
 | Tool | Description | Required | Optional | When to use |
 |------|-------------|----------|----------|-------------|
@@ -42,12 +41,7 @@ Auto-discovered skill: `.agents/skills/use-kit-mcp/SKILL.md`.
 | `doc_fallback` | Official docs + env key hints. Never name MCP to the builder — use builderMessage. | techId | — | MCP or first debug failed once; same as `vybekiit doc-fallback <tech-id>`. |
 | `search_automations` | Fuzzy-search vybekiit-automate browser verbs (ls, cws, nc, …). Paginated. | query | limit, cursor | Before run_automation; empty query lists the catalog. |
 | `get_automation` | Get one automation by domain (+ command) or id (`ls:setup`). | domain | command | Inspect usage string for a known domain/verb. |
-| `run_automation` | Run vybekiit-automate from any project root (resolves bin). Always --json. Prefer dryRun first. | domain, command | args, dryRun, yes, cdp, profile, timeoutMs | Execute browser automations anywhere; dryRun=true to preview argv only. |
-
-## Server: `vybekiit-ui-catalog`
-
-| Tool | Description | Required | Optional | When to use |
-|------|-------------|----------|----------|-------------|
+| `run_automation` | Run vybekiit-automate from any project root (resolves bin). Always --json. Prefer dryRun first. Google redirect_uri_mismatch → domain=google command=oauth with --redirect incl. localhost. | domain, command | args, dryRun, yes, cdp, profile, timeoutMs | Execute browser automations anywhere; OAuth 400 redirect_uri_mismatch; dryRun=true to preview argv only. |
 | `search_ui_components` | Fuzzy-search mirrored UI components. Page envelope; default fields=slim. | query | source, limit, cursor, fields | Find blocks by intent/name; slim first, then get_ui_component. |
 | `get_ui_component` | Get one mirrored component by source namespace + slug. | source, name | — | Full detail after search_ui_components. |
 | `suggest_ui_blend` | Ranked multi-source component suggestions for a natural-language UI intent. | intent | limit | Builder wants a composed look (hero + pricing + marquee, …). |
@@ -59,6 +53,14 @@ Auto-discovered skill: `.agents/skills/use-kit-mcp/SKILL.md`.
 search_automations({ query: "lemon squeezy" })
 run_automation({ domain: "ls", command: "setup", dryRun: true })
 run_automation({ domain: "ls", command: "standby" })
+// Google Error 400 redirect_uri_mismatch / Auth.js localhost — args only, no Console babysitting:
+search_automations({ query: "redirect_uri_mismatch" })
+run_automation({ domain: "google", command: "oauth", args: [
+  "--project=my-app", "--app-name=MyApp", "--support-email=you@gmail.com",
+  "--app-url=https://example.com",
+  "--redirect=https://example.com/api/auth/callback/google",
+  "--redirect=http://localhost:3000/api/auth/callback/google",
+]})
 ```
 
 Shell equivalent:
@@ -66,12 +68,13 @@ Shell equivalent:
 ```
 vybekiit-automate catalog --json
 vybekiit-automate ls standby --json --yes
+vybekiit-automate google oauth --project=... --app-name=... --support-email=... --app-url=... --redirect=... --json
 ```
 
 ## Wire-up (agents)
 
-1. After `pnpm build` (or package dist present), merge `mcp-agent.json` + `mcp-ui-catalog.json` into the client config (see `mcp-setup.md`).
-2. `create app` and kit workspaces always ship `@vybekiit/agent-mcp`, `@vybekiit/ui-catalog-mcp`, and `@vybekiit/browser-automation` under `packages/`.
+1. After `pnpm build` (or package dist present), merge `mcp-agent.json` into the client config (see `mcp-setup.md`).
+2. `create app` and kit workspaces always ship `@vybekiit/agent-mcp` and `@vybekiit/browser-automation` under `packages/` (UI catalog tools are served by the same `vybekiit` server).
 3. Project `.cursor/mcp.json` is written on scaffold (surface layout). Kit root also gets a kit-root layout config.
 4. Doctor may merge core third-party MCPs; first-party entries are preserved when already present.
 

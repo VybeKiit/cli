@@ -9,8 +9,8 @@ export const FIRST_PARTY_MCP_PACKAGES = [
   '@vybekiit/browser-automation',
 ] as const;
 
-/** First-party MCP server ids (Cursor / Claude / Codex config keys). */
-export type FirstPartyMcpServerId = 'vybekiit' | 'vybekiit-ui-catalog';
+/** First-party MCP server id (Cursor / Claude / Codex config key). One server ships all tools. */
+export type FirstPartyMcpServerId = 'vybekiit';
 
 /** One documented MCP tool. */
 export type McpToolCatalogEntry = {
@@ -154,7 +154,7 @@ export const FIRST_PARTY_MCP_TOOLS: readonly McpToolCatalogEntry[] = [
   },
   {
     name: 'search_ui_components',
-    server: 'vybekiit-ui-catalog',
+    server: 'vybekiit',
     description: 'Fuzzy-search mirrored UI components. Page envelope; default fields=slim.',
     requiredParams: ['query'],
     optionalParams: ['source', 'limit', 'cursor', 'fields'],
@@ -162,7 +162,7 @@ export const FIRST_PARTY_MCP_TOOLS: readonly McpToolCatalogEntry[] = [
   },
   {
     name: 'get_ui_component',
-    server: 'vybekiit-ui-catalog',
+    server: 'vybekiit',
     description: 'Get one mirrored component by source namespace + slug.',
     requiredParams: ['source', 'name'],
     optionalParams: [],
@@ -170,7 +170,7 @@ export const FIRST_PARTY_MCP_TOOLS: readonly McpToolCatalogEntry[] = [
   },
   {
     name: 'suggest_ui_blend',
-    server: 'vybekiit-ui-catalog',
+    server: 'vybekiit',
     description: 'Ranked multi-source component suggestions for a natural-language UI intent.',
     requiredParams: ['intent'],
     optionalParams: ['limit'],
@@ -178,7 +178,7 @@ export const FIRST_PARTY_MCP_TOOLS: readonly McpToolCatalogEntry[] = [
   },
   {
     name: 'list_ui_sources',
-    server: 'vybekiit-ui-catalog',
+    server: 'vybekiit',
     description: 'List mirrored UI source namespaces and component counts.',
     requiredParams: [],
     optionalParams: [],
@@ -198,13 +198,10 @@ export const FIRST_PARTY_MCP_TOOLS: readonly McpToolCatalogEntry[] = [
 export const firstPartyMcpBinPath = (
   packageFolder: 'agentMcp',
   layout: FirstPartyMcpPathLayout,
-  bin: 'agent' | 'ui-catalog' = 'agent',
-): string => {
-  const file = bin === 'ui-catalog' ? 'uiCatalog/bin.js' : 'bin.js';
-  return layout === 'kit-root'
-    ? `packages/${packageFolder}/dist/${file}`
-    : `../../packages/${packageFolder}/dist/${file}`;
-};
+): string =>
+  layout === 'kit-root'
+    ? `packages/${packageFolder}/dist/bin.js`
+    : `../../packages/${packageFolder}/dist/bin.js`;
 
 /**
  * Build first-party MCP server config for a path layout.
@@ -235,14 +232,7 @@ export const buildFirstPartyMcpConfig = (
         args: [firstPartyMcpBinPath('agentMcp', layout)],
         env: {
           VYBEKIIT_PROJECT_ROOT: projectRoot,
-        },
-      },
-      'vybekiit-ui-catalog': {
-        command: 'node',
-        args: [firstPartyMcpBinPath('agentMcp', layout, 'ui-catalog')],
-        env: {
           VYBEKIIT_UI_CATALOG_PATH: catalogPath,
-          VYBEKIIT_PROJECT_ROOT: projectRoot,
         },
       },
     },
@@ -280,8 +270,6 @@ const formatToolRow = (tool: McpToolCatalogEntry): string => {
  * renderMcpToolsPlatformSkill();
  */
 export const renderMcpToolsPlatformSkill = (): string => {
-  const agentTools = FIRST_PARTY_MCP_TOOLS.filter((tool) => tool.server === 'vybekiit');
-  const uiTools = FIRST_PARTY_MCP_TOOLS.filter((tool) => tool.server === 'vybekiit-ui-catalog');
   const lines = [
     '# Platform wrapper: kit MCP tools',
     '',
@@ -289,14 +277,13 @@ export const renderMcpToolsPlatformSkill = (): string => {
     '',
     'Never name MCP, tool ids, or package paths to the builder. Prefer **search → get** (slim pages, then detail).',
     '',
-    '## Servers',
+    '## Server',
     '',
     '| Server key | Package | Bin | Purpose |',
     '|------------|---------|-----|---------|',
-    '| `vybekiit` | `@vybekiit/agent-mcp` | `vybekiit-agent-mcp` | Skills, CLI catalog, doctor tools, doc-fallback, browser automations |',
-    '| `vybekiit-ui-catalog` | `@vybekiit/agent-mcp` | `vybekiit-ui-catalog-mcp` | Mirrored UI component search / blend |',
+    '| `vybekiit` | `@vybekiit/agent-mcp` | `vybekiit-agent-mcp` | Skills, CLI catalog, doctor tools, doc-fallback, browser automations, mirrored UI catalog |',
     '',
-    'Snippets: `.vybekiit/agent/mcp-agent.json`, `mcp-ui-catalog.json`. Setup: `.vybekiit/agent/mcp-setup.md`.',
+    'Snippet: `.vybekiit/agent/mcp-agent.json`. Setup: `.vybekiit/agent/mcp-setup.md`.',
     'Auto-discovered skill: `.agents/skills/use-kit-mcp/SKILL.md`.',
     '',
     '## Env',
@@ -307,23 +294,17 @@ export const renderMcpToolsPlatformSkill = (): string => {
     '| `VYBEKIIT_UI_CATALOG_PATH` | Path to `ui-catalog-index.json` |',
     '| `VYBEKIIT_AUTOMATE_BIN` | Optional absolute path to `vybekiit-automate` |',
     '',
-    '## Context controls (both servers)',
+    '## Context controls',
     '',
     '- Cursor pagination: `limit` / `cursor` / response `nextCursor` + `hasMore` + `total`',
     '- Prefer slim rows; request full detail only when needed (`fields=slim|full` on UI tools)',
     '- Automations: `run_automation({ dryRun: true })` before a real browser session',
     '',
-    '## Server: `vybekiit`',
+    '## Tools',
     '',
     '| Tool | Description | Required | Optional | When to use |',
     '|------|-------------|----------|----------|-------------|',
-    ...agentTools.map(formatToolRow),
-    '',
-    '## Server: `vybekiit-ui-catalog`',
-    '',
-    '| Tool | Description | Required | Optional | When to use |',
-    '|------|-------------|----------|----------|-------------|',
-    ...uiTools.map(formatToolRow),
+    ...FIRST_PARTY_MCP_TOOLS.map(formatToolRow),
     '',
     '## Browser automations (from any folder)',
     '',
@@ -351,8 +332,8 @@ export const renderMcpToolsPlatformSkill = (): string => {
     '',
     '## Wire-up (agents)',
     '',
-    '1. After `pnpm build` (or package dist present), merge `mcp-agent.json` + `mcp-ui-catalog.json` into the client config (see `mcp-setup.md`).',
-    '2. `create app` and kit workspaces always ship `@vybekiit/agent-mcp` and `@vybekiit/browser-automation` under `packages/` (UI catalog is a second bin of agent-mcp).',
+    '1. After `pnpm build` (or package dist present), merge `mcp-agent.json` into the client config (see `mcp-setup.md`).',
+    '2. `create app` and kit workspaces always ship `@vybekiit/agent-mcp` and `@vybekiit/browser-automation` under `packages/` (UI catalog tools are served by the same `vybekiit` server).',
     '3. Project `.cursor/mcp.json` is written on scaffold (surface layout). Kit root also gets a kit-root layout config.',
     '4. Doctor may merge core third-party MCPs; first-party entries are preserved when already present.',
     '',
@@ -392,7 +373,7 @@ export const renderUseKitMcpSkillMd = (): string => {
     '',
     '# Skill: use-kit-mcp',
     '',
-    '**Goal (agent-only):** know and use every MCP tool shipped with VybeKiit — locally as this file, or live via the `vybekiit` / `vybekiit-ui-catalog` MCP servers.',
+    '**Goal (agent-only):** know and use every MCP tool shipped with VybeKiit — locally as this file, or live via the `vybekiit` MCP server.',
     '',
     body,
     '',

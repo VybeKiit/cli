@@ -37,6 +37,8 @@ export type RunDataLiveWorkOptions = {
   readonly fetchImpl?: typeof fetch;
   /** Injectable steps (defaults to package adapters). */
   readonly steps?: readonly DataLadderStep[];
+  /** Injectable readiness check for deterministic orchestration tests. */
+  readonly verifyProvisioned?: typeof verifyProvisionedData;
   /**
    * Write pin keys to root `.env` (doctor-secure path). When omitted, keys are
    * returned on the result only — caller must persist.
@@ -205,6 +207,7 @@ const walkLadder = (
   namedStick: boolean,
   writePin: FinishArgs['writePin'],
   existingAuthProvider: string | undefined,
+  verifyProvisioned: typeof verifyProvisionedData,
 ): Effect.Effect<DataLiveWorkResult, LiveWorkError> =>
   Effect.gen(function* () {
     const stepByProvider = new Map(steps.map((step) => [step.provider, step]));
@@ -222,7 +225,7 @@ const walkLadder = (
         const attempt = yield* step.tryProvision(ctx).pipe(Effect.either);
         if (attempt._tag === 'Right') {
           const provisioned = attempt.right;
-          const verified = yield* verifyProvisionedData(provisioned).pipe(Effect.either);
+          const verified = yield* verifyProvisioned(provisioned).pipe(Effect.either);
           if (verified._tag === 'Left') {
             // Partial resource + failed ready-check — clean ephemeral, then stop (verify is hard_stop).
             orphans.push(orphanFromProvisioned(provisioned, 'verify failed'));
@@ -293,6 +296,7 @@ export const runDataLiveWork = (
   Effect.gen(function* () {
     const env = options.env ?? {};
     const preferExisting = options.preferExisting !== false;
+    const verifyProvisioned = options.verifyProvisioned || verifyProvisionedData;
     let existingAuthProvider: string | undefined;
     if (typeof env.AUTH_PROVIDER === 'string' && env.AUTH_PROVIDER.length > 0) {
       existingAuthProvider = env.AUTH_PROVIDER;
@@ -301,7 +305,7 @@ export const runDataLiveWork = (
     if (preferExisting && options.namedVendor === undefined) {
       const existing = detectExistingPrimary(env);
       if (existing !== null) {
-        yield* verifyProvisionedData(existing);
+        yield* verifyProvisioned(existing);
         return yield* finishSuccess({
           provisioned: existing,
           hopped: false,
@@ -331,5 +335,6 @@ export const runDataLiveWork = (
       options.namedVendor !== undefined && options.namedVendor !== null,
       options.writePin,
       existingAuthProvider,
+      verifyProvisioned,
     );
   });

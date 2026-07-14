@@ -1,18 +1,4 @@
-import type { TemplateName } from '../lib/scaffold';
-
-/** App surfaces buyers can create via `create app`. */
-export type CreateSurface = 'web' | 'mobile' | 'extension' | 'backend';
-
-/**
- * Check whether a template name is a buyer create-app surface.
- *
- * @param value - Candidate surface id.
- * @returns True when the value is web, mobile, extension, or backend.
- * @example
- * isCreateSurface('web');
- */
-export const isCreateSurface = (value: string): value is CreateSurface =>
-  value === 'web' || value === 'mobile' || value === 'extension' || value === 'backend';
+import { CREATE_SURFACES, type CreateSurface } from './createSurfaceRegistry';
 
 /**
  * Build the post-create success lines for a scaffolded app.
@@ -52,19 +38,6 @@ export const formatCreateError = (message: string): readonly string[] => [`❌ $
  */
 export const formatCreateUsage = (): readonly string[] => [
   'Pick one surface for your app:',
-  '  vybekiit create app --web [directory]',
-  '  vybekiit create app --mobile [directory]',
-  '  vybekiit create app --extension [directory]',
-  '  vybekiit create app --backend [directory]',
+  ...CREATE_SURFACES.map((surface) => `  vybekiit create app --${surface.id} [directory]`),
   '',
 ];
-
-/**
- * Map a create surface to the template name used by scaffold.
- *
- * @param surface - Buyer create-app surface.
- * @returns Template name for scaffold and mirror clone.
- * @example
- * const template = surfaceToTemplate('web');
- */
-export const surfaceToTemplate = (surface: CreateSurface): TemplateName => surface;

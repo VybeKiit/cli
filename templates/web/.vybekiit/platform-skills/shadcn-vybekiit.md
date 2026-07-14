@@ -6,7 +6,7 @@
 
 - Docs: https://ui.shadcn.com
 - MCP: shadcn/ui component search at edit time when available
-- **VybeKiit catalog MCP:** `.vybekiit/agent/mcp-ui-catalog.json` — search 474+ mirrored blocks across BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack
+- **VybeKiit catalog MCP:** UI catalog tools in `.vybekiit/agent/mcp-agent.json` (server `vybekiit`) — search 474+ mirrored blocks across BundUI, Magic UI, Kokonut, Aceternity, Untitled, Gluestack
 - Block catalog: `.vybekiit/agent/ui-sources.md`
 - Intent routing: `ui-routing-vybekiit.md`
 

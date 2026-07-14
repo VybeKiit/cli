@@ -1,17 +1,11 @@
+import type { AgentId } from '@/daemon/contract';
+
 /**
  * Canonical agent registry for the local development console.
  * Launch/resume commands open the real CLI in the user's terminal.
  */
 
-export type AgentId =
-  | 'kiro'
-  | 'claude-code'
-  | 'cursor'
-  | 'gemini'
-  | 'codex'
-  | 'kimi'
-  | 'grok'
-  | 'devin';
+export type { AgentId } from '@/daemon/contract';
 
 export type AgentDefinition = {
   readonly id: AgentId;

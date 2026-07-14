@@ -197,6 +197,7 @@ export const resolveProviderBrand = (
     const brandKey = DOMAIN_DEFAULT_BRAND[domain];
     return BRANDS[brandKey];
   }
+  return undefined;
 };
 
 /**
@@ -242,6 +243,17 @@ export type ProviderMarkProps = {
   readonly className?: string;
 };
 
+/** Border + opacity classes for the mark's active / running / idle state. */
+const markStateClass = (active: boolean, running: boolean): string => {
+  if (active) {
+    return 'border-transparent opacity-100';
+  }
+  if (running) {
+    return 'border-border/80 opacity-90';
+  }
+  return 'border-border/60 opacity-70 grayscale';
+};
+
 /**
  * Dynamic brand logo for the action in progress (Neon, Stripe, LS, Cloudflare, …).
  *
@@ -273,11 +285,7 @@ export const ProviderMark = ({
       data-running={running ? 'true' : 'false'}
       className={cn(
         'inline-flex items-center gap-2 rounded-xl border px-2 py-1.5 transition-all duration-500',
-        active
-          ? 'border-transparent opacity-100'
-          : running
-            ? 'border-border/80 opacity-90'
-            : 'border-border/60 opacity-70 grayscale',
+        markStateClass(active, running),
         className,
       )}
       style={

@@ -21,10 +21,10 @@ import { cookieFrom, type Loopback, startLoopback } from '../support/loopback.js
 const DEV_USER = { id: 'local-dev-user', email: 'you@local.dev' } as const;
 /** Session cookie name shared with the web/mobile templates. */
 const SESSION_COOKIE = 'vk_session';
-/** Fixed session token the local adapter issues (`LOCAL_DEV_SESSION_TOKEN`). */
-const DEV_SESSION_TOKEN = 'local-dev-session';
+/** Fixed session value the local adapter issues (`LOCAL_DEV_SESSION_TOKEN`). */
+const EXPECTED_SESSION_VALUE = 'local-dev-session';
 /** `name=value` pair a session-issuing route is expected to set. */
-const SESSION_SET = `${SESSION_COOKIE}=${DEV_SESSION_TOKEN}`;
+const SESSION_SET = `${SESSION_COOKIE}=${EXPECTED_SESSION_VALUE}`;
 
 /** Look up a registered route's response Schema by operation id. */
 const responseSchemaFor = (operationId: string): Schema.Schema.AnyNoContext => {

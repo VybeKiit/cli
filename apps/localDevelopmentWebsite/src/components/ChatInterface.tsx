@@ -29,7 +29,7 @@ export const ChatInterface = () => {
   const activeAgentId = useAgentStore((s) => s.activeAgentId);
   const agentsMap = useAgentStore((s) => s.agents);
   const activeAgent = agentsMap[activeAgentId];
-  useDaemon();
+  const daemon = useDaemon();
   useInstalledAgents();
 
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -124,7 +124,12 @@ export const ChatInterface = () => {
 
               <div className="border-t border-border bg-background px-4 py-4 sm:px-6">
                 <div className="mx-auto w-full max-w-3xl">
-                  <ChatInput conversationId={activeId} disabled={!activeConversation} />
+                  <ChatInput
+                    conversationId={activeId}
+                    disabled={!activeConversation}
+                    onSend={daemon.sendPrompt}
+                    daemonConnected={daemon.status === 'connected'}
+                  />
                 </div>
               </div>
             </div>

@@ -71,15 +71,16 @@ export const defaultRailwayCliRunner: RailwayCliRunner = async (args, options = 
       message?: string;
     };
     const exitCode = typeof err.code === 'number' ? err.code : 1;
+    let stderr = 'railway failed';
+    if (typeof err.stderr === 'string') {
+      stderr = err.stderr;
+    } else if (typeof err.message === 'string') {
+      stderr = err.message;
+    }
     return {
       code: exitCode,
       stdout: typeof err.stdout === 'string' ? err.stdout : '',
-      stderr:
-        typeof err.stderr === 'string'
-          ? err.stderr
-          : typeof err.message === 'string'
-            ? err.message
-            : 'railway failed',
+      stderr,
     };
   }
 };

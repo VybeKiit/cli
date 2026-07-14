@@ -189,12 +189,18 @@ function evaluate(data, budgets, strict) {
 
   const scoreFailed = labScore !== null && labScore < budgets.performanceScore;
   const passed = !(scoreFailed || rows.some((row) => row.failed));
+  let fieldOrigin = 'lab-only';
+  if (urlField) {
+    fieldOrigin = 'this-url';
+  } else if (originField) {
+    fieldOrigin = 'origin';
+  }
   return {
     labScore,
     rows,
     scoreFailed,
     passed,
-    fieldOrigin: urlField ? 'this-url' : originField ? 'origin' : 'lab-only',
+    fieldOrigin,
   };
 }
 
@@ -208,7 +214,12 @@ function renderReport(result, meta) {
   );
   lines.push(`Real-user Core Web Vitals (source: ${result.fieldOrigin}):`);
   for (const row of result.rows) {
-    const flag = row.failed ? '  ✗ FAIL' : row.rating === 'needs-improvement' ? '  ! warn' : '';
+    let flag = '';
+    if (row.failed) {
+      flag = '  ✗ FAIL';
+    } else if (row.rating === 'needs-improvement') {
+      flag = '  ! warn';
+    }
     const proxy = row.proxy ? ' [lab TBT proxy]' : '';
     const budget = `budget ${row.cls ? '≤ ' : '≤ '}${formatValue(row, row.budget)}`;
     lines.push(

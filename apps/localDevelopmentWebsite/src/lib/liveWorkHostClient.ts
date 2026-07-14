@@ -1,40 +1,38 @@
+import { Effect, Schema } from 'effect';
+import {
+  decodeLiveWorkApiResponse,
+  LiveWorkApiFailureSchema,
+  LiveWorkEventSchema,
+} from './liveWorkApiResponse';
+
 /**
  * Browser client for real host Live work (ADR-0039).
  * Calls the Next API route; never receives host API tokens.
  */
 
-export type LiveWorkHostApiSuccess = {
-  readonly ok: true;
-  readonly provider: string;
-  readonly ephemeral: boolean;
-  readonly hopped: boolean;
-  readonly fromProvider?: string;
-  readonly skipped: readonly string[];
-  readonly verified: true;
-  readonly buyerMessage: string;
-  readonly pinKeys: readonly string[];
-  readonly pinned: boolean;
-  readonly tornDown?: boolean;
-  readonly url?: string;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkHostApiSuccessSchema = Schema.Struct({
+  ok: Schema.Literal(true),
+  provider: Schema.String,
+  ephemeral: Schema.Boolean,
+  hopped: Schema.Boolean,
+  fromProvider: Schema.optional(Schema.String),
+  skipped: Schema.Array(Schema.String),
+  verified: Schema.Literal(true),
+  buyerMessage: Schema.String,
+  pinKeys: Schema.Array(Schema.String),
+  pinned: Schema.Boolean,
+  tornDown: Schema.optional(Schema.Boolean),
+  url: Schema.optional(Schema.String),
+  events: Schema.Array(LiveWorkEventSchema),
+});
 
-export type LiveWorkHostApiFailure = {
-  readonly ok: false;
-  readonly code: string;
-  readonly message: string;
-  readonly hopClass?: string;
-  readonly provider?: string;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkHostApiResultSchema = Schema.Union(
+  LiveWorkHostApiSuccessSchema,
+  LiveWorkApiFailureSchema,
+);
+
+export type LiveWorkHostApiSuccess = Schema.Schema.Type<typeof LiveWorkHostApiSuccessSchema>;
+export type LiveWorkHostApiFailure = Schema.Schema.Type<typeof LiveWorkApiFailureSchema>;
 
 export type LiveWorkHostApiResult = LiveWorkHostApiSuccess | LiveWorkHostApiFailure;
 
@@ -44,7 +42,7 @@ export type LiveWorkHostApiResult = LiveWorkHostApiSuccess | LiveWorkHostApiFail
  * @param options - Mode and optional named vendor stick.
  * @returns Public JSON (no API tokens).
  * @example
- * const result = await postLiveWorkHost({ mode: 'demo', vendor: 'cloudflare' });
+ * const apiResult = await postLiveWorkHost({ mode: 'demo', vendor: 'cloudflare' });
  */
 export const postLiveWorkHost = async (options: {
   readonly mode?: 'demo' | 'dogfood' | 'buyer';
@@ -61,8 +59,8 @@ export const postLiveWorkHost = async (options: {
     }),
   });
 
-  const body = (await response.json()) as LiveWorkHostApiResult;
-  return body;
+  const responseBody: unknown = await response.json();
+  return Effect.runPromise(decodeLiveWorkApiResponse(responseBody, LiveWorkHostApiResultSchema));
 };
 
 /**

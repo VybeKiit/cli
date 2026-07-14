@@ -22,6 +22,10 @@ type ChatInputProps = {
   conversationId: string | null;
   disabled?: boolean;
   onAgentSwitch?: () => void;
+  /** Stream the turn through the daemon; returns false when it isn't connected. */
+  onSend?: (conversationId: string, content: string) => boolean;
+  /** Whether the daemon is connected (prefer streaming over the terminal). */
+  daemonConnected?: boolean;
 };
 
 /**
@@ -230,7 +234,13 @@ const AgentPicker = ({ onSwitch }: { onSwitch: () => void }) => {
  * @example
  * const element = <ChatInput conversationId="local-1" onAgentSwitch={refreshSessions} />;
  */
-export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: ChatInputProps) => {
+export const ChatInput = ({
+  conversationId,
+  disabled = false,
+  onAgentSwitch,
+  onSend,
+  daemonConnected = false,
+}: ChatInputProps) => {
   const [text, setText] = useState('');
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -282,6 +292,13 @@ export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: C
         return;
       }
 
+      // Preferred path: stream the agent inside the browser via the daemon —
+      // no terminal window, the conversation stays in the tab.
+      if (daemonConnected && onSend !== undefined && onSend(conversationId, trimmed)) {
+        setIsSending(false);
+        return;
+      }
+
       if (seeded.length > 0) {
         addMessage(conversationId, {
           role: 'agent',
@@ -289,7 +306,7 @@ export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: C
         });
       }
 
-      // Open the real agent CLI with this prompt so the message actually reaches the agent.
+      // Fallback (daemon down): open the real agent CLI in a terminal.
       try {
         const res = await fetch('/api/agents/launch', {
           method: 'POST',
@@ -343,6 +360,8 @@ export const ChatInput = ({ conversationId, disabled = false, onAgentSwitch }: C
       seedFromMessage,
       applyTool,
       setSimulating,
+      onSend,
+      daemonConnected,
     ],
   );
 

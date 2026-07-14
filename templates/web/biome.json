@@ -31,6 +31,7 @@
       "!!**/src/components/supabase",
       "!!**/src/registry",
       "!!**/public/catalog.json",
+      "!!**/public/catalog",
       "!!**/public/logos"
     ]
   },

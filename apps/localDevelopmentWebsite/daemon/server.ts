@@ -1,114 +1,128 @@
-import { WebSocketServer } from 'ws';
-import { type AgentProcess, sendToAgent, spawnClaude, spawnGemini, stopAgent } from './agents';
-import type { AgentId, ClientMessage, DaemonMessage } from './protocol';
+import { mkdirSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import { type WebSocket, WebSocketServer } from 'ws';
+import type { AgentId, ClientMessage, DaemonMessage } from '@/daemon/contract';
+import { type Agent, createClaudeAgent } from './agents';
 
 const PORT = 3006;
-const sessions = new Map<string, AgentProcess>();
 
-const wss = new WebSocketServer({ port: PORT });
-const writeInfo = (message: string): void => {
-  process.stdout.write(`${message}\n`);
-};
-
-const send = (ws: import('ws').WebSocket, msg: DaemonMessage) => {
+/**
+ * Send a typed message to a client when its socket is open.
+ *
+ * @param ws - Target socket.
+ * @param msg - Message to serialize.
+ * @returns Nothing.
+ */
+const send = (ws: WebSocket, daemonMessage: DaemonMessage): void => {
   if (ws.readyState === ws.OPEN) {
-    ws.send(JSON.stringify(msg));
+    ws.send(JSON.stringify(daemonMessage));
   }
 };
 
-const spawnAgent = (ws: import('ws').WebSocket, agentId: AgentId) => {
-  const onOutput = (chunk: string) => {
-    const session = [...sessions.values()].find((s) => s.id === agentId);
-    if (session) {
-      send(ws, { type: 'agent.output', sessionId: session.sessionId, chunk });
+/**
+ * Directory the agent builds in. Defaults to a dedicated `~/vybekiit-agent-workspace`
+ * (created on demand) so an autonomous agent never edits the kit repo itself;
+ * override with `VYBEKIIT_AGENT_CWD` to point at a specific project.
+ *
+ * @returns Absolute working directory for agent turns.
+ */
+const resolveAgentCwd = (): string => {
+  const agentWorkingDirectory =
+    process.env.VYBEKIIT_AGENT_CWD || join(homedir(), 'vybekiit-agent-workspace');
+  mkdirSync(agentWorkingDirectory, { recursive: true });
+  return agentWorkingDirectory;
+};
+
+/**
+ * Build a streaming agent for the given id, or null when one isn't wired yet.
+ *
+ * @param id - Requested agent id.
+ * @param cwd - Working directory for the agent.
+ * @returns An {@link Agent}, or null.
+ */
+const createAgent = (id: AgentId, cwd: string): Agent | null =>
+  id === 'claude-code' ? createClaudeAgent(cwd) : null;
+
+/**
+ * Wire one client connection: one agent (conversation) per socket.
+ *
+ * @param ws - The connected socket.
+ * @returns Nothing.
+ */
+const handleConnection = (ws: WebSocket): void => {
+  let agent: Agent | null = null;
+
+  const runTurn = (id: AgentId, content: string): void => {
+    if (agent === null) {
+      agent = createAgent(id, resolveAgentCwd());
     }
-  };
-
-  const onExit = (code: number | null) => {
-    const session = [...sessions.values()].find((s) => s.id === agentId);
-    if (session) {
-      sessions.delete(session.sessionId);
-      send(ws, { type: 'agent.status', sessionId: session.sessionId, status: 'idle' });
-    }
-  };
-
-  let agent: AgentProcess;
-
-  switch (agentId) {
-    case 'claude-code':
-      agent = spawnClaude(onOutput, onExit);
-      break;
-    case 'gemini':
-      agent = spawnGemini(onOutput, onExit);
-      break;
-    default:
-      send(ws, { type: 'error', message: `Agent "${agentId}" not yet supported` });
+    if (agent === null) {
+      send(ws, { type: 'error', message: `Agent "${id}" is not available in streaming mode yet.` });
+      send(ws, { type: 'agent.status', status: 'idle' });
       return;
-  }
-
-  sessions.set(agent.sessionId, agent);
-  send(ws, { type: 'agent.status', sessionId: agent.sessionId, status: 'running' });
-};
-
-const route = (ws: import('ws').WebSocket, msg: ClientMessage) => {
-  switch (msg.type) {
-    case 'agent.spawn':
-      spawnAgent(ws, msg.agent);
-      break;
-
-    case 'agent.stop': {
-      const session = sessions.get(msg.sessionId);
-      if (session) {
-        stopAgent(session);
-        sessions.delete(msg.sessionId);
-        send(ws, { type: 'agent.status', sessionId: msg.sessionId, status: 'idle' });
-      } else {
-        send(ws, { type: 'error', message: `No session "${msg.sessionId}"` });
-      }
-      break;
     }
-
-    case 'agent.send': {
-      const session = sessions.get(msg.sessionId);
-      if (session) {
-        sendToAgent(session, msg.content);
-      } else {
-        send(ws, { type: 'error', message: `No session "${msg.sessionId}"` });
-      }
-      break;
-    }
-
-    case 'agent.list': {
-      const agents = [...sessions.values()].map((s) => ({
-        id: s.id,
-        sessionId: s.sessionId,
-        status: 'running' as const,
-      }));
-      send(ws, { type: 'agent.list', agents });
-      break;
-    }
-
-    case 'session.history':
-      send(ws, { type: 'session.history', sessions: [] });
-      break;
-  }
-};
-
-wss.on('connection', (ws) => {
-  writeInfo('[daemon] client connected');
+    send(ws, { type: 'agent.status', status: 'running' });
+    agent.send(content, {
+      onText: (text) => send(ws, { type: 'agent.output', chunk: text }),
+      onTool: (name) => send(ws, { type: 'agent.tool', name }),
+      onEnd: ({ isError }) =>
+        send(ws, { type: 'agent.status', status: isError ? 'error' : 'idle' }),
+    });
+  };
 
   ws.on('message', (data) => {
+    let clientMessage: ClientMessage;
     try {
-      const msg = JSON.parse(data.toString()) as ClientMessage;
-      route(ws, msg);
-    } catch (err) {
+      clientMessage = JSON.parse(data.toString()) as ClientMessage;
+    } catch {
       send(ws, { type: 'error', message: 'Invalid JSON' });
+      return;
+    }
+    if (clientMessage.type === 'agent.send') {
+      runTurn(clientMessage.agent, clientMessage.content);
+    } else if (clientMessage.type === 'agent.stop') {
+      agent?.stop();
+      send(ws, { type: 'agent.status', status: 'idle' });
     }
   });
 
   ws.on('close', () => {
-    writeInfo('[daemon] client disconnected');
+    agent?.stop();
+    agent = null;
   });
-});
+};
 
-writeInfo(`[daemon] VybeKiit daemon listening on ws://localhost:${PORT}`);
+let server: WebSocketServer | null = null;
+
+/**
+ * Start the daemon WebSocket server once (idempotent). Safe to call from Next
+ * instrumentation or a standalone entry; tolerates an already-bound port.
+ *
+ * @returns Nothing.
+ * @example
+ * startDaemon();
+ */
+export const startDaemon = (): void => {
+  if (server !== null) {
+    return;
+  }
+  const wss = new WebSocketServer({ port: PORT });
+  wss.on('connection', handleConnection);
+  wss.on('error', (err: NodeJS.ErrnoException) => {
+    server = null;
+    if (err.code === 'EADDRINUSE') {
+      process.stdout.write(`[daemon] port ${PORT} already in use — reusing existing daemon\n`);
+    } else {
+      process.stderr.write(`[daemon] ${err.message}\n`);
+    }
+  });
+  server = wss;
+  process.stdout.write(`[daemon] VybeKiit daemon listening on ws://localhost:${PORT}\n`);
+};
+
+// Running this file directly (node/tsx) starts the daemon immediately.
+const entry = process.argv[1] ?? '';
+if (entry.endsWith('server.ts') || entry.endsWith('server.js')) {
+  startDaemon();
+}

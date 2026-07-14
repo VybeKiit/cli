@@ -24,7 +24,10 @@
       "!!packages/ui/src/input-group.tsx",
       "!!packages/ui/src/notification-toast.tsx",
       "!!packages/ui/src/progress-ring.tsx",
-      "!!packages/ui/src/step-indicator.tsx"
+      "!!packages/ui/src/step-indicator.tsx",
+      "!!apps/componentLibrary/src/data/catalog.ts",
+      "!!apps/componentLibrary/src/data/catalog.meta.ts",
+      "!!apps/componentLibrary/src/lib/loadPreview.client.ts"
     ]
   },
   "formatter": {
@@ -68,7 +71,7 @@
         "noJsxLiterals": "off",
         "useComponentExportOnlyModules": "off",
         "noTernary": "off",
-        "noNestedTernary": "warn",
+        "noNestedTernary": "error",
         "useNamingConvention": "off",
         "useConsistentTypeDefinitions": "off",
         "noMagicNumbers": "off",
@@ -128,6 +131,7 @@
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
         "noExcessiveLinesPerFunction": "warn",
+        "noUselessUndefined": "off",
         "noVoid": "off"
       }
     },

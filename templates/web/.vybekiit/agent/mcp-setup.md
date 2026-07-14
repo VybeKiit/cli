@@ -79,8 +79,7 @@ After `pnpm build` in the monorepo (or a workspace that includes these packages)
 
 | Server | Tools | Context controls |
 |--------|-------|------------------|
-| `vybekiit` (`mcp-agent.json`) | `search_skills`, `get_skill`, `list_platform_skills`, `search_commands`, `get_command`, `search_doctor_tools`, `search_tech_ids`, `doc_fallback`, `search_automations`, `get_automation`, `run_automation` | Cursor pagination (`limit`/`cursor`/`nextCursor`), slim rows, fuzzy rank |
-| `vybekiit-ui-catalog` (`mcp-ui-catalog.json`) | `search_ui_components`, `get_ui_component`, `suggest_ui_blend`, `list_ui_sources` | Same page envelope; `fields=slim\|full` (default slim) |
+| `vybekiit` (`mcp-agent.json`) | `search_skills`, `get_skill`, `list_platform_skills`, `search_commands`, `get_command`, `search_doctor_tools`, `search_tech_ids`, `doc_fallback`, `search_automations`, `get_automation`, `run_automation`, `search_ui_components`, `get_ui_component`, `suggest_ui_blend`, `list_ui_sources` | Cursor pagination (`limit`/`cursor`/`nextCursor`), slim rows, fuzzy rank; UI tools take `fields=slim\|full` (default slim) |
 
 Env:
 
@@ -117,7 +116,6 @@ vybekiit-automate ls setup --json --yes --name=Kit --price-cents=2900 --mode=tes
 | PayPal payments | `mcp-paypal.json` | https://docs.paypal.ai/developer/tools/ai/mcp-quickstart |
 | Neon data | `mcp-neon.json` | https://neon.tech/docs/ai/neon-mcp-server |
 | Firebase data | `mcp-firebase.json` | Firebase MCP via `firebase-tools mcp` |
-| UI catalog | `mcp-ui-catalog.json` | VybeKiit local `@vybekiit/ui-catalog-mcp` |
 | Twilio SMS / Verify | `mcp-twilio-docs.json` | https://mcp.twilio.com/docs |
 | Twilio API (optional alpha) | `mcp-twilio-alpha.json` | `@twilio-alpha/mcp` stdio bridge |
 | Sentry error alerts | `mcp-sentry.json` | https://mcp.sentry.dev/mcp |

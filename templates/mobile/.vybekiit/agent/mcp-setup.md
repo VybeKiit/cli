@@ -66,7 +66,6 @@ Restart Codex after changes. Run `/mcp` in a session to verify tools are listed.
 | PayPal payments | `mcp-paypal.json` | https://docs.paypal.ai/developer/tools/ai/mcp-quickstart |
 | Neon data | `mcp-neon.json` | https://neon.tech/docs/ai/neon-mcp-server |
 | Firebase data | `mcp-firebase.json` | Firebase MCP via `firebase-tools mcp` |
-| UI catalog | `mcp-ui-catalog.json` | VybeKiit local catalog |
 | Twilio SMS / Verify | `mcp-twilio-docs.json` | https://mcp.twilio.com/docs |
 | Twilio API (optional alpha) | `mcp-twilio-alpha.json` | `@twilio-alpha/mcp` stdio bridge |
 | Sentry error alerts | `mcp-sentry.json` | https://mcp.sentry.dev/mcp |

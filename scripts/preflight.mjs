@@ -98,6 +98,16 @@ async function linuxDistro() {
 
 // ─── Check definitions ───────────────────────────────────────────────────────
 
+const resolvePlatformInstallCommand = ({ mac, windows, linux }) => {
+  if (IS_MAC) {
+    return mac;
+  }
+  if (IS_WIN) {
+    return windows;
+  }
+  return linux;
+};
+
 async function checkNode() {
   const version = await run('node', ['--version']);
   const expected = '>=20';
@@ -108,11 +118,11 @@ async function checkNode() {
     ok,
     found: version,
     expected: `${expected} (.nvmrc recommends 22)`,
-    fix: IS_MAC
-      ? 'brew install node@22  OR  curl -fsSL https://fnm.vercel.app/install | bash && fnm install 22'
-      : IS_WIN
-        ? 'winget install OpenJS.NodeJS.LTS  OR  https://nodejs.org/en/download'
-        : 'curl -fsSL https://fnm.vercel.app/install | bash && fnm install 22',
+    fix: resolvePlatformInstallCommand({
+      mac: 'brew install node@22  OR  curl -fsSL https://fnm.vercel.app/install | bash && fnm install 22',
+      windows: 'winget install OpenJS.NodeJS.LTS  OR  https://nodejs.org/en/download',
+      linux: 'curl -fsSL https://fnm.vercel.app/install | bash && fnm install 22',
+    }),
   });
 }
 
@@ -140,11 +150,11 @@ async function checkGit() {
     ok,
     found: version,
     expected: 'any (>=2.30 recommended)',
-    fix: IS_MAC
-      ? 'xcode-select --install  OR  brew install git'
-      : IS_WIN
-        ? 'winget install Git.Git'
-        : 'sudo apt-get install -y git  OR  sudo dnf install -y git',
+    fix: resolvePlatformInstallCommand({
+      mac: 'xcode-select --install  OR  brew install git',
+      windows: 'winget install Git.Git',
+      linux: 'sudo apt-get install -y git  OR  sudo dnf install -y git',
+    }),
   });
 }
 
@@ -184,11 +194,11 @@ async function checkGhCli() {
     ok,
     found: version ? version.split('\n')[0] : null,
     expected: 'any (for mirror sync + PR creation)',
-    fix: IS_MAC
-      ? 'brew install gh'
-      : IS_WIN
-        ? 'winget install GitHub.cli'
-        : 'sudo apt-get install -y gh  OR  https://cli.github.com',
+    fix: resolvePlatformInstallCommand({
+      mac: 'brew install gh',
+      windows: 'winget install GitHub.cli',
+      linux: 'sudo apt-get install -y gh  OR  https://cli.github.com',
+    }),
   });
 }
 
@@ -201,11 +211,11 @@ async function checkDocker() {
     ok,
     found: version,
     expected: 'any (for verify:docker native-deps check)',
-    fix: IS_MAC
-      ? 'brew install --cask docker'
-      : IS_WIN
-        ? 'winget install Docker.DockerDesktop'
-        : 'https://docs.docker.com/engine/install/',
+    fix: resolvePlatformInstallCommand({
+      mac: 'brew install --cask docker',
+      windows: 'winget install Docker.DockerDesktop',
+      linux: 'https://docs.docker.com/engine/install/',
+    }),
   });
 }
 
@@ -215,11 +225,15 @@ async function checkDedupBinary() {
   const binPath = IS_WIN ? `${releaseBin}.exe` : releaseBin;
   const debugPath = IS_WIN ? `${debugBin}.exe` : debugBin;
   const exists = existsSync(binPath) || existsSync(debugPath);
+  let found = null;
+  if (exists) {
+    found = existsSync(binPath) ? 'release' : 'debug';
+  }
   results.push({
     name: 'vybekiit-dedup binary',
     required: false,
     ok: exists,
-    found: exists ? (existsSync(binPath) ? 'release' : 'debug') : null,
+    found,
     expected: 'built (pre-commit hook uses it)',
     fix: 'cd tools/dedup && cargo build --release',
   });
@@ -270,9 +284,14 @@ async function main() {
   let hasWarning = false;
 
   for (const r of results) {
-    const icon = r.ok ? '✅' : r.required ? '❌' : '⚠️ ';
+    let icon = '⚠️ ';
+    if (r.ok) {
+      icon = '✅';
+    } else if (r.required) {
+      icon = '❌';
+    }
     const tag = r.required ? '[REQUIRED]' : '[optional]';
-    const found = r.found ?? 'NOT FOUND';
+    const found = r.found || 'NOT FOUND';
     console.log(`  ${icon} ${tag} ${r.name}`);
     console.log(`     found: ${found}`);
     console.log(`     needs: ${r.expected}`);

@@ -539,12 +539,12 @@ rendered on the landing hero carousel — representative, not exhaustive.
 component; live mount only when `renderMode: live`.
 
 **Platform MCP bundle** — per-provider MCP configs under `.vybekiit/agent/` (`mcp-agent.json`,
-`mcp-ui-catalog.json`, `mcp-neon.json`, `mcp-firebase.json`, …) merged into buyer `.cursor/mcp.json`.
+`mcp-neon.json`, `mcp-firebase.json`, …) merged into buyer `.cursor/mcp.json`.
 First-party tool catalog skill: `.agents/skills/use-kit-mcp/SKILL.md` (also
 `.vybekiit/platform-skills/mcp-tools-vybekiit.md`); SSOT in `@vybekiit/agent-kit`
-`mcpToolsCatalog`. `create app` always ships `@vybekiit/agent-mcp`,
-`@vybekiit/ui-catalog-mcp`, and `@vybekiit/browser-automation` into the kit workspace.
-First-party servers: `vybekiit` (skills/CLI/doctor/doc-fallback) and `vybekiit-ui-catalog` (mirrored UI).
+`mcpToolsCatalog`. `create app` always ships `@vybekiit/agent-mcp` and
+`@vybekiit/browser-automation` into the kit workspace.
+First-party server: `vybekiit` (skills, CLI, doctor, doc-fallback, browser automations, mirrored UI).
 
 **Normalize-on-import** — when copying a third-party UI block, swap to kit `Button`/`Input`, map
 colors to design tokens, and strip custom sizes before shipping.

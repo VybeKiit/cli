@@ -17,7 +17,7 @@
 
 ## MCP
 
-Merge `.vybekiit/agent/mcp-firebase.json` alongside `mcp-ui-catalog.json` in `.cursor/mcp.json`.
+Merge `.vybekiit/agent/mcp-firebase.json` alongside `mcp-agent.json` in `.cursor/mcp.json`.
 
 Skills + MCP are complementary: skills teach how; MCP executes.
 

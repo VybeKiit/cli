@@ -215,6 +215,12 @@ export const ScenariosRunner = () => {
         <ol className="mt-8 space-y-3" data-testid="scenarios-list">
           {OPENABLE_SCENARIOS.map((scenario, index) => {
             const isActive = activeId === scenario.id;
+            let statusLabel = 'Run →';
+            if (isActive && isRunning) {
+              statusLabel = 'Running…';
+            } else if (isActive) {
+              statusLabel = 'Done';
+            }
             return (
               <li key={scenario.id}>
                 <button
@@ -242,7 +248,7 @@ export const ScenariosRunner = () => {
                       </span>
                     </div>
                     <span className="shrink-0 text-xs font-semibold text-violet-600 dark:text-violet-300">
-                      {isActive && isRunning ? 'Running…' : isActive ? 'Done' : 'Run →'}
+                      {statusLabel}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
