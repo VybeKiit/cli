@@ -1,38 +1,38 @@
+import { Effect, Schema } from 'effect';
+import {
+  decodeLiveWorkApiResponse,
+  LiveWorkApiFailureSchema,
+  LiveWorkEventSchema,
+} from './liveWorkApiResponse';
+
 /**
  * Browser client for real payments Live work (ADR-0039).
  * Calls the Next API route; never receives payment API secrets.
  */
 
-export type LiveWorkPaymentsApiSuccess = {
-  readonly ok: true;
-  readonly provider: string;
-  readonly ephemeral: false;
-  readonly hopped: boolean;
-  readonly fromProvider?: string;
-  readonly skipped: readonly string[];
-  readonly verified: true;
-  readonly buyerMessage: string;
-  readonly pinKeys: readonly string[];
-  readonly pinned: boolean;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkPaymentsApiSuccessSchema = Schema.Struct({
+  ok: Schema.Literal(true),
+  provider: Schema.String,
+  ephemeral: Schema.Literal(false),
+  hopped: Schema.Boolean,
+  fromProvider: Schema.optional(Schema.String),
+  skipped: Schema.Array(Schema.String),
+  verified: Schema.Literal(true),
+  buyerMessage: Schema.String,
+  pinKeys: Schema.Array(Schema.String),
+  pinned: Schema.Boolean,
+  events: Schema.Array(LiveWorkEventSchema),
+});
 
-export type LiveWorkPaymentsApiFailure = {
-  readonly ok: false;
-  readonly code: string;
-  readonly message: string;
-  readonly hopClass?: string;
-  readonly provider?: string;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkPaymentsApiResultSchema = Schema.Union(
+  LiveWorkPaymentsApiSuccessSchema,
+  LiveWorkApiFailureSchema,
+);
+
+export type LiveWorkPaymentsApiSuccess = Schema.Schema.Type<
+  typeof LiveWorkPaymentsApiSuccessSchema
+>;
+export type LiveWorkPaymentsApiFailure = Schema.Schema.Type<typeof LiveWorkApiFailureSchema>;
 
 export type LiveWorkPaymentsApiResult = LiveWorkPaymentsApiSuccess | LiveWorkPaymentsApiFailure;
 
@@ -42,7 +42,7 @@ export type LiveWorkPaymentsApiResult = LiveWorkPaymentsApiSuccess | LiveWorkPay
  * @param options - Mode and optional named vendor stick.
  * @returns Public JSON (no API secrets).
  * @example
- * const result = await postLiveWorkPayments({ mode: 'demo', vendor: 'stripe' });
+ * const apiResult = await postLiveWorkPayments({ mode: 'demo', vendor: 'stripe' });
  */
 export const postLiveWorkPayments = async (options: {
   readonly mode?: 'demo' | 'dogfood' | 'buyer';
@@ -59,8 +59,10 @@ export const postLiveWorkPayments = async (options: {
     }),
   });
 
-  const body = (await response.json()) as LiveWorkPaymentsApiResult;
-  return body;
+  const responseBody: unknown = await response.json();
+  return Effect.runPromise(
+    decodeLiveWorkApiResponse(responseBody, LiveWorkPaymentsApiResultSchema),
+  );
 };
 
 /**

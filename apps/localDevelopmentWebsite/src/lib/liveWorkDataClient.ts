@@ -1,40 +1,38 @@
+import { Effect, Schema } from 'effect';
+import {
+  decodeLiveWorkApiResponse,
+  LiveWorkApiFailureSchema,
+  LiveWorkEventSchema,
+} from './liveWorkApiResponse';
+
 /**
  * Browser client for real data Live work (ADR-0039).
  * Calls the Next API route; never receives DATABASE_URL secrets.
  */
 
-export type LiveWorkDataApiSuccess = {
-  readonly ok: true;
-  readonly provider: string;
-  readonly ephemeral: boolean;
-  readonly hopped: boolean;
-  readonly fromProvider?: string;
-  readonly skipped: readonly string[];
-  readonly verified: true;
-  readonly buyerMessage: string;
-  readonly pinKeys: readonly string[];
-  readonly pinned: boolean;
-  readonly claimUrl?: string;
-  readonly claimableId?: string;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkDataApiSuccessSchema = Schema.Struct({
+  ok: Schema.Literal(true),
+  provider: Schema.String,
+  ephemeral: Schema.Boolean,
+  hopped: Schema.Boolean,
+  fromProvider: Schema.optional(Schema.String),
+  skipped: Schema.Array(Schema.String),
+  verified: Schema.Literal(true),
+  buyerMessage: Schema.String,
+  pinKeys: Schema.Array(Schema.String),
+  pinned: Schema.Boolean,
+  claimUrl: Schema.optional(Schema.String),
+  claimableId: Schema.optional(Schema.String),
+  events: Schema.Array(LiveWorkEventSchema),
+});
 
-export type LiveWorkDataApiFailure = {
-  readonly ok: false;
-  readonly code: string;
-  readonly message: string;
-  readonly hopClass?: string;
-  readonly provider?: string;
-  readonly events: readonly {
-    readonly name: string;
-    readonly phase: 'start' | 'end' | 'error';
-    readonly detail?: string;
-  }[];
-};
+const LiveWorkDataApiResultSchema = Schema.Union(
+  LiveWorkDataApiSuccessSchema,
+  LiveWorkApiFailureSchema,
+);
+
+export type LiveWorkDataApiSuccess = Schema.Schema.Type<typeof LiveWorkDataApiSuccessSchema>;
+export type LiveWorkDataApiFailure = Schema.Schema.Type<typeof LiveWorkApiFailureSchema>;
 
 export type LiveWorkDataApiResult = LiveWorkDataApiSuccess | LiveWorkDataApiFailure;
 
@@ -44,7 +42,7 @@ export type LiveWorkDataApiResult = LiveWorkDataApiSuccess | LiveWorkDataApiFail
  * @param options - Mode and optional named vendor stick.
  * @returns Public JSON (no connection secrets).
  * @example
- * const result = await postLiveWorkData({ mode: 'demo', vendor: 'neon' });
+ * const apiResult = await postLiveWorkData({ mode: 'demo', vendor: 'neon' });
  */
 export const postLiveWorkData = async (options: {
   readonly mode?: 'demo' | 'dogfood' | 'buyer';
@@ -61,8 +59,8 @@ export const postLiveWorkData = async (options: {
     }),
   });
 
-  const body = (await response.json()) as LiveWorkDataApiResult;
-  return body;
+  const responseBody: unknown = await response.json();
+  return Effect.runPromise(decodeLiveWorkApiResponse(responseBody, LiveWorkDataApiResultSchema));
 };
 
 /**
