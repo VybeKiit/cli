@@ -57,9 +57,13 @@ Rule: `naming.no-vague-local`.
 
 - Prefer `!value` when every falsy value is absent or invalid.
 - Use an explicit type, null, or undefined check when `0`, `false`, or `''` is a legitimate value.
-- Avoid routine `??` defaults and fallback chains. Apply defaults while decoding input or config.
+- Do not introduce `??` in authored business logic. Apply defaults while decoding input or config.
+  At an interoperability boundary where `0`, `false`, or `''` must survive, prefer an explicit check;
+  a single `??` is the documented exception, never a chain.
 - Missing internal registry entries and provider implementations fail clearly; they do not select a
   surprise default.
+- A function with a declared `| undefined` return contract ends with `return undefined`; tooling must
+  not remove that return when TypeScript requires every path to be explicit.
 
 ```ts
 if (!selectedSurface) {
@@ -85,9 +89,27 @@ Rule: `absence.explicit-boundary-defaults`.
   fragmentation.
 - Package entrypoints are deliberate public surfaces. Do not use a root barrel to expose internals
   accidentally.
+- Every entrypoint export has a current consumer or a documented public contract. Delete orphaned
+  exports, files, registries, and compatibility aliases instead of preserving them speculatively.
 - Keep provider folders only for multiple real providers or a genuine provider boundary.
 
 Rules: `architecture.real-boundaries`, `architecture.singular-contract`.
+
+## Repository invariants
+
+The old guide mixed daily style with repository architecture and operating recipes. Those contracts
+remain authoritative, but they live at their natural source instead of being repeated here:
+
+- [`AGENTS.md`](./AGENTS.md) owns maintained-vs-buyer boundaries, package kinds, UI primitives,
+  scripts, release policy, and the quality gate.
+- [ADR-0026](./docs/adr/0026-import-aliases-and-domain-packages.md) owns import vocabulary.
+- [ADR-0033](./docs/adr/0033-cli-single-published-artifact-and-access-gate.md) owns the CLI-only
+  published surface.
+- [ADR-0034](./docs/adr/0034-code-style-and-dependency-catalog.md) owns Effect migration and
+  dependency-catalog decisions.
+- [ADR-0035](./docs/adr/0035-package-kinds.md) owns package-shape rules.
+
+Do not copy these documents back into this guide. Link to the contract and keep one source of truth.
 
 ## Effect, I/O, and errors
 
@@ -166,6 +188,8 @@ Exceptions are listed in `code-style.rules.json` and must stay narrow and named.
 ## Enforcement
 
 - Biome owns formatting, imports, syntax, and machine-catchable lint rules.
+- An autofix may not make typecheck fail. Disable or narrow a conflicting fix before relying on it in
+  pre-commit.
 - `scripts/dev/checks/checkCodeStyleRules.mjs` validates the rules catalog and checks focused authored
   files for repository-specific tells.
 - Tests own behavior and singular-registry/contract drift.

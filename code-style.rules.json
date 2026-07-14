@@ -22,6 +22,12 @@
       "enforcedBy": ["tests", "review"]
     },
     {
+      "id": "architecture.no-orphan-surface",
+      "summary": "Every export, entrypoint, registry, and compatibility alias has a current consumer or documented public contract.",
+      "scope": "maintained",
+      "enforcedBy": ["usage scan", "tests", "review"]
+    },
+    {
       "id": "naming.no-vague-local",
       "summary": "Use a domain noun such as bodyRequest or checkoutResponse instead of data, result, or temp.",
       "scope": "authored",
@@ -46,6 +52,12 @@
       "enforcedBy": ["review", "tests"]
     },
     {
+      "id": "absence.no-nullish-business-defaults",
+      "summary": "Do not introduce nullish defaults in business logic; decode defaults at boundaries and never chain fallbacks.",
+      "scope": "maintained",
+      "enforcedBy": ["review", "migration inventory"]
+    },
+    {
       "id": "effect.visible-io",
       "summary": "Keep Effect workflows intact and run network, filesystem, database, process, or browser work at visible edges.",
       "scope": "maintained",
@@ -68,6 +80,12 @@
       "summary": "Comments explain a business constraint, compatibility reason, or surprising decision.",
       "scope": "authored",
       "enforcedBy": ["review"]
+    },
+    {
+      "id": "tooling.autofix-preserves-types",
+      "summary": "Formatter and lint autofixes must preserve the repository typecheck contract.",
+      "scope": "authored",
+      "enforcedBy": ["pre-commit", "typecheck"]
     },
     {
       "id": "tests.behavior-first",

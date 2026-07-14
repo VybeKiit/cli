@@ -131,6 +131,7 @@
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
         "noExcessiveLinesPerFunction": "warn",
+        "noUselessUndefined": "off",
         "noVoid": "off"
       }
     },
