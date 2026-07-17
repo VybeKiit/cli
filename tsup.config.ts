@@ -4,16 +4,22 @@ import { defineConfig } from 'tsup';
 // dual ESM/CJS + d.ts shape of the published library packages, so it uses its
 // own config rather than the shared `tsup.base`.
 export default defineConfig({
-  // `bin` is the package.json bin entry. `index` keeps older global shims that still
-  // point at `dist/index.js` working after the entry was renamed to `bin.js`.
-  entry: {
-    bin: 'src/bin.ts',
-    index: 'src/bin.ts',
-  },
+  // Single `bin` entry — the package.json bin. We deliberately do NOT emit a second
+  // `index` re-export: nothing imports the CLI as a library, and the old dist/index.js
+  // shim was dead weight (a thin re-export no one consumed).
+  //
+  // We do NOT bundle the first-party `vybekiit` MCP server here: it depends on
+  // @vybekiit/browser-automation -> playwright-core -> chromium-bidi, which esbuild
+  // cannot bundle. That server stays project-scoped (doctor wires it per project). The
+  // GLOBAL install registers the zero-config `playwright` + `context7` MCPs via
+  // `claude mcp add -s user` instead — no bundling required.
+  entry: { bin: 'src/bin.ts' },
   format: ['esm'],
   platform: 'node',
-  // Keep bin self-contained. Code-splitting moved top-level await into a chunk whose
-  // import.meta.url no longer matches process.argv[1], so the CLI exited as a no-op.
+  // With one entry there is no shared chunk to split, but we pin this off anyway:
+  // code-splitting is exactly what broke the published CLI — it moved the bin's
+  // main-module guard into a chunk whose import.meta.url no longer matched
+  // process.argv[1], so the CLI silently no-opped. Off = one self-contained bin.js.
   splitting: false,
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
