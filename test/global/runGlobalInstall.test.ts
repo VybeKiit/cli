@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { formatGlobalInstallSummary } from '../../src/global/runGlobalInstall';
+import { describe, expect, it, vi } from 'vitest';
+import { formatGlobalInstallSummary, runGlobalInstall } from '../../src/global/runGlobalInstall';
 
 describe('formatGlobalInstallSummary', () => {
   it('summarises a full install with the visible signals', () => {
@@ -29,5 +29,24 @@ describe('formatGlobalInstallSummary', () => {
     }).join('\n');
 
     expect(text).toContain('claude` command was not found');
+  });
+});
+
+describe('runGlobalInstall buyer gate', () => {
+  it('consults the gate and blocks with exit 1 when not entitled', async () => {
+    // Suppress the buyer-block message so it doesn't spew into the test runner's stderr.
+    const quiet = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
+    const gate = vi.fn(async () => ({
+      entitled: false,
+      reason: 'no-access' as const,
+      login: 'stranger',
+    }));
+
+    // A non-entitled gate must short-circuit before any skills/MCP/awareness work runs.
+    const code = await runGlobalInstall(['--yes'], gate);
+    quiet.mockRestore();
+
+    expect(gate).toHaveBeenCalledOnce();
+    expect(code).toBe(1);
   });
 });

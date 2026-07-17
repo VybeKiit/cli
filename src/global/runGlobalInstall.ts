@@ -2,6 +2,7 @@ import process from 'node:process';
 import { confirm, isCancel } from '@clack/prompts';
 import { isInteractive } from '../prompts/tty';
 import { installAwareness } from './awareness';
+import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from './entitlement';
 import { resolveGlobalPaths } from './globalPaths';
 import { installGlobalMcp } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
@@ -60,11 +61,25 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
  * `vybekiit setup` (with one confirm) and runnable directly as `vybekiit global-install`.
  *
  * @param args - Raw args; `--yes`/`-y` skips the confirmation prompt.
- * @returns Process exit code.
+ * @param gate - Buyer-entitlement check (defaults to the real `gh`-backed one; injected in tests).
+ * @returns Process exit code (1 when the buyer gate blocks the install).
  * @example
  * const code = await runGlobalInstall(['--yes']);
  */
-export const runGlobalInstall = async (args: readonly string[]): Promise<number> => {
+export const runGlobalInstall = async (
+  args: readonly string[],
+  gate: () => Promise<EntitlementResult> = checkEntitlement,
+): Promise<number> => {
+  // Buyer gate first: reuse the scaffolder's entitlement boundary (read access to a private
+  // VybeKiit surface mirror) before provisioning anything globally. Fail-closed, no bypass.
+  const entitlement = await gate();
+  if (!entitlement.entitled) {
+    for (const line of formatEntitlementBlock(entitlement)) {
+      process.stderr.write(`${line}\n`);
+    }
+    return 1;
+  }
+
   const skipPrompt = args.includes('--yes') || args.includes('-y');
 
   if (!skipPrompt) {

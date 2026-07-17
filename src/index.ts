@@ -37,6 +37,8 @@ export * from './commands/setupNextStep';
 export * from './commands/syncAgentLayer';
 export * from './doctor/claudeGlobalConfig';
 export * from './global/awareness';
+export * from './global/entitlement';
+export * from './global/exec';
 export * from './global/globalPaths';
 export * from './global/installGlobalMcp';
 export * from './global/installGlobalSkills';
