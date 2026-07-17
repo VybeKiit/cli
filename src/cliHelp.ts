@@ -14,7 +14,7 @@ export const CLI_HELP = `vybekiit — set up tools and create your app
 
 Getting started:
   vybekiit                 Interactive menu (terminal only)
-  vybekiit setup           Welcome + install/check the tools your app needs
+  vybekiit setup           Welcome + set up Claude Code globally (skills, MCP, tools)
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
 ${createSurfaceUsage}
 
@@ -47,6 +47,7 @@ export const CLI_HELP_ALL = `vybekiit — full command list
 
 Buyer journey:
   vybekiit setup
+  vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
   vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]

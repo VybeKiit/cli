@@ -4,6 +4,7 @@ import { inferVybeAssistant } from '@vybekiit/report-mode';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
 import { runAgentExperience } from './agentExperience';
 import { verifyAssetsPipeline } from './assetsValidate';
+import { formatGlobalStatus, readGlobalStatus } from './claudeGlobalConfig';
 import { ensureCodexSkillsEnabled } from './codexConfig';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
 import { verifyKitWorkspaceHealth } from './kitWorkspaceHealth';
@@ -408,6 +409,7 @@ export const runDoctor = async (log: Console = console): Promise<number> => {
   const agentReady = isAgentRuntimeReady(reports) || cursorSession;
 
   await ensureCodexSkills(reports, log);
+  log.log(formatGlobalStatus(await readGlobalStatus()));
   writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
 
   return computeDoctorExitCode({

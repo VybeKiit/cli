@@ -37,6 +37,7 @@ import { runUpdateKitCommand } from './commands/updateKit';
 import { ensureTool, formatEnsureResult } from './doctor/ensureTool';
 import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
+import { runGlobalInstall } from './global/runGlobalInstall';
 import { runEnvWizard } from './prompts/envWizard';
 import type { MainMenuChoice } from './prompts/mainMenu';
 import { promptMainMenu } from './prompts/mainMenu';
@@ -45,7 +46,7 @@ import { isInteractive } from './prompts/tty';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Commands that may run before license gate (first-run tools path). */
-const GATE_EXEMPT = new Set(['doctor', 'setup']);
+const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install']);
 
 type CliCommandContext = {
   readonly command: string;
@@ -331,6 +332,7 @@ const handleAddCommand = async (context: CliCommandContext): Promise<number> => 
 
 const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   setup: async () => await runSetup(),
+  'global-install': (context) => runGlobalInstall(commandArgs(context)),
   create: handleCreateCommand,
   new: (context) => runNew(commandArgs(context)),
   drop: (context) => runDrop(commandArgs(context)),
