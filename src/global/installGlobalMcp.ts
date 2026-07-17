@@ -1,5 +1,5 @@
-import { execFile } from 'node:child_process';
 import process from 'node:process';
+import { type ExecFn, makeExec } from './exec';
 
 /** A single MCP server we can register globally (user scope). */
 export type McpServerDef = {
@@ -90,17 +90,10 @@ const KEY_GATED: readonly McpServerDef[] = [
   },
 ];
 
-/** Result of a single `claude` invocation. */
-export type ExecResult = {
-  readonly code: number;
-  readonly stdout: string;
-  readonly stderr: string;
-};
-
 /** Dependencies for the MCP install, injected so arg-building is testable without shelling out. */
 export type McpInstallDeps = {
   /** Runs the `claude` binary with the given args. */
-  readonly exec: (args: readonly string[]) => Promise<ExecResult>;
+  readonly exec: ExecFn;
   /** Environment used to resolve key-gated servers. */
   readonly env: Record<string, string | undefined>;
 };
@@ -114,22 +107,7 @@ export type McpInstallResult = {
   readonly claudeMissing: boolean;
 };
 
-const defaultExec = (args: readonly string[]): Promise<ExecResult> =>
-  new Promise((resolve) => {
-    execFile('claude', [...args], { encoding: 'utf8' }, (error, stdout, stderr) => {
-      if (error && 'code' in error && error.code === 'ENOENT') {
-        resolve({ code: 127, stdout: '', stderr: 'claude not found' });
-        return;
-      }
-      let code = 0;
-      if (error) {
-        code = typeof error.code === 'number' ? error.code : 1;
-      }
-      resolve({ code, stdout: stdout ?? '', stderr: stderr ?? '' });
-    });
-  });
-
-const defaultDeps: McpInstallDeps = { exec: defaultExec, env: process.env };
+const defaultDeps: McpInstallDeps = { exec: makeExec('claude'), env: process.env };
 
 /**
  * Build the `claude mcp add` argument list for a server (user scope).

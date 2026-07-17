@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import type { ExecResult } from '../../src/global/exec';
 import {
   buildAddArgs,
-  type ExecResult,
   installGlobalMcp,
   type McpServerDef,
 } from '../../src/global/installGlobalMcp';
