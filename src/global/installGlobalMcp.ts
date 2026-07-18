@@ -96,12 +96,20 @@ export type McpInstallDeps = {
   readonly exec: ExecFn;
   /** Environment used to resolve key-gated servers. */
   readonly env: Record<string, string | undefined>;
+  /**
+   * When true (CLI auto-update / re-run), remove then re-add zero-config servers so command
+   * args track the latest CLI. Key-gated servers already present stay put (user may have
+   * customised them); missing ones with keys are still added.
+   */
+  readonly forceRefresh?: boolean;
 };
 
 /** What {@link installGlobalMcp} did. */
 export type McpInstallResult = {
   readonly enabled: readonly string[];
   readonly alreadyPresent: readonly string[];
+  /** Zero-config servers re-registered on an update re-run. */
+  readonly refreshed: readonly string[];
   readonly needsKey: readonly string[];
   readonly failed: readonly string[];
   readonly claudeMissing: boolean;
@@ -141,26 +149,45 @@ const hasKeys = (def: McpServerDef, env: Record<string, string | undefined>): bo
   (def.envKeys ?? []).every((key) => (env[key] ?? '') !== '');
 
 /**
+ * Whether a server definition is zero-config (always refreshable on auto-update).
+ *
+ * @param def - Server definition.
+ * @returns True for playwright / context7 / sentry-class entries.
+ */
+const isZeroConfig = (def: McpServerDef): boolean =>
+  ZERO_CONFIG.some((entry) => entry.name === def.name);
+
+/**
  * Register the zero-config MCP servers globally (plus any key-gated server whose token is
- * already set). Idempotent: servers already present are left alone.
+ * already set). Idempotent by default; with `forceRefresh`, re-adds zero-config servers so a
+ * re-run of install.sh / `vybekiit update` picks up CLI definition changes.
  *
  * @param deps - Injected executor + environment (defaults to real `claude` + process.env).
- * @returns A breakdown of enabled / already-present / needs-key / failed servers.
+ * @returns A breakdown of enabled / refreshed / already-present / needs-key / failed servers.
  * @example
- * const result = await installGlobalMcp();
+ * const result = await installGlobalMcp({ ...deps, forceRefresh: true });
  */
 export const installGlobalMcp = async (
   deps: McpInstallDeps = defaultDeps,
 ): Promise<McpInstallResult> => {
   const version = await deps.exec(['--version']);
   if (version.code === 127) {
-    return { enabled: [], alreadyPresent: [], needsKey: [], failed: [], claudeMissing: true };
+    return {
+      enabled: [],
+      alreadyPresent: [],
+      refreshed: [],
+      needsKey: [],
+      failed: [],
+      claudeMissing: true,
+    };
   }
 
   const enabled: string[] = [];
   const alreadyPresent: string[] = [];
+  const refreshed: string[] = [];
   const needsKey: string[] = [];
   const failed: string[] = [];
+  const forceRefresh = deps.forceRefresh === true;
 
   const candidates = [...ZERO_CONFIG, ...KEY_GATED];
   for (const def of candidates) {
@@ -168,7 +195,19 @@ export const installGlobalMcp = async (
       needsKey.push(def.name);
       continue;
     }
-    if ((await deps.exec(['mcp', 'get', def.name])).code === 0) {
+    const present = (await deps.exec(['mcp', 'get', def.name])).code === 0;
+    if (present && forceRefresh && isZeroConfig(def)) {
+      // Best-effort remove: if remove fails we still try add (some claude versions upsert).
+      await deps.exec(['mcp', 'remove', def.name]);
+      const readded = await deps.exec(buildAddArgs(def, deps.env));
+      if (readded.code === 0) {
+        refreshed.push(def.name);
+      } else {
+        failed.push(def.name);
+      }
+      continue;
+    }
+    if (present) {
       alreadyPresent.push(def.name);
       continue;
     }
@@ -180,5 +219,5 @@ export const installGlobalMcp = async (
     }
   }
 
-  return { enabled, alreadyPresent, needsKey, failed, claudeMissing: false };
+  return { enabled, alreadyPresent, refreshed, needsKey, failed, claudeMissing: false };
 };

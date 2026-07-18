@@ -100,6 +100,24 @@ describe('installGlobalMcp', () => {
     });
     expect(result.alreadyPresent).toContain('playwright');
     expect(result.enabled).not.toContain('playwright');
+    expect(result.refreshed).toEqual([]);
+  });
+
+  it('force-refreshes zero-config servers on auto-update re-runs', async () => {
+    const calls: string[][] = [];
+    const result = await installGlobalMcp({
+      exec: async (args) => {
+        calls.push([...args]);
+        if (args[0] === '--version') return ok;
+        if (args[1] === 'get') return ok; // already present
+        return ok; // remove + add succeed
+      },
+      env: {},
+      forceRefresh: true,
+    });
+    expect(result.refreshed).toEqual(expect.arrayContaining(['playwright', 'context7', 'sentry']));
+    expect(result.alreadyPresent).not.toContain('playwright');
+    expect(calls.some((args) => args[0] === 'mcp' && args[1] === 'remove')).toBe(true);
   });
 
   it('registers a key-gated server when its token is present', async () => {

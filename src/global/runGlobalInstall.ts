@@ -2,19 +2,27 @@ import process from 'node:process';
 import { confirm, isCancel } from '@clack/prompts';
 import { isInteractive } from '../prompts/tty';
 import { installAwareness } from './awareness';
+import { readCliVersion } from './cliVersion';
 import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from './entitlement';
+import { makeExec } from './exec';
 import { resolveGlobalPaths } from './globalPaths';
 import { installGlobalMcp } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
+import { readInstallState, writeInstallState } from './installState';
 
 /** Everything the global install did, for reporting + verification. */
 export type GlobalInstallSummary = {
   readonly skillsInstalled: number;
   readonly skillsSkipped: number;
   readonly mcpEnabled: readonly string[];
+  readonly mcpRefreshed: readonly string[];
   readonly mcpNeedsKey: readonly string[];
   readonly claudeMissing: boolean;
   readonly commandInstalled: boolean;
+  /** CLI version that just provisioned (from package.json / npm@latest). */
+  readonly version: string;
+  /** Prior stamp version when this was a re-run update; null on first install. */
+  readonly previousVersion: string | null;
 };
 
 /**
@@ -24,21 +32,34 @@ export type GlobalInstallSummary = {
  * @param summary - What the install did.
  * @returns Lines to print in order.
  * @example
- * formatGlobalInstallSummary({ skillsInstalled: 119, ... });
+ * formatGlobalInstallSummary({ skillsInstalled: 119, version: '0.6.2', ... });
  */
 export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): string[] => {
+  const isUpdate = summary.previousVersion !== null && summary.previousVersion !== summary.version;
+  const isRerun = summary.previousVersion !== null && summary.previousVersion === summary.version;
+
+  let headline = `✅ VybeKiit ${summary.version} is now set up globally in Claude Code.`;
+  if (isUpdate) {
+    headline = `✅ VybeKiit updated ${summary.previousVersion} → ${summary.version}`;
+  } else if (isRerun) {
+    headline = `✅ VybeKiit ${summary.version} re-applied (already latest)`;
+  }
+
   const lines = [
     '',
-    '✅ VybeKiit is now set up globally in Claude Code.',
+    headline,
     '',
     `  • Skills   ${summary.skillsInstalled} installed in ~/.claude/skills (available in every project)`,
   ];
   if (summary.claudeMissing) {
     lines.push('  • MCP      skipped — the `claude` command was not found on your PATH');
   } else {
-    lines.push(
-      `  • MCP      ${summary.mcpEnabled.length > 0 ? summary.mcpEnabled.join(', ') : 'none'} enabled (browser automation + live docs everywhere)`,
-    );
+    const enabledLabel =
+      summary.mcpEnabled.length > 0 ? summary.mcpEnabled.join(', ') : 'none newly added';
+    lines.push(`  • MCP      ${enabledLabel} (browser automation + live docs everywhere)`);
+    if (summary.mcpRefreshed.length > 0) {
+      lines.push(`             refreshed: ${summary.mcpRefreshed.join(', ')}`);
+    }
     if (summary.mcpNeedsKey.length > 0) {
       lines.push(
         `             ${summary.mcpNeedsKey.length} more need an API key — run \`vybekiit env wizard\``,
@@ -52,13 +73,18 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
     'To see it: restart Claude Code (or run `claude` once) to approve the new MCP servers,',
     'then type /vybekiit to confirm.',
     '',
+    'Re-run anytime to update:  curl -fsSL https://vybekiit.com/install.sh | sh',
+    '                     or:  npx -y vybekiit@latest update',
+    '',
   );
   return lines;
 };
 
 /**
  * Provision VybeKiit globally: skills, MCP servers, and awareness signals. Called from
- * `vybekiit setup` (with one confirm) and runnable directly as `vybekiit global-install`.
+ * `vybekiit setup` (with one confirm), `vybekiit global-install`, `vybekiit update`, and
+ * the install.sh path. Re-runs are the auto-updater: always pull managed skills from this
+ * CLI build, force-refresh zero-config MCP defs, and stamp the installed version.
  *
  * @param args - Raw args; `--yes`/`-y` skips the confirmation prompt.
  * @param gate - Buyer-entitlement check (defaults to the real `gh`-backed one; injected in tests).
@@ -85,35 +111,48 @@ export const runGlobalInstall = async (
   if (!skipPrompt) {
     if (!isInteractive()) {
       process.stdout.write(
-        'Skipping global setup (non-interactive). Run `vybekiit global-install --yes` to provision Claude Code globally.\n',
+        'Skipping global setup (non-interactive). Run `vybekiit global-install --yes` or `vybekiit update` to provision Claude Code globally.\n',
       );
       return 0;
     }
     const proceed = await confirm({
       message:
-        'Set up VybeKiit globally in Claude Code? Adds skills + browser automation to every project.',
+        'Set up / update VybeKiit globally in Claude Code? Refreshes skills + browser automation in every project.',
       initialValue: true,
     });
     if (isCancel(proceed) || proceed !== true) {
       process.stdout.write(
-        'Skipped global setup. You can run `vybekiit global-install` anytime.\n',
+        'Skipped global setup. You can run `vybekiit update` or `vybekiit global-install` anytime.\n',
       );
       return 0;
     }
   }
 
   const paths = resolveGlobalPaths();
+  const previous = await readInstallState(paths.configDir);
+  const version = await readCliVersion();
+  // Re-run = auto-update: re-apply zero-config MCP defs so install.sh always tracks latest.
+  const isRerun = previous !== null;
+
   const skills = await installGlobalSkills(paths);
-  const mcp = await installGlobalMcp();
+  const mcp = await installGlobalMcp({
+    exec: makeExec('claude'),
+    env: process.env,
+    forceRefresh: isRerun,
+  });
   const awareness = await installAwareness(paths);
+  await writeInstallState(paths.configDir, version);
 
   const summary: GlobalInstallSummary = {
     skillsInstalled: skills.installed.length,
     skillsSkipped: skills.skipped.length,
     mcpEnabled: mcp.enabled,
+    mcpRefreshed: mcp.refreshed,
     mcpNeedsKey: mcp.needsKey,
     claudeMissing: mcp.claudeMissing,
     commandInstalled: awareness.commandWritten,
+    version,
+    previousVersion: previous?.version ?? null,
   };
 
   for (const line of formatGlobalInstallSummary(summary)) {

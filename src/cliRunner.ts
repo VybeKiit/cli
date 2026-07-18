@@ -46,7 +46,7 @@ import { isInteractive } from './prompts/tty';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Commands that may run before license gate (first-run tools path). */
-const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install']);
+const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update']);
 
 type CliCommandContext = {
   readonly command: string;
@@ -333,6 +333,12 @@ const handleAddCommand = async (context: CliCommandContext): Promise<number> => 
 const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   setup: async () => await runSetup(),
   'global-install': (context) => runGlobalInstall(commandArgs(context)),
+  // Auto-updater: always non-interactive. install.sh / re-runs use this path.
+  update: (context) => {
+    const args = commandArgs(context);
+    const hasYes = args.includes('--yes') || args.includes('-y');
+    return runGlobalInstall(hasYes ? args : [...args, '--yes']);
+  },
   create: handleCreateCommand,
   new: (context) => runNew(commandArgs(context)),
   drop: (context) => runDrop(commandArgs(context)),

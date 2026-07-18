@@ -48,6 +48,7 @@ export const CLI_HELP_ALL = `vybekiit — full command list
 Buyer journey:
   vybekiit setup
   vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
+  vybekiit update                         (re-run auto-updater: latest skills + MCP)
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
   vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]
