@@ -4,7 +4,7 @@ import { inferVybeAssistant } from '@vybekiit/report-mode';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
 import { runAgentExperience } from './agentExperience';
 import { verifyAssetsPipeline } from './assetsValidate';
-import { formatGlobalStatus, readGlobalStatus } from './claudeGlobalConfig';
+import { formatGlobalStatus, isGloballyInstalled, readGlobalStatus } from './claudeGlobalConfig';
 import { ensureCodexSkillsEnabled } from './codexConfig';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from './env';
 import { verifyKitWorkspaceHealth } from './kitWorkspaceHealth';
@@ -409,7 +409,8 @@ export const runDoctor = async (log: Console = console): Promise<number> => {
   const agentReady = isAgentRuntimeReady(reports) || cursorSession;
 
   await ensureCodexSkills(reports, log);
-  log.log(formatGlobalStatus(await readGlobalStatus()));
+  const globalStatus = await readGlobalStatus();
+  log.log(formatGlobalStatus(globalStatus));
   writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
 
   return computeDoctorExitCode({
@@ -419,5 +420,8 @@ export const runDoctor = async (log: Console = console): Promise<number> => {
     skillsReady,
     projectHealthOk,
     mobilePublishOk,
+    // Hard-fail when zero managed skills: a skipped/failed global-install used to only print
+    // a soft arrow and still exit 0, so Claude never loaded kit skills and nobody noticed.
+    globalClaudeOk: isGloballyInstalled(globalStatus),
   });
 };

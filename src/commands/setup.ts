@@ -17,9 +17,10 @@ export const runSetup = async (): Promise<number> => {
   const code = await runDoctor();
 
   // Provision Claude Code globally (skills + MCP + awareness) so the buyer gets VybeKiit in
-  // every project, with a single confirmation. This is the whole point of setup for a
-  // non-technical builder — without it the CLI only scaffolds and "nothing feels different".
-  await runGlobalInstall([]);
+  // every project. Always `--yes` after entitlement: the confirm was a silent-skip path for
+  // non-coders (and non-TTY), so Claude never loaded kit skills. `global-install` without
+  // flags still prompts when run alone.
+  await runGlobalInstall(['--yes']);
 
   const access = checkAccess();
 

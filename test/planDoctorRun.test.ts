@@ -8,6 +8,7 @@ describe('computeDoctorExitCode', () => {
     agentReady: true,
     skillsReady: true,
     projectHealthOk: true,
+    globalClaudeOk: true,
   };
 
   it('returns 0 when every gate passes', () => {
@@ -38,7 +39,12 @@ describe('computeDoctorExitCode', () => {
     expect(computeDoctorExitCode({ ...allPass, mobilePublishOk: false })).toBe(1);
   });
 
-  it('passes when mobilePublishOk is omitted (non-mobile)', () => {
-    expect(computeDoctorExitCode(allPass)).toBe(0);
+  it('returns 1 when Claude global skills are not installed', () => {
+    expect(computeDoctorExitCode({ ...allPass, globalClaudeOk: false })).toBe(1);
+  });
+
+  it('passes when mobilePublishOk / globalClaudeOk are omitted', () => {
+    const { globalClaudeOk: _g, ...withoutOptional } = allPass;
+    expect(computeDoctorExitCode(withoutOptional)).toBe(0);
   });
 });

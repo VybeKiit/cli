@@ -39,9 +39,9 @@ describe('upsertMemoryBlock', () => {
 describe('statusLineCommandHasBadge', () => {
   it('detects the diamond badge token', () => {
     expect(statusLineCommandHasBadge(STATUSLINE_BADGE_COMMAND)).toBe(true);
-    expect(statusLineCommandHasBadge(`bash ~/.claude/statusline.sh; ${STATUSLINE_APPEND_SNIPPET}`)).toBe(
-      true,
-    );
+    expect(
+      statusLineCommandHasBadge(`bash ~/.claude/statusline.sh; ${STATUSLINE_APPEND_SNIPPET}`),
+    ).toBe(true);
   });
 
   it('is false for an unrelated command', () => {
@@ -76,9 +76,8 @@ describe('withStatusLineBadge', () => {
     });
     const next = withStatusLineBadge(raw);
     expect(next).not.toBeNull();
-    const command = (
-      JSON.parse(next ?? '') as { statusLine: { command: string } }
-    ).statusLine.command;
+    const command = (JSON.parse(next ?? '') as { statusLine: { command: string } }).statusLine
+      .command;
     expect(command.startsWith('bash /Users/me/.claude/statusline-command.sh')).toBe(true);
     expect(command).toContain(STATUSLINE_APPEND_SNIPPET);
     expect(command).toContain(STATUSLINE_BADGE);

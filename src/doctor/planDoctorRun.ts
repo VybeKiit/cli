@@ -10,6 +10,11 @@ export type DoctorReadinessInput = {
   readonly projectHealthOk: boolean;
   /** When omitted, treated as pass (non-mobile projects). */
   readonly mobilePublishOk?: boolean;
+  /**
+   * Claude Code global install (managed skills + /vybekiit + CLAUDE.md block).
+   * When omitted, treated as pass so unit tests that only care about other gates stay green.
+   */
+  readonly globalClaudeOk?: boolean;
 };
 
 /**

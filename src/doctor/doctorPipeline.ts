@@ -76,8 +76,11 @@ export const readinessToChecks = (input: {
   readonly skillsReady: boolean;
   readonly projectHealthOk: boolean;
   readonly mobilePublishOk?: boolean;
+  /** Claude Code global skills + awareness; omit to skip (tests / non-Claude hosts). */
+  readonly globalClaudeOk?: boolean;
 }): readonly DoctorCheckAdapter[] => {
   const mobileOk = input.mobilePublishOk === undefined ? true : input.mobilePublishOk;
+  const globalClaudeOk = input.globalClaudeOk === undefined ? true : input.globalClaudeOk;
   return [
     { id: 'cloud', run: () => input.cloudReady, blocksExit: true },
     { id: 'r2', run: () => input.r2Ok, blocksExit: true },
@@ -85,5 +88,6 @@ export const readinessToChecks = (input: {
     { id: 'skills', run: () => input.skillsReady, blocksExit: true },
     { id: 'projectHealth', run: () => input.projectHealthOk, blocksExit: true },
     { id: 'mobilePublish', run: () => mobileOk, blocksExit: true },
+    { id: 'globalClaude', run: () => globalClaudeOk, blocksExit: true },
   ];
 };

@@ -1,10 +1,7 @@
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { GlobalPaths } from './globalPaths';
-
-// Dropped into every skill dir we own, so a reinstall refreshes VybeKiit skills while a
-// same-named skill the user authored themselves (no marker) is left untouched.
-const MANAGED_MARKER = '.vybekiit-managed';
+import { MANAGED_SKILL_MARKER } from './managedSkills';
 
 /** Outcome of a global skills install. */
 export type SkillsInstallResult = {
@@ -80,14 +77,14 @@ export const installGlobalSkills = async (
   for (const name of names) {
     const dest = join(paths.skillsDir, name);
     if (await pathExists(dest)) {
-      if (!(await pathExists(join(dest, MANAGED_MARKER)))) {
+      if (!(await pathExists(join(dest, MANAGED_SKILL_MARKER)))) {
         skipped.push(name);
         continue;
       }
       await rm(dest, { recursive: true, force: true });
     }
     await cp(join(sourceDir, name), dest, { recursive: true });
-    await writeFile(join(dest, MANAGED_MARKER), '', 'utf8');
+    await writeFile(join(dest, MANAGED_SKILL_MARKER), '', 'utf8');
     installed.push(name);
   }
 

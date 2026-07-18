@@ -1,22 +1,29 @@
 import { describe, expect, it, vi } from 'vitest';
 import { formatGlobalInstallSummary, runGlobalInstall } from '../../src/global/runGlobalInstall';
 
+const baseSummary = {
+  skillsInstalled: 119,
+  skillsSkipped: 0,
+  skillSample: ['add-signin', 'go-live', 'onboarding', 'plan-my-idea', 'setup-payments'],
+  skillsPath: '/Users/me/.claude/skills',
+  mcpEnabled: ['playwright', 'context7'] as readonly string[],
+  mcpRefreshed: [] as readonly string[],
+  mcpNeedsKey: ['github'] as readonly string[],
+  claudeMissing: false,
+  commandInstalled: true,
+  version: '0.6.2',
+  previousVersion: null as string | null,
+};
+
 describe('formatGlobalInstallSummary', () => {
-  it('summarises a full first install with the visible signals', () => {
-    const text = formatGlobalInstallSummary({
-      skillsInstalled: 119,
-      skillsSkipped: 0,
-      mcpEnabled: ['playwright', 'context7'],
-      mcpRefreshed: [],
-      mcpNeedsKey: ['github'],
-      claudeMissing: false,
-      commandInstalled: true,
-      version: '0.6.2',
-      previousVersion: null,
-    }).join('\n');
+  it('summarises a full first install with the visible signals and skill smoke sample', () => {
+    const text = formatGlobalInstallSummary(baseSummary).join('\n');
 
     expect(text).toContain('0.6.2 is now set up');
     expect(text).toContain('119 installed');
+    expect(text).toContain('/Users/me/.claude/skills');
+    expect(text).toContain('onboarding');
+    expect(text).toContain('setup-payments');
     expect(text).toContain('playwright, context7');
     expect(text).toContain('1 more need an API key');
     expect(text).toContain('/vybekiit');
@@ -25,14 +32,10 @@ describe('formatGlobalInstallSummary', () => {
 
   it('calls out a version bump when re-running after a newer CLI', () => {
     const text = formatGlobalInstallSummary({
-      skillsInstalled: 119,
-      skillsSkipped: 0,
+      ...baseSummary,
       mcpEnabled: [],
       mcpRefreshed: ['playwright', 'context7'],
       mcpNeedsKey: [],
-      claudeMissing: false,
-      commandInstalled: true,
-      version: '0.6.2',
       previousVersion: '0.6.1',
     }).join('\n');
 
@@ -42,18 +45,27 @@ describe('formatGlobalInstallSummary', () => {
 
   it('explains when the claude command is missing', () => {
     const text = formatGlobalInstallSummary({
-      skillsInstalled: 119,
-      skillsSkipped: 0,
+      ...baseSummary,
       mcpEnabled: [],
-      mcpRefreshed: [],
       mcpNeedsKey: [],
       claudeMissing: true,
-      commandInstalled: true,
       version: '0.6.1',
-      previousVersion: null,
     }).join('\n');
 
     expect(text).toContain('claude` command was not found');
+  });
+
+  it('hard-fails messaging when zero skills landed', () => {
+    const text = formatGlobalInstallSummary({
+      ...baseSummary,
+      skillsInstalled: 0,
+      skillSample: [],
+      mcpEnabled: [],
+      mcpNeedsKey: [],
+    }).join('\n');
+
+    expect(text).toContain('0 installed');
+    expect(text).toContain('No managed skills');
   });
 });
 
