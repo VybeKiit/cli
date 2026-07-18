@@ -112,9 +112,33 @@ const writeIfChanged = async (path: string, next: string, previous: string): Pro
   return true;
 };
 
+/** Diamond badge shown on Claude Code's status line. */
+export const STATUSLINE_BADGE = '◆ vybekiit';
+
+/** Full command when the user has no status line yet. */
+export const STATUSLINE_BADGE_COMMAND = `echo '${STATUSLINE_BADGE}'`;
+
 /**
- * Set the status-line badge only when the user has no status line configured, so we never
- * clobber a custom one.
+ * Shell snippet appended after an existing status-line command.
+ * Runs after the user's script so stdin is still available to it first.
+ */
+export const STATUSLINE_APPEND_SNIPPET = `printf ' · ${STATUSLINE_BADGE}'`;
+
+/**
+ * Whether a statusLine.command already includes our badge (so reinstall stays idempotent).
+ *
+ * @param command - Existing statusLine.command string.
+ * @returns True when the badge is already present.
+ */
+export const statusLineCommandHasBadge = (command: string): boolean =>
+  command.includes(STATUSLINE_BADGE);
+
+/**
+ * Ensure Claude Code's status line shows the VybeKiit badge.
+ *
+ * - No status line → set `echo '◆ vybekiit'`.
+ * - Existing command without the badge → append `printf ' · ◆ vybekiit'` (never replace).
+ * - Already has the badge → leave unchanged.
  *
  * @param raw - Current settings.json content ('' when absent).
  * @returns The updated content, or null when it should be left as-is.
@@ -131,10 +155,30 @@ export const withStatusLineBadge = (raw: string): string | null => {
       return null;
     }
   }
-  if (settings.statusLine !== undefined) {
+
+  const existing = settings.statusLine;
+  if (existing === undefined) {
+    settings.statusLine = { type: 'command', command: STATUSLINE_BADGE_COMMAND };
+    return `${JSON.stringify(settings, null, 2)}\n`;
+  }
+
+  if (typeof existing !== 'object' || existing === null) {
     return null;
   }
-  settings.statusLine = { type: 'command', command: "echo '◆ vybekiit'" };
+
+  const statusLine = existing as { readonly type?: unknown; readonly command?: unknown };
+  if (typeof statusLine.command !== 'string') {
+    return null;
+  }
+
+  if (statusLineCommandHasBadge(statusLine.command)) {
+    return null;
+  }
+
+  settings.statusLine = {
+    type: typeof statusLine.type === 'string' ? statusLine.type : 'command',
+    command: `${statusLine.command}; ${STATUSLINE_APPEND_SNIPPET}`,
+  };
   return `${JSON.stringify(settings, null, 2)}\n`;
 };
 
