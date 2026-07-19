@@ -1,4 +1,3 @@
-import { readinessToChecks } from './doctorPipeline';
 import type { ToolReport } from './toolchain';
 
 /** Inputs to the pure doctor readiness policy — test surface for exit codes. */
@@ -20,8 +19,8 @@ export type DoctorReadinessInput = {
 /**
  * Compute the doctor process exit code from readiness checks.
  *
- * Folds the same {@link readinessToChecks} adapters the DoctorPipeline uses so
- * exit policy and check inventory stay one module.
+ * Exit non-zero when any blocking gate fails. Optional gates (mobile publish, Claude
+ * global install) default to pass when omitted — non-mobile / non-Claude hosts.
  *
  * @param input - Boolean readiness checks collected by the doctor runner.
  * @returns Zero when every gate passes, otherwise one.
@@ -29,24 +28,16 @@ export type DoctorReadinessInput = {
  * const code = computeDoctorExitCode({ cloudReady: true, r2Ok: true, agentReady: true, skillsReady: true, projectHealthOk: true });
  */
 export const computeDoctorExitCode = (input: DoctorReadinessInput): number => {
-  const checks = readinessToChecks(input);
-  const blocked = checks.some((check) => {
-    if (!check.blocksExit) {
-      return false;
-    }
-    const result = check.run();
-    return result === false;
-  });
-  return blocked ? 1 : 0;
-};
-
-/** Injectable seams for the side-effecting doctor executor. */
-export type DoctorDeps = {
-  readonly spawn: (
-    command: string,
-    args: readonly string[],
-    options: { stdio: 'ignore' | 'inherit' },
-  ) => { status: number | null; error?: Error };
+  const gates: readonly boolean[] = [
+    input.cloudReady,
+    input.r2Ok,
+    input.agentReady,
+    input.skillsReady,
+    input.projectHealthOk,
+    input.mobilePublishOk ?? true,
+    input.globalClaudeOk ?? true,
+  ];
+  return gates.every((ok) => ok) ? 0 : 1;
 };
 
 /**
