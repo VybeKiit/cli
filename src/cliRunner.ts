@@ -455,6 +455,16 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
 };
 
 /**
+ * Every dispatchable top-level verb, in registration order.
+ *
+ * Exported so `CLI_HELP_ALL` stays the enforced test surface for the verb registry
+ * (see cliHelp.test.ts): a new handler that never reaches the help text fails the drift
+ * guard instead of silently shipping undocumented. The two lists were previously
+ * maintained by hand with nothing linking them.
+ */
+export const COMMAND_NAMES: readonly string[] = Object.keys(COMMAND_HANDLERS);
+
+/**
  * Run the VybeKiit CLI for a parsed argv list.
  *
  * @param argv - Process arguments after the binary name.
