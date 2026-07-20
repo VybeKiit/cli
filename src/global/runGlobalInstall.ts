@@ -72,7 +72,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   } else {
     const enabledLabel =
       summary.mcpEnabled.length > 0 ? summary.mcpEnabled.join(', ') : 'none newly added';
-    lines.push(`  • MCP      ${enabledLabel} (browser automation + live docs everywhere)`);
+    lines.push(`  • MCP      ${enabledLabel} (browser automation + live docs + error monitoring)`);
     if (summary.mcpRefreshed.length > 0) {
       lines.push(`             refreshed: ${summary.mcpRefreshed.join(', ')}`);
     }
