@@ -51,8 +51,6 @@ export type RailwayAgentSetupResult = {
  * @param railwayInstalled - Whether the Railway CLI is installed.
  * @param railwayAuthed - Whether the Railway CLI is signed in, or null when unknown.
  * @returns Railway agent setup result.
- * @example
- * const result = runRailwayAgentSetup(true, true);
  */
 export const runRailwayAgentSetup = (
   railwayInstalled: boolean,

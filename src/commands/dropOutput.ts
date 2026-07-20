@@ -121,8 +121,6 @@ const getAgentConfigsForTemplate = (): Record<string, string> => ({
  * @param context - Resolved drop context.
  * @param postActions - Ordered next steps for the created project.
  * @returns Void after writing to stdout.
- * @example
- * writeDropSuccess(context, ['cd app && npm install']);
  */
 export const writeDropSuccess = (context: DropContext, postActions: readonly string[]): void => {
   const { dest, flags, template } = context;

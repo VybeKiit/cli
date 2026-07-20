@@ -45,8 +45,6 @@ const replaceEnvLine = (lines: string[], key: string, newLine: string): boolean 
  * @param cwd - Project directory to update.
  * @param keys - Env keys to upsert.
  * @returns Void after writing `.env`.
- * @example
- * writeEnvKeys(process.cwd(), { STORAGE_PROVIDER: 'r2' });
  */
 export const writeEnvKeys = (cwd: string, keys: Record<string, string>): void => {
   const path = join(cwd, '.env');

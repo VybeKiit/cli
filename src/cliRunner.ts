@@ -112,8 +112,6 @@ const commandArgs = (context: CliCommandContext): string[] => {
  *
  * @param lines - Lines to print in order.
  * @returns Void after all lines are printed.
- * @example
- * writeLines(['Done.']);
  */
 const writeLines = (lines: readonly string[]): void => {
   for (const line of lines) {
@@ -263,8 +261,6 @@ const handleCreateCommand = async (context: CliCommandContext): Promise<number> 
  *
  * @param argv - Full argv after the binary name.
  * @returns True when `--all` is present with help.
- * @example
- * wantsFullHelp(['help', '--all']);
  */
 const wantsFullHelp = (argv: readonly string[]): boolean =>
   argv.includes('--all') || argv.includes('-a');

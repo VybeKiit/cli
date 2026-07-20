@@ -57,8 +57,6 @@ const isLiveWorkMode = (value: string): value is LiveWorkMode =>
  *
  * @param args - CLI args after `live-work payments`.
  * @returns Parsed flags.
- * @example
- * parseLiveWorkPaymentsFlags(['--mode=buyer', '--vendor=stripe']);
  */
 export const parseLiveWorkPaymentsFlags = (
   args: readonly string[],
@@ -164,8 +162,6 @@ const writePaymentsPin = (
  *
  * @param args - Arguments after `live-work payments`.
  * @returns JSON stdout payload and exit code.
- * @example
- * const result = await runLiveWorkPayments(['--mode=buyer', '--cwd=./app']);
  */
 export const runLiveWorkPayments = async (
   args: readonly string[],

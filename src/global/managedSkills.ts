@@ -57,8 +57,6 @@ export const listManagedSkillNames = async (skillsDir: string): Promise<string[]
  * @param names - Sorted managed skill names.
  * @param size - Max sample size (default {@link GLOBAL_SKILL_SAMPLE_SIZE}).
  * @returns Up to `size` names, preferring known buyer goals when they exist.
- * @example
- * sampleManagedSkillNames(['add-ai', 'go-live', 'onboarding']);
  */
 export const sampleManagedSkillNames = (
   names: readonly string[],

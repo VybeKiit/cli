@@ -50,8 +50,6 @@ const isLiveWorkMode = (value: string): value is LiveWorkMode =>
  *
  * @param args - CLI args after `live-work host`.
  * @returns Parsed flags.
- * @example
- * parseLiveWorkHostFlags(['--mode=buyer', '--cwd=./app']);
  */
 export const parseLiveWorkHostFlags = (
   args: readonly string[],
@@ -168,8 +166,6 @@ const writeHostPin = (
  *
  * @param args - Arguments after `live-work host`.
  * @returns JSON stdout payload and exit code.
- * @example
- * const result = await runLiveWorkHost(['--mode=buyer', '--cwd=./app']);
  */
 export const runLiveWorkHost = async (
   args: readonly string[],

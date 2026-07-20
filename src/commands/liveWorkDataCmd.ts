@@ -70,8 +70,6 @@ const isLiveWorkMode = (value: string): value is LiveWorkMode =>
  *
  * @param args - CLI arguments after `live-work data`.
  * @returns Mode, optional named vendor, cwd, and pin toggle.
- * @example
- * parseLiveWorkDataFlags(['--mode=demo', '--cwd=./app']);
  */
 export const parseLiveWorkDataFlags = (
   args: readonly string[],
@@ -125,8 +123,6 @@ export const parseLiveWorkDataFlags = (
  * @param result - Full package result (may contain DATABASE_URL).
  * @param pinned - Whether pin keys were written to `.env`.
  * @returns Public JSON-safe payload.
- * @example
- * toPublicResult(result, true);
  */
 export const toPublicLiveWorkDataResult = (
   result: DataLiveWorkResult,
@@ -175,8 +171,6 @@ export const toPublicLiveWorkDataResult = (
  *
  * @param error - Package LiveWorkError.
  * @returns Failure payload (no secrets).
- * @example
- * toFailurePayload(error);
  */
 const toFailurePayload = (error: LiveWorkError): LiveWorkDataFailure => {
   const failure: {
@@ -214,8 +208,6 @@ const resolveLiveWorkEnv = (cwd: string): Record<string, string | undefined> =>
  * @param cwd - Project directory.
  * @param keys - Pin key map (may include secrets).
  * @returns Effect that fails as LiveWorkError on IO failure.
- * @example
- * await Effect.runPromise(writeDataPin(cwd, { DATA_PROVIDER: 'neon' }));
  */
 const writeDataPin = (
   cwd: string,
@@ -242,8 +234,6 @@ const writeDataPin = (
  *
  * @param args - Arguments after `live-work data`.
  * @returns JSON stdout payload and process exit code.
- * @example
- * const result = await runLiveWorkData(['--mode=demo', '--cwd=./tmp']);
  */
 export const runLiveWorkData = async (
   args: readonly string[],

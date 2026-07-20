@@ -164,8 +164,6 @@ const isZeroConfig = (def: McpServerDef): boolean =>
  *
  * @param deps - Injected executor + environment (defaults to real `claude` + process.env).
  * @returns A breakdown of enabled / refreshed / already-present / needs-key / failed servers.
- * @example
- * const result = await installGlobalMcp({ ...deps, forceRefresh: true });
  */
 export const installGlobalMcp = async (
   deps: McpInstallDeps = defaultDeps,

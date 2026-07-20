@@ -49,8 +49,6 @@ const serializePresetFailure = (error: PresetFailure): PresetFailure => ({
  *
  * @param effect - Preset Effect to execute.
  * @returns Result-shaped payload for existing CLI formatting.
- * @example
- * const result = await runPresetEffect(applyPreset(options));
  */
 const runPresetEffect = async <T>(
   effect: Effect.Effect<T, PresetFailure>,
@@ -222,8 +220,6 @@ const resolvePresetProvider = (
  *
  * @param args - CLI arguments after `apply-preset`.
  * @returns JSON apply report plus the process exit code.
- * @example
- * const result = await runApplyPreset(['orders', '--provider=supabase']);
  */
 export const runApplyPreset = async (
   args: string[],
@@ -319,8 +315,6 @@ export const runApplyPreset = async (
  *
  * @param args - CLI arguments after `verify-presets`.
  * @returns JSON verification report plus the process exit code.
- * @example
- * const result = await runVerifyPresets(['--fix']);
  */
 export const runVerifyPresets = async (
   args: string[],
@@ -375,8 +369,6 @@ export const runVerifyPresets = async (
  * List available database presets.
  *
  * @returns JSON preset list plus a successful process exit code.
- * @example
- * const result = runListPresets();
  */
 export const runListPresets = (): { readonly json: string; readonly exitCode: number } => {
   const presets = ALL_PRESETS.map((preset) => ({

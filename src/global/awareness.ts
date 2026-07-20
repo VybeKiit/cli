@@ -188,8 +188,6 @@ export const withStatusLineBadge = (raw: string): string | null => {
  *
  * @param paths - Resolved global paths.
  * @returns Which signals changed.
- * @example
- * const result = await installAwareness(resolveGlobalPaths());
  */
 export const installAwareness = async (paths: GlobalPaths): Promise<AwarenessResult> => {
   const commandPath = `${paths.commandsDir}/vybekiit.md`;

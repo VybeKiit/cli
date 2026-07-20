@@ -70,8 +70,6 @@ const resolveRenderTemplate = async (cwd: string, templateArg?: string): Promise
  * @param cwd - Project directory containing the agent layer.
  * @param templateArg - Optional template override.
  * @returns Files updated plus the process exit code.
- * @example
- * const result = await runRenderAgentLayer(process.cwd(), 'web');
  */
 export const runRenderAgentLayer = async (
   cwd: string = process.cwd(),

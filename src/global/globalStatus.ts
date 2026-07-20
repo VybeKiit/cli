@@ -59,8 +59,6 @@ export const readGlobalStatus = async (paths: GlobalPaths): Promise<GlobalStatus
  *
  * @param status - A status snapshot.
  * @returns True when command, memory, and at least one skill are present.
- * @example
- * isGloballyInstalled(await readGlobalStatus(paths));
  */
 export const isGloballyInstalled = (status: GlobalStatus): boolean =>
   status.hasCommand && status.hasMemory && status.skillCount > 0;

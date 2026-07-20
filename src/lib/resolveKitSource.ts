@@ -59,8 +59,6 @@ export type ResolvedKitSource = {
  * @param repoName - Repo name under the mirror org (normally {@link KIT_MIRROR_REPO}).
  * @param targetDir - Directory `gh` clones into, which must not already exist.
  * @returns Promise that resolves after the kit is cloned.
- * @example
- * await cloneKitMirror(KIT_MIRROR_REPO, '/tmp/vybekiit-kit');
  */
 export const cloneKitMirror = async (repoName: string, targetDir: string): Promise<void> => {
   try {

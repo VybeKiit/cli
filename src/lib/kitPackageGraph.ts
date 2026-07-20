@@ -47,8 +47,6 @@ export const readPackageJson = async (packageJsonPath: string): Promise<PackageJ
  *
  * @param pkg - Parsed package.json.
  * @returns Unique workspace package names.
- * @example
- * listWorkspaceVybekiitDeps({ dependencies: { '@vybekiit/core': 'workspace:*' } });
  */
 export const listWorkspaceVybekiitDeps = (pkg: PackageJsonLike): readonly string[] => {
   const sections = [
@@ -214,8 +212,6 @@ export const collectRequiredPackageDirs = async (
  * @param packagesRoot - Kit `packages/` absolute path.
  * @param packageDir - Absolute package directory.
  * @returns Relative segment like `core` or `tools/assistant-chat`.
- * @example
- * packageRelFromPackagesRoot('/repo/packages', '/repo/packages/core');
  */
 export const packageRelFromPackagesRoot = (packagesRoot: string, packageDir: string): string => {
   const prefix = packagesRoot.endsWith('/') ? packagesRoot : `${packagesRoot}/`;

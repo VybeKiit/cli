@@ -169,8 +169,6 @@ type DoctorToolRun = {
  * @param log - Doctor logger.
  * @param lines - Lines to write.
  * @returns Void after all lines are written.
- * @example
- * writeLines(console, ['Done.']);
  */
 const writeLines = (log: Console, lines: readonly string[]): void => {
   for (const line of lines) {
@@ -272,8 +270,6 @@ const verifyExternalServices = async (
  * @param reports - Tool reports.
  * @param log - Doctor logger.
  * @returns Void after report lines are written.
- * @example
- * writeRailwayReport(env, reports, console);
  */
 const writeRailwayReport = (
   env: Record<string, string | undefined>,
@@ -312,8 +308,6 @@ const writeProjectLocalReports = (
  * @param reports - Tool reports.
  * @param log - Doctor logger.
  * @returns Promise that resolves after Codex config is checked.
- * @example
- * await ensureCodexSkills(reports, console);
  */
 const ensureCodexSkills = async (reports: readonly ToolReport[], log: Console): Promise<void> => {
   const codex = reportFor(reports, 'codex');
@@ -334,8 +328,6 @@ const ensureCodexSkills = async (reports: readonly ToolReport[], log: Console): 
  *
  * @param options - Project, surface, reports, Cursor state, and logger.
  * @returns Void after env keys are written when an assistant is inferred.
- * @example
- * writeReportModeAssistant({ cwd, surface, reports, cursorSession: false, log: console });
  */
 type ReportModeAssistantOptions = {
   readonly cwd: string;

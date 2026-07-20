@@ -19,8 +19,6 @@ const SLUG_UNSAFE_PATTERN = /[^a-z0-9-]/g;
  *
  * @param name - Route or resource name from CLI input.
  * @returns PascalCase identifier segment.
- * @example
- * pascalCase('add-user');
  */
 const pascalCase = (name: string): string =>
   name
@@ -33,8 +31,6 @@ const pascalCase = (name: string): string =>
  *
  * @param name - Route or resource name from CLI input.
  * @returns Lowercase route slug.
- * @example
- * kebabCase('My Route!');
  */
 const kebabCase = (name: string): string =>
   name.trim().toLowerCase().replace(WHITESPACE_PATTERN, '-').replace(SLUG_UNSAFE_PATTERN, '');
@@ -62,8 +58,6 @@ const ensureBackendDir = async (cwd: string): Promise<boolean> => {
  * @param args - CLI arguments after `scaffold backend`; first item may be the destination folder.
  * @param cwd - Project directory where the backend should be created.
  * @returns Plain message plus the process exit code.
- * @example
- * const result = await runScaffoldBackend(['backend'], process.cwd());
  */
 export const runScaffoldBackend = async (
   args: string[],
@@ -121,8 +115,6 @@ export const runScaffoldBackend = async (
  * @param args - CLI arguments after `backend add-route`; first item is the route name.
  * @param cwd - Project directory containing the backend.
  * @returns Plain message plus the process exit code.
- * @example
- * const result = await runBackendAddRoute(['users'], process.cwd());
  */
 export const runBackendAddRoute = async (
   args: string[],
@@ -196,8 +188,6 @@ ${slug}Router.get('/', get${pascal});
  * @param args - CLI arguments after `backend add-crud`; first item is the resource name.
  * @param cwd - Project directory containing the backend.
  * @returns Plain message plus the process exit code.
- * @example
- * const result = await runBackendAddCrud(['posts'], process.cwd());
  */
 export const runBackendAddCrud = async (
   args: string[],
@@ -320,8 +310,6 @@ ${slug}Router.delete('/:id', delete${pascal});
  *
  * @param cwd - Project directory containing the backend.
  * @returns Plain message plus the process exit code.
- * @example
- * const result = await runBackendAddUpload(process.cwd());
  */
 export const runBackendAddUpload = async (
   cwd: string = process.cwd(),
@@ -386,8 +374,6 @@ const defaultRunner: CommandRunner = async (command, args, cwd) => {
  * @param cwd - Project directory containing the backend.
  * @param runner - Command runner; defaults to spawning the script, injected in tests.
  * @returns Plain message plus the process exit code.
- * @example
- * const result = await runBackendGenContract(process.cwd());
  */
 export const runBackendGenContract = async (
   cwd: string = process.cwd(),

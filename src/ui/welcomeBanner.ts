@@ -37,9 +37,6 @@ export type WelcomeBannerOptions = {
  *
  * @param write - Output sink used by the banner renderer.
  * @param line - Line text to write before the newline.
- * @returns Nothing.
- * @example
- * writeln(process.stdout.write.bind(process.stdout), 'VybeKiit');
  */
 const writeln = (write: (text: string) => void, line: string): void => {
   write(`${line}\n`);
@@ -50,9 +47,6 @@ const writeln = (write: (text: string) => void, line: string): void => {
  *
  * @param write - Output sink used by the banner renderer.
  * @param lines - Lines to write in order.
- * @returns Nothing.
- * @example
- * writeBlock(process.stdout.write.bind(process.stdout), WELCOME_ART);
  */
 const writeBlock = (write: (text: string) => void, lines: readonly string[]): void => {
   for (const line of lines) {
@@ -65,8 +59,6 @@ const writeBlock = (write: (text: string) => void, lines: readonly string[]): vo
  *
  * @param options - Banner rendering and timing overrides.
  * @returns Promise that resolves after the banner is written.
- * @example
- * await playWelcomeBanner({ forcePlain: true, frames: 0 });
  */
 export const playWelcomeBanner = async (options: WelcomeBannerOptions = {}): Promise<void> => {
   const write =

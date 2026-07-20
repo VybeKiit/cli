@@ -105,8 +105,6 @@ const runMobileSetup = (cwd: string, platform: Platform, log: Console): string[]
  * @param platform - Current OS family.
  * @param log - Logger used for setup output.
  * @returns Native project setup result lines.
- * @example
- * const result = runNativeProjectSetup(process.cwd(), surface, 'darwin', console);
  */
 export const runNativeProjectSetup = (
   cwd: string,

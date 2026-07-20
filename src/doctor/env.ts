@@ -31,8 +31,6 @@ export const mergeEnv = (
  * @param cwd - Project directory to update.
  * @param keys - Env values to write.
  * @returns Void after `.env` is updated.
- * @example
- * writeEnvKeys(process.cwd(), { STORAGE_PROVIDER: 'r2' });
  */
 export const writeEnvKeys = (cwd: string, keys: Record<string, string>): void => {
   writeEnvKeysToFile(cwd, keys);

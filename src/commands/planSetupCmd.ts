@@ -7,8 +7,6 @@ const DOMAINS: readonly SetupDomain[] = ['payments', 'auth', 'database', 'deploy
  *
  * @param args - CLI arguments after `plan-setup`; first item must be a setup domain.
  * @returns Plain text output plus the process exit code for the command.
- * @example
- * const result = runPlanSetup(['payments']);
  */
 export const runPlanSetup = (
   args: string[],

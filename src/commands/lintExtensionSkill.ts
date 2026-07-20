@@ -48,8 +48,6 @@ const resolveExtensionSkillKind = (
  *
  * @param args - CLI arguments after `lint-extension-skill`.
  * @returns JSON lint report plus the process exit code.
- * @example
- * const result = await runLintExtensionSkill(['skill.md', '--kind=buyer-goal']);
  */
 export const runLintExtensionSkill = async (args: string[]): Promise<LintExtensionSkillResult> => {
   const path = args.find((a) => !a.startsWith('--'));

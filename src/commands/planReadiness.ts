@@ -49,8 +49,6 @@ const pathExists = async (path: string): Promise<boolean> => {
  * @param args - CLI arguments after `plan-readiness`; feature then optional template.
  * @param cwd - Project directory used for template detection.
  * @returns JSON readiness plan plus the process exit code.
- * @example
- * const result = await runPlanReadiness(['payments', 'web'], process.cwd());
  */
 export const runPlanReadiness = async (
   args: string[],

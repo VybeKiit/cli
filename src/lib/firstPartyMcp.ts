@@ -27,8 +27,6 @@ export type ProjectMcpServersConfig = {
  *
  * @param raw - File text.
  * @returns Normalized config.
- * @example
- * parseProjectMcpConfig('{"mcpServers":{}}');
  */
 export const parseProjectMcpConfig = (raw: string): ProjectMcpServersConfig => {
   let parsed: unknown;
@@ -84,8 +82,6 @@ export const parseProjectMcpConfig = (raw: string): ProjectMcpServersConfig => {
  * @param existing - Existing project config.
  * @param firstParty - First-party fragment from {@link buildFirstPartyMcpConfig}.
  * @returns Merged config and names written/updated.
- * @example
- * mergeFirstPartyMcpServers({ mcpServers: {} }, buildFirstPartyMcpConfig('surface'));
  */
 export const mergeFirstPartyMcpServers = (
   existing: ProjectMcpServersConfig,
@@ -109,8 +105,6 @@ export const mergeFirstPartyMcpServers = (
  * @param layout - Path layout for bin resolution.
  * @param options - Optional template for kit-root project root.
  * @returns Names of first-party servers written.
- * @example
- * await writeFirstPartyMcpConfigFile(join(dest, '.cursor/mcp.json'), 'surface');
  */
 export const writeFirstPartyMcpConfigFile = async (
   configPath: string,
@@ -135,8 +129,6 @@ export const writeFirstPartyMcpConfigFile = async (
  *
  * @param options - Kit dest root and surface template name.
  * @returns Absolute paths written.
- * @example
- * await shipFirstPartyMcpConfigs({ dest: '/tmp/kit', template: 'web' });
  */
 export const shipFirstPartyMcpConfigs = async (options: {
   readonly dest: string;

@@ -24,8 +24,6 @@ export { shouldCopyScaffoldPath };
  *
  * @param value - Candidate template name from CLI input.
  * @returns True when the value is a known template id.
- * @example
- * isTemplateName('web');
  */
 export const isTemplateName = (value: string): value is TemplateName => {
   const match = TEMPLATES.find((template) => template === value);
@@ -53,8 +51,6 @@ export type ScaffoldOptions = {
  *
  * @param options - Scaffold source, destination, and template selection.
  * @returns Destination path after the template has been copied.
- * @example
- * await scaffold({ template: 'web', source: '/repo/templates', dest: '/tmp/app' });
  */
 export const scaffold = async (options: ScaffoldOptions): Promise<{ readonly dest: string }> => {
   const sourceDir = join(options.source, options.template);

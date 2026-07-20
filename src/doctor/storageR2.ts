@@ -185,8 +185,6 @@ const resolveR2PublicUrl = (
  * @param env - Environment values used for Cloudflare provisioning.
  * @param log - Logger used for provisioning output.
  * @returns R2 provisioning result.
- * @example
- * const result = await provisionR2Storage(process.cwd(), process.env, console);
  */
 export const provisionR2Storage = async (
   cwd: string,

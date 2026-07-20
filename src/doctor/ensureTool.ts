@@ -111,8 +111,6 @@ const probeAuth = (tool: Tool): boolean | null => {
  * @param name - Tool name requested by the caller.
  * @param log - Logger used for install progress and setup errors.
  * @returns Ensure result describing installation and auth state.
- * @example
- * const result = ensureTool('wrangler', console);
  */
 export const ensureTool = (
   name: string,

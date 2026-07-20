@@ -43,8 +43,6 @@ const loadRecipesFromKit = async (): Promise<readonly PageRecipeSummary[]> => {
  *
  * @param args - Optional `--kind=db|page-recipe|backend`.
  * @returns JSON catalog plus exit code.
- * @example
- * const result = await runListPieces(['--kind=page-recipe']);
  */
 export const runListPieces = async (args: readonly string[] = []): Promise<CommandResult> => {
   const flags = parsePieceFlags(args);
@@ -62,8 +60,6 @@ export const runListPieces = async (args: readonly string[] = []): Promise<Comma
  *
  * @param _args - Unused reserved args (flags ignored for symmetry).
  * @returns JSON recipe list plus exit code.
- * @example
- * const result = await runListPageRecipes();
  */
 export const runListPageRecipes = async (_args: readonly string[] = []): Promise<CommandResult> => {
   let cleanup: (() => Promise<void>) | undefined;
@@ -163,8 +159,6 @@ const recipeError = (error: string): CommandResult => ({
  *
  * @param args - ` <id> [--to=dir] [--dry-run] [--force] `.
  * @returns JSON install report plus exit code.
- * @example
- * const result = await runAddPageRecipe(['cart', '--to=./my-app', '--dry-run']);
  */
 export const runAddPageRecipe = async (args: readonly string[]): Promise<CommandResult> => {
   const flags = parsePieceFlags(args);

@@ -119,8 +119,6 @@ type CopyAgentLayerPathOptions = {
  *
  * @param options - Copy roots, path, and filesystem seams.
  * @returns Promise that resolves after the path is copied.
- * @example
- * await copyAgentLayerPath({ mirrorRoot, cwd, path: 'AGENTS.md', copy, pathExists });
  */
 const copyAgentLayerPath = async (options: CopyAgentLayerPathOptions): Promise<void> => {
   const { mirrorRoot, cwd, path, copy, pathExists } = options;
@@ -139,8 +137,6 @@ const copyAgentLayerPath = async (options: CopyAgentLayerPathOptions): Promise<v
    *
    * @param rel - Relative `.vybekiit` path to copy.
    * @returns Promise that resolves after the subtree is copied.
-   * @example
-   * await walk('.vybekiit');
    */
   const walk = async (rel: string): Promise<void> => {
     const relNorm = rel.split('\\').join('/');
@@ -174,8 +170,6 @@ const copyAgentLayerPath = async (options: CopyAgentLayerPathOptions): Promise<v
  * @param cwd - Buyer project directory.
  * @param deps - Injectable filesystem seams.
  * @returns Promise that resolves after all planned paths are copied.
- * @example
- * await copyPlannedAgentLayerPaths(plan.pathsToSync, mirrorRoot, cwd, deps);
  */
 const copyPlannedAgentLayerPaths = async (
   pathsToSync: readonly string[],
@@ -229,8 +223,6 @@ const readGoalIndexBeforeSync = async (
  * @param cwd - Buyer project directory.
  * @param goalIndexBefore - Goal index content captured before copying, when present.
  * @returns Promise that resolves after the merge write is complete.
- * @example
- * await mergeGoalIndexAfterSync(process.cwd(), previousGoalIndex);
  */
 const mergeGoalIndexAfterSync = async (
   cwd: string,
@@ -317,8 +309,6 @@ export type SyncAgentLayerResult = {
  * @param cwd - Buyer project directory.
  * @param deps - Injectable seams for tests.
  * @returns Plain output lines plus the process exit code.
- * @example
- * const result = await runSyncAgentLayer(['web'], process.cwd());
  */
 export const runSyncAgentLayer = async (
   args: string[],

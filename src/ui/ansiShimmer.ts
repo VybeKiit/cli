@@ -16,8 +16,6 @@ const CYCLE_LENGTH = 24;
  * @param g - Green channel from 0 to 255.
  * @param b - Blue channel from 0 to 255.
  * @returns ANSI foreground color escape sequence.
- * @example
- * rgb(34, 211, 238);
  */
 const rgb = (r: number, g: number, b: number): string => `\x1b[38;2;${r};${g};${b}m`;
 
@@ -28,8 +26,6 @@ const rgb = (r: number, g: number, b: number): string => `\x1b[38;2;${r};${g};${
  * @param b - End value.
  * @param t - Progress from 0 to 1.
  * @returns Rounded interpolated value.
- * @example
- * lerp(0, 10, 0.5);
  */
 const lerp = (a: number, b: number, t: number): number => Math.round(a + (b - a) * t);
 
@@ -38,8 +34,6 @@ const lerp = (a: number, b: number, t: number): number => Math.round(a + (b - a)
  *
  * @param t - Progress from the gradient start color to the gradient end color.
  * @returns ANSI foreground color escape sequence for the wave position.
- * @example
- * colorAt(0.5);
  */
 const colorAt = (t: number): string =>
   rgb(
@@ -54,8 +48,6 @@ const colorAt = (t: number): string =>
  * @param env - Process environment used to read color override flags.
  * @param isTTY - Whether stdout is attached to a terminal.
  * @returns True when color is allowed by terminal state and env flags.
- * @example
- * supportsColor({ FORCE_COLOR: '1' }, false);
  */
 export const supportsColor = (
   env: NodeJS.ProcessEnv = process.env,
@@ -77,8 +69,6 @@ export const supportsColor = (
  * @param frame - Animation frame offset.
  * @param options - Rendering options for color output.
  * @returns New lines with ANSI color escapes when color is enabled.
- * @example
- * applyShimmerSweep(['VybeKiit'], 2, { color: true });
  */
 export const applyShimmerSweep = (
   lines: readonly string[],
@@ -115,8 +105,6 @@ export const DIM = '\x1b[2m';
  *
  * @param ms - Delay in milliseconds.
  * @returns Promise that resolves after the delay.
- * @example
- * await sleep(80);
  */
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {

@@ -73,8 +73,6 @@ const isSkippedBasename = (base: string, profile: DeliveryCopyProfile): boolean 
  * @param src - Source path currently being considered by `fs.cp` or a walker.
  * @param profile - scaffold (create-app), drop (overlay), or kit (mirror stage).
  * @returns True when the path is safe to copy.
- * @example
- * shouldCopyDeliveryPath('templates/web/src/app/page.tsx', 'scaffold');
  */
 export const shouldCopyDeliveryPath = (
   src: string,
@@ -98,8 +96,6 @@ export const shouldCopyDeliveryPath = (
  *
  * @param src - Source path.
  * @returns True when safe to copy into a buyer project.
- * @example
- * shouldCopyScaffoldPath('packages/core/src/index.ts');
  */
 export const shouldCopyScaffoldPath = (src: string): boolean =>
   shouldCopyDeliveryPath(src, 'scaffold');
@@ -109,8 +105,6 @@ export const shouldCopyScaffoldPath = (src: string): boolean =>
  *
  * @param src - Source path.
  * @returns True when safe to copy.
- * @example
- * shouldCopyDropPath('templates/web/app/page.tsx');
  */
 export const shouldCopyDropPath = (src: string): boolean => shouldCopyDeliveryPath(src, 'drop');
 
@@ -119,7 +113,5 @@ export const shouldCopyDropPath = (src: string): boolean => shouldCopyDeliveryPa
  *
  * @param src - Source path.
  * @returns True when safe to stage.
- * @example
- * shouldCopyKitPath('/repo/packages/core/dist/index.js'); // true (ships prebuilt packages)
  */
 export const shouldCopyKitPath = (src: string): boolean => shouldCopyDeliveryPath(src, 'kit');

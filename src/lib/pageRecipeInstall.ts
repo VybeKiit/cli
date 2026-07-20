@@ -102,8 +102,6 @@ export const planPageRecipeInstall = async (options: {
  * @param plan - Plan from {@link planPageRecipeInstall}.
  * @param options - Force overwrite of existing files.
  * @returns Paths written and paths skipped because they already existed.
- * @example
- * const result = await applyPageRecipeInstall(plan, { force: false });
  */
 export const applyPageRecipeInstall = async (
   plan: PageRecipeInstallPlan,

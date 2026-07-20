@@ -8,8 +8,6 @@ import { listSkillPaths, resolveTemplateArg } from '../lib/agentLayerIo';
  * @param args - CLI arguments after `check-goals`; first item may be a template name.
  * @param cwd - Project directory used for template detection and skill discovery.
  * @returns JSON output plus the process exit code for the command.
- * @example
- * const result = await runCheckGoals(['web'], process.cwd());
  */
 export const runCheckGoals = async (
   args: string[],

@@ -42,8 +42,6 @@ const parseLiveDocsEnv = (): Record<string, string> | undefined => {
  * @param args - CLI arguments after `check-agent-layer`; first item may be a template.
  * @param cwd - Project directory containing the agent layer.
  * @returns JSON compliance report plus the process exit code.
- * @example
- * const result = await runCheckAgentLayer(['web'], process.cwd());
  */
 export const runCheckAgentLayer = async (
   args: string[],

@@ -18,8 +18,6 @@ export const writeInitFailure = (message: string): number => {
  *
  * @param pm - Detected package manager.
  * @returns Void after writing the summary.
- * @example
- * writeInitSuccess('pnpm');
  */
 export const writeInitSuccess = (pm: PackageManager): void => {
   process.stdout.write('\n');

@@ -11,8 +11,6 @@ const ENV_KEY_PATTERN = /^[A-Z][A-Z0-9_]*$/;
  *
  * @param raw - Raw `.env.example` file contents.
  * @returns Ordered env keys that look like maintained config keys.
- * @example
- * parseExampleEnvKeys('PORT=3000\nNEXT_PUBLIC_SITE_URL=\n');
  */
 const parseExampleEnvKeys = (raw: string): string[] =>
   raw.split('\n').reduce<string[]>((keys, line) => {
@@ -35,8 +33,6 @@ const parseExampleEnvKeys = (raw: string): string[] =>
  *
  * @param value - Raw value text from a `KEY=value` line.
  * @returns The value without wrapping quotes when both quote marks are present.
- * @example
- * stripEnvValueQuotes('"3000"');
  */
 const stripEnvValueQuotes = (value: string): string => {
   if (value.startsWith('"') && value.endsWith('"')) {
@@ -52,8 +48,6 @@ const stripEnvValueQuotes = (value: string): string => {
  * @param envContent - Existing `.env` file contents.
  * @param key - Environment key to read.
  * @returns The current value, or an empty string when the key is missing.
- * @example
- * readCurrentEnvValue('PORT="3000"', 'PORT');
  */
 const readCurrentEnvValue = (envContent: string, key: string): string => {
   const prefix = `${key}=`;
@@ -73,8 +67,6 @@ const readCurrentEnvValue = (envContent: string, key: string): string => {
  * @param key - Environment key to write.
  * @param value - Value returned from the interactive prompt.
  * @returns Updated `.env` file contents with the key set exactly once.
- * @example
- * upsertEnvLine('PORT="3000"', 'PORT', '3001');
  */
 const upsertEnvLine = (envContent: string, key: string, value: string): string => {
   const nextLine = `${key}="${value}"`;

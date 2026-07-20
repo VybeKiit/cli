@@ -97,8 +97,6 @@ export const listTemplateFiles = async (dir: string, prefix = ''): Promise<strin
  *
  * @param context - Resolved drop context.
  * @returns Promise that resolves after the template files are copied.
- * @example
- * await copyDropTemplate(context);
  */
 export const copyDropTemplate = async (context: DropContext): Promise<void> => {
   const { dest, flags, templateDir } = context;
@@ -126,8 +124,6 @@ type MutablePackageJson = {
  *
  * @param dest - Destination directory that may contain `package.json`.
  * @returns Promise that resolves after dependency versions are updated.
- * @example
- * await pinDeps('/tmp/my-app');
  */
 export const pinDeps = async (dest: string): Promise<void> => {
   const pkgPath = join(dest, 'package.json');
@@ -155,8 +151,6 @@ export const pinDeps = async (dest: string): Promise<void> => {
  *
  * @param cleanup - Optional cleanup callback from template resolution.
  * @returns Promise that resolves after cleanup, when present.
- * @example
- * await cleanupDropSource(source.cleanup);
  */
 export const cleanupDropSource = async (
   cleanup: (() => Promise<void>) | undefined,

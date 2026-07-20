@@ -51,8 +51,6 @@ export const readInstallState = async (configDir: string): Promise<InstallState 
  * @param configDir - Claude user config dir.
  * @param version - CLI version that was installed.
  * @param now - Clock injection for tests (defaults to `new Date()`).
- * @example
- * await writeInstallState(paths.configDir, '0.6.2');
  */
 export const writeInstallState = async (
   configDir: string,

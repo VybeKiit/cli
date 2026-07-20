@@ -37,8 +37,6 @@ export type GlobalInstallSummary = {
  *
  * @param summary - What the install did.
  * @returns Lines to print in order.
- * @example
- * formatGlobalInstallSummary({ skillsInstalled: 119, version: '0.6.2', ... });
  */
 export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): string[] => {
   const isUpdate = summary.previousVersion !== null && summary.previousVersion !== summary.version;

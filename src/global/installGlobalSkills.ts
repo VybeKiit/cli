@@ -61,8 +61,6 @@ const listBundledSkills = async (sourceDir: string): Promise<string[]> => {
  * @param paths - Resolved global paths.
  * @param sourceDir - Override for the bundled payload (defaults to the shipped one).
  * @returns Which skills were installed vs. skipped.
- * @example
- * const result = await installGlobalSkills(resolveGlobalPaths());
  */
 export const installGlobalSkills = async (
   paths: GlobalPaths,

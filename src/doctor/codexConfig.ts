@@ -60,8 +60,6 @@ const upsertFeaturesSkills = (content: string): string => {
  * Enable Codex Agent Skills discovery in ~/.codex/config.toml.
  *
  * @returns Update status and config path.
- * @example
- * const result = await ensureCodexSkillsEnabled();
  */
 export const ensureCodexSkillsEnabled = async (): Promise<{
   readonly updated: boolean;

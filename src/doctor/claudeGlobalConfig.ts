@@ -33,8 +33,6 @@ export const readGlobalStatus = async (
  *
  * @param status - A status snapshot.
  * @returns One line for the doctor report.
- * @example
- * formatGlobalStatus(await readGlobalStatus());
  */
 export const formatGlobalStatus = (status: GlobalStatus): string => {
   if (isGloballyInstalled(status)) {

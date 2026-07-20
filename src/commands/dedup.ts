@@ -67,8 +67,6 @@ const readExecFileError = (error: unknown): ExecFileErrorLike | undefined => {
  *
  * @param error - Unknown error caught from the Rust binary execution.
  * @returns Process exit code plus stdout output.
- * @example
- * const result = formatDedupExecError(error);
  */
 const formatDedupExecError = (error: unknown): DedupResult => {
   const execError = readExecFileError(error);
@@ -99,8 +97,6 @@ const formatDedupExecError = (error: unknown): DedupResult => {
  * @param binary - Binary path or PATH command name.
  * @param args - CLI arguments to pass through.
  * @returns Process exit code plus stdout output.
- * @example
- * const result = await runDedupBinary('vybekiit-dedup', ['--json']);
  */
 const runDedupBinary = async (binary: string, args: string[]): Promise<DedupResult> => {
   try {
@@ -124,8 +120,6 @@ const runDedupBinary = async (binary: string, args: string[]): Promise<DedupResu
  *
  * @param args - CLI arguments to pass to the Rust dedup binary.
  * @returns Process exit code plus stdout output.
- * @example
- * const result = await runDedup(['--intent', 'payment webhook']);
  */
 export const runDedup = async (args: string[]): Promise<DedupResult> =>
   runDedupBinary(findBinary(), args);

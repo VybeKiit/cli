@@ -18,8 +18,6 @@ export type UpdateKitCommandResult = {
  *
  * @param args - CLI args (`--apply` applies agent-layer sync).
  * @returns Exit code and stdout lines.
- * @example
- * const result = await runUpdateKit(['--apply']);
  */
 export const runUpdateKit = async (
   args: readonly string[] = [],

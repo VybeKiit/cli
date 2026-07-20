@@ -5,8 +5,6 @@ import { planDocFallback } from '@vybekiit/agent-kit';
  *
  * @param args - CLI arguments after `doc-fallback`; first item is the tech id.
  * @returns JSON output plus the process exit code for the command.
- * @example
- * const result = runDocFallback(['stripe']);
  */
 export const runDocFallback = (
   args: string[],

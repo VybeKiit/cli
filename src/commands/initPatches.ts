@@ -7,8 +7,6 @@ import { type PackageManager, pathExists, readInitPackageJson } from './initType
  *
  * @param cwd - Target project directory.
  * @returns Promise that resolves after `.gitignore` is patched.
- * @example
- * await patchGitignore(process.cwd());
  */
 export const patchGitignore = async (cwd: string): Promise<void> => {
   const gitignorePath = join(cwd, '.gitignore');
@@ -31,8 +29,6 @@ export const patchGitignore = async (cwd: string): Promise<void> => {
  * @param cwd - Target project directory.
  * @param pm - Detected package manager used to compose the verify command.
  * @returns Promise that resolves after package scripts are patched.
- * @example
- * await patchPackageScripts(process.cwd(), 'pnpm');
  */
 export const patchPackageScripts = async (cwd: string, pm: PackageManager): Promise<void> => {
   const pkgPath = join(cwd, 'package.json');

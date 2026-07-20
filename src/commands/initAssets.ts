@@ -14,8 +14,6 @@ const HERE = dirname(fileURLToPath(import.meta.url));
  * @param cwd - Target project directory.
  * @param templateDir - Resolved template source directory.
  * @returns Promise that resolves after the copy or visible warning.
- * @example
- * await copyClaudeHooks(process.cwd(), templateDir);
  */
 export const copyClaudeHooks = async (cwd: string, templateDir: string): Promise<void> => {
   const claudeSource = join(templateDir, '.claude');
@@ -35,8 +33,6 @@ export const copyClaudeHooks = async (cwd: string, templateDir: string): Promise
  * @param templateDir - Resolved template source directory.
  * @param pm - Detected package manager for workflow commands.
  * @returns Promise that resolves after workflow files are copied.
- * @example
- * await copyWorkflows(process.cwd(), templateDir, 'pnpm');
  */
 export const copyWorkflows = async (
   cwd: string,
@@ -64,8 +60,6 @@ export const copyWorkflows = async (
  * @param cwd - Target project directory.
  * @param templateDir - Resolved template source directory.
  * @returns Promise that resolves after the hook is copied or warned.
- * @example
- * await copyPrePushHook(process.cwd(), templateDir);
  */
 export const copyPrePushHook = async (cwd: string, templateDir: string): Promise<void> => {
   const huskySource = join(templateDir, '.husky', 'pre-push');
@@ -86,8 +80,6 @@ export const copyPrePushHook = async (cwd: string, templateDir: string): Promise
  * @param cwd - Target project directory.
  * @param templateDir - Resolved template source directory.
  * @returns Promise that resolves after SECURITY.md is copied or warned.
- * @example
- * await copySecurityFile(process.cwd(), templateDir);
  */
 export const copySecurityFile = async (cwd: string, templateDir: string): Promise<void> => {
   const dest = join(cwd, 'SECURITY.md');
@@ -111,8 +103,6 @@ export const copySecurityFile = async (cwd: string, templateDir: string): Promis
  *
  * @param cwd - Target project directory.
  * @returns Promise that resolves after the directory is ready.
- * @example
- * await createDevScriptsDir(process.cwd());
  */
 export const createDevScriptsDir = async (cwd: string): Promise<void> => {
   const devScriptsDir = join(cwd, 'dev-scripts');
@@ -136,8 +126,6 @@ export const createDevScriptsDir = async (cwd: string): Promise<void> => {
  *
  * @param cwd - Target project directory.
  * @returns Promise that resolves after configs are generated or minimally seeded.
- * @example
- * await generatePlatformConfigs(process.cwd());
  */
 export const generatePlatformConfigs = async (cwd: string): Promise<void> => {
   const possiblePaths = [
@@ -191,8 +179,6 @@ export const generatePlatformConfigs = async (cwd: string): Promise<void> => {
  * @param dir - Directory containing workflow YAML files.
  * @param pm - Non-pnpm package manager to render into workflow commands.
  * @returns Promise that resolves after workflow files are rewritten.
- * @example
- * await adaptWorkflows('.github/workflows', 'npm');
  */
 const adaptWorkflows = async (dir: string, pm: Exclude<PackageManager, 'pnpm'>): Promise<void> => {
   const files = await readdir(dir);

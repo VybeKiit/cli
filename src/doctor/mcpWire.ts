@@ -397,8 +397,6 @@ export const readCoreMcpServerNames = (
  * @param core - Core catalog servers.
  * @param deps - File I/O.
  * @returns Whether the file was written and which server names were newly added.
- * @example
- * const result = writeMergedMcpConfig(join(cwd, '.cursor/mcp.json'), core, deps);
  */
 export const writeMergedMcpConfig = (
   configPath: string,
@@ -476,8 +474,6 @@ export const tryClaudeMcpAdd = (
  * @param agents - Detected agents for this machine/project.
  * @param deps - Injectable I/O.
  * @returns Buyer-facing lines and wire status (never says "MCP").
- * @example
- * const result = wireCoreMcps(process.cwd(), agents, createDefaultMcpWireDeps());
  */
 export const wireCoreMcps = (
   cwd: string,

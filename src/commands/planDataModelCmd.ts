@@ -27,8 +27,6 @@ const resolveDataProvider = (value: string): DataProviderName | undefined =>
  *
  * @param args - CLI arguments after `plan-data-model`; file path then optional provider.
  * @returns JSON plan output plus the process exit code.
- * @example
- * const result = await runPlanDataModel(['entities.json', 'supabase']);
  */
 export const runPlanDataModel = async (
   args: string[],

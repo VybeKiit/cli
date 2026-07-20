@@ -22,8 +22,6 @@ const resolveMonorepoRoot = (): string => join(HERE, '..', '..', '..');
  *
  * @param url - URL to open.
  * @returns Promise that resolves after the browser open request is sent.
- * @example
- * await openBrowser('http://localhost:3005');
  */
 const openBrowser = async (url: string): Promise<void> => {
   const { default: open } = await import('open');

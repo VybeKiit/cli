@@ -40,8 +40,6 @@ export type ResolvedSource = {
  *
  * @param path - Absolute or relative path to probe.
  * @returns True when the path is accessible.
- * @example
- * await pathExists('/tmp/vybekiit/templates/web');
  */
 const pathExists = async (path: string): Promise<boolean> => {
   try {
@@ -65,8 +63,6 @@ const pathExists = async (path: string): Promise<boolean> => {
  * @param template - Template mirror to clone.
  * @param targetDir - Directory `gh` clones into, which must not already exist.
  * @returns Promise that resolves after the mirror is cloned.
- * @example
- * await cloneMirror('web', '/tmp/vybekiit-web');
  */
 export const cloneMirror = async (template: TemplateName, targetDir: string): Promise<void> => {
   try {
