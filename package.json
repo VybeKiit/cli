@@ -1,6 +1,6 @@
 {
   "name": "vybekiit",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Set up tools and create a VybeKiit app: `npx vybekiit setup` then `npx vybekiit create app --web`.",
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
