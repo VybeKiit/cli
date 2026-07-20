@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { caughtMessage } from '@vybekiit/core';
 import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { scaffold } from '../lib/scaffold';
 
@@ -99,7 +100,7 @@ export const runScaffoldBackend = async (
     return { message: `Scaffolded ${destName}/. Your API server is ready.`, exitCode: 0 };
   } catch (error) {
     return {
-      message: error instanceof Error ? error.message : 'Scaffold failed.',
+      message: caughtMessage(error, 'Scaffold failed.'),
       exitCode: 1,
     };
   } finally {
@@ -387,7 +388,7 @@ export const runBackendGenContract = async (
     await runner('npm', ['run', 'gen:contract'], join(cwd, 'backend'));
     return { message: 'Generated backend/openapi.json from your route registry.', exitCode: 0 };
   } catch (error) {
-    const detail = error instanceof Error ? error.message : 'unknown error';
+    const detail = caughtMessage(error, 'unknown error');
     return {
       message: `Could not generate the contract (${detail}). Install backend deps and retry.`,
       exitCode: 1,

@@ -1,5 +1,6 @@
 import process from 'node:process';
 import { cancel, isCancel, select } from '@clack/prompts';
+import { caughtMessage } from '@vybekiit/core';
 import { ALL_PRESETS } from '@vybekiit/db';
 import { loadPageRecipes } from '../lib/pageRecipeCatalog';
 import { resolveKitSource } from '../lib/resolveKitSource';
@@ -93,7 +94,7 @@ const runPageRecipePath = async (): Promise<number> => {
     }
     return result.exitCode;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = caughtMessage(error);
     process.stderr.write(`${message}\n`);
     return 1;
   } finally {

@@ -1,4 +1,9 @@
-import { type NamecheapConfig, namecheapConfigSchema, parseEnv } from '@vybekiit/core';
+import {
+  caughtMessage,
+  type NamecheapConfig,
+  namecheapConfigSchema,
+  parseEnv,
+} from '@vybekiit/core';
 import { verifyNamecheapCredentials } from '@vybekiit/deploy';
 import { Effect } from 'effect';
 
@@ -30,7 +35,7 @@ export const verifyNamecheapDoctor = async (
   try {
     config = parseEnv(namecheapConfigSchema, env);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Invalid Namecheap configuration';
+    const message = caughtMessage(error, 'Invalid Namecheap configuration');
     return {
       checked: true,
       ok: false,
@@ -50,7 +55,7 @@ export const verifyNamecheapDoctor = async (
       lines: ['✓ Namecheap - API credentials verified.'],
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Namecheap probe failed';
+    const message = caughtMessage(error, 'Namecheap probe failed');
     return {
       checked: true,
       ok: false,

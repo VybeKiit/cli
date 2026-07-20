@@ -1,3 +1,4 @@
+import { caughtMessage } from '@vybekiit/core';
 import type { TemplateName } from '../lib/scaffold';
 import { listTemplateFiles } from './dropFiles';
 import { DROP_MODE_LABELS, type DropContext, type DropFlags, dropMode } from './dropTypes';
@@ -175,7 +176,7 @@ export const writeDropSuccess = (context: DropContext, postActions: readonly str
  * const code = writeDropError(flags, error);
  */
 export const writeDropError = (flags: DropFlags, error: unknown): number => {
-  const message = error instanceof Error ? error.message : 'Could not resolve template source';
+  const message = caughtMessage(error, 'Could not resolve template source');
   if (flags.json) {
     process.stdout.write(`${JSON.stringify({ error: true, message })}\n`);
     return 1;

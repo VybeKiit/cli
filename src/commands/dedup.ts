@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { caughtMessage } from '@vybekiit/core';
 
 const execFileAsync = promisify(execFile);
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -86,7 +87,7 @@ const formatDedupExecError = (error: unknown): DedupResult => {
   return {
     exitCode: 1,
     output: JSON.stringify({
-      error: `Failed to run vybekiit-dedup: ${error instanceof Error ? error.message : String(error)}`,
+      error: `Failed to run vybekiit-dedup: ${caughtMessage(error)}`,
     }),
   };
 };

@@ -1,6 +1,7 @@
 import { readdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import process from 'node:process';
+import { caughtMessage } from '@vybekiit/core';
 import { resolveKitSource } from '../lib/resolveKitSource';
 import { ScaffoldError } from '../lib/scaffold';
 import { scaffoldKitWorkspace } from '../lib/scaffoldKitWorkspace';
@@ -185,7 +186,7 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
       writeStderr(formatCreateError(error.message));
       return 1;
     }
-    const message = error instanceof Error ? error.message : 'Could not create the app.';
+    const message = caughtMessage(error, 'Could not create the app.');
     writeStderr(formatCreateError(message));
     return 1;
   } finally {

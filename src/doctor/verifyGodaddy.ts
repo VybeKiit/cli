@@ -1,4 +1,4 @@
-import { type GodaddyConfig, godaddyConfigSchema, parseEnv } from '@vybekiit/core';
+import { caughtMessage, type GodaddyConfig, godaddyConfigSchema, parseEnv } from '@vybekiit/core';
 import { verifyGodaddyCredentials } from '@vybekiit/deploy';
 import { Effect } from 'effect';
 
@@ -26,7 +26,7 @@ export const verifyGodaddyDoctor = async (env: NodeJS.ProcessEnv): Promise<Godad
   try {
     config = parseEnv(godaddyConfigSchema, env);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Invalid GoDaddy configuration';
+    const message = caughtMessage(error, 'Invalid GoDaddy configuration');
     return {
       checked: true,
       ok: false,
@@ -46,7 +46,7 @@ export const verifyGodaddyDoctor = async (env: NodeJS.ProcessEnv): Promise<Godad
       lines: ['✓ GoDaddy - API credentials verified.'],
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'GoDaddy probe failed';
+    const message = caughtMessage(error, 'GoDaddy probe failed');
     return {
       checked: true,
       ok: false,

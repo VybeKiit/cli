@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { caughtMessage } from '@vybekiit/core';
 import { findPageRecipe, loadPageRecipes, type PageRecipeSummary } from '../lib/pageRecipeCatalog';
 import {
   applyPageRecipeInstall,
@@ -91,7 +92,7 @@ export const runListPageRecipes = async (_args: readonly string[] = []): Promise
       exitCode: 0,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = caughtMessage(error);
     return {
       json: JSON.stringify({ ok: false, error: message }, null, 2),
       exitCode: 1,
@@ -209,7 +210,7 @@ export const runAddPageRecipe = async (args: readonly string[]): Promise<Command
       exitCode: 0,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = caughtMessage(error);
     return recipeError(message);
   } finally {
     if (cleanup !== undefined) {

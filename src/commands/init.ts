@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { caughtMessage } from '@vybekiit/core';
 import { resolveTemplatesSource } from '../lib/resolveTemplates';
 import {
   copyClaudeHooks,
@@ -59,8 +60,7 @@ export const runInit = async (args: string[]): Promise<number> => {
     writeInitSuccess(pm);
     return 0;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Could not initialize VybeKiit guardrails.';
+    const message = caughtMessage(error, 'Could not initialize VybeKiit guardrails.');
     return writeInitFailure(message);
   } finally {
     if (cleanup !== undefined) {

@@ -1,5 +1,6 @@
 import {
   type CloudflareEmailConfig,
+  caughtMessage,
   cloudflareEmailConfigSchema,
   emailConfigSchema,
   parseEnv,
@@ -63,7 +64,7 @@ export const verifyEmailWorkerDoctor = async (
   try {
     config = parseEnv(cloudflareEmailConfigSchema, env);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Invalid email configuration';
+    const message = caughtMessage(error, 'Invalid email configuration');
     return {
       checked: true,
       ok: false,
@@ -94,7 +95,7 @@ export const verifyEmailWorkerDoctor = async (
       lines: ['✓ Email worker - health check passed.'],
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Email worker unreachable';
+    const message = caughtMessage(error, 'Email worker unreachable');
     return {
       checked: true,
       ok: false,

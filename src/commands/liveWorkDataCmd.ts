@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import process from 'node:process';
+import { caughtMessage } from '@vybekiit/core';
 import {
   type DataLadderProvider,
   type DataLiveWorkResult,
@@ -220,7 +221,7 @@ const writeDataPin = (
     catch: (cause) =>
       new LiveWorkError({
         code: 'pin_write_failed',
-        message: cause instanceof Error ? cause.message : 'Failed to write pin keys',
+        message: caughtMessage(cause, 'Failed to write pin keys'),
         hopClass: 'hard_stop',
       }),
   });

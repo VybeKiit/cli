@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { type DataProviderName, type EntityInput, planDataModel } from '@vybekiit/agent-kit';
+import { caughtMessage } from '@vybekiit/core';
 
 /** Data providers supported by the data-model planner. */
 const PROVIDERS: readonly DataProviderName[] = [
@@ -75,7 +76,7 @@ export const runPlanDataModel = async (
     return {
       json: JSON.stringify({
         ok: false,
-        error: error instanceof Error ? error.message : 'Failed to read input.',
+        error: caughtMessage(error, 'Failed to read input.'),
       }),
       exitCode: 1,
     };

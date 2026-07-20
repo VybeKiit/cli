@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { caughtMessage } from '@vybekiit/core';
 import { runCli } from './cliRunner';
 
 // This file is the package's `bin` entry (package.json -> "bin": "./dist/bin.js"),
@@ -17,6 +18,6 @@ import { runCli } from './cliRunner';
 try {
   process.exit(await runCli(process.argv.slice(2)));
 } catch (error) {
-  process.stderr.write(`vybekiit: ${error instanceof Error ? error.message : String(error)}\n`);
+  process.stderr.write(`vybekiit: ${caughtMessage(error)}\n`);
   process.exit(1);
 }
