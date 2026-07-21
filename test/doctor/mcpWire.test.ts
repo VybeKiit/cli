@@ -35,7 +35,7 @@ const CORE_CATALOG_JSON = JSON.stringify({
       name: 'playwright',
       category: 'frontend',
       priority: 2,
-      command: 'npx -y @anthropic-ai/mcp-playwright',
+      command: 'npx -y @playwright/mcp@latest',
       env: [],
     },
   ],

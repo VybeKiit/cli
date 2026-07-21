@@ -18,7 +18,7 @@ const ZERO_CONFIG: readonly McpServerDef[] = [
   {
     name: 'playwright',
     transport: 'stdio',
-    command: ['npx', '-y', '@anthropic-ai/mcp-playwright'],
+    command: ['npx', '-y', '@playwright/mcp@latest'],
   },
   { name: 'context7', transport: 'stdio', command: ['npx', '-y', '@upstash/context7-mcp@latest'] },
   { name: 'sentry', transport: 'sse', command: ['https://mcp.sentry.dev/sse'] },
@@ -37,32 +37,20 @@ const KEY_GATED: readonly McpServerDef[] = [
   {
     name: 'supabase',
     transport: 'stdio',
-    command: ['npx', '-y', 'supabase-mcp-server'],
+    command: ['npx', '-y', '@supabase/mcp-server-supabase@latest'],
     envKeys: ['SUPABASE_ACCESS_TOKEN'],
-  },
-  {
-    name: 'vercel',
-    transport: 'stdio',
-    command: ['npx', '-y', '@vercel/mcp'],
-    envKeys: ['VERCEL_TOKEN'],
   },
   {
     name: 'stripe',
     transport: 'stdio',
-    command: ['npx', '-y', '@stripe/mcp'],
+    command: ['npx', '-y', '@stripe/mcp', '--tools=all'],
     envKeys: ['STRIPE_SECRET_KEY'],
-  },
-  {
-    name: 'cloudflare',
-    transport: 'stdio',
-    command: ['npx', '-y', '@anthropic-ai/mcp-cloudflare'],
-    envKeys: ['CLOUDFLARE_API_TOKEN'],
   },
   {
     name: 'figma',
     transport: 'stdio',
-    command: ['npx', '-y', '@anthropic-ai/mcp-figma'],
-    envKeys: ['FIGMA_ACCESS_TOKEN'],
+    command: ['npx', '-y', 'figma-developer-mcp', '--stdio'],
+    envKeys: ['FIGMA_API_KEY'],
   },
   {
     name: 'resend',
