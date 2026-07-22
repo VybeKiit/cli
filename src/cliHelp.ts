@@ -21,6 +21,7 @@ ${createSurfaceUsage}
 After your app exists (your AI coding tool drives these):
   vybekiit list-pieces · list-page-recipes · list-presets
   vybekiit add page-recipe <id> [--to=dir] [--dry-run] [--force]
+  vybekiit add report-mode [--to=dir] [--dry-run] [--force]
   vybekiit apply-preset <id> [--cwd=dir] · verify-presets
   vybekiit scaffold backend · backend add-route|add-crud|add-upload|gen-contract
   vybekiit env wizard · sync-agent-layer · update path via your agent
@@ -72,6 +73,7 @@ Agent / kit:
   vybekiit list-page-recipes
   vybekiit list-presets
   vybekiit add page-recipe <id> [--to=dir] [--dry-run] [--force]
+  vybekiit add report-mode [--to=dir] [--dry-run] [--force]   (point & fix overlay into an existing app)
   vybekiit add                              (interactive: pick a ready piece)
   vybekiit apply-preset <feature> [--provider=supabase|neon|railway|mongodb|firebase|aws] [--cwd=dir] [--dry-run]
   vybekiit verify-presets [--fix] [--cwd=dir] [preset...]

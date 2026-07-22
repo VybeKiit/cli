@@ -12,8 +12,10 @@ export type McpServerDef = {
   readonly envKeys?: readonly string[];
 };
 
-// Zero-config servers register unconditionally — the point of the global install. Browser
-// automation everywhere = playwright; context7 = live library docs; sentry = remote OAuth.
+// Zero-config servers register unconditionally — the point of the global install: they need no
+// key and connect immediately. Browser automation everywhere = playwright; context7 = live
+// library docs. Anything needing a token or OAuth is KEY_GATED so we never register a server
+// that would sit "failed to connect".
 const ZERO_CONFIG: readonly McpServerDef[] = [
   {
     name: 'playwright',
@@ -21,7 +23,6 @@ const ZERO_CONFIG: readonly McpServerDef[] = [
     command: ['npx', '-y', '@playwright/mcp@latest'],
   },
   { name: 'context7', transport: 'stdio', command: ['npx', '-y', '@upstash/context7-mcp@latest'] },
-  { name: 'sentry', transport: 'sse', command: ['https://mcp.sentry.dev/sse'] },
 ];
 
 // Key-gated catalog servers — registered only when their token is already in the
@@ -45,6 +46,14 @@ const KEY_GATED: readonly McpServerDef[] = [
     transport: 'stdio',
     command: ['npx', '-y', '@stripe/mcp', '--tools=all'],
     envKeys: ['STRIPE_SECRET_KEY'],
+  },
+  {
+    // Sentry's hosted server is OAuth-only (would sit "failed to connect" until the user
+    // authenticates in a browser); its stdio server takes a token, so gate on that like the rest.
+    name: 'sentry',
+    transport: 'stdio',
+    command: ['npx', '-y', '@sentry/mcp-server@latest'],
+    envKeys: ['SENTRY_ACCESS_TOKEN'],
   },
   {
     name: 'figma',
@@ -140,7 +149,7 @@ const hasKeys = (def: McpServerDef, env: Record<string, string | undefined>): bo
  * Whether a server definition is zero-config (always refreshable on auto-update).
  *
  * @param def - Server definition.
- * @returns True for playwright / context7 / sentry-class entries.
+ * @returns True for playwright / context7 entries.
  */
 const isZeroConfig = (def: McpServerDef): boolean =>
   ZERO_CONFIG.some((entry) => entry.name === def.name);

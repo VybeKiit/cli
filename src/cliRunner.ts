@@ -31,6 +31,7 @@ import { runPlanReadiness } from './commands/planReadiness';
 import { runPlanSetup } from './commands/planSetupCmd';
 import { runApplyPreset, runListPresets, runVerifyPresets } from './commands/presetsCmd';
 import { runRenderAgentLayer } from './commands/renderAgentLayer';
+import { runAddReportMode } from './commands/reportModeCmd';
 import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
 import { runUpdateKitCommand } from './commands/updateKit';
@@ -314,6 +315,11 @@ const handleAddCommand = async (context: CliCommandContext): Promise<number> => 
     process.stdout.write(`${result.json}\n`);
     return result.exitCode;
   }
+  if (context.subcommand === 'report-mode') {
+    const result = await runAddReportMode([...context.rest]);
+    process.stdout.write(`${result.json}\n`);
+    return result.exitCode;
+  }
   if (context.subcommand === 'preset') {
     // Alias so agents can use one verb family: add preset | add page-recipe
     const result = await runApplyPreset([...context.rest]);
@@ -321,7 +327,7 @@ const handleAddCommand = async (context: CliCommandContext): Promise<number> => 
     return result.exitCode;
   }
   process.stderr.write(
-    'Unknown add command. Try: vybekiit add page-recipe <id> | add preset <id> | add bridge\n',
+    'Unknown add command. Try: vybekiit add page-recipe <id> | add report-mode | add preset <id> | add bridge\n',
   );
   return 1;
 };

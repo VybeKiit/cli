@@ -2,7 +2,7 @@ import { ALL_PRESETS } from '@vybekiit/db';
 import type { PageRecipeSummary } from '../lib/pageRecipeCatalog';
 
 /** Unified catalog piece kind for agents. */
-export type PieceKind = 'db' | 'page-recipe' | 'backend';
+export type PieceKind = 'db' | 'page-recipe' | 'backend' | 'report-mode';
 
 /** One listable ready piece across DB presets, page recipes, and backend scaffolds. */
 export type CatalogPiece = {
@@ -50,6 +50,23 @@ export const backendPieces = (): readonly CatalogPiece[] => [
     title: 'Add file upload',
     summary: 'Generate an upload endpoint on the backend.',
     command: 'vybekiit backend add-upload',
+  },
+];
+
+/**
+ * Build the static Report Mode piece entry (installable into any web/mobile/extension app).
+ *
+ * @returns Report Mode catalog rows.
+ * @example
+ * const reportMode = reportModePieces();
+ */
+export const reportModePieces = (): readonly CatalogPiece[] => [
+  {
+    kind: 'report-mode',
+    id: 'report-mode',
+    title: 'Report Mode',
+    summary: 'Install the dev-only point & fix inspect/report overlay into an existing app.',
+    command: 'vybekiit add report-mode [--to=dir]',
   },
 ];
 
@@ -107,6 +124,6 @@ export const buildCatalog = (
   recipes: readonly PageRecipeSummary[],
   kindFilter: string | undefined,
 ): readonly CatalogPiece[] =>
-  [...dbPieces(), ...pageRecipePieces(recipes), ...backendPieces()].filter(
+  [...dbPieces(), ...pageRecipePieces(recipes), ...backendPieces(), ...reportModePieces()].filter(
     (piece) => kindFilter === undefined || piece.kind === kindFilter,
   );

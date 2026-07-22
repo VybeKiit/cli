@@ -51,7 +51,7 @@ describe('buildAddArgs', () => {
   });
 
   it('builds sse args for remote servers', () => {
-    const def: McpServerDef = { name: 'sentry', transport: 'sse', command: ['https://x/sse'] };
+    const def: McpServerDef = { name: 'remote-sse', transport: 'sse', command: ['https://x/sse'] };
     expect(buildAddArgs(def, {})).toEqual([
       'mcp',
       'add',
@@ -59,7 +59,7 @@ describe('buildAddArgs', () => {
       'user',
       '--transport',
       'sse',
-      'sentry',
+      'remote-sse',
       'https://x/sse',
     ]);
   });
@@ -84,8 +84,10 @@ describe('installGlobalMcp', () => {
       },
       env: {},
     });
-    expect(result.enabled).toEqual(expect.arrayContaining(['playwright', 'context7', 'sentry']));
-    expect(result.needsKey).toContain('github');
+    expect(result.enabled).toEqual(expect.arrayContaining(['playwright', 'context7']));
+    // sentry is key-gated now (OAuth would fail to connect) — staged, not registered.
+    expect(result.enabled).not.toContain('sentry');
+    expect(result.needsKey).toEqual(expect.arrayContaining(['github', 'sentry']));
     expect(result.claudeMissing).toBe(false);
   });
 
@@ -115,7 +117,8 @@ describe('installGlobalMcp', () => {
       env: {},
       forceRefresh: true,
     });
-    expect(result.refreshed).toEqual(expect.arrayContaining(['playwright', 'context7', 'sentry']));
+    expect(result.refreshed).toEqual(expect.arrayContaining(['playwright', 'context7']));
+    expect(result.refreshed).not.toContain('sentry'); // key-gated servers are not force-refreshed
     expect(result.alreadyPresent).not.toContain('playwright');
     expect(calls.some((args) => args[0] === 'mcp' && args[1] === 'remove')).toBe(true);
   });
@@ -127,9 +130,10 @@ describe('installGlobalMcp', () => {
         if (args[1] === 'get') return missing;
         return ok;
       },
-      env: { GITHUB_PERSONAL_ACCESS_TOKEN: 'ghp_x' },
+      env: { GITHUB_PERSONAL_ACCESS_TOKEN: 'ghp_x', SENTRY_ACCESS_TOKEN: 'snt_x' },
     });
-    expect(result.enabled).toContain('github');
+    expect(result.enabled).toEqual(expect.arrayContaining(['github', 'sentry']));
     expect(result.needsKey).not.toContain('github');
+    expect(result.needsKey).not.toContain('sentry');
   });
 });

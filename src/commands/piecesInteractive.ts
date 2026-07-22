@@ -7,6 +7,7 @@ import { resolveKitSource } from '../lib/resolveKitSource';
 import { isInteractive } from '../prompts/tty';
 import { runAddPageRecipe, runListPieces } from './piecesCmd';
 import { runApplyPreset } from './presetsCmd';
+import { runAddReportMode } from './reportModeCmd';
 
 /**
  * Interactive list path for the TTY add menu.
@@ -50,6 +51,24 @@ const runDbPresetPath = async (): Promise<number> => {
     '\nDry-run shown. Apply for real with: vybekiit apply-preset ' +
       `${picked}\n(Needs DATABASE_URL in the project.)\n`,
   );
+  return result.exitCode;
+};
+
+/**
+ * Interactive Report Mode install into the current folder.
+ *
+ * @returns Exit code from add report-mode.
+ * @example
+ * const code = await runReportModePath();
+ */
+const runReportModePath = async (): Promise<number> => {
+  const result = await runAddReportMode(['--to=.']);
+  process.stdout.write(`${result.json}\n`);
+  if (result.exitCode === 0) {
+    process.stdout.write(
+      '\nInstalled Report Mode into the current folder. Wire any TODOs in the JSON report next.\n',
+    );
+  }
   return result.exitCode;
 };
 
@@ -128,6 +147,11 @@ export const runAddPiecesInteractive = async (): Promise<number> => {
         hint: 'Copy a full page into your app',
       },
       {
+        value: 'report-mode',
+        label: 'Report Mode (point & fix overlay)',
+        hint: 'Add the dev-only inspect/report dock',
+      },
+      {
         value: 'db',
         label: 'Database preset',
         hint: 'Tables/schema for a feature',
@@ -150,6 +174,9 @@ export const runAddPiecesInteractive = async (): Promise<number> => {
   }
   if (kind === 'db') {
     return runDbPresetPath();
+  }
+  if (kind === 'report-mode') {
+    return runReportModePath();
   }
   return runPageRecipePath();
 };
