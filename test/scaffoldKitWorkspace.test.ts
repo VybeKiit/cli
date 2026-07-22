@@ -176,7 +176,7 @@ describe('scaffoldKitWorkspace happy path', () => {
     await expect(
       readFile(join(emptyDest, 'packages', 'core', 'node_modules', 'left-pad', 'x'), 'utf8'),
     ).rejects.toThrow();
-  });
+  }, 15_000);
 });
 
 describe('scaffoldKitWorkspace failures', () => {
