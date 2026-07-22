@@ -82,6 +82,7 @@ Agent / kit:
   vybekiit live-work payments [--mode=demo|dogfood|buyer] [--vendor=lemon-squeezy|stripe|paypal] [--cwd=dir] [--no-pin] [--fresh]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
+  vybekiit feedback status | feedback submit <draft> [--confirm]
   vybekiit dedup [--intent <desc>] [--target <file>] [--scope <dir>] [--index] [--json]
   vybekiit add bridge
   vybekiit env wizard

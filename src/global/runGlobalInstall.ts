@@ -16,6 +16,8 @@ import { sampleManagedSkillNames } from './managedSkills';
 export type GlobalInstallSummary = {
   readonly skillsInstalled: number;
   readonly skillsSkipped: number;
+  readonly skippedSkillNames: readonly string[];
+  readonly feedbackInstalled: boolean;
   /** Recognizable sample of skill names that landed (smoke check for the buyer). */
   readonly skillSample: readonly string[];
   /** Absolute path skills were written to. */
@@ -61,6 +63,11 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   if (summary.skillSample.length > 0) {
     lines.push(`             smoke: ${summary.skillSample.join(', ')}`);
   }
+  if (summary.skippedSkillNames.length > 0) {
+    lines.push(
+      `             kept your own same-named skills: ${summary.skippedSkillNames.join(', ')}`,
+    );
+  }
   if (skillsEmpty) {
     lines.push(
       '             No managed skills on disk — Claude Code will not load kit skills until this is fixed.',
@@ -86,7 +93,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
     lines.push('');
   } else {
     lines.push(
-      '  • Command  type /vybekiit in Claude Code to see status anytime',
+      summary.feedbackInstalled
+        ? '  • Command  type /vybekiit for status or /feedback to send us a note'
+        : '  • Command  type /vybekiit in Claude Code to see status anytime',
       '  • Claude now knows it is VybeKiit-enabled in every project',
       '',
       'To see it: restart Claude Code (or run `claude` once) to approve the new MCP servers,',
@@ -175,6 +184,8 @@ export const runGlobalInstall = async (
   const summary: GlobalInstallSummary = {
     skillsInstalled: skills.installed.length,
     skillsSkipped: skills.skipped.length,
+    skippedSkillNames: skills.skipped,
+    feedbackInstalled: skills.installed.includes('feedback'),
     skillSample,
     skillsPath: skills.path,
     mcpEnabled: mcp.enabled,

@@ -4,6 +4,8 @@ import { formatGlobalInstallSummary, runGlobalInstall } from '../../src/global/r
 const baseSummary = {
   skillsInstalled: 119,
   skillsSkipped: 0,
+  skippedSkillNames: [] as readonly string[],
+  feedbackInstalled: true,
   skillSample: ['add-signin', 'go-live', 'onboarding', 'plan-my-idea', 'setup-payments'],
   skillsPath: '/Users/me/.claude/skills',
   mcpEnabled: ['playwright', 'context7'] as readonly string[],
@@ -27,7 +29,20 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('playwright, context7');
     expect(text).toContain('1 more need an API key');
     expect(text).toContain('/vybekiit');
+    expect(text).toContain('/feedback');
     expect(text).toContain('vybekiit@latest update');
+  });
+
+  it('does not advertise feedback when a user-owned collision was preserved', () => {
+    const text = formatGlobalInstallSummary({
+      ...baseSummary,
+      feedbackInstalled: false,
+      skillsSkipped: 1,
+      skippedSkillNames: ['feedback'],
+    }).join('\n');
+
+    expect(text).toContain('kept your own same-named skills: feedback');
+    expect(text).not.toContain('/feedback');
   });
 
   it('calls out a version bump when re-running after a newer CLI', () => {
