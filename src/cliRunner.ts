@@ -17,6 +17,7 @@ import { runCreateApp } from './commands/createApp';
 import { runDedup } from './commands/dedup';
 import { runDocFallback } from './commands/docFallback';
 import { runDrop } from './commands/drop';
+import { runFeedback } from './commands/feedbackCmd';
 import { runInit } from './commands/init';
 import { runLintExtensionSkill } from './commands/lintExtensionSkill';
 import { runLiveWorkData } from './commands/liveWorkDataCmd';
@@ -47,7 +48,7 @@ import { isInteractive } from './prompts/tty';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Commands that may run before license gate (first-run tools path). */
-const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update']);
+const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update', 'feedback']);
 
 type CliCommandContext = {
   readonly command: string;
@@ -454,6 +455,7 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
     return result.exitCode;
   },
   backend: handleBackendCommand,
+  feedback: (context) => runFeedback(commandArgs(context)),
 };
 
 /**
