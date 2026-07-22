@@ -20,6 +20,7 @@ const OUT_DIR = join(CLI_ROOT, 'dist', 'global-skills');
 // Surface priority: the first surface that defines a skill name wins. `web` is the
 // richest surface, so it is canonical; the rest only contribute skills web lacks.
 const SURFACE_PRIORITY = ['web', 'mobile', 'backend', 'extension', 'spa'];
+const REQUIRED_SKILLS = ['feedback'];
 
 /**
  * List immediate subdirectory names of a directory, or [] when it is absent.
@@ -56,6 +57,11 @@ const main = async () => {
   }
 
   manifest.sort((left, right) => left.localeCompare(right));
+  for (const requiredSkill of REQUIRED_SKILLS) {
+    if (!manifest.includes(requiredSkill)) {
+      throw new Error(`required global skill is missing: ${requiredSkill}`);
+    }
+  }
   await writeFile(
     join(OUT_DIR, 'manifest.json'),
     `${JSON.stringify({ skills: manifest, count: manifest.length }, null, 2)}\n`,
@@ -67,22 +73,4 @@ const main = async () => {
   );
 };
 
-// Never fail the whole build if the skills payload can't be assembled (e.g. templates
-// absent in a shallow checkout) — emit an empty manifest so the installer degrades to
-// "no skills bundled" instead of the CLI failing to build.
-await main().catch(async (error) => {
-  process.stderr.write(
-    `global-skills: skipped (${error instanceof Error ? error.message : error})\n`,
-  );
-  // Best-effort empty manifest so the installer degrades to "no skills bundled".
-  try {
-    await mkdir(OUT_DIR, { recursive: true });
-    await writeFile(
-      join(OUT_DIR, 'manifest.json'),
-      `${JSON.stringify({ skills: [], count: 0 })}\n`,
-      'utf8',
-    );
-  } catch {
-    // Nothing else we can do about the payload at build time.
-  }
-});
+await main();

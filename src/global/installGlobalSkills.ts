@@ -3,6 +3,8 @@ import { join } from 'node:path';
 import type { GlobalPaths } from './globalPaths';
 import { MANAGED_SKILL_MARKER } from './managedSkills';
 
+const REQUIRED_MANAGED_SKILLS = ['feedback'];
+
 /** Outcome of a global skills install. */
 export type SkillsInstallResult = {
   /** Skills copied or refreshed this run. */
@@ -67,6 +69,11 @@ export const installGlobalSkills = async (
   sourceDir: string = paths.bundledSkillsDir,
 ): Promise<SkillsInstallResult> => {
   const names = await listBundledSkills(sourceDir);
+  for (const requiredSkill of REQUIRED_MANAGED_SKILLS) {
+    if (!names.includes(requiredSkill)) {
+      throw new Error(`Bundled skills are incomplete: ${requiredSkill} is missing.`);
+    }
+  }
   await mkdir(paths.skillsDir, { recursive: true });
 
   const installed: string[] = [];

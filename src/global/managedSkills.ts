@@ -67,6 +67,7 @@ export const sampleManagedSkillNames = (
   }
   // Prefer the goals buyers hear about in onboarding so the smoke line is recognizable.
   const preferred = [
+    'feedback',
     'onboarding',
     'plan-my-idea',
     'setup-payments',
