@@ -19,8 +19,10 @@ Do this now, briefly:
 1. Say: "✅ VybeKiit is active — you have its skills and browser automation in every project."
 2. Read the skill names under ~/.claude/skills and name 4-5 useful ones (for example: onboarding,
    plan-my-idea, setup-payments, add-signin, go-live).
-3. If there is no app in the current folder yet, offer to run \`vybekiit create app --web\`.
-   Otherwise ask what they want to build or change next.
+3. If there is no app in the current folder yet, check for ~/vybekiit-app (first-install default).
+   If it exists, offer to open that folder and run onboarding. Otherwise offer
+   \`vybekiit create app --web\`. If they are already in an app folder, ask what they want next.
+4. Mention Report mode once if they are in an app: Option+Shift+R (Alt+Shift+R on Windows).
 
 Keep it short and friendly. Do not dump the whole skill list.
 `;

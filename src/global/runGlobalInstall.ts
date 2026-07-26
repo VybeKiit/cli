@@ -11,6 +11,7 @@ import { installGlobalMcp } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
 import { readInstallState, writeInstallState } from './installState';
 import { sampleManagedSkillNames } from './managedSkills';
+import { runSessionOne, shouldSkipSessionOne } from './runSessionOne';
 
 /** Everything the global install did, for reporting + verification. */
 export type GlobalInstallSummary = {
@@ -103,6 +104,8 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
       '',
       'Re-run anytime to update:  curl -fsSL https://vybekiit.com/install.sh | sh',
       '                     or:  npx -y vybekiit@latest update',
+      'First install also creates your web app and opens Claude with "Set up my app."',
+      'Skip that step:  VYBEKIIT_SKIP_SESSION_ONE=1  or  --skip-session-one',
       '',
     );
   }
@@ -210,6 +213,22 @@ export const runGlobalInstall = async (
     return 1;
   }
 
-  await writeInstallState(paths.configDir, version);
+  // Session #1: only on true first install (no prior stamp). Creates web app, installs
+  // deps, starts preview, opens Claude Code with "Set up my app." Re-runs only update.
+  let firstAppPath = previous?.firstAppPath;
+  const isFirstInstall = previous === null;
+  if (isFirstInstall && !shouldSkipSessionOne(args)) {
+    const sessionOne = await runSessionOne();
+    for (const line of sessionOne.lines) {
+      process.stdout.write(`${line}\n`);
+    }
+    if (sessionOne.appPath !== null) {
+      firstAppPath = sessionOne.appPath;
+    }
+  }
+
+  await writeInstallState(paths.configDir, version, {
+    ...(firstAppPath !== undefined ? { firstAppPath } : {}),
+  });
   return 0;
 };

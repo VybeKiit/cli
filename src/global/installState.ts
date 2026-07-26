@@ -10,6 +10,19 @@ export type InstallState = {
   readonly version: string;
   /** ISO timestamp of that install. */
   readonly updatedAt: string;
+  /**
+   * Absolute path of the Session #1 web app created on first install, when that
+   * step finished. Absent on older stamps and when Session #1 was skipped/failed.
+   */
+  readonly firstAppPath?: string;
+};
+
+/** Optional fields when writing install state after a successful global install. */
+export type WriteInstallStateOptions = {
+  /** Absolute path of the first-run app (omit to leave previous value / unset). */
+  readonly firstAppPath?: string;
+  /** When true, clear a previously recorded first-app path. */
+  readonly clearFirstAppPath?: boolean;
 };
 
 /**
@@ -32,14 +45,26 @@ export const installStatePath = (configDir: string): string =>
 export const readInstallState = async (configDir: string): Promise<InstallState | null> => {
   try {
     const raw = await readFile(installStatePath(configDir), 'utf8');
-    const parsed = JSON.parse(raw) as { readonly version?: unknown; readonly updatedAt?: unknown };
+    const parsed = JSON.parse(raw) as {
+      readonly version?: unknown;
+      readonly updatedAt?: unknown;
+      readonly firstAppPath?: unknown;
+    };
     if (typeof parsed.version !== 'string' || parsed.version === '') {
       return null;
     }
     if (typeof parsed.updatedAt !== 'string' || parsed.updatedAt === '') {
       return null;
     }
-    return { version: parsed.version, updatedAt: parsed.updatedAt };
+    const firstAppPath =
+      typeof parsed.firstAppPath === 'string' && parsed.firstAppPath !== ''
+        ? parsed.firstAppPath
+        : undefined;
+    return {
+      version: parsed.version,
+      updatedAt: parsed.updatedAt,
+      ...(firstAppPath !== undefined ? { firstAppPath } : {}),
+    };
   } catch {
     return null;
   }
@@ -50,16 +75,27 @@ export const readInstallState = async (configDir: string): Promise<InstallState 
  *
  * @param configDir - Claude user config dir.
  * @param version - CLI version that was installed.
+ * @param options - Optional first-app path and clock.
  * @param now - Clock injection for tests (defaults to `new Date()`).
  */
 export const writeInstallState = async (
   configDir: string,
   version: string,
+  options: WriteInstallStateOptions = {},
   now: () => Date = () => new Date(),
 ): Promise<InstallState> => {
+  const previous = await readInstallState(configDir);
+  let firstAppPath = previous?.firstAppPath;
+  if (options.clearFirstAppPath === true) {
+    firstAppPath = undefined;
+  } else if (options.firstAppPath !== undefined && options.firstAppPath !== '') {
+    firstAppPath = options.firstAppPath;
+  }
+
   const state: InstallState = {
     version,
     updatedAt: now().toISOString(),
+    ...(firstAppPath !== undefined ? { firstAppPath } : {}),
   };
   await mkdir(configDir, { recursive: true });
   await writeFile(installStatePath(configDir), `${JSON.stringify(state, null, 2)}\n`, 'utf8');

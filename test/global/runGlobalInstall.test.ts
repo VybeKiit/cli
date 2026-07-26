@@ -31,6 +31,8 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('/vybekiit');
     expect(text).toContain('/feedback');
     expect(text).toContain('vybekiit@latest update');
+    expect(text).toContain('Set up my app');
+    expect(text).toContain('--skip-session-one');
   });
 
   it('does not advertise feedback when a user-owned collision was preserved', () => {

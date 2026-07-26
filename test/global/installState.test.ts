@@ -19,6 +19,7 @@ describe('installState', () => {
     const written = await writeInstallState(
       dir,
       '0.6.1',
+      {},
       () => new Date('2026-07-18T12:00:00.000Z'),
     );
 
@@ -30,6 +31,30 @@ describe('installState', () => {
 
     const raw = await readFile(join(dir, INSTALL_STATE_FILENAME), 'utf8');
     expect(JSON.parse(raw)).toEqual(written);
+  });
+
+  it('persists firstAppPath across version-only updates', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'vk-install-state-'));
+    await writeInstallState(
+      dir,
+      '0.6.1',
+      { firstAppPath: '/Users/me/vybekiit-app' },
+      () => new Date('2026-07-18T12:00:00.000Z'),
+    );
+
+    const updated = await writeInstallState(
+      dir,
+      '0.7.0',
+      {},
+      () => new Date('2026-07-19T12:00:00.000Z'),
+    );
+
+    expect(updated).toEqual({
+      version: '0.7.0',
+      updatedAt: '2026-07-19T12:00:00.000Z',
+      firstAppPath: '/Users/me/vybekiit-app',
+    });
+    expect(await readInstallState(dir)).toEqual(updated);
   });
 
   it('treats a corrupt stamp as a first install', async () => {

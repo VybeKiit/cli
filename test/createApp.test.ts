@@ -128,9 +128,20 @@ describe('formatSetupNextStep', () => {
     expect(lines.join('\n')).toContain('gh auth login --web');
   });
 
-  it('points at create app when ready', () => {
+  it('points at create app when ready and no first app yet', () => {
     const lines = formatSetupNextStep({ doctorExitCode: 0, gateReason: 'ok' });
     expect(lines.join('\n')).toContain('vybekiit create app --web');
+  });
+
+  it('points at the Session #1 app when first install already created one', () => {
+    const lines = formatSetupNextStep({
+      doctorExitCode: 0,
+      gateReason: 'ok',
+      firstAppPath: '/Users/me/vybekiit-app',
+    });
+    expect(lines.join('\n')).toContain('/Users/me/vybekiit-app');
+    expect(lines.join('\n')).toContain('Set up my app');
+    expect(lines.join('\n')).not.toContain('create app');
   });
 
   it('explains no access', () => {
