@@ -31,9 +31,9 @@ export const runSetup = async (): Promise<number> => {
   for (const line of formatSetupNextStep({
     doctorExitCode: code,
     gateReason: access.reason,
-    ...(installState?.firstAppPath !== undefined
-      ? { firstAppPath: installState.firstAppPath }
-      : {}),
+    ...(installState?.firstAppPath === undefined
+      ? {}
+      : { firstAppPath: installState.firstAppPath }),
   })) {
     process.stdout.write(`${line}\n`);
   }

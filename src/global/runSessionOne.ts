@@ -287,7 +287,9 @@ export const formatSessionOneLines = (
  * @example
  * const result = await runSessionOne();
  */
-export const runSessionOne = async (deps: SessionOneDeps = defaultDeps()): Promise<SessionOneResult> => {
+export const runSessionOne = async (
+  deps: SessionOneDeps = defaultDeps(),
+): Promise<SessionOneResult> => {
   const appPath = resolveFirstAppPath(deps);
   const exists = await deps.pathExists(appPath);
   const empty = exists ? await deps.isEmptyDir(appPath) : true;

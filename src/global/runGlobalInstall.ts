@@ -228,7 +228,7 @@ export const runGlobalInstall = async (
   }
 
   await writeInstallState(paths.configDir, version, {
-    ...(firstAppPath !== undefined ? { firstAppPath } : {}),
+    ...(firstAppPath === undefined ? {} : { firstAppPath }),
   });
   return 0;
 };

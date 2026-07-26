@@ -63,7 +63,7 @@ export const readInstallState = async (configDir: string): Promise<InstallState 
     return {
       version: parsed.version,
       updatedAt: parsed.updatedAt,
-      ...(firstAppPath !== undefined ? { firstAppPath } : {}),
+      ...(firstAppPath === undefined ? {} : { firstAppPath }),
     };
   } catch {
     return null;
@@ -95,7 +95,7 @@ export const writeInstallState = async (
   const state: InstallState = {
     version,
     updatedAt: now().toISOString(),
-    ...(firstAppPath !== undefined ? { firstAppPath } : {}),
+    ...(firstAppPath === undefined ? {} : { firstAppPath }),
   };
   await mkdir(configDir, { recursive: true });
   await writeFile(installStatePath(configDir), `${JSON.stringify(state, null, 2)}\n`, 'utf8');

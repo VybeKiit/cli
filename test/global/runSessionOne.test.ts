@@ -5,8 +5,8 @@ import {
   resolveFirstAppPath,
   runSessionOne,
   SESSION_ONE_SEED_PROMPT,
-  shouldSkipSessionOne,
   type SessionOneDeps,
+  shouldSkipSessionOne,
 } from '../../src/global/runSessionOne';
 
 const baseDeps = (overrides: Partial<SessionOneDeps> = {}): SessionOneDeps => ({
@@ -97,10 +97,7 @@ describe('runSessionOne', () => {
       'build:packages',
     ]);
     expect(deps.startDetached).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', ['dev']);
-    expect(deps.openClaude).toHaveBeenCalledWith(
-      '/Users/me/vybekiit-app',
-      SESSION_ONE_SEED_PROMPT,
-    );
+    expect(deps.openClaude).toHaveBeenCalledWith('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
     expect(result).toMatchObject({
       appPath: '/Users/me/vybekiit-app',
       created: true,
