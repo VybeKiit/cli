@@ -17,6 +17,7 @@ Getting started:
   vybekiit setup           Welcome + set up Claude Code globally (skills, MCP, tools)
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
 ${createSurfaceUsage}
+  vybekiit create --ui-library [directory]   Full UI kit + gallery + Claude (report mode ready)
 
 After your app exists (your AI coding tool drives these):
   vybekiit list-pieces · list-page-recipes · list-presets
@@ -32,6 +33,7 @@ ${createSurfaceHelp}
 Examples:
   vybekiit setup
   vybekiit create app --web
+  vybekiit create --ui-library
   vybekiit create app --mobile ./my-app
   vybekiit doctor
 
@@ -53,6 +55,7 @@ Buyer journey:
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
   vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]
+  vybekiit create --ui-library [directory]   (kit + @vybekiit/ui + gallery + Claude; report mode in)
 
 Create / project:
   vybekiit new [template] [directory]     (deprecated → create app)

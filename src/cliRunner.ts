@@ -14,6 +14,7 @@ import {
 import { runCheckAgentLayer } from './commands/checkAgentLayer';
 import { runCheckGoals } from './commands/checkGoals';
 import { runCreateApp } from './commands/createApp';
+import { isUiLibraryCreateArgs, runCreateUiLibraryCommand } from './commands/createUiLibrary';
 import { runDedup } from './commands/dedup';
 import { runDocFallback } from './commands/docFallback';
 import { runDrop } from './commands/drop';
@@ -243,7 +244,7 @@ const handleEnvCommand = async (context: CliCommandContext): Promise<number> => 
 };
 
 /**
- * Run `create` subcommands (`create app …`).
+ * Run `create` subcommands (`create app …` or `create --ui-library`).
  *
  * @param context - Parsed CLI command context.
  * @returns Exit code for create.
@@ -251,8 +252,15 @@ const handleEnvCommand = async (context: CliCommandContext): Promise<number> => 
  * const code = await handleCreateCommand(context);
  */
 const handleCreateCommand = async (context: CliCommandContext): Promise<number> => {
+  const args = commandArgs(context);
+  if (isUiLibraryCreateArgs(args)) {
+    return await runCreateUiLibraryCommand(args);
+  }
   if (context.subcommand !== 'app') {
-    process.stderr.write('Usage: vybekiit create app --web|--mobile|--extension [directory]\n');
+    process.stderr.write(
+      'Usage: vybekiit create app --web|--mobile|--extension [directory]\n' +
+        '   or: vybekiit create --ui-library [directory]\n',
+    );
     return 1;
   }
   return await runCreateApp([...context.rest]);

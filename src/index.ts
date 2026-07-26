@@ -3,6 +3,7 @@ export * from './commands/backendCli';
 export * from './commands/checkAgentLayer';
 export * from './commands/checkGoals';
 export * from './commands/createApp';
+export * from './commands/createUiLibrary';
 export * from './commands/dedup';
 export * from './commands/docFallback';
 export * from './commands/drop';

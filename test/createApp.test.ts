@@ -102,9 +102,11 @@ describe('create surface registry', () => {
     ]);
     expect(CLI_HELP).toContain('  --web         Next.js + agent layer');
     expect(CLI_HELP).toContain('  --backend     Express API + typed routes');
+    expect(CLI_HELP).toContain('create --ui-library');
     expect(CLI_HELP_ALL).toContain(
       'vybekiit create app --web|--mobile|--extension|--backend [directory]',
     );
+    expect(CLI_HELP_ALL).toContain('create --ui-library');
   });
 });
 
