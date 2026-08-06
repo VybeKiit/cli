@@ -70,9 +70,9 @@ export const pathExists = async (path: string): Promise<boolean> => {
  * @param cwd - Project directory used for layout inference.
  * @returns Template id, or null when no template can be inferred.
  * @example
- * const template = await resolveTemplateArg('web', process.cwd());
+ * const template = await selectedTemplate('web', process.cwd());
  */
-export const resolveTemplateArg = async (
+export const selectedTemplate = async (
   explicit: string | undefined,
   cwd: string,
 ): Promise<TemplateId | null> => {

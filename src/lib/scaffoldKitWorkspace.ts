@@ -16,7 +16,7 @@ import { ScaffoldError, shouldCopyScaffoldPath, type TemplateName } from './scaf
  * Monorepo files required so buyer kits can rebuild `@vybekiit/*` packages
  * (`tsup` configs import `../../scripts/lib/tsupWorkspaceAliases.mjs`).
  */
-const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json', 'tsup.base.ts'] as const;
+const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json'] as const;
 
 /** Shared tsup alias helpers copied into the buyer kit `scripts/lib/`. */
 const KIT_BUILD_SCRIPT_LIBS = [
@@ -45,7 +45,7 @@ const CATALOG_BLOCK_START = /^catalog:\s*$/m;
  * @param template - Surface template id (drives the root `dev` script).
  * @returns JSON string for the destination root package.json.
  */
-const buildRootPackageJson = (
+const kitWorkspacePackageJson = (
   kitRootPkg: PackageJsonLike | null,
   template: TemplateName,
 ): string => {
@@ -103,7 +103,7 @@ const copyKitBuildRoots = async (kitRoot: string, dest: string): Promise<void> =
  * @param sourceWorkspaceYaml - Optional monorepo pnpm-workspace.yaml (for catalog: reuse).
  * @returns Workspace file contents.
  */
-const buildPnpmWorkspaceYaml = (
+const kitWorkspacePnpmYaml = (
   template: TemplateName,
   sourceWorkspaceYaml: string | null,
 ): string => {
@@ -222,7 +222,7 @@ export const scaffoldKitWorkspace = async (
   const kitRootPkg = await readPackageJson(join(options.kitRoot, 'package.json'));
   await writeFile(
     join(options.dest, 'package.json'),
-    buildRootPackageJson(kitRootPkg, options.template),
+    kitWorkspacePackageJson(kitRootPkg, options.template),
   );
 
   let sourceWorkspaceYaml: string | null = null;
@@ -233,7 +233,7 @@ export const scaffoldKitWorkspace = async (
   }
   await writeFile(
     join(options.dest, 'pnpm-workspace.yaml'),
-    buildPnpmWorkspaceYaml(options.template, sourceWorkspaceYaml),
+    kitWorkspacePnpmYaml(options.template, sourceWorkspaceYaml),
   );
 
   // Let buyers rebuild packages without the monorepo parent tree.

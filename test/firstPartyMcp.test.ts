@@ -1,7 +1,7 @@
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildFirstPartyMcpConfig } from '@vybekiit/agent-kit';
+import { firstPartyMcpConfig } from '@vybekiit/agent-kit';
 import { describe, expect, it } from 'vitest';
 import {
   mergeFirstPartyMcpServers,
@@ -39,7 +39,7 @@ describe('mergeFirstPartyMcpServers', () => {
           vybekiit: { command: 'node', args: ['old/path.js'] },
         },
       },
-      buildFirstPartyMcpConfig('surface'),
+      firstPartyMcpConfig('surface'),
     );
     expect(written).toContain('vybekiit');
     expect(config.mcpServers.context7).toEqual({ command: 'npx', args: ['-y', 'context7'] });

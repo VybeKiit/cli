@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildMcpServersConfig,
-  catalogServerToMcpEntry,
   type McpCatalogServer,
   type McpWireDeps,
+  mcpEntryFromCatalogServer,
+  mcpServersConfigFromCatalog,
   mergeCoreMcpServers,
   parseMcpCatalog,
   selectCoreMcpServers,
@@ -82,7 +82,7 @@ describe('parseMcpCatalog / selectCoreMcpServers', () => {
   });
 });
 
-describe('splitCatalogCommand / catalogServerToMcpEntry', () => {
+describe('splitCatalogCommand / mcpEntryFromCatalogServer', () => {
   it('splits npx catalog commands into command + args', () => {
     expect(splitCatalogCommand('npx -y @upstash/context7-mcp@latest')).toEqual({
       command: 'npx',
@@ -91,16 +91,16 @@ describe('splitCatalogCommand / catalogServerToMcpEntry', () => {
   });
 
   it('maps remote catalog commands to url entries', () => {
-    const entry = catalogServerToMcpEntry({
+    const mcpEntry = mcpEntryFromCatalogServer({
       name: 'sentry',
       command: 'remote:https://mcp.sentry.dev/sse',
     });
-    expect(entry).toEqual({ url: 'https://mcp.sentry.dev/sse' });
+    expect(mcpEntry).toEqual({ url: 'https://mcp.sentry.dev/sse' });
   });
 
   it('builds Cursor-shaped mcpServers without inventing packages', () => {
     const core = selectCoreMcpServers(parseMcpCatalog(CORE_CATALOG_JSON));
-    const config = buildMcpServersConfig(core);
+    const config = mcpServersConfigFromCatalog(core);
     expect(config.mcpServers.context7).toEqual({
       command: 'npx',
       args: ['-y', '@upstash/context7-mcp@latest'],

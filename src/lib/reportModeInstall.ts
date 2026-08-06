@@ -1,9 +1,9 @@
 import { access, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { writeEnvKeys } from '../doctor/writeEnvKeys';
+import type { AppSurfaceLayout } from './appSurface';
 import { reportModeEnvKeysForSurface } from './inferProjectSurface';
 import { ensureDependencies } from './packageJsonDeps';
-import type { AppSurfaceLayout } from './resolveAppSurface';
 import type { TemplateName } from './scaffold';
 
 /**
@@ -226,17 +226,17 @@ type PlanFileOptions = {
  * @param options - Seam, source root, destination, relative path, and rewrite flag.
  * @returns Planned file with its destination-existence flag, or `null`.
  */
-const toPlannedFile = async (options: PlanFileOptions): Promise<PlannedFile | null> => {
+const planReportModeFile = async (options: PlanFileOptions): Promise<PlannedFile | null> => {
   const { fs, sourceDir, dest, relativePath, applyRewrite } = options;
-  const raw = await fs.readText(join(sourceDir, relativePath));
-  if (raw === null) {
+  const sourceText = await fs.readText(join(sourceDir, relativePath));
+  if (sourceText === null) {
     return null;
   }
   const absolutePath = join(dest, relativePath);
   return {
     relativePath,
     absolutePath,
-    content: rewriteContent(relativePath, raw, applyRewrite),
+    content: rewriteContent(relativePath, sourceText, applyRewrite),
     exists: await fs.exists(absolutePath),
   };
 };
@@ -247,7 +247,7 @@ const toPlannedFile = async (options: PlanFileOptions): Promise<PlannedFile | nu
  * @param options - Seam, source root, destination, surface closure, and rewrite flag.
  * @returns Planned files in a stable order (subtrees first, then companions).
  */
-const buildPlannedFiles = async (options: {
+const planReportModeFiles = async (options: {
   readonly fs: ReportModeFs;
   readonly sourceDir: string;
   readonly dest: string;
@@ -264,7 +264,7 @@ const buildPlannedFiles = async (options: {
   const relativePaths = [...subtreeGroups.flat(), ...sources.companions];
   const planned = await Promise.all(
     relativePaths.map((relativePath) =>
-      toPlannedFile({ fs, sourceDir, dest, relativePath, applyRewrite }),
+      planReportModeFile({ fs, sourceDir, dest, relativePath, applyRewrite }),
     ),
   );
   return planned.filter((file): file is PlannedFile => file !== null);
@@ -282,27 +282,27 @@ const buildPlannedFiles = async (options: {
  * @param willWriteUtils - Whether `src/lib/utils.ts` will be newly written.
  * @returns Dependency name → version map.
  */
-const buildDeps = (
+const reportModeDependencies = (
   surface: ReportModeSurface,
   sourceDeps: Partial<Record<string, string>>,
   willWriteUtils: boolean,
 ): Record<string, string> => {
-  const deps: Record<string, string> = { '@vybekiit/report-mode': WORKSPACE_RANGE };
+  const dependencies: Record<string, string> = { '@vybekiit/report-mode': WORKSPACE_RANGE };
   if (surface === 'web') {
-    deps['@vybekiit/ui'] = WORKSPACE_RANGE;
-    deps['@vybekiit/walkthrough'] = WORKSPACE_RANGE;
+    dependencies['@vybekiit/ui'] = WORKSPACE_RANGE;
+    dependencies['@vybekiit/walkthrough'] = WORKSPACE_RANGE;
     const { sonner } = sourceDeps;
     if (sonner !== undefined) {
-      deps.sonner = sonner;
+      dependencies.sonner = sonner;
     }
   }
   if (willWriteUtils && (surface === 'web' || surface === 'extension')) {
     const { cnfast } = sourceDeps;
     if (cnfast !== undefined) {
-      deps.cnfast = cnfast;
+      dependencies.cnfast = cnfast;
     }
   }
-  return deps;
+  return dependencies;
 };
 
 /**
@@ -315,17 +315,20 @@ const buildDeps = (
  * @param assistant - Resolved assistant id, or `null`.
  * @returns Env key → value map.
  */
-const buildEnv = (surface: ReportModeSurface, assistant: string | null): Record<string, string> => {
-  const env: Record<string, string> = { VYBE_REPORT_MODE: '1' };
+const reportModeInstallEnv = (
+  surface: ReportModeSurface,
+  assistant: string | null,
+): Record<string, string> => {
+  const installEnv: Record<string, string> = { VYBE_REPORT_MODE: '1' };
   if (assistant === null) {
-    return env;
+    return installEnv;
   }
   const projectSurface = {
     template: surface,
     mobile: surface === 'mobile',
     extension: surface === 'extension',
   };
-  return { ...env, ...reportModeEnvKeysForSurface(projectSurface, assistant) };
+  return { ...installEnv, ...reportModeEnvKeysForSurface(projectSurface, assistant) };
 };
 
 /**
@@ -381,7 +384,7 @@ const uniquePaths = (paths: readonly string[]): readonly string[] => [...new Set
  * @param appSurface - Resolved web layout (undefined for mobile/extension).
  * @returns Mount component, snippets, candidate layouts, and anchor.
  */
-const buildMountSpec = (
+const reportModeMountSpec = (
   surface: ReportModeSurface,
   dest: string,
   appSurface: AppSurfaceLayout | undefined,
@@ -519,7 +522,7 @@ export type PlanReportModeOptions = {
   readonly dest: string;
   readonly surface: TemplateName;
   readonly assistant: string | null;
-  /** Resolved web layout (from `resolveAppSurface`); undefined for other surfaces. */
+  /** Resolved web layout (from `selectedAppSurface`); undefined for other surfaces. */
   readonly appSurface?: AppSurfaceLayout;
   readonly fs?: ReportModeFs;
 };
@@ -546,7 +549,7 @@ export const planReportModeInstall = async (
   const destDeps = parseDependencies(await fs.readText(join(dest, 'package.json')));
   const rewrite = await planRewrite({ surface, dest, fs, appSurface, destDeps });
 
-  const files = await buildPlannedFiles({
+  const files = await planReportModeFiles({
     fs,
     sourceDir,
     dest,
@@ -562,9 +565,9 @@ export const planReportModeInstall = async (
   const utilsFile = files.find((file) => file.relativePath === UTILS_FILE);
   const willWriteUtils = utilsFile !== undefined && !utilsFile.exists;
   const sourceDeps = parseDependencies(await fs.readText(join(sourceDir, 'package.json')));
-  const deps = buildDeps(surface, sourceDeps, willWriteUtils);
-  const env = buildEnv(surface, assistant);
-  const mount = await planMount(fs, buildMountSpec(surface, dest, appSurface));
+  const deps = reportModeDependencies(surface, sourceDeps, willWriteUtils);
+  const env = reportModeInstallEnv(surface, assistant);
+  const mount = await planMount(fs, reportModeMountSpec(surface, dest, appSurface));
 
   const todos: string[] = [];
   if (assistant === null) {

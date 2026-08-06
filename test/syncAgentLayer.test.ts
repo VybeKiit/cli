@@ -35,7 +35,7 @@ describe('runSyncAgentLayer', () => {
 
     const copied: Array<{ src: string; dest: string }> = [];
     const result = await runSyncAgentLayer(['web'], buyer, {
-      resolve: async () => ({ source: mirror }),
+      locateTemplateSource: async () => ({ source: mirror }),
       copy: async (src, dest) => {
         copied.push({ src: String(src), dest: String(dest) });
         const { cp } = await import('node:fs/promises');

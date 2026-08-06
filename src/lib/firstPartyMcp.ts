@@ -1,9 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
-  buildFirstPartyMcpConfig,
   type FirstPartyMcpPathLayout,
   type FirstPartyMcpServersConfig,
+  firstPartyMcpConfig,
   formatFirstPartyMcpConfigJson,
 } from '@vybekiit/agent-kit';
 
@@ -80,7 +80,7 @@ export const parseProjectMcpConfig = (raw: string): ProjectMcpServersConfig => {
  * other servers. Overwrites first-party keys so paths stay correct after scaffold.
  *
  * @param existing - Existing project config.
- * @param firstParty - First-party fragment from {@link buildFirstPartyMcpConfig}.
+ * @param firstParty - First-party fragment from {@link firstPartyMcpConfig}.
  * @returns Merged config and names written/updated.
  */
 export const mergeFirstPartyMcpServers = (
@@ -111,7 +111,7 @@ export const writeFirstPartyMcpConfigFile = async (
   layout: FirstPartyMcpPathLayout,
   options?: { readonly template?: string },
 ): Promise<readonly string[]> => {
-  const firstParty = buildFirstPartyMcpConfig(layout, options);
+  const firstParty = firstPartyMcpConfig(layout, options);
   let existing: ProjectMcpServersConfig = { mcpServers: {} };
   try {
     existing = parseProjectMcpConfig(await readFile(configPath, 'utf8'));

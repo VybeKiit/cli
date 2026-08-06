@@ -33,9 +33,9 @@ Keep it short and friendly. Do not dump the whole skill list.
  *
  * @returns The block text, markers included.
  * @example
- * const block = buildMemoryBlock();
+ * const block = vybekiitMemoryBlock();
  */
-export const buildMemoryBlock = (): string =>
+export const vybekiitMemoryBlock = (): string =>
   [
     BEGIN_MARKER,
     '## VybeKiit is active on this machine',
@@ -57,10 +57,10 @@ export const buildMemoryBlock = (): string =>
  * Upsert the managed block into existing global-memory content.
  *
  * @param existing - Current CLAUDE.md content ('' when the file is absent).
- * @param block - The block to insert or replace (from {@link buildMemoryBlock}).
+ * @param block - The block to insert or replace (from {@link vybekiitMemoryBlock}).
  * @returns The updated content, or the original when already current.
  * @example
- * const next = upsertMemoryBlock(previous, buildMemoryBlock());
+ * const next = upsertMemoryBlock(previous, vybekiitMemoryBlock());
  */
 export const upsertMemoryBlock = (existing: string, block: string): string => {
   const begin = existing.indexOf(BEGIN_MARKER);
@@ -205,7 +205,7 @@ export const installAwareness = async (paths: GlobalPaths): Promise<AwarenessRes
   const previousMemory = await readOrEmpty(paths.memoryFile);
   const memoryUpdated = await writeIfChanged(
     paths.memoryFile,
-    upsertMemoryBlock(previousMemory, buildMemoryBlock()),
+    upsertMemoryBlock(previousMemory, vybekiitMemoryBlock()),
     previousMemory,
   );
 

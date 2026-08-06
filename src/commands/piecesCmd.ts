@@ -1,14 +1,14 @@
 import process from 'node:process';
 import { caughtMessage } from '@vybekiit/core';
+import { locateKitWorkspace } from '../lib/kitWorkspaceSource';
 import { findPageRecipe, loadPageRecipes, type PageRecipeSummary } from '../lib/pageRecipeCatalog';
 import {
+  absoluteInstallDest,
   applyPageRecipeInstall,
   planPageRecipeInstall,
-  resolveInstallDest,
 } from '../lib/pageRecipeInstall';
 import type { PageRecipeInstallPlan } from '../lib/pageRecipeInstallTypes';
-import { resolveKitSource } from '../lib/resolveKitSource';
-import { buildCatalog } from './pieceCatalog';
+import { pieceCatalog } from './pieceCatalog';
 import { parsePieceFlags } from './pieceFlags';
 
 type CommandResult = {
@@ -26,7 +26,7 @@ type CommandResult = {
 const loadRecipesFromKit = async (): Promise<readonly PageRecipeSummary[]> => {
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveKitSource();
+    const resolved = await locateKitWorkspace();
     const { cleanup: resolvedCleanup, kitRoot } = resolved;
     cleanup = resolvedCleanup;
     return await loadPageRecipes(kitRoot);
@@ -48,7 +48,7 @@ const loadRecipesFromKit = async (): Promise<readonly PageRecipeSummary[]> => {
 export const runListPieces = async (args: readonly string[] = []): Promise<CommandResult> => {
   const flags = parsePieceFlags(args);
   const recipes = await loadRecipesFromKit();
-  const pieces = buildCatalog(recipes, flags.kind);
+  const pieces = pieceCatalog(recipes, flags.kind);
 
   return {
     json: JSON.stringify({ ok: true, count: pieces.length, pieces }, null, 2),
@@ -65,7 +65,7 @@ export const runListPieces = async (args: readonly string[] = []): Promise<Comma
 export const runListPageRecipes = async (_args: readonly string[] = []): Promise<CommandResult> => {
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveKitSource();
+    const resolved = await locateKitWorkspace();
     const { cleanup: resolvedCleanup, kitRoot } = resolved;
     cleanup = resolvedCleanup;
     const recipes = await loadPageRecipes(kitRoot);
@@ -179,7 +179,7 @@ export const runAddPageRecipe = async (args: readonly string[]): Promise<Command
 
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveKitSource();
+    const resolved = await locateKitWorkspace();
     const { cleanup: resolvedCleanup, kitRoot } = resolved;
     cleanup = resolvedCleanup;
     const recipes = await loadPageRecipes(kitRoot);
@@ -194,7 +194,7 @@ export const runAddPageRecipe = async (args: readonly string[]): Promise<Command
       return recipeError(`Unknown page recipe "${recipeId}". Run: vybekiit list-page-recipes`);
     }
 
-    const dest = resolveInstallDest(destArg, process.cwd());
+    const dest = absoluteInstallDest(destArg, process.cwd());
     const plan = await planPageRecipeInstall({ kitRoot, dest, recipe });
 
     if (flags.dryRun) {

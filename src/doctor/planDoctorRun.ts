@@ -17,37 +17,25 @@ export type DoctorReadinessInput = {
 };
 
 /**
- * Compute the doctor process exit code from readiness checks.
- *
+ * Doctor process exit code from readiness checks.
  * Exit non-zero when any blocking gate fails. Optional gates (mobile publish, Claude
  * global install) default to pass when omitted — non-mobile / non-Claude hosts.
- *
- * @param input - Boolean readiness checks collected by the doctor runner.
- * @returns Zero when every gate passes, otherwise one.
- * @example
- * const code = computeDoctorExitCode({ cloudReady: true, r2Ok: true, agentReady: true, skillsReady: true, projectHealthOk: true });
  */
-export const computeDoctorExitCode = (input: DoctorReadinessInput): number => {
+export const computeDoctorExitCode = (readiness: DoctorReadinessInput): number => {
   const gates: readonly boolean[] = [
-    input.cloudReady,
-    input.r2Ok,
-    input.agentReady,
-    input.skillsReady,
-    input.projectHealthOk,
-    input.mobilePublishOk ?? true,
-    input.globalClaudeOk ?? true,
+    readiness.cloudReady,
+    readiness.r2Ok,
+    readiness.agentReady,
+    readiness.skillsReady,
+    readiness.projectHealthOk,
+    readiness.mobilePublishOk ?? true,
+    readiness.globalClaudeOk ?? true,
   ];
-  return gates.every((ok) => ok) ? 0 : 1;
+  return gates.every((gatePassed) => gatePassed) ? 0 : 1;
 };
 
-/**
- * Find one doctor report by tool name.
- *
- * @param reports - Tool reports produced by the doctor runner.
- * @param name - Tool executable name to find.
- * @returns Matching report, or undefined when the tool was not checked.
- * @example
- * const gh = reportFor(reports, 'gh');
- */
-export const reportFor = (reports: readonly ToolReport[], name: string): ToolReport | undefined =>
-  reports.find((r) => r.tool === name);
+/** Doctor report for one tool executable name, if that tool was checked. */
+export const reportFor = (
+  reports: readonly ToolReport[],
+  toolName: string,
+): ToolReport | undefined => reports.find((report) => report.tool === toolName);

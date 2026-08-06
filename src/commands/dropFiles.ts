@@ -2,8 +2,8 @@ import { access, cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promise
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { shouldCopyDropPath } from '../lib/deliveryCopyPolicy';
-import { resolveTemplatesSource } from '../lib/resolveTemplates';
 import type { TemplateName } from '../lib/scaffold';
+import { locateTemplateSource } from '../lib/templateSource';
 import type { DropContext, DropDestinationState, DropFlags, DropTemplateSource } from './dropTypes';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -14,9 +14,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
  * @param template - Template to copy.
  * @returns Template source root and optional cleanup callback.
  * @example
- * const source = await resolveDropTemplateSource('web');
+ * const source = await locateDropTemplateSource('web');
  */
-export const resolveDropTemplateSource = async (
+export const locateDropTemplateSource = async (
   template: TemplateName,
 ): Promise<DropTemplateSource> => {
   const monorepoTemplates = join(HERE, '..', '..', '..', 'templates');
@@ -24,7 +24,7 @@ export const resolveDropTemplateSource = async (
     await access(join(monorepoTemplates, template));
     return { source: monorepoTemplates };
   } catch {
-    const { cleanup, source } = await resolveTemplatesSource(template);
+    const { cleanup, source } = await locateTemplateSource(template);
     if (cleanup === undefined) {
       return { source };
     }

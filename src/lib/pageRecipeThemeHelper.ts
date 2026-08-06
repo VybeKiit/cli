@@ -9,9 +9,9 @@ export const THEME_HELPER_SOURCE = `/**
  * @param hex - Hex color such as \`#7c3aed\` or \`#abc\`.
  * @returns RGB channels 0–255.
  * @example
- * const rgb = toRgb('#7c3aed');
+ * const rgb = hexToRgbChannels('#7c3aed');
  */
-const toRgb = (hex: string): { readonly r: number; readonly g: number; readonly b: number } => {
+const hexToRgbChannels = (hex: string): { readonly r: number; readonly g: number; readonly b: number } => {
   // #7c3aed → 7c3aed (strip optional leading # only).
   const clean = hex.startsWith('#') ? hex.slice(1) : hex;
   // #abc → aabbcc; otherwise take the first 6 hex digits.
@@ -39,7 +39,7 @@ const toRgb = (hex: string): { readonly r: number; readonly g: number; readonly 
  * const triplet = hexToHslTriplet('#7c3aed');
  */
 export const hexToHslTriplet = (hex: string): string => {
-  const { r: r255, g: g255, b: b255 } = toRgb(hex);
+  const { r: r255, g: g255, b: b255 } = hexToRgbChannels(hex);
   const r = r255 / 255;
   const g = g255 / 255;
   const b = b255 / 255;
@@ -76,7 +76,7 @@ export const hexToHslTriplet = (hex: string): string => {
  * const foreground = foregroundTripletFor('#7c3aed');
  */
 export const foregroundTripletFor = (hex: string): string => {
-  const { r, g, b } = toRgb(hex);
+  const { r, g, b } = hexToRgbChannels(hex);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.6 ? '0 0% 9%' : '0 0% 98%';
 };

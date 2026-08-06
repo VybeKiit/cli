@@ -1,4 +1,4 @@
-import { type GlobalPaths, resolveGlobalPaths } from '../global/globalPaths';
+import { type GlobalPaths, globalInstallPaths } from '../global/globalPaths';
 import {
   type GlobalStatus,
   isGloballyInstalled,
@@ -22,7 +22,7 @@ export {
  * const status = await readGlobalStatus();
  */
 export const readGlobalStatus = async (
-  paths: GlobalPaths = resolveGlobalPaths(),
+  paths: GlobalPaths = globalInstallPaths(),
 ): Promise<GlobalStatus> => readGlobalStatusAt(paths);
 
 /**

@@ -121,9 +121,9 @@ const defaultDeps: McpInstallDeps = { exec: makeExec('claude'), env: process.env
  * @param env - Environment used to inline `-e KEY=value` flags.
  * @returns The argument vector passed to `claude`.
  * @example
- * buildAddArgs(ZERO_CONFIG[0], {}); // ['mcp','add','-s','user','playwright','--','npx',...]
+ * claudeMcpAddArgv(ZERO_CONFIG[0], {}); // ['mcp','add','-s','user','playwright','--','npx',...]
  */
-export const buildAddArgs = (
+export const claudeMcpAddArgv = (
   def: McpServerDef,
   env: Record<string, string | undefined>,
 ): string[] => {
@@ -194,7 +194,7 @@ export const installGlobalMcp = async (
     if (present && forceRefresh && isZeroConfig(def)) {
       // Best-effort remove: if remove fails we still try add (some claude versions upsert).
       await deps.exec(['mcp', 'remove', def.name]);
-      const readded = await deps.exec(buildAddArgs(def, deps.env));
+      const readded = await deps.exec(claudeMcpAddArgv(def, deps.env));
       if (readded.code === 0) {
         refreshed.push(def.name);
       } else {
@@ -206,7 +206,7 @@ export const installGlobalMcp = async (
       alreadyPresent.push(def.name);
       continue;
     }
-    const added = await deps.exec(buildAddArgs(def, deps.env));
+    const added = await deps.exec(claudeMcpAddArgv(def, deps.env));
     if (added.code === 0) {
       enabled.push(def.name);
     } else {

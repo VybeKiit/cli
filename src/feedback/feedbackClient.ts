@@ -39,7 +39,7 @@ interface FeedbackClientOptions {
   readonly fetch?: typeof globalThis.fetch;
 }
 
-const resolveBaseUrl = (configuredUrl?: string): string => {
+const feedbackIntakeBaseUrl = (configuredUrl?: string): string => {
   const baseUrl = configuredUrl || process.env.VYBEKIIT_API_URL || 'https://vybekiit.com/api';
   const parsedUrl = new URL(baseUrl);
   const localDevelopment = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
@@ -59,7 +59,7 @@ const readJson = async <A>(response: Response, schema: Schema.Schema<A>): Promis
 export const createFeedbackIntakeClient = (
   options: FeedbackClientOptions = {},
 ): FeedbackIntakeClient => {
-  const baseUrl = resolveBaseUrl(options.baseUrl);
+  const baseUrl = feedbackIntakeBaseUrl(options.baseUrl);
   const fetchRequest = options.fetch || globalThis.fetch;
 
   return {

@@ -1,15 +1,15 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, relative, resolve } from 'node:path';
+import { selectedAppSurface } from './appSurface';
 import type { PageRecipeSummary } from './pageRecipeCatalog';
 import { rewriteInstalledSource } from './pageRecipeImports';
 import type { PageRecipeInstallPlan, PlannedInstallFile } from './pageRecipeInstallTypes';
 import {
-  buildInstallFollowUps,
+  pageRecipeInstallFollowUps,
   planRouteFile,
   planSharedFiles,
   themeHelperFiles,
 } from './pageRecipePlanFiles';
-import { resolveAppSurface } from './resolveAppSurface';
 
 /**
  * Check whether a path exists on disk.
@@ -42,7 +42,7 @@ export const planPageRecipeInstall = async (options: {
   readonly recipe: PageRecipeSummary;
 }): Promise<PageRecipeInstallPlan> => {
   const { kitRoot, dest, recipe } = options;
-  const layout = await resolveAppSurface(dest);
+  const layout = await selectedAppSurface(dest);
   const sourceAbs = join(kitRoot, recipe.sourcePath);
   if (!(await pathExists(sourceAbs))) {
     throw new Error(
@@ -66,7 +66,7 @@ export const planPageRecipeInstall = async (options: {
     recipe,
     recipeFileName,
   });
-  const followUps = buildInstallFollowUps(recipe);
+  const followUps = pageRecipeInstallFollowUps(recipe);
 
   const mainFile: PlannedInstallFile = {
     absolutePath: recipeDest,
@@ -135,9 +135,9 @@ export const applyPageRecipeInstall = async (
  * @param cwd - Process working directory.
  * @returns Absolute destination directory.
  * @example
- * const dest = resolveInstallDest('./apps/web', process.cwd());
+ * const dest = absoluteInstallDest('./apps/web', process.cwd());
  */
-export const resolveInstallDest = (destArg: string | undefined, cwd: string): string => {
+export const absoluteInstallDest = (destArg: string | undefined, cwd: string): string => {
   if (destArg === undefined || destArg === '') {
     return resolve(cwd);
   }

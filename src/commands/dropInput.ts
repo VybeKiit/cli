@@ -5,9 +5,9 @@ import { isInteractive } from '../prompts/tty';
 import {
   DROP_TEMPLATE_OPTIONS,
   type DropFlags,
+  type DropInputs,
   dropMode,
   type ParsedDropArgs,
-  type ResolvedDropInputs,
 } from './dropTypes';
 
 /**
@@ -87,7 +87,7 @@ const writeTemplateRequired = (flags: DropFlags): number => {
  * @example
  * const inputs = await promptForDropInputs(parseDropArgs([]));
  */
-const promptForDropInputs = async (parsed: ParsedDropArgs): Promise<ResolvedDropInputs | null> => {
+const promptForDropInputs = async (parsed: ParsedDropArgs): Promise<DropInputs | null> => {
   const { confirm, intro, isCancel, select, text, cancel } = await import('@clack/prompts');
 
   intro('VybeKiit: drop a template');
@@ -131,16 +131,14 @@ const promptForDropInputs = async (parsed: ParsedDropArgs): Promise<ResolvedDrop
 };
 
 /**
- * Resolve complete drop inputs from CLI args and, when possible, prompts.
+ * Complete drop inputs from CLI args and, when possible, prompts.
  *
  * @param parsed - Parsed CLI arguments.
  * @returns Complete inputs, or null when the command should stop.
  * @example
- * const inputs = await resolveDropInputs(parseDropArgs(['web']));
+ * const inputs = await completeDropInputs(parseDropArgs(['web']));
  */
-export const resolveDropInputs = async (
-  parsed: ParsedDropArgs,
-): Promise<ResolvedDropInputs | null> => {
+export const completeDropInputs = async (parsed: ParsedDropArgs): Promise<DropInputs | null> => {
   if (parsed.template !== undefined) {
     const destPath =
       parsed.destPath !== undefined && parsed.destPath !== ''

@@ -1,5 +1,7 @@
 import { access, readFile } from 'node:fs/promises';
 import { basename, dirname, join, relative } from 'node:path';
+import type { AppSurfaceLayout } from './appSurface';
+import { routeSegmentPath } from './appSurface';
 import type { PageRecipeSummary } from './pageRecipeCatalog';
 import {
   collectRelativeImports,
@@ -9,10 +11,8 @@ import {
   stripLeadingDotSlash,
 } from './pageRecipeImports';
 import type { PlannedInstallFile } from './pageRecipeInstallTypes';
-import { buildRouteStub } from './pageRecipeRouteStub';
+import { pageRecipeRouteStub } from './pageRecipeRouteStub';
 import { THEME_HELPER_SOURCE } from './pageRecipeThemeHelper';
-import type { AppSurfaceLayout } from './resolveAppSurface';
-import { routeSegmentPath } from './resolveAppSurface';
 
 /**
  * Check whether a path exists on disk.
@@ -37,9 +37,9 @@ const pathExists = async (path: string): Promise<boolean> => {
  * @param basePath - Path without or with extension.
  * @returns Absolute path that exists, or null.
  * @example
- * const file = await resolveSourceFile('/repo/apps/.../DemoThemeRandomizer');
+ * const file = await existingSourceFile('/repo/apps/.../DemoThemeRandomizer');
  */
-const resolveSourceFile = async (basePath: string): Promise<string | null> => {
+const existingSourceFile = async (basePath: string): Promise<string | null> => {
   const candidates = [
     basePath,
     `${basePath}.tsx`,
@@ -104,7 +104,7 @@ const loadSharedModule = async (options: {
   const { spec, appRoot, componentsDir, kitSharedDir } = options;
   // `spec` is a shared module stem (e.g. DemoPlugInPanel) after collectSharedImports.
   const kitSharedBase = join(kitSharedDir, stripLeadingDotSlash(spec));
-  const kitSharedFile = await resolveSourceFile(kitSharedBase);
+  const kitSharedFile = await existingSourceFile(kitSharedBase);
   if (kitSharedFile === null) {
     throw new Error(`Missing shared recipe dependency: ${spec}`);
   }
@@ -258,7 +258,7 @@ export const planRouteFile = async (options: {
       absolutePath: routeFile,
       relativePath: relative(appRoot, routeFile),
       kind: 'route',
-      content: buildRouteStub(recipe.exportName, importPath, recipe.targetRoute),
+      content: pageRecipeRouteStub(recipe.exportName, importPath, recipe.targetRoute),
     },
   ];
 };
@@ -296,9 +296,9 @@ export const themeHelperFiles = (
  * @param recipe - Installed recipe metadata.
  * @returns Todos, notes, and next commands.
  * @example
- * const followUps = buildInstallFollowUps(recipe);
+ * const followUps = pageRecipeInstallFollowUps(recipe);
  */
-export const buildInstallFollowUps = (
+export const pageRecipeInstallFollowUps = (
   recipe: PageRecipeSummary,
 ): {
   readonly todos: readonly string[];

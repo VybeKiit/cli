@@ -14,8 +14,8 @@ import {
 import { loadExistingAgentLayerRenderInputs } from '../lib/agentLayerIo';
 import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import { detectTemplateName as detectProjectTemplateName } from '../lib/detectTemplate';
-import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
+import { cloneMirror, locateTemplateSource } from '../lib/templateSource';
 
 const execFileAsync = promisify(execFile);
 
@@ -23,14 +23,14 @@ type SkillsUpdateResult = 'missing-lock' | 'updated' | 'failed';
 
 /** Injectable seams for unit tests (no network / no gh). */
 export type SyncAgentLayerDeps = {
-  readonly resolve: typeof resolveTemplatesSource;
+  readonly locateTemplateSource: typeof locateTemplateSource;
   readonly copy: typeof cp;
   readonly runSkillsUpdate: (cwd: string) => Promise<void>;
   readonly pathExists: (path: string) => Promise<boolean>;
 };
 
 const defaultDeps: SyncAgentLayerDeps = {
-  resolve: resolveTemplatesSource,
+  locateTemplateSource,
   copy: cp,
   runSkillsUpdate: async (cwd) => {
     await execFileAsync('npx', ['skills', 'update', '-y'], { cwd, env: process.env });
@@ -63,9 +63,9 @@ export const detectTemplateName = async (cwd: string): Promise<TemplateName | nu
  * @param cwd - Buyer project directory used for auto-detection when no argument is provided.
  * @returns Template name to sync, or null when no valid template can be resolved.
  * @example
- * const template = await resolveSyncTemplate('web', process.cwd());
+ * const template = await selectedSyncTemplate('web', process.cwd());
  */
-const resolveSyncTemplate = async (
+const selectedSyncTemplate = async (
   explicit: string | undefined,
   cwd: string,
 ): Promise<TemplateName | null> => {
@@ -316,7 +316,7 @@ export const runSyncAgentLayer = async (
   deps: SyncAgentLayerDeps = defaultDeps,
 ): Promise<SyncAgentLayerResult> => {
   const [explicit] = args;
-  const template = await resolveSyncTemplate(explicit, cwd);
+  const template = await selectedSyncTemplate(explicit, cwd);
 
   if (template === null) {
     return {
@@ -329,7 +329,7 @@ export const runSyncAgentLayer = async (
 
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await deps.resolve(template, {
+    const resolved = await deps.locateTemplateSource(template, {
       clone: cloneMirror,
       exists: deps.pathExists,
     });

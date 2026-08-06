@@ -32,9 +32,9 @@ const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
  *
  * @returns Absolute path to the config dir.
  * @example
- * const dir = resolveConfigDir(); // ~/.claude
+ * const dir = claudeConfigDir(); // ~/.claude
  */
-export const resolveConfigDir = (): string => {
+export const claudeConfigDir = (): string => {
   const override = process.env.CLAUDE_CONFIG_DIR;
   if (override !== undefined && override.trim() !== '') {
     return override.trim();
@@ -45,12 +45,12 @@ export const resolveConfigDir = (): string => {
 /**
  * Resolve all paths the global install touches.
  *
- * @param configDir - Config dir override (defaults to {@link resolveConfigDir}).
+ * @param configDir - Config dir override (defaults to {@link claudeConfigDir}).
  * @returns The resolved {@link GlobalPaths}.
  * @example
- * const paths = resolveGlobalPaths();
+ * const paths = globalInstallPaths();
  */
-export const resolveGlobalPaths = (configDir: string = resolveConfigDir()): GlobalPaths => ({
+export const globalInstallPaths = (configDir: string = claudeConfigDir()): GlobalPaths => ({
   configDir,
   skillsDir: join(configDir, 'skills'),
   commandsDir: join(configDir, 'commands'),

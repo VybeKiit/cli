@@ -1,6 +1,6 @@
 import process from 'node:process';
 import { planAgentLayerCompliance } from '@vybekiit/agent-kit';
-import { resolveTemplateArg } from '../lib/agentLayerIo';
+import { selectedTemplate } from '../lib/agentLayerIo';
 import { loadAgentLayerSnapshot } from '../lib/agentLayerSnapshot';
 
 /**
@@ -48,7 +48,7 @@ export const runCheckAgentLayer = async (
   cwd: string = process.cwd(),
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const [templateArg] = args;
-  const template = await resolveTemplateArg(templateArg, cwd);
+  const template = await selectedTemplate(templateArg, cwd);
 
   if (template === null) {
     return {

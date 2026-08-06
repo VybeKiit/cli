@@ -36,7 +36,7 @@ const exists = async (path: string): Promise<boolean> => {
  * @param paths - Resolved global paths.
  * @returns The {@link GlobalStatus}.
  * @example
- * const status = await readGlobalStatus(resolveGlobalPaths());
+ * const status = await readGlobalStatus(globalInstallPaths());
  */
 export const readGlobalStatus = async (paths: GlobalPaths): Promise<GlobalStatus> => {
   let hasMemory = false;

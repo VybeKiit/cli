@@ -160,21 +160,14 @@ export const detectPresentAgents = (
   return listAgents().filter((agent) => found.has(agent.id));
 };
 
-/**
- * Build MCP wire deps from agent-experience deps (shared path/command probes).
- *
- * @param deps - Agent experience deps.
- * @returns Full MCP wire deps for {@link wireCoreMcps}.
- * @example
- * const mcpDeps = resolveMcpWireDeps(createDefaultAgentExperienceDeps());
- */
-const resolveMcpWireDeps = (deps: AgentExperienceDeps): McpWireDeps => {
+/** MCP wire I/O from agent-experience deps (shared path/command probes). */
+const mcpWireDepsFromAgent = (agentDeps: AgentExperienceDeps): McpWireDeps => {
   const defaults = createDefaultMcpWireDeps();
   return {
     ...defaults,
-    pathExists: deps.pathExists,
-    commandExists: deps.commandExists,
-    ...deps.mcp,
+    pathExists: agentDeps.pathExists,
+    commandExists: agentDeps.commandExists,
+    ...agentDeps.mcp,
   };
 };
 
@@ -237,7 +230,7 @@ export const runAgentExperience = async (
       '→ assistant tools - your detected assistant does not use project tool plug-ins yet; official docs fallback still works.',
     );
   } else {
-    const mcpDeps = resolveMcpWireDeps(deps);
+    const mcpDeps = mcpWireDepsFromAgent(deps);
     const coreServers = readCoreMcpServerNames(cwd, mcpDeps);
     const mcpNames = mcpCapable.map((agent) => agent.name).join(', ');
     if (coreServers.length > 0) {

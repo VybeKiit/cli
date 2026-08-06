@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { checkAccess } from '../doctor/gate';
 import { runDoctor } from '../doctor/run';
-import { resolveGlobalPaths } from '../global/globalPaths';
+import { globalInstallPaths } from '../global/globalPaths';
 import { readInstallState } from '../global/installState';
 import { runGlobalInstall } from '../global/runGlobalInstall';
 import { playWelcomeBanner } from '../ui/welcomeBanner';
@@ -25,7 +25,7 @@ export const runSetup = async (): Promise<number> => {
   await runGlobalInstall(['--yes']);
 
   const access = checkAccess();
-  const installState = await readInstallState(resolveGlobalPaths().configDir);
+  const installState = await readInstallState(globalInstallPaths().configDir);
 
   process.stdout.write('\n');
   for (const line of formatSetupNextStep({

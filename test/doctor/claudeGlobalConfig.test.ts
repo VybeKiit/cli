@@ -8,7 +8,7 @@ import {
   listManagedSkillNames,
   readGlobalStatus,
 } from '../../src/doctor/claudeGlobalConfig';
-import { resolveGlobalPaths } from '../../src/global/globalPaths';
+import { globalInstallPaths } from '../../src/global/globalPaths';
 
 const makeConfig = async (): Promise<string> => mkdtemp(join(tmpdir(), 'vk-global-cfg-'));
 
@@ -20,7 +20,7 @@ const seedManagedSkill = async (skillsDir: string, name: string): Promise<void> 
 
 describe('readGlobalStatus / isGloballyInstalled', () => {
   it('reports zero skills when nothing is installed', async () => {
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     const status = await readGlobalStatus(paths);
     expect(status.skillCount).toBe(0);
     expect(status.hasCommand).toBe(false);
@@ -29,7 +29,7 @@ describe('readGlobalStatus / isGloballyInstalled', () => {
   });
 
   it('counts only dirs with the managed marker', async () => {
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     await seedManagedSkill(paths.skillsDir, 'onboarding');
     await seedManagedSkill(paths.skillsDir, 'go-live');
     await mkdir(join(paths.skillsDir, 'user-owned'), { recursive: true });
@@ -41,7 +41,7 @@ describe('readGlobalStatus / isGloballyInstalled', () => {
   });
 
   it('is fully installed only when command + memory + skills are present', async () => {
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     await seedManagedSkill(paths.skillsDir, 'onboarding');
     await mkdir(paths.commandsDir, { recursive: true });
     await writeFile(join(paths.commandsDir, 'vybekiit.md'), 'cmd', 'utf8');

@@ -13,9 +13,9 @@ afterEach(() => {
 describe('checkAccess', () => {
   it('bypasses the gate when VYBEKIIT_SKIP_GATE=1', () => {
     process.env.VYBEKIIT_SKIP_GATE = '1';
-    const result = checkAccess();
-    expect(result.allowed).toBe(true);
-    expect(result.reason).toBe('skipped');
+    const gateDecision = checkAccess();
+    expect(gateDecision.allowed).toBe(true);
+    expect(gateDecision.reason).toBe('skipped');
   });
 });
 

@@ -3,8 +3,8 @@ import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { caughtMessage } from '@vybekiit/core';
-import { cloneMirror, resolveTemplatesSource } from '../lib/resolveTemplates';
 import { scaffold } from '../lib/scaffold';
+import { cloneMirror, locateTemplateSource } from '../lib/templateSource';
 
 // Split "-", "_", "/": "add-user" -> ["add", "user"].
 const PASCAL_SPLIT_PATTERN = /[-_/]/;
@@ -77,7 +77,7 @@ export const runScaffoldBackend = async (
 
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveTemplatesSource('backend', {
+    const resolved = await locateTemplateSource('backend', {
       clone: cloneMirror,
       exists: async (path) => {
         try {

@@ -18,53 +18,44 @@ const { org: GATE_ORG, repos: GATE_REPOS } = readGateIdentity(process.env);
 
 /** Where to send an ungated buyer to purchase. Override with VYBEKIIT_SITE_URL. */
 const SITE_URL = (() => {
-  const value = process.env.VYBEKIIT_SITE_URL;
-  if (value !== undefined && value.trim() !== '') {
-    return value;
+  const siteUrl = process.env.VYBEKIIT_SITE_URL;
+  if (siteUrl !== undefined && siteUrl.trim() !== '') {
+    return siteUrl;
   }
   return 'https://vybekiit.com';
 })();
 
 export type GateReason = 'ok' | 'skipped' | 'gh-missing' | 'gh-unauthed' | 'no-access';
 
-export type GateResult = {
+export type GateDecision = {
   readonly allowed: boolean;
   readonly reason: GateReason;
   readonly org: string;
 };
 
-/**
- * Probe a GitHub CLI command.
- *
- * @param args - `gh` arguments.
- * @returns True when the command exits successfully.
- * @example
- * const ok = ghSucceeds(['--version']);
- */
-const ghSucceeds = (args: readonly string[]): boolean =>
-  spawnSync('gh', [...args], { stdio: 'ignore' }).status === 0;
+/** True when `gh` with the given args exits successfully. */
+const ghSucceeds = (ghArgs: readonly string[]): boolean =>
+  spawnSync('gh', [...ghArgs], { stdio: 'ignore' }).status === 0;
 
 /** True when the signed-in user is an active member of the gate org. */
 const isOrgMember = (): boolean => {
-  const result = spawnSync('gh', ['api', `user/memberships/orgs/${GATE_ORG}`, '--jq', '.state'], {
-    encoding: 'utf8',
-  });
-  const stdout = result.stdout === undefined ? '' : result.stdout;
-  return result.status === 0 && stdout.trim() === 'active';
+  const membershipProbe = spawnSync(
+    'gh',
+    ['api', `user/memberships/orgs/${GATE_ORG}`, '--jq', '.state'],
+    {
+      encoding: 'utf8',
+    },
+  );
+  const membershipStdout = membershipProbe.stdout === undefined ? '' : membershipProbe.stdout;
+  return membershipProbe.status === 0 && membershipStdout.trim() === 'active';
 };
 
 /** True when the signed-in user can read at least one private delivery repo. */
 const hasRepoAccess = (): boolean =>
   GATE_REPOS.some((repo) => ghSucceeds(['api', `repos/${GATE_ORG}/${repo}`]));
 
-/**
- * Decide whether the signed-in GitHub account holds a VybeKiit license.
- *
- * @returns Gate result with allow/deny reason.
- * @example
- * const access = checkAccess();
- */
-export const checkAccess = (): GateResult => {
+/** Whether the signed-in GitHub account holds a VybeKiit license. */
+export const checkAccess = (): GateDecision => {
   if (process.env.VYBEKIIT_SKIP_GATE === '1') {
     return { allowed: true, reason: 'skipped', org: GATE_ORG };
   }
@@ -80,19 +71,12 @@ export const checkAccess = (): GateResult => {
   return { allowed: false, reason: 'no-access', org: GATE_ORG };
 };
 
-/**
- * Format plain-language guidance for a blocked run.
- *
- * @param result - Failed gate result to explain.
- * @returns Buyer-readable remediation message.
- * @example
- * const message = formatGateFailure(result);
- */
-export const formatGateFailure = (result: GateResult): string => {
-  if (result.reason === 'gh-missing') {
+/** Plain-language remediation for a blocked gate decision. */
+export const formatGateFailure = (failedGate: GateDecision): string => {
+  if (failedGate.reason === 'gh-missing') {
     return 'VybeKiit needs the GitHub CLI to confirm your license. Install it by running: vybekiit doctor\nThen run this again.';
   }
-  if (result.reason === 'gh-unauthed') {
+  if (failedGate.reason === 'gh-unauthed') {
     return "You're not signed in to GitHub yet. Sign in first with: gh auth login\nThen run this again.";
   }
   return [
@@ -105,16 +89,12 @@ export const formatGateFailure = (result: GateResult): string => {
 /**
  * Enforce the gate at the top of a command run. Returns true when access is confirmed;
  * otherwise prints guidance and returns false so the caller exits non-zero.
- *
- * @returns True when the command may proceed.
- * @example
- * const allowed = ensureAccessOrExit();
  */
 export const ensureAccessOrExit = (): boolean => {
-  const result = checkAccess();
-  if (result.allowed) {
+  const gateDecision = checkAccess();
+  if (gateDecision.allowed) {
     return true;
   }
-  process.stderr.write(`${formatGateFailure(result)}\n`);
+  process.stderr.write(`${formatGateFailure(gateDecision)}\n`);
   return false;
 };

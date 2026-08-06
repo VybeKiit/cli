@@ -5,7 +5,7 @@ import { installAwareness } from './awareness';
 import { readCliVersion } from './cliVersion';
 import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from './entitlement';
 import { makeExec } from './exec';
-import { resolveGlobalPaths } from './globalPaths';
+import { globalInstallPaths } from './globalPaths';
 import { isGloballyInstalled, readGlobalStatus } from './globalStatus';
 import { installGlobalMcp } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
@@ -164,7 +164,7 @@ export const runGlobalInstall = async (
     }
   }
 
-  const paths = resolveGlobalPaths();
+  const paths = globalInstallPaths();
   const previous = await readInstallState(paths.configDir);
   const version = await readCliVersion();
   // Re-run = auto-update: re-apply zero-config MCP defs so install.sh always tracks latest.

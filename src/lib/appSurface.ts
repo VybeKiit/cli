@@ -69,9 +69,9 @@ const appRootCandidates = (dest: string): readonly string[] => {
  * @param dest - Destination directory.
  * @returns Layout treating dest as the app root.
  * @example
- * const layout = fallbackLayout('/tmp/fresh');
+ * const layout = defaultAppSurfaceLayout('/tmp/fresh');
  */
-const fallbackLayout = (dest: string): AppSurfaceLayout => {
+const defaultAppSurfaceLayout = (dest: string): AppSurfaceLayout => {
   const root = resolve(dest);
   return {
     appRoot: root,
@@ -135,15 +135,15 @@ const probeAppRoot = async (candidate: string): Promise<AppSurfaceLayout | undef
  * @param dest - Destination directory from `--to` or cwd.
  * @returns Layout paths for components and optional routes.
  * @example
- * const layout = await resolveAppSurface('/tmp/my-app');
+ * const layout = await selectedAppSurface('/tmp/my-app');
  */
-export const resolveAppSurface = async (dest: string): Promise<AppSurfaceLayout> => {
+export const selectedAppSurface = async (dest: string): Promise<AppSurfaceLayout> => {
   const probes = await Promise.all(appRootCandidates(dest).map(probeAppRoot));
   const hit = probes.find((layout) => layout !== undefined);
   if (hit !== undefined) {
     return hit;
   }
-  return fallbackLayout(dest);
+  return defaultAppSurfaceLayout(dest);
 };
 
 /**

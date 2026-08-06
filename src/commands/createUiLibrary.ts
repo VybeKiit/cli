@@ -58,7 +58,7 @@ export type CreateUiLibraryDeps = {
   readonly startDetached: SessionOneDeps['startDetached'];
   readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
   readonly openUrl: (url: string) => Promise<boolean>;
-  readonly resolvePnpm: SessionOneDeps['resolvePnpm'];
+  readonly pnpmCommand: SessionOneDeps['pnpmCommand'];
   readonly homeDir: () => string;
   readonly env: NodeJS.ProcessEnv;
   readonly platform: NodeJS.Platform;
@@ -205,7 +205,7 @@ const defaultOpenUrl = async (url: string): Promise<boolean> => {
   }
 };
 
-const defaultResolvePnpm = async (): Promise<readonly [string, ...string[]] | null> => {
+const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | null> => {
   const tryBin = async (bin: string, checkArgs: readonly string[]): Promise<boolean> => {
     const result = await defaultRunCommand(process.cwd(), bin, [...checkArgs]);
     return result.code === 0;
@@ -228,7 +228,7 @@ const defaultDeps = (): CreateUiLibraryDeps => ({
   startDetached: defaultStartDetached,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
   openUrl: defaultOpenUrl,
-  resolvePnpm: defaultResolvePnpm,
+  pnpmCommand: defaultPnpmCommand,
   homeDir: homedir,
   env: process.env,
   platform: process.platform,
@@ -360,7 +360,7 @@ export const runCreateUiLibrary = async (
     created = true;
   }
 
-  const pnpm = await deps.resolvePnpm();
+  const pnpm = await deps.pnpmCommand();
   let depsInstalled = false;
   let packagesBuilt = false;
   let devStarted = false;

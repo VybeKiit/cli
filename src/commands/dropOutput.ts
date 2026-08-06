@@ -74,22 +74,22 @@ export const runDropDryRun = async (context: DropContext): Promise<number> => {
 };
 
 /**
- * Build the post-drop instructions shown to the caller.
+ * Next steps shown after a successful template drop.
  *
  * @param template - Dropped template.
  * @param destPath - User-facing destination path.
  * @returns Ordered next steps for the created project.
  * @example
- * const actions = buildPostActions('web', './my-app');
+ * const steps = dropNextSteps('web', './my-app');
  */
-export const buildPostActions = (template: TemplateName, destPath: string): string[] => {
-  const postActions: string[] = [];
+export const dropNextSteps = (template: TemplateName, destPath: string): string[] => {
+  const nextSteps: string[] = [];
   if (template === 'mobile' && process.platform === 'darwin') {
-    postActions.push('Run setup-mobile-env.sh to verify Xcode + iOS toolchain');
+    nextSteps.push('Run setup-mobile-env.sh to verify Xcode + iOS toolchain');
   }
-  postActions.push(`cd ${destPath} && npm install`);
-  postActions.push('Check .env.example and create .env with your values');
-  return postActions;
+  nextSteps.push(`cd ${destPath} && npm install`);
+  nextSteps.push('Check .env.example and create .env with your values');
+  return nextSteps;
 };
 
 /**

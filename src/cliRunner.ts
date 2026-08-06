@@ -37,7 +37,7 @@ import { runAddReportMode } from './commands/reportModeCmd';
 import { runSetup } from './commands/setup';
 import { runSyncAgentLayer } from './commands/syncAgentLayer';
 import { runUpdateKitCommand } from './commands/updateKit';
-import { ensureTool, formatEnsureResult } from './doctor/ensureTool';
+import { ensureTool, formatEnsureStatus } from './doctor/ensureTool';
 import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
 import { runGlobalInstall } from './global/runGlobalInstall';
@@ -51,20 +51,25 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 /** Commands that may run before license gate (first-run tools path). */
 const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update', 'feedback']);
 
-type CliCommandContext = {
-  readonly command: string;
-  readonly subcommand: string | undefined;
+/**
+ * Parsed argv for one CLI invocation.
+ *
+ * `noun` is the first token after the top-level verb when present (`app` in
+ * `create app`, `data` in `live-work data`). Flat verbs fold every remaining
+ * token into {@link verbArgs} — never drop the first positional.
+ */
+type CliInvocation = {
+  readonly verb: string;
+  readonly noun: string | undefined;
   readonly rest: readonly string[];
 };
 
-type CliCommandHandler = (context: CliCommandContext) => Promise<number> | number;
+type CliCommand = (invocation: CliInvocation) => Promise<number> | number;
 
 /**
  * Read the CLI's own version from its package.json.
  *
  * @returns Package version string.
- * @example
- * const version = await readVersion();
  */
 const readVersion = async (): Promise<string> => {
   try {
@@ -80,46 +85,59 @@ const readVersion = async (): Promise<string> => {
 };
 
 /**
- * Parse raw argv into command, subcommand, and remaining arguments.
+ * Parse raw argv into verb, optional noun, and remaining arguments.
  *
  * @param argv - Process arguments after the binary name.
- * @returns Parsed command context, or null when no command was provided.
- * @example
- * const context = parseCommand(['doctor', '--ensure', 'wrangler']);
+ * @returns Parsed invocation, or null when no verb was provided.
  */
-const parseCommand = (argv: readonly string[]): CliCommandContext | null => {
-  const [command, subcommand, ...rest] = argv;
-  if (command === undefined || command === '') {
+const parseInvocation = (argv: readonly string[]): CliInvocation | null => {
+  const [verb, noun, ...rest] = argv;
+  if (verb === undefined || verb === '') {
     return null;
   }
-  return { command, subcommand, rest };
+  return { verb, noun, rest };
 };
 
 /**
- * Build an argument list that includes a present subcommand.
+ * Full argument list after the top-level verb (noun restored when present).
  *
- * @param context - Parsed CLI command context.
- * @returns Arguments with subcommand restored when present.
- * @example
- * const args = commandArgs(context);
+ * Flat commands must use this — using `rest` alone drops the first positional
+ * (`plan-setup payments` would become `[]` and always fail).
+ *
+ * @param invocation - Parsed CLI invocation.
+ * @returns Arguments with noun restored when present.
  */
-const commandArgs = (context: CliCommandContext): string[] => {
-  if (context.subcommand !== undefined) {
-    return [context.subcommand, ...context.rest];
+const verbArgs = (invocation: CliInvocation): string[] => {
+  if (invocation.noun !== undefined) {
+    return [invocation.noun, ...invocation.rest];
   }
-  return [...context.rest];
+  return [...invocation.rest];
 };
 
-/**
- * Print each output line from a command result.
- *
- * @param lines - Lines to print in order.
- * @returns Void after all lines are printed.
- */
-const writeLines = (lines: readonly string[]): void => {
-  for (const line of lines) {
-    process.stdout.write(`${line}\n`);
+/** Write structured command JSON (or text) once and return its exit code. */
+const writeJsonResult = (result: { readonly json: string; readonly exitCode: number }): number => {
+  process.stdout.write(`${result.json}\n`);
+  return result.exitCode;
+};
+
+/** Write plain message result once and return its exit code. */
+const writeMessageResult = (result: {
+  readonly message: string;
+  readonly exitCode: number;
+}): number => {
+  process.stdout.write(`${result.message}\n`);
+  return result.exitCode;
+};
+
+/** Write line-oriented result once and return its exit code. */
+const writeLinesResult = (result: {
+  readonly lines: readonly string[];
+  readonly exitCode: number;
+}): number => {
+  if (result.lines.length > 0) {
+    process.stdout.write(`${result.lines.join('\n')}\n`);
   }
+  return result.exitCode;
 };
 
 /**
@@ -128,10 +146,8 @@ const writeLines = (lines: readonly string[]): void => {
  * @param args - Doctor command arguments.
  * @param ensureArg - Matched ensure argument.
  * @returns Tool name, or undefined when the command is incomplete.
- * @example
- * const tool = resolveEnsureToolName(['--ensure', 'wrangler'], '--ensure');
  */
-const resolveEnsureToolName = (args: readonly string[], ensureArg: string): string | undefined => {
+const ensureToolDisplayName = (args: readonly string[], ensureArg: string): string | undefined => {
   if (ensureArg.includes('=')) {
     const [, inline] = ensureArg.split('=');
     return inline;
@@ -147,8 +163,6 @@ const resolveEnsureToolName = (args: readonly string[], ensureArg: string): stri
  * @param toolName - Tool name requested by the caller.
  * @param json - Whether to print machine-readable JSON.
  * @returns Exit code for the single-tool preflight.
- * @example
- * const code = runDoctorEnsure('wrangler', true);
  */
 const runDoctorEnsure = (toolName: string | undefined, json: boolean): number => {
   if (toolName === undefined || toolName === '' || toolName.startsWith('--')) {
@@ -161,61 +175,49 @@ const runDoctorEnsure = (toolName: string | undefined, json: boolean): number =>
     return 1;
   }
 
-  const result = ensureTool(toolName);
+  const ensureStatus = ensureTool(toolName);
   if (json) {
-    process.stdout.write(`${JSON.stringify({ ok: result.installed, ...result })}\n`);
+    process.stdout.write(`${JSON.stringify({ ok: ensureStatus.installed, ...ensureStatus })}\n`);
   } else {
-    process.stdout.write(`${formatEnsureResult(result)}\n`);
+    process.stdout.write(`${formatEnsureStatus(ensureStatus)}\n`);
   }
-  return result.installed ? 0 : 1;
+  return ensureStatus.installed ? 0 : 1;
 };
 
 /**
  * Run doctor command variants.
  *
- * @param context - Parsed CLI command context.
+ * @param invocation - Parsed CLI invocation.
  * @returns Exit code for doctor.
- * @example
- * const code = await handleDoctorCommand(context);
  */
-const handleDoctorCommand = async (context: CliCommandContext): Promise<number> => {
-  const args = commandArgs(context);
+const handleDoctorCommand = async (invocation: CliInvocation): Promise<number> => {
+  const args = verbArgs(invocation);
   const ensureArg = args.find((arg) => arg === '--ensure' || arg.startsWith('--ensure='));
   if (ensureArg === undefined) {
     return await runDoctor();
   }
 
-  return runDoctorEnsure(resolveEnsureToolName(args, ensureArg), args.includes('--json'));
+  return runDoctorEnsure(ensureToolDisplayName(args, ensureArg), args.includes('--json'));
 };
 
 /**
  * Run backend command variants.
  *
- * @param context - Parsed CLI command context.
+ * @param invocation - Parsed CLI invocation.
  * @returns Exit code for backend commands.
- * @example
- * const code = await handleBackendCommand(context);
  */
-const handleBackendCommand = async (context: CliCommandContext): Promise<number> => {
-  if (context.subcommand === 'add-route') {
-    const result = await runBackendAddRoute([...context.rest]);
-    process.stdout.write(`${result.message}\n`);
-    return result.exitCode;
+const handleBackendCommand = async (invocation: CliInvocation): Promise<number> => {
+  if (invocation.noun === 'add-route') {
+    return writeMessageResult(await runBackendAddRoute([...invocation.rest]));
   }
-  if (context.subcommand === 'add-crud') {
-    const result = await runBackendAddCrud([...context.rest]);
-    process.stdout.write(`${result.message}\n`);
-    return result.exitCode;
+  if (invocation.noun === 'add-crud') {
+    return writeMessageResult(await runBackendAddCrud([...invocation.rest]));
   }
-  if (context.subcommand === 'add-upload') {
-    const result = await runBackendAddUpload();
-    process.stdout.write(`${result.message}\n`);
-    return result.exitCode;
+  if (invocation.noun === 'add-upload') {
+    return writeMessageResult(await runBackendAddUpload());
   }
-  if (context.subcommand === 'gen-contract') {
-    const result = await runBackendGenContract();
-    process.stdout.write(`${result.message}\n`);
-    return result.exitCode;
+  if (invocation.noun === 'gen-contract') {
+    return writeMessageResult(await runBackendGenContract());
   }
   process.stderr.write(
     'Unknown backend command. Try: backend add-route | add-crud | add-upload | gen-contract\n',
@@ -226,13 +228,11 @@ const handleBackendCommand = async (context: CliCommandContext): Promise<number>
 /**
  * Run env command variants.
  *
- * @param context - Parsed CLI command context.
+ * @param invocation - Parsed CLI invocation.
  * @returns Exit code for env commands.
- * @example
- * const code = await handleEnvCommand(context);
  */
-const handleEnvCommand = async (context: CliCommandContext): Promise<number> => {
-  if (context.subcommand !== 'wizard') {
+const handleEnvCommand = async (invocation: CliInvocation): Promise<number> => {
+  if (invocation.noun !== 'wizard') {
     process.stderr.write('Unknown env command. Try: vybekiit env wizard\n');
     return 1;
   }
@@ -246,24 +246,22 @@ const handleEnvCommand = async (context: CliCommandContext): Promise<number> => 
 /**
  * Run `create` subcommands (`create app …` or `create --ui-library`).
  *
- * @param context - Parsed CLI command context.
+ * @param invocation - Parsed CLI invocation.
  * @returns Exit code for create.
- * @example
- * const code = await handleCreateCommand(context);
  */
-const handleCreateCommand = async (context: CliCommandContext): Promise<number> => {
-  const args = commandArgs(context);
+const handleCreateCommand = async (invocation: CliInvocation): Promise<number> => {
+  const args = verbArgs(invocation);
   if (isUiLibraryCreateArgs(args)) {
     return await runCreateUiLibraryCommand(args);
   }
-  if (context.subcommand !== 'app') {
+  if (invocation.noun !== 'app') {
     process.stderr.write(
       'Usage: vybekiit create app --web|--mobile|--extension [directory]\n' +
         '   or: vybekiit create --ui-library [directory]\n',
     );
     return 1;
   }
-  return await runCreateApp([...context.rest]);
+  return await runCreateApp([...invocation.rest]);
 };
 
 /**
@@ -280,8 +278,6 @@ const wantsFullHelp = (argv: readonly string[]): boolean =>
  *
  * @param choice - Main menu selection.
  * @returns Exit code from the chosen path.
- * @example
- * const code = await runMainMenuChoice('setup');
  */
 const runMainMenuChoice = async (choice: MainMenuChoice): Promise<number> => {
   if (choice === 'help-all') {
@@ -307,33 +303,25 @@ const runMainMenuChoice = async (choice: MainMenuChoice): Promise<number> => {
 /**
  * Handle `vybekiit add …` (bridge, page-recipe, or interactive picker).
  *
- * @param context - Parsed CLI command context.
+ * @param invocation - Parsed CLI invocation.
  * @returns Exit code for the add path.
- * @example
- * const code = await handleAddCommand(context);
  */
-const handleAddCommand = async (context: CliCommandContext): Promise<number> => {
-  if (context.subcommand === undefined) {
+const handleAddCommand = async (invocation: CliInvocation): Promise<number> => {
+  if (invocation.noun === undefined) {
     return await runAddPiecesInteractive();
   }
-  if (context.subcommand === 'bridge') {
-    return await runAddBridge([...context.rest]);
+  if (invocation.noun === 'bridge') {
+    return await runAddBridge([...invocation.rest]);
   }
-  if (context.subcommand === 'page-recipe') {
-    const result = await runAddPageRecipe([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
+  if (invocation.noun === 'page-recipe') {
+    return writeJsonResult(await runAddPageRecipe([...invocation.rest]));
   }
-  if (context.subcommand === 'report-mode') {
-    const result = await runAddReportMode([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
+  if (invocation.noun === 'report-mode') {
+    return writeJsonResult(await runAddReportMode([...invocation.rest]));
   }
-  if (context.subcommand === 'preset') {
+  if (invocation.noun === 'preset') {
     // Alias so agents can use one verb family: add preset | add page-recipe
-    const result = await runApplyPreset([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
+    return writeJsonResult(await runApplyPreset([...invocation.rest]));
   }
   process.stderr.write(
     'Unknown add command. Try: vybekiit add page-recipe <id> | add report-mode | add preset <id> | add bridge\n',
@@ -341,111 +329,79 @@ const handleAddCommand = async (context: CliCommandContext): Promise<number> => 
   return 1;
 };
 
-const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
+/**
+ * Single verb registry (ADR-0036 / CODE-STYLE `cliCommands`).
+ * Interactive menu choices and flag/non-TTY paths call the same operations.
+ */
+export const cliCommands: Record<string, CliCommand> = {
   setup: async () => await runSetup(),
-  'global-install': (context) => runGlobalInstall(commandArgs(context)),
+  'global-install': (invocation) => runGlobalInstall(verbArgs(invocation)),
   // Auto-updater: always non-interactive. install.sh / re-runs use this path.
-  update: (context) => {
-    const args = commandArgs(context);
+  update: (invocation) => {
+    const args = verbArgs(invocation);
     const hasYes = args.includes('--yes') || args.includes('-y');
     return runGlobalInstall(hasYes ? args : [...args, '--yes']);
   },
   create: handleCreateCommand,
-  new: (context) => runNew(commandArgs(context)),
-  drop: (context) => runDrop(commandArgs(context)),
+  new: (invocation) => runNew(verbArgs(invocation)),
+  drop: (invocation) => runDrop(verbArgs(invocation)),
   doctor: handleDoctorCommand,
-  init: async (context) => await runInit([...context.rest]),
+  init: async (invocation) => await runInit(verbArgs(invocation)),
   'local-dev': async () => await runLocalDev(),
-  'sync-agent-layer': async (context) => {
-    const result = await runSyncAgentLayer([...context.rest]);
-    writeLines(result.lines);
+  'sync-agent-layer': async (invocation) =>
+    writeLinesResult(await runSyncAgentLayer(verbArgs(invocation))),
+  'update-kit': async (invocation) => await runUpdateKitCommand(verbArgs(invocation)),
+  'render-agent-layer': async (invocation) => {
+    const templateArg = verbArgs(invocation)[0];
+    const result = await runRenderAgentLayer(process.cwd(), templateArg);
+    if (result.filesUpdated.length > 0) {
+      process.stdout.write(`${result.filesUpdated.join('\n')}\n`);
+    } else if (result.exitCode !== 0) {
+      process.stderr.write(
+        'No agent-layer files found to render. Run from a kit project or pass a template.\n',
+      );
+    }
     return result.exitCode;
   },
-  'update-kit': async (context) => await runUpdateKitCommand([...context.rest]),
-  'render-agent-layer': async () => (await runRenderAgentLayer()).exitCode,
-  'check-goals': async (context) => {
-    const result = await runCheckGoals([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'check-agent-layer': async (context) => {
-    const result = await runCheckAgentLayer([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'plan-readiness': async (context) => {
-    const result = await runPlanReadiness([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'plan-setup': async (context) => {
-    const result = await runPlanSetup([...context.rest]);
+  'check-goals': async (invocation) => writeJsonResult(await runCheckGoals(verbArgs(invocation))),
+  'check-agent-layer': async (invocation) =>
+    writeJsonResult(await runCheckAgentLayer(verbArgs(invocation))),
+  'plan-readiness': async (invocation) =>
+    writeJsonResult(await runPlanReadiness(verbArgs(invocation))),
+  'plan-setup': async (invocation) => {
+    const result = await runPlanSetup(verbArgs(invocation));
     process.stdout.write(`${result.output}\n`);
     return result.exitCode;
   },
-  'plan-data-model': async (context) => {
-    const result = await runPlanDataModel([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'apply-preset': async (context) => {
-    const result = await runApplyPreset(commandArgs(context));
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'list-presets': () => {
-    const result = runListPresets();
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'list-pieces': async (context) => {
-    const result = await runListPieces(commandArgs(context));
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'list-page-recipes': async (context) => {
-    const result = await runListPageRecipes(commandArgs(context));
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'verify-presets': async (context) => {
-    const result = await runVerifyPresets(commandArgs(context));
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'lint-extension-skill': async (context) => {
-    const result = await runLintExtensionSkill([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'doc-fallback': (context) => {
-    const result = runDocFallback([...context.rest]);
-    process.stdout.write(`${result.json}\n`);
-    return result.exitCode;
-  },
-  'live-work': async (context) => {
-    if (context.subcommand === 'data') {
-      const result = await runLiveWorkData([...context.rest]);
-      process.stdout.write(`${result.json}\n`);
-      return result.exitCode;
+  'plan-data-model': async (invocation) =>
+    writeJsonResult(await runPlanDataModel(verbArgs(invocation))),
+  'apply-preset': async (invocation) => writeJsonResult(await runApplyPreset(verbArgs(invocation))),
+  'list-presets': () => writeJsonResult(runListPresets()),
+  'list-pieces': async (invocation) => writeJsonResult(await runListPieces(verbArgs(invocation))),
+  'list-page-recipes': async (invocation) =>
+    writeJsonResult(await runListPageRecipes(verbArgs(invocation))),
+  'verify-presets': async (invocation) =>
+    writeJsonResult(await runVerifyPresets(verbArgs(invocation))),
+  'lint-extension-skill': async (invocation) =>
+    writeJsonResult(await runLintExtensionSkill(verbArgs(invocation))),
+  'doc-fallback': (invocation) => writeJsonResult(runDocFallback(verbArgs(invocation))),
+  'live-work': async (invocation) => {
+    if (invocation.noun === 'data') {
+      return writeJsonResult(await runLiveWorkData([...invocation.rest]));
     }
-    if (context.subcommand === 'host') {
-      const result = await runLiveWorkHost([...context.rest]);
-      process.stdout.write(`${result.json}\n`);
-      return result.exitCode;
+    if (invocation.noun === 'host') {
+      return writeJsonResult(await runLiveWorkHost([...invocation.rest]));
     }
-    if (context.subcommand === 'payments') {
-      const result = await runLiveWorkPayments([...context.rest]);
-      process.stdout.write(`${result.json}\n`);
-      return result.exitCode;
+    if (invocation.noun === 'payments') {
+      return writeJsonResult(await runLiveWorkPayments([...invocation.rest]));
     }
     process.stderr.write(
       'Usage: vybekiit live-work data|host|payments [--mode=demo|dogfood|buyer] [--vendor=…] [--cwd=dir] [--no-pin] [--fresh]\n',
     );
     return 1;
   },
-  dedup: async (context) => {
-    const result = await runDedup(commandArgs(context));
+  dedup: async (invocation) => {
+    const result = await runDedup(verbArgs(invocation));
     if (result.output !== '') {
       process.stdout.write(result.output);
     }
@@ -453,17 +409,15 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
   },
   add: handleAddCommand,
   env: handleEnvCommand,
-  scaffold: async (context) => {
-    if (context.subcommand !== 'backend') {
+  scaffold: async (invocation) => {
+    if (invocation.noun !== 'backend') {
       process.stderr.write('Unknown scaffold command. Try: vybekiit scaffold backend\n');
       return 1;
     }
-    const result = await runScaffoldBackend([...context.rest], process.cwd());
-    process.stdout.write(`${result.message}\n`);
-    return result.exitCode;
+    return writeMessageResult(await runScaffoldBackend([...invocation.rest], process.cwd()));
   },
   backend: handleBackendCommand,
-  feedback: (context) => runFeedback(commandArgs(context)),
+  feedback: (invocation) => runFeedback(verbArgs(invocation)),
 };
 
 /**
@@ -471,10 +425,9 @@ const COMMAND_HANDLERS: Record<string, CliCommandHandler> = {
  *
  * Exported so `CLI_HELP_ALL` stays the enforced test surface for the verb registry
  * (see cliHelp.test.ts): a new handler that never reaches the help text fails the drift
- * guard instead of silently shipping undocumented. The two lists were previously
- * maintained by hand with nothing linking them.
+ * guard instead of silently shipping undocumented.
  */
-export const COMMAND_NAMES: readonly string[] = Object.keys(COMMAND_HANDLERS);
+export const COMMAND_NAMES: readonly string[] = Object.keys(cliCommands);
 
 /**
  * Run the VybeKiit CLI for a parsed argv list.
@@ -485,9 +438,9 @@ export const COMMAND_NAMES: readonly string[] = Object.keys(COMMAND_HANDLERS);
  * const code = await runCli(['--help']);
  */
 export const runCli = async (argv: readonly string[]): Promise<number> => {
-  const context = parseCommand(argv);
+  const invocation = parseInvocation(argv);
 
-  if (context === null) {
+  if (invocation === null) {
     if (isInteractive()) {
       const choice = await promptMainMenu();
       if (choice === null) {
@@ -499,25 +452,25 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     return 0;
   }
 
-  if (context.command === 'help' || context.command === '--help' || context.command === '-h') {
+  if (invocation.verb === 'help' || invocation.verb === '--help' || invocation.verb === '-h') {
     process.stdout.write(`${wantsFullHelp(argv) ? CLI_HELP_ALL : CLI_HELP}\n`);
     return 0;
   }
-  if (context.command === '--version' || context.command === '-v') {
+  if (invocation.verb === '--version' || invocation.verb === '-v') {
     process.stdout.write(`${await readVersion()}\n`);
     return 0;
   }
 
-  if (!(GATE_EXEMPT.has(context.command) || ensureAccessOrExit())) {
+  if (!(GATE_EXEMPT.has(invocation.verb) || ensureAccessOrExit())) {
     return 1;
   }
 
-  const handler = COMMAND_HANDLERS[context.command];
+  const handler = cliCommands[invocation.verb];
   if (handler === undefined) {
     process.stderr.write(
-      `Unknown command: ${context.command}\nTry: vybekiit   or   vybekiit --help\n`,
+      `Unknown command: ${invocation.verb}\nTry: vybekiit   or   vybekiit --help\n`,
     );
     return 1;
   }
-  return await handler(context);
+  return await handler(invocation);
 };

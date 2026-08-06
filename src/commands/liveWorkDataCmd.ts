@@ -4,12 +4,12 @@ import { caughtMessage } from '@vybekiit/core';
 import {
   type DataLadderProvider,
   type DataLiveWorkResult,
+  dataLiveWorkErrorEvent,
+  dataLiveWorkJourneyEvents,
   isDataLadderProvider,
   LiveWorkError,
   type LiveWorkMode,
   runDataLiveWork,
-  toDataLiveWorkErrorEvent,
-  toDataLiveWorkJourneyEvents,
 } from '@vybekiit/db';
 import { Effect, Either } from 'effect';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from '../doctor/env';
@@ -125,8 +125,8 @@ export const parseLiveWorkDataFlags = (
  * @param pinned - Whether pin keys were written to `.env`.
  * @returns Public JSON-safe payload.
  */
-export const toPublicLiveWorkDataResult = (
-  result: DataLiveWorkResult,
+export const publicLiveWorkDataResult = (
+  liveWork: DataLiveWorkResult,
   pinned: boolean,
 ): LiveWorkDataPublicResult => {
   const publicResult: {
@@ -145,24 +145,24 @@ export const toPublicLiveWorkDataResult = (
     claimableId?: string;
   } = {
     ok: true,
-    provider: result.provider,
-    ephemeral: result.ephemeral,
-    hopped: result.hopped,
-    skipped: result.skipped,
+    provider: liveWork.provider,
+    ephemeral: liveWork.ephemeral,
+    hopped: liveWork.hopped,
+    skipped: liveWork.skipped,
     verified: true,
-    buyerMessage: result.buyerMessage,
-    pinKeys: Object.keys(result.pin),
+    buyerMessage: liveWork.buyerMessage,
+    pinKeys: Object.keys(liveWork.pin),
     pinned,
-    events: toDataLiveWorkJourneyEvents(result),
+    events: dataLiveWorkJourneyEvents(liveWork),
   };
-  if (result.fromProvider !== undefined) {
-    publicResult.fromProvider = result.fromProvider;
+  if (liveWork.fromProvider !== undefined) {
+    publicResult.fromProvider = liveWork.fromProvider;
   }
-  if (typeof result.claimUrl === 'string' && result.claimUrl.length > 0) {
-    publicResult.claimUrl = result.claimUrl;
+  if (typeof liveWork.claimUrl === 'string' && liveWork.claimUrl.length > 0) {
+    publicResult.claimUrl = liveWork.claimUrl;
   }
-  if (typeof result.claimableId === 'string' && result.claimableId.length > 0) {
-    publicResult.claimableId = result.claimableId;
+  if (typeof liveWork.claimableId === 'string' && liveWork.claimableId.length > 0) {
+    publicResult.claimableId = liveWork.claimableId;
   }
   return publicResult;
 };
@@ -173,7 +173,7 @@ export const toPublicLiveWorkDataResult = (
  * @param error - Package LiveWorkError.
  * @returns Failure payload (no secrets).
  */
-const toFailurePayload = (error: LiveWorkError): LiveWorkDataFailure => {
+const liveWorkDataFailure = (error: LiveWorkError): LiveWorkDataFailure => {
   const failure: {
     ok: false;
     code: string;
@@ -193,14 +193,14 @@ const toFailurePayload = (error: LiveWorkError): LiveWorkDataFailure => {
 };
 
 /**
- * Build env for Live work (process env + project `.env` when cwd is set).
+ * Process env merged with project `.env` for Live work.
  *
  * @param cwd - Absolute project directory.
  * @returns Merged environment; file values win.
  * @example
- * const env = resolveLiveWorkEnv('/tmp/app');
+ * const liveWorkEnv = liveWorkEnvFromProject('/tmp/app');
  */
-const resolveLiveWorkEnv = (cwd: string): Record<string, string | undefined> =>
+const liveWorkEnvFromProject = (cwd: string): Record<string, string | undefined> =>
   mergeEnv(process.env, loadEnvFile(cwd));
 
 /**
@@ -247,12 +247,12 @@ export const runLiveWorkData = async (
     };
   }
 
-  const env = resolveLiveWorkEnv(flags.cwd);
+  const liveWorkEnv = liveWorkEnvFromProject(flags.cwd);
   const either = await Effect.runPromise(
     Effect.either(
       runDataLiveWork({
         mode: flags.mode,
-        env,
+        env: liveWorkEnv,
         preferExisting: flags.preferExisting,
         cwd: flags.cwd,
         ...(flags.vendor === undefined ? {} : { namedVendor: flags.vendor }),
@@ -266,12 +266,12 @@ export const runLiveWorkData = async (
   );
 
   if (Either.isLeft(either)) {
-    const failure = toFailurePayload(either.left);
+    const failure = liveWorkDataFailure(either.left);
     return {
       json: JSON.stringify(
         {
           ...failure,
-          events: [toDataLiveWorkErrorEvent(failure.code, failure.message)],
+          events: [dataLiveWorkErrorEvent(failure.code, failure.message)],
         },
         null,
         2,
@@ -281,7 +281,7 @@ export const runLiveWorkData = async (
   }
 
   return {
-    json: JSON.stringify(toPublicLiveWorkDataResult(either.right, flags.pin), null, 2),
+    json: JSON.stringify(publicLiveWorkDataResult(either.right, flags.pin), null, 2),
     exitCode: 0,
   };
 };

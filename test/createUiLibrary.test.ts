@@ -18,7 +18,7 @@ const baseDeps = (overrides: Partial<CreateUiLibraryDeps> = {}): CreateUiLibrary
   startDetached: vi.fn(() => true),
   openClaude: vi.fn(async () => true),
   openUrl: vi.fn(async () => true),
-  resolvePnpm: vi.fn(async () => ['pnpm'] as const),
+  pnpmCommand: vi.fn(async () => ['pnpm'] as const),
   homeDir: () => '/Users/me',
   env: {},
   platform: 'darwin',

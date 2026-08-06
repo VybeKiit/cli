@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildMemoryBlock,
   STATUSLINE_APPEND_SNIPPET,
   STATUSLINE_BADGE,
   STATUSLINE_BADGE_COMMAND,
   statusLineCommandHasBadge,
   upsertMemoryBlock,
+  vybekiitMemoryBlock,
   withStatusLineBadge,
 } from '../../src/global/awareness';
 
 describe('upsertMemoryBlock', () => {
-  const block = buildMemoryBlock();
+  const block = vybekiitMemoryBlock();
 
   it('inserts the block into empty content', () => {
     expect(upsertMemoryBlock('', block)).toBe(block);

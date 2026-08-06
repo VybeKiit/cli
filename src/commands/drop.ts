@@ -2,14 +2,14 @@ import { join, resolve } from 'node:path';
 import {
   cleanupDropSource,
   copyDropTemplate,
+  locateDropTemplateSource,
   pinDeps,
   readDropDestinationState,
-  resolveDropTemplateSource,
   shouldBlockDestination,
 } from './dropFiles';
-import { parseDropArgs, resolveDropInputs } from './dropInput';
+import { completeDropInputs, parseDropArgs } from './dropInput';
 import {
-  buildPostActions,
+  dropNextSteps,
   runDropDryRun,
   writeDestinationNotEmpty,
   writeDropError,
@@ -26,7 +26,7 @@ import type { DropContext } from './dropTypes';
  * const code = await runDrop(['web', './my-app', '--merge']);
  */
 export const runDrop = async (args: string[]): Promise<number> => {
-  const inputs = await resolveDropInputs(parseDropArgs(args));
+  const inputs = await completeDropInputs(parseDropArgs(args));
   if (inputs === null) {
     return 1;
   }
@@ -35,8 +35,8 @@ export const runDrop = async (args: string[]): Promise<number> => {
   let cleanup: (() => Promise<void>) | undefined;
 
   try {
-    const { cleanup: resolvedCleanup, source } = await resolveDropTemplateSource(inputs.template);
-    cleanup = resolvedCleanup;
+    const { cleanup: sourceCleanup, source } = await locateDropTemplateSource(inputs.template);
+    cleanup = sourceCleanup;
     const context: DropContext = {
       ...inputs,
       dest,
@@ -53,7 +53,7 @@ export const runDrop = async (args: string[]): Promise<number> => {
 
     await copyDropTemplate(context);
     await pinDeps(dest);
-    writeDropSuccess(context, buildPostActions(inputs.template, inputs.destPath));
+    writeDropSuccess(context, dropNextSteps(inputs.template, inputs.destPath));
     return 0;
   } catch (error) {
     return writeDropError(inputs.flags, error);

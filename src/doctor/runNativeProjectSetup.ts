@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ProjectSurface } from '../lib/inferProjectSurface';
+import { type DoctorLog, processDoctorLog } from './doctorLog';
 import type { Platform } from './toolchain';
 
 export type NativeProjectSetupResult = {
@@ -9,7 +10,7 @@ export type NativeProjectSetupResult = {
 };
 
 type NativeCommandOptions = {
-  readonly log: Console;
+  readonly log: DoctorLog;
   readonly label: string;
   readonly cwd: string;
   readonly command: string;
@@ -22,7 +23,7 @@ type NativeCommandOptions = {
  * @param options - Command label, cwd, executable, args, and logger.
  * @returns True when the command exits successfully.
  * @example
- * const ok = runCommand({ log: console, label: 'pods', cwd, command: 'pod', args: ['install'] });
+ * const ok = runCommand({ log: processDoctorLog, label: 'pods', cwd, command: 'pod', args: ['install'] });
  */
 const runCommand = (options: NativeCommandOptions): boolean => {
   const { args, command, cwd, label, log } = options;
@@ -38,9 +39,9 @@ const runCommand = (options: NativeCommandOptions): boolean => {
  * @param log - Logger used for setup commands.
  * @returns Buyer-readable setup lines.
  * @example
- * const lines = runExtensionSetup(process.cwd(), console);
+ * const lines = runExtensionSetup(process.cwd(), processDoctorLog);
  */
-const runExtensionSetup = (cwd: string, log: Console): string[] => {
+const runExtensionSetup = (cwd: string, log: DoctorLog): string[] => {
   const wxtTypes = join(cwd, '.wxt', 'wxt.d.ts');
   if (existsSync(wxtTypes)) {
     return ['✓ Extension - WXT types already generated.'];
@@ -68,9 +69,9 @@ const runExtensionSetup = (cwd: string, log: Console): string[] => {
  * @param log - Logger used for setup commands.
  * @returns Buyer-readable setup lines.
  * @example
- * const lines = runMobileSetup(process.cwd(), 'darwin', console);
+ * const lines = runMobileSetup(process.cwd(), 'darwin', processDoctorLog);
  */
-const runMobileSetup = (cwd: string, platform: Platform, log: Console): string[] => {
+const runMobileSetup = (cwd: string, platform: Platform, log: DoctorLog): string[] => {
   if (platform !== 'darwin') {
     return [];
   }
@@ -110,7 +111,7 @@ export const runNativeProjectSetup = (
   cwd: string,
   surface: ProjectSurface,
   platform: Platform,
-  log: Console = console,
+  log: DoctorLog = processDoctorLog,
 ): NativeProjectSetupResult => {
   const lines: string[] = [];
 

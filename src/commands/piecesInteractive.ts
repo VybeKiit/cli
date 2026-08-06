@@ -2,8 +2,8 @@ import process from 'node:process';
 import { cancel, isCancel, select } from '@clack/prompts';
 import { caughtMessage } from '@vybekiit/core';
 import { ALL_PRESETS } from '@vybekiit/db';
+import { locateKitWorkspace } from '../lib/kitWorkspaceSource';
 import { loadPageRecipes } from '../lib/pageRecipeCatalog';
-import { resolveKitSource } from '../lib/resolveKitSource';
 import { isInteractive } from '../prompts/tty';
 import { runAddPageRecipe, runListPieces } from './piecesCmd';
 import { runApplyPreset } from './presetsCmd';
@@ -82,7 +82,7 @@ const runReportModePath = async (): Promise<number> => {
 const runPageRecipePath = async (): Promise<number> => {
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveKitSource();
+    const resolved = await locateKitWorkspace();
     const { cleanup: resolvedCleanup, kitRoot } = resolved;
     cleanup = resolvedCleanup;
     const recipes = await loadPageRecipes(kitRoot);

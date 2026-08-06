@@ -87,14 +87,14 @@ const parseFlags = (
 };
 
 /**
- * Build the env used for preset commands (process env + optional project `.env`).
+ * Process env merged with optional project `.env` for preset commands.
  *
  * @param cwd - Optional project directory from `--cwd`.
  * @returns Merged environment; when cwd is set, file values win over process.env.
  * @example
- * const env = resolvePresetEnv('./my-app');
+ * const presetEnv = presetEnvFromProject('./my-app');
  */
-const resolvePresetEnv = (cwd: string | undefined): NodeJS.ProcessEnv => {
+const presetEnvFromProject = (cwd: string | undefined): NodeJS.ProcessEnv => {
   if (cwd === undefined || cwd === '') {
     return process.env;
   }
@@ -154,15 +154,15 @@ const connectionUrlForProvider = (
 };
 
 /**
- * Resolve the postgres provider for verify-presets (--fix still applies SQL).
+ * Postgres provider for verify-presets (`--fix` still applies SQL).
  *
  * @param explicit - Optional provider flag value.
  * @param env - Environment source used when no explicit provider is passed.
  * @returns Supported postgres provider, or undefined for an unsupported explicit value.
  * @example
- * const provider = resolvePostgresProvider('supabase', process.env);
+ * const provider = postgresProviderForVerify('supabase', process.env);
  */
-const resolvePostgresProvider = (
+const postgresProviderForVerify = (
   explicit: string | undefined,
   env: NodeJS.ProcessEnv,
 ): PostgresProvider | undefined => {
@@ -179,15 +179,15 @@ const resolvePostgresProvider = (
 };
 
 /**
- * Resolve any supported preset provider (Postgres + NoSQL).
+ * Preset provider for apply-preset (Postgres + NoSQL).
  *
  * @param explicit - Optional provider flag value.
  * @param env - Environment source used when no explicit provider is passed.
  * @returns Supported provider, or undefined for an unsupported explicit value.
  * @example
- * const provider = resolvePresetProvider('mongodb', process.env);
+ * const provider = presetProviderForApply('mongodb', process.env);
  */
-const resolvePresetProvider = (
+const presetProviderForApply = (
   explicit: string | undefined,
   env: NodeJS.ProcessEnv,
 ): PresetProvider | undefined => {
@@ -243,8 +243,8 @@ export const runApplyPreset = async (
     };
   }
 
-  const env = resolvePresetEnv(flags.cwd);
-  const provider = resolvePresetProvider(flags.provider, env);
+  const env = presetEnvFromProject(flags.cwd);
+  const provider = presetProviderForApply(flags.provider, env);
   if (provider === undefined) {
     return {
       json: JSON.stringify({
@@ -320,7 +320,7 @@ export const runVerifyPresets = async (
   args: string[],
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const flags = parseFlags(args);
-  const env = resolvePresetEnv(flags.cwd);
+  const env = presetEnvFromProject(flags.cwd);
   const databaseUrl = databaseUrlFromEnv(env);
   if (databaseUrl === undefined || databaseUrl === '') {
     return {
@@ -341,7 +341,7 @@ export const runVerifyPresets = async (
     presetIds.length > 0 ? presetIds : expectedPresetsFromEnv(env).map((preset) => preset.id);
 
   if (flags.fix && ids.length > 0) {
-    const provider = resolvePostgresProvider(flags.provider, env);
+    const provider = postgresProviderForVerify(flags.provider, env);
     if (provider === undefined) {
       return {
         json: JSON.stringify({

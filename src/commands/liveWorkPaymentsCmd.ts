@@ -7,9 +7,9 @@ import {
   type PaymentsLadderProvider,
   PaymentsLiveWorkError,
   type PaymentsLiveWorkResult,
+  paymentsLiveWorkErrorEvent,
+  paymentsLiveWorkJourneyEvents,
   runPaymentsLiveWork,
-  toPaymentsLiveWorkErrorEvent,
-  toPaymentsLiveWorkJourneyEvents,
 } from '@vybekiit/payments';
 import { Effect, Either } from 'effect';
 import { loadEnvFile, mergeEnv, writeEnvKeys } from '../doctor/env';
@@ -112,21 +112,21 @@ export const parseLiveWorkPaymentsFlags = (
  * @param pinned - Whether pin was written.
  * @returns Public JSON-safe result.
  */
-export const toPublicLiveWorkPaymentsResult = (
-  result: PaymentsLiveWorkResult,
+export const publicLiveWorkPaymentsResult = (
+  liveWork: PaymentsLiveWorkResult,
   pinned: boolean,
 ): LiveWorkPaymentsPublicResult => ({
   ok: true,
-  provider: result.provider,
+  provider: liveWork.provider,
   ephemeral: false,
-  hopped: result.hopped,
-  skipped: result.skipped,
+  hopped: liveWork.hopped,
+  skipped: liveWork.skipped,
   verified: true,
-  buyerMessage: result.buyerMessage,
-  pinKeys: Object.keys(result.pin),
+  buyerMessage: liveWork.buyerMessage,
+  pinKeys: Object.keys(liveWork.pin),
   pinned,
-  events: [...toPaymentsLiveWorkJourneyEvents(result)],
-  ...(result.fromProvider === undefined ? {} : { fromProvider: result.fromProvider }),
+  events: [...paymentsLiveWorkJourneyEvents(liveWork)],
+  ...(liveWork.fromProvider === undefined ? {} : { fromProvider: liveWork.fromProvider }),
 });
 
 /**
@@ -194,7 +194,7 @@ export const runLiveWorkPayments = async (
 
   if (Either.isLeft(either)) {
     const error = either.left;
-    const event = toPaymentsLiveWorkErrorEvent(error.code, error.message);
+    const event = paymentsLiveWorkErrorEvent(error.code, error.message);
     return {
       json: JSON.stringify(
         {
@@ -213,7 +213,7 @@ export const runLiveWorkPayments = async (
   }
 
   return {
-    json: JSON.stringify(toPublicLiveWorkPaymentsResult(either.right, flags.pin), null, 2),
+    json: JSON.stringify(publicLiveWorkPaymentsResult(either.right, flags.pin), null, 2),
     exitCode: 0,
   };
 };

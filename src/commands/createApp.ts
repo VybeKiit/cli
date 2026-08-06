@@ -2,7 +2,7 @@ import { readdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import process from 'node:process';
 import { caughtMessage } from '@vybekiit/core';
-import { resolveKitSource } from '../lib/resolveKitSource';
+import { locateKitWorkspace } from '../lib/kitWorkspaceSource';
 import { ScaffoldError } from '../lib/scaffold';
 import { scaffoldKitWorkspace } from '../lib/scaffoldKitWorkspace';
 import { isInteractive } from '../prompts/tty';
@@ -174,7 +174,7 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
 
   try {
     // ADR-0038 Track 2: kit workspace (packages + surface), never an orphan template folder.
-    const { cleanup: resolvedCleanup, kitRoot } = await resolveKitSource();
+    const { cleanup: resolvedCleanup, kitRoot } = await locateKitWorkspace();
     cleanup = resolvedCleanup;
     await scaffoldKitWorkspace({ template, kitRoot, dest });
   } catch (error) {

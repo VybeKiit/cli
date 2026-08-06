@@ -122,9 +122,9 @@ const listOrEmpty = <T>(value: readonly T[] | undefined): readonly T[] => {
  * @param note - Raw note from the manifest.
  * @returns Zero or one normalized note.
  * @example
- * const notes = rawNotes.flatMap(normalizeInstallNote);
+ * const notes = rawNotes.flatMap(installNotesFromManifest);
  */
-const normalizeInstallNote = (note: ManifestInstallNote): readonly PageRecipeInstallNote[] => {
+const installNotesFromManifest = (note: ManifestInstallNote): readonly PageRecipeInstallNote[] => {
   if (note.label === undefined || note.note === undefined) {
     return [];
   }
@@ -181,7 +181,7 @@ const recipesFromManifest = (
       exportName,
       targetRoute: nonEmptyOr(recipe.targetRoute, `/${id}`),
       suggestedComponents: listOrEmpty(recipe.suggestedComponents),
-      installNotes: listOrEmpty(recipe.installNotes).flatMap(normalizeInstallNote),
+      installNotes: listOrEmpty(recipe.installNotes).flatMap(installNotesFromManifest),
       acceptanceChecks: listOrEmpty(recipe.acceptanceChecks),
       groupId: group.groupId,
       groupLabel: group.groupLabel,

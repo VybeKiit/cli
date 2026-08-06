@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { caughtMessage } from '@vybekiit/core';
-import { resolveTemplatesSource } from '../lib/resolveTemplates';
+import { locateTemplateSource } from '../lib/templateSource';
 import {
   copyClaudeHooks,
   copyPrePushHook,
@@ -45,7 +45,7 @@ export const runInit = async (args: string[]): Promise<number> => {
 
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const { cleanup: resolvedCleanup, source } = await resolveTemplatesSource(projectType);
+    const { cleanup: resolvedCleanup, source } = await locateTemplateSource(projectType);
     cleanup = resolvedCleanup;
     const templateDir = join(source, projectType);
 

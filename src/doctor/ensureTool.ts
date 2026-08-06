@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import process from 'node:process';
+import { type DoctorLog, processDoctorLog } from './doctorLog';
 import {
   findToolByName,
   type InstallAction,
@@ -18,7 +19,7 @@ import {
  * (via subprocess) to precheck/install just the one CLI it needs before minting a token.
  */
 
-export type EnsureToolResult = {
+export type EnsureToolStatus = {
   readonly tool: string;
   /** False when the tool name isn't a known toolchain entry. */
   readonly known: boolean;
@@ -34,69 +35,36 @@ export type EnsureToolResult = {
   readonly missingRequirement?: string;
 };
 
-/**
- * Narrow Node's platform string to the OS families doctor supports.
- *
- * @param platform - Raw `process.platform` value.
- * @returns Supported platform, or null when unsupported.
- * @example
- * const platform = toPlatform(process.platform);
- */
-const toPlatform = (platform: NodeJS.Platform): Platform | null =>
-  platform === 'darwin' || platform === 'win32' || platform === 'linux' ? platform : null;
+/** Node OS family doctor can install on, or null when unsupported. */
+const supportedDoctorPlatform = (nodePlatform: NodeJS.Platform): Platform | null =>
+  nodePlatform === 'darwin' || nodePlatform === 'win32' || nodePlatform === 'linux'
+    ? nodePlatform
+    : null;
 
-/**
- * Probe whether a command exits successfully.
- *
- * @param command - Executable to run.
- * @param args - Arguments passed to the executable.
- * @returns True when the command exits with status zero.
- * @example
- * const installed = succeeds('gh', ['--version']);
- */
-const succeeds = (command: string, args: readonly string[]): boolean =>
-  spawnSync(command, [...args], { stdio: 'ignore' }).status === 0;
+/** True when the command exits with status zero. */
+const succeeds = (command: string, spawnArgs: readonly string[]): boolean =>
+  spawnSync(command, [...spawnArgs], { stdio: 'ignore' }).status === 0;
 
-/**
- * Read a Node spawn error code when one exists.
- *
- * @param error - Optional spawn error.
- * @returns Error code string, or undefined when absent.
- * @example
- * const code = errorCode(result.error);
- */
-const errorCode = (error: Error | undefined): string | undefined =>
-  error !== undefined && 'code' in error && typeof error.code === 'string' ? error.code : undefined;
+/** Node spawn error code when present. */
+const errorCode = (spawnError: Error | undefined): string | undefined =>
+  spawnError !== undefined && 'code' in spawnError && typeof spawnError.code === 'string'
+    ? spawnError.code
+    : undefined;
 
-/**
- * Run one install action and translate missing prerequisites.
- *
- * @param action - Planned install command.
- * @param log - Logger used for buyer-visible progress.
- * @returns Install success and optional missing prerequisite.
- * @example
- * const outcome = runInstall(action, console);
- */
+/** Run one planned install command and translate missing prerequisites. */
 const runInstall = (
   action: InstallAction,
-  log: Pick<Console, 'log'>,
+  log: DoctorLog,
 ): { ok: boolean; missingRequirement?: string } => {
   log.log(`[doctor] setting up ${action.tool}: ${action.command} ${action.args.join(' ')}`);
-  const result = spawnSync(action.command, [...action.args], { stdio: 'inherit' });
-  if (errorCode(result.error) === 'ENOENT') {
+  const installProcess = spawnSync(action.command, [...action.args], { stdio: 'inherit' });
+  if (errorCode(installProcess.error) === 'ENOENT') {
     return action.requires ? { ok: false, missingRequirement: action.requires } : { ok: false };
   }
-  return { ok: result.status === 0 };
+  return { ok: installProcess.status === 0 };
 };
 
-/**
- * Probe auth for tools that declare an auth check.
- *
- * @param tool - Tool declaration to probe.
- * @returns Auth state, or null when no auth probe exists.
- * @example
- * const authed = probeAuth(tool);
- */
+/** Auth probe outcome for tools that declare one, else null. */
 const probeAuth = (tool: Tool): boolean | null => {
   if (tool.auth === undefined) {
     return null;
@@ -107,21 +75,14 @@ const probeAuth = (tool: Tool): boolean | null => {
 /**
  * Ensure a single named tool is installed (installing if missing) and report its auth
  * state. Idempotent: an already-present tool triggers no install.
- *
- * @param name - Tool name requested by the caller.
- * @param log - Logger used for install progress and setup errors.
- * @returns Ensure result describing installation and auth state.
  */
-export const ensureTool = (
-  name: string,
-  log: Pick<Console, 'log' | 'error'> = console,
-): EnsureToolResult => {
+export const ensureTool = (name: string, log: DoctorLog = processDoctorLog): EnsureToolStatus => {
   const tool = findToolByName(name);
   if (tool === undefined) {
     return { tool: name, known: false, installed: false, installedNow: false, authed: null };
   }
 
-  const platform = toPlatform(process.platform);
+  const platform = supportedDoctorPlatform(process.platform);
   if (!platform) {
     log.error(`[doctor] This operating system (${process.platform}) isn't supported yet.`);
     return { tool: name, known: true, installed: false, installedNow: false, authed: null };
@@ -157,27 +118,20 @@ export const ensureTool = (
   };
 };
 
-/**
- * Format one ensure result as a buyer-readable status line.
- *
- * @param result - Ensure result to format.
- * @returns Human-readable setup status.
- * @example
- * const line = formatEnsureResult(result);
- */
-export const formatEnsureResult = (result: EnsureToolResult): string => {
-  if (!result.known) {
-    return `✗ ${result.tool} - not a known tool. Run \`vybekiit doctor\` for the full check.`;
+/** Buyer-readable status line for one ensure-tool check. */
+export const formatEnsureStatus = (ensureStatus: EnsureToolStatus): string => {
+  if (!ensureStatus.known) {
+    return `✗ ${ensureStatus.tool} - not a known tool. Run \`vybekiit doctor\` for the full check.`;
   }
-  if (!result.installed) {
-    const fix = result.missingRequirement
-      ? ` Install ${result.missingRequirement} first, then re-run.`
+  if (!ensureStatus.installed) {
+    const fix = ensureStatus.missingRequirement
+      ? ` Install ${ensureStatus.missingRequirement} first, then re-run.`
       : ' Re-run to try again.';
-    return `✗ ${result.tool} - couldn't be set up.${fix}`;
+    return `✗ ${ensureStatus.tool} - couldn't be set up.${fix}`;
   }
-  const state = result.installedNow ? 'installed just now' : 'already installed';
-  if (result.authed === false) {
-    return `→ ${result.tool} - ${state}, but you're not signed in yet. One-time: run \`${result.loginHint}\`.`;
+  const installLabel = ensureStatus.installedNow ? 'installed just now' : 'already installed';
+  if (ensureStatus.authed === false) {
+    return `→ ${ensureStatus.tool} - ${installLabel}, but you're not signed in yet. One-time: run \`${ensureStatus.loginHint}\`.`;
   }
-  return `✓ ${result.tool} - ready (${state}).`;
+  return `✓ ${ensureStatus.tool} - ready (${installLabel}).`;
 };

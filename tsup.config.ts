@@ -1,8 +1,5 @@
 import { defineConfig } from 'tsup';
 
-// The CLI ships as a single ESM bin with a node shebang — it doesn't need the
-// dual ESM/CJS + d.ts shape of the published library packages, so it uses its
-// own config rather than the shared `tsup.base`.
 export default defineConfig({
   // Single `bin` entry — the package.json bin. We deliberately do NOT emit a second
   // `index` re-export: nothing imports the CLI as a library, and the old dist/index.js

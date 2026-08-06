@@ -13,7 +13,7 @@ export type ParsedDropArgs = {
   readonly destPath?: string;
 };
 
-export type ResolvedDropInputs = {
+export type DropInputs = {
   readonly flags: DropFlags;
   readonly template: TemplateName;
   readonly destPath: string;
@@ -29,7 +29,7 @@ export type DropDestinationState = {
   readonly hasFiles: boolean;
 };
 
-export type DropContext = ResolvedDropInputs & {
+export type DropContext = DropInputs & {
   readonly dest: string;
   readonly templateDir: string;
 };

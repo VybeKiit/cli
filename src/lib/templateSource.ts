@@ -15,20 +15,20 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const MIRROR_ORG = 'VybeKiit';
 
 /**
- * The seams a {@link resolveTemplatesSource} call needs, injected so the published
+ * The seams a {@link locateTemplateSource} call needs, injected so the published
  * clone path is unit-testable without `gh` or a network (ADR-0005). Defaults wire the
  * real `gh`-backed clone and a filesystem existence check.
  *
  * @property clone - downloads a template mirror into a target dir (see {@link cloneMirror})
  * @property exists - true when a path is present on disk (the monorepo-local probe)
  */
-export type ResolveDeps = {
+export type TemplateSourceSeams = {
   readonly clone: (template: TemplateName, targetDir: string) => Promise<void>;
   readonly exists: (path: string) => Promise<boolean>;
 };
 
 /** A resolved template source directory plus an optional teardown for any temp clone. */
-export type ResolvedSource = {
+export type LocatedTemplateSource = {
   /** Directory whose `<template>/` subdir holds the template files (what `scaffold` joins onto). */
   readonly source: string;
   /** Removes any temp clone created for a published install; absent for in-place sources. */
@@ -100,12 +100,12 @@ export const cloneMirror = async (template: TemplateName, targetDir: string): Pr
  * @param deps - Injectable clone and existence seams.
  * @returns Resolved source root plus cleanup when a temp clone was created.
  * @example
- * const source = await resolveTemplatesSource('web');
+ * const source = await locateTemplateSource('web');
  */
-export const resolveTemplatesSource = async (
+export const locateTemplateSource = async (
   template: TemplateName,
-  deps: ResolveDeps = { clone: cloneMirror, exists: pathExists },
-): Promise<ResolvedSource> => {
+  deps: TemplateSourceSeams = { clone: cloneMirror, exists: pathExists },
+): Promise<LocatedTemplateSource> => {
   const override = process.env.VYBEKIIT_TEMPLATES_DIR;
   if (override !== undefined && override !== '') {
     return { source: override };

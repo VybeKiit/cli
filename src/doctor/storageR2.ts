@@ -2,9 +2,10 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { hostingConfigSchema, parseEnv } from '@vybekiit/core';
+import type { DoctorLog } from './doctorLog';
 import { writeEnvKeys } from './env';
 
-export type R2ProvisionResult = {
+export type R2ProvisionStatus = {
   readonly ok: boolean;
   readonly message: string;
 };
@@ -19,35 +20,35 @@ type R2Credentials = {
   readonly secretAccessKey: string;
 };
 
-/**
- * Sanitize a project name into an R2 bucket-safe slug.
- *
- * @param name - Raw project or package name.
- * @returns R2-safe bucket prefix.
- * @example
- * const bucket = sanitizeBucketName('My App!!');
- */
-const sanitizeBucketName = (name: string): string =>
-  name
+type CloudflareR2TokenReply = {
+  readonly success?: boolean;
+  readonly result?: {
+    readonly access_key_id?: string;
+    readonly secret_access_key?: string;
+  };
+};
+
+/** R2-safe bucket prefix from a project or package name. */
+const sanitizeBucketName = (packageName: string): string =>
+  packageName
     .toLowerCase()
     .replace(R2_BUCKET_UNSAFE_PATTERN, '-')
     .replace(R2_BUCKET_DASH_RUN_PATTERN, '-')
     .replace(R2_BUCKET_EDGE_DASH_PATTERN, '')
     .slice(0, 40);
 
-/**
- * Read the package name to derive a bucket name.
- *
- * @param cwd - Project directory.
- * @returns Sanitized package name or the VybeKiit default.
- * @example
- * const name = readProjectName(process.cwd());
- */
+/** Sanitized package.json name, or the VybeKiit default bucket prefix. */
 const readProjectName = (cwd: string): string => {
   try {
-    const pkg = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as { name?: string };
-    if (pkg.name !== undefined && pkg.name !== '' && pkg.name !== 'my-vybekiit-app') {
-      return sanitizeBucketName(pkg.name);
+    const packageJson = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as {
+      name?: string;
+    };
+    if (
+      packageJson.name !== undefined &&
+      packageJson.name !== '' &&
+      packageJson.name !== 'my-vybekiit-app'
+    ) {
+      return sanitizeBucketName(packageJson.name);
     }
   } catch {
     // fall through
@@ -55,33 +56,17 @@ const readProjectName = (cwd: string): string => {
   return 'vybekiit-app';
 };
 
-/**
- * Probe a wrangler command.
- *
- * @param args - Wrangler arguments to run.
- * @returns True when wrangler exits successfully.
- * @example
- * const ok = wranglerOk(['whoami']);
- */
-const wranglerOk = (args: readonly string[]): boolean =>
-  spawnSync('wrangler', [...args], { stdio: 'ignore' }).status === 0;
+/** True when wrangler exits successfully. */
+const wranglerOk = (wranglerArgs: readonly string[]): boolean =>
+  spawnSync('wrangler', [...wranglerArgs], { stdio: 'ignore' }).status === 0;
 
-/**
- * Create a Cloudflare R2 API token for S3-compatible access.
- *
- * @param accountId - Cloudflare account id.
- * @param apiToken - Cloudflare API token with token-creation permissions.
- * @param bucketName - Bucket name the token will access.
- * @returns R2 credentials, or null when token creation fails.
- * @example
- * const token = await createR2ApiToken(accountId, apiToken, bucketName);
- */
+/** Cloudflare R2 API token for S3-compatible access, or null on failure. */
 const createR2ApiToken = async (
   accountId: string,
   apiToken: string,
   bucketName: string,
 ): Promise<R2Credentials | null> => {
-  const response = await fetch(
+  const cloudflareReply = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/tokens`,
     {
       method: 'POST',
@@ -97,82 +82,53 @@ const createR2ApiToken = async (
       }),
     },
   );
-  if (!response.ok) {
+  if (!cloudflareReply.ok) {
     return null;
   }
-  const json = (await response.json()) as {
-    success?: boolean;
-    result?: { access_key_id?: string; secret_access_key?: string };
-  };
-  if (!(json.success && json.result?.access_key_id && json.result?.secret_access_key)) {
+  const tokenCreation = (await cloudflareReply.json()) as CloudflareR2TokenReply;
+  const tokenFields = tokenCreation.result;
+  if (!(tokenCreation.success && tokenFields?.access_key_id && tokenFields.secret_access_key)) {
     return null;
   }
   return {
-    accessKeyId: json.result.access_key_id,
-    secretAccessKey: json.result.secret_access_key,
+    accessKeyId: tokenFields.access_key_id,
+    secretAccessKey: tokenFields.secret_access_key,
   };
 };
 
-/**
- * Resolve the bucket name, using an explicit env value when present.
- *
- * @param cwd - Project directory.
- * @param env - Merged doctor environment.
- * @returns Bucket name to verify/create.
- * @example
- * const bucket = resolveBucketName(process.cwd(), process.env);
- */
-const resolveBucketName = (cwd: string, env: Record<string, string | undefined>): string => {
-  if (env.R2_BUCKET !== undefined && env.R2_BUCKET !== '') {
-    return env.R2_BUCKET;
+/** R2 bucket name from env, or derived from the project package name. */
+const r2BucketName = (cwd: string, processEnv: Record<string, string | undefined>): string => {
+  if (processEnv.R2_BUCKET !== undefined && processEnv.R2_BUCKET !== '') {
+    return processEnv.R2_BUCKET;
   }
   return `${readProjectName(cwd)}-assets`;
 };
 
-/**
- * Resolve existing or newly-created R2 credentials.
- *
- * @param env - Merged doctor environment.
- * @param accountId - Cloudflare account id.
- * @param apiToken - Cloudflare API token.
- * @param bucketName - R2 bucket name.
- * @returns R2 credentials, or null when token creation fails.
- * @example
- * const credentials = await resolveR2Credentials(env, accountId, apiToken, bucketName);
- */
-const resolveR2Credentials = async (
-  env: Record<string, string | undefined>,
+/** Existing R2 credentials from env, or a newly created API token. */
+const r2CredentialsFromEnvOrCreate = async (
+  processEnv: Record<string, string | undefined>,
   accountId: string,
   apiToken: string,
   bucketName: string,
 ): Promise<R2Credentials | null> => {
-  if (env.R2_ACCESS_KEY_ID !== undefined && env.R2_SECRET_ACCESS_KEY !== undefined) {
+  if (processEnv.R2_ACCESS_KEY_ID !== undefined && processEnv.R2_SECRET_ACCESS_KEY !== undefined) {
     return {
-      accessKeyId: env.R2_ACCESS_KEY_ID,
-      secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+      accessKeyId: processEnv.R2_ACCESS_KEY_ID,
+      secretAccessKey: processEnv.R2_SECRET_ACCESS_KEY,
     };
   }
 
   return await createR2ApiToken(accountId, apiToken, bucketName);
 };
 
-/**
- * Resolve the public R2 URL, using an explicit env value when present.
- *
- * @param env - Merged doctor environment.
- * @param accountId - Cloudflare account id.
- * @param bucketName - R2 bucket name.
- * @returns Public URL stored in `.env`.
- * @example
- * const url = resolveR2PublicUrl(process.env, accountId, bucketName);
- */
-const resolveR2PublicUrl = (
-  env: Record<string, string | undefined>,
+/** Public R2 URL from env, or the account/bucket default endpoint. */
+const r2PublicUrl = (
+  processEnv: Record<string, string | undefined>,
   accountId: string,
   bucketName: string,
 ): string => {
-  if (env.R2_PUBLIC_URL !== undefined && env.R2_PUBLIC_URL !== '') {
-    return env.R2_PUBLIC_URL;
+  if (processEnv.R2_PUBLIC_URL !== undefined && processEnv.R2_PUBLIC_URL !== '') {
+    return processEnv.R2_PUBLIC_URL;
   }
   return `https://${accountId}.r2.cloudflarestorage.com/${bucketName}`;
 };
@@ -180,33 +136,28 @@ const resolveR2PublicUrl = (
 /**
  * Provision Cloudflare R2 for asset storage when the default CF stack is active and
  * storage is not yet configured. Creates the bucket, API token, and writes `.env`.
- *
- * @param cwd - Project directory where env keys may be written.
- * @param env - Environment values used for Cloudflare provisioning.
- * @param log - Logger used for provisioning output.
- * @returns R2 provisioning result.
  */
 export const provisionR2Storage = async (
   cwd: string,
-  env: Record<string, string | undefined>,
-  log: Console,
-): Promise<R2ProvisionResult> => {
-  const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, env);
+  processEnv: Record<string, string | undefined>,
+  log: DoctorLog,
+): Promise<R2ProvisionStatus> => {
+  const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, processEnv);
   if (HOSTING_PROVIDER !== 'cloudflare') {
     return { ok: true, message: 'R2 provisioning skipped - hosting is not Cloudflare.' };
   }
 
   if (
-    env.R2_BUCKET !== undefined &&
-    env.R2_ACCESS_KEY_ID !== undefined &&
-    env.R2_SECRET_ACCESS_KEY !== undefined &&
-    env.R2_PUBLIC_URL !== undefined
+    processEnv.R2_BUCKET !== undefined &&
+    processEnv.R2_ACCESS_KEY_ID !== undefined &&
+    processEnv.R2_SECRET_ACCESS_KEY !== undefined &&
+    processEnv.R2_PUBLIC_URL !== undefined
   ) {
     return { ok: true, message: 'R2 storage already configured.' };
   }
 
-  const accountId = env.CLOUDFLARE_ACCOUNT_ID;
-  const apiToken = env.CLOUDFLARE_API_TOKEN;
+  const accountId = processEnv.CLOUDFLARE_ACCOUNT_ID;
+  const apiToken = processEnv.CLOUDFLARE_API_TOKEN;
   if (!(accountId && apiToken)) {
     return {
       ok: false,
@@ -218,7 +169,7 @@ export const provisionR2Storage = async (
     return { ok: false, message: 'wrangler is not signed in - run wrangler login first.' };
   }
 
-  const bucketName = resolveBucketName(cwd, env);
+  const bucketName = r2BucketName(cwd, processEnv);
   if (!wranglerOk(['r2', 'bucket', 'list'])) {
     return { ok: false, message: 'Could not list R2 buckets - check wrangler auth.' };
   }
@@ -226,14 +177,19 @@ export const provisionR2Storage = async (
   if (wranglerOk(['r2', 'bucket', 'create', bucketName])) {
     log.log(`[doctor] Created R2 bucket "${bucketName}".`);
   } else {
-    const exists = wranglerOk(['r2', 'bucket', 'list']);
-    if (!exists) {
+    const bucketListOk = wranglerOk(['r2', 'bucket', 'list']);
+    if (!bucketListOk) {
       return { ok: false, message: `Could not create R2 bucket "${bucketName}".` };
     }
     log.log(`[doctor] R2 bucket "${bucketName}" already exists or create skipped.`);
   }
 
-  const credentials = await resolveR2Credentials(env, accountId, apiToken, bucketName);
+  const credentials = await r2CredentialsFromEnvOrCreate(
+    processEnv,
+    accountId,
+    apiToken,
+    bucketName,
+  );
   if (credentials === null) {
     return {
       ok: false,
@@ -241,7 +197,7 @@ export const provisionR2Storage = async (
     };
   }
 
-  const publicUrl = resolveR2PublicUrl(env, accountId, bucketName);
+  const publicUrl = r2PublicUrl(processEnv, accountId, bucketName);
 
   writeEnvKeys(cwd, {
     STORAGE_PROVIDER: 'r2',

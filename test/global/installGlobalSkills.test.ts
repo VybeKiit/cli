@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { resolveGlobalPaths } from '../../src/global/globalPaths';
+import { globalInstallPaths } from '../../src/global/globalPaths';
 import { installGlobalSkills } from '../../src/global/installGlobalSkills';
 
 /** Build a throwaway bundled-skills source dir with required skills + a manifest. */
@@ -24,7 +24,7 @@ const makeConfig = async (): Promise<string> => mkdtemp(join(tmpdir(), 'vk-cfg-'
 
 describe('installGlobalSkills', () => {
   it('copies the bundled skills into the skills dir', async () => {
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     const result = await installGlobalSkills(paths, await makeSource());
     expect(result.installed).toEqual(['feedback', 'onboarding', 'go-live']);
     expect(await readFile(join(paths.skillsDir, 'onboarding', 'SKILL.md'), 'utf8')).toBe(
@@ -33,7 +33,7 @@ describe('installGlobalSkills', () => {
   });
 
   it('never clobbers a same-named skill the user authored', async () => {
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     await mkdir(join(paths.skillsDir, 'onboarding'), { recursive: true });
     await writeFile(join(paths.skillsDir, 'onboarding', 'SKILL.md'), 'MINE', 'utf8');
 
@@ -44,7 +44,7 @@ describe('installGlobalSkills', () => {
 
   it('is idempotent — refreshes managed skills without duplicating them', async () => {
     const source = await makeSource();
-    const paths = resolveGlobalPaths(await makeConfig());
+    const paths = globalInstallPaths(await makeConfig());
     await installGlobalSkills(paths, source);
     const second = await installGlobalSkills(paths, source);
     expect(second.installed).toEqual(['feedback', 'onboarding', 'go-live']);
@@ -60,7 +60,7 @@ describe('installGlobalSkills', () => {
     );
 
     await expect(
-      installGlobalSkills(resolveGlobalPaths(await makeConfig()), source),
+      installGlobalSkills(globalInstallPaths(await makeConfig()), source),
     ).rejects.toThrow('feedback is missing');
   });
 });

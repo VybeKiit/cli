@@ -13,14 +13,16 @@ const PROVIDERS: readonly DataProviderName[] = [
 ];
 
 /**
- * Resolve a data provider name from CLI input.
+ * Match a CLI value against known data provider names.
+ *
+ * Local to this command only — not the package ADR `resolveDataProvider` export.
  *
  * @param value - Candidate provider name.
  * @returns Data provider name when supported, otherwise undefined.
  * @example
- * const provider = resolveDataProvider('supabase');
+ * const provider = knownDataProvider('supabase');
  */
-const resolveDataProvider = (value: string): DataProviderName | undefined =>
+const knownDataProvider = (value: string): DataProviderName | undefined =>
   PROVIDERS.find((provider) => provider === value);
 
 /**
@@ -46,7 +48,7 @@ export const runPlanDataModel = async (
 
   const providerArg =
     providerInput === undefined || providerInput === '' ? 'supabase' : providerInput;
-  const provider = resolveDataProvider(providerArg);
+  const provider = knownDataProvider(providerArg);
 
   if (provider === undefined) {
     return {

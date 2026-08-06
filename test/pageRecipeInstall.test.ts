@@ -2,12 +2,12 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { locateKitWorkspace } from '../src/lib/kitWorkspaceSource';
 import type { PageRecipeSummary } from '../src/lib/pageRecipeCatalog';
 import { findPageRecipe, loadPageRecipes } from '../src/lib/pageRecipeCatalog';
 import { collectSharedImports, rewriteInstalledSource } from '../src/lib/pageRecipeImports';
 import { planPageRecipeInstall } from '../src/lib/pageRecipeInstall';
-import { buildRouteStub } from '../src/lib/pageRecipeRouteStub';
-import { resolveKitSource } from '../src/lib/resolveKitSource';
+import { pageRecipeRouteStub } from '../src/lib/pageRecipeRouteStub';
 
 const tempDirs: string[] = [];
 
@@ -50,9 +50,9 @@ describe('rewriteInstalledSource', () => {
   });
 });
 
-describe('buildRouteStub', () => {
+describe('pageRecipeRouteStub', () => {
   it('emits a default-export page that renders the recipe', () => {
-    const stub = buildRouteStub('CartPage', '@/components/pageRecipes/CartPage', '/cart');
+    const stub = pageRecipeRouteStub('CartPage', '@/components/pageRecipes/CartPage', '/cart');
     expect(stub).toContain("import { CartPage } from '@/components/pageRecipes/CartPage'");
     expect(stub).toContain('const Page = () => <CartPage />');
     expect(stub).toContain('export default Page');
@@ -61,7 +61,7 @@ describe('buildRouteStub', () => {
 
 describe('planPageRecipeInstall cart', () => {
   it('loads the monorepo catalog and plans a cart install', async () => {
-    const { kitRoot, cleanup } = await resolveKitSource();
+    const { kitRoot, cleanup } = await locateKitWorkspace();
     try {
       const recipes = await loadPageRecipes(kitRoot);
       expect(recipes.length).toBeGreaterThan(10);
@@ -97,7 +97,7 @@ describe('planPageRecipeInstall cart', () => {
 
 describe('planPageRecipeInstall bare dest', () => {
   it('plans without a route file when app/ is missing', async () => {
-    const { kitRoot, cleanup } = await resolveKitSource();
+    const { kitRoot, cleanup } = await locateKitWorkspace();
     try {
       const recipes = await loadPageRecipes(kitRoot);
       const pricing = findPageRecipe(recipes, 'pricing');
@@ -126,7 +126,7 @@ describe('planPageRecipeInstall bare dest', () => {
 
 describe('applyPageRecipeInstall smoke', () => {
   it('writes component + shared + route under a fake web app', async () => {
-    const { kitRoot, cleanup } = await resolveKitSource();
+    const { kitRoot, cleanup } = await locateKitWorkspace();
     try {
       const recipes = await loadPageRecipes(kitRoot);
       const recipe = findPageRecipe(recipes, 'onboarding');

@@ -38,7 +38,7 @@ export type SessionOneDeps = {
   ) => Promise<{ readonly code: number }>;
   readonly startDetached: (cwd: string, bin: string, args: readonly string[]) => boolean;
   readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
-  readonly resolvePnpm: () => Promise<readonly [string, ...string[]] | null>;
+  readonly pnpmCommand: () => Promise<readonly [string, ...string[]] | null>;
   readonly homeDir: () => string;
   readonly env: NodeJS.ProcessEnv;
   readonly platform: NodeJS.Platform;
@@ -69,7 +69,7 @@ export const shouldSkipSessionOne = (
  * @param deps - Home + env injection.
  * @returns Absolute destination directory.
  */
-export const resolveFirstAppPath = (deps: Pick<SessionOneDeps, 'homeDir' | 'env'>): string => {
+export const firstAppPath = (deps: Pick<SessionOneDeps, 'homeDir' | 'env'>): string => {
   const override = deps.env.VYBEKIIT_FIRST_APP_DIR?.trim();
   if (override !== undefined && override !== '') {
     return override.startsWith('/') || /^[A-Za-z]:[\\/]/.test(override)
@@ -174,7 +174,7 @@ export const openClaudeWithSeed = async (
   }
 };
 
-const defaultResolvePnpm = async (): Promise<readonly [string, ...string[]] | null> => {
+const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | null> => {
   const pnpm = makeExec('pnpm');
   const version = await pnpm(['--version']);
   if (version.code === 0) {
@@ -210,7 +210,7 @@ const defaultDeps = (): SessionOneDeps => ({
   runCommand: defaultRunCommand,
   startDetached: defaultStartDetached,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
-  resolvePnpm: defaultResolvePnpm,
+  pnpmCommand: defaultPnpmCommand,
   homeDir: homedir,
   env: process.env,
   platform: process.platform,
@@ -290,7 +290,7 @@ export const formatSessionOneLines = (
 export const runSessionOne = async (
   deps: SessionOneDeps = defaultDeps(),
 ): Promise<SessionOneResult> => {
-  const appPath = resolveFirstAppPath(deps);
+  const appPath = firstAppPath(deps);
   const exists = await deps.pathExists(appPath);
   const empty = exists ? await deps.isEmptyDir(appPath) : true;
 
@@ -336,7 +336,7 @@ export const runSessionOne = async (
     created = true;
   }
 
-  const pnpm = await deps.resolvePnpm();
+  const pnpm = await deps.pnpmCommand();
   if (pnpm === null) {
     const partial: Omit<SessionOneResult, 'lines'> = {
       appPath,

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  parseLiveWorkHostFlags,
-  toPublicLiveWorkHostResult,
-} from '../src/commands/liveWorkHostCmd';
+import { parseLiveWorkHostFlags, publicLiveWorkHostResult } from '../src/commands/liveWorkHostCmd';
 
 describe('parseLiveWorkHostFlags', () => {
   it('defaults to buyer mode', () => {
@@ -24,9 +21,9 @@ describe('parseLiveWorkHostFlags', () => {
   });
 });
 
-describe('toPublicLiveWorkHostResult', () => {
+describe('publicLiveWorkHostResult', () => {
   it('exposes url and pin key names only', () => {
-    const publicResult = toPublicLiveWorkHostResult(
+    const publicResult = publicLiveWorkHostResult(
       {
         provider: 'cloudflare',
         url: 'https://app.pages.dev',

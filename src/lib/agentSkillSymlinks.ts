@@ -76,7 +76,7 @@ export const ensureAgentSkillSymlinks = async (cwd: string): Promise<readonly st
   const plan = planAgentSkillSymlinks(await readAgentSkillSymlinkStates(cwd));
 
   return Promise.all(
-    plan.toCreate.map(async ({ link, target }) => {
+    plan.pendingSymlinks.map(async ({ link, target }) => {
       const linkPath = join(cwd, link);
       try {
         const stat = await lstat(linkPath);

@@ -39,7 +39,6 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
   await mkdir(join(coreDir, 'node_modules', 'left-pad'), { recursive: true });
   // Build roots so buyer kits can rebuild packages offline.
   await writeFile(join(kitRoot, 'tsconfig.base.json'), '{}\n');
-  await writeFile(join(kitRoot, 'tsup.base.ts'), 'export {};\n');
   await mkdir(join(kitRoot, 'scripts', 'lib'), { recursive: true });
   await writeFile(join(kitRoot, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'export {};\n');
   await writeFile(join(kitRoot, 'scripts', 'lib', 'repoRoot.mjs'), 'export {};\n');

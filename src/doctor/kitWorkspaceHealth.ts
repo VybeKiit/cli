@@ -161,8 +161,11 @@ export const verifyKitWorkspaceHealth = (cwd: string): KitWorkspaceHealthReport 
     );
   }
 
-  const buildRoots = ['tsconfig.base.json', 'scripts/lib/tsupWorkspaceAliases.mjs'] as const;
-  const missingRoots = buildRoots.filter((rel) => !existsSync(join(cwd, rel)));
+  const kitWorkspaceHealthRoots = [
+    'tsconfig.base.json',
+    'scripts/lib/tsupWorkspaceAliases.mjs',
+  ] as const;
+  const missingRoots = kitWorkspaceHealthRoots.filter((rel) => !existsSync(join(cwd, rel)));
   if (missingRoots.length > 0 && missing.length > 0) {
     lines.push(
       `✗ Kit is also missing rebuild helpers (${missingRoots.join(', ')}). Re-run \`vybekiit create app\` with a current CLI so build roots ship with the workspace.`,

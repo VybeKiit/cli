@@ -2,16 +2,16 @@ import { stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type ResolveDeps, resolveTemplatesSource } from '../src';
 import { ScaffoldError } from '../src/lib/scaffold';
+import { locateTemplateSource, type TemplateSourceSeams } from '../src/lib/templateSource';
 
 /**
- * `resolveTemplatesSource` resolution-order tests. All three branches are exercised
+ * `locateTemplateSource` resolution-order tests. All three branches are exercised
  * with injected `clone`/`exists` seams so nothing touches `gh` or the network.
  * `vi.stubEnv` controls (and restores) `VYBEKIIT_TEMPLATES_DIR` so cases stay isolated
  * without mutating `process.env` directly.
  */
-describe('resolveTemplatesSource overrides', () => {
+describe('locateTemplateSource overrides', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -19,7 +19,7 @@ describe('resolveTemplatesSource overrides', () => {
   it('uses VYBEKIIT_TEMPLATES_DIR when set, without cloning or cleanup', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '/tmp/override-templates');
     let cloneCalls = 0;
-    const deps: ResolveDeps = {
+    const deps: TemplateSourceSeams = {
       clone: () => {
         cloneCalls += 1;
         return Promise.resolve();
@@ -27,7 +27,7 @@ describe('resolveTemplatesSource overrides', () => {
       exists: () => Promise.resolve(false),
     };
 
-    const resolved = await resolveTemplatesSource('web', deps);
+    const resolved = await locateTemplateSource('web', deps);
 
     expect(resolved.source).toBe('/tmp/override-templates');
     expect(resolved.cleanup).toBeUndefined();
@@ -37,7 +37,7 @@ describe('resolveTemplatesSource overrides', () => {
   it('uses the monorepo-local templates dir when it holds the template, no cleanup', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     let cloneCalls = 0;
-    const deps: ResolveDeps = {
+    const deps: TemplateSourceSeams = {
       clone: () => {
         cloneCalls += 1;
         return Promise.resolve();
@@ -45,7 +45,7 @@ describe('resolveTemplatesSource overrides', () => {
       exists: () => Promise.resolve(true),
     };
 
-    const resolved = await resolveTemplatesSource('web', deps);
+    const resolved = await locateTemplateSource('web', deps);
 
     expect(resolved.source.endsWith('templates')).toBe(true);
     expect(resolved.cleanup).toBeUndefined();
@@ -53,7 +53,7 @@ describe('resolveTemplatesSource overrides', () => {
   });
 });
 
-describe('resolveTemplatesSource mirror clone', () => {
+describe('locateTemplateSource mirror clone', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -61,7 +61,7 @@ describe('resolveTemplatesSource mirror clone', () => {
   it('clones the mirror into a temp dir when published, exposing a cleanup', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     const cloned: Array<{ template: string; targetDir: string }> = [];
-    const deps: ResolveDeps = {
+    const deps: TemplateSourceSeams = {
       clone: (template, targetDir) => {
         cloned.push({ template, targetDir });
         return Promise.resolve();
@@ -69,7 +69,7 @@ describe('resolveTemplatesSource mirror clone', () => {
       exists: () => Promise.resolve(false),
     };
 
-    const resolved = await resolveTemplatesSource('web', deps);
+    const resolved = await locateTemplateSource('web', deps);
 
     expect(cloned).toHaveLength(1);
     expect(cloned[0]?.template).toBe('web');
@@ -85,11 +85,11 @@ describe('resolveTemplatesSource mirror clone', () => {
 
   it('propagates the clone failure as a ScaffoldError, leaving no temp dir behind', async () => {
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
-    const deps: ResolveDeps = {
+    const deps: TemplateSourceSeams = {
       clone: () => Promise.reject(new ScaffoldError('Couldn’t download the web template. ...')),
       exists: () => Promise.resolve(false),
     };
 
-    await expect(resolveTemplatesSource('web', deps)).rejects.toBeInstanceOf(ScaffoldError);
+    await expect(locateTemplateSource('web', deps)).rejects.toBeInstanceOf(ScaffoldError);
   });
 });

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_FIRST_APP_DIR_NAME,
+  firstAppPath,
   formatSessionOneLines,
-  resolveFirstAppPath,
   runSessionOne,
   SESSION_ONE_SEED_PROMPT,
   type SessionOneDeps,
@@ -16,7 +16,7 @@ const baseDeps = (overrides: Partial<SessionOneDeps> = {}): SessionOneDeps => ({
   runCommand: vi.fn(async () => ({ code: 0 })),
   startDetached: vi.fn(() => true),
   openClaude: vi.fn(async () => true),
-  resolvePnpm: vi.fn(async () => ['pnpm'] as const),
+  pnpmCommand: vi.fn(async () => ['pnpm'] as const),
   homeDir: () => '/Users/me',
   env: {},
   platform: 'darwin',
@@ -32,22 +32,22 @@ describe('shouldSkipSessionOne', () => {
   });
 });
 
-describe('resolveFirstAppPath', () => {
+describe('firstAppPath', () => {
   it('defaults to ~/vybekiit-app', () => {
-    expect(resolveFirstAppPath({ homeDir: () => '/Users/me', env: {} })).toBe(
+    expect(firstAppPath({ homeDir: () => '/Users/me', env: {} })).toBe(
       `/Users/me/${DEFAULT_FIRST_APP_DIR_NAME}`,
     );
   });
 
   it('honours absolute and relative VYBEKIIT_FIRST_APP_DIR', () => {
     expect(
-      resolveFirstAppPath({
+      firstAppPath({
         homeDir: () => '/Users/me',
         env: { VYBEKIIT_FIRST_APP_DIR: '/tmp/app' },
       }),
     ).toBe('/tmp/app');
     expect(
-      resolveFirstAppPath({
+      firstAppPath({
         homeDir: () => '/Users/me',
         env: { VYBEKIIT_FIRST_APP_DIR: 'projects/shop' },
       }),
@@ -138,7 +138,7 @@ describe('runSessionOne', () => {
 
   it('still opens Claude when pnpm is missing after create', async () => {
     const deps = baseDeps({
-      resolvePnpm: vi.fn(async () => null),
+      pnpmCommand: vi.fn(async () => null),
     });
 
     const result = await runSessionOne(deps);

@@ -35,7 +35,7 @@ export const verifyPresetsDoctor = async (env: NodeJS.ProcessEnv): Promise<Prese
     };
   }
 
-  const result = await Effect.runPromise(
+  const presetCheck = await Effect.runPromise(
     Effect.either(
       verifyPresets(
         expected.map((preset) => preset.id),
@@ -43,25 +43,26 @@ export const verifyPresetsDoctor = async (env: NodeJS.ProcessEnv): Promise<Prese
       ),
     ),
   );
-  if (Either.isLeft(result)) {
-    const error: PresetFailure = result.left;
+  if (Either.isLeft(presetCheck)) {
+    const failure: PresetFailure = presetCheck.left;
     return {
       checked: true,
       ok: false,
-      lines: [`✗ DB presets - verification failed: ${error.message}`],
+      lines: [`✗ DB presets - verification failed: ${failure.message}`],
     };
   }
 
   const lines: string[] = [];
-  if (result.right.ok) {
-    lines.push(`✓ DB presets - ${result.right.applied.length} feature preset(s) present.`);
+  const presetReport = presetCheck.right;
+  if (presetReport.ok) {
+    lines.push(`✓ DB presets - ${presetReport.applied.length} feature preset(s) present.`);
   } else {
     lines.push('⚠ DB presets - some feature tables are missing:');
-    for (const issue of result.right.issues) {
+    for (const issue of presetReport.issues) {
       lines.push(`  · ${issue.presetId}: ${issue.detail}`);
     }
     lines.push('  Run `vybekiit verify-presets --fix` to apply missing presets.');
   }
 
-  return { checked: true, ok: result.right.ok, lines };
+  return { checked: true, ok: presetReport.ok, lines };
 };

@@ -30,9 +30,9 @@ describe('railway agent setup', () => {
   });
 
   it('skips agent setup when railway is not installed', () => {
-    const result = runRailwayAgentSetup(false, null);
-    expect(result.ok).toBe(false);
-    expect(result.message).toMatch(INSTALL_WARNING);
+    const agentSetup = runRailwayAgentSetup(false, null);
+    expect(agentSetup.ok).toBe(false);
+    expect(agentSetup.message).toMatch(INSTALL_WARNING);
   });
 
   it('formats stack report lines when railway is active', () => {

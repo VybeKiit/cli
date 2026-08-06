@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   parseLiveWorkPaymentsFlags,
-  toPublicLiveWorkPaymentsResult,
+  publicLiveWorkPaymentsResult,
 } from '../src/commands/liveWorkPaymentsCmd';
 
 describe('parseLiveWorkPaymentsFlags', () => {
@@ -40,9 +40,9 @@ describe('parseLiveWorkPaymentsFlags', () => {
   });
 });
 
-describe('toPublicLiveWorkPaymentsResult', () => {
+describe('publicLiveWorkPaymentsResult', () => {
   it('exposes pin key names only and journey events', () => {
-    const publicResult = toPublicLiveWorkPaymentsResult(
+    const publicResult = publicLiveWorkPaymentsResult(
       {
         provider: 'stripe',
         ephemeral: false,

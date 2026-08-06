@@ -9,7 +9,7 @@ import {
 import {
   listBuyerSkillContents,
   loadAgentLayerRenderInputs,
-  resolveTemplateArg,
+  selectedTemplate,
   writeAgentLayerRenderOutputs,
 } from '../lib/agentLayerIo';
 import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
@@ -43,20 +43,20 @@ const writeBuyerSkillStubs = async (
 };
 
 /**
- * Resolve the template used by the render command.
+ * Template used by the agent-layer render command.
  *
  * @param cwd - Project directory used for template inference.
  * @param templateArg - Optional template argument passed by the caller.
  * @returns Explicit, inferred, or bootstrap-default template id.
  * @example
- * const template = await resolveRenderTemplate(process.cwd(), 'web');
+ * const template = await selectedRenderTemplate(process.cwd(), 'web');
  */
-const resolveRenderTemplate = async (cwd: string, templateArg?: string): Promise<TemplateId> => {
+const selectedRenderTemplate = async (cwd: string, templateArg?: string): Promise<TemplateId> => {
   if (templateArg !== undefined && templateArg !== '' && isTemplateName(templateArg)) {
     return templateArg;
   }
 
-  const detected = await resolveTemplateArg(undefined, cwd);
+  const detected = await selectedTemplate(undefined, cwd);
   if (detected !== null) {
     return detected;
   }
@@ -78,7 +78,7 @@ export const runRenderAgentLayer = async (
   readonly filesUpdated: readonly string[];
   readonly exitCode: number;
 }> => {
-  const template = await resolveRenderTemplate(cwd, templateArg);
+  const template = await selectedRenderTemplate(cwd, templateArg);
 
   const { contents, present } = await loadAgentLayerRenderInputs(cwd);
   const skillContents = await listBuyerSkillContents(cwd);

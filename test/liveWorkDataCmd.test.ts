@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  parseLiveWorkDataFlags,
-  toPublicLiveWorkDataResult,
-} from '../src/commands/liveWorkDataCmd';
+import { parseLiveWorkDataFlags, publicLiveWorkDataResult } from '../src/commands/liveWorkDataCmd';
 
 describe('parseLiveWorkDataFlags', () => {
   it('defaults to demo mode and pin enabled', () => {
@@ -34,9 +31,9 @@ describe('parseLiveWorkDataFlags', () => {
   });
 });
 
-describe('toPublicLiveWorkDataResult', () => {
+describe('publicLiveWorkDataResult', () => {
   it('never includes DATABASE_URL or other secret pin values', () => {
-    const publicResult = toPublicLiveWorkDataResult(
+    const publicResult = publicLiveWorkDataResult(
       {
         provider: 'neon',
         databaseUrl: 'postgresql://secret/db',

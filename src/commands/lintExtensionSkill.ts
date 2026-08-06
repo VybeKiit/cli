@@ -8,18 +8,15 @@ export type LintExtensionSkillResult = {
 };
 
 /**
- * Resolve the extension skill kind from an explicit flag or path convention.
+ * Extension skill kind from an explicit flag or path convention.
  *
  * @param path - Skill file path passed to the command.
  * @param explicit - Optional `--kind` flag value.
  * @returns Lint kind, or null when the kind cannot be inferred.
  * @example
- * const kind = resolveExtensionSkillKind('extensions/skills/payments.md');
+ * const kind = extensionSkillKind('extensions/skills/payments.md');
  */
-const resolveExtensionSkillKind = (
-  path: string,
-  explicit?: string,
-): ExtensionSkillLintKind | null => {
+const extensionSkillKind = (path: string, explicit?: string): ExtensionSkillLintKind | null => {
   if (
     explicit === 'buyer-goal' ||
     explicit === 'platform-wrapper' ||
@@ -64,7 +61,7 @@ export const runLintExtensionSkill = async (args: string[]): Promise<LintExtensi
     };
   }
 
-  const kind = resolveExtensionSkillKind(path, kindFlag);
+  const kind = extensionSkillKind(path, kindFlag);
   if (kind === null) {
     return {
       json: JSON.stringify({

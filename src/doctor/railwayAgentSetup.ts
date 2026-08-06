@@ -7,39 +7,26 @@ import {
   parseEnv,
 } from '@vybekiit/core';
 
-/**
- * Check whether both Railway provider settings are active.
- *
- * @param env - Environment source to inspect.
- * @returns True when the Railway stack is active.
- * @example
- * const active = isRailwayStackActive(process.env);
- */
-export const isRailwayStackActive = (env: EnvSource): boolean => isCoreRailwayStackActive(env);
+/** True when either Railway hosting or data is active (core ADR signal). */
+export const isRailwayStackActive = (processEnv: EnvSource): boolean =>
+  isCoreRailwayStackActive(processEnv);
 
-/**
- * Warn when only one half of the coupled Railway stack is selected.
- *
- * @param env - Environment source to inspect.
- * @returns Buyer-readable warning, or null when the stack is coherent.
- * @example
- * const warning = verifyCoupledStack(process.env);
- */
-export const verifyCoupledStack = (env: EnvSource): string | null => {
-  const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, env);
-  const { DATA_PROVIDER } = parseEnv(dataConfigSchema, env);
-  const hosting = HOSTING_PROVIDER === 'railway';
-  const data = DATA_PROVIDER === 'railway';
-  if (hosting && !data) {
+/** Buyer-readable warning when only one half of the coupled Railway stack is selected. */
+export const verifyCoupledStack = (processEnv: EnvSource): string | null => {
+  const { HOSTING_PROVIDER } = parseEnv(hostingConfigSchema, processEnv);
+  const { DATA_PROVIDER } = parseEnv(dataConfigSchema, processEnv);
+  const railwayOwnsHosting = HOSTING_PROVIDER === 'railway';
+  const railwayOwnsData = DATA_PROVIDER === 'railway';
+  if (railwayOwnsHosting && !railwayOwnsData) {
     return '→ Railway hosting is on but your database setting is not Railway - set DATA_PROVIDER=railway for the coupled stack.';
   }
-  if (data && !hosting) {
+  if (railwayOwnsData && !railwayOwnsHosting) {
     return '→ Railway database is on but your hosting setting is not Railway - set HOSTING_PROVIDER=railway for the coupled stack.';
   }
   return null;
 };
 
-export type RailwayAgentSetupResult = {
+export type RailwayAgentSetupStatus = {
   readonly ok: boolean;
   readonly message: string;
 };
@@ -47,15 +34,11 @@ export type RailwayAgentSetupResult = {
 /**
  * Run Railway's bundled agent setup (skills + MCP merge + auth check).
  * Non-interactive; requires `railway` on PATH and signed in for full success.
- *
- * @param railwayInstalled - Whether the Railway CLI is installed.
- * @param railwayAuthed - Whether the Railway CLI is signed in, or null when unknown.
- * @returns Railway agent setup result.
  */
 export const runRailwayAgentSetup = (
   railwayInstalled: boolean,
   railwayAuthed: boolean | null,
-): RailwayAgentSetupResult => {
+): RailwayAgentSetupStatus => {
   if (!railwayInstalled) {
     return {
       ok: false,
@@ -69,17 +52,17 @@ export const runRailwayAgentSetup = (
     };
   }
 
-  const result = spawnSync('railway', ['setup', 'agent', '-y'], {
+  const agentSetupProcess = spawnSync('railway', ['setup', 'agent', '-y'], {
     stdio: 'pipe',
     encoding: 'utf8',
   });
-  if (result.status === 0) {
+  if (agentSetupProcess.status === 0) {
     return {
       ok: true,
       message: '✓ Railway - agent skills and MCP configuration updated.',
     };
   }
-  const [detail] = `${result.stderr}${result.stdout}`.trim().split('\n');
+  const [detail] = `${agentSetupProcess.stderr}${agentSetupProcess.stdout}`.trim().split('\n');
   return {
     ok: false,
     message: detail
@@ -88,24 +71,16 @@ export const runRailwayAgentSetup = (
   };
 };
 
-/**
- * Format Railway stack checks as buyer-readable doctor lines.
- *
- * @param env - Environment values for stack detection.
- * @param agentSetup - Optional Railway agent setup result.
- * @returns Doctor lines for active Railway stacks.
- * @example
- * const lines = formatRailwayStackReport(process.env, agentSetup);
- */
+/** Doctor lines for active Railway stacks (coupling warning + agent setup). */
 export const formatRailwayStackReport = (
-  env: EnvSource,
-  agentSetup: RailwayAgentSetupResult | null,
+  processEnv: EnvSource,
+  agentSetup: RailwayAgentSetupStatus | null,
 ): readonly string[] => {
-  if (!isRailwayStackActive(env)) {
+  if (!isRailwayStackActive(processEnv)) {
     return [];
   }
   const lines: string[] = [];
-  const coupling = verifyCoupledStack(env);
+  const coupling = verifyCoupledStack(processEnv);
   if (coupling) {
     lines.push(coupling);
   }

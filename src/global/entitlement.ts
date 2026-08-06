@@ -39,7 +39,7 @@ const defaultDeps: EntitlementDeps = { exec: makeExec('gh') };
  * @param exec - `gh` runner.
  * @returns The login, or null when gh is missing / not authenticated.
  */
-const resolveLogin = async (exec: ExecFn): Promise<string | null> => {
+const signedInGithubLogin = async (exec: ExecFn): Promise<string | null> => {
   const res = await exec(['api', 'user', '--jq', '.login']);
   if (res.code !== 0) {
     return null;
@@ -68,7 +68,7 @@ export const checkEntitlement = async (
   if ((await exec(['--version'])).code === 127) {
     return { entitled: false, reason: 'gh-missing' };
   }
-  const login = await resolveLogin(exec);
+  const login = await signedInGithubLogin(exec);
   if (login === null) {
     return { entitled: false, reason: 'not-authenticated' };
   }

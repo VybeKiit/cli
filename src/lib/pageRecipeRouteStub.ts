@@ -6,9 +6,9 @@
  * @param targetRoute - Manifest route for documentation.
  * @returns Route module source.
  * @example
- * const page = buildRouteStub('CartPage', '@/components/pageRecipes/CartPage', '/cart');
+ * const page = pageRecipeRouteStub('CartPage', '@/components/pageRecipes/CartPage', '/cart');
  */
-export const buildRouteStub = (
+export const pageRecipeRouteStub = (
   exportName: string,
   componentImportPath: string,
   targetRoute: string,

@@ -14,7 +14,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 
 /**
  * GitHub org that holds private delivery mirrors (same org as per-template mirrors in
- * `resolveTemplates.ts`).
+ * `templateSource.ts`).
  */
 const MIRROR_ORG = 'VybeKiit';
 
@@ -31,19 +31,19 @@ const MIRROR_ORG = 'VybeKiit';
 export const KIT_MIRROR_REPO = 'kit';
 
 /**
- * The seams a {@link resolveKitSource} call needs, injected so the published clone path is
+ * The seams a {@link locateKitWorkspace} call needs, injected so the published clone path is
  * unit-testable without `gh` or a network.
  *
  * @property clone - downloads the kit mirror into a target dir (see {@link cloneKitMirror})
  * @property exists - true when a path is present on disk (the monorepo-local probe)
  */
-export type ResolveKitDeps = {
+export type KitWorkspaceSeams = {
   readonly clone: (repoName: string, targetDir: string) => Promise<void>;
   readonly exists: (path: string) => Promise<boolean>;
 };
 
 /** A resolved kit workspace root plus optional teardown for a temp clone. */
-export type ResolvedKitSource = {
+export type LocatedKitWorkspace = {
   /** Root that contains `packages/` and `templates/`. */
   readonly kitRoot: string;
   /** Removes any temp clone created for a published install; absent for in-place sources. */
@@ -86,7 +86,7 @@ export const cloneKitMirror = async (repoName: string, targetDir: string): Promi
  * @param exists - Path existence seam.
  * @returns First root that has both `packages/` and `templates/`, or null.
  */
-const findLocalKitRoot = async (
+const localKitWorkspaceRoot = async (
   exists: (path: string) => Promise<boolean>,
 ): Promise<string | null> => {
   // Bundled bin lives at cli/dist → monorepo root is ../..
@@ -118,11 +118,11 @@ const findLocalKitRoot = async (
  * @param deps - Injectable clone and existence seams.
  * @returns Resolved kit root plus cleanup when a temp clone was created.
  * @example
- * const { kitRoot, cleanup } = await resolveKitSource();
+ * const { kitRoot, cleanup } = await locateKitWorkspace();
  */
-export const resolveKitSource = async (
-  deps: ResolveKitDeps = { clone: cloneKitMirror, exists: pathExists },
-): Promise<ResolvedKitSource> => {
+export const locateKitWorkspace = async (
+  deps: KitWorkspaceSeams = { clone: cloneKitMirror, exists: pathExists },
+): Promise<LocatedKitWorkspace> => {
   const kitOverride = process.env.VYBEKIIT_KIT_DIR;
   if (kitOverride !== undefined && kitOverride !== '') {
     return { kitRoot: kitOverride };
@@ -133,7 +133,7 @@ export const resolveKitSource = async (
     return { kitRoot: resolve(templatesOverride, '..') };
   }
 
-  const localRoot = await findLocalKitRoot(deps.exists);
+  const localRoot = await localKitWorkspaceRoot(deps.exists);
   if (localRoot !== null) {
     return { kitRoot: localRoot };
   }

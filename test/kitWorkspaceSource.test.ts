@@ -4,13 +4,13 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   KIT_MIRROR_REPO,
-  type ResolveKitDeps,
-  resolveKitSource,
-} from '../src/lib/resolveKitSource';
+  type KitWorkspaceSeams,
+  locateKitWorkspace,
+} from '../src/lib/kitWorkspaceSource';
 import { ScaffoldError } from '../src/lib/scaffold';
 
 /** Build a no-op clone that counts calls. */
-const countingClone = (): { readonly deps: ResolveKitDeps; readonly calls: () => number } => {
+const countingClone = (): { readonly deps: KitWorkspaceSeams; readonly calls: () => number } => {
   let cloneCalls = 0;
   return {
     deps: {
@@ -24,7 +24,7 @@ const countingClone = (): { readonly deps: ResolveKitDeps; readonly calls: () =>
   };
 };
 
-describe('resolveKitSource env overrides', () => {
+describe('locateKitWorkspace env overrides', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -33,7 +33,7 @@ describe('resolveKitSource env overrides', () => {
     vi.stubEnv('VYBEKIIT_KIT_DIR', '/tmp/override-kit');
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     const { deps, calls } = countingClone();
-    const resolved = await resolveKitSource(deps);
+    const resolved = await locateKitWorkspace(deps);
     expect(resolved.kitRoot).toBe('/tmp/override-kit');
     expect(resolved.cleanup).toBeUndefined();
     expect(calls()).toBe(0);
@@ -43,14 +43,14 @@ describe('resolveKitSource env overrides', () => {
     vi.stubEnv('VYBEKIIT_KIT_DIR', '');
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '/tmp/dev-kit/templates');
     const { deps, calls } = countingClone();
-    const resolved = await resolveKitSource(deps);
+    const resolved = await locateKitWorkspace(deps);
     expect(resolved.kitRoot).toBe('/tmp/dev-kit');
     expect(resolved.cleanup).toBeUndefined();
     expect(calls()).toBe(0);
   });
 });
 
-describe('resolveKitSource monorepo-local', () => {
+describe('locateKitWorkspace monorepo-local', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -59,7 +59,7 @@ describe('resolveKitSource monorepo-local', () => {
     vi.stubEnv('VYBEKIIT_KIT_DIR', '');
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     let cloneCalls = 0;
-    const deps: ResolveKitDeps = {
+    const deps: KitWorkspaceSeams = {
       clone: () => {
         cloneCalls += 1;
         return Promise.resolve();
@@ -75,7 +75,7 @@ describe('resolveKitSource monorepo-local', () => {
       },
     };
 
-    const resolved = await resolveKitSource(deps);
+    const resolved = await locateKitWorkspace(deps);
     await expect(stat(join(resolved.kitRoot, 'packages'))).resolves.toBeDefined();
     await expect(stat(join(resolved.kitRoot, 'templates'))).resolves.toBeDefined();
     expect(resolved.cleanup).toBeUndefined();
@@ -83,7 +83,7 @@ describe('resolveKitSource monorepo-local', () => {
   });
 });
 
-describe('resolveKitSource kit mirror clone', () => {
+describe('locateKitWorkspace kit mirror clone', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -92,7 +92,7 @@ describe('resolveKitSource kit mirror clone', () => {
     vi.stubEnv('VYBEKIIT_KIT_DIR', '');
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
     const cloned: Array<{ repoName: string; targetDir: string }> = [];
-    const deps: ResolveKitDeps = {
+    const deps: KitWorkspaceSeams = {
       clone: async (repoName, targetDir) => {
         cloned.push({ repoName, targetDir });
         // Real `gh repo clone` creates targetDir; the mock must too so cleanup can remove it.
@@ -101,7 +101,7 @@ describe('resolveKitSource kit mirror clone', () => {
       exists: () => Promise.resolve(false),
     };
 
-    const resolved = await resolveKitSource(deps);
+    const resolved = await locateKitWorkspace(deps);
 
     expect(cloned).toHaveLength(1);
     expect(cloned[0]?.repoName).toBe(KIT_MIRROR_REPO);
@@ -117,11 +117,11 @@ describe('resolveKitSource kit mirror clone', () => {
   it('propagates the clone failure as a ScaffoldError, leaving no temp dir behind', async () => {
     vi.stubEnv('VYBEKIIT_KIT_DIR', '');
     vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
-    const deps: ResolveKitDeps = {
+    const deps: KitWorkspaceSeams = {
       clone: () => Promise.reject(new ScaffoldError("Couldn't download the kit workspace. ...")),
       exists: () => Promise.resolve(false),
     };
 
-    await expect(resolveKitSource(deps)).rejects.toBeInstanceOf(ScaffoldError);
+    await expect(locateKitWorkspace(deps)).rejects.toBeInstanceOf(ScaffoldError);
   });
 });

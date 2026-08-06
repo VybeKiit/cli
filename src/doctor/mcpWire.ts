@@ -95,15 +95,15 @@ export const createDefaultMcpWireDeps = (): McpWireDeps => ({
     mkdirSync(path, { recursive: true });
   },
   commandExists: defaultCommandExists,
-  spawn: (command, args, options) => {
+  spawn: (command, spawnArgs, spawnOptions) => {
     // Cap duration so optional `claude mcp add` never hangs an interactive doctor.
-    const result = spawnSync(command, [...args], {
+    const spawnOutcome = spawnSync(command, [...spawnArgs], {
       stdio: 'ignore',
-      cwd: options?.cwd,
+      cwd: spawnOptions?.cwd,
       timeout: 8000,
       env: { ...process.env, CI: process.env.CI ?? '1' },
     });
-    return { status: result.status };
+    return { status: spawnOutcome.status };
   },
 });
 
@@ -129,18 +129,11 @@ export const findMcpCatalogPath = (
   return null;
 };
 
-/**
- * Parse a raw `mcp-servers.json` catalog into typed server rows.
- *
- * @param raw - JSON text from the catalog file.
- * @returns Server rows with required name + command; invalid rows dropped.
- * @example
- * const servers = parseMcpCatalog(fs.readFileSync(path, 'utf8'));
- */
-export const parseMcpCatalog = (raw: string): readonly McpCatalogServer[] => {
+/** Typed server rows from `mcp-servers.json`; invalid rows dropped. */
+export const parseMcpCatalog = (catalogText: string): readonly McpCatalogServer[] => {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw) as unknown;
+    parsed = JSON.parse(catalogText) as unknown;
   } catch {
     return [];
   }
@@ -218,52 +211,42 @@ export const splitCatalogCommand = (
 };
 
 /**
- * Convert one catalog server into a Cursor/Claude MCP config entry.
+ * Cursor/Claude MCP config entry for one catalog server.
  *
  * Remote catalog commands use the `remote:<url>` prefix and become `{ url }`.
  * Stdio commands become `{ command, args }`. Secrets are never written —
  * env key names from the catalog are not materialized as values.
- *
- * @param server - Catalog row.
- * @returns Config entry, or null when the command is empty/invalid.
- * @example
- * const entry = catalogServerToMcpEntry({ name: 'context7', command: 'npx -y @upstash/context7-mcp@latest' });
  */
-export const catalogServerToMcpEntry = (server: McpCatalogServer): McpServerEntry | null => {
+export const mcpEntryFromCatalogServer = (server: McpCatalogServer): McpServerEntry | null => {
   const trimmed = server.command.trim();
   if (trimmed === '') {
     return null;
   }
   if (trimmed.startsWith('remote:')) {
-    const url = trimmed.slice('remote:'.length).trim();
-    if (url === '') {
+    const remoteUrl = trimmed.slice('remote:'.length).trim();
+    if (remoteUrl === '') {
       return null;
     }
-    return { url };
+    return { url: remoteUrl };
   }
-  const { command, args } = splitCatalogCommand(trimmed);
+  const { command, args: commandArgs } = splitCatalogCommand(trimmed);
   if (command === '') {
     return null;
   }
-  return { command, args };
+  return { command, args: commandArgs };
 };
 
-/**
- * Build a full `{ mcpServers }` config from catalog core rows.
- *
- * @param servers - Core catalog servers to include.
- * @returns Project MCP config object.
- * @example
- * const config = buildMcpServersConfig(selectCoreMcpServers(servers));
- */
-export const buildMcpServersConfig = (servers: readonly McpCatalogServer[]): McpServersConfig => {
+/** Full `{ mcpServers }` project config from catalog core rows. */
+export const mcpServersConfigFromCatalog = (
+  servers: readonly McpCatalogServer[],
+): McpServersConfig => {
   const mcpServers: Record<string, McpServerEntry> = {};
   for (const server of servers) {
-    const entry = catalogServerToMcpEntry(server);
-    if (entry === null) {
+    const mcpEntry = mcpEntryFromCatalogServer(server);
+    if (mcpEntry === null) {
       continue;
     }
-    mcpServers[server.name] = entry;
+    mcpServers[server.name] = mcpEntry;
   }
   return { mcpServers };
 };
@@ -271,12 +254,6 @@ export const buildMcpServersConfig = (servers: readonly McpCatalogServer[]): Mcp
 /**
  * Merge curated core servers into an existing project MCP config without
  * clobbering buyer-owned entries that already exist under the same name.
- *
- * @param existing - Parsed existing config (or empty).
- * @param core - Core servers to ensure are present.
- * @returns Merged config and whether any core name was newly added.
- * @example
- * const { config, added } = mergeCoreMcpServers({ mcpServers: {} }, coreServers);
  */
 export const mergeCoreMcpServers = (
   existing: McpServersConfig,
@@ -288,28 +265,21 @@ export const mergeCoreMcpServers = (
     if (next[server.name] !== undefined) {
       continue;
     }
-    const entry = catalogServerToMcpEntry(server);
-    if (entry === null) {
+    const mcpEntry = mcpEntryFromCatalogServer(server);
+    if (mcpEntry === null) {
       continue;
     }
-    next[server.name] = entry;
+    next[server.name] = mcpEntry;
     added.push(server.name);
   }
   return { config: { mcpServers: next }, added };
 };
 
-/**
- * Parse an existing project MCP JSON file; invalid/missing shape yields empty servers.
- *
- * @param raw - File text.
- * @returns Normalized config.
- * @example
- * const config = parseMcpServersConfig(fs.readFileSync('.cursor/mcp.json', 'utf8'));
- */
-export const parseMcpServersConfig = (raw: string): McpServersConfig => {
+/** Existing project MCP JSON; invalid/missing shape yields empty servers. */
+export const parseMcpServersConfig = (configText: string): McpServersConfig => {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw) as unknown;
+    parsed = JSON.parse(configText) as unknown;
   } catch {
     return { mcpServers: {} };
   }
@@ -321,20 +291,20 @@ export const parseMcpServersConfig = (raw: string): McpServersConfig => {
     return { mcpServers: {} };
   }
   const mcpServers: Record<string, McpServerEntry> = {};
-  for (const [name, value] of Object.entries(servers as Record<string, unknown>)) {
-    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+  for (const [serverName, serverValue] of Object.entries(servers as Record<string, unknown>)) {
+    if (serverValue === null || typeof serverValue !== 'object' || Array.isArray(serverValue)) {
       continue;
     }
-    const record = value as Record<string, unknown>;
-    if (typeof record.url === 'string' && record.url !== '') {
-      mcpServers[name] = { url: record.url };
+    const serverFields = serverValue as Record<string, unknown>;
+    if (typeof serverFields.url === 'string' && serverFields.url !== '') {
+      mcpServers[serverName] = { url: serverFields.url };
       continue;
     }
-    if (typeof record.command === 'string' && record.command !== '') {
-      const args = Array.isArray(record.args)
-        ? record.args.filter((item): item is string => typeof item === 'string')
+    if (typeof serverFields.command === 'string' && serverFields.command !== '') {
+      const commandArgs = Array.isArray(serverFields.args)
+        ? serverFields.args.filter((arg): arg is string => typeof arg === 'string')
         : [];
-      mcpServers[name] = { command: record.command, args };
+      mcpServers[serverName] = { command: serverFields.command, args: commandArgs };
     }
   }
   return { mcpServers };
@@ -369,8 +339,8 @@ export const loadCoreMcpServers = (
     return [];
   }
   try {
-    const raw = deps.readFile(catalogPath);
-    return selectCoreMcpServers(parseMcpCatalog(raw));
+    const catalogText = deps.readFile(catalogPath);
+    return selectCoreMcpServers(parseMcpCatalog(catalogText));
   } catch {
     return [];
   }
@@ -450,12 +420,12 @@ export const tryClaudeMcpAdd = (
       continue;
     }
     // claude mcp add <name> --scope project -- <command> [args...]
-    const result = deps.spawn(
+    const mcpAdd = deps.spawn(
       'claude',
       ['mcp', 'add', server.name, '--scope', 'project', '--', command, ...args],
       { cwd },
     );
-    if (result.status === 0) {
+    if (mcpAdd.status === 0) {
       registered.push(server.name);
     }
   }

@@ -1,6 +1,6 @@
 import process from 'node:process';
 import { checkGoalDrift } from '@vybekiit/agent-kit';
-import { listSkillPaths, resolveTemplateArg } from '../lib/agentLayerIo';
+import { listSkillPaths, selectedTemplate } from '../lib/agentLayerIo';
 
 /**
  * Validate that a template's goal index and skill files still agree.
@@ -14,7 +14,7 @@ export const runCheckGoals = async (
   cwd: string = process.cwd(),
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const [templateArg] = args;
-  const template = await resolveTemplateArg(templateArg, cwd);
+  const template = await selectedTemplate(templateArg, cwd);
 
   if (!template) {
     return {

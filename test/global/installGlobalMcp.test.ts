@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ExecResult } from '../../src/global/exec';
 import {
-  buildAddArgs,
+  claudeMcpAddArgv,
   installGlobalMcp,
   type McpServerDef,
 } from '../../src/global/installGlobalMcp';
@@ -9,14 +9,14 @@ import {
 const ok: ExecResult = { code: 0, stdout: '', stderr: '' };
 const missing: ExecResult = { code: 1, stdout: '', stderr: '' };
 
-describe('buildAddArgs', () => {
+describe('claudeMcpAddArgv', () => {
   it('builds stdio args with no env keys', () => {
     const def: McpServerDef = {
       name: 'context7',
       transport: 'stdio',
       command: ['npx', '-y', 'pkg'],
     };
-    expect(buildAddArgs(def, {})).toEqual([
+    expect(claudeMcpAddArgv(def, {})).toEqual([
       'mcp',
       'add',
       '-s',
@@ -36,7 +36,7 @@ describe('buildAddArgs', () => {
       command: ['npx', 'srv'],
       envKeys: ['TOKEN'],
     };
-    expect(buildAddArgs(def, { TOKEN: 'abc' })).toEqual([
+    expect(claudeMcpAddArgv(def, { TOKEN: 'abc' })).toEqual([
       'mcp',
       'add',
       '-s',
@@ -52,7 +52,7 @@ describe('buildAddArgs', () => {
 
   it('builds sse args for remote servers', () => {
     const def: McpServerDef = { name: 'remote-sse', transport: 'sse', command: ['https://x/sse'] };
-    expect(buildAddArgs(def, {})).toEqual([
+    expect(claudeMcpAddArgv(def, {})).toEqual([
       'mcp',
       'add',
       '-s',

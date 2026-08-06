@@ -16,14 +16,14 @@ const FEATURES: readonly FeatureName[] = [
 ];
 
 /**
- * Resolve a feature name from CLI input.
+ * Match a CLI value against known readiness feature names.
  *
  * @param value - Candidate feature name.
  * @returns Feature name when supported, otherwise undefined.
  * @example
- * const feature = resolveFeatureName('payments');
+ * const feature = knownFeatureName('payments');
  */
-const resolveFeatureName = (value: string): FeatureName | undefined =>
+const knownFeatureName = (value: string): FeatureName | undefined =>
   FEATURES.find((feature) => feature === value);
 
 /**
@@ -55,7 +55,7 @@ export const runPlanReadiness = async (
   cwd: string = process.cwd(),
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   const [featureArg, templateArg] = args;
-  const feature = featureArg === undefined ? undefined : resolveFeatureName(featureArg);
+  const feature = featureArg === undefined ? undefined : knownFeatureName(featureArg);
 
   if (feature === undefined) {
     return {

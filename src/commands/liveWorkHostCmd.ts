@@ -60,14 +60,14 @@ export const parseLiveWorkHostFlags = (
   readonly cwd: string;
   readonly pin: boolean;
   readonly preferExisting: boolean;
-  readonly buildDir?: string;
+  readonly outputDir?: string;
   readonly projectName?: string;
   readonly error?: string;
 } => {
   const modeRaw = readFlagValue(args, 'mode') ?? 'buyer';
   const vendorRaw = readFlagValue(args, 'vendor');
   const cwdRaw = readFlagValue(args, 'cwd');
-  const buildDirRaw = readFlagValue(args, 'build-dir');
+  const outputDirRaw = readFlagValue(args, 'output-dir');
   const projectNameRaw = readFlagValue(args, 'project-name');
   const cwd = resolve(process.cwd(), cwdRaw === undefined || cwdRaw === '' ? '.' : cwdRaw);
 
@@ -99,8 +99,8 @@ export const parseLiveWorkHostFlags = (
     ...(vendorRaw !== undefined && vendorRaw !== '' && isHostLadderProvider(vendorRaw)
       ? { vendor: vendorRaw }
       : {}),
-    ...(buildDirRaw !== undefined && buildDirRaw !== ''
-      ? { buildDir: resolve(cwd, buildDirRaw) }
+    ...(outputDirRaw !== undefined && outputDirRaw !== ''
+      ? { outputDir: resolve(cwd, outputDirRaw) }
       : {}),
     ...(projectNameRaw !== undefined && projectNameRaw !== ''
       ? { projectName: projectNameRaw }
@@ -115,22 +115,22 @@ export const parseLiveWorkHostFlags = (
  * @param pinned - Whether pin was written.
  * @returns Public JSON-safe result.
  */
-export const toPublicLiveWorkHostResult = (
-  result: HostLiveWorkResult,
+export const publicLiveWorkHostResult = (
+  liveWork: HostLiveWorkResult,
   pinned: boolean,
 ): LiveWorkHostPublicResult => {
   const publicResult: LiveWorkHostPublicResult = {
     ok: true,
-    provider: result.provider,
-    ephemeral: result.ephemeral,
-    hopped: result.hopped,
-    skipped: result.skipped,
+    provider: liveWork.provider,
+    ephemeral: liveWork.ephemeral,
+    hopped: liveWork.hopped,
+    skipped: liveWork.skipped,
     verified: true,
-    buyerMessage: result.buyerMessage,
-    pinKeys: Object.keys(result.pin),
+    buyerMessage: liveWork.buyerMessage,
+    pinKeys: Object.keys(liveWork.pin),
     pinned,
-    ...(result.fromProvider === undefined ? {} : { fromProvider: result.fromProvider }),
-    ...(typeof result.url === 'string' ? { url: result.url } : {}),
+    ...(liveWork.fromProvider === undefined ? {} : { fromProvider: liveWork.fromProvider }),
+    ...(typeof liveWork.url === 'string' ? { url: liveWork.url } : {}),
   };
   return publicResult;
 };
@@ -162,7 +162,7 @@ const writeHostPin = (
  * Run host Live work: preference ladder → existing pin or create (create adapters landing).
  *
  * Usage: `vybekiit live-work host [--mode=demo|dogfood|buyer]
- * [--vendor=cloudflare|render|railway|vercel|netlify|github-pages] [--cwd=dir] [--build-dir=dir]
+ * [--vendor=cloudflare|render|railway|vercel|netlify|github-pages] [--cwd=dir] [--output-dir=dir]
  * [--project-name=name] [--no-pin] [--fresh]`
  *
  * @param args - Arguments after `live-work host`.
@@ -188,7 +188,7 @@ export const runLiveWorkHost = async (
         preferExisting: flags.preferExisting,
         cwd: flags.cwd,
         ...(flags.vendor === undefined ? {} : { namedVendor: flags.vendor }),
-        ...(flags.buildDir === undefined ? {} : { buildDir: flags.buildDir }),
+        ...(flags.outputDir === undefined ? {} : { outputDir: flags.outputDir }),
         ...(flags.projectName === undefined ? {} : { projectName: flags.projectName }),
         ...(flags.pin
           ? {
@@ -218,7 +218,7 @@ export const runLiveWorkHost = async (
   }
 
   return {
-    json: JSON.stringify(toPublicLiveWorkHostResult(either.right, flags.pin), null, 2),
+    json: JSON.stringify(publicLiveWorkHostResult(either.right, flags.pin), null, 2),
     exitCode: 0,
   };
 };

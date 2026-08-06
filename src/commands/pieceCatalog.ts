@@ -112,15 +112,15 @@ export const pageRecipePieces = (recipes: readonly PageRecipeSummary[]): readonl
   }));
 
 /**
- * Build the full catalog, optionally filtered by kind.
+ * Full piece catalog, optionally filtered by kind.
  *
  * @param recipes - Loaded page recipes (may be empty offline).
  * @param kindFilter - Optional kind from `--kind`.
  * @returns Catalog rows.
  * @example
- * const pieces = buildCatalog(recipes, 'page-recipe');
+ * const pieces = pieceCatalog(recipes, 'page-recipe');
  */
-export const buildCatalog = (
+export const pieceCatalog = (
   recipes: readonly PageRecipeSummary[],
   kindFilter: string | undefined,
 ): readonly CatalogPiece[] =>

@@ -2,15 +2,15 @@ import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { caughtMessage } from '@vybekiit/core';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
+import { selectedAppSurface } from '../lib/appSurface';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
-import { resolveInstallDest } from '../lib/pageRecipeInstall';
+import { locateKitWorkspace } from '../lib/kitWorkspaceSource';
+import { absoluteInstallDest } from '../lib/pageRecipeInstall';
 import {
   applyReportModeInstall,
   type InstallableReportModePlan,
   planReportModeInstall,
 } from '../lib/reportModeInstall';
-import { resolveAppSurface } from '../lib/resolveAppSurface';
-import { resolveKitSource } from '../lib/resolveKitSource';
 import { parsePieceFlags } from './pieceFlags';
 
 type CommandResult = {
@@ -43,7 +43,7 @@ const succeeds = (command: string, args: readonly string[]): boolean =>
  *
  * @returns Assistant id, or `null`.
  */
-const resolveAssistant = (): string | null =>
+const detectedAssistantId = (): string | null =>
   inferVybeAssistant({
     cursorSession: isCursorSession(),
     claudeInstalled: succeeds('claude', ['--version']),
@@ -103,21 +103,21 @@ const reportModeError = (error: string): CommandResult => ({
 export const runAddReportMode = async (args: readonly string[]): Promise<CommandResult> => {
   const flags = parsePieceFlags(args);
   const destArg = flags.to === undefined || flags.to === '' ? flags.positionals.at(0) : flags.to;
-  const dest = resolveInstallDest(destArg, process.cwd());
+  const dest = absoluteInstallDest(destArg, process.cwd());
   const surface = inferProjectSurfaceSync(dest).template;
 
   let cleanup: (() => Promise<void>) | undefined;
   try {
-    const resolved = await resolveKitSource();
+    const resolved = await locateKitWorkspace();
     const { cleanup: resolvedCleanup, kitRoot } = resolved;
     cleanup = resolvedCleanup;
 
-    const appSurface = surface === 'web' ? await resolveAppSurface(dest) : undefined;
+    const appSurface = surface === 'web' ? await selectedAppSurface(dest) : undefined;
     const plan = await planReportModeInstall({
       kitRoot,
       dest,
       surface,
-      assistant: resolveAssistant(),
+      assistant: detectedAssistantId(),
       ...(appSurface === undefined ? {} : { appSurface }),
     });
 

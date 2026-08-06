@@ -9,13 +9,13 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const PORT = 3005;
 
 /**
- * Resolve the VybeKiit monorepo root from the CLI location.
+ * VybeKiit monorepo root derived from the CLI package location.
  *
  * @returns Absolute path to the monorepo root.
  * @example
- * const root = resolveMonorepoRoot();
+ * const root = monorepoRoot();
  */
-const resolveMonorepoRoot = (): string => join(HERE, '..', '..', '..');
+const monorepoRoot = (): string => join(HERE, '..', '..', '..');
 
 /**
  * Open a URL in the user's default browser.
@@ -39,7 +39,7 @@ const openBrowser = async (url: string): Promise<void> => {
  * const exitCode = await runLocalDev();
  */
 export const runLocalDev = async (): Promise<number> => {
-  const root = resolveMonorepoRoot();
+  const root = monorepoRoot();
 
   try {
     await access(join(root, 'pnpm-workspace.yaml'));
