@@ -74,12 +74,6 @@ const KEY_GATED: readonly McpServerDef[] = [
     envKeys: ['EXA_API_KEY'],
   },
   {
-    name: 'firecrawl',
-    transport: 'stdio',
-    command: ['npx', '-y', 'firecrawl-mcp'],
-    envKeys: ['FIRECRAWL_API_KEY'],
-  },
-  {
     name: 'tavily',
     transport: 'stdio',
     command: ['npx', '-y', 'tavily-mcp'],
