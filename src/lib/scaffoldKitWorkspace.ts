@@ -81,7 +81,7 @@ const kitWorkspacePackageJson = (
  * @param dest - Buyer kit workspace root.
  * @returns Promise that resolves after available roots are copied.
  */
-const copyKitBuildRoots = async (kitRoot: string, dest: string): Promise<void> => {
+export const repairKitBuildRoots = async (kitRoot: string, dest: string): Promise<void> => {
   for (const rel of KIT_BUILD_ROOT_FILES) {
     const src = join(kitRoot, rel);
     if (await pathExists(src)) {
@@ -241,7 +241,7 @@ export const scaffoldKitWorkspace = async (
   );
 
   // Let buyers rebuild packages without the monorepo parent tree.
-  await copyKitBuildRoots(options.kitRoot, options.dest);
+  await repairKitBuildRoots(options.kitRoot, options.dest);
 
   // Cursor + Claude discover skills via per-agent paths on the OWNED surface.
   await ensureAgentSkillSymlinks(surfaceDest);

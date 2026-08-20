@@ -12,6 +12,9 @@ import {
 } from '../commands/setupPreferences';
 import { writeEnvKeys } from '../doctor/env';
 import { shipFirstPartyMcpConfigs } from '../lib/firstPartyMcp';
+import { type LocatedKitWorkspace, locateKitWorkspace } from '../lib/kitWorkspaceSource';
+import { pathExists } from '../lib/pathExists';
+import { repairKitBuildRoots } from '../lib/scaffoldKitWorkspace';
 import { makeExec } from './exec';
 
 /** Default folder name under the home directory for the first web app. */
@@ -101,6 +104,40 @@ const defaultPathExists = async (path: string): Promise<boolean> => {
     return true;
   } catch {
     return false;
+  }
+};
+
+const BUYER_BUILD_HELPER = join('scripts', 'lib', 'tsupWorkspaceAliases.mjs');
+
+export type ProjectBuildRootRepairDeps = {
+  readonly pathExists: (path: string) => Promise<boolean>;
+  readonly locateKit: () => Promise<LocatedKitWorkspace>;
+  readonly repairFromKit: (kitRoot: string, appPath: string) => Promise<void>;
+};
+
+/** Restore build helpers omitted by an older kit delivery without replacing buyer code. */
+export const repairProjectBuildRoots = async (
+  appPath: string,
+  deps: ProjectBuildRootRepairDeps = {
+    pathExists,
+    locateKit: locateKitWorkspace,
+    repairFromKit: repairKitBuildRoots,
+  },
+): Promise<boolean> => {
+  const helperPath = join(appPath, BUYER_BUILD_HELPER);
+  if (await deps.pathExists(helperPath)) {
+    return true;
+  }
+
+  let source: LocatedKitWorkspace | undefined;
+  try {
+    source = await deps.locateKit();
+    await deps.repairFromKit(source.kitRoot, appPath);
+    return await deps.pathExists(helperPath);
+  } catch {
+    return false;
+  } finally {
+    await source?.cleanup?.();
   }
 };
 
@@ -289,8 +326,9 @@ const defaultDeps = (): SessionOneDeps => ({
   openBrowser: defaultOpenBrowser,
   prepareProjectTools: async (appPath) => {
     try {
+      const buildRootsReady = await repairProjectBuildRoots(appPath);
       const writtenConfigs = await shipFirstPartyMcpConfigs({ dest: appPath, template: 'web' });
-      return writtenConfigs.length === 2;
+      return buildRootsReady && writtenConfigs.length === 2;
     } catch {
       return false;
     }

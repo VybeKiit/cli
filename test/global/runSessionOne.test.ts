@@ -4,6 +4,7 @@ import {
   DEFAULT_FIRST_APP_DIR_NAME,
   firstAppPath,
   formatSessionOneLines,
+  repairProjectBuildRoots,
   runSessionOne,
   SESSION_ONE_SEED_PROMPT,
   type SessionOneDeps,
@@ -82,6 +83,41 @@ describe('canOpenDesktopBrowser', () => {
     expect(canOpenDesktopBrowser('linux', { DISPLAY: ':0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WAYLAND_DISPLAY: 'wayland-0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WSL_DISTRO_NAME: 'Ubuntu' })).toBe(true);
+  });
+});
+
+describe('repairProjectBuildRoots', () => {
+  it('restores a missing buyer build helper from the current kit and cleans up the source', async () => {
+    const cleanup = vi.fn(async () => undefined);
+    const repairFromKit = vi.fn(async () => undefined);
+    const pathExists = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit', cleanup }));
+
+    await expect(
+      repairProjectBuildRoots('/Users/me/vybekiit-app', {
+        locateKit,
+        pathExists,
+        repairFromKit,
+      }),
+    ).resolves.toBe(true);
+
+    expect(locateKit).toHaveBeenCalledOnce();
+    expect(repairFromKit).toHaveBeenCalledWith('/tmp/current-kit', '/Users/me/vybekiit-app');
+    expect(cleanup).toHaveBeenCalledOnce();
+  });
+
+  it('does not download the kit when the buyer build helper is already present', async () => {
+    const locateKit = vi.fn();
+
+    await expect(
+      repairProjectBuildRoots('/Users/me/vybekiit-app', {
+        locateKit,
+        pathExists: vi.fn(async () => true),
+        repairFromKit: vi.fn(),
+      }),
+    ).resolves.toBe(true);
+
+    expect(locateKit).not.toHaveBeenCalled();
   });
 });
 
