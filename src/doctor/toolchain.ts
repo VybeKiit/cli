@@ -37,6 +37,10 @@ export type AuthProbe = {
   readonly command: string;
   readonly args: readonly string[];
   readonly loginHint: string;
+  readonly signIn?: {
+    readonly command: string;
+    readonly args: readonly string[];
+  };
 };
 
 export type Tool = {

@@ -18,6 +18,11 @@ export type McpServerDef = {
 // that would sit "failed to connect".
 const ZERO_CONFIG: readonly McpServerDef[] = [
   {
+    name: 'vybekiit',
+    transport: 'stdio',
+    command: ['npx', '-y', 'vybekiit@latest', 'mcp', 'serve'],
+  },
+  {
     name: 'playwright',
     transport: 'stdio',
     command: ['npx', '-y', '@playwright/mcp@latest'],
@@ -106,7 +111,14 @@ export type McpInstallResult = {
   readonly claudeMissing: boolean;
 };
 
+/** Whether Claude has a user-scoped VybeKiit server after this install attempt. */
+export const isVybekiitMcpReady = (installation: McpInstallResult): boolean =>
+  [...installation.enabled, ...installation.alreadyPresent, ...installation.refreshed].includes(
+    'vybekiit',
+  );
+
 const defaultDeps: McpInstallDeps = { exec: makeExec('claude'), env: process.env };
+const USER_SCOPE_LINE = /^\s*Scope:\s+User(?:\s+config)?\b/m;
 
 /**
  * Build the `claude mcp add` argument list for a server (user scope).
@@ -178,16 +190,21 @@ export const installGlobalMcp = async (
   const failed: string[] = [];
   const forceRefresh = deps.forceRefresh === true;
 
+  // Older kits wrote a shared project entry. Remove only that stale scope so it cannot
+  // shadow the user-scoped server; Claude preserves every other project MCP entry.
+  await deps.exec(['mcp', 'remove', '-s', 'project', 'vybekiit']);
+
   const candidates = [...ZERO_CONFIG, ...KEY_GATED];
   for (const def of candidates) {
     if (!hasKeys(def, deps.env)) {
       needsKey.push(def.name);
       continue;
     }
-    const present = (await deps.exec(['mcp', 'get', def.name])).code === 0;
+    const inspected = await deps.exec(['mcp', 'get', def.name]);
+    const present = inspected.code === 0 && USER_SCOPE_LINE.test(inspected.stdout);
     if (present && forceRefresh && isZeroConfig(def)) {
       // Best-effort remove: if remove fails we still try add (some claude versions upsert).
-      await deps.exec(['mcp', 'remove', def.name]);
+      await deps.exec(['mcp', 'remove', '-s', 'user', def.name]);
       const readded = await deps.exec(claudeMcpAddArgv(def, deps.env));
       if (readded.code === 0) {
         refreshed.push(def.name);

@@ -3,11 +3,17 @@ import type { ExecResult } from '../../src/global/exec';
 import {
   claudeMcpAddArgv,
   installGlobalMcp,
+  isVybekiitMcpReady,
   type McpServerDef,
 } from '../../src/global/installGlobalMcp';
 
 const ok: ExecResult = { code: 0, stdout: '', stderr: '' };
 const missing: ExecResult = { code: 1, stdout: '', stderr: '' };
+const userScoped: ExecResult = {
+  code: 0,
+  stdout: 'vybekiit:\n  Scope: User config (available in all your projects)\n',
+  stderr: '',
+};
 
 describe('claudeMcpAddArgv', () => {
   it('builds stdio args with no env keys', () => {
@@ -73,6 +79,7 @@ describe('installGlobalMcp', () => {
     });
     expect(result.claudeMissing).toBe(true);
     expect(result.enabled).toEqual([]);
+    expect(isVybekiitMcpReady(result)).toBe(false);
   });
 
   it('enables zero-config servers and stages key-gated ones without keys', async () => {
@@ -84,7 +91,7 @@ describe('installGlobalMcp', () => {
       },
       env: {},
     });
-    expect(result.enabled).toEqual(expect.arrayContaining(['playwright', 'context7']));
+    expect(result.enabled).toEqual(expect.arrayContaining(['vybekiit', 'playwright', 'context7']));
     // sentry is key-gated now (OAuth would fail to connect) — staged, not registered.
     expect(result.enabled).not.toContain('sentry');
     expect(result.needsKey).toEqual(expect.arrayContaining(['github', 'sentry']));
@@ -95,7 +102,7 @@ describe('installGlobalMcp', () => {
     const result = await installGlobalMcp({
       exec: async (args) => {
         if (args[0] === '--version') return ok;
-        if (args[1] === 'get') return ok; // already present
+        if (args[1] === 'get') return userScoped;
         return ok;
       },
       env: {},
@@ -103,6 +110,7 @@ describe('installGlobalMcp', () => {
     expect(result.alreadyPresent).toContain('playwright');
     expect(result.enabled).not.toContain('playwright');
     expect(result.refreshed).toEqual([]);
+    expect(isVybekiitMcpReady(result)).toBe(true);
   });
 
   it('force-refreshes zero-config servers on auto-update re-runs', async () => {
@@ -111,16 +119,74 @@ describe('installGlobalMcp', () => {
       exec: async (args) => {
         calls.push([...args]);
         if (args[0] === '--version') return ok;
-        if (args[1] === 'get') return ok; // already present
+        if (args[1] === 'get') return userScoped;
         return ok; // remove + add succeed
       },
       env: {},
       forceRefresh: true,
     });
-    expect(result.refreshed).toEqual(expect.arrayContaining(['playwright', 'context7']));
+    expect(result.refreshed).toEqual(
+      expect.arrayContaining(['vybekiit', 'playwright', 'context7']),
+    );
     expect(result.refreshed).not.toContain('sentry'); // key-gated servers are not force-refreshed
     expect(result.alreadyPresent).not.toContain('playwright');
     expect(calls.some((args) => args[0] === 'mcp' && args[1] === 'remove')).toBe(true);
+  });
+
+  it('does not mistake a project-scoped server for a global installation', async () => {
+    const calls: string[][] = [];
+    const result = await installGlobalMcp({
+      exec: async (args) => {
+        calls.push([...args]);
+        if (args[0] === '--version') return ok;
+        if (args[1] === 'get') {
+          return {
+            code: 0,
+            stdout: 'vybekiit:\n  Scope: Project config (shared via .mcp.json)\n',
+            stderr: '',
+          };
+        }
+        return ok;
+      },
+      env: {},
+    });
+
+    expect(result.enabled).toContain('vybekiit');
+    expect(calls).toContainEqual(['mcp', 'remove', '-s', 'project', 'vybekiit']);
+    expect(calls).toContainEqual([
+      'mcp',
+      'add',
+      '-s',
+      'user',
+      'vybekiit',
+      '--',
+      'npx',
+      '-y',
+      'vybekiit@latest',
+      'mcp',
+      'serve',
+    ]);
+  });
+
+  it('removes only the obsolete project-scoped VybeKiit server before inspection', async () => {
+    const calls: string[][] = [];
+    await installGlobalMcp({
+      exec: async (args) => {
+        calls.push([...args]);
+        if (args[0] === '--version') return ok;
+        if (args[1] === 'get') return missing;
+        return ok;
+      },
+      env: {},
+    });
+
+    const cleanupIndex = calls.findIndex((args) =>
+      args.join(' ').includes('mcp remove -s project vybekiit'),
+    );
+    const inspectIndex = calls.findIndex((args) => args.join(' ') === 'mcp get vybekiit');
+    expect(cleanupIndex).toBeGreaterThan(-1);
+    expect(inspectIndex).toBeGreaterThan(cleanupIndex);
+    expect(calls).not.toContainEqual(['mcp', 'remove', '-s', 'project', 'playwright']);
   });
 
   it('registers a key-gated server when its token is present', async () => {
@@ -135,5 +201,32 @@ describe('installGlobalMcp', () => {
     expect(result.enabled).toEqual(expect.arrayContaining(['github', 'sentry']));
     expect(result.needsKey).not.toContain('github');
     expect(result.needsKey).not.toContain('sentry');
+  });
+
+  it('registers the published VybeKiit server at Claude user scope', async () => {
+    const calls: string[][] = [];
+    await installGlobalMcp({
+      exec: async (args) => {
+        calls.push([...args]);
+        if (args[0] === '--version') return ok;
+        if (args[1] === 'get') return missing;
+        return ok;
+      },
+      env: {},
+    });
+
+    expect(calls).toContainEqual([
+      'mcp',
+      'add',
+      '-s',
+      'user',
+      'vybekiit',
+      '--',
+      'npx',
+      '-y',
+      'vybekiit@latest',
+      'mcp',
+      'serve',
+    ]);
   });
 });

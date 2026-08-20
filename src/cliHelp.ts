@@ -14,7 +14,7 @@ export const CLI_HELP = `vybekiit — set up tools and create your app
 
 Getting started:
   vybekiit                 Interactive menu (terminal only)
-  vybekiit setup           Welcome + set up Claude Code globally (skills, MCP, tools)
+  vybekiit setup           Choose services, sign in, create your app, and open its welcome page
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
 ${createSurfaceUsage}
   vybekiit create --ui-library [directory]   Full UI kit + gallery + Claude (report mode ready)
@@ -32,6 +32,7 @@ ${createSurfaceHelp}
 
 Examples:
   vybekiit setup
+  vybekiit setup --yes --hosting=railway --data=supabase
   vybekiit create app --web
   vybekiit create --ui-library
   vybekiit create app --mobile ./my-app
@@ -49,7 +50,9 @@ Tip: open your app folder and say "Set up my app." to your coding tool.
 export const CLI_HELP_ALL = `vybekiit — full command list
 
 Buyer journey:
-  vybekiit setup
+  vybekiit setup [--yes] [--hosting=cloudflare|vercel|railway|aws|github-pages]
+                  [--data=supabase|neon|railway|mongodb|firebase|aws|local]
+                  [--google-sign-in]
   vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
   vybekiit update                         (re-run auto-updater: latest skills + MCP)
   vybekiit doctor
@@ -65,6 +68,7 @@ Create / project:
   vybekiit scaffold backend [directory]
 
 Agent / kit:
+  vybekiit mcp serve                       (global Claude tool server; setup registers this)
   vybekiit sync-agent-layer [template]
   vybekiit render-agent-layer
   vybekiit check-goals [template]

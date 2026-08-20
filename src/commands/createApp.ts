@@ -184,6 +184,7 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
     }
     if (error instanceof ScaffoldError) {
       writeStderr(formatCreateError(error.message));
+      writeStderr(formatCreateUsage());
       return 1;
     }
     const message = caughtMessage(error, 'Could not create the app.');

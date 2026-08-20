@@ -56,9 +56,9 @@ export const formatSetupNextStep = (input: SetupNextStepInput): readonly string[
 
   if (input.firstAppPath !== undefined && input.firstAppPath !== '') {
     return [
-      'Your app is ready — open Claude Code in that folder and say: "Set up my app."',
+      'Your app is ready. Continue in the assistant window and say: "Set up my app."',
       `  ${input.firstAppPath}`,
-      '  (If Claude is already open there, you are set.)',
+      '  (If your assistant is already open there, you are set.)',
       '',
     ];
   }

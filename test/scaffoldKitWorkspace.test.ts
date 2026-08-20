@@ -41,6 +41,7 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
   await writeFile(join(kitRoot, 'tsconfig.base.json'), '{}\n');
   await mkdir(join(kitRoot, 'scripts', 'lib'), { recursive: true });
   await writeFile(join(kitRoot, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'export {};\n');
+  await writeFile(join(kitRoot, 'scripts', 'lib', 'packageExportEntries.mjs'), 'export {};\n');
   await writeFile(join(kitRoot, 'scripts', 'lib', 'repoRoot.mjs'), 'export {};\n');
   await writePkg(authDir, {
     name: '@vybekiit/auth',
@@ -98,6 +99,7 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
     name: 'vybekiit',
     private: true,
     packageManager: 'pnpm@10.33.2',
+    devDependencies: { '@types/node': 'catalog:' },
   });
 };
 
@@ -117,10 +119,12 @@ describe('scaffoldKitWorkspace happy path', () => {
     expect(result.dest).toBe(emptyDest);
 
     const rootPkg = JSON.parse(await readFile(join(emptyDest, 'package.json'), 'utf8')) as {
+      readonly devDependencies?: Record<string, string>;
       readonly private?: boolean;
       readonly scripts?: Record<string, string>;
     };
     expect(rootPkg.private).toBe(true);
+    expect(rootPkg.devDependencies?.['@types/node']).toBe('catalog:');
     expect(rootPkg.scripts?.dev).toBe('pnpm --dir templates/web dev');
     expect(rootPkg.scripts?.['build:packages']).toContain('packages/**');
 
@@ -134,6 +138,9 @@ describe('scaffoldKitWorkspace happy path', () => {
     await expect(readFile(join(emptyDest, 'tsconfig.base.json'), 'utf8')).resolves.toBeDefined();
     await expect(
       readFile(join(emptyDest, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'utf8'),
+    ).resolves.toBeDefined();
+    await expect(
+      readFile(join(emptyDest, 'scripts', 'lib', 'packageExportEntries.mjs'), 'utf8'),
     ).resolves.toBeDefined();
 
     const surfacePkgRaw = await readFile(

@@ -5,11 +5,6 @@ export default defineConfig({
   // `index` re-export: nothing imports the CLI as a library, and the old dist/index.js
   // shim was dead weight (a thin re-export no one consumed).
   //
-  // We do NOT bundle the first-party `vybekiit` MCP server here: it depends on
-  // @vybekiit/browser-automation -> playwright-core -> chromium-bidi, which esbuild
-  // cannot bundle. That server stays project-scoped (doctor wires it per project). The
-  // GLOBAL install registers the zero-config `playwright` + `context7` MCPs via
-  // `claude mcp add -s user` instead — no bundling required.
   entry: { bin: 'src/bin.ts' },
   format: ['esm'],
   platform: 'node',
@@ -32,5 +27,7 @@ export default defineConfig({
     /^@aws-sdk\//,
     '@neondatabase/serverless',
     '@supabase/supabase-js',
+    /^playwright(\/|$)/,
+    /^playwright-core(\/|$)/,
   ],
 });

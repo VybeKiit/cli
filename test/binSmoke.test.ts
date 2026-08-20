@@ -3,6 +3,8 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { describe, expect, it } from 'vitest';
 
 const execFileAsync = promisify(execFile);
@@ -23,5 +25,31 @@ describe('built bin (dist/bin.js)', () => {
     expect(stdout.trim()).toMatch(SEMVER);
     // Generous timeout: this spawns a cold `node` that loads the whole bundled
     // bin, which can exceed the 5s default under parallel test load in CI.
+  }, 30_000);
+
+  it('serves the global MCP and answers a real read-only tool call', async () => {
+    if (!existsSync(BIN)) {
+      expect(true).toBe(true);
+      return;
+    }
+    const client = new Client({ name: 'vybekiit-cli-smoke', version: '1.0.0' });
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [BIN, 'mcp', 'serve'],
+      cwd: dirname(BIN),
+      stderr: 'pipe',
+    });
+    await client.connect(transport);
+    try {
+      const catalog = await client.listTools();
+      expect(catalog.tools.map((tool) => tool.name)).toContain('search_skills');
+      const paymentSkill = await client.callTool({
+        name: 'search_skills',
+        arguments: { query: 'payments', template: 'web', limit: 3 },
+      });
+      expect(JSON.stringify(paymentSkill)).toContain('setup-payments');
+    } finally {
+      await client.close();
+    }
   }, 30_000);
 });

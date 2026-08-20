@@ -12,6 +12,14 @@ import {
 describe('upsertMemoryBlock', () => {
   const block = vybekiitMemoryBlock();
 
+  it('teaches Claude to use the globally registered VybeKiit tools', () => {
+    expect(block).toContain('`vybekiit` MCP server is registered globally');
+    expect(block).toContain('search_skills');
+    expect(block).toContain('search_commands');
+    expect(block).toContain('search_ui_components');
+    expect(block).not.toContain('project-scoped');
+  });
+
   it('inserts the block into empty content', () => {
     expect(upsertMemoryBlock('', block)).toBe(block);
   });

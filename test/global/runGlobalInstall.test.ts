@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { formatGlobalInstallSummary, runGlobalInstall } from '../../src/global/runGlobalInstall';
+import {
+  formatGlobalInstallSummary,
+  runGlobalInstall,
+  shouldRunSessionOneOnInstall,
+} from '../../src/global/runGlobalInstall';
 
 const baseSummary = {
   skillsInstalled: 119,
@@ -8,9 +12,10 @@ const baseSummary = {
   feedbackInstalled: true,
   skillSample: ['add-signin', 'go-live', 'onboarding', 'plan-my-idea', 'setup-payments'],
   skillsPath: '/Users/me/.claude/skills',
-  mcpEnabled: ['playwright', 'context7'] as readonly string[],
+  mcpEnabled: ['vybekiit', 'playwright', 'context7'] as readonly string[],
   mcpRefreshed: [] as readonly string[],
   mcpNeedsKey: ['github'] as readonly string[],
+  mcpFailed: [] as readonly string[],
   claudeMissing: false,
   commandInstalled: true,
   version: '0.6.2',
@@ -26,7 +31,7 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('/Users/me/.claude/skills');
     expect(text).toContain('onboarding');
     expect(text).toContain('setup-payments');
-    expect(text).toContain('playwright, context7');
+    expect(text).toContain('vybekiit, playwright, context7');
     expect(text).toContain('1 more need an API key');
     expect(text).toContain('/vybekiit');
     expect(text).toContain('/feedback');
@@ -84,6 +89,16 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('0 installed');
     expect(text).toContain('No managed skills');
   });
+
+  it('reports a failed global VybeKiit registration', () => {
+    const text = formatGlobalInstallSummary({
+      ...baseSummary,
+      mcpEnabled: ['playwright', 'context7'],
+      mcpFailed: ['vybekiit'],
+    }).join('\n');
+
+    expect(text).toContain('failed to register: vybekiit');
+  });
 });
 
 describe('runGlobalInstall buyer gate', () => {
@@ -102,5 +117,13 @@ describe('runGlobalInstall buyer gate', () => {
 
     expect(gate).toHaveBeenCalledOnce();
     expect(code).toBe(1);
+  });
+});
+
+describe('shouldRunSessionOneOnInstall', () => {
+  it('runs for a fresh install and for an explicit safe setup re-run', () => {
+    expect(shouldRunSessionOneOnInstall([], true)).toBe(true);
+    expect(shouldRunSessionOneOnInstall(['--session-one'], false)).toBe(true);
+    expect(shouldRunSessionOneOnInstall([], false)).toBe(false);
   });
 });

@@ -3,7 +3,15 @@ import { access, readdir } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import process from 'node:process';
+import open from 'open';
 import { runCreateApp } from '../commands/createApp';
+import {
+  parseSetupPreferences,
+  type SetupPreferences,
+  setupEnvironment,
+} from '../commands/setupPreferences';
+import { writeEnvKeys } from '../doctor/env';
+import { shipFirstPartyMcpConfigs } from '../lib/firstPartyMcp';
 import { makeExec } from './exec';
 
 /** Default folder name under the home directory for the first web app. */
@@ -22,6 +30,10 @@ export type SessionOneResult = {
   readonly packagesBuilt: boolean;
   readonly devStarted: boolean;
   readonly claudeOpened: boolean;
+  readonly projectToolsReady: boolean;
+  /** True when the generated welcome route returned a successful response. */
+  readonly previewReady: boolean;
+  readonly browserOpened: boolean;
   /** Buyer-facing lines to print after the global-install banner. */
   readonly lines: readonly string[];
 };
@@ -38,6 +50,10 @@ export type SessionOneDeps = {
   ) => Promise<{ readonly code: number }>;
   readonly startDetached: (cwd: string, bin: string, args: readonly string[]) => boolean;
   readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
+  readonly waitForPreview: (url: string) => Promise<boolean>;
+  readonly openBrowser: (url: string) => Promise<boolean>;
+  readonly prepareProjectTools: (appPath: string) => Promise<boolean>;
+  readonly writeSetupEnvironment: (appPath: string, values: Record<string, string>) => void;
   readonly pnpmCommand: () => Promise<readonly [string, ...string[]] | null>;
   readonly homeDir: () => string;
   readonly env: NodeJS.ProcessEnv;
@@ -203,6 +219,65 @@ const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | nu
   return null;
 };
 
+const wait = async (milliseconds: number): Promise<void> =>
+  await new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const defaultWaitForPreview = async (url: string): Promise<boolean> => {
+  const attemptPreview = async (remainingAttempts: number): Promise<boolean> => {
+    try {
+      const response = await fetch(url, { redirect: 'follow' });
+      if (response.ok) {
+        return true;
+      }
+    } catch {
+      // The preview process is still starting. Retry within the bounded window.
+    }
+    if (remainingAttempts <= 1) {
+      return false;
+    }
+    await wait(500);
+    return await attemptPreview(remainingAttempts - 1);
+  };
+
+  return await attemptPreview(60);
+};
+
+/** Whether this process has a desktop browser bridge it can open honestly. */
+export const canOpenDesktopBrowser = (
+  platform: NodeJS.Platform = process.platform,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean => {
+  if (env.CI === '1' || env.CI === 'true') {
+    return false;
+  }
+  if (platform !== 'linux') {
+    return true;
+  }
+  return Boolean(env.DISPLAY || env.WAYLAND_DISPLAY || env.WSL_DISTRO_NAME);
+};
+
+const defaultOpenBrowser = async (url: string): Promise<boolean> => {
+  if (!canOpenDesktopBrowser()) {
+    return false;
+  }
+  try {
+    await open(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/** Local welcome URL opened only after the generated preview responds. */
+export const sessionOneWelcomeUrl = (preferences: SetupPreferences): string => {
+  const query = new URLSearchParams({
+    hosting: preferences.hosting,
+    data: preferences.data,
+    googleSignIn: String(preferences.googleSignIn),
+  });
+  return `http://localhost:3000/en/setup?${query.toString()}`;
+};
+
 const defaultDeps = (): SessionOneDeps => ({
   createApp: runCreateApp,
   pathExists: defaultPathExists,
@@ -210,11 +285,31 @@ const defaultDeps = (): SessionOneDeps => ({
   runCommand: defaultRunCommand,
   startDetached: defaultStartDetached,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
+  waitForPreview: defaultWaitForPreview,
+  openBrowser: defaultOpenBrowser,
+  prepareProjectTools: async (appPath) => {
+    try {
+      const writtenConfigs = await shipFirstPartyMcpConfigs({ dest: appPath, template: 'web' });
+      return writtenConfigs.length === 2;
+    } catch {
+      return false;
+    }
+  },
+  writeSetupEnvironment: (appPath, values) =>
+    writeEnvKeys(join(appPath, 'templates', 'web'), values),
   pnpmCommand: defaultPnpmCommand,
   homeDir: homedir,
   env: process.env,
   platform: process.platform,
 });
+
+const projectToolsLines = (ready: boolean): readonly string[] =>
+  ready
+    ? [
+        '  • @vybekiit/ui + the UI catalog are available to Claude',
+        '  • Global VybeKiit tools, browser automation, and matching project skills are connected',
+      ]
+    : [];
 
 /**
  * Build buyer-facing success / partial-success lines for Session #1.
@@ -258,6 +353,20 @@ export const formatSessionOneLines = (
     lines.push('  • Preview not started — in that folder run:  pnpm dev');
   }
 
+  lines.push(...projectToolsLines(result.projectToolsReady));
+
+  if (result.browserOpened) {
+    lines.push('  • Verified welcome page opened in your browser');
+  } else if (result.previewReady) {
+    lines.push('  • Welcome page verified. Open http://localhost:3000/en/setup in your browser.');
+  } else if (result.devStarted) {
+    lines.push('  • The preview still needs a moment. Open http://localhost:3000/en/setup soon.');
+  }
+
+  if (!result.projectToolsReady) {
+    lines.push('  • Project tools still need repair. Re-run: npx vybekiit setup');
+  }
+
   if (result.claudeOpened) {
     lines.push('  • Claude Code opening with: "Set up my app."');
   } else {
@@ -289,6 +398,7 @@ export const formatSessionOneLines = (
  */
 export const runSessionOne = async (
   deps: SessionOneDeps = defaultDeps(),
+  preferences: SetupPreferences = parseSetupPreferences([]),
 ): Promise<SessionOneResult> => {
   const appPath = firstAppPath(deps);
   const exists = await deps.pathExists(appPath);
@@ -307,6 +417,9 @@ export const runSessionOne = async (
         packagesBuilt: false,
         devStarted: false,
         claudeOpened: false,
+        projectToolsReady: false,
+        previewReady: false,
+        browserOpened: false,
       };
       return {
         ...failed,
@@ -330,6 +443,9 @@ export const runSessionOne = async (
         packagesBuilt: false,
         devStarted: false,
         claudeOpened: false,
+        projectToolsReady: false,
+        previewReady: false,
+        browserOpened: false,
       };
       return { ...failed, lines: formatSessionOneLines(failed) };
     }
@@ -345,6 +461,9 @@ export const runSessionOne = async (
       packagesBuilt: false,
       devStarted: false,
       claudeOpened: false,
+      projectToolsReady: false,
+      previewReady: false,
+      browserOpened: false,
     };
     const claudeOpened = await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT);
     return {
@@ -355,6 +474,12 @@ export const runSessionOne = async (
   }
 
   const [pnpmBin, ...pnpmPrefix] = pnpm;
+  const projectToolsReady = await deps.prepareProjectTools(appPath);
+  deps.writeSetupEnvironment(appPath, {
+    ...setupEnvironment(preferences),
+    VYBE_ASSISTANT: 'claude',
+    VYBE_REPORT_MODE: '1',
+  });
 
   process.stdout.write('\nInstalling dependencies (this can take a few minutes)…\n');
   const install = await deps.runCommand(appPath, pnpmBin, [...pnpmPrefix, 'install']);
@@ -369,10 +494,14 @@ export const runSessionOne = async (
 
   let devStarted = false;
   if (depsInstalled && packagesBuilt) {
-    devStarted = deps.startDetached(appPath, pnpmBin, [...pnpmPrefix, 'dev']);
+    devStarted = deps.startDetached(appPath, pnpmBin, [...pnpmPrefix, 'dev', 'web']);
   }
 
   const claudeOpened = await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT);
+  const welcomeUrl = sessionOneWelcomeUrl(preferences);
+  const previewReady =
+    devStarted && projectToolsReady ? await deps.waitForPreview(welcomeUrl) : false;
+  const browserOpened = previewReady ? await deps.openBrowser(welcomeUrl) : false;
 
   const outcome: Omit<SessionOneResult, 'lines'> = {
     appPath,
@@ -381,6 +510,9 @@ export const runSessionOne = async (
     packagesBuilt,
     devStarted,
     claudeOpened,
+    projectToolsReady,
+    previewReady,
+    browserOpened,
   };
   return { ...outcome, lines: formatSessionOneLines(outcome) };
 };

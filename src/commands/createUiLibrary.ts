@@ -244,7 +244,10 @@ const defaultDeps = (): CreateUiLibraryDeps => ({
 export const formatCreateUiLibraryLines = (
   result: Omit<CreateUiLibraryResult, 'lines' | 'exitCode'> & { readonly exitCode?: number },
 ): readonly string[] => {
-  const lines: string[] = ['', 'UI library ready path:'];
+  const lines: string[] = [
+    '',
+    result.exitCode === 1 ? 'UI library needs attention:' : 'UI library ready:',
+  ];
   if (result.appPath === null) {
     lines.push('  • Could not create or open a kit workspace.');
     lines.push('  • Accept the GitHub invite, run:  gh auth login --web');
@@ -394,7 +397,7 @@ export const runCreateUiLibrary = async (
   }
 
   const outcome: Omit<CreateUiLibraryResult, 'lines'> = {
-    exitCode: 0,
+    exitCode: depsInstalled && packagesBuilt ? 0 : 1,
     appPath,
     created,
     depsInstalled,

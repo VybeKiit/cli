@@ -1,5 +1,6 @@
 import process from 'node:process';
 import { confirm, isCancel } from '@clack/prompts';
+import { parseSetupPreferences } from '../commands/setupPreferences';
 import { isInteractive } from '../prompts/tty';
 import { installAwareness } from './awareness';
 import { readCliVersion } from './cliVersion';
@@ -7,7 +8,7 @@ import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from
 import { makeExec } from './exec';
 import { globalInstallPaths } from './globalPaths';
 import { isGloballyInstalled, readGlobalStatus } from './globalStatus';
-import { installGlobalMcp } from './installGlobalMcp';
+import { installGlobalMcp, isVybekiitMcpReady } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
 import { readInstallState, writeInstallState } from './installState';
 import { sampleManagedSkillNames } from './managedSkills';
@@ -26,6 +27,7 @@ export type GlobalInstallSummary = {
   readonly mcpEnabled: readonly string[];
   readonly mcpRefreshed: readonly string[];
   readonly mcpNeedsKey: readonly string[];
+  readonly mcpFailed: readonly string[];
   readonly claudeMissing: boolean;
   readonly commandInstalled: boolean;
   /** CLI version that just provisioned (from package.json / npm@latest). */
@@ -33,6 +35,12 @@ export type GlobalInstallSummary = {
   /** Prior stamp version when this was a re-run update; null on first install. */
   readonly previousVersion: string | null;
 };
+
+/** True when this install should create or safely reopen the first app. */
+export const shouldRunSessionOneOnInstall = (
+  args: readonly string[],
+  isFirstInstall: boolean,
+): boolean => isFirstInstall || args.includes('--session-one');
 
 /**
  * Format the success banner shown after a global install. Written for the non-technical
@@ -80,7 +88,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   } else {
     const enabledLabel =
       summary.mcpEnabled.length > 0 ? summary.mcpEnabled.join(', ') : 'none newly added';
-    lines.push(`  • MCP      ${enabledLabel} (browser automation + live docs + error monitoring)`);
+    lines.push(`  • MCP      ${enabledLabel} (VybeKiit tools + browser automation + live docs)`);
     if (summary.mcpRefreshed.length > 0) {
       lines.push(`             refreshed: ${summary.mcpRefreshed.join(', ')}`);
     }
@@ -88,6 +96,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
       lines.push(
         `             ${summary.mcpNeedsKey.length} more need an API key — run \`vybekiit env wizard\``,
       );
+    }
+    if (summary.mcpFailed.length > 0) {
+      lines.push(`             failed to register: ${summary.mcpFailed.join(', ')}`);
     }
   }
   if (skillsEmpty) {
@@ -194,6 +205,7 @@ export const runGlobalInstall = async (
     mcpEnabled: mcp.enabled,
     mcpRefreshed: mcp.refreshed,
     mcpNeedsKey: mcp.needsKey,
+    mcpFailed: mcp.failed,
     claudeMissing: mcp.claudeMissing,
     commandInstalled: awareness.commandWritten,
     version,
@@ -206,19 +218,19 @@ export const runGlobalInstall = async (
 
   // Hard fail: never stamp install-state when Claude has nothing to load. Doctor will also
   // exit 1 until a later run lands managed skills.
-  if (!isGloballyInstalled(postStatus)) {
+  if (!(isGloballyInstalled(postStatus) && isVybekiitMcpReady(mcp))) {
     process.stderr.write(
-      'VybeKiit global install incomplete: expected managed skills + /vybekiit + CLAUDE.md block.\n',
+      'VybeKiit global install incomplete: expected managed skills, global MCP, /vybekiit, and CLAUDE.md awareness.\n',
     );
     return 1;
   }
 
-  // Session #1: only on true first install (no prior stamp). Creates web app, installs
-  // deps, starts preview, opens Claude Code with "Set up my app." Re-runs only update.
+  // Session #1: first install, or an explicit setup re-run. It safely reuses a kit folder.
   let firstAppPath = previous?.firstAppPath;
   const isFirstInstall = previous === null;
-  if (isFirstInstall && !shouldSkipSessionOne(args)) {
-    const sessionOne = await runSessionOne();
+  const shouldRunSessionOne = shouldRunSessionOneOnInstall(args, isFirstInstall);
+  if (shouldRunSessionOne && !shouldSkipSessionOne(args)) {
+    const sessionOne = await runSessionOne(undefined, parseSetupPreferences(args));
     for (const line of sessionOne.lines) {
       process.stdout.write(`${line}\n`);
     }

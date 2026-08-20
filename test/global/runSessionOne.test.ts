@@ -1,11 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  canOpenDesktopBrowser,
   DEFAULT_FIRST_APP_DIR_NAME,
   firstAppPath,
   formatSessionOneLines,
   runSessionOne,
   SESSION_ONE_SEED_PROMPT,
   type SessionOneDeps,
+  sessionOneWelcomeUrl,
   shouldSkipSessionOne,
 } from '../../src/global/runSessionOne';
 
@@ -16,11 +18,21 @@ const baseDeps = (overrides: Partial<SessionOneDeps> = {}): SessionOneDeps => ({
   runCommand: vi.fn(async () => ({ code: 0 })),
   startDetached: vi.fn(() => true),
   openClaude: vi.fn(async () => true),
+  waitForPreview: vi.fn(async () => true),
+  openBrowser: vi.fn(async () => true),
+  prepareProjectTools: vi.fn(async () => true),
+  writeSetupEnvironment: vi.fn(() => undefined),
   pnpmCommand: vi.fn(async () => ['pnpm'] as const),
   homeDir: () => '/Users/me',
   env: {},
   platform: 'darwin',
   ...overrides,
+});
+
+const DEFAULT_WELCOME_URL = sessionOneWelcomeUrl({
+  data: 'supabase',
+  googleSignIn: false,
+  hosting: 'cloudflare',
 });
 
 describe('shouldSkipSessionOne', () => {
@@ -55,6 +67,24 @@ describe('firstAppPath', () => {
   });
 });
 
+describe('canOpenDesktopBrowser', () => {
+  it('keeps browser opening enabled on desktop macOS and Windows', () => {
+    expect(canOpenDesktopBrowser('darwin', {})).toBe(true);
+    expect(canOpenDesktopBrowser('win32', {})).toBe(true);
+  });
+
+  it('does not claim it can open a browser in a headless Linux container', () => {
+    expect(canOpenDesktopBrowser('linux', {})).toBe(false);
+    expect(canOpenDesktopBrowser('linux', { CI: 'true', DISPLAY: ':99' })).toBe(false);
+  });
+
+  it('allows Linux desktops and WSL to use their browser bridges', () => {
+    expect(canOpenDesktopBrowser('linux', { DISPLAY: ':0' })).toBe(true);
+    expect(canOpenDesktopBrowser('linux', { WAYLAND_DISPLAY: 'wayland-0' })).toBe(true);
+    expect(canOpenDesktopBrowser('linux', { WSL_DISTRO_NAME: 'Ubuntu' })).toBe(true);
+  });
+});
+
 describe('formatSessionOneLines', () => {
   it('mentions report mode and the seed prompt on success', () => {
     const text = formatSessionOneLines({
@@ -64,12 +94,19 @@ describe('formatSessionOneLines', () => {
       packagesBuilt: true,
       devStarted: true,
       claudeOpened: true,
+      projectToolsReady: true,
+      previewReady: true,
+      browserOpened: true,
     }).join('\n');
 
     expect(text).toContain('/Users/me/vybekiit-app');
     expect(text).toContain(SESSION_ONE_SEED_PROMPT);
     expect(text).toContain('Option+Shift+R');
     expect(text).toContain('localhost:3000');
+    expect(text).toContain('@vybekiit/ui');
+    expect(text).toContain('UI catalog');
+    expect(text).toContain('project skills');
+    expect(text).toContain('browser automation');
   });
 
   it('prints manual Claude command when open failed', () => {
@@ -80,24 +117,62 @@ describe('formatSessionOneLines', () => {
       packagesBuilt: true,
       devStarted: false,
       claudeOpened: false,
+      projectToolsReady: false,
+      previewReady: false,
+      browserOpened: false,
     }).join('\n');
 
     expect(text).toContain('cd /Users/me/vybekiit-app && claude "Set up my app."');
+    expect(text).toContain('npx vybekiit setup');
+    expect(text).not.toContain('@latest setup');
+  });
+
+  it('prints the verified URL when a headless environment cannot open a browser', () => {
+    const text = formatSessionOneLines({
+      appPath: '/Users/me/vybekiit-app',
+      created: false,
+      depsInstalled: true,
+      packagesBuilt: true,
+      devStarted: true,
+      claudeOpened: false,
+      projectToolsReady: true,
+      previewReady: true,
+      browserOpened: false,
+    }).join('\n');
+
+    expect(text).toContain('Welcome page verified');
+    expect(text).toContain('http://localhost:3000/en/setup');
+    expect(text).not.toContain('still needs a moment');
   });
 });
 
 describe('runSessionOne', () => {
-  it('creates the web app, installs, builds, starts dev, opens Claude', async () => {
+  it('creates the web app, installs, builds, opens Claude, then opens a verified welcome page', async () => {
     const deps = baseDeps();
-    const result = await runSessionOne(deps);
+    const result = await runSessionOne(deps, {
+      data: 'supabase',
+      googleSignIn: false,
+      hosting: 'cloudflare',
+    });
 
     expect(deps.createApp).toHaveBeenCalledWith(['--web', '/Users/me/vybekiit-app']);
     expect(deps.runCommand).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', ['install']);
     expect(deps.runCommand).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', [
       'build:packages',
     ]);
-    expect(deps.startDetached).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', ['dev']);
+    expect(deps.startDetached).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', [
+      'dev',
+      'web',
+    ]);
     expect(deps.openClaude).toHaveBeenCalledWith('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
+    expect(deps.writeSetupEnvironment).toHaveBeenCalledWith('/Users/me/vybekiit-app', {
+      DATA_PROVIDER: 'supabase',
+      HOSTING_PROVIDER: 'cloudflare',
+      VYBE_ASSISTANT: 'claude',
+      VYBE_REPORT_MODE: '1',
+    });
+    expect(deps.waitForPreview).toHaveBeenCalledWith(DEFAULT_WELCOME_URL);
+    expect(deps.openBrowser).toHaveBeenCalledWith(DEFAULT_WELCOME_URL);
     expect(result).toMatchObject({
       appPath: '/Users/me/vybekiit-app',
       created: true,
@@ -105,16 +180,40 @@ describe('runSessionOne', () => {
       packagesBuilt: true,
       devStarted: true,
       claudeOpened: true,
+      projectToolsReady: true,
+      previewReady: true,
+      browserOpened: true,
     });
+  });
+
+  it('does not open a success page when the preview never becomes ready', async () => {
+    const deps = baseDeps({ waitForPreview: vi.fn(async () => false) });
+    const result = await runSessionOne(deps);
+
+    expect(deps.openBrowser).not.toHaveBeenCalled();
+    expect(result.browserOpened).toBe(false);
+    expect(result.previewReady).toBe(false);
+    expect(result.lines.join('\n')).toContain('preview still needs a moment');
+  });
+
+  it('does not open a success page when the project tools cannot be prepared', async () => {
+    const deps = baseDeps({ prepareProjectTools: vi.fn(async () => false) });
+    const result = await runSessionOne(deps);
+
+    expect(deps.waitForPreview).not.toHaveBeenCalled();
+    expect(deps.openBrowser).not.toHaveBeenCalled();
+    expect(result.projectToolsReady).toBe(false);
+    expect(result.previewReady).toBe(false);
+    expect(result.lines.join('\n')).toContain('Project tools still need repair');
   });
 
   it('reuses an existing kit workspace without re-scaffolding', async () => {
     const deps = baseDeps({
-      pathExists: vi.fn(async (path: string) => {
-        if (path === '/Users/me/vybekiit-app') return true;
-        if (path === '/Users/me/vybekiit-app/templates/web') return true;
-        return false;
-      }),
+      pathExists: vi.fn((path: string) =>
+        Promise.resolve(
+          path === '/Users/me/vybekiit-app' || path === '/Users/me/vybekiit-app/templates/web',
+        ),
+      ),
       isEmptyDir: vi.fn(async () => false),
     });
 

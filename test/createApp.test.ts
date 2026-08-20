@@ -99,6 +99,9 @@ describe('create surface registry', () => {
       '  vybekiit create app --extension [directory]',
       '  vybekiit create app --backend [directory]',
       '',
+      'Need the complete component workspace instead?',
+      '  vybekiit create --ui-library [directory]',
+      '',
     ]);
     expect(CLI_HELP).toContain('  --web         Next.js + agent layer');
     expect(CLI_HELP).toContain('  --backend     Express API + typed routes');
@@ -111,10 +114,23 @@ describe('create surface registry', () => {
 });
 
 describe('formatCreateSuccess', () => {
-  it('includes one next action', () => {
+  it('confirms the surface-specific agent and UI tools before one next action', () => {
     const lines = formatCreateSuccess('web', './web');
+    const text = lines.join('\n');
+
     expect(lines.some((line) => line.includes('Set up my app'))).toBe(true);
     expect(lines.some((line) => line.includes('web'))).toBe(true);
+    expect(text).toContain('matching project skills');
+    expect(text).toContain('UI catalog');
+    expect(text).toContain('browser automation');
+  });
+
+  it('does not promise web UI components inside a non-web template', () => {
+    const text = formatCreateSuccess('mobile', './mobile').join('\n');
+
+    expect(text).toContain('matching project skills');
+    expect(text).toContain('browser automation');
+    expect(text).not.toContain('UI catalog');
   });
 });
 

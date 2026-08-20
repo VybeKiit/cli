@@ -124,8 +124,28 @@ export const writeFirstPartyMcpConfigFile = async (
   return written;
 };
 
+/** Remove the obsolete Claude project entry without touching other project servers. */
+const removeProjectVybekiitMcp = async (configPath: string): Promise<boolean> => {
+  let existingText: string;
+  try {
+    existingText = await readFile(configPath, 'utf8');
+  } catch {
+    return false;
+  }
+  const existing = parseProjectMcpConfig(existingText);
+  if (existing.mcpServers.vybekiit === undefined) {
+    return false;
+  }
+  const mcpServers = Object.fromEntries(
+    Object.entries(existing.mcpServers).filter(([name]) => name !== 'vybekiit'),
+  );
+  await writeFile(configPath, formatFirstPartyMcpConfigJson({ mcpServers }));
+  return true;
+};
+
 /**
- * Write surface + kit-root first-party MCP project configs after scaffold.
+ * Write Cursor first-party MCP project configs after scaffold.
+ * Claude receives the same server once at user scope from `vybekiit setup`.
  *
  * @param options - Kit dest root and surface template name.
  * @returns Absolute paths written.
@@ -137,19 +157,15 @@ export const shipFirstPartyMcpConfigs = async (options: {
   const surfaceDir = join(options.dest, 'templates', options.template);
   const paths = [
     join(surfaceDir, '.cursor', 'mcp.json'),
-    join(surfaceDir, '.mcp.json'),
     join(options.dest, '.cursor', 'mcp.json'),
-    join(options.dest, '.mcp.json'),
   ];
+  const obsoleteClaudePaths = [join(surfaceDir, '.mcp.json'), join(options.dest, '.mcp.json')];
 
   await writeFirstPartyMcpConfigFile(paths[0] as string, 'surface');
-  await writeFirstPartyMcpConfigFile(paths[1] as string, 'surface');
-  await writeFirstPartyMcpConfigFile(paths[2] as string, 'kit-root', {
+  await writeFirstPartyMcpConfigFile(paths[1] as string, 'kit-root', {
     template: options.template,
   });
-  await writeFirstPartyMcpConfigFile(paths[3] as string, 'kit-root', {
-    template: options.template,
-  });
+  await Promise.all(obsoleteClaudePaths.map(removeProjectVybekiitMcp));
 
   return paths;
 };

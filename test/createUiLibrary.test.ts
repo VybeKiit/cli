@@ -136,6 +136,19 @@ describe('runCreateUiLibrary', () => {
     expect(result.exitCode).toBe(1);
     expect(result.appPath).toBeNull();
   });
+
+  it('returns a failure when the copied workspace packages do not build', async () => {
+    const deps = baseDeps({
+      runCommand: vi.fn().mockResolvedValueOnce({ code: 0 }).mockResolvedValueOnce({ code: 1 }),
+    });
+
+    const result = await runCreateUiLibrary(['--ui-library', '--skip-dev'], deps);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.depsInstalled).toBe(true);
+    expect(result.packagesBuilt).toBe(false);
+    expect(result.lines.join('\n')).toContain('needs attention');
+  });
 });
 
 describe('formatCreateUiLibraryLines', () => {

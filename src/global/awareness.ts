@@ -17,8 +17,9 @@ VybeKiit is installed globally on this machine. Orient the user in plain, non-te
 
 Do this now, briefly:
 1. Say: "✅ VybeKiit is active — you have its skills and browser automation in every project."
-2. Read the skill names under ~/.claude/skills and name 4-5 useful ones (for example: onboarding,
-   plan-my-idea, setup-payments, add-signin, go-live).
+2. Use the global VybeKiit tools now: call search_skills for the user's goal, then get_skill for
+   the best match. Use search_commands before suggesting a CLI command. For interface work, use
+   search_ui_components or suggest_ui_blend before writing new UI.
 3. If there is no app in the current folder yet, check for ~/vybekiit-app (first-install default).
    If it exists, offer to open that folder and run onboarding. Otherwise offer
    \`vybekiit create app --web\`. If they are already in an app folder, ask what they want next.
@@ -40,15 +41,16 @@ export const vybekiitMemoryBlock = (): string =>
     BEGIN_MARKER,
     '## VybeKiit is active on this machine',
     '',
-    'VybeKiit is installed globally: its skills live in `~/.claude/skills`, and the `playwright`',
-    'and `context7` MCP servers are registered (browser automation, live library docs). Key-gated',
+    'VybeKiit is installed globally: its skills live in `~/.claude/skills`, and the `vybekiit` MCP server is registered globally alongside `playwright` and `context7`.',
+    'The VybeKiit server provides skills, commands, browser automations, and UI catalog tools in every project. Key-gated',
     'servers like `sentry`, `github`, and `stripe` register once their API key is set (run',
-    '`vybekiit env wizard`). Inside a scaffolded app (`vybekiit create app`), a project-scoped',
-    '`vybekiit` MCP server adds the kit tools (UI catalog, skills, browser automations).',
+    '`vybekiit env wizard`).',
     '',
-    'At the start of a session in any project, briefly tell the user VybeKiit is available, and use',
-    'its skills (onboarding, plan-my-idea, setup-payments, add-signin, go-live, harden, …) when they',
-    'fit the request. The user can type `/vybekiit` any time to see status.',
+    'At the start of a session, use `search_skills` for the user goal and `get_skill` for the chosen',
+    'workflow. Use `search_commands` before proposing a VybeKiit command. For interface work, use',
+    '`search_ui_components` or `suggest_ui_blend` before creating UI. For browser setup, search',
+    'automations before running one. Briefly tell the user VybeKiit is available. The user can type',
+    '`/vybekiit` any time to see status.',
     END_MARKER,
     '',
   ].join('\n');

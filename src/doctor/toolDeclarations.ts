@@ -10,7 +10,12 @@ export const GH: Tool = {
     win32: { command: 'scoop', args: ['install', 'gh'], requires: 'Scoop' },
     linux: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
   },
-  auth: { command: 'gh', args: ['auth', 'status'], loginHint: 'gh auth login --web' },
+  auth: {
+    command: 'gh',
+    args: ['auth', 'status'],
+    loginHint: 'gh auth login --web',
+    signIn: { command: 'gh', args: ['auth', 'login', '--web'] },
+  },
 };
 
 /** Cloudflare Wrangler CLI for hosting and edge resources. */
@@ -23,7 +28,12 @@ export const WRANGLER: Tool = {
     win32: { command: 'npm', args: ['install', '-g', 'wrangler'] },
     linux: { command: 'npm', args: ['install', '-g', 'wrangler'] },
   },
-  auth: { command: 'wrangler', args: ['whoami'], loginHint: 'wrangler login' },
+  auth: {
+    command: 'wrangler',
+    args: ['whoami'],
+    loginHint: 'wrangler login',
+    signIn: { command: 'wrangler', args: ['login'] },
+  },
 };
 
 /** Vercel CLI for the Vercel hosting adapter. */
@@ -36,7 +46,12 @@ export const VERCEL: Tool = {
     win32: { command: 'npm', args: ['install', '-g', 'vercel'] },
     linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
   },
-  auth: { command: 'vercel', args: ['whoami'], loginHint: 'vercel login' },
+  auth: {
+    command: 'vercel',
+    args: ['whoami'],
+    loginHint: 'vercel login',
+    signIn: { command: 'vercel', args: ['login'] },
+  },
 };
 
 /** Railway CLI for Railway hosting and coupled database setup. */
@@ -49,7 +64,12 @@ export const RAILWAY: Tool = {
     win32: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
     linux: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
   },
-  auth: { command: 'railway', args: ['whoami'], loginHint: 'railway login' },
+  auth: {
+    command: 'railway',
+    args: ['whoami'],
+    loginHint: 'railway login',
+    signIn: { command: 'railway', args: ['login'] },
+  },
 };
 
 /** Supabase CLI for the default data adapter. */
@@ -62,7 +82,12 @@ export const SUPABASE: Tool = {
     win32: { command: 'scoop', args: ['install', 'supabase'], requires: 'Scoop' },
     linux: { command: 'brew', args: ['install', 'supabase/tap/supabase'], requires: 'Homebrew' },
   },
-  auth: { command: 'supabase', args: ['projects', 'list'], loginHint: 'supabase login' },
+  auth: {
+    command: 'supabase',
+    args: ['projects', 'list'],
+    loginHint: 'supabase login',
+    signIn: { command: 'supabase', args: ['login'] },
+  },
 };
 
 /** Neon CLI for Neon database projects. */
@@ -75,7 +100,12 @@ export const NEON: Tool = {
     win32: { command: 'npm', args: ['install', '-g', 'neonctl'] },
     linux: { command: 'npm', args: ['install', '-g', 'neonctl'] },
   },
-  auth: { command: 'neonctl', args: ['me'], loginHint: 'neonctl auth' },
+  auth: {
+    command: 'neonctl',
+    args: ['me'],
+    loginHint: 'neonctl auth',
+    signIn: { command: 'neonctl', args: ['auth'] },
+  },
 };
 
 /** MongoDB Atlas CLI for the MongoDB data adapter. */
@@ -88,7 +118,12 @@ export const ATLAS: Tool = {
     win32: { command: 'scoop', args: ['install', 'mongodb-atlas-cli'], requires: 'Scoop' },
     linux: { command: 'brew', args: ['install', 'mongodb-atlas-cli'], requires: 'Homebrew' },
   },
-  auth: { command: 'atlas', args: ['auth', 'whoami'], loginHint: 'atlas auth login' },
+  auth: {
+    command: 'atlas',
+    args: ['auth', 'whoami'],
+    loginHint: 'atlas auth login',
+    signIn: { command: 'atlas', args: ['auth', 'login'] },
+  },
 };
 
 /** AWS CLI for AWS-backed adapters. */
@@ -101,7 +136,12 @@ export const AWS: Tool = {
     win32: { command: 'scoop', args: ['install', 'aws'], requires: 'Scoop' },
     linux: { command: 'brew', args: ['install', 'awscli'], requires: 'Homebrew' },
   },
-  auth: { command: 'aws', args: ['sts', 'get-caller-identity'], loginHint: 'aws configure' },
+  auth: {
+    command: 'aws',
+    args: ['sts', 'get-caller-identity'],
+    loginHint: 'aws configure sso',
+    signIn: { command: 'aws', args: ['configure', 'sso'] },
+  },
 };
 
 /** Google Cloud CLI for provisioning Google OAuth clients. */
@@ -114,7 +154,12 @@ export const GCLOUD: Tool = {
     win32: { command: 'scoop', args: ['install', 'gcloud'], requires: 'Scoop' },
     linux: { command: 'brew', args: ['install', '--cask', 'gcloud-cli'], requires: 'Homebrew' },
   },
-  auth: { command: 'gcloud', args: ['auth', 'list'], loginHint: 'gcloud auth login' },
+  auth: {
+    command: 'gcloud',
+    args: ['auth', 'print-access-token'],
+    loginHint: 'gcloud auth login',
+    signIn: { command: 'gcloud', args: ['auth', 'login'] },
+  },
 };
 
 /** Claude Code CLI agent runtime. */
@@ -163,7 +208,12 @@ export const EAS: Tool = {
     win32: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
     linux: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
   },
-  auth: { command: 'eas', args: ['whoami'], loginHint: 'eas login' },
+  auth: {
+    command: 'eas',
+    args: ['whoami'],
+    loginHint: 'eas login',
+    signIn: { command: 'eas', args: ['login'] },
+  },
 };
 
 /** Launch CLI for mobile app-store submission. */

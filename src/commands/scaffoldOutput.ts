@@ -13,6 +13,9 @@ export const formatCreateSuccess = (surface: CreateSurface, dest: string): reado
   '',
   `✅ Created kit workspace + ${surface} surface at ${dest}`,
   '   (assets optimize path on; speed-check skill available after doctor in this folder)',
+  surface === 'web'
+    ? '   Included: matching project skills + VybeKiit MCP (UI catalog + browser automation)'
+    : '   Included: matching project skills + VybeKiit MCP (browser automation)',
   '',
   'Next (one step):',
   '  Open this folder in your AI coding tool and say: "Set up my app."',
@@ -39,5 +42,8 @@ export const formatCreateError = (message: string): readonly string[] => [`❌ $
 export const formatCreateUsage = (): readonly string[] => [
   'Pick one surface for your app:',
   ...CREATE_SURFACES.map((surface) => `  vybekiit create app --${surface.id} [directory]`),
+  '',
+  'Need the complete component workspace instead?',
+  '  vybekiit create --ui-library [directory]',
   '',
 ];

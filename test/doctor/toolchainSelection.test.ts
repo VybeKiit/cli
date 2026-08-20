@@ -185,8 +185,9 @@ describe('selectToolchain Google auth tools', () => {
     const presence = [{ tool: 'gcloud', present: false }];
 
     expect(gcloud?.auth?.command).toBe('gcloud');
-    expect(gcloud?.auth?.args).toEqual(['auth', 'list']);
+    expect(gcloud?.auth?.args).toEqual(['auth', 'print-access-token']);
     expect(gcloud?.auth?.loginHint).toBe('gcloud auth login');
+    expect(gcloud?.auth?.signIn).toEqual({ command: 'gcloud', args: ['auth', 'login'] });
     for (const platform of ['darwin', 'win32', 'linux'] as const) {
       const [action] = planInstall(platform, presence, gcloud ? [gcloud] : []);
       expect(action?.command).toBeTruthy();

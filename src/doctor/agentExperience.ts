@@ -271,7 +271,7 @@ export const runAgentExperience = async (
               deps.pathExists(join(cwd, 'templates', name)),
             )
           : undefined;
-      const configPaths = [join(cwd, '.cursor', 'mcp.json'), join(cwd, '.mcp.json')];
+      const configPaths = [join(cwd, '.cursor', 'mcp.json')];
       for (const configPath of configPaths) {
         await writeFirstPartyMcpConfigFile(
           configPath,
@@ -280,7 +280,7 @@ export const runAgentExperience = async (
         );
       }
       lines.push(
-        '✓ kit tools - first-party assistant tools (skills, commands, automations, UI catalog) are in the project config.',
+        '✓ kit tools - first-party assistant tools are in Cursor project config and Claude receives them globally from setup.',
       );
     } catch {
       lines.push(

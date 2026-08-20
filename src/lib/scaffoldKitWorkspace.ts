@@ -20,6 +20,7 @@ const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json'] as const;
 
 /** Shared tsup alias helpers copied into the buyer kit `scripts/lib/`. */
 const KIT_BUILD_SCRIPT_LIBS = [
+  'scripts/lib/packageExportEntries.mjs',
   'scripts/lib/tsupWorkspaceAliases.mjs',
   'scripts/lib/tsupWorkspaceAliases.d.mts',
   'scripts/lib/repoRoot.mjs',
@@ -59,6 +60,9 @@ const kitWorkspacePackageJson = (
       name: 'my-vybekiit-kit',
       private: true,
       packageManager,
+      ...(kitRootPkg?.devDependencies?.['@types/node'] === undefined
+        ? {}
+        : { devDependencies: { '@types/node': kitRootPkg.devDependencies['@types/node'] } }),
       scripts: {
         // Run the surface from the kit root so agents don't have to discover templates/*.
         dev: `pnpm --dir templates/${template} dev`,

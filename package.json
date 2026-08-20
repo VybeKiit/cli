@@ -1,7 +1,7 @@
 {
   "name": "vybekiit",
   "version": "0.7.6",
-  "description": "Set up tools and create a VybeKiit app: `npx vybekiit setup` then `npx vybekiit create app --web`.",
+  "description": "Choose your services, sign in, create a VybeKiit app, and open its verified local welcome page.",
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
   "publishConfig": {
@@ -20,6 +20,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
     "@aws-sdk/client-dynamodb": "^3.1075.0",
     "@aws-sdk/client-s3": "^3.1075.0",
     "@aws-sdk/lib-dynamodb": "^3.1075.0",
@@ -29,7 +30,8 @@
     "effect": "catalog:",
     "firebase-admin": "^13.0.2",
     "mongodb": "^7.4.0",
-    "open": "catalog:"
+    "open": "catalog:",
+    "playwright": "^1.61.1"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -37,6 +39,7 @@
     "typescript": "catalog:",
     "vitest": "catalog:",
     "@vybekiit/agent-kit": "workspace:*",
+    "@vybekiit/agent-mcp": "workspace:*",
     "@vybekiit/core": "workspace:*",
     "@vybekiit/db": "workspace:*",
     "@vybekiit/deploy": "workspace:*",

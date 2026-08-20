@@ -123,16 +123,25 @@ type DoctorToolRun = {
   readonly reports: readonly ToolReport[];
 };
 
+type DoctorToolchainRun = {
+  readonly platform: Platform;
+  readonly surface: ReturnType<typeof inferProjectSurfaceSync>;
+  readonly processEnv: Record<string, string | undefined>;
+  readonly log: DoctorLog;
+  readonly wantsGoogleAuth: boolean | undefined;
+};
+
 /** Probe and install the selected toolchain; return tools and final reports. */
-const runToolchain = (
-  platform: Platform,
-  surface: ReturnType<typeof inferProjectSurfaceSync>,
-  processEnv: Record<string, string | undefined>,
-  log: DoctorLog,
-): DoctorToolRun => {
+const runToolchain = ({
+  platform,
+  surface,
+  processEnv,
+  log,
+  wantsGoogleAuth = false,
+}: DoctorToolchainRun): DoctorToolRun => {
   const providerTools = selectToolchain(processEnv, {
     mobile: surface.mobile,
-    wantsGoogleAuth: Boolean(processEnv.GOOGLE_OAUTH_CLIENT_ID),
+    wantsGoogleAuth: wantsGoogleAuth || Boolean(processEnv.GOOGLE_OAUTH_CLIENT_ID),
   });
   const nativeTools = selectNativeTools(surface, platform);
   const providerAndNative = mergeDoctorTools(providerTools, nativeTools);
@@ -257,8 +266,17 @@ const writeReportModeAssistant = (assistantWrite: ReportModeAssistantOptions): v
   }
 };
 
+export type DoctorSetupScope = {
+  readonly preparingFirstApp?: boolean;
+  readonly environment?: Record<string, string>;
+  readonly wantsGoogleAuth?: boolean;
+};
+
 /** Provision and verify the agentic toolchain for the current project. */
-export const runDoctor = async (log: DoctorLog = processDoctorLog): Promise<number> => {
+export const runDoctor = async (
+  log: DoctorLog = processDoctorLog,
+  setupScope: DoctorSetupScope = {},
+): Promise<number> => {
   const platform = supportedDoctorPlatform(process.platform);
   if (platform === null) {
     log.error(`[doctor] This operating system (${process.platform}) isn't supported yet.`);
@@ -267,31 +285,53 @@ export const runDoctor = async (log: DoctorLog = processDoctorLog): Promise<numb
 
   const cwd = process.cwd();
   const surface = inferProjectSurfaceSync(cwd);
-  const processEnv = mergeEnv(process.env, loadEnvFile(cwd));
+  const processEnv = {
+    ...mergeEnv(process.env, loadEnvFile(cwd)),
+    ...setupScope.environment,
+  };
+  const preparingFirstApp = setupScope.preparingFirstApp === true;
 
   const cursorSession = isCursorSession();
   if (cursorSession) {
     log.log("✓ Cursor - you're in Cursor; no separate agent install needed.");
   }
 
-  const { nativeTools, providerTools, reports } = runToolchain(platform, surface, processEnv, log);
+  const { nativeTools, providerTools, reports } = runToolchain({
+    platform,
+    surface,
+    processEnv,
+    log,
+    wantsGoogleAuth: setupScope.wantsGoogleAuth,
+  });
   writeDoctorLines(log, formatReport(reports));
-  const nativeSetup = runNativeProjectSetup(cwd, surface, platform, log);
-  writeDoctorLines(log, nativeSetup.lines);
-
-  const mobilePublishOk = verifyMobilePublishing(platform, processEnv, surface.mobile, log);
-  for (const lines of await verifyExternalServices(processEnv)) {
-    writeDoctorLines(log, lines);
+  if (!preparingFirstApp) {
+    const nativeSetup = runNativeProjectSetup(cwd, surface, platform, log);
+    writeDoctorLines(log, nativeSetup.lines);
   }
 
-  writeRailwayReport(processEnv, reports, log);
-  const projectHealthOk = writeProjectLocalReports(cwd, surface, log);
+  const mobilePublishOk = preparingFirstApp
+    ? true
+    : verifyMobilePublishing(platform, processEnv, surface.mobile, log);
+  if (!preparingFirstApp) {
+    for (const lines of await verifyExternalServices(processEnv)) {
+      writeDoctorLines(log, lines);
+    }
+  }
+
+  if (!preparingFirstApp) {
+    writeRailwayReport(processEnv, reports, log);
+  }
+  const projectHealthOk = preparingFirstApp ? true : writeProjectLocalReports(cwd, surface, log);
 
   const skillsReady = isSkillsCliReady(reports);
-  const agentExperience = await runAgentExperience(cwd, { skillsCliReady: skillsReady });
-  writeDoctorLines(log, agentExperience.lines);
+  if (!preparingFirstApp) {
+    const agentExperience = await runAgentExperience(cwd, { skillsCliReady: skillsReady });
+    writeDoctorLines(log, agentExperience.lines);
+  }
 
-  const r2Provision = await provisionR2Storage(cwd, processEnv, log);
+  const r2Provision = preparingFirstApp
+    ? { ok: true, message: 'file storage will be connected after your app is created.' }
+    : await provisionR2Storage(cwd, processEnv, log);
   log.log(`[doctor] ${r2Provision.message}`);
   writeDoctorLines(log, formatProductSurfaceHints(processEnv));
 
@@ -302,7 +342,9 @@ export const runDoctor = async (log: DoctorLog = processDoctorLog): Promise<numb
   await ensureCodexSkills(reports, log);
   const globalStatus = await readGlobalStatus();
   log.log(formatGlobalStatus(globalStatus));
-  writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
+  if (!preparingFirstApp) {
+    writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
+  }
 
   return computeDoctorExitCode({
     cloudReady,
@@ -313,6 +355,6 @@ export const runDoctor = async (log: DoctorLog = processDoctorLog): Promise<numb
     mobilePublishOk,
     // Hard-fail when zero managed skills: a skipped/failed global-install used to only print
     // a soft arrow and still exit 0, so Claude never loaded kit skills and nobody noticed.
-    globalClaudeOk: isGloballyInstalled(globalStatus),
+    globalClaudeOk: preparingFirstApp || isGloballyInstalled(globalStatus),
   });
 };

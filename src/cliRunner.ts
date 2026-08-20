@@ -25,6 +25,7 @@ import { runLiveWorkData } from './commands/liveWorkDataCmd';
 import { runLiveWorkHost } from './commands/liveWorkHostCmd';
 import { runLiveWorkPayments } from './commands/liveWorkPaymentsCmd';
 import { runLocalDev } from './commands/localDev';
+import { runMcpServer } from './commands/mcpServer';
 import { runNew } from './commands/new';
 import { runAddPageRecipe, runListPageRecipes, runListPieces } from './commands/piecesCmd';
 import { runAddPiecesInteractive } from './commands/piecesInteractive';
@@ -49,7 +50,7 @@ import { isInteractive } from './prompts/tty';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Commands that may run before license gate (first-run tools path). */
-const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update', 'feedback']);
+const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update', 'feedback', 'mcp']);
 
 /**
  * Parsed argv for one CLI invocation.
@@ -334,7 +335,7 @@ const handleAddCommand = async (invocation: CliInvocation): Promise<number> => {
  * Interactive menu choices and flag/non-TTY paths call the same operations.
  */
 export const cliCommands: Record<string, CliCommand> = {
-  setup: async () => await runSetup(),
+  setup: async (invocation) => await runSetup(verbArgs(invocation)),
   'global-install': (invocation) => runGlobalInstall(verbArgs(invocation)),
   // Auto-updater: always non-interactive. install.sh / re-runs use this path.
   update: (invocation) => {
@@ -418,6 +419,13 @@ export const cliCommands: Record<string, CliCommand> = {
   },
   backend: handleBackendCommand,
   feedback: (invocation) => runFeedback(verbArgs(invocation)),
+  mcp: async (invocation) => {
+    if (invocation.noun === 'serve') {
+      return await runMcpServer();
+    }
+    process.stderr.write('Usage: vybekiit mcp serve\n');
+    return 1;
+  },
 };
 
 /**
