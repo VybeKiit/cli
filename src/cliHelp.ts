@@ -14,7 +14,7 @@ export const CLI_HELP = `vybekiit — set up tools and create your app
 
 Getting started:
   vybekiit                 Interactive menu (terminal only)
-  vybekiit setup           Choose services, sign in, create your app, and open its welcome page
+  vybekiit setup           First run or repair: sign in, reapply tools, and open your app
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
 ${createSurfaceUsage}
   vybekiit create --ui-library [directory]   Full UI kit + gallery + Claude (report mode ready)
@@ -54,7 +54,6 @@ Buyer journey:
                   [--data=supabase|neon|railway|mongodb|firebase|aws|local]
                   [--google-sign-in]
   vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
-  vybekiit update                         (re-run auto-updater: latest skills + MCP)
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
   vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]

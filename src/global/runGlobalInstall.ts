@@ -80,7 +80,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   if (skillsEmpty) {
     lines.push(
       '             No managed skills on disk — Claude Code will not load kit skills until this is fixed.',
-      '             Re-run: `npx -y vybekiit@latest global-install --yes` (or rebuild the CLI so dist/global-skills exists).',
+      '             Re-run: `npx vybekiit setup` to repair the installation.',
     );
   }
   if (summary.claudeMissing) {
@@ -113,10 +113,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
       'To see it: restart Claude Code (or run `claude` once) to approve the new MCP servers,',
       'then type /vybekiit to confirm.',
       '',
-      'Re-run anytime to update:  curl -fsSL https://vybekiit.com/install.sh | sh',
-      '                     or:  npx -y vybekiit@latest update',
-      'First install also creates your web app and opens Claude with "Set up my app."',
-      'Skip that step:  VYBEKIIT_SKIP_SESSION_ONE=1  or  --skip-session-one',
+      'Re-run anytime to repair or reapply everything:  npx vybekiit setup',
+      'The first run creates your web app and opens Claude with "Set up my app.";',
+      'later runs reuse that app and redo the required setup.',
       '',
     );
   }
@@ -125,10 +124,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
 
 /**
  * Provision VybeKiit globally: skills, MCP servers, and awareness signals. Called from
- * `vybekiit setup` (always `--yes` after entitlement), `vybekiit global-install`,
- * `vybekiit update`, and the install.sh path. Re-runs are the auto-updater: always pull
- * managed skills from this CLI build, force-refresh zero-config MCP defs, and stamp the
- * installed version.
+ * `vybekiit setup` (always `--yes` after entitlement), the backward-compatible update
+ * alias, `vybekiit global-install`, and the install.sh path. Re-runs pull managed skills
+ * from this CLI build, force-refresh zero-config MCP defs, and stamp the installed version.
  *
  * Exits non-zero when entitlement fails **or** when zero managed skills land (so a broken
  * bundle / skipped copy cannot look like success).
@@ -158,7 +156,7 @@ export const runGlobalInstall = async (
   if (!skipPrompt) {
     if (!isInteractive()) {
       process.stdout.write(
-        'Skipping global setup (non-interactive). Run `vybekiit global-install --yes` or `vybekiit update` to provision Claude Code globally.\n',
+        'Skipping global setup (non-interactive). Run `npx vybekiit setup` to provision Claude Code globally.\n',
       );
       return 0;
     }
@@ -168,9 +166,7 @@ export const runGlobalInstall = async (
       initialValue: true,
     });
     if (isCancel(proceed) || proceed !== true) {
-      process.stdout.write(
-        'Skipped global setup. You can run `vybekiit update` or `vybekiit global-install` anytime.\n',
-      );
+      process.stdout.write('Skipped global setup. You can run `npx vybekiit setup` anytime.\n');
       return 0;
     }
   }

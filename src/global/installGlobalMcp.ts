@@ -163,7 +163,7 @@ const isZeroConfig = (def: McpServerDef): boolean =>
 /**
  * Register the zero-config MCP servers globally (plus any key-gated server whose token is
  * already set). Idempotent by default; with `forceRefresh`, re-adds zero-config servers so a
- * re-run of install.sh / `vybekiit update` picks up CLI definition changes.
+ * re-run of `vybekiit setup` picks up CLI definition changes.
  *
  * @param deps - Injected executor + environment (defaults to real `claude` + process.env).
  * @returns A breakdown of enabled / refreshed / already-present / needs-key / failed servers.

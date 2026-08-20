@@ -251,7 +251,7 @@ export const formatCreateUiLibraryLines = (
   if (result.appPath === null) {
     lines.push('  • Could not create or open a kit workspace.');
     lines.push('  • Accept the GitHub invite, run:  gh auth login --web');
-    lines.push('  • Then:  npx -y vybekiit@latest create --ui-library');
+    lines.push('  • Then:  npx vybekiit create --ui-library');
     lines.push('');
     return lines;
   }
@@ -338,7 +338,7 @@ export const runCreateUiLibrary = async (
         lines: [
           '',
           `${appPath} already exists and is not a VybeKiit kit workspace.`,
-          '  Pick a free folder:  npx -y vybekiit@latest create --ui-library ~/my-ui-kit',
+          '  Pick a free folder:  npx vybekiit create --ui-library ~/my-ui-kit',
           '  Or set VYBEKIIT_UI_LIBRARY_DIR and re-run.',
           '',
         ],

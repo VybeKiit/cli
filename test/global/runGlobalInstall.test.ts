@@ -35,9 +35,11 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('1 more need an API key');
     expect(text).toContain('/vybekiit');
     expect(text).toContain('/feedback');
-    expect(text).toContain('vybekiit@latest update');
+    expect(text).toContain('npx vybekiit setup');
+    expect(text).not.toContain('vybekiit@latest');
+    expect(text).not.toContain('vybekiit update');
     expect(text).toContain('Set up my app');
-    expect(text).toContain('--skip-session-one');
+    expect(text).toContain('later runs reuse that app');
   });
 
   it('does not advertise feedback when a user-owned collision was preserved', () => {

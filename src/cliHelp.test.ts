@@ -5,11 +5,12 @@ import { COMMAND_NAMES } from './cliRunner';
 /**
  * Verbs deliberately absent from `vybekiit help --all`.
  *
- * `update-kit` is the legacy/internal kit updater; the buyer-facing path is `update`
- * (the auto-updater). Keep this set tiny and each entry justified — it is the explicit
- * escape hatch for hidden verbs, not a place to silence the drift guard.
+ * `update` remains a backward-compatible alias for old installers, while `update-kit` is
+ * the legacy/internal kit updater. The buyer-facing rerun is always `vybekiit setup`.
+ * Keep this set tiny and each entry justified — it is the explicit escape hatch for hidden
+ * verbs, not a place to silence the drift guard.
  */
-const INTENTIONALLY_UNLISTED = new Set<string>(['update-kit']);
+const INTENTIONALLY_UNLISTED = new Set<string>(['update', 'update-kit']);
 
 /** True when the verb appears as a whole word anywhere in the help text. */
 const isDocumented = (verb: string): boolean => new RegExp(`\\b${verb}\\b`).test(CLI_HELP_ALL);
@@ -26,5 +27,10 @@ describe('CLI_HELP_ALL is the enforced test surface for the verb registry', () =
     for (const hidden of INTENTIONALLY_UNLISTED) {
       expect(COMMAND_NAMES).toContain(hidden);
     }
+  });
+
+  it('keeps setup as the one buyer-facing rerun command', () => {
+    expect(CLI_HELP_ALL).toContain('vybekiit setup');
+    expect(CLI_HELP_ALL).not.toContain('vybekiit update');
   });
 });
