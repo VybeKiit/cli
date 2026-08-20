@@ -26,6 +26,55 @@ const KIT_BUILD_SCRIPT_LIBS = [
   'scripts/lib/repoRoot.mjs',
 ] as const;
 
+const SETUP_PAGE_PATH = join('templates', 'web', 'app', '[locale]', 'setup', 'page.tsx');
+const SETUP_MESSAGE_LOCALES = ['en', 'he'] as const;
+const SETUP_MESSAGE_PREFIX = 'setup.';
+
+const mergeMissingSetupMessages = async (
+  kitRoot: string,
+  dest: string,
+  locale: (typeof SETUP_MESSAGE_LOCALES)[number],
+): Promise<void> => {
+  const kitCatalogPath = join(kitRoot, 'templates', 'web', 'messages', `${locale}.json`);
+  const buyerCatalogPath = join(dest, 'templates', 'web', 'messages', `${locale}.json`);
+  const catalogsExist = await Promise.all([
+    pathExists(kitCatalogPath),
+    pathExists(buyerCatalogPath),
+  ]);
+  if (!catalogsExist.every(Boolean)) {
+    return;
+  }
+
+  try {
+    const kitCatalog: unknown = JSON.parse(await readFile(kitCatalogPath, 'utf8'));
+    const buyerCatalog: unknown = JSON.parse(await readFile(buyerCatalogPath, 'utf8'));
+    const kitCatalogIsObject =
+      typeof kitCatalog === 'object' && kitCatalog !== null && !Array.isArray(kitCatalog);
+    const buyerCatalogIsObject =
+      typeof buyerCatalog === 'object' && buyerCatalog !== null && !Array.isArray(buyerCatalog);
+    if (!(kitCatalogIsObject && buyerCatalogIsObject)) {
+      return;
+    }
+
+    const buyerMessageKeys = new Set(Object.keys(buyerCatalog));
+    const missingSetupMessages = Object.entries(kitCatalog).filter(
+      ([messageKey]) =>
+        messageKey.startsWith(SETUP_MESSAGE_PREFIX) && !buyerMessageKeys.has(messageKey),
+    );
+    if (missingSetupMessages.length === 0) {
+      return;
+    }
+
+    const mergedCatalog = Object.fromEntries([
+      ...Object.entries(buyerCatalog),
+      ...missingSetupMessages,
+    ]);
+    await writeFile(buyerCatalogPath, `${JSON.stringify(mergedCatalog, null, 2)}\n`);
+  } catch {
+    // Preserve an unreadable buyer catalog instead of replacing it.
+  }
+};
+
 /** Inputs for {@link scaffoldKitWorkspace}. */
 export type ScaffoldKitOptions = {
   readonly template: TemplateName;
@@ -98,6 +147,19 @@ export const repairKitBuildRoots = async (kitRoot: string, dest: string): Promis
     await mkdir(dirname(target), { recursive: true });
     await cp(src, target);
   }
+
+  const kitSetupPage = join(kitRoot, SETUP_PAGE_PATH);
+  const buyerSetupPage = join(dest, SETUP_PAGE_PATH);
+  const shouldAddSetupPage =
+    (await pathExists(kitSetupPage)) && !(await pathExists(buyerSetupPage));
+  if (shouldAddSetupPage) {
+    await mkdir(dirname(buyerSetupPage), { recursive: true });
+    await cp(kitSetupPage, buyerSetupPage);
+  }
+
+  await Promise.all(
+    SETUP_MESSAGE_LOCALES.map((locale) => mergeMissingSetupMessages(kitRoot, dest, locale)),
+  );
 };
 
 /**

@@ -94,8 +94,12 @@ describe('repairProjectBuildRoots', () => {
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(false)
       .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true);
-    const readText = vi.fn(async () => '"@vybekiit/client-state"');
+    const readText = vi.fn(async (path: string) =>
+      path.endsWith('tsconfig.base.json') ? '"@vybekiit/client-state"' : '"setup.title"',
+    );
     const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit' }));
 
     await expect(
@@ -108,17 +112,25 @@ describe('repairProjectBuildRoots', () => {
     ).resolves.toBe(true);
 
     expect(repairFromKit).toHaveBeenCalledOnce();
-    expect(readText).toHaveBeenCalledOnce();
+    expect(readText).toHaveBeenCalledTimes(2);
   });
 
   it('restores stale buyer build roots from the current kit and cleans up the source', async () => {
     const cleanup = vi.fn(async () => undefined);
     const repairFromKit = vi.fn(async () => undefined);
     const pathExists = vi.fn(async () => true);
-    const readText = vi
-      .fn()
-      .mockResolvedValueOnce(JSON.stringify({ compilerOptions: { paths: {} } }))
-      .mockResolvedValueOnce('"@vybekiit/client-state"');
+    let tsconfigReads = 0;
+    const readText = vi.fn((path: string) => {
+      if (path.endsWith('messages/en.json')) {
+        return Promise.resolve('"setup.title"');
+      }
+      tsconfigReads += 1;
+      const tsconfigText =
+        tsconfigReads === 1
+          ? JSON.stringify({ compilerOptions: { paths: {} } })
+          : '"@vybekiit/client-state"';
+      return Promise.resolve(tsconfigText);
+    });
     const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit', cleanup }));
 
     await expect(
@@ -136,14 +148,47 @@ describe('repairProjectBuildRoots', () => {
       '/Users/me/vybekiit-app/scripts/lib/tsupWorkspaceAliases.mjs',
     );
     expect(pathExists).toHaveBeenCalledWith('/Users/me/vybekiit-app/tsup.base.ts');
+    expect(pathExists).toHaveBeenCalledWith(
+      '/Users/me/vybekiit-app/templates/web/app/[locale]/setup/page.tsx',
+    );
     expect(readText).toHaveBeenCalledWith('/Users/me/vybekiit-app/tsconfig.base.json');
+    expect(readText).toHaveBeenCalledWith('/Users/me/vybekiit-app/templates/web/messages/en.json');
     expect(cleanup).toHaveBeenCalledOnce();
+  });
+
+  it('restores a missing welcome route even when buyer build roots are current', async () => {
+    const repairFromKit = vi.fn(async () => undefined);
+    const pathExists = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true);
+    const readText = vi.fn(async (path: string) =>
+      path.endsWith('tsconfig.base.json') ? '"@vybekiit/client-state"' : '"setup.title"',
+    );
+
+    await expect(
+      repairProjectBuildRoots('/Users/me/vybekiit-app', {
+        locateKit: vi.fn(async () => ({ kitRoot: '/tmp/current-kit' })),
+        pathExists,
+        readText,
+        repairFromKit,
+      }),
+    ).resolves.toBe(true);
+
+    expect(repairFromKit).toHaveBeenCalledWith('/tmp/current-kit', '/Users/me/vybekiit-app');
+    expect(readText).toHaveBeenCalledTimes(2);
   });
 
   it('does not download the kit when all buyer build roots are already present', async () => {
     const locateKit = vi.fn();
     const pathExists = vi.fn(async () => true);
-    const readText = vi.fn(async () => '"@vybekiit/client-state"');
+    const readText = vi.fn(async (path: string) =>
+      path.endsWith('tsconfig.base.json') ? '"@vybekiit/client-state"' : '"setup.title"',
+    );
 
     await expect(
       repairProjectBuildRoots('/Users/me/vybekiit-app', {
@@ -154,8 +199,8 @@ describe('repairProjectBuildRoots', () => {
       }),
     ).resolves.toBe(true);
 
-    expect(pathExists).toHaveBeenCalledTimes(2);
-    expect(readText).toHaveBeenCalledOnce();
+    expect(pathExists).toHaveBeenCalledTimes(3);
+    expect(readText).toHaveBeenCalledTimes(2);
     expect(locateKit).not.toHaveBeenCalled();
   });
 });

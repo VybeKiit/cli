@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ScaffoldError } from '../src/lib/scaffold';
-import { scaffoldKitWorkspace } from '../src/lib/scaffoldKitWorkspace';
+import { repairKitBuildRoots, scaffoldKitWorkspace } from '../src/lib/scaffoldKitWorkspace';
 
 /**
  * Write a minimal package.json for a fake kit package.
@@ -185,6 +185,68 @@ describe('scaffoldKitWorkspace happy path', () => {
       readFile(join(emptyDest, 'packages', 'core', 'node_modules', 'left-pad', 'x'), 'utf8'),
     ).rejects.toThrow();
   }, 15_000);
+});
+
+describe('repairKitBuildRoots', () => {
+  it('adds missing welcome support without replacing buyer copy or unrelated messages', async () => {
+    const kitRoot = await mkdtemp(join(tmpdir(), 'vybekiit-kit-repair-src-'));
+    const buyerRoot = await mkdtemp(join(tmpdir(), 'vybekiit-kit-repair-dest-'));
+    const kitSetupPage = join(kitRoot, 'templates', 'web', 'app', '[locale]', 'setup', 'page.tsx');
+    const kitMessagesDir = join(kitRoot, 'templates', 'web', 'messages');
+    const buyerMessagesDir = join(buyerRoot, 'templates', 'web', 'messages');
+
+    await mkdir(join(kitSetupPage, '..'), { recursive: true });
+    await mkdir(kitMessagesDir, { recursive: true });
+    await mkdir(buyerMessagesDir, { recursive: true });
+    await writeFile(kitSetupPage, 'export default function SetupPage() { return null; }\n');
+    await writeFile(
+      join(kitMessagesDir, 'en.json'),
+      `${JSON.stringify({
+        'marketing.hero': 'Kit marketing copy',
+        'setup.description': 'Current setup description',
+        'setup.title': 'Current setup title',
+      })}\n`,
+    );
+    await writeFile(
+      join(kitMessagesDir, 'he.json'),
+      `${JSON.stringify({ 'setup.title': 'כותרת התקנה' })}\n`,
+    );
+    await writeFile(
+      join(buyerMessagesDir, 'en.json'),
+      `${JSON.stringify({
+        'buyer.custom': 'Keep me',
+        'setup.title': 'My custom setup title',
+      })}\n`,
+    );
+
+    await repairKitBuildRoots(kitRoot, buyerRoot);
+
+    await expect(
+      readFile(join(buyerRoot, 'templates', 'web', 'app', '[locale]', 'setup', 'page.tsx'), 'utf8'),
+    ).resolves.toContain('SetupPage');
+
+    const buyerMessages = JSON.parse(
+      await readFile(join(buyerMessagesDir, 'en.json'), 'utf8'),
+    ) as Record<string, string>;
+    expect(buyerMessages['buyer.custom']).toBe('Keep me');
+    expect(buyerMessages['setup.title']).toBe('My custom setup title');
+    expect(buyerMessages['setup.description']).toBe('Current setup description');
+    expect(buyerMessages['marketing.hero']).toBeUndefined();
+    await expect(readFile(join(buyerMessagesDir, 'he.json'), 'utf8')).rejects.toThrow();
+
+    const buyerSetupPage = join(
+      buyerRoot,
+      'templates',
+      'web',
+      'app',
+      '[locale]',
+      'setup',
+      'page.tsx',
+    );
+    await writeFile(buyerSetupPage, 'export default function MySetupPage() { return null; }\n');
+    await repairKitBuildRoots(kitRoot, buyerRoot);
+    await expect(readFile(buyerSetupPage, 'utf8')).resolves.toContain('MySetupPage');
+  });
 });
 
 describe('scaffoldKitWorkspace failures', () => {

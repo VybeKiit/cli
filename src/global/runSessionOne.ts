@@ -110,8 +110,10 @@ const defaultPathExists = async (path: string): Promise<boolean> => {
 const BUYER_BUILD_ROOTS = [
   join('scripts', 'lib', 'tsupWorkspaceAliases.mjs'),
   'tsup.base.ts',
+  join('templates', 'web', 'app', '[locale]', 'setup', 'page.tsx'),
 ] as const;
 const LEGACY_CLIENT_STATE_ALIAS = '"@vybekiit/client-state"';
+const SETUP_TITLE_MESSAGE = '"setup.title"';
 
 export type ProjectBuildRootRepairDeps = {
   readonly pathExists: (path: string) => Promise<boolean>;
@@ -120,7 +122,7 @@ export type ProjectBuildRootRepairDeps = {
   readonly repairFromKit: (kitRoot: string, appPath: string) => Promise<void>;
 };
 
-/** Restore build helpers omitted by an older kit delivery without replacing buyer code. */
+/** Restore setup support omitted by an older kit delivery without replacing buyer code. */
 export const repairProjectBuildRoots = async (
   appPath: string,
   deps: ProjectBuildRootRepairDeps = {
@@ -139,8 +141,14 @@ export const repairProjectBuildRoots = async (
     }
 
     try {
-      const baseTsconfig = await deps.readText(join(appPath, 'tsconfig.base.json'));
-      return baseTsconfig.includes(LEGACY_CLIENT_STATE_ALIAS);
+      const [baseTsconfig, englishMessages] = await Promise.all([
+        deps.readText(join(appPath, 'tsconfig.base.json')),
+        deps.readText(join(appPath, 'templates', 'web', 'messages', 'en.json')),
+      ]);
+      return (
+        baseTsconfig.includes(LEGACY_CLIENT_STATE_ALIAS) &&
+        englishMessages.includes(SETUP_TITLE_MESSAGE)
+      );
     } catch {
       return false;
     }
