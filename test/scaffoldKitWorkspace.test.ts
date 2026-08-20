@@ -39,6 +39,7 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
   await mkdir(join(coreDir, 'node_modules', 'left-pad'), { recursive: true });
   // Build roots so buyer kits can rebuild packages offline.
   await writeFile(join(kitRoot, 'tsconfig.base.json'), '{}\n');
+  await writeFile(join(kitRoot, 'tsup.base.ts'), 'export default {};\n');
   await mkdir(join(kitRoot, 'scripts', 'lib'), { recursive: true });
   await writeFile(join(kitRoot, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'export {};\n');
   await writeFile(join(kitRoot, 'scripts', 'lib', 'packageExportEntries.mjs'), 'export {};\n');
@@ -136,6 +137,7 @@ describe('scaffoldKitWorkspace happy path', () => {
       readFile(join(emptyDest, 'packages', 'core', 'dist', 'index.js'), 'utf8'),
     ).resolves.toContain('core');
     await expect(readFile(join(emptyDest, 'tsconfig.base.json'), 'utf8')).resolves.toBeDefined();
+    await expect(readFile(join(emptyDest, 'tsup.base.ts'), 'utf8')).resolves.toBeDefined();
     await expect(
       readFile(join(emptyDest, 'scripts', 'lib', 'tsupWorkspaceAliases.mjs'), 'utf8'),
     ).resolves.toBeDefined();

@@ -107,7 +107,10 @@ const defaultPathExists = async (path: string): Promise<boolean> => {
   }
 };
 
-const BUYER_BUILD_HELPER = join('scripts', 'lib', 'tsupWorkspaceAliases.mjs');
+const BUYER_BUILD_ROOTS = [
+  join('scripts', 'lib', 'tsupWorkspaceAliases.mjs'),
+  'tsup.base.ts',
+] as const;
 
 export type ProjectBuildRootRepairDeps = {
   readonly pathExists: (path: string) => Promise<boolean>;
@@ -124,8 +127,14 @@ export const repairProjectBuildRoots = async (
     repairFromKit: repairKitBuildRoots,
   },
 ): Promise<boolean> => {
-  const helperPath = join(appPath, BUYER_BUILD_HELPER);
-  if (await deps.pathExists(helperPath)) {
+  const buildRootsReady = async (): Promise<boolean> => {
+    const checks = await Promise.all(
+      BUYER_BUILD_ROOTS.map((relativePath) => deps.pathExists(join(appPath, relativePath))),
+    );
+    return checks.every(Boolean);
+  };
+
+  if (await buildRootsReady()) {
     return true;
   }
 
@@ -133,7 +142,7 @@ export const repairProjectBuildRoots = async (
   try {
     source = await deps.locateKit();
     await deps.repairFromKit(source.kitRoot, appPath);
-    return await deps.pathExists(helperPath);
+    return await buildRootsReady();
   } catch {
     return false;
   } finally {

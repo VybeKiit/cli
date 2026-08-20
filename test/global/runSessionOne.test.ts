@@ -87,10 +87,15 @@ describe('canOpenDesktopBrowser', () => {
 });
 
 describe('repairProjectBuildRoots', () => {
-  it('restores a missing buyer build helper from the current kit and cleans up the source', async () => {
+  it('restores missing buyer build roots from the current kit and cleans up the source', async () => {
     const cleanup = vi.fn(async () => undefined);
     const repairFromKit = vi.fn(async () => undefined);
-    const pathExists = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const pathExists = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true);
     const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit', cleanup }));
 
     await expect(
@@ -103,20 +108,26 @@ describe('repairProjectBuildRoots', () => {
 
     expect(locateKit).toHaveBeenCalledOnce();
     expect(repairFromKit).toHaveBeenCalledWith('/tmp/current-kit', '/Users/me/vybekiit-app');
+    expect(pathExists).toHaveBeenCalledWith(
+      '/Users/me/vybekiit-app/scripts/lib/tsupWorkspaceAliases.mjs',
+    );
+    expect(pathExists).toHaveBeenCalledWith('/Users/me/vybekiit-app/tsup.base.ts');
     expect(cleanup).toHaveBeenCalledOnce();
   });
 
-  it('does not download the kit when the buyer build helper is already present', async () => {
+  it('does not download the kit when all buyer build roots are already present', async () => {
     const locateKit = vi.fn();
+    const pathExists = vi.fn(async () => true);
 
     await expect(
       repairProjectBuildRoots('/Users/me/vybekiit-app', {
         locateKit,
-        pathExists: vi.fn(async () => true),
+        pathExists,
         repairFromKit: vi.fn(),
       }),
     ).resolves.toBe(true);
 
+    expect(pathExists).toHaveBeenCalledTimes(2);
     expect(locateKit).not.toHaveBeenCalled();
   });
 });

@@ -16,7 +16,7 @@ import { ScaffoldError, shouldCopyScaffoldPath, type TemplateName } from './scaf
  * Monorepo files required so buyer kits can rebuild `@vybekiit/*` packages
  * (`tsup` configs import `../../scripts/lib/tsupWorkspaceAliases.mjs`).
  */
-const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json'] as const;
+const KIT_BUILD_ROOT_FILES = ['tsconfig.base.json', 'tsup.base.ts'] as const;
 
 /** Shared tsup alias helpers copied into the buyer kit `scripts/lib/`. */
 const KIT_BUILD_SCRIPT_LIBS = [
