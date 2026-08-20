@@ -553,7 +553,7 @@ export const runSessionOne = async (
 
   let devStarted = false;
   if (depsInstalled && packagesBuilt) {
-    devStarted = deps.startDetached(appPath, pnpmBin, [...pnpmPrefix, 'dev', 'web']);
+    devStarted = deps.startDetached(appPath, pnpmBin, [...pnpmPrefix, 'dev']);
   }
 
   const claudeOpened = await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT);

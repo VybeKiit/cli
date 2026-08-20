@@ -235,10 +235,7 @@ describe('runSessionOne', () => {
     expect(deps.runCommand).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', [
       'build:packages',
     ]);
-    expect(deps.startDetached).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', [
-      'dev',
-      'web',
-    ]);
+    expect(deps.startDetached).toHaveBeenCalledWith('/Users/me/vybekiit-app', 'pnpm', ['dev']);
     expect(deps.openClaude).toHaveBeenCalledWith('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
     expect(deps.writeSetupEnvironment).toHaveBeenCalledWith('/Users/me/vybekiit-app', {
       DATA_PROVIDER: 'supabase',
