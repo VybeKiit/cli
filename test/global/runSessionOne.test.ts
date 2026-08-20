@@ -87,8 +87,7 @@ describe('canOpenDesktopBrowser', () => {
 });
 
 describe('repairProjectBuildRoots', () => {
-  it('restores missing buyer build roots from the current kit and cleans up the source', async () => {
-    const cleanup = vi.fn(async () => undefined);
+  it('restores missing buyer build roots from the current kit', async () => {
     const repairFromKit = vi.fn(async () => undefined);
     const pathExists = vi
       .fn()
@@ -96,12 +95,37 @@ describe('repairProjectBuildRoots', () => {
       .mockResolvedValueOnce(false)
       .mockResolvedValueOnce(true)
       .mockResolvedValueOnce(true);
+    const readText = vi.fn(async () => '"@vybekiit/client-state"');
+    const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit' }));
+
+    await expect(
+      repairProjectBuildRoots('/Users/me/vybekiit-app', {
+        locateKit,
+        pathExists,
+        readText,
+        repairFromKit,
+      }),
+    ).resolves.toBe(true);
+
+    expect(repairFromKit).toHaveBeenCalledOnce();
+    expect(readText).toHaveBeenCalledOnce();
+  });
+
+  it('restores stale buyer build roots from the current kit and cleans up the source', async () => {
+    const cleanup = vi.fn(async () => undefined);
+    const repairFromKit = vi.fn(async () => undefined);
+    const pathExists = vi.fn(async () => true);
+    const readText = vi
+      .fn()
+      .mockResolvedValueOnce(JSON.stringify({ compilerOptions: { paths: {} } }))
+      .mockResolvedValueOnce('"@vybekiit/client-state"');
     const locateKit = vi.fn(async () => ({ kitRoot: '/tmp/current-kit', cleanup }));
 
     await expect(
       repairProjectBuildRoots('/Users/me/vybekiit-app', {
         locateKit,
         pathExists,
+        readText,
         repairFromKit,
       }),
     ).resolves.toBe(true);
@@ -112,22 +136,26 @@ describe('repairProjectBuildRoots', () => {
       '/Users/me/vybekiit-app/scripts/lib/tsupWorkspaceAliases.mjs',
     );
     expect(pathExists).toHaveBeenCalledWith('/Users/me/vybekiit-app/tsup.base.ts');
+    expect(readText).toHaveBeenCalledWith('/Users/me/vybekiit-app/tsconfig.base.json');
     expect(cleanup).toHaveBeenCalledOnce();
   });
 
   it('does not download the kit when all buyer build roots are already present', async () => {
     const locateKit = vi.fn();
     const pathExists = vi.fn(async () => true);
+    const readText = vi.fn(async () => '"@vybekiit/client-state"');
 
     await expect(
       repairProjectBuildRoots('/Users/me/vybekiit-app', {
         locateKit,
         pathExists,
+        readText,
         repairFromKit: vi.fn(),
       }),
     ).resolves.toBe(true);
 
     expect(pathExists).toHaveBeenCalledTimes(2);
+    expect(readText).toHaveBeenCalledOnce();
     expect(locateKit).not.toHaveBeenCalled();
   });
 });

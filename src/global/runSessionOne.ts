@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { access, readdir } from 'node:fs/promises';
+import { access, readdir, readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import process from 'node:process';
@@ -111,9 +111,11 @@ const BUYER_BUILD_ROOTS = [
   join('scripts', 'lib', 'tsupWorkspaceAliases.mjs'),
   'tsup.base.ts',
 ] as const;
+const LEGACY_CLIENT_STATE_ALIAS = '"@vybekiit/client-state"';
 
 export type ProjectBuildRootRepairDeps = {
   readonly pathExists: (path: string) => Promise<boolean>;
+  readonly readText: (path: string) => Promise<string>;
   readonly locateKit: () => Promise<LocatedKitWorkspace>;
   readonly repairFromKit: (kitRoot: string, appPath: string) => Promise<void>;
 };
@@ -123,6 +125,7 @@ export const repairProjectBuildRoots = async (
   appPath: string,
   deps: ProjectBuildRootRepairDeps = {
     pathExists,
+    readText: async (path) => await readFile(path, 'utf8'),
     locateKit: locateKitWorkspace,
     repairFromKit: repairKitBuildRoots,
   },
@@ -131,7 +134,16 @@ export const repairProjectBuildRoots = async (
     const checks = await Promise.all(
       BUYER_BUILD_ROOTS.map((relativePath) => deps.pathExists(join(appPath, relativePath))),
     );
-    return checks.every(Boolean);
+    if (!checks.every(Boolean)) {
+      return false;
+    }
+
+    try {
+      const baseTsconfig = await deps.readText(join(appPath, 'tsconfig.base.json'));
+      return baseTsconfig.includes(LEGACY_CLIENT_STATE_ALIAS);
+    } catch {
+      return false;
+    }
   };
 
   if (await buildRootsReady()) {
