@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   KIT_MIRROR_REPO,
   type KitWorkspaceSeams,
+  kitMirrorCloneArgs,
   locateKitWorkspace,
 } from '../src/lib/kitWorkspaceSource';
 import { ScaffoldError } from '../src/lib/scaffold';
@@ -123,5 +124,20 @@ describe('locateKitWorkspace kit mirror clone', () => {
     };
 
     await expect(locateKitWorkspace(deps)).rejects.toBeInstanceOf(ScaffoldError);
+  });
+});
+
+describe('kitMirrorCloneArgs', () => {
+  it('uses authenticated HTTPS so a buyer SSH configuration cannot block setup', () => {
+    expect(kitMirrorCloneArgs('kit', '/tmp/kit')).toEqual([
+      'repo',
+      'clone',
+      'https://github.com/VybeKiit/kit',
+      '/tmp/kit',
+      '--',
+      '--depth',
+      '1',
+      '--no-tags',
+    ]);
   });
 });

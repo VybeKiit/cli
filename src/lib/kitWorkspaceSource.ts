@@ -30,6 +30,18 @@ const MIRROR_ORG = 'VybeKiit';
  */
 export const KIT_MIRROR_REPO = 'kit';
 
+/** Build the GitHub CLI clone arguments for the private kit delivery mirror. */
+export const kitMirrorCloneArgs = (repoName: string, targetDir: string): readonly string[] => [
+  'repo',
+  'clone',
+  `https://github.com/${MIRROR_ORG}/${repoName}`,
+  targetDir,
+  '--',
+  '--depth',
+  '1',
+  '--no-tags',
+];
+
 /**
  * The seams a {@link locateKitWorkspace} call needs, injected so the published clone path is
  * unit-testable without `gh` or a network.
@@ -62,16 +74,9 @@ export type LocatedKitWorkspace = {
  */
 export const cloneKitMirror = async (repoName: string, targetDir: string): Promise<void> => {
   try {
-    await execFileAsync('gh', [
-      'repo',
-      'clone',
-      `${MIRROR_ORG}/${repoName}`,
-      targetDir,
-      '--',
-      '--depth',
-      '1',
-      '--no-tags',
-    ]);
+    // An explicit HTTPS URL makes `gh` use its authenticated token even when the buyer's
+    // configured Git protocol is SSH and that machine has no matching GitHub SSH key.
+    await execFileAsync('gh', kitMirrorCloneArgs(repoName, targetDir));
   } catch (error) {
     throw new ScaffoldError(
       "Couldn't download the kit workspace. Make sure your assistant is signed in to GitHub: run gh auth login --web",
