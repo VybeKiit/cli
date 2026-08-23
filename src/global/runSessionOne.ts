@@ -373,8 +373,8 @@ const defaultDeps = (): SessionOneDeps => ({
 const projectToolsLines = (ready: boolean): readonly string[] =>
   ready
     ? [
-        '  • @vybekiit/ui + the UI catalog are available to Claude',
-        '  • Global VybeKiit tools, browser automation, and matching project skills are connected',
+        '  • @vybekiit/ui + the UI catalog are available to your coding agent',
+        '  • VybeKiit tools, browser automation, and matching project skills are connected',
       ]
     : [];
 
@@ -437,14 +437,14 @@ export const formatSessionOneLines = (
   if (result.claudeOpened) {
     lines.push('  • Claude Code opening with: "Set up my app."');
   } else {
-    lines.push('  • Open Claude Code in that folder and say: "Set up my app."');
-    lines.push(`      cd ${result.appPath} && claude "Set up my app."`);
+    lines.push('  • Open that folder in your coding agent and say: "Set up my app."');
+    lines.push(`      ${result.appPath}`);
   }
 
   lines.push(
     '',
     'Report mode is built in — if something looks wrong, press Option+Shift+R',
-    '(Alt+Shift+R on Windows), click it, and tell Claude what is off.',
+    '(Alt+Shift+R on Windows), click it, and tell your coding agent what is off.',
     '',
   );
   return lines;

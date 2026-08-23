@@ -229,7 +229,7 @@ describe('formatSessionOneLines', () => {
     expect(text).toContain('browser automation');
   });
 
-  it('prints manual Claude command when open failed', () => {
+  it('hands the ready app to whichever coding agent the buyer uses', () => {
     const text = formatSessionOneLines({
       appPath: '/Users/me/vybekiit-app',
       created: true,
@@ -242,7 +242,9 @@ describe('formatSessionOneLines', () => {
       browserOpened: false,
     }).join('\n');
 
-    expect(text).toContain('cd /Users/me/vybekiit-app && claude "Set up my app."');
+    expect(text).toContain('Open that folder in your coding agent');
+    expect(text).toContain('/Users/me/vybekiit-app');
+    expect(text).not.toContain('&& claude');
     expect(text).toContain('npx vybekiit setup');
     expect(text).not.toContain('@latest setup');
   });

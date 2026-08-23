@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { McpInstallResult } from '../../src/global/installGlobalMcp';
 import {
   formatGlobalInstallSummary,
+  globalSetupComplete,
   runGlobalInstall,
   shouldRunSessionOneOnInstall,
 } from '../../src/global/runGlobalInstall';
@@ -20,6 +22,15 @@ const baseSummary = {
   commandInstalled: true,
   version: '0.6.2',
   previousVersion: null as string | null,
+};
+
+const readyMcp: McpInstallResult = {
+  enabled: ['vybekiit'],
+  alreadyPresent: [],
+  refreshed: [],
+  needsKey: [],
+  failed: [],
+  claudeMissing: false,
 };
 
 describe('formatGlobalInstallSummary', () => {
@@ -76,7 +87,8 @@ describe('formatGlobalInstallSummary', () => {
       version: '0.6.1',
     }).join('\n');
 
-    expect(text).toContain('claude` command was not found');
+    expect(text).toContain('ready for your coding agent');
+    expect(text).toContain('Claude Code is optional');
   });
 
   it('hard-fails messaging when zero skills landed', () => {
@@ -100,6 +112,21 @@ describe('formatGlobalInstallSummary', () => {
     }).join('\n');
 
     expect(text).toContain('failed to register: vybekiit');
+  });
+});
+
+describe('globalSetupComplete', () => {
+  it('continues for other coding agents when Claude Code is not installed', () => {
+    expect(globalSetupComplete(true, { ...readyMcp, enabled: [], claudeMissing: true })).toBe(true);
+  });
+
+  it('still blocks missing skills or a failed Claude MCP registration', () => {
+    expect(globalSetupComplete(false, { ...readyMcp, enabled: [], claudeMissing: true })).toBe(
+      false,
+    );
+    expect(globalSetupComplete(true, { ...readyMcp, enabled: [], failed: ['vybekiit'] })).toBe(
+      false,
+    );
   });
 });
 

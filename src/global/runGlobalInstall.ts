@@ -8,7 +8,7 @@ import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from
 import { makeExec } from './exec';
 import { globalInstallPaths } from './globalPaths';
 import { isGloballyInstalled, readGlobalStatus } from './globalStatus';
-import { installGlobalMcp, isVybekiitMcpReady } from './installGlobalMcp';
+import { installGlobalMcp, isVybekiitMcpReady, type McpInstallResult } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
 import { readInstallState, writeInstallState } from './installState';
 import { sampleManagedSkillNames } from './managedSkills';
@@ -42,6 +42,13 @@ export const shouldRunSessionOneOnInstall = (
   isFirstInstall: boolean,
 ): boolean => isFirstInstall || args.includes('--session-one');
 
+/** Claude-specific MCP is optional when the buyer uses another coding agent. */
+export const globalSetupComplete = (
+  managedFilesReady: boolean,
+  mcpInstallation: McpInstallResult,
+): boolean =>
+  managedFilesReady && (mcpInstallation.claudeMissing || isVybekiitMcpReady(mcpInstallation));
+
 /**
  * Format the success banner shown after a global install. Written for the non-technical
  * buyer: it names the visible signals so they can tell it worked.
@@ -54,7 +61,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   const isRerun = summary.previousVersion !== null && summary.previousVersion === summary.version;
   const skillsEmpty = summary.skillsInstalled === 0 && summary.skillSample.length === 0;
 
-  let headline = `✅ VybeKiit ${summary.version} is now set up globally in Claude Code.`;
+  let headline = summary.claudeMissing
+    ? `✅ VybeKiit ${summary.version} is ready for your coding agent.`
+    : `✅ VybeKiit ${summary.version} is now set up globally in Claude Code.`;
   if (skillsEmpty) {
     headline = `✗ VybeKiit ${summary.version} global setup did not land any managed skills.`;
   } else if (isUpdate) {
@@ -84,7 +93,9 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
     );
   }
   if (summary.claudeMissing) {
-    lines.push('  • MCP      skipped — the `claude` command was not found on your PATH');
+    lines.push(
+      '  • MCP      Claude Code is optional and was not found. Continuing with your coding agent.',
+    );
   } else {
     const enabledLabel =
       summary.mcpEnabled.length > 0 ? summary.mcpEnabled.join(', ') : 'none newly added';
@@ -214,9 +225,9 @@ export const runGlobalInstall = async (
 
   // Hard fail: never stamp install-state when Claude has nothing to load. Doctor will also
   // exit 1 until a later run lands managed skills.
-  if (!(isGloballyInstalled(postStatus) && isVybekiitMcpReady(mcp))) {
+  if (!globalSetupComplete(isGloballyInstalled(postStatus), mcp)) {
     process.stderr.write(
-      'VybeKiit global install incomplete: expected managed skills, global MCP, /vybekiit, and CLAUDE.md awareness.\n',
+      'VybeKiit setup is incomplete: the managed files or an available Claude Code connection could not be prepared.\n',
     );
     return 1;
   }
