@@ -7,6 +7,7 @@ import {
   parseCreateUiLibraryArgs,
   runCreateUiLibrary,
   UI_LIBRARY_GALLERY_URL,
+  UI_LIBRARY_LOCAL_URL,
   UI_LIBRARY_SEED_PROMPT,
 } from '../src/commands/createUiLibrary';
 
@@ -16,6 +17,7 @@ const baseDeps = (overrides: Partial<CreateUiLibraryDeps> = {}): CreateUiLibrary
   isEmptyDir: vi.fn(async () => true),
   runCommand: vi.fn(async () => ({ code: 0 })),
   startDetached: vi.fn(() => true),
+  waitForPreview: vi.fn(async () => true),
   openClaude: vi.fn(async () => true),
   openUrl: vi.fn(async () => true),
   pnpmCommand: vi.fn(async () => ['pnpm'] as const),
@@ -78,7 +80,7 @@ describe('parseCreateUiLibraryArgs', () => {
 });
 
 describe('runCreateUiLibrary', () => {
-  it('scaffolds web kit, installs, opens gallery + Claude', async () => {
+  it('scaffolds web kit, opens its ready local preview, gallery, and Claude', async () => {
     const deps = baseDeps();
     const result = await runCreateUiLibrary(['--ui-library'], deps);
 
@@ -95,12 +97,26 @@ describe('runCreateUiLibrary', () => {
       ['install'],
     );
     expect(deps.startDetached).toHaveBeenCalled();
-    expect(deps.openUrl).toHaveBeenCalledWith(UI_LIBRARY_GALLERY_URL);
+    expect(deps.waitForPreview).toHaveBeenCalledWith(UI_LIBRARY_LOCAL_URL);
+    expect(deps.openUrl).toHaveBeenNthCalledWith(1, UI_LIBRARY_LOCAL_URL);
+    expect(deps.openUrl).toHaveBeenNthCalledWith(2, UI_LIBRARY_GALLERY_URL);
     expect(deps.openClaude).toHaveBeenCalledWith(
       `/Users/me/${DEFAULT_UI_LIBRARY_DIR_NAME}`,
       UI_LIBRARY_SEED_PROMPT,
     );
     expect(result.lines.join('\n')).toContain(UI_LIBRARY_GALLERY_URL);
+    expect(result.lines.join('\n')).toContain(UI_LIBRARY_LOCAL_URL);
+  });
+
+  it('does not open a local tab before the preview responds', async () => {
+    const deps = baseDeps({ waitForPreview: vi.fn(async () => false) });
+
+    const result = await runCreateUiLibrary(['--ui-library', '--no-gallery'], deps);
+
+    expect(result.previewReady).toBe(false);
+    expect(result.localPreviewOpened).toBe(false);
+    expect(deps.openUrl).not.toHaveBeenCalledWith(UI_LIBRARY_LOCAL_URL);
+    expect(result.lines.join('\n')).toContain(`Open your local app: ${UI_LIBRARY_LOCAL_URL}`);
   });
 
   it('reuses an existing kit workspace without re-create', async () => {
@@ -159,6 +175,8 @@ describe('formatCreateUiLibraryLines', () => {
       depsInstalled: true,
       packagesBuilt: true,
       devStarted: true,
+      previewReady: true,
+      localPreviewOpened: true,
       galleryOpened: true,
       claudeOpened: true,
     });

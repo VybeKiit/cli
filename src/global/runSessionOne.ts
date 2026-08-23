@@ -291,7 +291,7 @@ const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | nu
 const wait = async (milliseconds: number): Promise<void> =>
   await new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-const defaultWaitForPreview = async (url: string): Promise<boolean> => {
+export const waitForPreview = async (url: string): Promise<boolean> => {
   const attemptPreview = async (remainingAttempts: number): Promise<boolean> => {
     try {
       const response = await fetch(url, { redirect: 'follow' });
@@ -354,7 +354,7 @@ const defaultDeps = (): SessionOneDeps => ({
   runCommand: defaultRunCommand,
   startDetached: defaultStartDetached,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
-  waitForPreview: defaultWaitForPreview,
+  waitForPreview,
   openBrowser: defaultOpenBrowser,
   prepareProjectTools: async (appPath) => {
     try {

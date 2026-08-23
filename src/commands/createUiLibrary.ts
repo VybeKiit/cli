@@ -4,7 +4,7 @@ import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import open from 'open';
-import { openClaudeWithSeed, type SessionOneDeps } from '../global/runSessionOne';
+import { openClaudeWithSeed, type SessionOneDeps, waitForPreview } from '../global/runSessionOne';
 import { runCreateApp } from './createApp';
 
 /** Default folder under home for the UI-library kit workspace. */
@@ -12,6 +12,9 @@ export const DEFAULT_UI_LIBRARY_DIR_NAME = 'vybekiit-ui-library';
 
 /** Public component gallery (browse). Local kit files power MCP pull/use. */
 export const UI_LIBRARY_GALLERY_URL = 'https://ui.vybekiit.com';
+
+/** Local buyer workspace opened after its development server responds. */
+export const UI_LIBRARY_LOCAL_URL = 'http://127.0.0.1:3000/en';
 
 /**
  * Seed prompt for Claude after `create --ui-library`.
@@ -44,6 +47,8 @@ export type CreateUiLibraryResult = {
   readonly depsInstalled: boolean;
   readonly packagesBuilt: boolean;
   readonly devStarted: boolean;
+  readonly previewReady: boolean;
+  readonly localPreviewOpened: boolean;
   readonly galleryOpened: boolean;
   readonly claudeOpened: boolean;
   readonly lines: readonly string[];
@@ -56,6 +61,7 @@ export type CreateUiLibraryDeps = {
   readonly isEmptyDir: (path: string) => Promise<boolean>;
   readonly runCommand: SessionOneDeps['runCommand'];
   readonly startDetached: SessionOneDeps['startDetached'];
+  readonly waitForPreview: SessionOneDeps['waitForPreview'];
   readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
   readonly openUrl: (url: string) => Promise<boolean>;
   readonly pnpmCommand: SessionOneDeps['pnpmCommand'];
@@ -226,6 +232,7 @@ const defaultDeps = (): CreateUiLibraryDeps => ({
   isEmptyDir: defaultIsEmptyDir,
   runCommand: defaultRunCommand,
   startDetached: defaultStartDetached,
+  waitForPreview,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
   openUrl: defaultOpenUrl,
   pnpmCommand: defaultPnpmCommand,
@@ -273,7 +280,11 @@ export const formatCreateUiLibraryLines = (
     lines.push('  • Build packages:  pnpm build:packages');
   }
   if (result.devStarted) {
-    lines.push('  • Local app preview starting (http://localhost:3000)');
+    if (result.localPreviewOpened) {
+      lines.push(`  • Local app opened: ${UI_LIBRARY_LOCAL_URL}`);
+    } else {
+      lines.push(`  • Open your local app: ${UI_LIBRARY_LOCAL_URL}`);
+    }
   }
   if (result.galleryOpened) {
     lines.push(`  • UI gallery opened: ${UI_LIBRARY_GALLERY_URL}`);
@@ -330,6 +341,8 @@ export const runCreateUiLibrary = async (
         depsInstalled: false,
         packagesBuilt: false,
         devStarted: false,
+        previewReady: false,
+        localPreviewOpened: false,
         galleryOpened: false,
         claudeOpened: false,
       };
@@ -355,6 +368,8 @@ export const runCreateUiLibrary = async (
         depsInstalled: false,
         packagesBuilt: false,
         devStarted: false,
+        previewReady: false,
+        localPreviewOpened: false,
         galleryOpened: false,
         claudeOpened: false,
       };
@@ -385,6 +400,9 @@ export const runCreateUiLibrary = async (
     }
   }
 
+  const previewReady = devStarted ? await deps.waitForPreview(UI_LIBRARY_LOCAL_URL) : false;
+  const localPreviewOpened = previewReady ? await deps.openUrl(UI_LIBRARY_LOCAL_URL) : false;
+
   let galleryOpened = false;
   if (inputs.openGallery) {
     process.stdout.write(`\nOpening UI gallery: ${UI_LIBRARY_GALLERY_URL}\n`);
@@ -403,6 +421,8 @@ export const runCreateUiLibrary = async (
     depsInstalled,
     packagesBuilt,
     devStarted,
+    previewReady,
+    localPreviewOpened,
     galleryOpened,
     claudeOpened,
   };
