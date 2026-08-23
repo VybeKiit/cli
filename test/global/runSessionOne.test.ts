@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   canOpenDesktopBrowser,
+  claudeTerminalCommand,
   DEFAULT_FIRST_APP_DIR_NAME,
   firstAppPath,
   formatSessionOneLines,
@@ -83,6 +84,15 @@ describe('canOpenDesktopBrowser', () => {
     expect(canOpenDesktopBrowser('linux', { DISPLAY: ':0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WAYLAND_DISPLAY: 'wayland-0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WSL_DISTRO_NAME: 'Ubuntu' })).toBe(true);
+  });
+});
+
+describe('claudeTerminalCommand', () => {
+  it('keeps the macOS Terminal tab open after Claude finishes', () => {
+    const command = claudeTerminalCommand('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
+
+    expect(command).toContain('claude "Set up my app."');
+    expect(command).toContain('exec "${SHELL:-/bin/zsh}" -l');
   });
 });
 

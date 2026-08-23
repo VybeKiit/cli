@@ -213,6 +213,9 @@ const defaultStartDetached = (cwd: string, bin: string, args: readonly string[])
   }
 };
 
+export const claudeTerminalCommand = (appPath: string, prompt: string): string =>
+  `cd ${JSON.stringify(appPath)} && claude ${JSON.stringify(prompt)}; exec "\${SHELL:-/bin/zsh}" -l`;
+
 /**
  * Open Claude Code in the app folder with the onboarding seed prompt.
  *
@@ -231,7 +234,7 @@ export const openClaudeWithSeed = async (
   platform: NodeJS.Platform = process.platform,
 ): Promise<boolean> => {
   if (platform === 'darwin') {
-    const shellCommand = `cd ${JSON.stringify(appPath)} && claude ${JSON.stringify(prompt)}`;
+    const shellCommand = claudeTerminalCommand(appPath, prompt);
     const osa = makeExec('osascript');
     const result = await osa([
       '-e',
