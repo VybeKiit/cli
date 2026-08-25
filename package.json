@@ -1,6 +1,6 @@
 {
   "name": "vybekiit",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "description": "Choose your services, sign in, create a VybeKiit app, and open its verified local welcome page.",
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
@@ -9,7 +9,7 @@
   },
   "type": "module",
   "bin": {
-    "vybekiit": "./dist/bin.js"
+    "vybekiit": "dist/bin.js"
   },
   "files": [
     "dist"
