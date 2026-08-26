@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -30,8 +30,18 @@ describe('runSyncAgentLayer', () => {
     const buyer = await mkdtemp(join(tmpdir(), 'vyb-buyer-'));
     const mirror = await mkdtemp(join(tmpdir(), 'vyb-mirror-'));
     await mkdir(join(mirror, 'web', '.vybekiit'), { recursive: true });
+    await mkdir(join(mirror, 'web', '.claude', 'hooks'), { recursive: true });
+    await mkdir(join(buyer, '.claude', 'hooks'), { recursive: true });
     await writeFile(join(mirror, 'web', 'AGENTS.md'), '# agent');
     await writeFile(join(mirror, 'web', 'BUILDER-VOICE.md'), '# lang');
+    await writeFile(join(mirror, 'web', '.claude', 'settings.json'), '{"hooks":"maintained"}');
+    await writeFile(
+      join(mirror, 'web', '.claude', 'hooks', 'block-visible-terminal-launch.sh'),
+      '# maintained hook',
+    );
+    await writeFile(join(buyer, '.claude', 'settings.json'), '{"hooks":"stale"}');
+    await writeFile(join(buyer, '.claude', 'hooks', 'buyer-hook.sh'), '# buyer hook');
+    await writeFile(join(buyer, '.claude', 'settings.local.json'), '{"permissions":"personal"}');
 
     const copied: Array<{ src: string; dest: string }> = [];
     const result = await runSyncAgentLayer(['web'], buyer, {
@@ -56,5 +66,17 @@ describe('runSyncAgentLayer', () => {
     expect(result.exitCode).toBe(0);
     expect(result.lines.some((l) => l.includes('Refreshing'))).toBe(true);
     expect(copied.some((c) => c.src.endsWith('AGENTS.md'))).toBe(true);
+    expect(await readFile(join(buyer, '.claude', 'settings.json'), 'utf8')).toBe(
+      '{"hooks":"maintained"}',
+    );
+    expect(
+      await readFile(join(buyer, '.claude', 'hooks', 'block-visible-terminal-launch.sh'), 'utf8'),
+    ).toBe('# maintained hook');
+    expect(await readFile(join(buyer, '.claude', 'hooks', 'buyer-hook.sh'), 'utf8')).toBe(
+      '# buyer hook',
+    );
+    expect(await readFile(join(buyer, '.claude', 'settings.local.json'), 'utf8')).toBe(
+      '{"permissions":"personal"}',
+    );
   });
 });
