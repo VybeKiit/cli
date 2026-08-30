@@ -1,6 +1,6 @@
 {
   "name": "vybekiit",
-  "version": "0.7.25",
+  "version": "0.7.26",
   "description": "Choose your services, sign in, create a VybeKiit app, and open its verified local welcome page.",
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "tsup && node scripts/bundleGlobalSkills.mjs",
+    "prepublishOnly": "node ../scripts/dev/publish/assertPnpmPublishAgent.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
