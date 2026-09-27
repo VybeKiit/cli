@@ -1,16 +1,36 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { Schema } from 'effect';
 import { ScaffoldError } from './scaffold';
 
-/** Loose package.json shape used while walking workspace:* dependencies. */
-export type PackageJsonLike = {
-  readonly name?: string;
-  readonly dependencies?: Readonly<Record<string, string>>;
-  readonly devDependencies?: Readonly<Record<string, string>>;
-  readonly peerDependencies?: Readonly<Record<string, string>>;
-  readonly optionalDependencies?: Readonly<Record<string, string>>;
-  readonly packageManager?: string;
-};
+const DependencyVersions = Schema.Record({ key: Schema.String, value: Schema.String });
+const KitPackageManifest = Schema.Struct({
+  name: Schema.optional(Schema.String),
+  version: Schema.optional(Schema.String),
+  dependencies: Schema.optional(DependencyVersions),
+  devDependencies: Schema.optional(DependencyVersions),
+  peerDependencies: Schema.optional(DependencyVersions),
+  optionalDependencies: Schema.optional(DependencyVersions),
+  packageManager: Schema.optional(Schema.String),
+  pnpm: Schema.optional(
+    Schema.Struct({
+      overrides: Schema.optional(DependencyVersions),
+      packageExtensions: Schema.optional(
+        Schema.Record({
+          key: Schema.String,
+          value: Schema.Struct({
+            dependencies: Schema.optional(DependencyVersions),
+            peerDependencies: Schema.optional(DependencyVersions),
+            optionalDependencies: Schema.optional(DependencyVersions),
+          }),
+        }),
+      ),
+      onlyBuiltDependencies: Schema.optional(Schema.Array(Schema.String)),
+    }),
+  ),
+});
+
+export type PackageJsonLike = Schema.Schema.Type<typeof KitPackageManifest>;
 
 /**
  * Tooling packages always shipped into a scaffolded kit workspace so first-party
@@ -36,7 +56,7 @@ const PATH_SEPARATOR_PATTERN = /[/\\]/;
 export const readPackageJson = async (packageJsonPath: string): Promise<PackageJsonLike | null> => {
   try {
     const raw = await readFile(packageJsonPath, 'utf8');
-    return JSON.parse(raw) as PackageJsonLike;
+    return Schema.decodeUnknownSync(Schema.parseJson(KitPackageManifest))(raw);
   } catch {
     return null;
   }

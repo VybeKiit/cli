@@ -50,7 +50,7 @@ Tip: open your app folder and say "Set up my app." to your coding tool.
 export const CLI_HELP_ALL = `vybekiit — full command list
 
 Buyer journey:
-  vybekiit setup [--yes] [--hosting=cloudflare|vercel|railway|aws|github-pages]
+  vybekiit setup [--yes] [--feedback=automatic|off] [--hosting=cloudflare|vercel|railway|aws|github-pages]
                   [--data=supabase|neon|railway|mongodb|firebase|aws|local]
                   [--google-sign-in]
   vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
@@ -88,7 +88,8 @@ Agent / kit:
   vybekiit live-work payments [--mode=demo|dogfood|buyer] [--vendor=lemon-squeezy|stripe|paypal] [--cwd=dir] [--no-pin] [--fresh]
   vybekiit lint-extension-skill <path> [--kind=buyer-goal|platform-wrapper|agent-skills-global]
   vybekiit doc-fallback <tech-id>
-  vybekiit feedback status | feedback submit <draft> [--confirm]
+  vybekiit feedback status | consent on|off [--confirm] | submit <draft> [--confirm|--automatic]
+  vybekiit guardian check --target=name=https://your-app.com/health [--target=…] [--json]
   vybekiit dedup [--intent <desc>] [--target <file>] [--scope <dir>] [--index] [--json]
   vybekiit add bridge
   vybekiit env wizard

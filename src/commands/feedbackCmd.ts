@@ -1,19 +1,23 @@
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import process from 'node:process';
-
 import { confirm, isCancel } from '@clack/prompts';
 import { fingerprintFeedbackDraft } from '@vybekiit/agent-kit';
+import { Effect, Option } from 'effect';
 import open from 'open';
-
 import {
   createFeedbackIntakeClient,
+  FeedbackHttpError,
   type FeedbackIntakeClient,
   type IntakeSessionState,
 } from '../feedback/feedbackClient';
+import { readFeedbackConsent, saveFeedbackConsent } from '../feedback/feedbackConsent';
 import { readFeedbackDraft, recordFeedbackSubmission } from '../feedback/feedbackFiles';
 import { isInteractive } from '../prompts/tty';
 
 export interface FeedbackCommandDependencies {
   readonly projectRoot: string;
+  readonly feedbackDirectory: string;
   readonly interactive: boolean;
   readonly confirm: () => Promise<boolean>;
   readonly openBrowser: (url: string) => Promise<unknown>;
@@ -26,6 +30,7 @@ export interface FeedbackCommandDependencies {
 
 const defaultDependencies = (): FeedbackCommandDependencies => ({
   projectRoot: process.cwd(),
+  feedbackDirectory: join(homedir(), '.vybekiit'),
   interactive: isInteractive(),
   confirm: async () => {
     const answer = await confirm({ message: 'Send this private feedback report to VybeKiit?' });
@@ -58,18 +63,13 @@ const waitForSession = async (
     }
     await dependencies.sleep(pollingInterval * 1000);
   }
-  return { status: 'denied', message: 'The sign-in code expired. Run /feedback again.' };
-};
-
-const showFeedbackStatus = (dependencies: FeedbackCommandDependencies): number => {
-  dependencies.writeOutput(
-    JSON.stringify({ ok: true, drafts: '.vybekiit/feedback-drafts', confirmationRequired: true }),
-  );
-  return 0;
+  return { status: 'denied', message: 'The sign-in code expired. Run /vybekiit-feedback again.' };
 };
 
 const showFeedbackUsage = (dependencies: FeedbackCommandDependencies): number => {
-  dependencies.writeError('Usage: vybekiit feedback status | feedback submit <draft> [--confirm]');
+  dependencies.writeError(
+    'Usage: vybekiit feedback status | consent on|off [--confirm] | submit <draft> [--confirm|--automatic]',
+  );
   return 1;
 };
 
@@ -80,47 +80,95 @@ export const runFeedback = async (
   const dependencies = suppliedDependencies || defaultDependencies();
   const [action, draftPath] = args;
 
-  if (action === 'status') {
-    return showFeedbackStatus(dependencies);
-  }
-
-  if (action !== 'submit' || !draftPath) {
-    return showFeedbackUsage(dependencies);
-  }
-
-  const confirmed = dependencies.interactive
-    ? await dependencies.confirm()
-    : args.includes('--confirm');
-  if (!confirmed) {
-    if (!dependencies.interactive) {
+  try {
+    const consent = await Effect.runPromise(readFeedbackConsent(dependencies.feedbackDirectory));
+    const signedIn =
+      Option.isSome(consent.session) && consent.expiresAt > dependencies.now().getTime();
+    if (action === 'status') {
+      dependencies.writeOutput(
+        JSON.stringify({
+          ok: true,
+          automatic: consent.automatic,
+          signedIn,
+          drafts: '.vybekiit/feedback-drafts',
+        }),
+      );
+      return 0;
+    }
+    if (action === 'consent' && draftPath === 'off') {
+      await Effect.runPromise(
+        saveFeedbackConsent(dependencies.feedbackDirectory, false, Option.none()),
+      );
+      dependencies.writeOutput('Automatic kit feedback is off.');
+      return 0;
+    }
+    const enablingAutomatic = action === 'consent' && draftPath === 'on';
+    if (!enablingAutomatic && (action !== 'submit' || !draftPath)) {
+      return showFeedbackUsage(dependencies);
+    }
+    const automaticReport = args.includes('--automatic');
+    if (automaticReport && !consent.automatic) {
+      dependencies.writeError('Automatic feedback is off. Your draft is still saved.');
+      return 1;
+    }
+    const authorized =
+      automaticReport ||
+      args.includes('--confirm') ||
+      (dependencies.interactive && (await dependencies.confirm()));
+    if (!authorized) {
+      dependencies.writeOutput('Feedback was not sent. Your draft is still saved.');
+      return dependencies.interactive ? 0 : 1;
+    }
+    if (automaticReport && !signedIn) {
       dependencies.writeError(
-        'Add --confirm only after the buyer has approved sending the report.',
+        'Feedback needs sign-in. Your draft is still saved. Run vybekiit feedback consent on --confirm when ready.',
       );
       return 1;
     }
-    dependencies.writeOutput('Feedback was not sent. Your draft is still saved.');
-    return 0;
-  }
+    let feedbackSession = signedIn ? Option.getOrNull(consent.session) : null;
+    if (feedbackSession === null) {
+      const deviceLogin = await dependencies.client.createDeviceLogin();
+      dependencies.writeOutput(
+        `Sign in to send feedback: ${deviceLogin.verificationUri} code ${deviceLogin.userCode}`,
+      );
+      await dependencies.openBrowser(deviceLogin.verificationUri);
+      const sessionState = await waitForSession(
+        deviceLogin.deviceCode,
+        deviceLogin.interval,
+        deviceLogin.expiresIn,
+        dependencies,
+      );
+      if (sessionState.status !== 'ready') {
+        dependencies.writeError(sessionState.message);
+        return 1;
+      }
 
-  try {
-    const draft = await readFeedbackDraft(draftPath, dependencies.projectRoot);
-    const deviceLogin = await dependencies.client.createDeviceLogin();
-    dependencies.writeOutput(
-      `Sign in to send feedback: ${deviceLogin.verificationUri} code ${deviceLogin.userCode}`,
-    );
-    await dependencies.openBrowser(deviceLogin.verificationUri);
-    const sessionState = await waitForSession(
-      deviceLogin.deviceCode,
-      deviceLogin.interval,
-      deviceLogin.expiresIn,
-      dependencies,
-    );
-    if (sessionState.status !== 'ready') {
-      dependencies.writeError(sessionState.message);
-      return 1;
+      await Effect.runPromise(
+        saveFeedbackConsent(
+          dependencies.feedbackDirectory,
+          enablingAutomatic || consent.automatic,
+          Option.some(sessionState.session),
+          dependencies.now().getTime() + (sessionState.expiresIn ?? 900) * 1000,
+        ),
+      );
+      feedbackSession = sessionState.session;
+    } else if (enablingAutomatic) {
+      await Effect.runPromise(
+        saveFeedbackConsent(
+          dependencies.feedbackDirectory,
+          true,
+          consent.session,
+          consent.expiresAt,
+        ),
+      );
     }
-
-    const receipt = await dependencies.client.submit({ session: sessionState.session, draft });
+    if (enablingAutomatic) {
+      dependencies.writeOutput('Automatic sanitized kit feedback is on.');
+      return 0;
+    }
+    if (!draftPath) return showFeedbackUsage(dependencies);
+    const draft = await readFeedbackDraft(draftPath, dependencies.projectRoot);
+    const receipt = await dependencies.client.submit({ session: feedbackSession, draft });
     await recordFeedbackSubmission(dependencies.projectRoot, {
       fingerprint: fingerprintFeedbackDraft(draft),
       reference: receipt.reference,
@@ -129,7 +177,20 @@ export const runFeedback = async (
     dependencies.writeOutput(JSON.stringify({ ok: true, reference: receipt.reference }));
     return 0;
   } catch (error) {
-    const detail = error instanceof Error ? error.message : 'The feedback service is unavailable.';
+    if (error instanceof FeedbackHttpError && error.status === 401) {
+      const consent = await Effect.runPromise(readFeedbackConsent(dependencies.feedbackDirectory));
+      await Effect.runPromise(
+        saveFeedbackConsent(dependencies.feedbackDirectory, consent.automatic, Option.none()),
+      );
+      dependencies.writeError(
+        'Feedback sign-in expired. Your draft is still saved. Run vybekiit feedback consent on --confirm when ready.',
+      );
+      return 1;
+    }
+    const detail =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'The feedback service is unavailable. Try again later.';
     dependencies.writeError(`Feedback was not sent. Your draft is still saved. ${detail}`);
     return 1;
   }

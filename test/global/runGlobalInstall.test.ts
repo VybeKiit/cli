@@ -45,7 +45,7 @@ describe('formatGlobalInstallSummary', () => {
     expect(text).toContain('vybekiit, playwright, context7');
     expect(text).toContain('1 more need an API key');
     expect(text).toContain('/vybekiit');
-    expect(text).toContain('/feedback');
+    expect(text).toContain('/vybekiit-feedback');
     expect(text).toContain('npx vybekiit setup');
     expect(text).not.toContain('vybekiit@latest');
     expect(text).not.toContain('vybekiit update');
@@ -58,11 +58,11 @@ describe('formatGlobalInstallSummary', () => {
       ...baseSummary,
       feedbackInstalled: false,
       skillsSkipped: 1,
-      skippedSkillNames: ['feedback'],
+      skippedSkillNames: ['vybekiit-feedback'],
     }).join('\n');
 
-    expect(text).toContain('kept your own same-named skills: feedback');
-    expect(text).not.toContain('/feedback');
+    expect(text).toContain('kept your own same-named skills: vybekiit-feedback');
+    expect(text).not.toContain('/vybekiit-feedback');
   });
 
   it('calls out a version bump when re-running after a newer CLI', () => {

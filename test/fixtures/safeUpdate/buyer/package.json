@@ -1,0 +1,7 @@
+{
+  "name": "safe-update-buyer",
+  "private": true,
+  "scripts": {
+    "verify": "node verify.mjs"
+  }
+}

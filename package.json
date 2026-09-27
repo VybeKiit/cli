@@ -45,6 +45,7 @@
     "@vybekiit/db": "workspace:*",
     "@vybekiit/deploy": "workspace:*",
     "@vybekiit/payments": "workspace:*",
-    "@vybekiit/report-mode": "workspace:*"
+    "@vybekiit/report-mode": "workspace:*",
+    "@effect/vitest": "catalog:"
   }
 }

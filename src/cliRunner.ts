@@ -19,6 +19,7 @@ import { runDedup } from './commands/dedup';
 import { runDocFallback } from './commands/docFallback';
 import { runDrop } from './commands/drop';
 import { runFeedback } from './commands/feedbackCmd';
+import { runGuardianCheck } from './commands/guardianCmd';
 import { runInit } from './commands/init';
 import { runLintExtensionSkill } from './commands/lintExtensionSkill';
 import { runLiveWorkData } from './commands/liveWorkDataCmd';
@@ -419,6 +420,19 @@ export const cliCommands: Record<string, CliCommand> = {
   },
   backend: handleBackendCommand,
   feedback: (invocation) => runFeedback(verbArgs(invocation)),
+  guardian: async (invocation) => {
+    if (invocation.noun !== 'check') {
+      process.stderr.write(
+        'Usage: vybekiit guardian check --target=name=https://your-app.com/health [--json]\n',
+      );
+      return 1;
+    }
+
+    const guardianCommand = await runGuardianCheck([...invocation.rest]);
+    const guardianWriter = guardianCommand.exitCode === 1 ? process.stderr : process.stdout;
+    guardianWriter.write(`${guardianCommand.printedText}\n`);
+    return guardianCommand.exitCode;
+  },
   mcp: async (invocation) => {
     if (invocation.noun === 'serve') {
       return await runMcpServer();
@@ -446,6 +460,9 @@ export const COMMAND_NAMES: readonly string[] = Object.keys(cliCommands);
  * const code = await runCli(['--help']);
  */
 export const runCli = async (argv: readonly string[]): Promise<number> => {
+  const optionBoundary = argv.indexOf('--');
+  const commandArguments = optionBoundary < 0 ? argv : argv.slice(0, optionBoundary);
+  const helpRequested = commandArguments.includes('--help') || commandArguments.includes('-h');
   const invocation = parseInvocation(argv);
 
   if (invocation === null) {
@@ -460,7 +477,7 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     return 0;
   }
 
-  if (invocation.verb === 'help' || invocation.verb === '--help' || invocation.verb === '-h') {
+  if (invocation.verb === 'help' || helpRequested) {
     process.stdout.write(`${wantsFullHelp(argv) ? CLI_HELP_ALL : CLI_HELP}\n`);
     return 0;
   }

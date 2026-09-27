@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { describe, expect, it, vi } from 'vitest';
-
+import { FeedbackHttpError } from '../feedback/feedbackClient';
 import { type FeedbackCommandDependencies, runFeedback } from './feedbackCmd';
 
 const createDraft = async (): Promise<{ readonly root: string; readonly path: string }> => {
@@ -36,6 +36,7 @@ const createDependencies = (
   confirm: () => Promise<boolean>,
 ): FeedbackCommandDependencies => ({
   projectRoot: root,
+  feedbackDirectory: join(root, '.vybekiit'),
   interactive: true,
   confirm,
   openBrowser: vi.fn(async () => undefined),
@@ -57,6 +58,68 @@ const createDependencies = (
 });
 
 describe('feedback command', () => {
+  it('explains an unavailable service even when the HTTP error has no message', async () => {
+    const draft = await createDraft();
+    const dependencies = createDependencies(draft.root, async () => true);
+    vi.mocked(dependencies.client.createDeviceLogin).mockRejectedValue(
+      new FeedbackHttpError({ status: 502 }),
+    );
+
+    expect(await runFeedback(['submit', draft.path, '--confirm'], dependencies)).toBe(1);
+    expect(dependencies.writeError).toHaveBeenCalledWith(
+      'Feedback was not sent. Your draft is still saved. The feedback service is unavailable. Try again later.',
+    );
+    await expect(stat(draft.path)).resolves.toBeDefined();
+  });
+
+  it('clears a rejected cached sign-in without opening a browser automatically', async () => {
+    const draft = await createDraft();
+    const dependencies = createDependencies(draft.root, async () => true);
+    await runFeedback(['consent', 'on', '--confirm'], dependencies);
+    vi.mocked(dependencies.client.submit).mockRejectedValue(new FeedbackHttpError({ status: 401 }));
+    expect(await runFeedback(['submit', draft.path, '--automatic'], dependencies)).toBe(1);
+    expect(dependencies.openBrowser).toHaveBeenCalledOnce();
+    await runFeedback(['status'], dependencies);
+    expect(dependencies.writeOutput).toHaveBeenLastCalledWith(
+      expect.stringContaining('"signedIn":false'),
+    );
+    await expect(stat(draft.path)).resolves.toBeDefined();
+  });
+
+  it('retains consent after expiry and requires explicit sign-in renewal', async () => {
+    const draft = await createDraft();
+    const dependencies = createDependencies(draft.root, async () => true);
+    await runFeedback(['consent', 'on', '--confirm'], dependencies);
+    const later = { ...dependencies, now: () => new Date('2026-09-01T12:00:00Z') };
+    expect(await runFeedback(['submit', draft.path, '--automatic'], later)).toBe(1);
+    expect(dependencies.client.submit).not.toHaveBeenCalled();
+    expect(dependencies.openBrowser).toHaveBeenCalledOnce();
+    expect(await runFeedback(['consent', 'on', '--confirm'], later)).toBe(0);
+    expect(dependencies.openBrowser).toHaveBeenCalledTimes(2);
+  });
+  it('does not send automatic reports without a saved opt-in', async () => {
+    const draft = await createDraft();
+    const dependencies = createDependencies(draft.root, async () => true);
+    expect(await runFeedback(['submit', draft.path, '--automatic'], dependencies)).toBe(1);
+    expect(dependencies.client.createDeviceLogin).not.toHaveBeenCalled();
+    expect(dependencies.client.submit).not.toHaveBeenCalled();
+  });
+
+  it('remembers consent, sends automatically, and stops after revocation', async () => {
+    const draft = await createDraft();
+    const dependencies = createDependencies(
+      draft.root,
+      vi.fn(async () => true),
+    );
+    expect(await runFeedback(['consent', 'on', '--confirm'], dependencies)).toBe(0);
+    expect(await runFeedback(['submit', draft.path, '--automatic'], dependencies)).toBe(0);
+    expect(dependencies.client.submit).toHaveBeenCalledOnce();
+    expect(dependencies.confirm).not.toHaveBeenCalled();
+    expect(await runFeedback(['consent', 'off'], dependencies)).toBe(0);
+    expect(await runFeedback(['submit', draft.path, '--automatic'], dependencies)).toBe(1);
+    expect(dependencies.client.submit).toHaveBeenCalledOnce();
+  });
+
   it('does not call submit when confirmation is declined', async () => {
     const draft = await createDraft();
     const dependencies = createDependencies(draft.root, async () => false);

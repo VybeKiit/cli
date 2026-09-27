@@ -1,4 +1,8 @@
+import { existsSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import process from 'node:process';
+import { confirm, isCancel } from '@clack/prompts';
 import { checkAccess } from '../doctor/gate';
 import { runDoctor } from '../doctor/run';
 import { globalInstallPaths } from '../global/globalPaths';
@@ -6,6 +10,7 @@ import { readInstallState } from '../global/installState';
 import { runGlobalInstall } from '../global/runGlobalInstall';
 import { isInteractive } from '../prompts/tty';
 import { playWelcomeBanner } from '../ui/welcomeBanner';
+import { runFeedback } from './feedbackCmd';
 import { connectSetupServices } from './setupAuthentication';
 import { formatSetupNextStep } from './setupNextStep';
 import {
@@ -47,6 +52,15 @@ const setupPreferences = async (args: readonly string[]): Promise<SetupPreferenc
 };
 
 export const runSetup = async (args: readonly string[] = []): Promise<number> => {
+  const invalidFeedbackChoice = args.some(
+    (argument) =>
+      argument.startsWith('--feedback=') &&
+      !['--feedback=automatic', '--feedback=off'].includes(argument),
+  );
+  if (invalidFeedbackChoice) {
+    process.stderr.write('Choose --feedback=automatic or --feedback=off.\n');
+    return 1;
+  }
   await playWelcomeBanner();
   writeLines(formatSetupIntroduction());
   const preferences = await setupPreferences(args);
@@ -87,6 +101,27 @@ export const runSetup = async (args: readonly string[] = []): Promise<number> =>
   if (globalInstallCode !== 0) {
     process.stderr.write('\nSetup is incomplete. No success page was opened.\n');
     return globalInstallCode;
+  }
+
+  const feedbackFlag = args.find((argument) => argument.startsWith('--feedback='));
+  const feedbackChoiceSaved = existsSync(join(homedir(), '.vybekiit', 'feedback-consent.json'));
+  const askForFeedback =
+    !feedbackChoiceSaved &&
+    isInteractive() &&
+    !args.includes('--yes') &&
+    feedbackFlag === undefined;
+  const automaticFeedback = askForFeedback
+    ? await confirm({
+        message:
+          'Let your assistant send short, private notes about kit problems to VybeKiit? No code or conversations are sent. You can turn this off anytime.',
+        initialValue: false,
+      })
+    : feedbackFlag === '--feedback=automatic';
+  if (askForFeedback || feedbackFlag !== undefined) {
+    const optedIn = !isCancel(automaticFeedback) && automaticFeedback === true;
+    const feedbackCode = await runFeedback(['consent', optedIn ? 'on' : 'off', '--confirm']);
+    if (feedbackCode !== 0)
+      process.stderr.write('Your app is ready. Automatic feedback still needs attention.\n');
   }
 
   const access = checkAccess();

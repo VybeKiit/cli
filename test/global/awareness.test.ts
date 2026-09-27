@@ -4,45 +4,8 @@ import {
   STATUSLINE_BADGE,
   STATUSLINE_BADGE_COMMAND,
   statusLineCommandHasBadge,
-  upsertMemoryBlock,
-  vybekiitMemoryBlock,
   withStatusLineBadge,
 } from '../../src/global/awareness';
-
-describe('upsertMemoryBlock', () => {
-  const block = vybekiitMemoryBlock();
-
-  it('teaches Claude to use the globally registered VybeKiit tools', () => {
-    expect(block).toContain('`vybekiit` MCP server is registered globally');
-    expect(block).toContain('search_skills');
-    expect(block).toContain('search_commands');
-    expect(block).toContain('search_ui_components');
-    expect(block).not.toContain('project-scoped');
-  });
-
-  it('inserts the block into empty content', () => {
-    expect(upsertMemoryBlock('', block)).toBe(block);
-  });
-
-  it('appends after existing user content', () => {
-    const result = upsertMemoryBlock('# My notes\n', block);
-    expect(result.startsWith('# My notes')).toBe(true);
-    expect(result).toContain('BEGIN VYBEKIIT');
-  });
-
-  it('is idempotent — replaces its own block, never duplicates', () => {
-    const once = upsertMemoryBlock('# My notes\n', block);
-    const twice = upsertMemoryBlock(once, block);
-    expect(twice).toBe(once);
-    expect(twice.match(/BEGIN VYBEKIIT/g)?.length).toBe(1);
-  });
-
-  it('preserves user content on both sides of the block', () => {
-    const result = upsertMemoryBlock(`before\n\n${block}\nafter`, block);
-    expect(result).toContain('before');
-    expect(result).toContain('after');
-  });
-});
 
 describe('statusLineCommandHasBadge', () => {
   it('detects the diamond badge token', () => {

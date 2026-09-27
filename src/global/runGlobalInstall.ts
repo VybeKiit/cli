@@ -1,13 +1,21 @@
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import process from 'node:process';
 import { confirm, isCancel } from '@clack/prompts';
+import { Effect, Schema } from 'effect';
 import { parseSetupPreferences } from '../commands/setupPreferences';
 import { isInteractive } from '../prompts/tty';
+import {
+  AgentInstallationSettings,
+  agentInstallationTargets,
+  installAgentGuidance,
+} from './agentGuidance';
 import { installAwareness } from './awareness';
 import { readCliVersion } from './cliVersion';
 import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from './entitlement';
 import { makeExec } from './exec';
 import { globalInstallPaths } from './globalPaths';
-import { isGloballyInstalled, readGlobalStatus } from './globalStatus';
+import { readGlobalStatus } from './globalStatus';
 import { installGlobalMcp, isVybekiitMcpReady, type McpInstallResult } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
 import { readInstallState, writeInstallState } from './installState';
@@ -117,15 +125,15 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   } else {
     lines.push(
       summary.feedbackInstalled
-        ? '  • Command  type /vybekiit for status or /feedback to send us a note'
+        ? '  • Command  type /vybekiit for status or /vybekiit-feedback to send us a note'
         : '  • Command  type /vybekiit in Claude Code to see status anytime',
-      '  • Claude now knows it is VybeKiit-enabled in every project',
+      '  • Installed assistants share one VybeKiit building guide',
       '',
-      'To see it: restart Claude Code (or run `claude` once) to approve the new MCP servers,',
-      'then type /vybekiit to confirm.',
+      'Start a fresh session in your coding assistant to load the new skills and guidance.',
+      'In Claude Code, approve the tools when asked and type /vybekiit to check status.',
       '',
       'Re-run anytime to repair or reapply everything:  npx vybekiit setup',
-      'The first run creates your web app and opens Claude with "Set up my app.";',
+      'The first run creates your web app. In your coding assistant, say "Set up my app.";',
       'later runs reuse that app and redo the required setup.',
       '',
     );
@@ -173,7 +181,7 @@ export const runGlobalInstall = async (
     }
     const proceed = await confirm({
       message:
-        'Set up / update VybeKiit globally in Claude Code? Refreshes skills + browser automation in every project.',
+        'Set up / update VybeKiit for your installed coding assistants? Adds skills and building guidance in every project.',
       initialValue: true,
     });
     if (isCancel(proceed) || proceed !== true) {
@@ -183,6 +191,17 @@ export const runGlobalInstall = async (
   }
 
   const paths = globalInstallPaths();
+  const agentSettings = Schema.decodeUnknownSync(AgentInstallationSettings)({
+    homeDirectory: homedir(),
+    claudeDirectory: paths.configDir,
+    codexDirectory: process.env.CODEX_HOME || join(homedir(), '.codex'),
+    executablePath: process.env.PATH || '',
+  });
+  const detectedAgents = agentInstallationTargets(agentSettings);
+  if (!detectedAgents.some((agent) => agent.detected)) {
+    process.stderr.write('Open your coding assistant once, then run npx vybekiit setup again.\n');
+    return 1;
+  }
   const previous = await readInstallState(paths.configDir);
   const version = await readCliVersion();
   // Re-run = auto-update: re-apply zero-config MCP defs so install.sh always tracks latest.
@@ -195,6 +214,22 @@ export const runGlobalInstall = async (
     forceRefresh: isRerun,
   });
   const awareness = await installAwareness(paths);
+  const agentInstallations = await Effect.runPromise(
+    installAgentGuidance(agentSettings, detectedAgents, paths.skillsDir, skills.installed, version),
+  );
+  process.stdout.write(
+    agentInstallations
+      .map(
+        (agent) =>
+          `  ${agent.agent}: ${agent.status}${agent.collisions.length > 0 ? ` (${agent.collisions.join(', ')})` : ''}\n`,
+      )
+      .join(''),
+  );
+  const usableAgent = agentInstallations.some((agent) => agent.status === 'restart-required');
+  if (!usableAgent) {
+    process.stderr.write('Your assistant instructions need attention before setup can finish.\n');
+    return 1;
+  }
 
   const postStatus = await readGlobalStatus(paths);
   const skillSample =
@@ -206,7 +241,7 @@ export const runGlobalInstall = async (
     skillsInstalled: skills.installed.length,
     skillsSkipped: skills.skipped.length,
     skippedSkillNames: skills.skipped,
-    feedbackInstalled: skills.installed.includes('feedback'),
+    feedbackInstalled: skills.installed.includes('vybekiit-feedback'),
     skillSample,
     skillsPath: skills.path,
     mcpEnabled: mcp.enabled,
@@ -219,13 +254,9 @@ export const runGlobalInstall = async (
     previousVersion: previous?.version ?? null,
   };
 
-  for (const line of formatGlobalInstallSummary(summary)) {
-    process.stdout.write(`${line}\n`);
-  }
-
   // Hard fail: never stamp install-state when Claude has nothing to load. Doctor will also
   // exit 1 until a later run lands managed skills.
-  if (!globalSetupComplete(isGloballyInstalled(postStatus), mcp)) {
+  if (!globalSetupComplete(postStatus.skillCount > 0 && usableAgent, mcp)) {
     process.stderr.write(
       'VybeKiit setup is incomplete: the managed files or an available Claude Code connection could not be prepared.\n',
     );
@@ -244,6 +275,22 @@ export const runGlobalInstall = async (
     if (sessionOne.appPath !== null) {
       firstAppPath = sessionOne.appPath;
     }
+    const firstAppReady =
+      sessionOne.appPath !== null &&
+      sessionOne.depsInstalled &&
+      sessionOne.packagesBuilt &&
+      sessionOne.projectToolsReady &&
+      sessionOne.previewReady;
+    if (!firstAppReady) {
+      process.stderr.write(
+        'Your app setup is incomplete. Run npx vybekiit setup again to continue.\n',
+      );
+      return 1;
+    }
+  }
+
+  for (const line of formatGlobalInstallSummary(summary)) {
+    process.stdout.write(`${line}\n`);
   }
 
   await writeInstallState(paths.configDir, version, {

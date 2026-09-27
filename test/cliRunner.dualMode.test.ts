@@ -1,7 +1,12 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CLI_HELP } from '../src/cliHelp';
 import { COMMAND_NAMES, cliCommands, runCli } from '../src/cliRunner';
 import * as tty from '../src/prompts/tty';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const SAFE_UPDATE_FIXTURE = join(HERE, 'fixtures', 'safeUpdate');
 
 /**
  * Dual-mode contract (ADR-0036): non-TTY never hangs on prompts, and flat verbs
@@ -106,18 +111,22 @@ describe('runCli dual-mode / argv forwarding', () => {
     expect([0, 1]).toContain(code);
   });
 
-  it('forwards flags for update-kit when they are the first token after the verb', async () => {
+  it('forwards flags for update-kit when they follow the verb', async () => {
     vi.stubEnv('VYBEKIIT_SKIP_GATE', '1');
     const stdout = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
     vi.spyOn(process.stderr, 'write').mockReturnValue(true);
 
-    // Dry plan only — --check-agent-layer is a first token that must not be dropped
-    const code = await runCli(['update-kit', '--check-agent-layer']);
+    const code = await runCli([
+      'update-kit',
+      '--json',
+      `--cwd=${join(SAFE_UPDATE_FIXTURE, 'buyer')}`,
+      `--source=${join(SAFE_UPDATE_FIXTURE, 'target-green')}`,
+    ]);
 
     expect(code).toBe(0);
     const out = stdout.mock.calls.map((call) => String(call[0])).join('');
-    expect(out).toContain('Update kit plan');
-    expect(out).toContain('Run with --apply to sync the agent layer now.');
+    expect(out).toContain('"status":"planned"');
+    expect(out).toContain('"targetVersion":"1.1.0"');
   });
 
   it('forwards directory for init as the first positional', async () => {

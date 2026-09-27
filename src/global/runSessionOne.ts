@@ -1,8 +1,10 @@
 import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { access, readdir, readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import process from 'node:process';
+import { Effect } from 'effect';
 import open from 'open';
 import { runCreateApp } from '../commands/createApp';
 import {
@@ -16,6 +18,7 @@ import { type LocatedKitWorkspace, locateKitWorkspace } from '../lib/kitWorkspac
 import { pathExists } from '../lib/pathExists';
 import { repairKitBuildRoots } from '../lib/scaffoldKitWorkspace';
 import { makeExec } from './exec';
+import { choosePreviewPort } from './previewPort';
 
 /** Default folder name under the home directory for the first web app. */
 export const DEFAULT_FIRST_APP_DIR_NAME = 'vybekiit-app';
@@ -37,6 +40,7 @@ export type SessionOneResult = {
   /** True when the generated welcome route returned a successful response. */
   readonly previewReady: boolean;
   readonly browserOpened: boolean;
+  readonly welcomeUrl?: string;
   /** Buyer-facing lines to print after the global-install banner. */
   readonly lines: readonly string[];
 };
@@ -53,7 +57,9 @@ export type SessionOneDeps = {
   ) => Promise<{ readonly code: number }>;
   readonly startDetached: (cwd: string, bin: string, args: readonly string[]) => boolean;
   readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
-  readonly waitForPreview: (url: string) => Promise<boolean>;
+  readonly waitForPreview: (url: string, previewIdentity?: string) => Promise<boolean>;
+  readonly previewPort: () => Promise<number>;
+  readonly previewIdentity: string;
   readonly openBrowser: (url: string) => Promise<boolean>;
   readonly prepareProjectTools: (appPath: string) => Promise<boolean>;
   readonly writeSetupEnvironment: (appPath: string, values: Record<string, string>) => void;
@@ -146,7 +152,7 @@ export const repairProjectBuildRoots = async (
         deps.readText(join(appPath, 'templates', 'web', 'messages', 'en.json')),
       ]);
       return (
-        baseTsconfig.includes(LEGACY_CLIENT_STATE_ALIAS) &&
+        !baseTsconfig.includes(LEGACY_CLIENT_STATE_ALIAS) &&
         englishMessages.includes(SETUP_TITLE_MESSAGE)
       );
     } catch {
@@ -214,7 +220,7 @@ const defaultStartDetached = (cwd: string, bin: string, args: readonly string[])
 };
 
 export const claudeTerminalCommand = (appPath: string, prompt: string): string =>
-  `cd ${JSON.stringify(appPath)} && claude ${JSON.stringify(prompt)}; exec "\${SHELL:-/bin/zsh}" -l`;
+  `cd '${appPath.replaceAll("'", "'\\''")}' && claude '${prompt.replaceAll("'", "'\\''")}'; exec "\${SHELL:-/bin/zsh}" -l`;
 
 /**
  * Open Claude Code in the app folder with the onboarding seed prompt.
@@ -233,6 +239,8 @@ export const openClaudeWithSeed = async (
   prompt: string,
   platform: NodeJS.Platform = process.platform,
 ): Promise<boolean> => {
+  const claudeVersion = await makeExec('claude')(['--version']);
+  if (claudeVersion.code !== 0) return false;
   if (platform === 'darwin') {
     const shellCommand = claudeTerminalCommand(appPath, prompt);
     const osa = makeExec('osascript');
@@ -291,11 +299,16 @@ const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | nu
 const wait = async (milliseconds: number): Promise<void> =>
   await new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export const waitForPreview = async (url: string): Promise<boolean> => {
+export const waitForPreview = async (url: string, previewIdentity?: string): Promise<boolean> => {
   const attemptPreview = async (remainingAttempts: number): Promise<boolean> => {
     try {
-      const response = await fetch(url, { redirect: 'follow' });
-      if (response.ok) {
+      const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(2000) });
+      const previewHtml = await response.text();
+      if (
+        response.ok &&
+        (previewIdentity === undefined ||
+          previewHtml.includes(`data-vybekiit-preview="${previewIdentity}"`))
+      ) {
         return true;
       }
     } catch {
@@ -338,13 +351,13 @@ const defaultOpenBrowser = async (url: string): Promise<boolean> => {
 };
 
 /** Local welcome URL opened only after the generated preview responds. */
-export const sessionOneWelcomeUrl = (preferences: SetupPreferences): string => {
+export const sessionOneWelcomeUrl = (preferences: SetupPreferences, port = 3000): string => {
   const query = new URLSearchParams({
     hosting: preferences.hosting,
     data: preferences.data,
     googleSignIn: String(preferences.googleSignIn),
   });
-  return `http://localhost:3000/en/setup?${query.toString()}`;
+  return `http://localhost:${port}/en/setup?${query.toString()}`;
 };
 
 const defaultDeps = (): SessionOneDeps => ({
@@ -355,6 +368,8 @@ const defaultDeps = (): SessionOneDeps => ({
   startDetached: defaultStartDetached,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
   waitForPreview,
+  previewPort: () => Effect.runPromise(choosePreviewPort),
+  previewIdentity: randomUUID(),
   openBrowser: defaultOpenBrowser,
   prepareProjectTools: async (appPath) => {
     try {
@@ -402,9 +417,9 @@ export const formatSessionOneLines = (
 
   const lines: string[] = [
     '',
-    result.created
-      ? `✅ Your first web app is ready at ${result.appPath}`
-      : `✅ Using your app at ${result.appPath}`,
+    result.previewReady
+      ? `✅ Your app preview is ready at ${result.appPath}`
+      : `Your app setup needs attention at ${result.appPath}`,
   ];
 
   if (result.depsInstalled) {
@@ -418,7 +433,7 @@ export const formatSessionOneLines = (
     lines.push('  • Kit packages still need a build — in that folder run:  pnpm build:packages');
   }
   if (result.devStarted) {
-    lines.push('  • Preview starting at http://localhost:3000');
+    lines.push(`  • Preview starting at ${result.welcomeUrl ?? 'http://localhost:3000'}`);
   } else if (result.depsInstalled && result.packagesBuilt) {
     lines.push('  • Preview not started — in that folder run:  pnpm dev');
   }
@@ -428,9 +443,11 @@ export const formatSessionOneLines = (
   if (result.browserOpened) {
     lines.push('  • Verified welcome page opened in your browser');
   } else if (result.previewReady) {
-    lines.push('  • Welcome page verified. Open http://localhost:3000/en/setup in your browser.');
+    lines.push(
+      `  • Welcome page verified. Open ${result.welcomeUrl ?? 'http://localhost:3000/en/setup'} in your browser.`,
+    );
   } else if (result.devStarted) {
-    lines.push('  • The preview still needs a moment. Open http://localhost:3000/en/setup soon.');
+    lines.push('  • The preview did not pass its readiness check. Run npx vybekiit setup again.');
   }
 
   if (!result.projectToolsReady) {
@@ -535,11 +552,9 @@ export const runSessionOne = async (
       previewReady: false,
       browserOpened: false,
     };
-    const claudeOpened = await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT);
     return {
       ...partial,
-      claudeOpened,
-      lines: formatSessionOneLines({ ...partial, claudeOpened }),
+      lines: formatSessionOneLines(partial),
     };
   }
 
@@ -549,6 +564,7 @@ export const runSessionOne = async (
     ...setupEnvironment(preferences),
     VYBE_ASSISTANT: 'claude',
     VYBE_REPORT_MODE: '1',
+    VYBE_SETUP_PREVIEW_ID: deps.previewIdentity,
   });
 
   process.stdout.write('\nInstalling dependencies (this can take a few minutes)…\n');
@@ -562,16 +578,27 @@ export const runSessionOne = async (
     packagesBuilt = build.code === 0;
   }
 
+  const previewPort = await deps.previewPort();
   let devStarted = false;
-  if (depsInstalled && packagesBuilt) {
-    devStarted = deps.startDetached(appPath, pnpmBin, [...pnpmPrefix, 'dev']);
+  if (depsInstalled && packagesBuilt && projectToolsReady) {
+    devStarted = deps.startDetached(appPath, pnpmBin, [
+      ...pnpmPrefix,
+      'dev',
+      '--port',
+      String(previewPort),
+    ]);
   }
 
-  const claudeOpened = await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT);
-  const welcomeUrl = sessionOneWelcomeUrl(preferences);
+  const welcomeUrl = sessionOneWelcomeUrl(preferences, previewPort);
   const previewReady =
-    devStarted && projectToolsReady ? await deps.waitForPreview(welcomeUrl) : false;
-  const browserOpened = previewReady ? await deps.openBrowser(welcomeUrl) : false;
+    devStarted && projectToolsReady
+      ? await deps.waitForPreview(welcomeUrl, deps.previewIdentity)
+      : false;
+  const desktopHandoffReady = previewReady && canOpenDesktopBrowser(deps.platform, deps.env);
+  const browserOpened = desktopHandoffReady ? await deps.openBrowser(welcomeUrl) : false;
+  const claudeOpened = desktopHandoffReady
+    ? await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT)
+    : false;
 
   const outcome: Omit<SessionOneResult, 'lines'> = {
     appPath,
@@ -583,6 +610,7 @@ export const runSessionOne = async (
     projectToolsReady,
     previewReady,
     browserOpened,
+    welcomeUrl,
   };
   return { ...outcome, lines: formatSessionOneLines(outcome) };
 };

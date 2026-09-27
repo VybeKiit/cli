@@ -2,13 +2,6 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import type { GlobalPaths } from './globalPaths';
 
-// Markers delimit the block we own inside the user's global CLAUDE.md. Everything outside
-// them is the user's and is never touched; everything inside is regenerated on each run.
-const BEGIN_MARKER = '<!-- BEGIN VYBEKIIT (managed by `vybekiit setup`) -->';
-const END_MARKER = '<!-- END VYBEKIIT -->';
-// Hoisted (biome useTopLevelRegex): strips a single leading newline left after the block.
-const LEADING_NEWLINE = /^\n/;
-
 /** Body of the global `/vybekiit` slash command (~/.claude/commands/vybekiit.md). */
 const VYBEKIIT_COMMAND = `---
 description: Show VybeKiit status and what you can do with it right now
@@ -28,60 +21,9 @@ Do this now, briefly:
 Keep it short and friendly. Do not dump the whole skill list.
 `;
 
-/**
- * The managed CLAUDE.md block. Injected into the user's global memory so Claude is aware
- * of VybeKiit in every session and tells the user it is active.
- *
- * @returns The block text, markers included.
- * @example
- * const block = vybekiitMemoryBlock();
- */
-export const vybekiitMemoryBlock = (): string =>
-  [
-    BEGIN_MARKER,
-    '## VybeKiit is active on this machine',
-    '',
-    'VybeKiit is installed globally: its skills live in `~/.claude/skills`, and the `vybekiit` MCP server is registered globally alongside `playwright` and `context7`.',
-    'The VybeKiit server provides skills, commands, browser automations, and UI catalog tools in every project. Key-gated',
-    'servers like `sentry`, `github`, and `stripe` register once their API key is set (run',
-    '`vybekiit env wizard`).',
-    '',
-    'At the start of a session, use `search_skills` for the user goal and `get_skill` for the chosen',
-    'workflow. Use `search_commands` before proposing a VybeKiit command. For interface work, use',
-    '`search_ui_components` or `suggest_ui_blend` before creating UI. For browser setup, search',
-    'automations before running one. Briefly tell the user VybeKiit is available. The user can type',
-    '`/vybekiit` any time to see status.',
-    END_MARKER,
-    '',
-  ].join('\n');
-
-/**
- * Upsert the managed block into existing global-memory content.
- *
- * @param existing - Current CLAUDE.md content ('' when the file is absent).
- * @param block - The block to insert or replace (from {@link vybekiitMemoryBlock}).
- * @returns The updated content, or the original when already current.
- * @example
- * const next = upsertMemoryBlock(previous, vybekiitMemoryBlock());
- */
-export const upsertMemoryBlock = (existing: string, block: string): string => {
-  const begin = existing.indexOf(BEGIN_MARKER);
-  const end = existing.indexOf(END_MARKER);
-  if (begin !== -1 && end !== -1 && end > begin) {
-    const before = existing.slice(0, begin);
-    const after = existing.slice(end + END_MARKER.length).replace(LEADING_NEWLINE, '');
-    return `${before}${block}${after}`;
-  }
-  if (existing.trim() === '') {
-    return block;
-  }
-  return `${existing.trimEnd()}\n\n${block}`;
-};
-
 /** What {@link installAwareness} changed. */
 export type AwarenessResult = {
   readonly commandWritten: boolean;
-  readonly memoryUpdated: boolean;
   readonly statusLineSet: boolean;
 };
 
@@ -190,7 +132,7 @@ export const withStatusLineBadge = (raw: string): string | null => {
 };
 
 /**
- * Install every awareness signal: the `/vybekiit` command, the CLAUDE.md block, and the
+ * Install every awareness signal: the `/vybekiit` command and the
  * status-line badge. Idempotent — safe to run on every setup.
  *
  * @param paths - Resolved global paths.
@@ -204,18 +146,11 @@ export const installAwareness = async (paths: GlobalPaths): Promise<AwarenessRes
     await readOrEmpty(commandPath),
   );
 
-  const previousMemory = await readOrEmpty(paths.memoryFile);
-  const memoryUpdated = await writeIfChanged(
-    paths.memoryFile,
-    upsertMemoryBlock(previousMemory, vybekiitMemoryBlock()),
-    previousMemory,
-  );
-
   const previousSettings = await readOrEmpty(paths.settingsFile);
   const nextSettings = withStatusLineBadge(previousSettings);
   const statusLineSet =
     nextSettings !== null &&
     (await writeIfChanged(paths.settingsFile, nextSettings, previousSettings));
 
-  return { commandWritten, memoryUpdated, statusLineSet };
+  return { commandWritten, statusLineSet };
 };

@@ -8,13 +8,13 @@ import { installGlobalSkills } from '../../src/global/installGlobalSkills';
 /** Build a throwaway bundled-skills source dir with required skills + a manifest. */
 const makeSource = async (): Promise<string> => {
   const source = await mkdtemp(join(tmpdir(), 'vk-skills-src-'));
-  for (const name of ['feedback', 'onboarding', 'go-live']) {
+  for (const name of ['vybekiit-feedback', 'onboarding', 'go-live']) {
     await mkdir(join(source, name), { recursive: true });
     await writeFile(join(source, name, 'SKILL.md'), `# ${name}`, 'utf8');
   }
   await writeFile(
     join(source, 'manifest.json'),
-    JSON.stringify({ skills: ['feedback', 'onboarding', 'go-live'], count: 3 }),
+    JSON.stringify({ skills: ['vybekiit-feedback', 'onboarding', 'go-live'], count: 3 }),
     'utf8',
   );
   return source;
@@ -26,7 +26,7 @@ describe('installGlobalSkills', () => {
   it('copies the bundled skills into the skills dir', async () => {
     const paths = globalInstallPaths(await makeConfig());
     const result = await installGlobalSkills(paths, await makeSource());
-    expect(result.installed).toEqual(['feedback', 'onboarding', 'go-live']);
+    expect(result.installed).toEqual(['vybekiit-feedback', 'onboarding', 'go-live']);
     expect(await readFile(join(paths.skillsDir, 'onboarding', 'SKILL.md'), 'utf8')).toBe(
       '# onboarding',
     );
@@ -47,7 +47,7 @@ describe('installGlobalSkills', () => {
     const paths = globalInstallPaths(await makeConfig());
     await installGlobalSkills(paths, source);
     const second = await installGlobalSkills(paths, source);
-    expect(second.installed).toEqual(['feedback', 'onboarding', 'go-live']);
+    expect(second.installed).toEqual(['vybekiit-feedback', 'onboarding', 'go-live']);
     expect(second.skipped).toEqual([]);
   });
 
@@ -61,6 +61,6 @@ describe('installGlobalSkills', () => {
 
     await expect(
       installGlobalSkills(globalInstallPaths(await makeConfig()), source),
-    ).rejects.toThrow('feedback is missing');
+    ).rejects.toThrow('vybekiit-feedback is missing');
   });
 });

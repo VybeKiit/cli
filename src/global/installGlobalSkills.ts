@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import type { GlobalPaths } from './globalPaths';
 import { MANAGED_SKILL_MARKER } from './managedSkills';
 
-const REQUIRED_MANAGED_SKILLS = ['feedback'];
+const REQUIRED_MANAGED_SKILLS = ['vybekiit-feedback'];
 
 /** Outcome of a global skills install. */
 export type SkillsInstallResult = {

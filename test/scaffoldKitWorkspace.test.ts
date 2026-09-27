@@ -100,7 +100,21 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
     name: 'vybekiit',
     private: true,
     packageManager: 'pnpm@10.33.2',
-    devDependencies: { '@types/node': 'catalog:' },
+    devDependencies: {
+      '@types/node': 'catalog:',
+      '@types/react': 'catalog:',
+      '@types/react-dom': 'catalog:',
+      turbo: 'catalog:',
+    },
+    pnpm: {
+      overrides: {
+        '@types/react': '$@types/react',
+        '@types/react-dom': '$@types/react-dom',
+      },
+      packageExtensions: {
+        'next-themes@0.4.6': { peerDependencies: { '@types/react': '*' } },
+      },
+    },
   });
 };
 
@@ -118,6 +132,11 @@ describe('scaffoldKitWorkspace happy path', () => {
     });
 
     expect(result.dest).toBe(emptyDest);
+    await expect(readFile(join(emptyDest, 'AGENTS.md'), 'utf8')).resolves.toContain(
+      'templates/web/AGENTS.md',
+    );
+    await expect(readFile(join(emptyDest, 'CLAUDE.md'), 'utf8')).resolves.toBe('@AGENTS.md\n');
+    await expect(readFile(join(emptyDest, 'GEMINI.md'), 'utf8')).resolves.toBe('@AGENTS.md\n');
 
     const rootPkg = JSON.parse(await readFile(join(emptyDest, 'package.json'), 'utf8')) as {
       readonly devDependencies?: Record<string, string>;
@@ -126,8 +145,32 @@ describe('scaffoldKitWorkspace happy path', () => {
     };
     expect(rootPkg.private).toBe(true);
     expect(rootPkg.devDependencies?.['@types/node']).toBe('catalog:');
+    expect(rootPkg.devDependencies).toEqual({
+      '@types/node': 'catalog:',
+      '@types/react': 'catalog:',
+      '@types/react-dom': 'catalog:',
+    });
+    expect(rootPkg).toMatchObject({
+      pnpm: {
+        overrides: {
+          '@types/react': '$@types/react',
+          '@types/react-dom': '$@types/react-dom',
+        },
+        packageExtensions: {
+          'next-themes@0.4.6': { peerDependencies: { '@types/react': '*' } },
+        },
+      },
+    });
     expect(rootPkg.scripts?.dev).toBe('pnpm --dir templates/web dev');
+    expect(rootPkg.scripts?.verify).toBe('pnpm --dir templates/web verify');
     expect(rootPkg.scripts?.['build:packages']).toContain('packages/**');
+    expect(rootPkg.scripts?.['build:packages']).toContain('--workspace-concurrency=1');
+    expect(rootPkg.scripts?.['build:packages']).toContain(
+      '--config.node-options=--max-old-space-size=4096',
+    );
+    await expect(readFile(join(emptyDest, '.vybekiit-kit.json'), 'utf8')).resolves.toContain(
+      '"surface": "web"',
+    );
 
     const workspaceYaml = await readFile(join(emptyDest, 'pnpm-workspace.yaml'), 'utf8');
     expect(workspaceYaml).toContain('packages/*');

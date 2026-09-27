@@ -20,7 +20,7 @@ const OUT_DIR = join(CLI_ROOT, 'dist', 'global-skills');
 // Surface priority: the first surface that defines a skill name wins. `web` is the
 // richest surface, so it is canonical; the rest only contribute skills web lacks.
 const SURFACE_PRIORITY = ['web', 'mobile', 'backend', 'extension', 'spa'];
-const REQUIRED_SKILLS = ['feedback'];
+const REQUIRED_SKILLS = ['vybekiit-feedback'];
 const POSTHOG_CREDENTIAL_PATTERN = /\bph[cxsar]_[A-Za-z0-9_-]{30,}\b/;
 
 /**

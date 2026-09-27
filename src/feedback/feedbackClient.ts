@@ -1,5 +1,9 @@
 import { type FeedbackDraft, redactFeedbackDraft } from '@vybekiit/agent-kit';
-import { Schema } from 'effect';
+import { Data, Schema } from 'effect';
+
+export class FeedbackHttpError extends Data.TaggedError('FeedbackHttpError')<{
+  readonly status: number;
+}> {}
 
 const DeviceLoginSchema = Schema.Struct({
   deviceCode: Schema.String,
@@ -14,7 +18,11 @@ const IntakeSessionStateSchema = Schema.Union(
     status: Schema.Literal('pending'),
     retryAfter: Schema.optional(Schema.Number),
   }),
-  Schema.Struct({ status: Schema.Literal('ready'), session: Schema.String }),
+  Schema.Struct({
+    status: Schema.Literal('ready'),
+    session: Schema.String,
+    expiresIn: Schema.optional(Schema.Positive),
+  }),
   Schema.Struct({ status: Schema.Literal('denied'), message: Schema.String }),
 );
 
@@ -51,7 +59,7 @@ const feedbackIntakeBaseUrl = (configuredUrl?: string): string => {
 
 const readJson = async <A>(response: Response, schema: Schema.Schema<A>): Promise<A> => {
   if (!response.ok) {
-    throw new Error(`Feedback intake returned ${response.status}.`);
+    throw new FeedbackHttpError({ status: response.status });
   }
   return Schema.decodeUnknownSync(schema)(await response.json());
 };

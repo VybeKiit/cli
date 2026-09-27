@@ -1,4 +1,4 @@
-import { access, cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { access, cp, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
 import { shipFirstPartyMcpConfigs } from './firstPartyMcp';
@@ -9,6 +9,7 @@ import {
   packageRelFromPackagesRoot,
   readPackageJson,
 } from './kitPackageGraph';
+import { writeKitWorkspaceManifest } from './kitUpdateManifest';
 import { pathExists } from './pathExists';
 import { ScaffoldError, shouldCopyScaffoldPath, type TemplateName } from './scaffold';
 
@@ -104,18 +105,33 @@ const kitWorkspacePackageJson = (
       ? kitRootPkg.packageManager
       : 'pnpm@10.33.2';
 
+  const rootDependencyNames = new Set([
+    '@types/node',
+    ...Object.values(kitRootPkg?.pnpm?.overrides ?? {})
+      .filter((version) => version.startsWith('$'))
+      .map((reference) => reference.slice(1)),
+  ]);
+  const buyerDevDependencies = Object.fromEntries(
+    Object.entries({ ...kitRootPkg?.dependencies, ...kitRootPkg?.devDependencies }).filter(
+      ([dependencyName]) => rootDependencyNames.has(dependencyName),
+    ),
+  );
+
   return `${JSON.stringify(
     {
       name: 'my-vybekiit-kit',
       private: true,
       packageManager,
-      ...(kitRootPkg?.devDependencies?.['@types/node'] === undefined
+      ...(Object.keys(buyerDevDependencies).length === 0
         ? {}
-        : { devDependencies: { '@types/node': kitRootPkg.devDependencies['@types/node'] } }),
+        : { devDependencies: buyerDevDependencies }),
+      ...(kitRootPkg?.pnpm === undefined ? {} : { pnpm: kitRootPkg.pnpm }),
       scripts: {
         // Run the surface from the kit root so agents don't have to discover templates/*.
         dev: `pnpm --dir templates/${template} dev`,
-        'build:packages': 'pnpm -r --filter "./packages/**" run build',
+        'build:packages':
+          'pnpm --config.node-options=--max-old-space-size=4096 -r --workspace-concurrency=1 --filter "./packages/**" run build',
+        verify: `pnpm --dir templates/${template} verify`,
       },
     },
     null,
@@ -307,9 +323,32 @@ export const scaffoldKitWorkspace = async (
 
   // Cursor + Claude discover skills via per-agent paths on the OWNED surface.
   await ensureAgentSkillSymlinks(surfaceDest);
+  await writeFile(
+    join(options.dest, 'AGENTS.md'),
+    `# Your VybeKiit app\n\nBefore planning or changing this app, read templates/${options.template}/AGENTS.md and its .vybekiit/agent/session-bootstrap.md. Follow the matching skill in its goal index. Paths in those instructions are relative to templates/${options.template}. Customize that app; reuse the maintained packages in packages/.\n`,
+  );
+  await Promise.all(
+    ['CLAUDE.md', 'GEMINI.md'].map((instructionFile) =>
+      writeFile(join(options.dest, instructionFile), '@AGENTS.md\n'),
+    ),
+  );
+  if (await pathExists(join(surfaceDest, '.agents', 'skills'))) {
+    await mkdir(join(options.dest, '.agents'), { recursive: true });
+    await symlink(
+      `../templates/${options.template}/.agents/skills`,
+      join(options.dest, '.agents', 'skills'),
+      'junction',
+    );
+    await ensureAgentSkillSymlinks(options.dest);
+  }
 
   // First-party MCPs always ship: packages (via KIT_ALWAYS_SHIP) + project configs.
   await shipFirstPartyMcpConfigs({ dest: options.dest, template: options.template });
+  await writeKitWorkspaceManifest({
+    projectRoot: options.dest,
+    kitVersion: kitRootPkg?.version ?? 'unknown',
+    surface: options.template,
+  });
 
   return { dest: options.dest };
 };
