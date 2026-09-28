@@ -196,6 +196,7 @@ export const runGlobalInstall = async (
     claudeDirectory: paths.configDir,
     codexDirectory: process.env.CODEX_HOME || join(homedir(), '.codex'),
     executablePath: process.env.PATH || '',
+    plainLanguageGuide: paths.bundledLanguageGuide,
   });
   const detectedAgents = agentInstallationTargets(agentSettings);
   if (!detectedAgents.some((agent) => agent.detected)) {

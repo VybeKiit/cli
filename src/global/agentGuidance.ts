@@ -9,6 +9,8 @@ export const AgentInstallationSettings = Schema.Struct({
   claudeDirectory: Schema.NonEmptyString,
   codexDirectory: Schema.NonEmptyString,
   executablePath: Schema.String,
+  /** The plain-language guide bundled with the CLI (the web template's language.md). */
+  plainLanguageGuide: Schema.NonEmptyString,
 });
 
 export class AgentInstallationError extends Data.TaggedError('AgentInstallationError')<{
@@ -115,12 +117,22 @@ export const installAgentGuidance = (
         }),
       ),
     );
+    const plainLanguageGuide = yield* Effect.tryPromise({
+      try: () => readFile(settings.plainLanguageGuide, 'utf8'),
+      catch: (cause) =>
+        new AgentInstallationError({
+          message: 'The plain-language guide is missing. No instructions were changed.',
+          cause,
+        }),
+    });
     const guidanceDirectory = join(settings.homeDirectory, '.vybekiit');
     const guidancePath = join(guidanceDirectory, 'agent-guidance.md');
+    const languagePath = join(guidanceDirectory, 'language.md');
     yield* Effect.tryPromise({
       try: async () => {
         await mkdir(guidanceDirectory, { recursive: true });
         await writeFile(guidancePath, BUYER_GUIDANCE, 'utf8');
+        await writeFile(languagePath, plainLanguageGuide, 'utf8');
       },
       catch: (cause) =>
         new AgentInstallationError({ message: 'Could not install the building guidance.', cause }),
@@ -146,7 +158,7 @@ export const installAgentGuidance = (
                 agent.agent === 'claude'
                   ? '@~/.vybekiit/agent-guidance.md'
                   : `For app-building tasks, read ${JSON.stringify(guidancePath)} before choosing an approach.`;
-              const instruction = `${guidancePointer}\nUse its matching VybeKiit skills and reuse the kit's UI, schemas, server and client code.\nSkills: ${JSON.stringify(agent.skills)}. Installed instructions require a fresh agent session.`;
+              const instruction = `${guidancePointer}\nUse its matching VybeKiit skills and reuse the kit's UI, schemas, server and client code.\nSpeak to the vibe coder in plain words: translate every technical term with the project's language.md, or ${JSON.stringify(languagePath)} when the project has none.\nSkills: ${JSON.stringify(agent.skills)}. Installed instructions require a fresh agent session.`;
               const nextInstruction = updateAgentInstruction(previousInstruction, instruction);
               await mkdir(dirname(instructionPath), { recursive: true });
               if (previousInstruction !== nextInstruction) {

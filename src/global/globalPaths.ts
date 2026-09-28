@@ -23,6 +23,8 @@ export type GlobalPaths = {
   readonly settingsFile: string;
   /** The skills payload bundled into the published CLI (dist/global-skills). */
   readonly bundledSkillsDir: string;
+  /** The plain-language guide bundled into the published CLI (dist/global-guidance/language.md). */
+  readonly bundledLanguageGuide: string;
 };
 
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -59,4 +61,5 @@ export const globalInstallPaths = (configDir: string = claudeConfigDir()): Globa
   // At runtime this module is inlined into dist/bin.js, so MODULE_DIR is <install>/dist
   // and the payload sits beside it at dist/global-skills.
   bundledSkillsDir: join(MODULE_DIR, 'global-skills'),
+  bundledLanguageGuide: join(MODULE_DIR, 'global-guidance', 'language.md'),
 });

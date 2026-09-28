@@ -6,7 +6,8 @@
 // The npm package ships only `dist/` (files: ["dist"]), and the @vybekiit/* template
 // packages are private, so the skills have to be materialised into dist at build time.
 // We take the UNION of every surface's skills (deduped by skill name — web wins ties),
-// giving the buyer every VybeKiit skill in every project.
+// giving the buyer every VybeKiit skill in every project. The web template's language.md ships
+// beside them so setup can install the plain-language guide the skills point to.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import process from 'node:process';
@@ -16,6 +17,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const CLI_ROOT = join(HERE, '..');
 const REPO_ROOT = join(CLI_ROOT, '..');
 const OUT_DIR = join(CLI_ROOT, 'dist', 'global-skills');
+const LANGUAGE_GUIDE_SOURCE = join(REPO_ROOT, 'templates', 'web', 'language.md');
+const LANGUAGE_GUIDE_OUT = join(CLI_ROOT, 'dist', 'global-guidance', 'language.md');
 
 // Surface priority: the first surface that defines a skill name wins. `web` is the
 // richest surface, so it is canonical; the rest only contribute skills web lacks.
@@ -93,8 +96,11 @@ const main = async () => {
     'utf8',
   );
 
+  await mkdir(dirname(LANGUAGE_GUIDE_OUT), { recursive: true });
+  await cp(LANGUAGE_GUIDE_SOURCE, LANGUAGE_GUIDE_OUT);
+
   process.stdout.write(
-    `global-skills: bundled ${manifest.length} skills into dist/global-skills\n`,
+    `global-skills: bundled ${manifest.length} skills into dist/global-skills and the plain-language guide into dist/global-guidance\n`,
   );
 };
 
