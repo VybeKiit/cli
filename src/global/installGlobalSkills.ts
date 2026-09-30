@@ -76,6 +76,20 @@ export const installGlobalSkills = async (
   }
   await mkdir(paths.skillsDir, { recursive: true });
 
+  const bundledReferences = join(sourceDir, 'vybekiitReferences');
+  const installedReferences = join(paths.skillsDir, 'vybekiitReferences');
+  if (await pathExists(bundledReferences)) {
+    const referencesExist = await pathExists(installedReferences);
+    const referencesManaged = await pathExists(join(installedReferences, MANAGED_SKILL_MARKER));
+    if (referencesExist && !referencesManaged) {
+      throw new Error(
+        'The skill reference folder already belongs to you. Your files were preserved.',
+      );
+    }
+    await cp(bundledReferences, installedReferences, { recursive: true });
+    await writeFile(join(installedReferences, MANAGED_SKILL_MARKER), '', 'utf8');
+  }
+
   const installed: string[] = [];
   const skipped: string[] = [];
 

@@ -1,9 +1,11 @@
-import { resolve } from 'node:path';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
 import {
   ALL_PRESETS,
   applyPreset,
   applyPresets,
+  decodeAppExtension,
   expectedPresetsFromEnv,
   getPreset,
   postgresProviderFromEnv,
@@ -215,6 +217,32 @@ const presetProviderForApply = (
   return 'supabase';
 };
 
+const presetIdsFromFlags = (tokens: readonly string[]): string[] =>
+  tokens.filter(
+    (token, position) =>
+      !(
+        token.startsWith('--') ||
+        ['--provider', '--cwd', '--manifest'].includes(tokens[position - 1] ?? '')
+      ),
+  );
+
+const readPresetExtension = (path: string, cwd: string | undefined) =>
+  Effect.tryPromise({
+    try: () => readFile(resolve(cwd ?? process.cwd(), path), 'utf8'),
+    catch: () => ({
+      code: 'extension_read_failed',
+      message: 'Could not read the app extension manifest.',
+    }),
+  }).pipe(
+    Effect.flatMap((document) =>
+      Effect.try({
+        try: () => JSON.parse(document),
+        catch: () => ({ code: 'invalid_json', message: 'App extension must be valid JSON.' }),
+      }),
+    ),
+    Effect.flatMap(decodeAppExtension),
+  );
+
 /**
  * Apply one database preset.
  *
@@ -226,7 +254,7 @@ export const runApplyPreset = async (
 ): Promise<{ readonly json: string; readonly exitCode: number }> => {
   // Allow `apply-preset --cwd=./app orders` or `apply-preset orders --cwd=./app`.
   const flags = parseFlags(args);
-  const presetId = args.find((arg) => !arg.startsWith('--') && arg !== flags.cwd);
+  const presetId = presetIdsFromFlags(args)[0];
 
   if (presetId === undefined || presetId === '') {
     return {
@@ -235,7 +263,14 @@ export const runApplyPreset = async (
     };
   }
 
-  const manifest = getPreset(presetId);
+  const extensionPath = readFlagValue(args, 'manifest');
+  const extension = extensionPath
+    ? await runPresetEffect(readPresetExtension(extensionPath, flags.cwd))
+    : undefined;
+  if (extension && !extension.ok) {
+    return { json: JSON.stringify(extension), exitCode: 1 };
+  }
+  const manifest = extension?.ok ? extension.value : getPreset(presetId);
   if (!manifest) {
     return {
       json: JSON.stringify({ ok: false, error: `Unknown preset "${presetId}".` }),
@@ -285,12 +320,59 @@ export const runApplyPreset = async (
   // Dry-run may run offline with no URL; live paths already rejected missingUrl above.
   const connectionUrl = databaseUrl === undefined ? '' : databaseUrl;
 
+  if (extensionPath && !isNosqlProvider(provider)) {
+    const migrationFile = join(
+      dirname(resolve(flags.cwd ?? process.cwd(), extensionPath)),
+      'migrations',
+      `${manifest.id}.${manifest.version}.${provider}.sql`,
+    );
+    const persisted = await runPresetEffect(
+      Effect.tryPromise({
+        try: async () => {
+          const migration = renderPreset(manifest, provider).sql;
+          if (!migration) {
+            throw new Error('No SQL migration was generated.');
+          }
+          const existing = await readFile(migrationFile, 'utf8').catch((failure: unknown) => {
+            if (failure instanceof Error && 'code' in failure && failure.code === 'ENOENT') {
+              return undefined;
+            }
+            throw failure;
+          });
+          if (existing === migration) {
+            return;
+          }
+          if (existing !== undefined) {
+            throw new Error('Migration checksum conflict');
+          }
+          await mkdir(dirname(migrationFile), { recursive: true });
+          await writeFile(migrationFile, migration, { flag: 'wx' });
+        },
+        catch: () => ({
+          code: 'migration_artifact_conflict',
+          message: `Could not create ${migrationFile}. Preserve existing migration files and use a new version for changes.`,
+        }),
+      }),
+    );
+    if (!persisted.ok) {
+      return { json: JSON.stringify(persisted), exitCode: 1 };
+    }
+  }
+
+  const prerequisites = await runPresetEffect(
+    applyPresets(manifest.dependencies, provider, connectionUrl, dryRun),
+  );
+  if (!prerequisites.ok) {
+    return { json: JSON.stringify(prerequisites), exitCode: 1 };
+  }
   const result = await runPresetEffect(
     applyPreset({
       presetId,
       provider,
       databaseUrl: connectionUrl,
       dryRun,
+      manifest,
+      upgrade: hasBoolFlag(args, 'upgrade'),
     }),
   );
 
@@ -335,30 +417,39 @@ export const runVerifyPresets = async (
 
   const presetIds = flags.fix
     ? expectedPresetsFromEnv(env).map((preset) => preset.id)
-    : args.filter((arg) => !arg.startsWith('--') && arg !== flags.cwd);
+    : presetIdsFromFlags(args);
 
   const ids =
     presetIds.length > 0 ? presetIds : expectedPresetsFromEnv(env).map((preset) => preset.id);
 
-  if (flags.fix && ids.length > 0) {
-    const provider = postgresProviderForVerify(flags.provider, env);
-    if (provider === undefined) {
-      return {
-        json: JSON.stringify({
-          ok: false,
-          error: `Unsupported preset provider: ${flags.provider}`,
-        }),
-        exitCode: 1,
-      };
-    }
+  const provider = postgresProviderForVerify(flags.provider, env);
+  if (provider === undefined) {
+    return {
+      json: JSON.stringify({
+        ok: false,
+        error: `Unsupported preset provider: ${flags.provider}`,
+      }),
+      exitCode: 1,
+    };
+  }
 
+  if (flags.fix && ids.length > 0) {
     const applied = await runPresetEffect(applyPresets(ids, provider, databaseUrl));
     if (!applied.ok) {
       return { json: JSON.stringify(applied, null, 2), exitCode: 1 };
     }
   }
 
-  const verification = await runPresetEffect(verifyPresets(ids, databaseUrl));
+  const extensionPath = readFlagValue(args, 'manifest');
+  const extension = extensionPath
+    ? await runPresetEffect(readPresetExtension(extensionPath, flags.cwd))
+    : undefined;
+  if (extension && !extension.ok) {
+    return { json: JSON.stringify(extension), exitCode: 1 };
+  }
+  const verification = await runPresetEffect(
+    verifyPresets(ids, databaseUrl, provider, extension?.ok ? [extension.value] : []),
+  );
   return {
     json: JSON.stringify(verification.ok ? { ...verification.value } : verification, null, 2),
     exitCode: verification.ok && verification.value.ok ? 0 : 1,
@@ -373,6 +464,10 @@ export const runVerifyPresets = async (
 export const runListPresets = (): { readonly json: string; readonly exitCode: number } => {
   const presets = ALL_PRESETS.map((preset) => ({
     id: preset.id,
+    version: preset.version,
+    dependencies: preset.dependencies,
+    requirements: preset.requirements,
+    tables: preset.entities.map((table) => ({ name: table.name, access: table.access })),
     description: preset.description,
     skills: preset.skills,
     packages: preset.packages,

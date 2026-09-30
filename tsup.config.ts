@@ -24,6 +24,7 @@ export default defineConfig({
   external: [
     /^firebase-admin(\/|$)/,
     'mongodb',
+    'pg',
     /^@aws-sdk\//,
     '@neondatabase/serverless',
     '@supabase/supabase-js',

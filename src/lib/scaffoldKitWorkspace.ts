@@ -1,5 +1,6 @@
 import { access, cp, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { renderAgentSessionBootstrap } from '@vybekiit/agent-kit';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
 import { shipFirstPartyMcpConfigs } from './firstPartyMcp';
 import {
@@ -147,6 +148,15 @@ const kitWorkspacePackageJson = (
  * @returns Promise that resolves after available roots are copied.
  */
 export const repairKitBuildRoots = async (kitRoot: string, dest: string): Promise<void> => {
+  await Promise.all(
+    ['biome.json', '.gitignore'].map(async (filename) => {
+      const kitFile = join(kitRoot, filename);
+      const buyerFile = join(dest, filename);
+      if ((await pathExists(kitFile)) && !(await pathExists(buyerFile))) {
+        await cp(kitFile, buyerFile);
+      }
+    }),
+  );
   for (const rel of KIT_BUILD_ROOT_FILES) {
     const src = join(kitRoot, rel);
     if (await pathExists(src)) {
@@ -246,6 +256,7 @@ const copyPackageIntoKit = async (
   await mkdir(join(packageDest, '..'), { recursive: true });
   await cp(packageDir, packageDest, {
     recursive: true,
+    verbatimSymlinks: true,
     filter: (src) => shouldCopyScaffoldPath(src),
   });
 };
@@ -294,6 +305,7 @@ export const scaffoldKitWorkspace = async (
   const surfaceDest = join(options.dest, 'templates', options.template);
   await cp(surfaceSource, surfaceDest, {
     recursive: true,
+    verbatimSymlinks: true,
     filter: (src) => shouldCopyScaffoldPath(src),
   });
 
@@ -325,7 +337,7 @@ export const scaffoldKitWorkspace = async (
   await ensureAgentSkillSymlinks(surfaceDest);
   await writeFile(
     join(options.dest, 'AGENTS.md'),
-    `# Your VybeKiit app\n\nBefore planning or changing this app, read templates/${options.template}/AGENTS.md and its .vybekiit/agent/session-bootstrap.md. Follow the matching skill in its goal index. Paths in those instructions are relative to templates/${options.template}. Customize that app; reuse the maintained packages in packages/.\n`,
+    `# Your VybeKiit app\n\nBefore planning or changing this app, read templates/${options.template}/AGENTS.md and its .vybekiit/agent/session-bootstrap.md. Follow the matching skill in its goal index. Paths in those instructions are relative to templates/${options.template}. Customize that app; reuse the maintained packages in packages/.\n\n${renderAgentSessionBootstrap()}\n`,
   );
   await Promise.all(
     ['CLAUDE.md', 'GEMINI.md'].map((instructionFile) =>

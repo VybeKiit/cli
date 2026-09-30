@@ -166,6 +166,9 @@ export const installAgentGuidance = (
         }),
     });
     const guidanceDirectory = join(settings.homeDirectory, '.vybekiit');
+    const linkedDirectories = existsSync(join(canonicalSkills, 'vybekiitReferences'))
+      ? [...managedSkills, 'vybekiitReferences']
+      : managedSkills;
     const guidancePath = join(guidanceDirectory, 'agent-guidance.md');
     const languagePath = join(guidanceDirectory, 'language.md');
     yield* Effect.tryPromise({
@@ -225,7 +228,7 @@ export const installAgentGuidance = (
               }),
           });
           const collisions = yield* Effect.all(
-            managedSkills.map((skillName) =>
+            linkedDirectories.map((skillName) =>
               Effect.tryPromise({
                 try: async () => {
                   const canonicalSkill = join(canonicalSkills, skillName);

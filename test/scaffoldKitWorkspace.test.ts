@@ -1,7 +1,9 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { it } from '@effect/vitest';
+import { Effect } from 'effect';
+import { describe, expect } from 'vitest';
 import { ScaffoldError } from '../src/lib/scaffold';
 import { repairKitBuildRoots, scaffoldKitWorkspace } from '../src/lib/scaffoldKitWorkspace';
 
@@ -119,6 +121,29 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
 };
 
 describe('scaffoldKitWorkspace happy path', () => {
+  it.scoped('keeps copied skill links inside the buyer workspace', () =>
+    Effect.gen(function* () {
+      const directory = yield* Effect.acquireRelease(
+        Effect.promise(() => mkdtemp(join(tmpdir(), 'vybekiit-skill-links-'))),
+        (scratch) => Effect.promise(() => rm(scratch, { recursive: true, force: true })),
+      );
+      yield* Effect.promise(async () => {
+        const kitRoot = join(directory, 'kit');
+        const buyerRoot = join(directory, 'buyer');
+        await writeFakeKit(kitRoot);
+        const skillPath = 'templates/web/.agents/skills/example';
+        const linkPath = 'templates/web/.continue/skills/example';
+        await mkdir(join(kitRoot, skillPath), { recursive: true });
+        await mkdir(join(kitRoot, 'templates/web/.continue/skills'), { recursive: true });
+        await writeFile(join(kitRoot, skillPath, 'SKILL.md'), 'original');
+        await symlink('../../.agents/skills/example', join(kitRoot, linkPath));
+        await scaffoldKitWorkspace({ template: 'web', kitRoot, dest: buyerRoot });
+        await writeFile(join(buyerRoot, linkPath, 'SKILL.md'), 'buyer change');
+        expect(await readFile(join(kitRoot, skillPath, 'SKILL.md'), 'utf8')).toBe('original');
+        expect(await readlink(join(buyerRoot, linkPath))).toBe('../../.agents/skills/example');
+      });
+    }),
+  );
   it('writes a kit workspace with packages, surface, and workspace:* preserved', async () => {
     const kitRoot = await mkdtemp(join(tmpdir(), 'vybekiit-kit-src-'));
     const destParent = await mkdtemp(join(tmpdir(), 'vybekiit-kit-dest-'));
@@ -231,6 +256,34 @@ describe('scaffoldKitWorkspace happy path', () => {
 });
 
 describe('repairKitBuildRoots', () => {
+  it.scoped('ships the formatting root without replacing buyer customizations', () =>
+    Effect.gen(function* () {
+      const directory = yield* Effect.acquireRelease(
+        Effect.promise(() => mkdtemp(join(tmpdir(), 'vybekiit-formatting-root-'))),
+        (scratch) => Effect.promise(() => rm(scratch, { recursive: true, force: true })),
+      );
+      yield* Effect.promise(async () => {
+        const kitRoot = join(directory, 'kit');
+        const buyerRoot = join(directory, 'buyer');
+        await writeFakeKit(kitRoot);
+        const kitFormatting = '{"formatter":{"indentStyle":"space","indentWidth":2}}\n';
+        await writeFile(join(kitRoot, 'biome.json'), kitFormatting);
+        await writeFile(join(kitRoot, '.gitignore'), 'node_modules/\n.env*\n');
+        await scaffoldKitWorkspace({ template: 'web', kitRoot, dest: buyerRoot });
+        const buyerFormattingPath = join(buyerRoot, 'biome.json');
+        expect(await readFile(buyerFormattingPath, 'utf8')).toBe(kitFormatting);
+        expect(await readFile(join(buyerRoot, '.gitignore'), 'utf8')).toBe(
+          'node_modules/\n.env*\n',
+        );
+        await writeFile(join(buyerRoot, '.gitignore'), 'custom-private/\n');
+        const buyerFormatting = '{"formatter":{"indentStyle":"tab"}}\n';
+        await writeFile(buyerFormattingPath, buyerFormatting);
+        await repairKitBuildRoots(kitRoot, buyerRoot);
+        expect(await readFile(buyerFormattingPath, 'utf8')).toBe(buyerFormatting);
+        expect(await readFile(join(buyerRoot, '.gitignore'), 'utf8')).toBe('custom-private/\n');
+      });
+    }),
+  );
   it('adds missing welcome support without replacing buyer copy or unrelated messages', async () => {
     const kitRoot = await mkdtemp(join(tmpdir(), 'vybekiit-kit-repair-src-'));
     const buyerRoot = await mkdtemp(join(tmpdir(), 'vybekiit-kit-repair-dest-'));

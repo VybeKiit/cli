@@ -40,6 +40,7 @@ export const verifyPresetsDoctor = async (env: NodeJS.ProcessEnv): Promise<Prese
       verifyPresets(
         expected.map((preset) => preset.id),
         databaseUrl,
+        postgres,
       ),
     ),
   );

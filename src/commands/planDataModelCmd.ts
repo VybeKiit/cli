@@ -6,6 +6,7 @@ import { caughtMessage } from '@vybekiit/core';
 const PROVIDERS: readonly DataProviderName[] = [
   'supabase',
   'neon',
+  'railway',
   'firebase',
   'mongodb',
   'aws',

@@ -6,9 +6,8 @@
 // The npm package ships only `dist/` (files: ["dist"]), and the @vybekiit/* template
 // packages are private, so the skills have to be materialised into dist at build time.
 // We take the UNION of every surface's skills (deduped by skill name — web wins ties),
-// giving the buyer every VybeKiit skill in every project. The web template's language.md ships
-// beside them so setup can install the plain-language guide the skills point to.
-import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+// giving the buyer every VybeKiit skill in every project.
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -72,6 +71,30 @@ const main = async () => {
   const manifest = [];
 
   for (const surface of SURFACE_PRIORITY) {
+    const templateRoot = join(REPO_ROOT, 'templates', surface);
+    const referenceRoot = join(OUT_DIR, 'vybekiitReferences', surface);
+    await mkdir(referenceRoot, { recursive: true });
+    await Promise.all(
+      [
+        'language.md',
+        'CODE-STYLE.md',
+        'AGENTS.md',
+        '.vybekiit/agent',
+        '.vybekiit/platform-skills',
+      ].map(async (reference) => {
+        const referencePath = join(templateRoot, reference);
+        if (
+          await stat(referencePath).then(
+            () => true,
+            () => false,
+          )
+        ) {
+          await cp(referencePath, join(referenceRoot, reference.replace('.vybekiit/', '')), {
+            recursive: true,
+          });
+        }
+      }),
+    );
     const skillsRoot = join(REPO_ROOT, 'templates', surface, '.agents', 'skills');
     for (const name of await listDirs(skillsRoot)) {
       if (seen.has(name)) {
@@ -79,6 +102,23 @@ const main = async () => {
       }
       seen.add(name);
       await cp(join(skillsRoot, name), join(OUT_DIR, name), { recursive: true });
+      const skillPath = join(OUT_DIR, name, 'SKILL.md');
+      const instruction = await readFile(skillPath, 'utf8');
+      if (instruction.includes('vybekiit-generated: buyer-skill-stub')) {
+        const referenceNote = [
+          '',
+          'Prefer the current project instructions and matching project skill when inside a kit app.',
+          `Outside a kit app, resolve guidance relative to this skill directory: ../vybekiitReferences/${surface}/.`,
+          'That folder contains language.md, AGENTS.md, CODE-STYLE.md, agent/ and platform-skills/.',
+          'Bare wrapper filenames refer to platform-skills/ there. Do not assume project code or recipe files exist globally.',
+          'Inspect an existing app before changing it. Scaffold a new kit app only when the builder asked for a new app.',
+          '',
+        ].join('\n');
+        await writeFile(
+          skillPath,
+          instruction.replace(/^(---\n[\s\S]*?\n---\n)/, `$1${referenceNote}`),
+        );
+      }
       manifest.push(name);
     }
   }
@@ -92,7 +132,7 @@ const main = async () => {
   await assertNoEmbeddedPosthogCredentials(OUT_DIR);
   await writeFile(
     join(OUT_DIR, 'manifest.json'),
-    `${JSON.stringify({ skills: manifest, count: manifest.length }, null, 2)}\n`,
+    `${JSON.stringify({ skills: manifest, resources: ['vybekiitReferences'], count: manifest.length }, null, 2)}\n`,
     'utf8',
   );
 

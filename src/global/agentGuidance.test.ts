@@ -75,6 +75,11 @@ it.scoped('shares skill files across agents and preserves a colliding user skill
       await writeFile(settings.plainLanguageGuide, '| deploy | put your app online |\n');
       await mkdir(join(canonicalSkills, 'onboarding'), { recursive: true });
       await writeFile(join(canonicalSkills, 'onboarding', 'SKILL.md'), 'kit onboarding');
+      await mkdir(join(canonicalSkills, 'vybekiitReferences', 'web'), { recursive: true });
+      await writeFile(
+        join(canonicalSkills, 'vybekiitReferences', 'web', 'language.md'),
+        'buyer language',
+      );
       await mkdir(settings.codexDirectory, { recursive: true });
       await writeFile(join(settings.codexDirectory, 'AGENTS.md'), 'My own preferences.\n');
       await writeFile(
@@ -119,6 +124,12 @@ it.scoped('shares skill files across agents and preserves a colliding user skill
       expect(await realpath(join(homeDirectory, '.agents', 'skills', 'onboarding'))).toBe(
         await realpath(join(canonicalSkills, 'onboarding')),
       );
+      expect(
+        await readFile(
+          join(homeDirectory, '.agents', 'skills', 'vybekiitReferences', 'web', 'language.md'),
+          'utf8',
+        ),
+      ).toBe('buyer language');
       expect(
         await readFile(join(homeDirectory, '.kiro', 'skills', 'onboarding', 'SKILL.md'), 'utf8'),
       ).toBe('my onboarding');
