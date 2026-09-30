@@ -1,9 +1,11 @@
+import { Option } from 'effect';
 import { describe, expect, it } from 'vitest';
 import {
   STATUSLINE_APPEND_SNIPPET,
   STATUSLINE_BADGE,
   STATUSLINE_BADGE_COMMAND,
   statusLineCommandHasBadge,
+  withoutStatusLineBadge,
   withStatusLineBadge,
 } from '../../src/global/awareness';
 
@@ -96,5 +98,31 @@ describe('withStatusLineBadge', () => {
   it('does not touch an unknown statusLine shape', () => {
     expect(withStatusLineBadge(JSON.stringify({ statusLine: { type: 'command' } }))).toBeNull();
     expect(withStatusLineBadge(JSON.stringify({ statusLine: 'weird' }))).toBeNull();
+  });
+});
+
+describe('withoutStatusLineBadge', () => {
+  it('deletes a badge-only status line and keeps the other settings', () => {
+    const installedSettings = withStatusLineBadge(JSON.stringify({ theme: 'dark' })) ?? '';
+    const restoredSettings = Option.getOrThrow(withoutStatusLineBadge(installedSettings));
+    expect(JSON.parse(restoredSettings)).toEqual({ theme: 'dark' });
+  });
+
+  it('strips only the appended badge from the user status line', () => {
+    const userStatusLine = { type: 'command', command: 'bash ~/.claude/statusline.sh' };
+    const installedSettings = withStatusLineBadge(JSON.stringify({ statusLine: userStatusLine }));
+    const restoredSettings = Option.getOrThrow(withoutStatusLineBadge(installedSettings ?? ''));
+    expect(JSON.parse(restoredSettings)).toEqual({ statusLine: userStatusLine });
+  });
+
+  it('leaves settings without the badge, malformed files, and odd shapes alone', () => {
+    expect(
+      Option.isNone(withoutStatusLineBadge(JSON.stringify({ statusLine: { command: 'echo hi' } }))),
+    ).toBe(true);
+    expect(Option.isNone(withoutStatusLineBadge('{ not json'))).toBe(true);
+    expect(Option.isNone(withoutStatusLineBadge(JSON.stringify({ statusLine: 'weird' })))).toBe(
+      true,
+    );
+    expect(Option.isNone(withoutStatusLineBadge(''))).toBe(true);
   });
 });

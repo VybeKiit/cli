@@ -6,7 +6,9 @@ import { Effect } from 'effect';
 import { expect } from 'vitest';
 import {
   agentInstallationTargets,
+  agentInstructionPaths,
   installAgentGuidance,
+  removeAgentInstruction,
   updateAgentInstruction,
 } from './agentGuidance';
 
@@ -21,6 +23,34 @@ it('preserves user instructions byte-for-byte across reruns', () => {
   expect(() =>
     updateAgentInstruction(`${installedGuidance}<!-- END VYBEKIIT -->`, 'new'),
   ).toThrow();
+});
+
+it('removes only the managed block and restores the user instructions exactly', () => {
+  const personalGuidance = '# My preferences\r\nUse short sentences.\r\n';
+  const installedGuidance = updateAgentInstruction(personalGuidance, 'Read the kit guidance.');
+  expect(removeAgentInstruction(installedGuidance)).toBe(personalGuidance);
+  expect(removeAgentInstruction(updateAgentInstruction('', 'Read the kit guidance.'))).toBe('');
+  expect(removeAgentInstruction(personalGuidance)).toBe(personalGuidance);
+  expect(() => removeAgentInstruction(`${installedGuidance}<!-- END VYBEKIIT -->`)).toThrow();
+});
+
+it('lists both Codex instruction files so uninstall finds either one', () => {
+  const instructionPaths = agentInstructionPaths({
+    homeDirectory: '/home/builder',
+    claudeDirectory: '/home/builder/.claude',
+    codexDirectory: '/home/builder/.codex',
+    executablePath: '',
+    plainLanguageGuide: '/kit/language.md',
+  });
+  expect(instructionPaths).toEqual(
+    expect.arrayContaining([
+      '/home/builder/.claude/CLAUDE.md',
+      '/home/builder/.codex/AGENTS.md',
+      '/home/builder/.codex/AGENTS.override.md',
+      '/home/builder/.gemini/GEMINI.md',
+      '/home/builder/.kiro/steering/vybekiit.md',
+    ]),
+  );
 });
 
 it.scoped('shares skill files across agents and preserves a colliding user skill', () =>

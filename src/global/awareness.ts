@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { Option, Schema } from 'effect';
 import type { GlobalPaths } from './globalPaths';
 
 /** Body of the global `/vybekiit` slash command (~/.claude/commands/vybekiit.md). */
@@ -129,6 +130,42 @@ export const withStatusLineBadge = (raw: string): string | null => {
     command: `${statusLine.command}; ${STATUSLINE_APPEND_SNIPPET}`,
   };
   return `${JSON.stringify(settings, null, 2)}\n`;
+};
+
+const ClaudeUserSettings = Schema.parseJson(
+  Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+);
+
+const ClaudeStatusLine = Schema.Struct(
+  { command: Schema.String },
+  Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+);
+
+/** Remove the badge {@link withStatusLineBadge} added; `None` when the status line has nothing of ours. */
+export const withoutStatusLineBadge = (claudeSettingsText: string): Option.Option<string> => {
+  const claudeSettings = Schema.decodeUnknownOption(ClaudeUserSettings)(claudeSettingsText);
+  if (Option.isNone(claudeSettings)) {
+    return Option.none();
+  }
+  const statusLine = Schema.decodeUnknownOption(ClaudeStatusLine)(claudeSettings.value.statusLine);
+  if (Option.isNone(statusLine)) {
+    return Option.none();
+  }
+  if (statusLine.value.command === STATUSLINE_BADGE_COMMAND) {
+    const { statusLine: _badgeStatusLine, ...settingsWithoutStatusLine } = claudeSettings.value;
+    return Option.some(`${JSON.stringify(settingsWithoutStatusLine, null, 2)}\n`);
+  }
+  const appendedBadge = `; ${STATUSLINE_APPEND_SNIPPET}`;
+  if (!statusLine.value.command.endsWith(appendedBadge)) {
+    return Option.none();
+  }
+  const userStatusLine = {
+    ...statusLine.value,
+    command: statusLine.value.command.slice(0, -appendedBadge.length),
+  };
+  return Option.some(
+    `${JSON.stringify({ ...claudeSettings.value, statusLine: userStatusLine }, null, 2)}\n`,
+  );
 };
 
 /**

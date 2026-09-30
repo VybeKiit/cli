@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import type { ExecResult } from '../../src/global/exec';
 import {
   claudeMcpAddArgv,
+  GLOBAL_MCP_SERVERS,
   installGlobalMcp,
   isVybekiitMcpReady,
   type McpServerDef,
+  mcpRegistrationOwner,
 } from '../../src/global/installGlobalMcp';
 
 const ok: ExecResult = { code: 0, stdout: '', stderr: '' };
@@ -228,5 +230,66 @@ describe('installGlobalMcp', () => {
       'mcp',
       'serve',
     ]);
+  });
+});
+
+describe('mcpRegistrationOwner', () => {
+  const registeredServer = (scope: string, command: string, commandArguments: string) =>
+    `server:\n  Scope: ${scope}\n  Type: stdio\n  Command: ${command}\n  Args: ${commandArguments}\n`;
+  const serverNamed = (name: string): McpServerDef => {
+    const mcpServer = GLOBAL_MCP_SERVERS.find((catalogServer) => catalogServer.name === name);
+    if (mcpServer === undefined) {
+      throw new Error(`${name} is not in the global MCP catalog`);
+    }
+    return mcpServer;
+  };
+
+  it('claims a user-scope server registered exactly as VybeKiit registers it', () => {
+    expect(
+      mcpRegistrationOwner(
+        serverNamed('context7'),
+        registeredServer(
+          'User config (available in all your projects)',
+          'npx',
+          '-y @upstash/context7-mcp@latest',
+        ),
+      ),
+    ).toBe('vybekiit');
+  });
+
+  it('always claims the vybekiit server, whatever command an older kit used', () => {
+    expect(
+      mcpRegistrationOwner(
+        serverNamed('vybekiit'),
+        registeredServer(
+          'User config (available in all your projects)',
+          'node',
+          '/old/bin.js mcp serve',
+        ),
+      ),
+    ).toBe('vybekiit');
+  });
+
+  it('leaves a customised server to the user and ignores other scopes', () => {
+    expect(
+      mcpRegistrationOwner(
+        serverNamed('playwright'),
+        registeredServer(
+          'User config (available in all your projects)',
+          'npx',
+          '-y @playwright/mcp@0.0.40',
+        ),
+      ),
+    ).toBe('user');
+    expect(
+      mcpRegistrationOwner(
+        serverNamed('playwright'),
+        registeredServer(
+          'Local config (private to you in this project)',
+          'npx',
+          '-y @playwright/mcp@latest',
+        ),
+      ),
+    ).toBe('absent');
   });
 });

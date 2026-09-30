@@ -120,6 +120,36 @@ export const isVybekiitMcpReady = (installation: McpInstallResult): boolean =>
 const defaultDeps: McpInstallDeps = { exec: makeExec('claude'), env: process.env };
 const USER_SCOPE_LINE = /^\s*Scope:\s+User(?:\s+config)?\b/m;
 
+/** Every server the global install may register, in registration order. */
+export const GLOBAL_MCP_SERVERS: readonly McpServerDef[] = [...ZERO_CONFIG, ...KEY_GATED];
+
+const REGISTERED_COMMAND_LINES = [
+  /^\s*Command:[ \t]*(.*)$/m,
+  /^\s*Args:[ \t]*(.*)$/m,
+  /^\s*URL:[ \t]*(.*)$/m,
+];
+
+/**
+ * Who owns a server according to `claude mcp get <name>`: absent from user scope, registered
+ * exactly as VybeKiit registers it, or customised by the user (kept on uninstall).
+ */
+export const mcpRegistrationOwner = (
+  def: McpServerDef,
+  registeredServerDetails: string,
+): 'absent' | 'vybekiit' | 'user' => {
+  if (!USER_SCOPE_LINE.test(registeredServerDetails)) {
+    return 'absent';
+  }
+  const registeredCommand = REGISTERED_COMMAND_LINES.map(
+    (commandLine) => registeredServerDetails.match(commandLine)?.[1]?.trim() ?? '',
+  )
+    .filter((commandPart) => commandPart !== '')
+    .join(' ');
+  const vybekiitRegistration =
+    def.name === 'vybekiit' || registeredCommand === def.command.join(' ');
+  return vybekiitRegistration ? 'vybekiit' : 'user';
+};
+
 /**
  * Build the `claude mcp add` argument list for a server (user scope).
  *
@@ -194,8 +224,7 @@ export const installGlobalMcp = async (
   // shadow the user-scoped server; Claude preserves every other project MCP entry.
   await deps.exec(['mcp', 'remove', '-s', 'project', 'vybekiit']);
 
-  const candidates = [...ZERO_CONFIG, ...KEY_GATED];
-  for (const def of candidates) {
+  for (const def of GLOBAL_MCP_SERVERS) {
     if (!hasKeys(def, deps.env)) {
       needsKey.push(def.name);
       continue;

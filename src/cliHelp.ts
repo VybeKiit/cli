@@ -16,6 +16,7 @@ Getting started:
   vybekiit                 Interactive menu (terminal only)
   vybekiit setup           First run or repair: sign in, reapply tools, and open your app
   vybekiit doctor          Full toolchain pass (agents, gh, cloud CLIs, skills, …)
+  vybekiit uninstall       Remove VybeKiit's skills, guidance, and tools from this computer
 ${createSurfaceUsage}
   vybekiit create --ui-library [directory]   Full UI kit + gallery + Claude (report mode ready)
 
@@ -54,6 +55,7 @@ Buyer journey:
                   [--data=supabase|neon|railway|mongodb|firebase|aws|local]
                   [--google-sign-in]
   vybekiit global-install [--yes]         (skills + MCP + awareness into ~/.claude)
+  vybekiit uninstall [--yes] [--dry-run] (removes everything setup / global-install added)
   vybekiit doctor
   vybekiit doctor --ensure <tool> [--json]
   vybekiit create app ${CREATE_SURFACE_PIPE_FLAGS} [directory]

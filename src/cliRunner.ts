@@ -43,6 +43,7 @@ import { ensureTool, formatEnsureStatus } from './doctor/ensureTool';
 import { ensureAccessOrExit } from './doctor/gate';
 import { runDoctor } from './doctor/run';
 import { runGlobalInstall } from './global/runGlobalInstall';
+import { runGlobalUninstall } from './global/runGlobalUninstall';
 import { runEnvWizard } from './prompts/envWizard';
 import type { MainMenuChoice } from './prompts/mainMenu';
 import { promptMainMenu } from './prompts/mainMenu';
@@ -51,7 +52,15 @@ import { isInteractive } from './prompts/tty';
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Commands that may run before license gate (first-run tools path). */
-const GATE_EXEMPT = new Set(['doctor', 'setup', 'global-install', 'update', 'feedback', 'mcp']);
+const GATE_EXEMPT = new Set([
+  'doctor',
+  'setup',
+  'global-install',
+  'uninstall',
+  'update',
+  'feedback',
+  'mcp',
+]);
 
 /**
  * Parsed argv for one CLI invocation.
@@ -338,6 +347,7 @@ const handleAddCommand = async (invocation: CliInvocation): Promise<number> => {
 export const cliCommands: Record<string, CliCommand> = {
   setup: async (invocation) => await runSetup(verbArgs(invocation)),
   'global-install': (invocation) => runGlobalInstall(verbArgs(invocation)),
+  uninstall: (invocation) => runGlobalUninstall(verbArgs(invocation), isInteractive()),
   // Auto-updater: always non-interactive. install.sh / re-runs use this path.
   update: (invocation) => {
     const args = verbArgs(invocation);

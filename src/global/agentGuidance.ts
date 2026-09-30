@@ -2,7 +2,7 @@ import { constants, existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { delimiter, dirname, join } from 'node:path';
 import { BUYER_GUIDANCE } from '@vybekiit/agent-kit';
-import { Data, Effect, Schema } from 'effect';
+import { Data, Effect, Option, Schema } from 'effect';
 
 export const AgentInstallationSettings = Schema.Struct({
   homeDirectory: Schema.NonEmptyString,
@@ -21,13 +21,11 @@ export class AgentInstallationError extends Data.TaggedError('AgentInstallationE
 const guidanceStart = '<!-- BEGIN VYBEKIIT (managed by `vybekiit setup`) -->';
 const guidanceEnd = '<!-- END VYBEKIIT -->';
 
-export const updateAgentInstruction = (previousInstruction: string, instruction: string) => {
+const managedInstructionSpan = (previousInstruction: string) => {
   const startAt = previousInstruction.indexOf(guidanceStart);
   const endAt = previousInstruction.indexOf(guidanceEnd);
-  const managedInstruction = `${guidanceStart}\n${instruction}\n${guidanceEnd}`;
   if (startAt === -1 && endAt === -1) {
-    const separator = previousInstruction.endsWith('\n') || previousInstruction === '' ? '' : '\n';
-    return `${previousInstruction}${separator}${managedInstruction}\n`;
+    return Option.none();
   }
   const repeatedMarker =
     previousInstruction.indexOf(guidanceStart, startAt + 1) !== -1 ||
@@ -35,8 +33,30 @@ export const updateAgentInstruction = (previousInstruction: string, instruction:
   if (startAt < 0 || endAt < startAt || repeatedMarker) {
     throw new AgentInstallationError({ message: 'The VybeKiit instruction markers need repair.' });
   }
-  return `${previousInstruction.slice(0, startAt)}${managedInstruction}${previousInstruction.slice(endAt + guidanceEnd.length)}`;
+  return Option.some({ startAt, endAt: endAt + guidanceEnd.length });
 };
+
+export const updateAgentInstruction = (previousInstruction: string, instruction: string) => {
+  const managedInstruction = `${guidanceStart}\n${instruction}\n${guidanceEnd}`;
+  return Option.match(managedInstructionSpan(previousInstruction), {
+    onNone: () => {
+      const separator =
+        previousInstruction.endsWith('\n') || previousInstruction === '' ? '' : '\n';
+      return `${previousInstruction}${separator}${managedInstruction}\n`;
+    },
+    onSome: ({ startAt, endAt }) =>
+      `${previousInstruction.slice(0, startAt)}${managedInstruction}${previousInstruction.slice(endAt)}`,
+  });
+};
+
+export const removeAgentInstruction = (previousInstruction: string) =>
+  Option.match(managedInstructionSpan(previousInstruction), {
+    onNone: () => previousInstruction,
+    onSome: ({ startAt, endAt }) => {
+      const blockLineBreak = previousInstruction.startsWith('\n', endAt) ? 1 : 0;
+      return `${previousInstruction.slice(0, startAt)}${previousInstruction.slice(endAt + blockLineBreak)}`;
+    },
+  });
 
 export const agentInstallationTargets = (
   settings: Schema.Schema.Type<typeof AgentInstallationSettings>,
@@ -96,6 +116,26 @@ export const agentInstallationTargets = (
         ),
   }));
 };
+
+export const agentInstructionPaths = (
+  settings: Schema.Schema.Type<typeof AgentInstallationSettings>,
+) => [
+  ...new Set([
+    ...agentInstallationTargets(settings).map((agent) => join(agent.directory, agent.instruction)),
+    join(settings.codexDirectory, 'AGENTS.md'),
+    join(settings.codexDirectory, 'AGENTS.override.md'),
+  ]),
+];
+
+export const agentSkillLinkDirectories = (
+  settings: Schema.Schema.Type<typeof AgentInstallationSettings>,
+) => [
+  ...new Set(
+    agentInstallationTargets(settings)
+      .map((agent) => agent.skills)
+      .filter((skillsDirectory) => skillsDirectory !== join(settings.claudeDirectory, 'skills')),
+  ),
+];
 
 export const installAgentGuidance = (
   settings: Schema.Schema.Type<typeof AgentInstallationSettings>,
