@@ -1,6 +1,8 @@
+import { execFile } from 'node:child_process';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import { afterEach, describe, expect, it } from 'vitest';
 import { writeKitWorkspaceManifest } from '../lib/kitUpdateManifest';
 import { runUpdateKit } from './updateKit';
@@ -28,6 +30,15 @@ afterEach(async () => {
 });
 
 describe('runUpdateKit verification transaction', () => {
+  it('keeps package installation inside the buyer workspace', async () => {
+    const buyerRoot = await prepareBuyer('installation-scope');
+    const installationRoot = await promisify(execFile)('pnpm', ['root', '--workspace-root'], {
+      cwd: buyerRoot,
+    });
+
+    expect(installationRoot.stdout.trim()).toBe(join(buyerRoot, 'node_modules'));
+  });
+
   it('tests a green update in isolation and preserves the buyer-owned app', async () => {
     const buyerRoot = await prepareBuyer('green');
     const receipt = await runUpdateKit([
