@@ -1,4 +1,4 @@
-# Opens a deduped GitHub issue when CI fails on main — agent-friendly triage block included.
+# Keeps one rolling GitHub issue while CI fails on main — agent-friendly triage block included.
 name: CI failure issue
 
 on:
@@ -23,22 +23,7 @@ jobs:
         with:
           script: |
             const run = context.payload.workflow_run;
-            const dedupKey = `ci-failure-${run.id}`;
             const shortSha = run.head_sha.slice(0, 7);
-            const title = `CI failed on main — ${shortSha}`;
-
-            const { data: openIssues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'ci-failure',
-              per_page: 100,
-            });
-
-            if (openIssues.some((issue) => issue.body?.includes(dedupKey))) {
-              core.info(`Issue already open for ${dedupKey}`);
-              return;
-            }
 
             const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
               owner: context.repo.owner,
@@ -47,8 +32,27 @@ jobs:
             });
             const failedJobs = jobs.filter((j) => j.conclusion === 'failure').map((j) => j.name);
 
+            // One rolling issue per repo: while main stays red, comment on the open
+            // ci-failure issue instead of opening one per commit.
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ci-failure',
+              per_page: 1,
+            });
+
+            if (openIssues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: openIssues[0].number,
+                body: `Still failing at \`${shortSha}\` — ${run.html_url}\n\nFailed jobs: ${failedJobs.length > 0 ? failedJobs.join(', ') : '(see run logs)'}`,
+              });
+              return;
+            }
+
             const body = [
-              `<!-- ${dedupKey} -->`,
               '## CI failure on main',
               '',
               `- **Repo:** ${context.repo.owner}/${context.repo.repo}`,
@@ -70,7 +74,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title,
+              title: 'CI failing on main',
               body,
               labels: ['ci-failure', 'agent-triage'],
             });
