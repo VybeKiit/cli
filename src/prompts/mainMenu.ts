@@ -1,6 +1,6 @@
 import { cancel, intro, isCancel, select } from '@clack/prompts';
 
-/** Buyer-tier menu choices for bare `vybekiit` (ADR-0038). */
+/** Buyer-tier menu choices for bare `vybekiit`. */
 export type MainMenuChoice = 'setup' | 'create' | 'doctor' | 'add-piece' | 'help-all';
 
 /**

@@ -289,7 +289,7 @@ export const runAgentExperience = async (
     }
   }
 
-  // Speed-check / web-perf-ci discoverability lives in perfReadiness.ts (ADR-0038 §8.2).
+  // Speed-check / web-perf-ci discoverability lives in perfReadiness.ts.
 
   return { ok, lines, agents };
 };

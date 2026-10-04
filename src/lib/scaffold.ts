@@ -42,7 +42,7 @@ export type ScaffoldOptions = {
 /**
  * Copy a template into a fresh destination, preserving its `workspace:*` deps.
  *
- * Since ADR-0033 (CLI is the only published artifact) buyers work inside the gated
+ * The CLI is the only published artifact, so buyers work inside the gated
  * monorepo clone, where `@vybekiit/*` resolve locally via the workspace — so the
  * copied `package.json` keeps `workspace:*` untouched (no npm rewrite). Refuses to
  * write into a non-empty directory (never clobber a buyer's work) and skips build

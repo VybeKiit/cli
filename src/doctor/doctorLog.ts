@@ -1,6 +1,6 @@
 import process from 'node:process';
 
-/** Process-stream sink for doctor output (ADR-0036 — no `console`). */
+/** Process-stream sink for doctor output (no `console`). */
 export type DoctorLog = {
   readonly log: (message: string) => void;
   readonly error: (message: string) => void;

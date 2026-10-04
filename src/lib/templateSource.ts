@@ -11,12 +11,12 @@ const execFileAsync = promisify(execFile);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
-/** GitHub org that holds the private per-template mirror repos (ADR-0005). */
+/** GitHub org that holds the private per-template mirror repos. */
 const MIRROR_ORG = 'VybeKiit';
 
 /**
  * The seams a {@link locateTemplateSource} call needs, injected so the published
- * clone path is unit-testable without `gh` or a network (ADR-0005). Defaults wire the
+ * clone path is unit-testable without `gh` or a network. Defaults wire the
  * real `gh`-backed clone and a filesystem existence check.
  *
  * @property clone - downloads a template mirror into a target dir (see {@link cloneMirror})
@@ -85,7 +85,7 @@ export const cloneMirror = async (template: TemplateName, targetDir: string): Pr
 };
 
 /**
- * Locate the template source for one template, in ADR-0005 order:
+ * Locate the template source for one template, in this order:
  *
  * 1. `VYBEKIIT_TEMPLATES_DIR` set: that dir (dev/CI override), no cleanup.
  * 2. Else the monorepo-local `templates/` dir if it actually holds the template: it,

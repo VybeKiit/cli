@@ -9,7 +9,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SAFE_UPDATE_FIXTURE = join(HERE, 'fixtures', 'safeUpdate');
 
 /**
- * Dual-mode contract (ADR-0036): non-TTY never hangs on prompts, and flat verbs
+ * Dual-mode contract: non-TTY never hangs on prompts, and flat verbs
  * forward every positional after the top-level command (not just `rest`).
  */
 describe('runCli dual-mode / argv forwarding', () => {

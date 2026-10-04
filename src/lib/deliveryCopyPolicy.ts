@@ -83,7 +83,7 @@ export const shouldCopyDeliveryPath = (
     return false;
   }
 
-  // Scaffold: skip maintainer-only scripts/dev/ scratch (ADR-0029).
+  // Scaffold: skip maintainer-only scripts/dev/ scratch.
   if (profile === 'scaffold') {
     return !parts.some((part, index) => part === 'scripts' && parts[index + 1] === 'dev');
   }

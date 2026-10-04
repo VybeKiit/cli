@@ -87,7 +87,7 @@ const createToolCollector = (): ToolCollector => {
   };
 };
 
-/** Hosting CLI for the active hosting provider (ADR-0018 registry). */
+/** Hosting CLI for the active hosting provider. */
 const hostingCliForProvider = (provider: string, processEnv: EnvSource): Tool =>
   resolveEnvProvider(
     provider,

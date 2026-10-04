@@ -1,5 +1,5 @@
 /**
- * Plain-language hints for the expanded product-surface packages (ADR-0012).
+ * Plain-language hints for the expanded product-surface packages.
  * Does not import maintained packages — env-only checks the agent can translate.
  *
  * @param env - Environment source to inspect for product-surface providers.

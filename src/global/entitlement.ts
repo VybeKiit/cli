@@ -1,7 +1,7 @@
 import { type ExecFn, makeExec } from './exec';
 
 /**
- * GitHub org holding the private per-surface kit mirrors (ADR-0005/0033). Read access to any
+ * GitHub org holding the private per-surface kit mirrors. Read access to any
  * of these private repos is exactly the boundary a real `vybekiit create app` clone relies on,
  * so it doubles as the buyer entitlement for the global install — no second allowlist to keep.
  */

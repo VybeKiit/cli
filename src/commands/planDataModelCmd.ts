@@ -16,7 +16,7 @@ const PROVIDERS: readonly DataProviderName[] = [
 /**
  * Match a CLI value against known data provider names.
  *
- * Local to this command only — not the package ADR `resolveDataProvider` export.
+ * Local to this command only — not the package `resolveDataProvider` export.
  *
  * @param value - Candidate provider name.
  * @returns Data provider name when supported, otherwise undefined.

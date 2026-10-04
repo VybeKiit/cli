@@ -1,6 +1,6 @@
 import type { GateReason } from '../doctor/gate';
 
-/** Inputs for the setup honest next-step matrix (ADR-0038). */
+/** Inputs for the setup honest next-step matrix. */
 export type SetupNextStepInput = {
   readonly doctorExitCode: number;
   readonly gateReason: GateReason;

@@ -15,7 +15,7 @@ export default defineConfig({
   splitting: false,
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
-  // Every @vybekiit/* package is private (ADR-0033) — never on npm — so the published CLI
+  // Every @vybekiit/* package is private — never on npm — so the published CLI
   // (the single public artifact) must inline their source rather than declare unresolvable deps.
   noExternal: [/^@vybekiit\//],
   // CJS SDKs pulled in via inlined @vybekiit/db break in the ESM bin

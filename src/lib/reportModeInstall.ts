@@ -8,8 +8,8 @@ import type { TemplateName } from './scaffold';
 
 /**
  * `vybekiit add report-mode` — install the dev-only Report Mode overlay into an existing
- * buyer app (ADR-0046). The first sanctioned owned-`src/` backfill: `add` copies OWNED
- * template files post-scaffold, which `update-kit` deliberately refuses (ADR-0007).
+ * buyer app. The first sanctioned owned-`src/` backfill: `add` copies OWNED
+ * template files post-scaffold, which `update-kit` deliberately refuses.
  *
  * The plan/apply split and skip-if-exists per-file copy mirror `pageRecipeInstall.ts`;
  * every read is behind an injectable {@link ReportModeFs} seam so planning is unit-testable
@@ -273,7 +273,7 @@ const planReportModeFiles = async (options: {
 /**
  * Compute the dependency set to ensure for a surface.
  *
- * `@vybekiit/*` stay `workspace:*` (ADR-0033: buyers resolve locally). `sonner` (web) and
+ * `@vybekiit/*` stay `workspace:*` (buyers resolve locally). `sonner` (web) and
  * `cnfast` (only when the copy-if-missing `utils.ts` is actually written) reuse the version
  * the source template pins rather than guessing.
  *

@@ -4,7 +4,7 @@ import type { ProjectSurface } from '../lib/inferProjectSurface';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 import type { TemplateName } from '../lib/scaffold';
 
-/** Report for hybrid asset pipeline validation (ADR-0010 / ADR-0038 §8.1). */
+/** Report for hybrid asset pipeline validation. */
 export type AssetsValidateReport = {
   /** True when not a kit project, or the surface pipeline is wired. Warn-only gaps stay true. */
   readonly ok: boolean;
@@ -242,7 +242,7 @@ const warnLine = (input: {
 };
 
 /**
- * Validate that a kit project keeps the hybrid assets path (ADR-0010).
+ * Validate that a kit project keeps the hybrid assets path.
  * Pre-create / non-kit directories skip silently so doctor stays green.
  *
  * @param cwd - Project directory to inspect.

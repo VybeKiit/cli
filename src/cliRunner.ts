@@ -341,7 +341,7 @@ const handleAddCommand = async (invocation: CliInvocation): Promise<number> => {
 };
 
 /**
- * Single verb registry (ADR-0036 / CODE-STYLE `cliCommands`).
+ * Single verb registry (CODE-STYLE `cliCommands`).
  * Interactive menu choices and flag/non-TTY paths call the same operations.
  */
 export const cliCommands: Record<string, CliCommand> = {

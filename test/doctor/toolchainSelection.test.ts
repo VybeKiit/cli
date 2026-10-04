@@ -92,7 +92,7 @@ describe('selectToolchain hosting and auxiliary providers', () => {
     expect(names).toEqual(['gh', 'vercel', 'supabase']);
   });
 
-  it('uses only gh for GitHub Pages hosting (free static, ADR-0040)', () => {
+  it('uses only gh for GitHub Pages hosting (free static)', () => {
     const names = selectToolchain({ HOSTING_PROVIDER: 'github-pages' }).map((tool) => tool.name);
 
     expect(names).toEqual(['gh', 'supabase']);

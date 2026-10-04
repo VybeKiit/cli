@@ -18,7 +18,7 @@ describe('writeEnvKeys', () => {
     expect(updated.split('R2_BUCKET=').length - 1).toBe(1);
   });
 
-  it('securely upserts a github-pages host pin, no hand-edit needed (ADR-0040)', () => {
+  it('securely upserts a github-pages host pin, no hand-edit needed', () => {
     const dir = mkdtempSync(join(tmpdir(), 'vybekiit-env-'));
     // The exact key map buildHostPinKeys emits for a github-pages provision — the
     // same map `live-work host` feeds through this secure appender, so a buyer never

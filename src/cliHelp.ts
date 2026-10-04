@@ -9,7 +9,7 @@ const createSurfaceHelp = CREATE_SURFACES.map((surface) => {
   return `  ${surfaceFlag}${surface.help}`;
 }).join('\n');
 
-/** Buyer-tier help printed by `vybekiit --help` and bare non-TTY (ADR-0038). */
+/** Buyer-tier help printed by `vybekiit --help` and bare non-TTY. */
 export const CLI_HELP = `vybekiit — set up tools and create your app
 
 Getting started:

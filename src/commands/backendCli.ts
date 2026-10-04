@@ -369,7 +369,7 @@ const defaultRunner: CommandRunner = async (command, args, cwd) => {
 };
 
 /**
- * Generate the backend's OpenAPI document (ADR-0043) by running its `gen:contract`
+ * Generate the backend's OpenAPI document by running its `gen:contract`
  * script, which derives the spec from the route registry in `backend/src/contract.ts`.
  *
  * @param cwd - Project directory containing the backend.

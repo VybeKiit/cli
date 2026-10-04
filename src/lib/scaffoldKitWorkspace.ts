@@ -264,8 +264,8 @@ const copyPackageIntoKit = async (
 /**
  * Copy a template surface + required private packages into a fresh kit workspace root.
  *
- * Delivers an installable pnpm workspace so `workspace:*` on `@vybekiit/*` resolves locally
- * (ADR-0033 / ADR-0038 Track 2). Does not rewrite deps to public npm. Skips build artifacts
+ * Delivers an installable pnpm workspace so `workspace:*` on `@vybekiit/*` resolves locally.
+ * Does not rewrite deps to public npm. Skips build artifacts
  * via {@link shouldCopyScaffoldPath}. Ensures agent skill symlinks on the surface.
  *
  * @param options - Kit source, destination, and surface template.

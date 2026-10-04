@@ -42,7 +42,7 @@ import { verifyNamecheapDoctor } from './verifyNamecheap';
 import { verifyPresetsDoctor } from './verifyPresets';
 
 /**
- * `vybekiit doctor` — provision + verify the agentic toolchain (ADR-0001).
+ * `vybekiit doctor` — provision + verify the agentic toolchain.
  *
  * Pure planning lives in `toolchain.ts` and `plan-doctor-run.ts`; this file is the
  * side-effecting executor (install, probe, env writes).

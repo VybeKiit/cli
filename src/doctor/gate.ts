@@ -3,7 +3,7 @@ import process from 'node:process';
 import { readGateIdentity } from '@vybekiit/core';
 
 /**
- * The access gate — VybeKiit's paid wall on the CLI (ADR-0033).
+ * The access gate — VybeKiit's paid wall on the CLI.
  *
  * A paid purchase invites the buyer's GitHub account to the private delivery repos
  * (see apps/landing AccessGate). Every command except help/version/doctor runs this first:

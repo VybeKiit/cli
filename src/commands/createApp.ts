@@ -173,7 +173,7 @@ export const runCreateApp = async (args: readonly string[]): Promise<number> => 
   const mayCleanupPartial = await destIsMissingOrEmpty(dest);
 
   try {
-    // ADR-0038 Track 2: kit workspace (packages + surface), never an orphan template folder.
+    // Kit workspace (packages + surface), never an orphan template folder.
     const { cleanup: resolvedCleanup, kitRoot } = await locateKitWorkspace();
     cleanup = resolvedCleanup;
     await scaffoldKitWorkspace({ template, kitRoot, dest });

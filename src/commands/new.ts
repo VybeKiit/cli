@@ -7,7 +7,7 @@ import {
 } from './createSurfaceRegistry';
 
 /**
- * Deprecated scaffold entry — maps to `create app` when possible (ADR-0038).
+ * Deprecated scaffold entry — maps to `create app` when possible.
  *
  * @param args - CLI arguments after `new`; optional template then directory.
  * @returns Process exit code for the command.

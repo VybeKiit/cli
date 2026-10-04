@@ -19,7 +19,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const MIRROR_ORG = 'VybeKiit';
 
 /**
- * Gated **kit workspace** delivery repo under the VybeKiit org (ADR-0038 Track 2).
+ * Gated **kit workspace** delivery repo under the VybeKiit org.
  *
  * Synced by `scripts/dev/mirror/syncKitMirror.mjs` (packages + templates). Per-template
  * mirrors (`web` / `mobile` / `extension`) remain for advanced `drop` / single-surface
@@ -111,7 +111,7 @@ const localKitWorkspaceRoot = async (
 };
 
 /**
- * Locate the kit workspace root for `create app`, in ADR-0038 §8 order:
+ * Locate the kit workspace root for `create app`, in this order:
  *
  * 1. `VYBEKIIT_KIT_DIR` set: that dir (explicit kit override for dev/CI), no cleanup.
  * 2. Else `VYBEKIIT_TEMPLATES_DIR` set: its parent (legacy override points at `templates/`), no cleanup.

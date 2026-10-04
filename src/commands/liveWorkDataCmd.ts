@@ -204,7 +204,7 @@ const liveWorkEnvFromProject = (cwd: string): Record<string, string | undefined>
   mergeEnv(process.env, loadEnvFile(cwd));
 
 /**
- * Write pin keys into project `.env` via the doctor-secure path (ADR-0039).
+ * Write pin keys into project `.env` via the doctor-secure path.
  *
  * @param cwd - Project directory.
  * @param keys - Pin key map (may include secrets).
@@ -227,7 +227,7 @@ const writeDataPin = (
   });
 
 /**
- * Run data Live work: preference ladder → provision → verify → pin (ADR-0039).
+ * Run data Live work: preference ladder → provision → verify → pin.
  * Shared SSOT for buyer skills (`save-data`) and local-dev console.
  *
  * Usage: `vybekiit live-work data [--mode=demo|dogfood|buyer] [--vendor=supabase|neon|railway]

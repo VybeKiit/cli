@@ -87,7 +87,7 @@ describe('runAgentExperience', () => {
     );
     expect(ensured).toBe(true);
     expect(report.lines.some((line) => line.includes('project skills'))).toBe(true);
-    // Speed checks moved to perfReadiness.ts (ADR-0038 §8.2).
+    // Speed checks moved to perfReadiness.ts.
     expect(report.lines.some((line) => line.includes('speed checks'))).toBe(false);
   });
 

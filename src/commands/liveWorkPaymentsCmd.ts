@@ -153,7 +153,7 @@ const writePaymentsPin = (
   });
 
 /**
- * Run payments Live work: preference ladder → verify credentials → pin (ADR-0039).
+ * Run payments Live work: preference ladder → verify credentials → pin.
  *
  * Usage: `vybekiit live-work payments [--mode=demo|dogfood|buyer]
  * [--vendor=lemon-squeezy|stripe|paypal] [--cwd=dir] [--no-pin] [--fresh]`

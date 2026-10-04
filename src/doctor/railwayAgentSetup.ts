@@ -7,7 +7,7 @@ import {
   parseEnv,
 } from '@vybekiit/core';
 
-/** True when either Railway hosting or data is active (core ADR signal). */
+/** True when either Railway hosting or data is active (core signal). */
 export const isRailwayStackActive = (processEnv: EnvSource): boolean =>
   isCoreRailwayStackActive(processEnv);
 

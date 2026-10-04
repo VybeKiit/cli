@@ -5,7 +5,7 @@ import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 import type { TemplateName } from '../lib/scaffold';
 import { type AssetsValidateDeps, isKitProject } from './assetsValidate';
 
-/** Report for measured performance path discoverability (ADR-0038 §8.2). */
+/** Report for measured performance path discoverability. */
 export type PerfReadinessReport = {
   /** True when not a kit project, or speed-check guidance was emitted (warn is non-fatal). */
   readonly ok: boolean;
