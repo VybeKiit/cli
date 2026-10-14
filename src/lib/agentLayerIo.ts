@@ -8,7 +8,7 @@ import {
 import { detectTemplateName } from './detectTemplate';
 import { isTemplateName } from './scaffold';
 
-/** Agent-layer files that must exist or be rendered for buyer-facing guidance. */
+/** Agent-layer files the compliance checks read when present. */
 export const COMPLIANCE_FILES = [
   'AGENTS.md',
   'CLAUDE.md',
@@ -20,6 +20,7 @@ export const COMPLIANCE_FILES = [
   '.vybekiit/agent/tech-references.md',
   '.vybekiit/agent/session-bootstrap.md',
   '.vybekiit/agent/goal-index.md',
+  '.vybekiit/agent/goal-routes.json',
 ] as const;
 
 /**
@@ -314,6 +315,7 @@ export const writeAgentLayerRenderOutputs = async (
     'checklist.md',
     '.vybekiit/agent/tech-references.md',
     '.vybekiit/agent/session-bootstrap.md',
+    '.vybekiit/agent/goal-routes.json',
   ] as const;
 
   for (const file of seedFiles) {

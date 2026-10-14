@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -149,6 +150,13 @@ describe('scaffoldKitWorkspace happy path', () => {
     const destParent = await mkdtemp(join(tmpdir(), 'vybekiit-kit-dest-'));
     const emptyDest = join(destParent, 'app');
     await writeFakeKit(kitRoot);
+    const routerCommand = 'node "$CLAUDE_PROJECT_DIR"/.claude/hooks/skill-router.mjs';
+    const appSettings = {
+      hooks: { UserPromptSubmit: [{ hooks: [{ type: 'command', command: routerCommand }] }] },
+    };
+    const appSettingsText = JSON.stringify(appSettings);
+    await mkdir(join(kitRoot, 'templates', 'web', '.claude'), { recursive: true });
+    await writeFile(join(kitRoot, 'templates', 'web', '.claude', 'settings.json'), appSettingsText);
 
     const result = await scaffoldKitWorkspace({
       template: 'web',
@@ -160,7 +168,19 @@ describe('scaffoldKitWorkspace happy path', () => {
     await expect(readFile(join(emptyDest, 'AGENTS.md'), 'utf8')).resolves.toContain(
       'templates/web/AGENTS.md',
     );
-    await expect(readFile(join(emptyDest, 'CLAUDE.md'), 'utf8')).resolves.toBe('@AGENTS.md\n');
+    await expect(readFile(join(emptyDest, 'AGENTS.md'), 'utf8')).resolves.toContain(
+      '@templates/web/AGENTS.md',
+    );
+    expect(existsSync(join(emptyDest, 'CLAUDE.md'))).toBe(false);
+    const workspaceSettingsText = await readFile(
+      join(emptyDest, '.claude', 'settings.json'),
+      'utf8',
+    );
+    const workspaceSettings = JSON.parse(workspaceSettingsText) as typeof appSettings;
+    const [routerGroup] = workspaceSettings.hooks.UserPromptSubmit;
+    expect(routerGroup?.hooks[0]?.command).toBe(
+      'node "$CLAUDE_PROJECT_DIR"/templates/web/.claude/hooks/skill-router.mjs',
+    );
     await expect(readFile(join(emptyDest, 'GEMINI.md'), 'utf8')).resolves.toBe('@AGENTS.md\n');
 
     const rootPkg = JSON.parse(await readFile(join(emptyDest, 'package.json'), 'utf8')) as {

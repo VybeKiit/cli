@@ -79,4 +79,64 @@ describe('runSyncAgentLayer', () => {
       '{"permissions":"personal"}',
     );
   });
+
+  const syncFromMirror = async (buyer: string, mirror: string) => {
+    const { access, cp } = await import('node:fs/promises');
+    return await runSyncAgentLayer(['web'], buyer, {
+      locateTemplateSource: async () => ({ source: mirror }),
+      copy: async (src, dest) => {
+        await cp(src, dest, { recursive: true, force: true });
+      },
+      runSkillsUpdate: () => Promise.resolve(),
+      pathExists: async (path) => {
+        try {
+          await access(path);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    });
+  };
+
+  const makeBuyerAndMirror = async () => {
+    const buyer = await mkdtemp(join(tmpdir(), 'vyb-buyer-'));
+    const mirror = await mkdtemp(join(tmpdir(), 'vyb-mirror-'));
+    await mkdir(join(mirror, 'web'), { recursive: true });
+    await writeFile(join(mirror, 'web', 'AGENTS.md'), '# agent');
+    return { buyer, mirror };
+  };
+
+  it('keeps locked platform skills from loading on their own after an update', async () => {
+    const { buyer, mirror } = await makeBuyerAndMirror();
+    await mkdir(join(buyer, '.agents', 'skills', 'neon'), { recursive: true });
+    await mkdir(join(buyer, '.agents', 'skills', 'onboarding'), { recursive: true });
+    const lock = { version: 1, skills: { neon: { source: 'neondatabase/agent-skills' } } };
+    await writeFile(join(buyer, 'skills-lock.json'), JSON.stringify(lock));
+    const neonSkill = '---\nname: neon\ndescription: Neon.\n---\n\n# Neon\n';
+    const onboardingSkill = '---\nname: onboarding\ndescription: Start.\n---\n';
+    await writeFile(join(buyer, '.agents', 'skills', 'neon', 'SKILL.md'), neonSkill);
+    await writeFile(join(buyer, '.agents', 'skills', 'onboarding', 'SKILL.md'), onboardingSkill);
+
+    const sync = await syncFromMirror(buyer, mirror);
+
+    expect(sync.exitCode).toBe(0);
+    expect(await readFile(join(buyer, '.agents', 'skills', 'neon', 'SKILL.md'), 'utf8')).toBe(
+      '---\nname: neon\ndescription: Neon.\ndisable-model-invocation: true\n---\n\n# Neon\n',
+    );
+    expect(await readFile(join(buyer, '.agents', 'skills', 'onboarding', 'SKILL.md'), 'utf8')).toBe(
+      onboardingSkill,
+    );
+  });
+
+  it('points an old CLAUDE.md at AGENTS.md so Claude Code still reads the kit', async () => {
+    const { buyer, mirror } = await makeBuyerAndMirror();
+    const oldPointer = '# CLAUDE.md\n\nRead [AGENTS.md](./AGENTS.md).\n';
+    await writeFile(join(buyer, 'CLAUDE.md'), oldPointer);
+
+    const sync = await syncFromMirror(buyer, mirror);
+
+    expect(sync.exitCode).toBe(0);
+    expect(await readFile(join(buyer, 'CLAUDE.md'), 'utf8')).toBe(`${oldPointer}\n@AGENTS.md\n`);
+  });
 });

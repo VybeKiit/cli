@@ -1,6 +1,5 @@
 import { access, cp, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { renderAgentSessionBootstrap } from '@vybekiit/agent-kit';
 import { ensureAgentSkillSymlinks } from './agentSkillSymlinks';
 import { shipFirstPartyMcpConfigs } from './firstPartyMcp';
 import {
@@ -277,6 +276,24 @@ const copyPackageIntoKit = async (
  *   dest: '/tmp/my-app',
  * });
  */
+const writeWorkspaceClaudeSettings = async (
+  surfaceDest: string,
+  dest: string,
+  template: TemplateName,
+): Promise<void> => {
+  const appSettingsPath = join(surfaceDest, '.claude', 'settings.json');
+  if (!(await pathExists(appSettingsPath))) {
+    return;
+  }
+  const appSettings = await readFile(appSettingsPath, 'utf8');
+  const workspaceSettings = appSettings.replaceAll(
+    '/.claude/hooks/',
+    `/templates/${template}/.claude/hooks/`,
+  );
+  await mkdir(join(dest, '.claude'), { recursive: true });
+  await writeFile(join(dest, '.claude', 'settings.json'), workspaceSettings);
+};
+
 export const scaffoldKitWorkspace = async (
   options: ScaffoldKitOptions,
 ): Promise<{ readonly dest: string }> => {
@@ -337,13 +354,9 @@ export const scaffoldKitWorkspace = async (
   await ensureAgentSkillSymlinks(surfaceDest);
   await writeFile(
     join(options.dest, 'AGENTS.md'),
-    `# Your VybeKiit app\n\nBefore planning or changing this app, read templates/${options.template}/AGENTS.md and its .vybekiit/agent/session-bootstrap.md. Follow the matching skill in its goal index. Paths in those instructions are relative to templates/${options.template}. Customize that app; reuse the maintained packages in packages/.\n\n${renderAgentSessionBootstrap()}\n`,
+    `# Your VybeKiit app\n\nThe app lives in templates/${options.template}. Before planning or changing it, read templates/${options.template}/AGENTS.md; paths in it are relative to templates/${options.template}. Customize that app; reuse the maintained packages in packages/.\n\n@templates/${options.template}/AGENTS.md\n`,
   );
-  await Promise.all(
-    ['CLAUDE.md', 'GEMINI.md'].map((instructionFile) =>
-      writeFile(join(options.dest, instructionFile), '@AGENTS.md\n'),
-    ),
-  );
+  await writeFile(join(options.dest, 'GEMINI.md'), '@AGENTS.md\n');
   if (await pathExists(join(surfaceDest, '.agents', 'skills'))) {
     await mkdir(join(options.dest, '.agents'), { recursive: true });
     await symlink(
@@ -353,6 +366,7 @@ export const scaffoldKitWorkspace = async (
     );
     await ensureAgentSkillSymlinks(options.dest);
   }
+  await writeWorkspaceClaudeSettings(surfaceDest, options.dest, options.template);
 
   // First-party MCPs always ship: packages (via KIT_ALWAYS_SHIP) + project configs.
   await shipFirstPartyMcpConfigs({ dest: options.dest, template: options.template });

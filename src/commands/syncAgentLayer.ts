@@ -4,10 +4,14 @@ import process from 'node:process';
 import {
   AGENT_LAYER_PATHS,
   applyAgentLayerSections,
+  disableModelInvocation,
+  expectedSkillNamesFromLock,
   formatAgentLayerSyncSummary,
   isAgentLayerExtensionPath,
   mergeGoalIndexOnSync,
   planAgentLayerSync,
+  type SkillsLockFile,
+  withAgentsImport,
 } from '@vybekiit/agent-kit';
 import { runProcess } from '../global/exec';
 import { loadExistingAgentLayerRenderInputs } from '../lib/agentLayerIo';
@@ -296,6 +300,44 @@ const refreshPlatformInstructionFiles = async (
   }
 };
 
+const importAgentsIntoClaudeFile = async (
+  cwd: string,
+  deps: SyncAgentLayerDeps,
+): Promise<boolean> => {
+  const claudePath = join(cwd, 'CLAUDE.md');
+  if (!(await deps.pathExists(claudePath))) {
+    return false;
+  }
+  const claudeText = await readFile(claudePath, 'utf8');
+  const importedText = withAgentsImport(claudeText);
+  if (importedText === claudeText) {
+    return false;
+  }
+  await writeFile(claudePath, importedText, 'utf8');
+  return true;
+};
+
+const disableLockedSkillInvocation = async (
+  cwd: string,
+  deps: SyncAgentLayerDeps,
+): Promise<void> => {
+  const lockText = await readFile(join(cwd, 'skills-lock.json'), 'utf8');
+  const lock = JSON.parse(lockText) as SkillsLockFile;
+  const skillNames = expectedSkillNamesFromLock(lock);
+  const flagSkill = async (skillName: string): Promise<void> => {
+    const skillPath = join(cwd, '.agents', 'skills', skillName, 'SKILL.md');
+    if (!(await deps.pathExists(skillPath))) {
+      return;
+    }
+    const skillMarkdown = await readFile(skillPath, 'utf8');
+    const flaggedMarkdown = disableModelInvocation(skillMarkdown);
+    if (flaggedMarkdown !== skillMarkdown) {
+      await writeFile(skillPath, flaggedMarkdown, 'utf8');
+    }
+  };
+  await Promise.all(skillNames.map(flagSkill));
+};
+
 export type SyncAgentLayerResult = {
   readonly lines: readonly string[];
   readonly exitCode: number;
@@ -350,12 +392,17 @@ export const runSyncAgentLayer = async (
       lines.push('Linked Cursor and Claude skill folders to your project skills.');
     }
 
+    if (await importAgentsIntoClaudeFile(cwd, deps)) {
+      lines.push('Pointed your CLAUDE.md at AGENTS.md so Claude Code reads the kit instructions.');
+    }
+
     if (await refreshGeneratedInstructionSections(cwd, template, deps)) {
       lines.push('Refreshed generated instruction sections.');
     }
 
     const skillsUpdate = await refreshPlatformInstructionFiles(cwd, deps);
     if (skillsUpdate === 'updated') {
+      await disableLockedSkillInvocation(cwd, deps);
       lines.push('Updated your assistant’s platform instruction files.');
     }
     if (skillsUpdate === 'failed') {

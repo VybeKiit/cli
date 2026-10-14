@@ -35,5 +35,5 @@ export const writeInitSuccess = (pm: PackageManager): void => {
   process.stdout.write('     .cursor/rules/vybekiit.mdc   -> Cursor\n');
   process.stdout.write('     AGENTS.md                    -> OpenAI Codex\n');
   process.stdout.write('     GEMINI.md                    -> Gemini CLI\n');
-  process.stdout.write('     CLAUDE.md + .claude/hooks/   -> Claude Code\n');
+  process.stdout.write('     AGENTS.md + .claude/hooks/   -> Claude Code\n');
 };
