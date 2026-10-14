@@ -1,9 +1,16 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   inferProjectSurfaceSync,
   type ProjectSurfaceProbe,
   reportModeEnvKeysForSurface,
 } from '../src/lib/inferProjectSurface';
+
+const testFile = fileURLToPath(import.meta.url);
+const testsDir = dirname(testFile);
+const repositoryRoot = join(testsDir, '..', '..');
 
 const probe = (files: Record<string, string>): ProjectSurfaceProbe => ({
   exists: (path) => path in files,
@@ -50,6 +57,18 @@ describe('project surface dependency signals', () => {
     );
     expect(surface.template).toBe('web');
     expect(surface.mobile).toBe(false);
+  });
+
+  it.each([
+    'web',
+    'mobile',
+    'spa',
+    'backend',
+  ])('detects the %s template from its own package.json', (template) => {
+    const packagePath = join(repositoryRoot, 'templates', template, 'package.json');
+    const packageText = readFileSync(packagePath, 'utf8');
+    const surface = inferProjectSurfaceSync('/tmp', probe({ 'package.json': packageText }));
+    expect(surface.template).toBe(template);
   });
 
   it('detects backend from express dependency', () => {

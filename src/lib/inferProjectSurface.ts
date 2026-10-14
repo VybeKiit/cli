@@ -40,6 +40,12 @@ const createDefaultProbe = (cwd: string): ProjectSurfaceProbe => ({
   },
 });
 
+type PackageSignals = {
+  readonly dependencies?: Partial<Record<string, string>>;
+  readonly devDependencies?: Partial<Record<string, string>>;
+  readonly main?: string;
+};
+
 /**
  * Read and parse package.json through the injected probe.
  *
@@ -48,18 +54,13 @@ const createDefaultProbe = (cwd: string): ProjectSurfaceProbe => ({
  * @example
  * const pkg = readPackageJson(createDefaultProbe(process.cwd()));
  */
-const readPackageJson = (
-  probe: ProjectSurfaceProbe,
-): { readonly dependencies?: Partial<Record<string, string>>; readonly main?: string } | null => {
+const readPackageJson = (probe: ProjectSurfaceProbe): PackageSignals | null => {
   const raw = probe.readUtf8('package.json');
   if (raw === null || raw === '') {
     return null;
   }
   try {
-    return JSON.parse(raw) as {
-      readonly dependencies?: Partial<Record<string, string>>;
-      readonly main?: string;
-    };
+    return JSON.parse(raw) as PackageSignals;
   } catch {
     return null;
   }
@@ -98,29 +99,20 @@ const hasExpoConfig = (probe: ProjectSurfaceProbe): boolean => {
  * @example
  * const template = inferTemplateFromPackage({ dependencies: { next: 'latest' } });
  */
-const inferTemplateFromPackage = (pkg: {
-  readonly dependencies?: Partial<Record<string, string>>;
-  readonly main?: string;
-}): TemplateName | null => {
-  const { dependencies, main } = pkg;
+const inferTemplateFromPackage = (pkg: PackageSignals): TemplateName | null => {
+  const { main } = pkg;
+  const dependencies = { ...pkg.dependencies, ...pkg.devDependencies };
 
-  if (dependencies !== undefined && dependencies.express !== undefined) {
+  if (dependencies.express !== undefined) {
     return 'backend';
   }
-  if (
-    (dependencies !== undefined && dependencies.expo !== undefined) ||
-    main?.includes('expo-router')
-  ) {
+  if (dependencies.expo !== undefined || main?.includes('expo-router')) {
     return 'mobile';
   }
-  if (
-    dependencies !== undefined &&
-    dependencies.vite !== undefined &&
-    dependencies['@tanstack/react-router'] !== undefined
-  ) {
+  if (dependencies.vite !== undefined && dependencies['@tanstack/react-router'] !== undefined) {
     return 'spa';
   }
-  if (dependencies !== undefined && dependencies.next !== undefined) {
+  if (dependencies.next !== undefined) {
     return 'web';
   }
   return null;
