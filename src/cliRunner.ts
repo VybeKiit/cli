@@ -25,7 +25,6 @@ import { runLintExtensionSkill } from './commands/lintExtensionSkill';
 import { runLiveWorkData } from './commands/liveWorkDataCmd';
 import { runLiveWorkHost } from './commands/liveWorkHostCmd';
 import { runLiveWorkPayments } from './commands/liveWorkPaymentsCmd';
-import { runLocalDev } from './commands/localDev';
 import { runMcpServer } from './commands/mcpServer';
 import { runNew } from './commands/new';
 import { runAddPageRecipe, runListPageRecipes, runListPieces } from './commands/piecesCmd';
@@ -359,7 +358,6 @@ export const cliCommands: Record<string, CliCommand> = {
   drop: (invocation) => runDrop(verbArgs(invocation)),
   doctor: handleDoctorCommand,
   init: async (invocation) => await runInit(verbArgs(invocation)),
-  'local-dev': async () => await runLocalDev(),
   'sync-agent-layer': async (invocation) =>
     writeLinesResult(await runSyncAgentLayer(verbArgs(invocation))),
   'update-kit': async (invocation) => await runUpdateKitCommand(verbArgs(invocation)),

@@ -1,9 +1,12 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { runAddPageRecipe, runListPageRecipes, runListPieces } from '../src/commands/piecesCmd';
 import { runApplyPreset, runListPresets } from '../src/commands/presetsCmd';
 
 // Missing-env failure may mention DATABASE_URL and/or --cwd guidance.
 const MISSING_DB_URL_HINT = /DATABASE_URL|cwd/i;
+const SKILL_RECIPE_PATTERN = /vybekiit add page-recipe ([a-z-]+)/g;
 
 describe('runListPresets', () => {
   it('returns DB presets with ok true', () => {
@@ -63,6 +66,29 @@ describe('runListPageRecipes', () => {
     const cart = body.recipes.find((recipe) => recipe.id === 'cart');
     expect(cart?.command).toBe('vybekiit add page-recipe cart');
     expect(cart?.targetRoute).toBe('/cart');
+  });
+
+  it('backs every page recipe a web skill installs', async () => {
+    const skillsFolder = fileURLToPath(
+      new URL('../../templates/web/.vybekiit/skills', import.meta.url),
+    );
+    const skillTexts = readdirSync(skillsFolder).map((fileName) =>
+      readFileSync(`${skillsFolder}/${fileName}`, 'utf8'),
+    );
+    const installedIds = skillTexts.flatMap((skillText) =>
+      [...skillText.matchAll(SKILL_RECIPE_PATTERN)].map((recipeMatch) => String(recipeMatch[1])),
+    );
+    const listing = await runListPageRecipes();
+    const body = JSON.parse(listing.json) as {
+      readonly recipes: readonly { readonly id: string }[];
+    };
+    const knownIds = new Set(body.recipes.map((recipe) => recipe.id));
+
+    expect(installedIds.length).toBeGreaterThan(20);
+    expect(installedIds.filter((recipeId) => !knownIds.has(recipeId))).toEqual([]);
+    expect(skillTexts.filter((skillText) => skillText.includes('apps/componentLibrary'))).toEqual(
+      [],
+    );
   });
 });
 

@@ -65,7 +65,6 @@ Create / project:
   vybekiit new [template] [directory]     (deprecated → create app)
   vybekiit drop <template> [path] [--force|--merge|--dry-run|--json]
   vybekiit init [directory]
-  vybekiit local-dev
   vybekiit scaffold backend [directory]
 
 Agent / kit:
