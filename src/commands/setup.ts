@@ -10,6 +10,7 @@ import { globalInstallPaths } from '../global/globalPaths';
 import { readInstallState } from '../global/installState';
 import { runGlobalInstall } from '../global/runGlobalInstall';
 import { canOpenDesktopBrowser, SESSION_ONE_SEED_PROMPT } from '../global/runSessionOne';
+import { findUnzippedKit, locateUnzippedKit, rememberUnzippedKit } from '../lib/unzippedKit';
 import { isInteractive } from '../prompts/tty';
 import { playWelcomeBanner } from '../ui/welcomeBanner';
 import { runFeedback } from './feedbackCmd';
@@ -79,6 +80,10 @@ export const runSetup = async (args: readonly string[] = []): Promise<number> =>
   if (preferences === null) {
     return 1;
   }
+  const surroundingKit = await findUnzippedKit(process.cwd());
+  if (surroundingKit !== null) {
+    await rememberUnzippedKit(surroundingKit);
+  }
 
   const doctorCode = await runDoctor(undefined, {
     preparingFirstApp: true,
@@ -92,7 +97,8 @@ export const runSetup = async (args: readonly string[] = []): Promise<number> =>
     return doctorCode;
   }
 
-  const authentication = await connectSetupServices(preferences);
+  const unzippedKit = await locateUnzippedKit();
+  const authentication = await connectSetupServices(preferences, unzippedKit !== null);
   writeLines(authentication.lines);
   if (!authentication.ok) {
     process.stderr.write(

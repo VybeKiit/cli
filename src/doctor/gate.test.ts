@@ -13,6 +13,8 @@ afterEach(() => {
 
 const exitWith = (code: number, stdout = ''): ExecResult => ({ code, stdout, stderr: '' });
 
+const noUnzippedKit = async (): Promise<string | null> => null;
+
 const fakeGh = (replies: Readonly<Record<string, ExecResult>>) =>
   vi.fn(async (ghArguments: readonly string[]) => {
     const ghCommand = ghArguments.join(' ');
@@ -28,17 +30,25 @@ describe('checkAccess', () => {
     expect(gateDecision.reason).toBe('skipped');
   });
 
+  it('lets an unzipped kit through without asking GitHub', async () => {
+    delete process.env.VYBEKIIT_SKIP_GATE;
+    const gh = fakeGh({});
+    const gateDecision = await checkAccess(gh, async () => '/Users/buyer/vybekiit-kit');
+    expect(gateDecision).toEqual({ allowed: true, reason: 'kit-zip', org: 'VybeKiit' });
+    expect(gh).not.toHaveBeenCalled();
+  });
+
   it('reports a missing gh', async () => {
     delete process.env.VYBEKIIT_SKIP_GATE;
     const gh = fakeGh({ '--version': exitWith(127) });
-    const gateDecision = await checkAccess(gh);
+    const gateDecision = await checkAccess(gh, noUnzippedKit);
     expect(gateDecision.reason).toBe('gh-missing');
   });
 
   it('reports a signed-out gh', async () => {
     delete process.env.VYBEKIIT_SKIP_GATE;
     const gh = fakeGh({ '--version': exitWith(0) });
-    const gateDecision = await checkAccess(gh);
+    const gateDecision = await checkAccess(gh, noUnzippedKit);
     expect(gateDecision.reason).toBe('gh-unauthed');
   });
 
@@ -51,7 +61,7 @@ describe('checkAccess', () => {
       'api -X PATCH user/repository_invitations/42': exitWith(0),
       'api repos/VybeKiit/kit': exitWith(0),
     });
-    const gateDecision = await checkAccess(gh);
+    const gateDecision = await checkAccess(gh, noUnzippedKit);
     expect(gateDecision).toEqual({ allowed: true, reason: 'ok', org: 'VybeKiit' });
     expect(gh).toHaveBeenCalledWith([
       'api',
@@ -69,7 +79,7 @@ describe('checkAccess', () => {
       'auth status': exitWith(0),
       'api user/repository_invitations --paginate': exitWith(0),
     });
-    const gateDecision = await checkAccess(gh);
+    const gateDecision = await checkAccess(gh, noUnzippedKit);
     expect(gateDecision.reason).toBe('no-access');
   });
 });

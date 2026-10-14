@@ -2,6 +2,7 @@ import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
 import crossSpawn from 'cross-spawn';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
+import { locateUnzippedKit } from '../lib/unzippedKit';
 import { runAgentExperience } from './agentExperience';
 import { verifyAssetsPipeline } from './assetsValidate';
 import { formatGlobalStatus, isGloballyInstalled, readGlobalStatus } from './claudeGlobalConfig';
@@ -104,6 +105,7 @@ type DoctorToolchainRun = {
   readonly processEnv: Record<string, string | undefined>;
   readonly log: DoctorLog;
   readonly wantsGoogleAuth: boolean | undefined;
+  readonly withoutGithub: boolean;
 };
 
 /** Probe and install the selected toolchain; return tools and final reports. */
@@ -113,10 +115,12 @@ const runToolchain = async ({
   processEnv,
   log,
   wantsGoogleAuth = false,
+  withoutGithub,
 }: DoctorToolchainRun): Promise<DoctorToolRun> => {
   const providerTools = selectToolchain(processEnv, {
     mobile: surface.mobile,
     wantsGoogleAuth: wantsGoogleAuth || Boolean(processEnv.GOOGLE_OAUTH_CLIENT_ID),
+    withoutGithub,
   });
   const nativeTools = selectNativeTools(surface, platform);
   const providerAndNative = mergeDoctorTools(providerTools, nativeTools);
@@ -267,12 +271,14 @@ export const runDoctor = async (
     log.log("✓ Cursor - you're in Cursor; no separate agent install needed.");
   }
 
+  const unzippedKit = await locateUnzippedKit(cwd);
   const { nativeTools, providerTools, reports } = await runToolchain({
     platform,
     surface,
     processEnv,
     log,
     wantsGoogleAuth: setupScope.wantsGoogleAuth,
+    withoutGithub: unzippedKit !== null,
   });
   writeDoctorLines(log, formatReport(reports));
   if (!preparingFirstApp) {

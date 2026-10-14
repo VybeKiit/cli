@@ -20,6 +20,7 @@ const countingClone = (): { readonly deps: KitWorkspaceSeams; readonly calls: ()
         return Promise.resolve();
       },
       exists: () => Promise.resolve(false),
+      unzippedKit: () => Promise.resolve(null),
     },
     calls: () => cloneCalls,
   };
@@ -74,6 +75,7 @@ describe('locateKitWorkspace monorepo-local', () => {
           return false;
         }
       },
+      unzippedKit: () => Promise.resolve(null),
     };
 
     const resolved = await locateKitWorkspace(deps);
@@ -81,6 +83,24 @@ describe('locateKitWorkspace monorepo-local', () => {
     await expect(stat(join(resolved.kitRoot, 'templates'))).resolves.toBeDefined();
     expect(resolved.cleanup).toBeUndefined();
     expect(cloneCalls).toBe(0);
+  });
+});
+
+describe('locateKitWorkspace unzipped kit', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('uses the unzipped kit folder before it tries GitHub', async () => {
+    vi.stubEnv('VYBEKIIT_KIT_DIR', '');
+    vi.stubEnv('VYBEKIIT_TEMPLATES_DIR', '');
+    const { deps, calls } = countingClone();
+    const resolved = await locateKitWorkspace({
+      ...deps,
+      unzippedKit: () => Promise.resolve('/Users/buyer/vybekiit-kit'),
+    });
+    expect(resolved).toEqual({ kitRoot: '/Users/buyer/vybekiit-kit' });
+    expect(calls()).toBe(0);
   });
 });
 
@@ -100,6 +120,7 @@ describe('locateKitWorkspace kit mirror clone', () => {
         await mkdir(targetDir, { recursive: true });
       },
       exists: () => Promise.resolve(false),
+      unzippedKit: () => Promise.resolve(null),
     };
 
     const resolved = await locateKitWorkspace(deps);
@@ -121,6 +142,7 @@ describe('locateKitWorkspace kit mirror clone', () => {
     const deps: KitWorkspaceSeams = {
       clone: () => Promise.reject(new ScaffoldError("Couldn't download the kit workspace. ...")),
       exists: () => Promise.resolve(false),
+      unzippedKit: () => Promise.resolve(null),
     };
 
     await expect(locateKitWorkspace(deps)).rejects.toBeInstanceOf(ScaffoldError);

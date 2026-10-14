@@ -25,6 +25,12 @@ describe('selectToolchain defaults', () => {
     expect(selectToolchain({}, { mobile: true }).map((tool) => tool.name)[0]).toBe('gh');
   });
 
+  it('leaves out GitHub for a buyer who unzipped the kit', () => {
+    const names = selectToolchain({}, { withoutGithub: true }).map((tool) => tool.name);
+
+    expect(names).toEqual(['wrangler', 'supabase']);
+  });
+
   it('configures the GitHub sign-in probe', () => {
     const gh = selectToolchain({}).find((tool) => tool.name === 'gh');
 

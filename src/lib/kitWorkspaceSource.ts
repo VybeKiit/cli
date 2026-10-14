@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { pathExists } from './pathExists';
 import { ScaffoldError } from './scaffold';
+import { locateUnzippedKit } from './unzippedKit';
 
 const execFileAsync = promisify(execFile);
 
@@ -48,10 +49,12 @@ export const kitMirrorCloneArgs = (repoName: string, targetDir: string): readonl
  *
  * @property clone - downloads the kit mirror into a target dir (see {@link cloneKitMirror})
  * @property exists - true when a path is present on disk (the monorepo-local probe)
+ * @property unzippedKit - the buyer's unzipped kit ZIP folder, or null (see `unzippedKit.ts`)
  */
 export type KitWorkspaceSeams = {
   readonly clone: (repoName: string, targetDir: string) => Promise<void>;
   readonly exists: (path: string) => Promise<boolean>;
+  readonly unzippedKit: () => Promise<string | null>;
 };
 
 /** A resolved kit workspace root plus optional teardown for a temp clone. */
@@ -79,7 +82,7 @@ export const cloneKitMirror = async (repoName: string, targetDir: string): Promi
     await execFileAsync('gh', kitMirrorCloneArgs(repoName, targetDir));
   } catch (error) {
     throw new ScaffoldError(
-      "Couldn't download the kit workspace. Make sure your assistant is signed in to GitHub: run gh auth login --web",
+      "Couldn't download the kit workspace. Make sure your assistant is signed in to GitHub: run gh auth login --web. Bought the kit as a ZIP? Open a terminal in the unzipped kit folder and run npx vybekiit setup",
       { cause: error },
     );
   }
@@ -116,7 +119,8 @@ const localKitWorkspaceRoot = async (
  * 1. `VYBEKIIT_KIT_DIR` set: that dir (explicit kit override for dev/CI), no cleanup.
  * 2. Else `VYBEKIIT_TEMPLATES_DIR` set: its parent (legacy override points at `templates/`), no cleanup.
  * 3. Else the monorepo root when it holds `packages/` + `templates/`, no cleanup.
- * 4. Else (published install): clone {@link KIT_MIRROR_REPO} into a temp dir, with cleanup.
+ * 4. Else the buyer's unzipped kit ZIP folder (around cwd, or remembered by setup), no cleanup.
+ * 5. Else (published install): clone {@link KIT_MIRROR_REPO} into a temp dir, with cleanup.
  *
  * Deps are injected so all branches, including clone failure, are testable without the network.
  *
@@ -126,7 +130,11 @@ const localKitWorkspaceRoot = async (
  * const { kitRoot, cleanup } = await locateKitWorkspace();
  */
 export const locateKitWorkspace = async (
-  deps: KitWorkspaceSeams = { clone: cloneKitMirror, exists: pathExists },
+  deps: KitWorkspaceSeams = {
+    clone: cloneKitMirror,
+    exists: pathExists,
+    unzippedKit: locateUnzippedKit,
+  },
 ): Promise<LocatedKitWorkspace> => {
   const kitOverride = process.env.VYBEKIIT_KIT_DIR;
   if (kitOverride !== undefined && kitOverride !== '') {
@@ -141,6 +149,11 @@ export const locateKitWorkspace = async (
   const localRoot = await localKitWorkspaceRoot(deps.exists);
   if (localRoot !== null) {
     return { kitRoot: localRoot };
+  }
+
+  const unzippedKitRoot = await deps.unzippedKit();
+  if (unzippedKitRoot !== null) {
+    return { kitRoot: unzippedKitRoot };
   }
 
   // Parent owns cleanup; clone target must not exist yet (`gh` rejects a pre-created dir).

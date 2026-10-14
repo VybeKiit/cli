@@ -106,6 +106,7 @@ export const findToolByName = (name: string): Tool | undefined =>
 export type ToolchainOptions = {
   readonly mobile?: boolean;
   readonly wantsGoogleAuth?: boolean;
+  readonly withoutGithub?: boolean;
 };
 
 type ToolCollector = {
@@ -171,7 +172,7 @@ export const selectToolchain = (
   const { DATA_PROVIDER } = parseEnv(dataConfigSchema, envSource);
   const collector = createToolCollector();
 
-  collector.add(GH);
+  collector.add(surface.withoutGithub === true ? undefined : GH);
   collector.add(hostingCliForProvider(HOSTING_PROVIDER, envSource));
   if (isRailwayStackActive(envSource) && HOSTING_PROVIDER !== 'railway') {
     collector.add(RAILWAY);

@@ -16,11 +16,19 @@ const browserAvailable = () => true;
 describe('connectSetupServices', () => {
   it('reuses existing sign-ins and does not open another browser flow', async () => {
     const run = vi.fn(async () => exitWith(0));
-    const connection = await connectSetupServices(SELECTED_STACK, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
 
     expect(connection.ok).toBe(true);
     expect(connection.connected).toEqual(['gh', 'wrangler', 'supabase']);
     expect(run).toHaveBeenCalledTimes(3);
+  });
+
+  it('leaves GitHub out for a buyer who unzipped the kit', async () => {
+    const run = vi.fn(async () => exitWith(0));
+    const connection = await connectSetupServices(SELECTED_STACK, true, run, browserAvailable);
+
+    expect(connection.connected).toEqual(['wrangler', 'supabase']);
+    expect(run).not.toHaveBeenCalledWith('gh', expect.anything(), expect.anything());
   });
 
   it('runs the official browser sign-in and verifies it afterward', async () => {
@@ -39,7 +47,7 @@ describe('connectSetupServices', () => {
       return exitWith(0);
     });
 
-    const connection = await connectSetupServices(SELECTED_STACK, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
 
     expect(connection.ok).toBe(true);
     expect(run).toHaveBeenCalledWith('wrangler', ['login'], true);
@@ -53,7 +61,7 @@ describe('connectSetupServices', () => {
         : exitWith(0),
     );
 
-    const connection = await connectSetupServices(SELECTED_STACK, run, () => false);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, () => false);
 
     expect(connection.needsAttention).toEqual(['wrangler']);
   });
@@ -63,7 +71,7 @@ describe('connectSetupServices', () => {
       command === 'gh' && args[1] === 'status' ? exitWith(1) : exitWith(0),
     );
 
-    await connectSetupServices(SELECTED_STACK, run, browserAvailable);
+    await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
 
     expect(run).toHaveBeenCalledWith(
       'gh',
@@ -77,7 +85,7 @@ describe('connectSetupServices', () => {
       exitWith(1),
     );
 
-    const connection = await connectSetupServices(SELECTED_STACK, run, () => false);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, () => false);
 
     expect(run).toHaveBeenCalledTimes(3);
     expect(run.mock.calls.every(([, , interactive]) => interactive === false)).toBe(true);
@@ -86,7 +94,7 @@ describe('connectSetupServices', () => {
 
   it('fails honestly when sign-in still cannot be verified', async () => {
     const run = vi.fn(async (command: string) => exitWith(command === 'supabase' ? 1 : 0));
-    const connection = await connectSetupServices(SELECTED_STACK, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
 
     expect(connection.ok).toBe(false);
     expect(connection.needsAttention).toEqual(['supabase']);

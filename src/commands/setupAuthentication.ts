@@ -63,11 +63,13 @@ const connectTool = async (
 /** Reuse or open the official sign-in flow for each selected service. */
 export const connectSetupServices = async (
   preferences: SetupPreferences,
+  withoutGithub: boolean,
   run: SetupCommandRunner = defaultSetupCommandRunner,
   canOpenBrowser: () => boolean = canOpenDesktopBrowser,
 ): Promise<SetupAuthenticationResult> => {
   const selectedTools = selectToolchain(setupEnvironment(preferences), {
     wantsGoogleAuth: preferences.googleSignIn,
+    withoutGithub,
   });
   const attempts = await selectedTools.reduce<
     Promise<{ readonly tool: Tool; readonly connection: ToolConnection }[]>
