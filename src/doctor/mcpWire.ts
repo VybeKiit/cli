@@ -1,6 +1,6 @@
-import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import crossSpawn from 'cross-spawn';
 import type { AgentId, DetectedAgent } from '../lib/agentDetection';
 
 /** One server entry from a project `mcp-servers.json` catalog. */
@@ -70,11 +70,11 @@ const CATALOG_RELATIVE_PATHS = [
  * const present = defaultCommandExists('claude');
  */
 const defaultCommandExists = (command: string): boolean => {
-  const version = spawnSync(command, ['--version'], { stdio: 'ignore' });
+  const version = crossSpawn.sync(command, ['--version'], { stdio: 'ignore' });
   if (version.status === 0) {
     return true;
   }
-  const help = spawnSync(command, ['--help'], { stdio: 'ignore' });
+  const help = crossSpawn.sync(command, ['--help'], { stdio: 'ignore' });
   return help.status === 0 || help.error === undefined;
 };
 
@@ -97,7 +97,7 @@ export const createDefaultMcpWireDeps = (): McpWireDeps => ({
   commandExists: defaultCommandExists,
   spawn: (command, spawnArgs, spawnOptions) => {
     // Cap duration so optional `claude mcp add` never hangs an interactive doctor.
-    const spawnOutcome = spawnSync(command, [...spawnArgs], {
+    const spawnOutcome = crossSpawn.sync(command, [...spawnArgs], {
       stdio: 'ignore',
       cwd: spawnOptions?.cwd,
       timeout: 8000,

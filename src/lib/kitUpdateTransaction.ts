@@ -1,14 +1,9 @@
-import { execFile } from 'node:child_process';
 import { cp, lstat, mkdir, readdir, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import process from 'node:process';
-import { promisify } from 'node:util';
-
+import { runProcess } from '../global/exec';
 import type { KitUpdateInspection } from './kitUpdateInspection';
 import { KIT_WORKSPACE_MANIFEST_PATH, writeKitWorkspaceManifest } from './kitUpdateManifest';
 import { pathExists } from './pathExists';
-
-const execFileAsync = promisify(execFile);
 
 const copyWorkspacePath = async (
   sourceRoot: string,
@@ -68,20 +63,12 @@ const verifyPreview = async (previewRoot: string): Promise<boolean> => {
   const installArguments = hasLock
     ? ['install', '--frozen-lockfile', '--ignore-scripts']
     : ['install', '--no-frozen-lockfile', '--ignore-scripts'];
-  return await execFileAsync('pnpm', installArguments, {
-    cwd: previewRoot,
-    env: process.env,
-    maxBuffer: 10 * 1024 * 1024,
-  })
-    .then(async () =>
-      execFileAsync('pnpm', ['verify'], {
-        cwd: previewRoot,
-        env: process.env,
-        maxBuffer: 10 * 1024 * 1024,
-      }),
-    )
-    .then(() => true)
-    .catch(() => false);
+  const previewInstall = await runProcess('pnpm', installArguments, { cwd: previewRoot });
+  if (previewInstall.code !== 0) {
+    return false;
+  }
+  const previewVerify = await runProcess('pnpm', ['verify'], { cwd: previewRoot });
+  return previewVerify.code === 0;
 };
 
 const restoreBuyerPaths = async (

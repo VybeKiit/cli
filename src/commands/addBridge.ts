@@ -1,6 +1,7 @@
-import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { npmUserInstallArguments } from '../doctor/toolFolders';
+import { commandSucceeds } from '../global/exec';
 
 const SKILL_CONTENT = `# ai-browser-bridge
 
@@ -138,18 +139,13 @@ export const runAddBridge = (args: string[]): number => {
   const results: string[] = [];
 
   // 1. Install ai-browser-bridge globally
-  try {
-    execFileSync('pnpm', ['add', '-g', 'ai-browser-bridge'], { stdio: 'pipe' });
-    results.push('Installed ai-browser-bridge globally');
-  } catch {
-    // Already installed or pnpm not available for global, try npm.
-    try {
-      execFileSync('npm', ['install', '-g', 'ai-browser-bridge'], { stdio: 'pipe' });
-      results.push('Installed ai-browser-bridge globally (via npm)');
-    } catch {
-      results.push('Could not install globally. Install manually: pnpm add -g ai-browser-bridge');
-    }
-  }
+  const bridgeInstallArguments = npmUserInstallArguments('ai-browser-bridge');
+  const bridgeInstalled = commandSucceeds('npm', bridgeInstallArguments);
+  results.push(
+    bridgeInstalled
+      ? 'Installed ai-browser-bridge'
+      : 'Could not install ai-browser-bridge. Install it with: npm install --global ai-browser-bridge',
+  );
 
   // 2. Copy SKILL.md into all agent skill directories
   let skillsCopied = 0;

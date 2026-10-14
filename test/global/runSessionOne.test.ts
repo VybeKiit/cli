@@ -1,13 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   canOpenDesktopBrowser,
-  claudeTerminalCommand,
   DEFAULT_FIRST_APP_DIR_NAME,
   firstAppPath,
   formatSessionOneLines,
   repairProjectBuildRoots,
   runSessionOne,
-  SESSION_ONE_SEED_PROMPT,
   type SessionOneDeps,
   sessionOneWelcomeUrl,
   shouldSkipSessionOne,
@@ -19,7 +17,6 @@ const baseDeps = (overrides: Partial<SessionOneDeps> = {}): SessionOneDeps => ({
   isEmptyDir: vi.fn(async () => true),
   runCommand: vi.fn(async () => ({ code: 0 })),
   startDetached: vi.fn(() => true),
-  openClaude: vi.fn(async () => true),
   waitForPreview: vi.fn(async () => true),
   previewPort: vi.fn(async () => 4317),
   previewIdentity: 'buyer-preview',
@@ -89,15 +86,6 @@ describe('canOpenDesktopBrowser', () => {
     expect(canOpenDesktopBrowser('linux', { DISPLAY: ':0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WAYLAND_DISPLAY: 'wayland-0' })).toBe(true);
     expect(canOpenDesktopBrowser('linux', { WSL_DISTRO_NAME: 'Ubuntu' })).toBe(true);
-  });
-});
-
-describe('claudeTerminalCommand', () => {
-  it('keeps the macOS Terminal tab open after Claude finishes', () => {
-    const command = claudeTerminalCommand('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
-
-    expect(command).toContain("claude 'Set up my app.'");
-    expect(command).toContain('exec "${SHELL:-/bin/zsh}" -l');
   });
 });
 
@@ -218,21 +206,20 @@ describe('repairProjectBuildRoots', () => {
 });
 
 describe('formatSessionOneLines', () => {
-  it('mentions report mode and the seed prompt on success', () => {
+  it('mentions report mode and the project tools on success', () => {
     const text = formatSessionOneLines({
       appPath: '/Users/me/vybekiit-app',
       created: true,
       depsInstalled: true,
       packagesBuilt: true,
       devStarted: true,
-      claudeOpened: true,
       projectToolsReady: true,
       previewReady: true,
       browserOpened: true,
     }).join('\n');
 
-    expect(text).toContain('/Users/me/vybekiit-app');
-    expect(text).toContain(SESSION_ONE_SEED_PROMPT);
+    expect(text).toContain('✓ Your app preview is ready at /Users/me/vybekiit-app');
+    expect(text).not.toContain('—');
     expect(text).toContain('Option+Shift+R');
     expect(text).toContain('localhost:3000');
     expect(text).toContain('@vybekiit/ui');
@@ -241,22 +228,20 @@ describe('formatSessionOneLines', () => {
     expect(text).toContain('browser automation');
   });
 
-  it('hands the ready app to whichever coding agent the buyer uses', () => {
+  it('points a partly prepared app back at setup', () => {
     const text = formatSessionOneLines({
       appPath: '/Users/me/vybekiit-app',
       created: true,
       depsInstalled: true,
       packagesBuilt: true,
       devStarted: false,
-      claudeOpened: false,
       projectToolsReady: false,
       previewReady: false,
       browserOpened: false,
     }).join('\n');
 
-    expect(text).toContain('Open that folder in your coding agent');
-    expect(text).toContain('/Users/me/vybekiit-app');
-    expect(text).not.toContain('&& claude');
+    expect(text).toContain('Your app needs attention at /Users/me/vybekiit-app');
+    expect(text).toContain('Project tools still need repair');
     expect(text).toContain('npx vybekiit setup');
     expect(text).not.toContain('@latest setup');
   });
@@ -268,7 +253,6 @@ describe('formatSessionOneLines', () => {
       depsInstalled: true,
       packagesBuilt: true,
       devStarted: true,
-      claudeOpened: false,
       projectToolsReady: true,
       previewReady: true,
       browserOpened: false,
@@ -287,13 +271,11 @@ describe('runSessionOne', () => {
 
     expect(result.previewReady).toBe(true);
     expect(result.browserOpened).toBe(false);
-    expect(result.claudeOpened).toBe(false);
     expect(deps.openBrowser).not.toHaveBeenCalled();
-    expect(deps.openClaude).not.toHaveBeenCalled();
-    expect(result.lines.join('\n')).toContain('Open that folder in your coding agent');
+    expect(result.lines.join('\n')).toContain('Welcome page verified');
   });
 
-  it('creates the web app, installs, builds, opens Claude, then opens a verified welcome page', async () => {
+  it('creates the web app, installs, builds, then opens a verified welcome page', async () => {
     const deps = baseDeps();
     const result = await runSessionOne(deps, {
       data: 'supabase',
@@ -311,7 +293,6 @@ describe('runSessionOne', () => {
       '--port',
       '4317',
     ]);
-    expect(deps.openClaude).toHaveBeenCalledWith('/Users/me/vybekiit-app', SESSION_ONE_SEED_PROMPT);
     expect(deps.writeSetupEnvironment).toHaveBeenCalledWith('/Users/me/vybekiit-app', {
       DATA_PROVIDER: 'supabase',
       HOSTING_PROVIDER: 'cloudflare',
@@ -327,7 +308,6 @@ describe('runSessionOne', () => {
       depsInstalled: true,
       packagesBuilt: true,
       devStarted: true,
-      claudeOpened: true,
       projectToolsReady: true,
       previewReady: true,
       browserOpened: true,
@@ -383,7 +363,7 @@ describe('runSessionOne', () => {
     expect(result.lines.join('\n')).toContain('already exists');
   });
 
-  it('keeps the assistant closed when setup cannot install dependencies', async () => {
+  it('stops before the preview when setup cannot install dependencies', async () => {
     const deps = baseDeps({
       pnpmCommand: vi.fn(async () => null),
     });
@@ -391,7 +371,7 @@ describe('runSessionOne', () => {
     const result = await runSessionOne(deps);
     expect(result.created).toBe(true);
     expect(result.depsInstalled).toBe(false);
-    expect(deps.openClaude).not.toHaveBeenCalled();
+    expect(deps.startDetached).not.toHaveBeenCalled();
     expect(result.appPath).toBe('/Users/me/vybekiit-app');
   });
 });

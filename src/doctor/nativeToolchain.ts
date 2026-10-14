@@ -5,6 +5,7 @@
  */
 
 import type { ProjectSurface } from '../lib/inferProjectSurface';
+import { aptInstall, homebrewInstall, wingetInstall } from './installSteps';
 import type { Platform, Tool } from './toolchain';
 
 /** Keeps Metro file watching fast while editing a mobile app. */
@@ -13,9 +14,8 @@ const WATCHMAN: Tool = {
   purpose: 'keep your mobile app preview fast while you edit',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'watchman'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'watchman'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'watchman'], requires: 'Homebrew' },
+    darwin: homebrewInstall('watchman'),
+    linux: aptInstall('watchman'),
   },
 };
 
@@ -25,15 +25,7 @@ const COCOAPODS: Tool = {
   purpose: 'install iOS native libraries for your mobile app',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'cocoapods'], requires: 'Homebrew' },
-    win32: {
-      command: 'echo',
-      args: ['CocoaPods is only needed on macOS for iOS builds'],
-    },
-    linux: {
-      command: 'echo',
-      args: ['CocoaPods is only needed on macOS for iOS builds'],
-    },
+    darwin: homebrewInstall('cocoapods'),
   },
 };
 
@@ -43,9 +35,9 @@ const DOCKER: Tool = {
   purpose: 'run local services in containers',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', '--cask', 'docker'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'docker'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'docker'], requires: 'Homebrew' },
+    darwin: homebrewInstall('--cask', 'docker'),
+    win32: wingetInstall('Docker.DockerDesktop'),
+    linux: { kind: 'script', url: 'https://get.docker.com' },
   },
   auth: {
     command: 'docker',
@@ -77,12 +69,10 @@ export const selectNativeTools = (surface: ProjectSurface, platform: Platform): 
 
   if (surface.mobile) {
     add(WATCHMAN);
-    if (platform === 'darwin') {
-      add(COCOAPODS);
-    }
+    add(COCOAPODS);
   }
 
-  return tools;
+  return tools.filter((tool) => tool.install[platform] !== undefined);
 };
 
 /**

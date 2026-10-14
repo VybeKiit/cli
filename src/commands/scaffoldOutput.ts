@@ -11,7 +11,7 @@ import { CREATE_SURFACES, type CreateSurface } from './createSurfaceRegistry';
  */
 export const formatCreateSuccess = (surface: CreateSurface, dest: string): readonly string[] => [
   '',
-  `✅ Created kit workspace + ${surface} surface at ${dest}`,
+  `✓ Created kit workspace + ${surface} surface at ${dest}`,
   '   (assets optimize path on; speed-check skill available after doctor in this folder)',
   surface === 'web'
     ? '   Included: matching project skills + VybeKiit MCP (UI catalog + browser automation)'

@@ -1,6 +1,6 @@
-import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import crossSpawn from 'cross-spawn';
 import type { ProjectSurface } from '../lib/inferProjectSurface';
 import { type DoctorLog, processDoctorLog } from './doctorLog';
 import type { Platform } from './toolchain';
@@ -28,7 +28,7 @@ type NativeCommandOptions = {
 const runCommand = (options: NativeCommandOptions): boolean => {
   const { args, command, cwd, label, log } = options;
   log.log(`[doctor] ${label}: ${command} ${args.join(' ')}`);
-  const result = spawnSync(command, [...args], { cwd, stdio: 'inherit' });
+  const result = crossSpawn.sync(command, [...args], { cwd, stdio: 'inherit' });
   return result.status === 0;
 };
 

@@ -1,4 +1,24 @@
+import {
+  githubRelease,
+  homebrewInstall,
+  npmEverywhere,
+  snapInstall,
+  wingetInstall,
+} from './installSteps';
 import type { Tool } from './toolchain';
+
+const GITHUB_SIGN_IN_FLAGS: readonly string[] = [
+  'auth',
+  'login',
+  '--web',
+  '-h',
+  'github.com',
+  '-p',
+  'https',
+  '--skip-ssh-key',
+];
+
+export const GITHUB_SIGN_IN_COMMAND = `gh ${GITHUB_SIGN_IN_FLAGS.join(' ')}`;
 
 /** GitHub CLI: downloads private template mirrors and verifies GitHub auth. */
 export const GH: Tool = {
@@ -6,15 +26,27 @@ export const GH: Tool = {
   purpose: "download your app's starter files and sign you in to GitHub",
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'gh'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'gh'], requires: 'Homebrew' },
+    darwin: githubRelease(
+      'cli/cli',
+      'gh_{version}_macOS_amd64.zip',
+      'gh_{version}_macOS_arm64.zip',
+    ),
+    win32: githubRelease(
+      'cli/cli',
+      'gh_{version}_windows_amd64.zip',
+      'gh_{version}_windows_arm64.zip',
+    ),
+    linux: githubRelease(
+      'cli/cli',
+      'gh_{version}_linux_amd64.tar.gz',
+      'gh_{version}_linux_arm64.tar.gz',
+    ),
   },
   auth: {
     command: 'gh',
     args: ['auth', 'status'],
-    loginHint: 'gh auth login --web',
-    signIn: { command: 'gh', args: ['auth', 'login', '--web'] },
+    loginHint: GITHUB_SIGN_IN_COMMAND,
+    signIn: { command: 'gh', args: GITHUB_SIGN_IN_FLAGS },
   },
 };
 
@@ -23,15 +55,12 @@ export const WRANGLER: Tool = {
   name: 'wrangler',
   purpose: 'put your app online',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-    win32: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-    linux: { command: 'npm', args: ['install', '-g', 'wrangler'] },
-  },
+  install: npmEverywhere('wrangler'),
   auth: {
     command: 'wrangler',
     args: ['whoami'],
     loginHint: 'wrangler login',
+    signedOutText: 'not authenticated',
     signIn: { command: 'wrangler', args: ['login'] },
   },
 };
@@ -41,11 +70,7 @@ export const VERCEL: Tool = {
   name: 'vercel',
   purpose: 'put your app online',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'vercel'] },
-    win32: { command: 'npm', args: ['install', '-g', 'vercel'] },
-    linux: { command: 'npm', args: ['install', '-g', 'vercel'] },
-  },
+  install: npmEverywhere('vercel'),
   auth: {
     command: 'vercel',
     args: ['whoami'],
@@ -59,11 +84,7 @@ export const RAILWAY: Tool = {
   name: 'railway',
   purpose: 'put your app online and manage your database host',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
-    win32: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
-    linux: { command: 'npm', args: ['install', '-g', '@railway/cli'] },
-  },
+  install: npmEverywhere('@railway/cli'),
   auth: {
     command: 'railway',
     args: ['whoami'],
@@ -78,9 +99,21 @@ export const SUPABASE: Tool = {
   purpose: 'create and manage your database',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'supabase/tap/supabase'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'supabase'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'supabase/tap/supabase'], requires: 'Homebrew' },
+    darwin: githubRelease(
+      'supabase/cli',
+      'supabase_darwin_amd64.tar.gz',
+      'supabase_darwin_arm64.tar.gz',
+    ),
+    win32: githubRelease(
+      'supabase/cli',
+      'supabase_windows_amd64.tar.gz',
+      'supabase_windows_arm64.tar.gz',
+    ),
+    linux: githubRelease(
+      'supabase/cli',
+      'supabase_linux_amd64.tar.gz',
+      'supabase_linux_arm64.tar.gz',
+    ),
   },
   auth: {
     command: 'supabase',
@@ -95,11 +128,7 @@ export const NEON: Tool = {
   name: 'neonctl',
   purpose: 'create and manage your database',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'neonctl'] },
-    win32: { command: 'npm', args: ['install', '-g', 'neonctl'] },
-    linux: { command: 'npm', args: ['install', '-g', 'neonctl'] },
-  },
+  install: npmEverywhere('neonctl'),
   auth: {
     command: 'neonctl',
     args: ['me'],
@@ -114,9 +143,21 @@ export const ATLAS: Tool = {
   purpose: 'create and manage your database',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'mongodb-atlas-cli'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'mongodb-atlas-cli'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'mongodb-atlas-cli'], requires: 'Homebrew' },
+    darwin: githubRelease(
+      'mongodb/mongodb-atlas-cli',
+      'mongodb-atlas-cli_{version}_macos_x86_64.zip',
+      'mongodb-atlas-cli_{version}_macos_arm64.zip',
+    ),
+    win32: githubRelease(
+      'mongodb/mongodb-atlas-cli',
+      'mongodb-atlas-cli_{version}_windows_x86_64.zip',
+      'mongodb-atlas-cli_{version}_windows_x86_64.zip',
+    ),
+    linux: githubRelease(
+      'mongodb/mongodb-atlas-cli',
+      'mongodb-atlas-cli_{version}_linux_x86_64.tar.gz',
+      'mongodb-atlas-cli_{version}_linux_arm64.tar.gz',
+    ),
   },
   auth: {
     command: 'atlas',
@@ -132,9 +173,9 @@ export const AWS: Tool = {
   purpose: 'create and manage your cloud services',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', 'awscli'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'aws'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', 'awscli'], requires: 'Homebrew' },
+    darwin: homebrewInstall('awscli'),
+    win32: wingetInstall('Amazon.AWSCLI'),
+    linux: snapInstall('aws-cli'),
   },
   auth: {
     command: 'aws',
@@ -150,9 +191,9 @@ export const GCLOUD: Tool = {
   purpose: 'set up sign in with Google for your app',
   versionArgs: ['--version'],
   install: {
-    darwin: { command: 'brew', args: ['install', '--cask', 'gcloud-cli'], requires: 'Homebrew' },
-    win32: { command: 'scoop', args: ['install', 'gcloud'], requires: 'Scoop' },
-    linux: { command: 'brew', args: ['install', '--cask', 'gcloud-cli'], requires: 'Homebrew' },
+    darwin: homebrewInstall('--cask', 'gcloud-cli'),
+    win32: wingetInstall('Google.CloudSDK'),
+    linux: snapInstall('google-cloud-cli'),
   },
   auth: {
     command: 'gcloud',
@@ -165,25 +206,32 @@ export const GCLOUD: Tool = {
 /** Claude Code CLI agent runtime. */
 export const CLAUDE: Tool = {
   name: 'claude',
-  purpose: 'your AI coding assistant (Claude Code)',
+  purpose: 'run Claude Code, your AI coding assistant',
   versionArgs: ['--version'],
+  minimumVersion: '2.1.281',
   install: {
-    darwin: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
-    win32: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
-    linux: { command: 'npm', args: ['install', '-g', '@anthropic-ai/claude-code'] },
+    darwin: { kind: 'script', url: 'https://claude.ai/install.sh' },
+    win32: {
+      kind: 'command',
+      command: 'powershell',
+      args: [
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-Command',
+        'irm https://claude.ai/install.ps1 | iex',
+      ],
+    },
+    linux: { kind: 'script', url: 'https://claude.ai/install.sh' },
   },
 };
 
 /** OpenAI Codex CLI agent runtime. */
 export const CODEX: Tool = {
   name: 'codex',
-  purpose: 'your AI coding assistant (OpenAI Codex)',
+  purpose: 'run OpenAI Codex, your AI coding assistant',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
-    win32: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
-    linux: { command: 'npm', args: ['install', '-g', '@openai/codex'] },
-  },
+  install: npmEverywhere('@openai/codex'),
 };
 
 /** skills.sh CLI for pinning official platform skills. */
@@ -191,11 +239,7 @@ export const SKILLS: Tool = {
   name: 'skills',
   purpose: 'install the official platform skills your app needs',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'skills'] },
-    win32: { command: 'npm', args: ['install', '-g', 'skills'] },
-    linux: { command: 'npm', args: ['install', '-g', 'skills'] },
-  },
+  install: npmEverywhere('skills'),
 };
 
 /** EAS CLI for mobile builds. */
@@ -203,11 +247,7 @@ export const EAS: Tool = {
   name: 'eas',
   purpose: 'build your app for the app stores',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
-    win32: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
-    linux: { command: 'npm', args: ['install', '-g', 'eas-cli'] },
-  },
+  install: npmEverywhere('eas-cli'),
   auth: {
     command: 'eas',
     args: ['whoami'],
@@ -221,11 +261,7 @@ export const LAUNCH: Tool = {
   name: 'launch',
   purpose: 'publish your app to the app stores',
   versionArgs: ['--version'],
-  install: {
-    darwin: { command: 'npm', args: ['install', '-g', 'launch-store'] },
-    win32: { command: 'npm', args: ['install', '-g', 'launch-store'] },
-    linux: { command: 'npm', args: ['install', '-g', 'launch-store'] },
-  },
+  install: npmEverywhere('launch-store'),
 };
 
 /** Agent-runtime CLIs always checked by doctor. */

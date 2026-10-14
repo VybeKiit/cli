@@ -5,9 +5,11 @@ import process from 'node:process';
 import { confirm, isCancel } from '@clack/prompts';
 import { checkAccess } from '../doctor/gate';
 import { runDoctor } from '../doctor/run';
+import { manualClaudeLine, openClaudeInApp } from '../global/claudeHandoff';
 import { globalInstallPaths } from '../global/globalPaths';
 import { readInstallState } from '../global/installState';
 import { runGlobalInstall } from '../global/runGlobalInstall';
+import { canOpenDesktopBrowser, SESSION_ONE_SEED_PROMPT } from '../global/runSessionOne';
 import { isInteractive } from '../prompts/tty';
 import { playWelcomeBanner } from '../ui/welcomeBanner';
 import { runFeedback } from './feedbackCmd';
@@ -31,6 +33,16 @@ import {
  */
 const writeLines = (lines: readonly string[]): void => {
   process.stdout.write(lines.map((line) => `${line}\n`).join(''));
+};
+
+const handOffToClaude = async (appPath: string): Promise<void> => {
+  const interactive = isInteractive();
+  const canOpenClaude = interactive || canOpenDesktopBrowser();
+  const claudeOpened =
+    canOpenClaude && (await openClaudeInApp(appPath, SESSION_ONE_SEED_PROMPT, interactive));
+  if (!claudeOpened) {
+    process.stdout.write(`${manualClaudeLine(SESSION_ONE_SEED_PROMPT)}\n`);
+  }
 };
 
 const setupPreferences = async (args: readonly string[]): Promise<SetupPreferences | null> => {
@@ -80,7 +92,7 @@ export const runSetup = async (args: readonly string[] = []): Promise<number> =>
     return doctorCode;
   }
 
-  const authentication = connectSetupServices(preferences);
+  const authentication = await connectSetupServices(preferences);
   writeLines(authentication.lines);
   if (!authentication.ok) {
     process.stderr.write(
@@ -124,18 +136,20 @@ export const runSetup = async (args: readonly string[] = []): Promise<number> =>
       process.stderr.write('Your app is ready. Automatic feedback still needs attention.\n');
   }
 
-  const access = checkAccess();
+  const access = await checkAccess();
   const installState = await readInstallState(globalInstallPaths().configDir);
+  const firstAppPath = installState?.firstAppPath;
 
   process.stdout.write('\n');
-  for (const line of formatSetupNextStep({
-    doctorExitCode: doctorCode,
-    gateReason: access.reason,
-    ...(installState?.firstAppPath === undefined
-      ? {}
-      : { firstAppPath: installState.firstAppPath }),
-  })) {
-    process.stdout.write(`${line}\n`);
+  writeLines(
+    formatSetupNextStep({
+      doctorExitCode: doctorCode,
+      gateReason: access.reason,
+      ...(firstAppPath === undefined ? {} : { firstAppPath }),
+    }),
+  );
+  if (doctorCode === 0 && access.allowed && firstAppPath !== undefined) {
+    await handOffToClaude(firstAppPath);
   }
 
   return doctorCode;

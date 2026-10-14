@@ -1,8 +1,6 @@
-import { execFile } from 'node:child_process';
 import { access, cp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
-import { promisify } from 'node:util';
 import {
   AGENT_LAYER_PATHS,
   applyAgentLayerSections,
@@ -11,13 +9,12 @@ import {
   mergeGoalIndexOnSync,
   planAgentLayerSync,
 } from '@vybekiit/agent-kit';
+import { runProcess } from '../global/exec';
 import { loadExistingAgentLayerRenderInputs } from '../lib/agentLayerIo';
 import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
 import { detectTemplateName as detectProjectTemplateName } from '../lib/detectTemplate';
 import { isTemplateName, ScaffoldError, type TemplateName } from '../lib/scaffold';
 import { cloneMirror, locateTemplateSource } from '../lib/templateSource';
-
-const execFileAsync = promisify(execFile);
 
 type SkillsUpdateResult = 'missing-lock' | 'updated' | 'failed';
 
@@ -33,7 +30,10 @@ const defaultDeps: SyncAgentLayerDeps = {
   locateTemplateSource,
   copy: cp,
   runSkillsUpdate: async (cwd) => {
-    await execFileAsync('npx', ['skills', 'update', '-y'], { cwd, env: process.env });
+    const skillsUpdate = await runProcess('npx', ['skills', 'update', '-y'], { cwd });
+    if (skillsUpdate.code !== 0) {
+      throw new Error(`skills update failed: ${skillsUpdate.stderr.trim()}`);
+    }
   },
   pathExists: async (path) => {
     try {

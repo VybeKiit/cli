@@ -30,7 +30,7 @@ describe('selectToolchain defaults', () => {
 
     expect(gh?.auth?.command).toBe('gh');
     expect(gh?.auth?.args).toEqual(['auth', 'status']);
-    expect(gh?.auth?.loginHint).toBe('gh auth login --web');
+    expect(gh?.auth?.loginHint).toBe('gh auth login --web -h github.com -p https --skip-ssh-key');
   });
 });
 
@@ -188,10 +188,12 @@ describe('selectToolchain Google auth tools', () => {
     expect(gcloud?.auth?.args).toEqual(['auth', 'print-access-token']);
     expect(gcloud?.auth?.loginHint).toBe('gcloud auth login');
     expect(gcloud?.auth?.signIn).toEqual({ command: 'gcloud', args: ['auth', 'login'] });
-    for (const platform of ['darwin', 'win32', 'linux'] as const) {
-      const [action] = planInstall(platform, presence, gcloud ? [gcloud] : []);
-      expect(action?.command).toBeTruthy();
-      expect(action?.args.length).toBeGreaterThan(0);
-    }
+    const gcloudTools = gcloud ? [gcloud] : [];
+    const installCommands = (['darwin', 'win32', 'linux'] as const).map((platform) =>
+      planInstall(platform, presence, gcloudTools).map((action) =>
+        action.kind === 'command' ? action.command : action.kind,
+      ),
+    );
+    expect(installCommands).toEqual([['brew'], ['winget'], ['sudo']]);
   });
 });

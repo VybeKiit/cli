@@ -1,7 +1,7 @@
-import { spawnSync } from 'node:child_process';
 import { accessSync, constants } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import crossSpawn from 'cross-spawn';
 import type { AgentId, DetectedAgent } from '../lib/agentDetection';
 import { getAgentById, listAgents } from '../lib/agentDetection';
 import { ensureAgentSkillSymlinks } from '../lib/agentSkillSymlinks';
@@ -39,11 +39,11 @@ export type AgentExperienceDeps = {
  * const present = defaultCommandExists('claude');
  */
 const defaultCommandExists = (command: string): boolean => {
-  const version = spawnSync(command, ['--version'], { stdio: 'ignore' });
+  const version = crossSpawn.sync(command, ['--version'], { stdio: 'ignore' });
   if (version.status === 0) {
     return true;
   }
-  const help = spawnSync(command, ['--help'], { stdio: 'ignore' });
+  const help = crossSpawn.sync(command, ['--help'], { stdio: 'ignore' });
   return help.status === 0 || help.error === undefined;
 };
 

@@ -137,7 +137,7 @@ describe('formatCreateSuccess', () => {
 describe('formatSetupNextStep', () => {
   it('asks to re-run setup when doctor fails', () => {
     const lines = formatSetupNextStep({ doctorExitCode: 1, gateReason: 'ok' });
-    expect(lines.join('\n')).toContain('vybekiit setup');
+    expect(lines.join('\n')).toContain('npx vybekiit setup');
     expect(lines.join('\n')).not.toContain('create app');
   });
 
@@ -148,7 +148,7 @@ describe('formatSetupNextStep', () => {
 
   it('points at create app when ready and no first app yet', () => {
     const lines = formatSetupNextStep({ doctorExitCode: 0, gateReason: 'ok' });
-    expect(lines.join('\n')).toContain('vybekiit create app --web');
+    expect(lines.join('\n')).toContain('npx vybekiit create app --web');
   });
 
   it('points at the Session #1 app when first install already created one', () => {
@@ -157,13 +157,12 @@ describe('formatSetupNextStep', () => {
       gateReason: 'ok',
       firstAppPath: '/Users/me/vybekiit-app',
     });
-    expect(lines.join('\n')).toContain('/Users/me/vybekiit-app');
-    expect(lines.join('\n')).toContain('Set up my app');
-    expect(lines.join('\n')).not.toContain('create app');
+    expect(lines).toEqual(['Your app is ready at:', '  /Users/me/vybekiit-app', '']);
   });
 
-  it('explains no access', () => {
+  it('explains no access without asking a buyer to pay again', () => {
     const lines = formatSetupNextStep({ doctorExitCode: 0, gateReason: 'no-access' });
-    expect(lines.join('\n')).toContain('vybekiit.com');
+    expect(lines.join('\n')).toContain('info@vybekiit.com');
+    expect(lines.join('\n')).not.toMatch(/purchase|buy/i);
   });
 });

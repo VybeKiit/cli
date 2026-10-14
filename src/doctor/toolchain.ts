@@ -8,6 +8,7 @@ import {
   resolveEnvProvider,
   resolveOptionalEnvProvider,
 } from '@vybekiit/core';
+import type { ExecResult } from '../global/exec';
 import {
   ATLAS,
   AWS,
@@ -27,16 +28,33 @@ import {
 /** OS families doctor knows how to install on. */
 export type Platform = 'darwin' | 'win32' | 'linux';
 
-export type InstallStep = {
-  readonly command: string;
-  readonly args: readonly string[];
-  readonly requires?: string;
+export type CpuArchitecture = 'x64' | 'arm64';
+
+type InstallStepFields = {
+  readonly npm: { readonly packageName: string };
+  readonly release: {
+    readonly repository: string;
+    readonly assetNames: Readonly<Record<CpuArchitecture, string>>;
+  };
+  readonly script: { readonly url: string };
+  readonly command: {
+    readonly command: string;
+    readonly args: readonly string[];
+    readonly requires?: string;
+  };
 };
+
+export type InstallKind = keyof InstallStepFields;
+
+export type InstallStep<Kind extends InstallKind = InstallKind> = {
+  readonly [StepKind in Kind]: { readonly kind: StepKind } & InstallStepFields[StepKind];
+}[Kind];
 
 export type AuthProbe = {
   readonly command: string;
   readonly args: readonly string[];
   readonly loginHint: string;
+  readonly signedOutText?: string;
   readonly signIn?: {
     readonly command: string;
     readonly args: readonly string[];
@@ -47,8 +65,29 @@ export type Tool = {
   readonly name: string;
   readonly purpose: string;
   readonly versionArgs: readonly string[];
-  readonly install: Readonly<Record<Platform, InstallStep>>;
+  readonly minimumVersion?: string;
+  readonly install: Readonly<Partial<Record<Platform, InstallStep>>>;
   readonly auth?: AuthProbe;
+};
+
+const VERSION_PATTERN = /\d+\.\d+\.\d+/;
+
+export const meetsMinimumVersion = (versionText: string, minimumVersion?: string): boolean => {
+  if (minimumVersion === undefined) {
+    return true;
+  }
+  const installedVersion = VERSION_PATTERN.exec(versionText)?.[0];
+  return (
+    installedVersion !== undefined &&
+    installedVersion.localeCompare(minimumVersion, 'en', { numeric: true }) >= 0
+  );
+};
+
+export const isSignedIn = (auth: AuthProbe, authProbe: ExecResult): boolean => {
+  const probeText = `${authProbe.stdout}\n${authProbe.stderr}`.toLowerCase();
+  const reportsSignedOut =
+    auth.signedOutText !== undefined && probeText.includes(auth.signedOutText.toLowerCase());
+  return authProbe.code === 0 && !reportsSignedOut;
 };
 
 /** Agent-runtime CLIs always checked by doctor. */
@@ -197,7 +236,10 @@ export const planInstall = (
   );
   return tools
     .filter((tool) => missing.has(tool.name))
-    .map((tool) => ({ tool: tool.name, ...tool.install[platform] }));
+    .flatMap((tool) => {
+      const installStep = tool.install[platform];
+      return installStep === undefined ? [] : [{ tool: tool.name, ...installStep }];
+    });
 };
 
 export type ToolReport = {

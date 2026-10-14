@@ -1,4 +1,3 @@
-import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { access, readdir, readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
@@ -13,11 +12,12 @@ import {
   setupEnvironment,
 } from '../commands/setupPreferences';
 import { writeEnvKeys } from '../doctor/env';
+import { findPnpmCommand, runAppCommand, startDetachedCommand } from '../lib/appProcesses';
 import { shipFirstPartyMcpConfigs } from '../lib/firstPartyMcp';
 import { type LocatedKitWorkspace, locateKitWorkspace } from '../lib/kitWorkspaceSource';
 import { pathExists } from '../lib/pathExists';
 import { repairKitBuildRoots } from '../lib/scaffoldKitWorkspace';
-import { makeExec } from './exec';
+import { setupLogPath } from '../lib/setupLog';
 import { choosePreviewPort } from './previewPort';
 
 /** Default folder name under the home directory for the first web app. */
@@ -35,7 +35,6 @@ export type SessionOneResult = {
   readonly depsInstalled: boolean;
   readonly packagesBuilt: boolean;
   readonly devStarted: boolean;
-  readonly claudeOpened: boolean;
   readonly projectToolsReady: boolean;
   /** True when the generated welcome route returned a successful response. */
   readonly previewReady: boolean;
@@ -56,7 +55,6 @@ export type SessionOneDeps = {
     args: readonly string[],
   ) => Promise<{ readonly code: number }>;
   readonly startDetached: (cwd: string, bin: string, args: readonly string[]) => boolean;
-  readonly openClaude: (appPath: string, prompt: string) => Promise<boolean>;
   readonly waitForPreview: (url: string, previewIdentity?: string) => Promise<boolean>;
   readonly previewPort: () => Promise<number>;
   readonly previewIdentity: string;
@@ -185,117 +183,6 @@ const defaultIsEmptyDir = async (path: string): Promise<boolean> => {
   }
 };
 
-const defaultRunCommand = async (
-  cwd: string,
-  bin: string,
-  args: readonly string[],
-): Promise<{ readonly code: number }> =>
-  await new Promise((resolve) => {
-    const child = spawn(bin, [...args], {
-      cwd,
-      stdio: ['ignore', 'inherit', 'inherit'],
-      env: process.env,
-    });
-    child.on('error', () => {
-      resolve({ code: 127 });
-    });
-    child.on('close', (code) => {
-      resolve({ code: code ?? 1 });
-    });
-  });
-
-const defaultStartDetached = (cwd: string, bin: string, args: readonly string[]): boolean => {
-  try {
-    const child = spawn(bin, [...args], {
-      cwd,
-      detached: true,
-      stdio: 'ignore',
-      env: process.env,
-    });
-    child.unref();
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const claudeTerminalCommand = (appPath: string, prompt: string): string =>
-  `cd '${appPath.replaceAll("'", "'\\''")}' && claude '${prompt.replaceAll("'", "'\\''")}'; exec "\${SHELL:-/bin/zsh}" -l`;
-
-/**
- * Open Claude Code in the app folder with the onboarding seed prompt.
- *
- * Prefer a new Terminal window on macOS (works even when install ran via `curl | sh`
- * with a non-TTY stdin). Elsewhere, try a detached `claude` spawn; callers always
- * print a manual fallback.
- *
- * @param appPath - Absolute kit workspace path.
- * @param prompt - Seed user message (onboarding).
- * @param platform - `process.platform`.
- * @returns True when a launch was attempted successfully.
- */
-export const openClaudeWithSeed = async (
-  appPath: string,
-  prompt: string,
-  platform: NodeJS.Platform = process.platform,
-): Promise<boolean> => {
-  const claudeVersion = await makeExec('claude')(['--version']);
-  if (claudeVersion.code !== 0) return false;
-  if (platform === 'darwin') {
-    const shellCommand = claudeTerminalCommand(appPath, prompt);
-    const osa = makeExec('osascript');
-    const result = await osa([
-      '-e',
-      `tell application "Terminal" to do script ${JSON.stringify(shellCommand)}`,
-    ]);
-    if (result.code === 0) {
-      return true;
-    }
-  }
-
-  try {
-    const child = spawn('claude', [prompt], {
-      cwd: appPath,
-      detached: true,
-      stdio: 'ignore',
-      env: process.env,
-    });
-    child.unref();
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | null> => {
-  const pnpm = makeExec('pnpm');
-  const version = await pnpm(['--version']);
-  if (version.code === 0) {
-    return ['pnpm'];
-  }
-
-  // Prefer corepack so packageManager field is honoured without a global install.
-  const corepack = makeExec('corepack');
-  const enabled = await corepack(['enable']);
-  if (enabled.code === 0) {
-    const prepared = await corepack(['prepare', 'pnpm@10.33.2', '--activate']);
-    if (prepared.code === 0) {
-      const again = await pnpm(['--version']);
-      if (again.code === 0) {
-        return ['pnpm'];
-      }
-    }
-  }
-
-  const npx = makeExec('npx');
-  const npxCheck = await npx(['-y', 'pnpm@10.33.2', '--version']);
-  if (npxCheck.code === 0) {
-    return ['npx', '-y', 'pnpm@10.33.2'];
-  }
-
-  return null;
-};
-
 const wait = async (milliseconds: number): Promise<void> =>
   await new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -364,9 +251,8 @@ const defaultDeps = (): SessionOneDeps => ({
   createApp: runCreateApp,
   pathExists: defaultPathExists,
   isEmptyDir: defaultIsEmptyDir,
-  runCommand: defaultRunCommand,
-  startDetached: defaultStartDetached,
-  openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
+  runCommand: runAppCommand,
+  startDetached: startDetachedCommand,
   waitForPreview,
   previewPort: () => Effect.runPromise(choosePreviewPort),
   previewIdentity: randomUUID(),
@@ -382,92 +268,84 @@ const defaultDeps = (): SessionOneDeps => ({
   },
   writeSetupEnvironment: (appPath, values) =>
     writeEnvKeys(join(appPath, 'templates', 'web'), values),
-  pnpmCommand: defaultPnpmCommand,
+  pnpmCommand: findPnpmCommand,
   homeDir: homedir,
   env: process.env,
   platform: process.platform,
 });
 
+const RERUN_SETUP = 'Run npx vybekiit setup again.';
+
+const previewLines = (outcome: Omit<SessionOneResult, 'lines'>): readonly string[] => {
+  const welcomeUrl = outcome.welcomeUrl || 'http://localhost:3000/en/setup';
+  if (outcome.browserOpened) {
+    return [`  ✓ Welcome page opened in your browser: ${welcomeUrl}`];
+  }
+  if (outcome.previewReady) {
+    return [`  ✓ Welcome page verified. Open ${welcomeUrl} in your browser.`];
+  }
+  if (outcome.devStarted) {
+    return [`  ✗ The preview did not pass its readiness check. ${RERUN_SETUP}`];
+  }
+  return [];
+};
+
+const preparationLines = (outcome: Omit<SessionOneResult, 'lines'>): readonly string[] => {
+  const logHint = `Details are in ${setupLogPath()}. ${RERUN_SETUP}`;
+  const preparationChecks = [
+    { failed: !outcome.depsInstalled, line: `  ✗ The app packages did not install. ${logHint}` },
+    {
+      failed: outcome.depsInstalled && !outcome.packagesBuilt,
+      line: `  ✗ The app could not be prepared for preview. ${logHint}`,
+    },
+    {
+      failed: !outcome.projectToolsReady,
+      line: `  ✗ Project tools still need repair. ${RERUN_SETUP}`,
+    },
+  ];
+  return preparationChecks.filter(({ failed }) => failed).map(({ line }) => line);
+};
+
 const projectToolsLines = (ready: boolean): readonly string[] =>
   ready
     ? [
-        '  • @vybekiit/ui + the UI catalog are available to your coding agent',
-        '  • VybeKiit tools, browser automation, and matching project skills are connected',
+        '  ✓ @vybekiit/ui and the UI catalog are ready for your assistant',
+        '  ✓ VybeKiit tools, browser automation, and matching project skills are connected',
       ]
     : [];
 
 /**
  * Build buyer-facing success / partial-success lines for Session #1.
  *
- * @param result - Outcome fields without lines.
+ * @param outcome - Outcome fields without lines.
  * @returns Ordered stdout lines.
  */
 export const formatSessionOneLines = (
-  result: Omit<SessionOneResult, 'lines'>,
+  outcome: Omit<SessionOneResult, 'lines'>,
 ): readonly string[] => {
-  if (result.appPath === null) {
+  if (outcome.appPath === null) {
     return [
       '',
-      'Session #1: could not create your first app automatically.',
-      '  Run:  npx vybekiit create app --web',
-      '  Then open that folder in Claude Code and say: "Set up my app."',
+      'Could not create your first app automatically.',
+      '  Run: npx vybekiit create app --web',
       '',
     ];
   }
 
-  const lines: string[] = [
+  const headline = outcome.previewReady
+    ? `✓ Your app preview is ready at ${outcome.appPath}`
+    : `Your app needs attention at ${outcome.appPath}`;
+  return [
     '',
-    result.previewReady
-      ? `✅ Your app preview is ready at ${result.appPath}`
-      : `Your app setup needs attention at ${result.appPath}`,
+    headline,
+    ...preparationLines(outcome),
+    ...projectToolsLines(outcome.projectToolsReady),
+    ...previewLines(outcome),
+    '',
+    'Report mode is built in. If something looks wrong, press Option+Shift+R',
+    '(Alt+Shift+R on Windows), click it, and tell your assistant what is off.',
+    '',
   ];
-
-  if (result.depsInstalled) {
-    lines.push('  • Dependencies installed');
-  } else {
-    lines.push('  • Dependencies still need install — in that folder run:  pnpm install');
-  }
-  if (result.packagesBuilt) {
-    lines.push('  • Kit packages built for local preview');
-  } else if (result.depsInstalled) {
-    lines.push('  • Kit packages still need a build — in that folder run:  pnpm build:packages');
-  }
-  if (result.devStarted) {
-    lines.push(`  • Preview starting at ${result.welcomeUrl ?? 'http://localhost:3000'}`);
-  } else if (result.depsInstalled && result.packagesBuilt) {
-    lines.push('  • Preview not started — in that folder run:  pnpm dev');
-  }
-
-  lines.push(...projectToolsLines(result.projectToolsReady));
-
-  if (result.browserOpened) {
-    lines.push('  • Verified welcome page opened in your browser');
-  } else if (result.previewReady) {
-    lines.push(
-      `  • Welcome page verified. Open ${result.welcomeUrl ?? 'http://localhost:3000/en/setup'} in your browser.`,
-    );
-  } else if (result.devStarted) {
-    lines.push('  • The preview did not pass its readiness check. Run npx vybekiit setup again.');
-  }
-
-  if (!result.projectToolsReady) {
-    lines.push('  • Project tools still need repair. Re-run: npx vybekiit setup');
-  }
-
-  if (result.claudeOpened) {
-    lines.push('  • Claude Code opening with: "Set up my app."');
-  } else {
-    lines.push('  • Open that folder in your coding agent and say: "Set up my app."');
-    lines.push(`      ${result.appPath}`);
-  }
-
-  lines.push(
-    '',
-    'Report mode is built in — if something looks wrong, press Option+Shift+R',
-    '(Alt+Shift+R on Windows), click it, and tell your coding agent what is off.',
-    '',
-  );
-  return lines;
 };
 
 /**
@@ -503,7 +381,6 @@ export const runSessionOne = async (
         depsInstalled: false,
         packagesBuilt: false,
         devStarted: false,
-        claudeOpened: false,
         projectToolsReady: false,
         previewReady: false,
         browserOpened: false,
@@ -512,15 +389,15 @@ export const runSessionOne = async (
         ...failed,
         lines: [
           '',
-          `Session #1: ${appPath} already exists and is not a VybeKiit app.`,
-          '  Pick a free folder and run:  npx vybekiit create app --web ~/my-app',
-          '  Or set VYBEKIIT_FIRST_APP_DIR and re-run install once.',
+          `${appPath} already exists and is not a VybeKiit app.`,
+          '  Pick a free folder and run: npx vybekiit create app --web ~/my-app',
+          '  Or set VYBEKIIT_FIRST_APP_DIR and run setup again.',
           '',
         ],
       };
     }
   } else {
-    process.stdout.write(`\nCreating your first web app at ${appPath}…\n`);
+    process.stdout.write(`\nCreating your app at ${appPath}...\n`);
     const code = await deps.createApp(['--web', appPath]);
     if (code !== 0) {
       const failed: Omit<SessionOneResult, 'lines'> = {
@@ -529,7 +406,6 @@ export const runSessionOne = async (
         depsInstalled: false,
         packagesBuilt: false,
         devStarted: false,
-        claudeOpened: false,
         projectToolsReady: false,
         previewReady: false,
         browserOpened: false,
@@ -547,7 +423,6 @@ export const runSessionOne = async (
       depsInstalled: false,
       packagesBuilt: false,
       devStarted: false,
-      claudeOpened: false,
       projectToolsReady: false,
       previewReady: false,
       browserOpened: false,
@@ -567,13 +442,13 @@ export const runSessionOne = async (
     VYBE_SETUP_PREVIEW_ID: deps.previewIdentity,
   });
 
-  process.stdout.write('\nInstalling dependencies (this can take a few minutes)…\n');
+  process.stdout.write('\nInstalling your app packages. This can take a few minutes...\n');
   const install = await deps.runCommand(appPath, pnpmBin, [...pnpmPrefix, 'install']);
   const depsInstalled = install.code === 0;
 
   let packagesBuilt = false;
   if (depsInstalled) {
-    process.stdout.write('\nBuilding kit packages for preview…\n');
+    process.stdout.write('Preparing your app preview...\n');
     const build = await deps.runCommand(appPath, pnpmBin, [...pnpmPrefix, 'build:packages']);
     packagesBuilt = build.code === 0;
   }
@@ -596,9 +471,6 @@ export const runSessionOne = async (
       : false;
   const desktopHandoffReady = previewReady && canOpenDesktopBrowser(deps.platform, deps.env);
   const browserOpened = desktopHandoffReady ? await deps.openBrowser(welcomeUrl) : false;
-  const claudeOpened = desktopHandoffReady
-    ? await deps.openClaude(appPath, SESSION_ONE_SEED_PROMPT)
-    : false;
 
   const outcome: Omit<SessionOneResult, 'lines'> = {
     appPath,
@@ -606,7 +478,6 @@ export const runSessionOne = async (
     depsInstalled,
     packagesBuilt,
     devStarted,
-    claudeOpened,
     projectToolsReady,
     previewReady,
     browserOpened,

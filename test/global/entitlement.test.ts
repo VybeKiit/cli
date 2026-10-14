@@ -33,7 +33,25 @@ describe('checkEntitlement', () => {
       },
     });
     expect(result).toMatchObject({ entitled: true, reason: 'entitled', login: 'octocat' });
-    expect(result.via).toBe('VybeKiit/web');
+    expect(result.via).toBe('VybeKiit/kit');
+  });
+
+  it('accepts a pending VybeKiit invite before it probes the repos', async () => {
+    const exec = vi.fn(async (args: readonly string[]): Promise<ExecResult> => {
+      if (args[1] === 'user') return { code: 0, stdout: 'octocat', stderr: '' };
+      if (args[1] === 'user/repository_invitations') return { code: 0, stdout: '7\n', stderr: '' };
+      return ok;
+    });
+    await checkEntitlement({ exec });
+    const calledArguments = exec.mock.calls.map(([args]) => args.join(' '));
+    const acceptIndex = calledArguments.indexOf(
+      'api -X PATCH user/repository_invitations/7 --silent',
+    );
+    const firstRepoProbe = calledArguments.findIndex((ghCommand) =>
+      ghCommand.startsWith('api repos/'),
+    );
+    expect(acceptIndex).toBeGreaterThan(-1);
+    expect(acceptIndex).toBeLessThan(firstRepoProbe);
   });
 
   it('short-circuits on the first readable mirror instead of probing all surfaces', async () => {
@@ -60,14 +78,16 @@ describe('checkEntitlement', () => {
 });
 
 describe('formatEntitlementBlock', () => {
-  it('points a signed-in non-buyer at the purchase page and names the account', () => {
+  it('sends a signed-in account without access to its email and support, never to buy again', () => {
     const text = formatEntitlementBlock({
       entitled: false,
       reason: 'no-access',
       login: 'stranger',
     } satisfies EntitlementResult).join('\n');
-    expect(text).toContain('https://vybekiit.com');
-    expect(text).toContain("'stranger'");
+    expect(text).toContain('Signed in to GitHub as stranger.');
+    expect(text).toContain('Check your email');
+    expect(text).toContain('info@vybekiit.com');
+    expect(text).not.toMatch(/purchase|buy/i);
   });
 
   it('tells a signed-out user to run gh auth login', () => {
@@ -77,8 +97,8 @@ describe('formatEntitlementBlock', () => {
     expect(text).toContain('gh auth login');
   });
 
-  it('tells a user without gh where to install it', () => {
+  it('tells a user without gh to run setup', () => {
     const text = formatEntitlementBlock({ entitled: false, reason: 'gh-missing' }).join('\n');
-    expect(text).toContain('cli.github.com');
+    expect(text).toContain('npx vybekiit setup');
   });
 });

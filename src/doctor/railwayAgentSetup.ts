@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import {
   dataConfigSchema,
   type EnvSource,
@@ -6,6 +5,7 @@ import {
   isRailwayStackActive as isCoreRailwayStackActive,
   parseEnv,
 } from '@vybekiit/core';
+import crossSpawn from 'cross-spawn';
 
 /** True when either Railway hosting or data is active (core signal). */
 export const isRailwayStackActive = (processEnv: EnvSource): boolean =>
@@ -52,7 +52,7 @@ export const runRailwayAgentSetup = (
     };
   }
 
-  const agentSetupProcess = spawnSync('railway', ['setup', 'agent', '-y'], {
+  const agentSetupProcess = crossSpawn.sync('railway', ['setup', 'agent', '-y'], {
     stdio: 'pipe',
     encoding: 'utf8',
   });

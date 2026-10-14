@@ -1,7 +1,7 @@
-import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { caughtMessage } from '@vybekiit/core';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
+import crossSpawn from 'cross-spawn';
 import { selectedAppSurface } from '../lib/appSurface';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 import { locateKitWorkspace } from '../lib/kitWorkspaceSource';
@@ -34,7 +34,7 @@ const isCursorSession = (): boolean =>
  * @returns True when the command exits with status zero.
  */
 const succeeds = (command: string, args: readonly string[]): boolean =>
-  spawnSync(command, [...args], { stdio: 'ignore' }).status === 0;
+  crossSpawn.sync(command, [...args], { stdio: 'ignore' }).status === 0;
 
 /**
  * Resolve which assistant Report Mode should hand off to, reusing the SSOT inference the

@@ -1,7 +1,7 @@
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { hostingConfigSchema, parseEnv } from '@vybekiit/core';
+import crossSpawn from 'cross-spawn';
 import type { DoctorLog } from './doctorLog';
 import { writeEnvKeys } from './env';
 
@@ -58,7 +58,7 @@ const readProjectName = (cwd: string): string => {
 
 /** True when wrangler exits successfully. */
 const wranglerOk = (wranglerArgs: readonly string[]): boolean =>
-  spawnSync('wrangler', [...wranglerArgs], { stdio: 'ignore' }).status === 0;
+  crossSpawn.sync('wrangler', [...wranglerArgs], { stdio: 'ignore' }).status === 0;
 
 /** Cloudflare R2 API token for S3-compatible access, or null on failure. */
 const createR2ApiToken = async (

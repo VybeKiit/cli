@@ -1,3 +1,4 @@
+import { accessHelpLines, isAccessProblem } from '../doctor/accessHelp';
 import type { GateReason } from '../doctor/gate';
 
 /** Inputs for the setup honest next-step matrix. */
@@ -22,50 +23,23 @@ export type SetupNextStepInput = {
 export const formatSetupNextStep = (input: SetupNextStepInput): readonly string[] => {
   if (input.doctorExitCode !== 0) {
     return [
-      'Tools still need attention — fix the items marked above, then run:',
-      '  vybekiit setup',
+      'Some tools still need attention. Fix the items marked above, then run:',
+      '  npx vybekiit setup',
       '',
     ];
   }
 
-  if (input.gateReason === 'gh-missing') {
-    return [
-      'GitHub CLI is missing. Fix the doctor items above (install gh), then run:',
-      '  vybekiit setup',
-      '',
-    ];
-  }
-
-  if (input.gateReason === 'gh-unauthed') {
-    return [
-      "You're not signed in to GitHub yet. Run:",
-      '  gh auth login --web',
-      'Then run: vybekiit setup',
-      '',
-    ];
-  }
-
-  if (input.gateReason === 'no-access') {
-    return [
-      "We couldn't find VybeKiit access for your GitHub account.",
-      'Purchase at https://vybekiit.com (invite is automatic after checkout),',
-      'or sign in as the GitHub account you bought with (`gh auth status`), then run setup again.',
-      '',
-    ];
+  if (isAccessProblem(input.gateReason)) {
+    return [...accessHelpLines(input.gateReason), ''];
   }
 
   if (input.firstAppPath !== undefined && input.firstAppPath !== '') {
-    return [
-      'Your app is ready. Continue in the assistant window and say: "Set up my app."',
-      `  ${input.firstAppPath}`,
-      '  (If your assistant is already open there, you are set.)',
-      '',
-    ];
+    return ['Your app is ready at:', `  ${input.firstAppPath}`, ''];
   }
 
   return [
     'Next: create your app',
-    '  vybekiit create app --web',
+    '  npx vybekiit create app --web',
     '  (or --mobile / --extension)',
     '',
   ];

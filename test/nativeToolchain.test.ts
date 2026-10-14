@@ -25,9 +25,23 @@ describe('selectNativeTools', () => {
     ]);
   });
 
-  it('adds Watchman only on Windows/Linux for mobile (no CocoaPods)', () => {
-    expect(selectNativeTools(surface('mobile'), 'win32').map((t) => t.name)).toEqual(['watchman']);
-    expect(selectNativeTools(surface('mobile'), 'linux').map((t) => t.name)).toEqual(['watchman']);
+  it('adds Watchman through apt on Linux for mobile (no CocoaPods)', () => {
+    const [watchman, ...otherTools] = selectNativeTools(surface('mobile'), 'linux');
+    expect(watchman?.install.linux).toEqual({
+      kind: 'command',
+      command: 'sudo',
+      args: ['apt-get', 'install', '-y', 'watchman'],
+    });
+    expect(otherTools).toEqual([]);
+  });
+
+  it('skips Watchman and CocoaPods on Windows, where Metro runs without them', () => {
+    expect(selectNativeTools(surface('mobile'), 'win32')).toEqual([]);
+  });
+
+  it('installs Docker Desktop through winget on Windows', () => {
+    const [docker] = selectNativeTools(surface('backend'), 'win32');
+    expect(docker?.install.win32).toMatchObject({ command: 'winget' });
   });
 
   it('returns no native tools for web, spa, or extension', () => {

@@ -1,12 +1,13 @@
-import { spawnSync } from 'node:child_process';
-import { selectToolchain, type Tool } from '../doctor/toolchain';
+import { isSignedIn, selectToolchain, type Tool } from '../doctor/toolchain';
+import { type ExecResult, runProcess } from '../global/exec';
+import { canOpenDesktopBrowser } from '../global/runSessionOne';
 import { type SetupPreferences, setupEnvironment } from './setupPreferences';
 
 export type SetupCommandRunner = (
   command: string,
   args: readonly string[],
   interactive: boolean,
-) => number;
+) => Promise<ExecResult>;
 
 export type SetupAuthenticationResult = {
   readonly ok: boolean;
@@ -15,51 +16,75 @@ export type SetupAuthenticationResult = {
   readonly lines: readonly string[];
 };
 
-const defaultSetupCommandRunner: SetupCommandRunner = (command, args, interactive) =>
-  spawnSync(command, [...args], { stdio: interactive ? 'inherit' : 'ignore' }).status ?? 1;
+type ToolConnection = { readonly connected: boolean; readonly line: string };
 
-const connectTool = (
+const AUTH_PROBE_TIMEOUT_MILLISECONDS = 60_000;
+
+const defaultSetupCommandRunner: SetupCommandRunner = (command, args, interactive) =>
+  runProcess(
+    command,
+    args,
+    interactive ? { stdio: 'inherit' } : { timeout: AUTH_PROBE_TIMEOUT_MILLISECONDS },
+  );
+
+const needsSignIn = (tool: Tool, loginHint: string): ToolConnection => ({
+  connected: false,
+  line: `✗ ${tool.name} needs sign-in. Run: ${loginHint}`,
+});
+
+const connectTool = async (
   tool: Tool,
   run: SetupCommandRunner,
-): { readonly connected: boolean; readonly line: string } => {
-  if (tool.auth === undefined) {
+  canOpenBrowser: () => boolean,
+): Promise<ToolConnection> => {
+  const { auth } = tool;
+  if (auth === undefined) {
     return { connected: true, line: `✓ ${tool.name} is ready.` };
   }
-  if (run(tool.auth.command, tool.auth.args, false) === 0) {
+  const existingSignIn = await run(auth.command, auth.args, false);
+  if (isSignedIn(auth, existingSignIn)) {
     return { connected: true, line: `✓ ${tool.name} reused your existing sign-in.` };
   }
-  if (tool.auth.signIn === undefined) {
-    return {
-      connected: false,
-      line: `✗ ${tool.name} still needs attention. ${tool.auth.loginHint}`,
-    };
+  if (auth.signIn === undefined || !canOpenBrowser()) {
+    return needsSignIn(tool, auth.loginHint);
   }
 
-  process.stdout.write(`\nOpening the ${tool.name} sign-in flow in your browser…\n`);
-  const signInCode = run(tool.auth.signIn.command, tool.auth.signIn.args, true);
-  const connected = signInCode === 0 && run(tool.auth.command, tool.auth.args, false) === 0;
-  return connected
+  process.stdout.write(`\nOpening the ${tool.name} sign-in page in your browser...\n`);
+  const signIn = await run(auth.signIn.command, auth.signIn.args, true);
+  if (signIn.code !== 0) {
+    return needsSignIn(tool, auth.loginHint);
+  }
+  const verifiedSignIn = await run(auth.command, auth.args, false);
+  return isSignedIn(auth, verifiedSignIn)
     ? { connected: true, line: `✓ ${tool.name} sign-in verified.` }
-    : {
-        connected: false,
-        line: `✗ ${tool.name} still needs sign-in. Run: ${tool.auth.loginHint}`,
-      };
+    : needsSignIn(tool, auth.loginHint);
 };
 
 /** Reuse or open the official sign-in flow for each selected service. */
-export const connectSetupServices = (
+export const connectSetupServices = async (
   preferences: SetupPreferences,
   run: SetupCommandRunner = defaultSetupCommandRunner,
-): SetupAuthenticationResult => {
+  canOpenBrowser: () => boolean = canOpenDesktopBrowser,
+): Promise<SetupAuthenticationResult> => {
   const selectedTools = selectToolchain(setupEnvironment(preferences), {
     wantsGoogleAuth: preferences.googleSignIn,
   });
-  const attempts = selectedTools.map((tool) => ({ tool, result: connectTool(tool, run) }));
+  const attempts = await selectedTools.reduce<
+    Promise<{ readonly tool: Tool; readonly connection: ToolConnection }[]>
+  >(async (earlierAttempts, tool) => {
+    const finishedAttempts = await earlierAttempts;
+    const connection = await connectTool(tool, run, canOpenBrowser);
+    return [...finishedAttempts, { tool, connection }];
+  }, Promise.resolve([]));
 
   return {
-    ok: attempts.every(({ result }) => result.connected),
-    connected: attempts.filter(({ result }) => result.connected).map(({ tool }) => tool.name),
-    needsAttention: attempts.filter(({ result }) => !result.connected).map(({ tool }) => tool.name),
-    lines: attempts.map(({ result }) => result.line),
+    ok: attempts.every(({ connection }) => connection.connected),
+    connected: attempts
+      .filter(({ connection }) => connection.connected)
+      .map(({ tool }) => tool.name),
+    needsAttention: attempts
+      .filter(({ connection }) => !connection.connected)
+      .map(({ tool }) => tool.name),
+    lines: attempts.map(({ connection }) => connection.line),
   };
 };

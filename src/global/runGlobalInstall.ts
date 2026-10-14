@@ -70,14 +70,14 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   const skillsEmpty = summary.skillsInstalled === 0 && summary.skillSample.length === 0;
 
   let headline = summary.claudeMissing
-    ? `✅ VybeKiit ${summary.version} is ready for your coding agent.`
-    : `✅ VybeKiit ${summary.version} is now set up globally in Claude Code.`;
+    ? `✓ VybeKiit ${summary.version} is ready for your coding agent.`
+    : `✓ VybeKiit ${summary.version} is now set up globally in Claude Code.`;
   if (skillsEmpty) {
     headline = `✗ VybeKiit ${summary.version} global setup did not land any managed skills.`;
   } else if (isUpdate) {
-    headline = `✅ VybeKiit updated ${summary.previousVersion} → ${summary.version}`;
+    headline = `✓ VybeKiit updated ${summary.previousVersion} → ${summary.version}`;
   } else if (isRerun) {
-    headline = `✅ VybeKiit ${summary.version} re-applied (already latest)`;
+    headline = `✓ VybeKiit ${summary.version} re-applied (already latest)`;
   }
 
   const lines = [
@@ -96,7 +96,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
   }
   if (skillsEmpty) {
     lines.push(
-      '             No managed skills on disk — Claude Code will not load kit skills until this is fixed.',
+      '             No managed skills on disk. Claude Code will not load kit skills until this is fixed.',
       '             Re-run: `npx vybekiit setup` to repair the installation.',
     );
   }
@@ -113,7 +113,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
     }
     if (summary.mcpNeedsKey.length > 0) {
       lines.push(
-        `             ${summary.mcpNeedsKey.length} more need an API key — run \`vybekiit env wizard\``,
+        `             ${summary.mcpNeedsKey.length} more need an API key. Run \`vybekiit env wizard\``,
       );
     }
     if (summary.mcpFailed.length > 0) {

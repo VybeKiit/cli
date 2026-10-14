@@ -1,10 +1,11 @@
-import { spawn } from 'node:child_process';
 import { access, readdir } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import open from 'open';
-import { openClaudeWithSeed, type SessionOneDeps, waitForPreview } from '../global/runSessionOne';
+import { openClaudeWithSeed } from '../global/claudeHandoff';
+import { type SessionOneDeps, waitForPreview } from '../global/runSessionOne';
+import { findPnpmCommand, runAppCommand, startDetachedCommand } from '../lib/appProcesses';
 import { runCreateApp } from './createApp';
 
 /** Default folder under home for the UI-library kit workspace. */
@@ -168,40 +169,6 @@ const defaultIsEmptyDir = async (path: string): Promise<boolean> => {
   }
 };
 
-const defaultRunCommand = async (
-  cwd: string,
-  bin: string,
-  args: readonly string[],
-): Promise<{ readonly code: number }> =>
-  await new Promise((resolvePromise) => {
-    const child = spawn(bin, [...args], {
-      cwd,
-      stdio: ['ignore', 'inherit', 'inherit'],
-      env: process.env,
-    });
-    child.on('error', () => {
-      resolvePromise({ code: 127 });
-    });
-    child.on('close', (code) => {
-      resolvePromise({ code: code ?? 1 });
-    });
-  });
-
-const defaultStartDetached = (cwd: string, bin: string, args: readonly string[]): boolean => {
-  try {
-    const child = spawn(bin, [...args], {
-      cwd,
-      detached: true,
-      stdio: 'ignore',
-      env: process.env,
-    });
-    child.unref();
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 const defaultOpenUrl = async (url: string): Promise<boolean> => {
   try {
     await open(url);
@@ -211,31 +178,16 @@ const defaultOpenUrl = async (url: string): Promise<boolean> => {
   }
 };
 
-const defaultPnpmCommand = async (): Promise<readonly [string, ...string[]] | null> => {
-  const tryBin = async (bin: string, checkArgs: readonly string[]): Promise<boolean> => {
-    const result = await defaultRunCommand(process.cwd(), bin, [...checkArgs]);
-    return result.code === 0;
-  };
-
-  if (await tryBin('pnpm', ['--version'])) {
-    return ['pnpm'];
-  }
-  if (await tryBin('npx', ['-y', 'pnpm@10.33.2', '--version'])) {
-    return ['npx', '-y', 'pnpm@10.33.2'];
-  }
-  return null;
-};
-
 const defaultDeps = (): CreateUiLibraryDeps => ({
   createApp: runCreateApp,
   pathExists: defaultPathExists,
   isEmptyDir: defaultIsEmptyDir,
-  runCommand: defaultRunCommand,
-  startDetached: defaultStartDetached,
+  runCommand: runAppCommand,
+  startDetached: startDetachedCommand,
   waitForPreview,
   openClaude: (appPath, prompt) => openClaudeWithSeed(appPath, prompt, process.platform),
   openUrl: defaultOpenUrl,
-  pnpmCommand: defaultPnpmCommand,
+  pnpmCommand: findPnpmCommand,
   homeDir: homedir,
   env: process.env,
   platform: process.platform,

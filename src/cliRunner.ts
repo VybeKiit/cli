@@ -174,7 +174,7 @@ const ensureToolDisplayName = (args: readonly string[], ensureArg: string): stri
  * @param json - Whether to print machine-readable JSON.
  * @returns Exit code for the single-tool preflight.
  */
-const runDoctorEnsure = (toolName: string | undefined, json: boolean): number => {
+const runDoctorEnsure = async (toolName: string | undefined, json: boolean): Promise<number> => {
   if (toolName === undefined || toolName === '' || toolName.startsWith('--')) {
     const message = 'Usage: vybekiit doctor --ensure <tool> [--json]';
     if (json) {
@@ -185,7 +185,7 @@ const runDoctorEnsure = (toolName: string | undefined, json: boolean): number =>
     return 1;
   }
 
-  const ensureStatus = ensureTool(toolName);
+  const ensureStatus = await ensureTool(toolName);
   if (json) {
     process.stdout.write(`${JSON.stringify({ ok: ensureStatus.installed, ...ensureStatus })}\n`);
   } else {
@@ -207,7 +207,7 @@ const handleDoctorCommand = async (invocation: CliInvocation): Promise<number> =
     return await runDoctor();
   }
 
-  return runDoctorEnsure(ensureToolDisplayName(args, ensureArg), args.includes('--json'));
+  return await runDoctorEnsure(ensureToolDisplayName(args, ensureArg), args.includes('--json'));
 };
 
 /**
@@ -301,7 +301,7 @@ const runMainMenuChoice = async (choice: MainMenuChoice): Promise<number> => {
     return await runDoctor();
   }
   // create / add-piece — still need license gate
-  if (!ensureAccessOrExit()) {
+  if (!(await ensureAccessOrExit())) {
     return 1;
   }
   if (choice === 'add-piece') {
@@ -494,7 +494,7 @@ export const runCli = async (argv: readonly string[]): Promise<number> => {
     return 0;
   }
 
-  if (!(GATE_EXEMPT.has(invocation.verb) || ensureAccessOrExit())) {
+  if (!(GATE_EXEMPT.has(invocation.verb) || (await ensureAccessOrExit()))) {
     return 1;
   }
 

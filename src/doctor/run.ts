@@ -1,6 +1,6 @@
-import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { inferVybeAssistant } from '@vybekiit/report-mode';
+import crossSpawn from 'cross-spawn';
 import { inferProjectSurfaceSync, reportModeEnvKeysForSurface } from '../lib/inferProjectSurface';
 import { runAgentExperience } from './agentExperience';
 import { verifyAssetsPipeline } from './assetsValidate';
@@ -22,20 +22,26 @@ import {
   runRailwayAgentSetup,
 } from './railwayAgentSetup';
 import { runNativeProjectSetup } from './runNativeProjectSetup';
+import { saveToolFoldersOnPath } from './shellPath';
 import { provisionR2Storage } from './storageR2';
 import {
   formatReport,
-  type InstallAction,
   isAgentRuntimeReady,
   isSkillsCliReady,
   mergeAgentAndProviderTools,
   type Platform,
-  planInstall,
   selectToolchain,
   type Tool,
   type ToolPresence,
   type ToolReport,
 } from './toolchain';
+import {
+  type InstallOutcome,
+  installMissingTools,
+  probeToolAuth,
+  probeToolsPresence,
+  supportedDoctorPlatform,
+} from './toolInstall';
 import { verifyEmailWorkerDoctor } from './verifyEmailWorker';
 import { verifyGodaddyDoctor } from './verifyGodaddy';
 import { verifyNamecheapDoctor } from './verifyNamecheap';
@@ -48,47 +54,16 @@ import { verifyPresetsDoctor } from './verifyPresets';
  * side-effecting executor (install, probe, env writes).
  */
 
-/** Node OS family doctor can install on, or null when unsupported. */
-const supportedDoctorPlatform = (nodePlatform: NodeJS.Platform): Platform | null =>
-  nodePlatform === 'darwin' || nodePlatform === 'win32' || nodePlatform === 'linux'
-    ? nodePlatform
-    : null;
-
 /** True when Cursor session env markers are present. */
 const isCursorSession = (): boolean =>
   Boolean(process.env.CURSOR_TRACE_ID || process.env.CURSOR_SESSION_ID);
 
-/** True when the command exits with status zero. */
-const succeeds = (command: string, spawnArgs: readonly string[]): boolean =>
-  spawnSync(command, [...spawnArgs], { stdio: 'ignore' }).status === 0;
-
-type InstallOutcome = {
-  readonly ok: boolean;
-  readonly missingRequirement?: string;
-};
-
-/** Node spawn error code when present. */
-const errorCode = (spawnError: Error | undefined): string | undefined =>
-  spawnError !== undefined && 'code' in spawnError && typeof spawnError.code === 'string'
-    ? spawnError.code
-    : undefined;
-
-/** Run one planned install command. */
-const runInstall = (action: InstallAction, log: DoctorLog): InstallOutcome => {
-  log.log(`[doctor] setting up ${action.tool}: ${action.command} ${action.args.join(' ')}`);
-  const installProcess = spawnSync(action.command, [...action.args], { stdio: 'inherit' });
-  if (errorCode(installProcess.error) === 'ENOENT') {
-    return action.requires ? { ok: false, missingRequirement: action.requires } : { ok: false };
-  }
-  return { ok: installProcess.status === 0 };
-};
-
 /** Final tool report after presence probe and optional install. */
-const toolReportAfterInstall = (
+const toolReportAfterInstall = async (
   tool: Tool,
   presence: readonly ToolPresence[],
   installs: ReadonlyMap<string, InstallOutcome>,
-): ToolReport => {
+): Promise<ToolReport> => {
   const observedPresence = presence.find((presenceRow) => presenceRow.tool === tool.name);
   const wasPresent = observedPresence === undefined ? false : observedPresence.present;
   const install = installs.get(tool.name);
@@ -104,10 +79,10 @@ const toolReportAfterInstall = (
       ...(requirement ? { missingRequirement: requirement } : {}),
     };
   }
-  if (tool.auth === undefined) {
+  const authed = await probeToolAuth(tool);
+  if (tool.auth === undefined || authed === null) {
     return { tool: tool.name, purpose: tool.purpose, installed: true, authed: null };
   }
-  const authed = succeeds(tool.auth.command, tool.auth.args);
   return {
     tool: tool.name,
     purpose: tool.purpose,
@@ -132,13 +107,13 @@ type DoctorToolchainRun = {
 };
 
 /** Probe and install the selected toolchain; return tools and final reports. */
-const runToolchain = ({
+const runToolchain = async ({
   platform,
   surface,
   processEnv,
   log,
   wantsGoogleAuth = false,
-}: DoctorToolchainRun): DoctorToolRun => {
+}: DoctorToolchainRun): Promise<DoctorToolRun> => {
   const providerTools = selectToolchain(processEnv, {
     mobile: surface.mobile,
     wantsGoogleAuth: wantsGoogleAuth || Boolean(processEnv.GOOGLE_OAUTH_CLIENT_ID),
@@ -146,20 +121,16 @@ const runToolchain = ({
   const nativeTools = selectNativeTools(surface, platform);
   const providerAndNative = mergeDoctorTools(providerTools, nativeTools);
   const toolchain = mergeAgentAndProviderTools(providerAndNative);
-  const presence: ToolPresence[] = toolchain.map((tool) => ({
-    tool: tool.name,
-    present: succeeds(tool.name, tool.versionArgs),
-  }));
-  const installs = new Map<string, InstallOutcome>();
-  for (const action of planInstall(platform, presence, toolchain)) {
-    installs.set(action.tool, runInstall(action, log));
+  const presence = await probeToolsPresence(toolchain);
+  const installs = await installMissingTools(platform, toolchain, presence, log);
+  const pathSaved = await saveToolFoldersOnPath();
+  if (pathSaved) {
+    log.log('✓ New terminal windows will find the tools VybeKiit installed.');
   }
-
-  return {
-    providerTools,
-    nativeTools,
-    reports: toolchain.map((tool) => toolReportAfterInstall(tool, presence, installs)),
-  };
+  const reports = await Promise.all(
+    toolchain.map((tool) => toolReportAfterInstall(tool, presence, installs)),
+  );
+  return { providerTools, nativeTools, reports };
 };
 
 /** Mobile store publish gates when the project has a mobile surface. */
@@ -176,7 +147,7 @@ const verifyMobilePublishing = (
   const report = verifyMobilePublishReadiness(
     platform,
     processEnv,
-    createDefaultCommandProbe(spawnSync),
+    createDefaultCommandProbe(crossSpawn.sync),
   );
   writeDoctorLines(log, report.lines);
   return report.ok;
@@ -296,7 +267,7 @@ export const runDoctor = async (
     log.log("✓ Cursor - you're in Cursor; no separate agent install needed.");
   }
 
-  const { nativeTools, providerTools, reports } = runToolchain({
+  const { nativeTools, providerTools, reports } = await runToolchain({
     platform,
     surface,
     processEnv,
@@ -341,8 +312,8 @@ export const runDoctor = async (
 
   await ensureCodexSkills(reports, log);
   const globalStatus = await readGlobalStatus();
-  log.log(formatGlobalStatus(globalStatus));
   if (!preparingFirstApp) {
+    log.log(formatGlobalStatus(globalStatus));
     writeReportModeAssistant({ cwd, surface, reports, cursorSession, log });
   }
 

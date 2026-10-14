@@ -1,17 +1,8 @@
+import process from 'node:process';
+import { readGateIdentity } from '@vybekiit/core';
+import { type AccessProblem, accessHelpLines } from '../doctor/accessHelp';
+import { acceptRepositoryInvites } from '../doctor/repositoryInvites';
 import { type ExecFn, makeExec } from './exec';
-
-/**
- * GitHub org holding the private per-surface kit mirrors. Read access to any
- * of these private repos is exactly the boundary a real `vybekiit create app` clone relies on,
- * so it doubles as the buyer entitlement for the global install — no second allowlist to keep.
- */
-const MIRROR_ORG = 'VybeKiit';
-
-/**
- * Surface mirrors we probe for read access. Buyers get the surfaces they purchased, and a match
- * on ANY one proves entitlement — so a mobile-only buyer still passes without owning `web`.
- */
-const SURFACE_MIRRORS = ['web', 'mobile', 'backend', 'extension', 'spa'] as const;
 
 /** Why the gate allowed or blocked the install. */
 export type EntitlementReason = 'entitled' | 'gh-missing' | 'not-authenticated' | 'no-access';
@@ -33,6 +24,12 @@ export type EntitlementDeps = {
 
 const defaultDeps: EntitlementDeps = { exec: makeExec('gh') };
 
+const ACCESS_PROBLEM_BY_REASON: Readonly<Partial<Record<EntitlementReason, AccessProblem>>> = {
+  'gh-missing': 'gh-missing',
+  'not-authenticated': 'gh-unauthed',
+  'no-access': 'no-access',
+};
+
 /**
  * Resolve the signed-in GitHub login via `gh api user`.
  *
@@ -48,12 +45,27 @@ const signedInGithubLogin = async (exec: ExecFn): Promise<string | null> => {
   return login === '' ? null : login;
 };
 
+const firstReadableRepo = async (
+  exec: ExecFn,
+  org: string,
+  repos: readonly string[],
+): Promise<string | undefined> =>
+  await repos.reduce<Promise<string | undefined>>(async (earlierMatch, repo) => {
+    const readableRepo = await earlierMatch;
+    if (readableRepo !== undefined) {
+      return readableRepo;
+    }
+    const fullName = `${org}/${repo}`;
+    const repoProbe = await exec(['api', `repos/${fullName}`, '--silent']);
+    return repoProbe.code === 0 ? fullName : undefined;
+  }, Promise.resolve(undefined));
+
 /**
- * Confirm the caller is an entitled VybeKiit buyer by reusing the scaffolder's gate: read
- * access to a private `VybeKiit/<surface>` mirror. Granting a buyer their mirror is what
- * unlocks scaffolding, so it unlocks the global install too — there is no separate list.
+ * Confirm the caller is an entitled VybeKiit buyer by reusing the access gate: read access to
+ * one private delivery repo from {@link readGateIdentity}. Pending repo invites from the org are
+ * accepted first, so a buyer who never opened the invite email still passes.
  *
- * Fail-closed: a missing `gh`, a signed-out `gh`, or no readable mirror all block the install.
+ * Fail-closed: a missing `gh`, a signed-out `gh`, or no readable repo all block the install.
  *
  * @param deps - Injected `gh` runner (defaults to the real binary).
  * @returns Whether to proceed, with a machine-readable reason + resolved login.
@@ -72,51 +84,27 @@ export const checkEntitlement = async (
   if (login === null) {
     return { entitled: false, reason: 'not-authenticated' };
   }
-  for (const surface of SURFACE_MIRRORS) {
-    const repo = `${MIRROR_ORG}/${surface}`;
-    if ((await exec(['api', `repos/${repo}`, '--silent'])).code === 0) {
-      return { entitled: true, reason: 'entitled', login, via: repo };
-    }
-  }
-  return { entitled: false, reason: 'no-access', login };
+  const { org, repos } = readGateIdentity(process.env);
+  await acceptRepositoryInvites(exec, org);
+  const readableRepo = await firstReadableRepo(exec, org, repos);
+  return readableRepo === undefined
+    ? { entitled: false, reason: 'no-access', login }
+    : { entitled: true, reason: 'entitled', login, via: readableRepo };
 };
 
 /**
  * Human-facing lines explaining a blocked install and the one fix, tuned for a non-technical
  * buyer. Never prints raw stderr.
  *
- * @param result - A non-entitled {@link EntitlementResult}.
+ * @param entitlement - A non-entitled {@link EntitlementResult}.
  * @returns Lines to print (to stderr) in order.
  * @example
  * for (const line of formatEntitlementBlock(gate)) process.stderr.write(`${line}\n`);
  */
-export const formatEntitlementBlock = (result: EntitlementResult): string[] => {
-  const lines = [
-    '',
-    '✗ VybeKiit is a paid kit — this GitHub account is not on the buyer list.',
-    '',
-  ];
-  if (result.reason === 'gh-missing') {
-    lines.push(
-      'GitHub CLI (gh) was not found. Install it from https://cli.github.com, then run',
-      '  gh auth login --web',
-      'signed in with the GitHub account you purchased VybeKiit with, and re-run.',
-    );
-  } else if (result.reason === 'not-authenticated') {
-    lines.push(
-      'You are not signed in to GitHub. Run',
-      '  gh auth login --web',
-      'with the GitHub account you purchased VybeKiit with, then re-run.',
-    );
-  } else {
-    lines.push(
-      `Signed in as '${result.login}', but that account can't access the VybeKiit kit.`,
-      'If you have purchased, accept the repository invite (check your email or',
-      'https://github.com/notifications), or email info@vybekiit.com.',
-      '',
-      'Not a buyer yet?  https://vybekiit.com',
-    );
-  }
-  lines.push('');
-  return lines;
+export const formatEntitlementBlock = (entitlement: EntitlementResult): string[] => {
+  const accessProblem = ACCESS_PROBLEM_BY_REASON[entitlement.reason];
+  const helpLines = accessProblem === undefined ? [] : accessHelpLines(accessProblem);
+  const accountLines =
+    entitlement.login === undefined ? [] : [`Signed in to GitHub as ${entitlement.login}.`];
+  return ['', ...accountLines, ...helpLines, ''];
 };

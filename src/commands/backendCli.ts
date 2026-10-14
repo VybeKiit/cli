@@ -1,8 +1,7 @@
-import { execFile } from 'node:child_process';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { caughtMessage } from '@vybekiit/core';
+import { runProcess } from '../global/exec';
 import { scaffold } from '../lib/scaffold';
 import { cloneMirror, locateTemplateSource } from '../lib/templateSource';
 
@@ -355,8 +354,6 @@ uploadRouter.post('/', uploadSingle, uploadFile);
   return { message: 'Added POST /api/upload with multer limits.', exitCode: 0 };
 };
 
-const execFileAsync = promisify(execFile);
-
 /** Runs a package script in a directory; injectable so tests never spawn a process. */
 export type CommandRunner = (
   command: string,
@@ -365,7 +362,10 @@ export type CommandRunner = (
 ) => Promise<void>;
 
 const defaultRunner: CommandRunner = async (command, args, cwd) => {
-  await execFileAsync(command, [...args], { cwd });
+  const scriptRun = await runProcess(command, args, { cwd });
+  if (scriptRun.code !== 0) {
+    throw new Error(scriptRun.stderr.trim() || `${command} exited with code ${scriptRun.code}`);
+  }
 };
 
 /**

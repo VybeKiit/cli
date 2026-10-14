@@ -1,6 +1,9 @@
 import process from 'node:process';
 import { caughtMessage } from '@vybekiit/core';
 import { runCli } from './cliRunner';
+import { addToolFoldersToProcessPath } from './doctor/toolFolders';
+
+addToolFoldersToProcessPath();
 
 // This file is the package's `bin` entry (package.json -> "bin": "dist/bin.js"),
 // so it only ever runs as the process entrypoint. It invokes the CLI directly and
