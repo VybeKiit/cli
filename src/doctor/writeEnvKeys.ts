@@ -39,15 +39,20 @@ const replaceEnvLine = (lines: string[], key: string, newLine: string): boolean 
 };
 
 /**
- * Upsert keys into `.env`; updates existing lines or appends new ones. Values are
- * quoted when they contain spaces.
+ * Upsert keys into an env file (`.env` by default); updates existing lines or appends new
+ * ones. Values are quoted when they contain spaces.
  *
  * @param cwd - Project directory to update.
  * @param keys - Env keys to upsert.
- * @returns Void after writing `.env`.
+ * @param filename - Env file to write, relative to `cwd`.
+ * @returns Void after writing the file.
  */
-export const writeEnvKeys = (cwd: string, keys: Record<string, string>): void => {
-  const path = join(cwd, '.env');
+export const writeEnvKeys = (
+  cwd: string,
+  keys: Record<string, string>,
+  filename = '.env',
+): void => {
+  const path = join(cwd, filename);
   const existing = existsSync(path) ? readFileSync(path, 'utf8') : '';
   const lines = existing.length > 0 ? existing.split('\n') : [];
 

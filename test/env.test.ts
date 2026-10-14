@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -33,6 +33,21 @@ describe('writeEnvKeys', () => {
     writeEnvKeys(dir, { HOSTING_PROVIDER: 'github-pages' });
     const content = readFileSync(join(dir, '.env'), 'utf8');
     expect(content.split('HOSTING_PROVIDER=').length - 1).toBe(1);
+  });
+});
+
+describe('writeEnvKeys with settings.env', () => {
+  it('updates settings in settings.env and keeps secrets in .env', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'vybekiit-env-'));
+    writeFileSync(join(dir, 'settings.env'), '# Hosting\nHOSTING_PROVIDER=""\n');
+
+    writeEnvKeys(dir, { HOSTING_PROVIDER: 'vercel', VERCEL_TOKEN: 'token-value' });
+
+    expect(readFileSync(join(dir, 'settings.env'), 'utf8')).toBe(
+      '# Hosting\nHOSTING_PROVIDER=vercel\n',
+    );
+    expect(readFileSync(join(dir, '.env'), 'utf8')).toBe('VERCEL_TOKEN=token-value\n');
+    expect(loadEnvFile(dir)).toEqual({ HOSTING_PROVIDER: 'vercel', VERCEL_TOKEN: 'token-value' });
   });
 });
 

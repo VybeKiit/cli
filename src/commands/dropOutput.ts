@@ -88,7 +88,7 @@ export const dropNextSteps = (template: TemplateName, destPath: string): string[
     nextSteps.push('Run setup-mobile-env.sh to verify Xcode + iOS toolchain');
   }
   nextSteps.push(`cd ${destPath} && npm install`);
-  nextSteps.push('Check .env.example and create .env with your values');
+  nextSteps.push('Check settings.env, then copy .env.example to .env and add your secrets');
   return nextSteps;
 };
 

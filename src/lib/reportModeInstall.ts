@@ -1,6 +1,6 @@
 import { access, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
-import { writeEnvKeys } from '../doctor/writeEnvKeys';
+import { writeEnvKeys } from '../doctor/env';
 import type { AppSurfaceLayout } from './appSurface';
 import { reportModeEnvKeysForSurface } from './inferProjectSurface';
 import { ensureDependencies } from './packageJsonDeps';
