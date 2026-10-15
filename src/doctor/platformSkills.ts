@@ -9,6 +9,8 @@ import {
 } from '@vybekiit/agent-kit';
 import { inferProjectSurfaceSync } from '../lib/inferProjectSurface';
 
+const UPDATE_KIT_HINT = 'Ask your AI helper: "Update my kit."';
+
 export type PlatformSkillsReport = {
   readonly ok: boolean;
   readonly missing: readonly string[];
@@ -127,10 +129,10 @@ export const formatPlatformSkillsReport = (report: PlatformSkillsReport): string
       const count = Object.keys(lock.skills).length;
       lines.push(`✓ platform skills lock - ${count} pinned skill(s) in skills-lock.json.`);
     } catch {
-      lines.push('→ platform skills lock - skills-lock.json unreadable.');
+      lines.push(`→ platform skills lock - skills-lock.json unreadable. ${UPDATE_KIT_HINT}`);
     }
   } else {
-    lines.push('→ platform skills lock - skills-lock.json missing (run pin-platform-skills).');
+    lines.push(`→ platform skills lock - skills-lock.json missing. ${UPDATE_KIT_HINT}`);
   }
   if (report.ok) {
     const scope =
@@ -140,8 +142,6 @@ export const formatPlatformSkillsReport = (report: PlatformSkillsReport): string
     lines.push(`✓ platform skills - ${scope} are present.`);
     return lines;
   }
-  lines.push(
-    `→ platform skills - missing: ${report.missing.join(', ')}. Ask your agent to refresh platform skills (update-kit) or run the pin script.`,
-  );
+  lines.push(`→ platform skills - missing: ${report.missing.join(', ')}. ${UPDATE_KIT_HINT}`);
   return lines;
 };
