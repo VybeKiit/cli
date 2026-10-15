@@ -1,6 +1,7 @@
 import { isSignedIn, selectToolchain, type Tool } from '../doctor/toolchain';
 import { type ExecResult, runProcess } from '../global/exec';
 import { canOpenDesktopBrowser } from '../global/runSessionOne';
+import { isInteractive } from '../prompts/tty';
 import { type SetupPreferences, setupEnvironment } from './setupPreferences';
 
 export type SetupCommandRunner = (
@@ -16,7 +17,20 @@ export type SetupAuthenticationResult = {
   readonly lines: readonly string[];
 };
 
-type ToolConnection = { readonly connected: boolean; readonly line: string };
+export type SetupMachine = {
+  readonly canOpenBrowser: () => boolean;
+  readonly hasTerminal: () => boolean;
+};
+
+const DESKTOP_MACHINE: SetupMachine = {
+  canOpenBrowser: canOpenDesktopBrowser,
+  hasTerminal: isInteractive,
+};
+
+type ToolConnection = {
+  readonly status: 'connected' | 'later' | 'needsSignIn';
+  readonly line: string;
+};
 
 const AUTH_PROBE_TIMEOUT_MILLISECONDS = 60_000;
 
@@ -28,24 +42,31 @@ const defaultSetupCommandRunner: SetupCommandRunner = (command, args, interactiv
   );
 
 const needsSignIn = (tool: Tool, loginHint: string): ToolConnection => ({
-  connected: false,
+  status: 'needsSignIn',
   line: `✗ ${tool.name} needs sign-in. Run: ${loginHint}`,
 });
 
 const connectTool = async (
   tool: Tool,
   run: SetupCommandRunner,
-  canOpenBrowser: () => boolean,
+  machine: SetupMachine,
 ): Promise<ToolConnection> => {
   const { auth } = tool;
   if (auth === undefined) {
-    return { connected: true, line: `✓ ${tool.name} is ready.` };
+    return { status: 'connected', line: `✓ ${tool.name} is ready.` };
   }
   const existingSignIn = await run(auth.command, auth.args, false);
   if (isSignedIn(auth, existingSignIn)) {
-    return { connected: true, line: `✓ ${tool.name} reused your existing sign-in.` };
+    return { status: 'connected', line: `✓ ${tool.name} reused your existing sign-in.` };
   }
-  if (auth.signIn === undefined || !canOpenBrowser()) {
+  const signInWaitsForTerminal = auth.signIn?.needsTerminal === true && !machine.hasTerminal();
+  if (signInWaitsForTerminal) {
+    return {
+      status: 'later',
+      line: `→ ${tool.name} sign-in waits until your app needs it, because it asks for a code typed in a terminal. Then run: ${auth.loginHint}`,
+    };
+  }
+  if (auth.signIn === undefined || !machine.canOpenBrowser()) {
     return needsSignIn(tool, auth.loginHint);
   }
 
@@ -56,7 +77,7 @@ const connectTool = async (
   }
   const verifiedSignIn = await run(auth.command, auth.args, false);
   return isSignedIn(auth, verifiedSignIn)
-    ? { connected: true, line: `✓ ${tool.name} sign-in verified.` }
+    ? { status: 'connected', line: `✓ ${tool.name} sign-in verified.` }
     : needsSignIn(tool, auth.loginHint);
 };
 
@@ -65,7 +86,7 @@ export const connectSetupServices = async (
   preferences: SetupPreferences,
   withoutGithub: boolean,
   run: SetupCommandRunner = defaultSetupCommandRunner,
-  canOpenBrowser: () => boolean = canOpenDesktopBrowser,
+  machine: SetupMachine = DESKTOP_MACHINE,
 ): Promise<SetupAuthenticationResult> => {
   const selectedTools = selectToolchain(setupEnvironment(preferences), {
     wantsGoogleAuth: preferences.googleSignIn,
@@ -75,17 +96,17 @@ export const connectSetupServices = async (
     Promise<{ readonly tool: Tool; readonly connection: ToolConnection }[]>
   >(async (earlierAttempts, tool) => {
     const finishedAttempts = await earlierAttempts;
-    const connection = await connectTool(tool, run, canOpenBrowser);
+    const connection = await connectTool(tool, run, machine);
     return [...finishedAttempts, { tool, connection }];
   }, Promise.resolve([]));
 
   return {
-    ok: attempts.every(({ connection }) => connection.connected),
+    ok: attempts.every(({ connection }) => connection.status !== 'needsSignIn'),
     connected: attempts
-      .filter(({ connection }) => connection.connected)
+      .filter(({ connection }) => connection.status === 'connected')
       .map(({ tool }) => tool.name),
     needsAttention: attempts
-      .filter(({ connection }) => !connection.connected)
+      .filter(({ connection }) => connection.status === 'needsSignIn')
       .map(({ tool }) => tool.name),
     lines: attempts.map(({ connection }) => connection.line),
   };

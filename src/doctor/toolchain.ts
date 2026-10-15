@@ -58,6 +58,7 @@ export type AuthProbe = {
   readonly signIn?: {
     readonly command: string;
     readonly args: readonly string[];
+    readonly needsTerminal?: boolean;
   };
 };
 

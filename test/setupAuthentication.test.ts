@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { connectSetupServices } from '../src/commands/setupAuthentication';
+import { connectSetupServices, type SetupMachine } from '../src/commands/setupAuthentication';
 import type { SetupPreferences } from '../src/commands/setupPreferences';
 import type { ExecResult } from '../src/global/exec';
 
@@ -11,12 +11,14 @@ const SELECTED_STACK: SetupPreferences = {
 
 const exitWith = (code: number, stdout = ''): ExecResult => ({ code, stdout, stderr: '' });
 
-const browserAvailable = () => true;
+const DESKTOP_TERMINAL: SetupMachine = { canOpenBrowser: () => true, hasTerminal: () => true };
+const AGENT_SHELL: SetupMachine = { canOpenBrowser: () => true, hasTerminal: () => false };
+const NO_BROWSER: SetupMachine = { canOpenBrowser: () => false, hasTerminal: () => true };
 
 describe('connectSetupServices', () => {
   it('reuses existing sign-ins and does not open another browser flow', async () => {
     const run = vi.fn(async () => exitWith(0));
-    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, DESKTOP_TERMINAL);
 
     expect(connection.ok).toBe(true);
     expect(connection.connected).toEqual(['gh', 'wrangler', 'supabase']);
@@ -25,7 +27,7 @@ describe('connectSetupServices', () => {
 
   it('leaves GitHub out for a buyer who unzipped the kit', async () => {
     const run = vi.fn(async () => exitWith(0));
-    const connection = await connectSetupServices(SELECTED_STACK, true, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, true, run, DESKTOP_TERMINAL);
 
     expect(connection.connected).toEqual(['wrangler', 'supabase']);
     expect(run).not.toHaveBeenCalledWith('gh', expect.anything(), expect.anything());
@@ -47,7 +49,7 @@ describe('connectSetupServices', () => {
       return exitWith(0);
     });
 
-    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, DESKTOP_TERMINAL);
 
     expect(connection.ok).toBe(true);
     expect(run).toHaveBeenCalledWith('wrangler', ['login'], true);
@@ -61,7 +63,7 @@ describe('connectSetupServices', () => {
         : exitWith(0),
     );
 
-    const connection = await connectSetupServices(SELECTED_STACK, false, run, () => false);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, NO_BROWSER);
 
     expect(connection.needsAttention).toEqual(['wrangler']);
   });
@@ -71,7 +73,7 @@ describe('connectSetupServices', () => {
       command === 'gh' && args[1] === 'status' ? exitWith(1) : exitWith(0),
     );
 
-    await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
+    await connectSetupServices(SELECTED_STACK, false, run, DESKTOP_TERMINAL);
 
     expect(run).toHaveBeenCalledWith(
       'gh',
@@ -85,7 +87,7 @@ describe('connectSetupServices', () => {
       exitWith(1),
     );
 
-    const connection = await connectSetupServices(SELECTED_STACK, false, run, () => false);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, NO_BROWSER);
 
     expect(run).toHaveBeenCalledTimes(3);
     expect(run.mock.calls.every(([, , interactive]) => interactive === false)).toBe(true);
@@ -94,10 +96,28 @@ describe('connectSetupServices', () => {
 
   it('fails honestly when sign-in still cannot be verified', async () => {
     const run = vi.fn(async (command: string) => exitWith(command === 'supabase' ? 1 : 0));
-    const connection = await connectSetupServices(SELECTED_STACK, false, run, browserAvailable);
+    const connection = await connectSetupServices(SELECTED_STACK, false, run, DESKTOP_TERMINAL);
 
     expect(connection.ok).toBe(false);
     expect(connection.needsAttention).toEqual(['supabase']);
     expect(connection.lines.join('\n')).toContain('supabase login');
+  });
+
+  it('keeps going without a terminal when a sign-in needs a typed code', async () => {
+    const run = vi.fn(async (command: string) => exitWith(command === 'supabase' ? 1 : 0));
+    const connection = await connectSetupServices(SELECTED_STACK, true, run, AGENT_SHELL);
+
+    expect(connection.ok).toBe(true);
+    expect(connection.needsAttention).toEqual([]);
+    expect(run).not.toHaveBeenCalledWith('supabase', ['login'], true);
+    expect(connection.lines.join('\n')).toContain('supabase sign-in waits');
+  });
+
+  it('still opens a typed-code sign-in when a terminal is attached', async () => {
+    const run = vi.fn(async (command: string) => exitWith(command === 'supabase' ? 1 : 0));
+
+    await connectSetupServices(SELECTED_STACK, true, run, DESKTOP_TERMINAL);
+
+    expect(run).toHaveBeenCalledWith('supabase', ['login'], true);
   });
 });

@@ -119,7 +119,7 @@ export const SUPABASE: Tool = {
     command: 'supabase',
     args: ['projects', 'list'],
     loginHint: 'supabase login',
-    signIn: { command: 'supabase', args: ['login'] },
+    signIn: { command: 'supabase', args: ['login'], needsTerminal: true },
   },
 };
 
