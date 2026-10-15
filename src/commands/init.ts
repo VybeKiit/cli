@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { caughtMessage } from '@vybekiit/core';
 import { locateTemplateSource } from '../lib/templateSource';
 import {
-  copyClaudeHooks,
+  copyAgentHooks,
   copyPrePushHook,
   copySecurityFile,
   copyWorkflows,
@@ -49,7 +49,7 @@ export const runInit = async (args: string[]): Promise<number> => {
     cleanup = resolvedCleanup;
     const templateDir = join(source, projectType);
 
-    await copyClaudeHooks(cwd, templateDir);
+    await copyAgentHooks(cwd, templateDir);
     await copyWorkflows(cwd, templateDir, pm);
     await copyPrePushHook(cwd, templateDir);
     await copySecurityFile(cwd, templateDir);

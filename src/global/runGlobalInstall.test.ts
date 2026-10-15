@@ -31,6 +31,17 @@ vi.mock('./installGlobalMcp', () => ({
   }),
   isVybekiitMcpReady: () => true,
 }));
+vi.mock('./installCodexMcp', () => ({
+  installCodexMcp: () =>
+    Effect.succeed({
+      enabled: [],
+      alreadyPresent: [],
+      refreshed: [],
+      needsKey: [],
+      failed: [],
+      codexMissing: true,
+    }),
+}));
 vi.mock('./awareness', () => ({ installAwareness: async () => ({ commandWritten: true }) }));
 vi.mock('./globalStatus', () => ({
   readGlobalStatus: async () => ({ skillCount: 1, skillSample: ['onboarding'] }),

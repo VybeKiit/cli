@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/hooks/skill-router.mjs\"; [ ! -f \"$hook\" ] || node \"$hook\""
+          }
+        ]
+      }
+    ]
+  }
+}

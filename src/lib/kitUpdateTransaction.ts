@@ -4,6 +4,7 @@ import { runProcess } from '../global/exec';
 import type { KitUpdateInspection } from './kitUpdateInspection';
 import { KIT_WORKSPACE_MANIFEST_PATH, writeKitWorkspaceManifest } from './kitUpdateManifest';
 import { pathExists } from './pathExists';
+import { AGENT_HOOK_SETTINGS_FILES, writeWorkspaceHookSettings } from './scaffoldKitWorkspace';
 
 const copyWorkspacePath = async (
   sourceRoot: string,
@@ -87,13 +88,28 @@ const restoreBuyerPaths = async (
   );
 };
 
+const changedHookSettingsFor = (inspection: KitUpdateInspection) =>
+  AGENT_HOOK_SETTINGS_FILES.filter(([settingsFolder, settingsFile]) =>
+    inspection.changedMaintainedPaths.includes(
+      `templates/${inspection.manifest.surface}/${settingsFolder}/${settingsFile}`,
+    ),
+  );
+
 const applyVerifiedPreview = async (
   projectRoot: string,
   previewRoot: string,
   backupRoot: string,
   inspection: KitUpdateInspection,
 ): Promise<void> => {
-  const protectedPaths = [...inspection.changedMaintainedPaths, KIT_WORKSPACE_MANIFEST_PATH];
+  const changedHookSettings = changedHookSettingsFor(inspection);
+  const workspaceHookSettingsPaths = changedHookSettings.map(
+    ([settingsFolder, settingsFile]) => `${settingsFolder}/${settingsFile}`,
+  );
+  const protectedPaths = [
+    ...inspection.changedMaintainedPaths,
+    KIT_WORKSPACE_MANIFEST_PATH,
+    ...workspaceHookSettingsPaths,
+  ];
   await rm(backupRoot, { recursive: true, force: true });
   await mkdir(backupRoot, { recursive: true });
   const buyerPaths = await Promise.all(
@@ -112,6 +128,11 @@ const applyVerifiedPreview = async (
   );
   await overlayMaintainedPaths(previewRoot, projectRoot, inspection.changedMaintainedPaths)
     .then(async () => {
+      await Promise.all(
+        changedHookSettings.map((settingsPath) =>
+          writeWorkspaceHookSettings(projectRoot, inspection.manifest.surface, settingsPath),
+        ),
+      );
       await writeKitWorkspaceManifest({
         projectRoot,
         kitVersion: inspection.plan.targetVersion,

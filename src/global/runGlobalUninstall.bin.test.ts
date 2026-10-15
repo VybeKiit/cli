@@ -34,6 +34,19 @@ echo "No MCP server found" >&2
 exit 1
 `;
 
+const STUB_CODEX = (callLog: string) => `#!/bin/sh
+echo "$*" >> "${callLog}"
+case "$*" in
+  "--version") echo "codex-cli 0.162.1"; exit 0 ;;
+  "mcp list --json")
+    if grep -qx "mcp remove vybekiit" "${callLog}"; then echo '[]'; exit 0; fi
+    echo '[{"name":"vybekiit","enabled":true,"transport":{"type":"stdio","command":"npx","args":["-y","vybekiit@latest","mcp","serve"]}}]'
+    exit 0 ;;
+  "mcp remove vybekiit") exit 0 ;;
+esac
+exit 1
+`;
+
 const sandboxes: string[] = [];
 
 afterEach(async () => {
@@ -55,6 +68,7 @@ describe('built bin: vybekiit uninstall', () => {
     const codexDirectory = join(homeDirectory, '.codex');
     const stubDirectory = join(homeDirectory, 'stub-bin');
     const callLog = join(homeDirectory, 'claude-calls.log');
+    const codexCallLog = join(homeDirectory, 'codex-calls.log');
     const paths = globalInstallPaths(claudeDirectory);
     const settings = {
       homeDirectory,
@@ -66,6 +80,8 @@ describe('built bin: vybekiit uninstall', () => {
     await mkdir(stubDirectory, { recursive: true });
     await writeFile(join(stubDirectory, 'claude'), STUB_CLAUDE(callLog));
     await chmod(join(stubDirectory, 'claude'), 0o755);
+    await writeFile(join(stubDirectory, 'codex'), STUB_CODEX(codexCallLog));
+    await chmod(join(stubDirectory, 'codex'), 0o755);
     await mkdir(claudeDirectory, { recursive: true });
     await writeFile(paths.memoryFile, '# My rules\n');
     await mkdir(codexDirectory, { recursive: true });
@@ -102,6 +118,7 @@ describe('built bin: vybekiit uninstall', () => {
     expect(preview.stdout).toContain('VybeKiit will remove:');
     expect(preview.stdout).toContain('Claude Code tool connections (1): vybekiit');
     expect(preview.stdout).toContain('Your own playwright tool connection in Claude Code.');
+    expect(preview.stdout).toContain('Codex tool connections (1): vybekiit');
     expect(preview.stdout).toContain('Dry run: nothing was removed.');
     expect((await listManagedSkillNames(paths.skillsDir)).length).toBeGreaterThan(100);
 
@@ -122,6 +139,7 @@ describe('built bin: vybekiit uninstall', () => {
     const claudeCalls = await readFile(callLog, 'utf8');
     expect(claudeCalls).toContain('mcp remove -s user vybekiit');
     expect(claudeCalls).not.toContain('mcp remove -s user playwright');
+    expect(await readFile(codexCallLog, 'utf8')).toContain('mcp remove vybekiit');
 
     const repeated = await runUninstall(['--yes']);
     expect(repeated.stdout).toContain('Nothing to remove.');

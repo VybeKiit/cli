@@ -9,13 +9,13 @@ const execFileAsync = promisify(execFile);
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 /**
- * Copy Claude Code settings and hooks from the selected template.
+ * Copy the Claude Code and Codex hook settings and hooks from the selected template.
  *
  * @param cwd - Target project directory.
  * @param templateDir - Resolved template source directory.
  * @returns Promise that resolves after the copy or visible warning.
  */
-export const copyClaudeHooks = async (cwd: string, templateDir: string): Promise<void> => {
+export const copyAgentHooks = async (cwd: string, templateDir: string): Promise<void> => {
   const claudeSource = join(templateDir, '.claude');
   if (!(await pathExists(claudeSource))) {
     process.stdout.write('  ⚠️  Could not copy .claude hooks (source missing)\n');
@@ -24,6 +24,14 @@ export const copyClaudeHooks = async (cwd: string, templateDir: string): Promise
 
   await cp(claudeSource, join(cwd, '.claude'), { recursive: true, force: true });
   process.stdout.write('  ✅ .claude/settings.json + hooks\n');
+
+  const codexHooksSource = join(templateDir, '.codex', 'hooks.json');
+  if (!(await pathExists(codexHooksSource))) {
+    return;
+  }
+  await mkdir(join(cwd, '.codex'), { recursive: true });
+  await cp(codexHooksSource, join(cwd, '.codex', 'hooks.json'), { force: true });
+  process.stdout.write('  ✅ .codex/hooks.json\n');
 };
 
 /**

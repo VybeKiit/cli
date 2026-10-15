@@ -56,6 +56,9 @@ describe('runUpdateKit verification transaction', () => {
     await expect(
       readFile(join(buyerRoot, 'templates', 'web', 'src', 'page.txt'), 'utf8'),
     ).resolves.toBe('buyer owned\n');
+    await expect(readFile(join(buyerRoot, '.codex', 'hooks.json'), 'utf8')).resolves.toContain(
+      '|| pwd)/templates/web/.claude/hooks/skill-router.mjs\\"',
+    );
   }, 15_000);
 
   it('refuses a red update and leaves the real workspace on its working version', async () => {

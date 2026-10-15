@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { CodexMcpInstallation } from '../../src/global/installCodexMcp';
 import type { McpInstallResult } from '../../src/global/installGlobalMcp';
 import {
   formatGlobalInstallSummary,
@@ -6,6 +7,15 @@ import {
   runGlobalInstall,
   shouldRunSessionOneOnInstall,
 } from '../../src/global/runGlobalInstall';
+
+const missingCodexMcp: CodexMcpInstallation = {
+  enabled: [],
+  alreadyPresent: [],
+  refreshed: [],
+  needsKey: [],
+  failed: [],
+  codexMissing: true,
+};
 
 const baseSummary = {
   skillsInstalled: 119,
@@ -19,6 +29,7 @@ const baseSummary = {
   mcpNeedsKey: ['github'] as readonly string[],
   mcpFailed: [] as readonly string[],
   claudeMissing: false,
+  codexMcp: missingCodexMcp,
   commandInstalled: true,
   version: '0.6.2',
   previousVersion: null as string | null,
@@ -31,6 +42,15 @@ const readyMcp: McpInstallResult = {
   needsKey: [],
   failed: [],
   claudeMissing: false,
+};
+
+const readyCodexMcp: CodexMcpInstallation = {
+  enabled: ['vybekiit'],
+  alreadyPresent: [],
+  refreshed: [],
+  needsKey: [],
+  failed: [],
+  codexMissing: false,
 };
 
 describe('formatGlobalInstallSummary', () => {
@@ -113,20 +133,34 @@ describe('formatGlobalInstallSummary', () => {
 
     expect(text).toContain('failed to register: vybekiit');
   });
+
+  it('lists the Codex tool connections only when Codex is installed', () => {
+    const withoutCodex = formatGlobalInstallSummary(baseSummary).join('\n');
+    const withCodex = formatGlobalInstallSummary({
+      ...baseSummary,
+      codexMcp: { ...readyCodexMcp, enabled: ['playwright'], refreshed: ['vybekiit'] },
+    }).join('\n');
+
+    expect(withoutCodex).not.toContain('Codex');
+    expect(withCodex).toContain('Codex    playwright (the same tool connections in Codex)');
+    expect(withCodex).toContain('refreshed: vybekiit');
+  });
 });
 
 describe('globalSetupComplete', () => {
-  it('continues for other coding agents when Claude Code is not installed', () => {
-    expect(globalSetupComplete(true, { ...readyMcp, enabled: [], claudeMissing: true })).toBe(true);
+  const missingClaude = { ...readyMcp, enabled: [], claudeMissing: true };
+
+  it('continues for other coding agents when Claude Code or Codex is not installed', () => {
+    expect(globalSetupComplete(true, missingClaude, readyCodexMcp)).toBe(true);
+    expect(globalSetupComplete(true, readyMcp, missingCodexMcp)).toBe(true);
   });
 
-  it('still blocks missing skills or a failed Claude MCP registration', () => {
-    expect(globalSetupComplete(false, { ...readyMcp, enabled: [], claudeMissing: true })).toBe(
-      false,
-    );
-    expect(globalSetupComplete(true, { ...readyMcp, enabled: [], failed: ['vybekiit'] })).toBe(
-      false,
-    );
+  it('still blocks missing skills or a failed VybeKiit MCP registration', () => {
+    const failedClaude = { ...readyMcp, enabled: [], failed: ['vybekiit'] };
+    const failedCodex = { ...readyCodexMcp, enabled: [], failed: ['vybekiit'] };
+    expect(globalSetupComplete(false, missingClaude, missingCodexMcp)).toBe(false);
+    expect(globalSetupComplete(true, failedClaude, missingCodexMcp)).toBe(false);
+    expect(globalSetupComplete(true, missingClaude, failedCodex)).toBe(false);
   });
 });
 

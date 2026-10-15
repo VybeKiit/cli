@@ -43,6 +43,35 @@ const claudeWithRegisteredServers = (claudeCalls: string[][]): ExecFn => {
   };
 };
 
+const codexWithRegisteredServers = (codexCalls: string[][]): ExecFn => {
+  const registeredServers = new Map([
+    ['vybekiit', { command: 'npx', args: ['-y', 'vybekiit@latest', 'mcp', 'serve'] }],
+    ['playwright', { command: 'npx', args: ['-y', '@playwright/mcp@latest'] }],
+    ['context7', { command: 'node', args: ['my-context7.js'] }],
+  ]);
+  return (codexArguments) => {
+    codexCalls.push([...codexArguments]);
+    const [subcommand, action, serverName = ''] = codexArguments;
+    if (subcommand === 'mcp' && action === 'remove') {
+      registeredServers.delete(serverName);
+    }
+    const listedServers = [...registeredServers].map(([name, transport]) => ({
+      name,
+      enabled: true,
+      transport: { type: 'stdio', ...transport, env: null, env_vars: [], cwd: null },
+    }));
+    const listing = subcommand === 'mcp' && action === 'list';
+    return Promise.resolve({
+      code: 0,
+      stdout: listing ? JSON.stringify(listedServers) : 'codex-cli 0.162.1',
+      stderr: '',
+    });
+  };
+};
+
+const missingCommand: ExecFn = () =>
+  Promise.resolve({ code: 127, stdout: '', stderr: 'not found' });
+
 it.scoped('removes everything global setup added and keeps what the user owns', () =>
   Effect.gen(function* () {
     const homeDirectory = yield* Effect.acquireRelease(
@@ -111,21 +140,29 @@ it.scoped('removes everything global setup added and keeps what the user owns', 
     ).toBe(true);
 
     const claudeCalls: string[][] = [];
-    const claude = claudeWithRegisteredServers(claudeCalls);
-    const plan = yield* planGlobalUninstall(settings, claude);
-    expect(formatUninstallPlan(plan).join('\n')).toContain(
-      'Claude Code tool connections (2): vybekiit, context7',
-    );
+    const codexCalls: string[][] = [];
+    const assistantCommands = {
+      claude: claudeWithRegisteredServers(claudeCalls),
+      codex: codexWithRegisteredServers(codexCalls),
+    };
+    const plan = yield* planGlobalUninstall(settings, assistantCommands);
+    const plannedRemovals = formatUninstallPlan(plan).join('\n');
+    expect(plannedRemovals).toContain('Claude Code tool connections (2): vybekiit, context7');
+    expect(plannedRemovals).toContain('Codex tool connections (2): vybekiit, playwright');
     expect(plan.keptNotes).toContain('Your own playwright tool connection in Claude Code.');
+    expect(plan.keptNotes).toContain('Your own context7 tool connection in Codex.');
     expect(plan.keptNotes.join('\n')).toContain(`Your app at ${firstAppPath}.`);
     expect(plan.keptNotes.join('\n')).toContain('benchmark-backups');
     expect(plan.repairNotes).toEqual([]);
 
-    const failures = yield* applyGlobalUninstall(plan, claude);
+    const failures = yield* applyGlobalUninstall(plan, assistantCommands);
     expect(failures).toEqual([]);
     expect(claudeCalls).toContainEqual(['mcp', 'remove', '-s', 'user', 'vybekiit']);
     expect(claudeCalls).toContainEqual(['mcp', 'remove', '-s', 'user', 'context7']);
     expect(claudeCalls).not.toContainEqual(['mcp', 'remove', '-s', 'user', 'playwright']);
+    expect(codexCalls).toContainEqual(['mcp', 'remove', 'vybekiit']);
+    expect(codexCalls).toContainEqual(['mcp', 'remove', 'playwright']);
+    expect(codexCalls).not.toContainEqual(['mcp', 'remove', 'context7']);
 
     yield* Effect.promise(async () => {
       expect(existsSync(join(paths.skillsDir, 'onboarding'))).toBe(false);
@@ -157,7 +194,7 @@ it.scoped('removes everything global setup added and keeps what the user owns', 
       expect(existsSync(join(firstAppPath, 'package.json'))).toBe(true);
     });
 
-    const repeatedPlan = yield* planGlobalUninstall(settings, claude);
+    const repeatedPlan = yield* planGlobalUninstall(settings, assistantCommands);
     expect(repeatedPlan.removals).toEqual([]);
   }),
 );
@@ -185,11 +222,10 @@ it.scoped('leaves an instruction file with broken markers untouched and asks for
       await mkdir(settings.claudeDirectory, { recursive: true });
       await writeFile(join(settings.claudeDirectory, 'CLAUDE.md'), brokenInstruction);
     });
-    const plan = yield* planGlobalUninstall(settings, async () => ({
-      code: 127,
-      stdout: '',
-      stderr: 'claude not found',
-    }));
+    const plan = yield* planGlobalUninstall(settings, {
+      claude: missingCommand,
+      codex: missingCommand,
+    });
     expect(plan.removals).toEqual([]);
     expect(plan.repairNotes).toEqual([
       `Remove the VybeKiit section from ${join(settings.claudeDirectory, 'CLAUDE.md')} by hand, then run this again.`,
@@ -200,5 +236,38 @@ it.scoped('leaves an instruction file with broken markers untouched and asks for
     expect(
       yield* Effect.promise(() => readFile(join(settings.claudeDirectory, 'CLAUDE.md'), 'utf8')),
     ).toBe(brokenInstruction);
+  }),
+);
+
+it.scoped('asks for a hand check when Codex cannot list its tool connections', () =>
+  Effect.gen(function* () {
+    const homeDirectory = yield* Effect.acquireRelease(
+      Effect.promise(async () => {
+        const scratchDirectory = join(process.cwd(), 'scripts', 'dev');
+        await mkdir(scratchDirectory, { recursive: true });
+        return mkdtemp(join(scratchDirectory, 'global-uninstall-'));
+      }),
+      (directory) => Effect.promise(() => rm(directory, { recursive: true, force: true })),
+    );
+    const settings = {
+      homeDirectory,
+      claudeDirectory: join(homeDirectory, '.claude'),
+      codexDirectory: join(homeDirectory, '.codex'),
+      executablePath: '',
+      plainLanguageGuide: join(homeDirectory, 'bundled-language.md'),
+    };
+    const olderCodex: ExecFn = (codexArguments) =>
+      Promise.resolve(
+        codexArguments[0] === '--version'
+          ? { code: 0, stdout: 'codex-cli 0.1.0', stderr: '' }
+          : { code: 2, stdout: '', stderr: "unexpected argument '--json'" },
+      );
+    const plan = yield* planGlobalUninstall(settings, {
+      claude: missingCommand,
+      codex: olderCodex,
+    });
+    expect(plan.removals).toEqual([]);
+    expect(plan.repairNotes.join('\n')).toContain('Codex could not list its tool connections.');
+    expect(plan.repairNotes.join('\n')).toContain('codex mcp remove <name>');
   }),
 );

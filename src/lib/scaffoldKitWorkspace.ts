@@ -260,6 +260,29 @@ const copyPackageIntoKit = async (
   });
 };
 
+export const AGENT_HOOK_SETTINGS_FILES = [
+  ['.claude', 'settings.json'],
+  ['.codex', 'hooks.json'],
+] as const;
+
+export const writeWorkspaceHookSettings = async (
+  dest: string,
+  template: TemplateName,
+  [settingsFolder, settingsFile]: (typeof AGENT_HOOK_SETTINGS_FILES)[number],
+): Promise<void> => {
+  const appSettingsPath = join(dest, 'templates', template, settingsFolder, settingsFile);
+  if (!(await pathExists(appSettingsPath))) {
+    return;
+  }
+  const appSettings = await readFile(appSettingsPath, 'utf8');
+  const workspaceSettings = appSettings.replaceAll(
+    '/.claude/hooks/',
+    `/templates/${template}/.claude/hooks/`,
+  );
+  await mkdir(join(dest, settingsFolder), { recursive: true });
+  await writeFile(join(dest, settingsFolder, settingsFile), workspaceSettings);
+};
+
 /**
  * Copy a template surface + required private packages into a fresh kit workspace root.
  *
@@ -276,24 +299,6 @@ const copyPackageIntoKit = async (
  *   dest: '/tmp/my-app',
  * });
  */
-const writeWorkspaceClaudeSettings = async (
-  surfaceDest: string,
-  dest: string,
-  template: TemplateName,
-): Promise<void> => {
-  const appSettingsPath = join(surfaceDest, '.claude', 'settings.json');
-  if (!(await pathExists(appSettingsPath))) {
-    return;
-  }
-  const appSettings = await readFile(appSettingsPath, 'utf8');
-  const workspaceSettings = appSettings.replaceAll(
-    '/.claude/hooks/',
-    `/templates/${template}/.claude/hooks/`,
-  );
-  await mkdir(join(dest, '.claude'), { recursive: true });
-  await writeFile(join(dest, '.claude', 'settings.json'), workspaceSettings);
-};
-
 export const scaffoldKitWorkspace = async (
   options: ScaffoldKitOptions,
 ): Promise<{ readonly dest: string }> => {
@@ -366,7 +371,11 @@ export const scaffoldKitWorkspace = async (
     );
     await ensureAgentSkillSymlinks(options.dest);
   }
-  await writeWorkspaceClaudeSettings(surfaceDest, options.dest, options.template);
+  await Promise.all(
+    AGENT_HOOK_SETTINGS_FILES.map((settingsPath) =>
+      writeWorkspaceHookSettings(options.dest, options.template, settingsPath),
+    ),
+  );
 
   // First-party MCPs always ship: packages (via KIT_ALWAYS_SHIP) + project configs.
   await shipFirstPartyMcpConfigs({ dest: options.dest, template: options.template });

@@ -100,19 +100,22 @@ export type McpInstallDeps = {
   readonly forceRefresh?: boolean;
 };
 
-/** What {@link installGlobalMcp} did. */
-export type McpInstallResult = {
+export type McpRegistrationOutcomes = {
   readonly enabled: readonly string[];
   readonly alreadyPresent: readonly string[];
   /** Zero-config servers re-registered on an update re-run. */
   readonly refreshed: readonly string[];
   readonly needsKey: readonly string[];
   readonly failed: readonly string[];
+};
+
+/** What {@link installGlobalMcp} did. */
+export type McpInstallResult = McpRegistrationOutcomes & {
   readonly claudeMissing: boolean;
 };
 
-/** Whether Claude has a user-scoped VybeKiit server after this install attempt. */
-export const isVybekiitMcpReady = (installation: McpInstallResult): boolean =>
+/** Whether the assistant has a user-scoped VybeKiit server after this install attempt. */
+export const isVybekiitMcpReady = (installation: McpRegistrationOutcomes): boolean =>
   [...installation.enabled, ...installation.alreadyPresent, ...installation.refreshed].includes(
     'vybekiit',
   );
@@ -178,7 +181,7 @@ export const claudeMcpAddArgv = (
  * @param env - Environment to check.
  * @returns True when the server can be registered now.
  */
-const hasKeys = (def: McpServerDef, env: Record<string, string | undefined>): boolean =>
+export const hasKeys = (def: McpServerDef, env: Record<string, string | undefined>): boolean =>
   (def.envKeys ?? []).every((key) => (env[key] ?? '') !== '');
 
 /**
@@ -187,7 +190,7 @@ const hasKeys = (def: McpServerDef, env: Record<string, string | undefined>): bo
  * @param def - Server definition.
  * @returns True for playwright / context7 entries.
  */
-const isZeroConfig = (def: McpServerDef): boolean =>
+export const isZeroConfig = (def: McpServerDef): boolean =>
   ZERO_CONFIG.some((entry) => entry.name === def.name);
 
 /**

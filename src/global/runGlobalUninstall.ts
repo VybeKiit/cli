@@ -14,6 +14,12 @@ import {
 import { STATUSLINE_BADGE, withoutStatusLineBadge } from './awareness';
 import { type ExecFn, makeExec } from './exec';
 import { globalInstallPaths } from './globalPaths';
+import {
+  CODEX_MCP_SERVERS,
+  codexInstalled,
+  codexMcpOwner,
+  listCodexMcpRegistrations,
+} from './installCodexMcp';
 import { GLOBAL_MCP_SERVERS, mcpRegistrationOwner } from './installGlobalMcp';
 import { installStatePath, readInstallState } from './installState';
 import { listManagedSkillNames } from './managedSkills';
@@ -25,6 +31,7 @@ export class GlobalUninstallError extends Data.TaggedError('GlobalUninstallError
 
 const REMOVAL_GROUPS = {
   mcp: 'Claude Code tool connections',
+  codexMcp: 'Codex tool connections',
   skillLinks: 'Skill links for your other coding assistants',
   skills: 'Skills',
   instructions: 'VybeKiit instructions in your coding assistants',
@@ -46,7 +53,10 @@ type GlobalRemoval =
       readonly path: string;
       readonly remainingText: string;
     }
-  | { readonly kind: 'mcp'; readonly group: string; readonly name: string };
+  | { readonly kind: 'mcp'; readonly group: string; readonly name: string }
+  | { readonly kind: 'codexMcp'; readonly group: string; readonly name: string };
+
+export type AssistantCommands = { readonly claude: ExecFn; readonly codex: ExecFn };
 
 export type GlobalUninstallPlan = {
   readonly removals: readonly GlobalRemoval[];
@@ -59,6 +69,12 @@ const pathRemoval = (group: string, path: string): GlobalRemoval => ({ kind: 'pa
 const mcpRemoval = (name: string): GlobalRemoval => ({
   kind: 'mcp',
   group: REMOVAL_GROUPS.mcp,
+  name,
+});
+
+const codexMcpRemoval = (name: string): GlobalRemoval => ({
+  kind: 'codexMcp',
+  group: REMOVAL_GROUPS.codexMcp,
   name,
 });
 
@@ -118,6 +134,35 @@ const planMcpRemovals = (claude: ExecFn) =>
       registrations
         .filter((registration) => registration.owner === 'user')
         .map((registration) => `Your own ${registration.name} tool connection in Claude Code.`),
+    );
+  });
+
+const planCodexMcpRemovals = (codex: ExecFn) =>
+  Effect.gen(function* () {
+    if (!(yield* codexInstalled(codex))) {
+      return uninstallPlan([]);
+    }
+    const registrations = yield* Effect.either(listCodexMcpRegistrations(codex));
+    if (Either.isLeft(registrations)) {
+      return uninstallPlan(
+        [],
+        [],
+        [
+          `${registrations.left.message} Run \`codex mcp list\` and remove the VybeKiit ones with \`codex mcp remove <name>\`.`,
+        ],
+      );
+    }
+    const owners = CODEX_MCP_SERVERS.map((mcpServer) => ({
+      name: mcpServer.name,
+      owner: codexMcpOwner(mcpServer, registrations.right),
+    }));
+    return uninstallPlan(
+      owners
+        .filter((registration) => registration.owner === 'vybekiit')
+        .map((registration) => codexMcpRemoval(registration.name)),
+      owners
+        .filter((registration) => registration.owner === 'user')
+        .map((registration) => `Your own ${registration.name} tool connection in Codex.`),
     );
   });
 
@@ -270,13 +315,14 @@ const planInstallStampRemoval = (claudeDirectory: string) =>
 /** Everything `vybekiit setup` / `global-install` left on this computer that can be removed. */
 export const planGlobalUninstall = (
   settings: Schema.Schema.Type<typeof AgentInstallationSettings>,
-  claude: ExecFn,
+  assistantCommands: AssistantCommands,
 ) =>
   Effect.gen(function* () {
     const paths = globalInstallPaths(settings.claudeDirectory);
     const managedSkills = yield* Effect.promise(() => listManagedSkillNames(paths.skillsDir));
     const commandPath = join(paths.commandsDir, 'vybekiit.md');
-    const mcpPlan = yield* planMcpRemovals(claude);
+    const mcpPlan = yield* planMcpRemovals(assistantCommands.claude);
+    const codexMcpPlan = yield* planCodexMcpRemovals(assistantCommands.codex);
     const skillLinkPlans = yield* Effect.all(
       agentSkillLinkDirectories(settings).map((directory) =>
         planSkillLinkRemovals(directory, paths.skillsDir, managedSkills),
@@ -290,6 +336,7 @@ export const planGlobalUninstall = (
     const installStampPlan = yield* planInstallStampRemoval(paths.configDir);
     return combinedPlan([
       mcpPlan,
+      codexMcpPlan,
       ...skillLinkPlans,
       uninstallPlan(
         managedSkills.map((skillName) =>
@@ -306,9 +353,23 @@ export const planGlobalUninstall = (
     ]);
   });
 
-const applyRemoval = (removal: GlobalRemoval, claude: ExecFn) => {
+const applyRemoval = (removal: GlobalRemoval, assistantCommands: AssistantCommands) => {
+  if (removal.kind === 'codexMcp') {
+    return Effect.promise(() => assistantCommands.codex(['mcp', 'remove', removal.name])).pipe(
+      Effect.flatMap((codexRemoval) =>
+        codexRemoval.code === 0
+          ? Effect.void
+          : Effect.fail(
+              new GlobalUninstallError({
+                message: `Could not remove the ${removal.name} tool connection from Codex.`,
+              }),
+            ),
+      ),
+    );
+  }
   if (removal.kind === 'mcp') {
-    return Effect.promise(() => claude(['mcp', 'remove', '-s', 'user', removal.name])).pipe(
+    const claudeRemoval = ['mcp', 'remove', '-s', 'user', removal.name];
+    return Effect.promise(() => assistantCommands.claude(claudeRemoval)).pipe(
       Effect.flatMap((mcpRemoval) =>
         mcpRemoval.code === 0
           ? Effect.void
@@ -338,15 +399,20 @@ const applyRemoval = (removal: GlobalRemoval, claude: ExecFn) => {
 };
 
 /** Apply a plan in order; returns the plain-language failures (empty when everything went). */
-export const applyGlobalUninstall = (plan: GlobalUninstallPlan, claude: ExecFn) =>
-  Effect.all(plan.removals.map((removal) => Effect.either(applyRemoval(removal, claude)))).pipe(
+export const applyGlobalUninstall = (
+  plan: GlobalUninstallPlan,
+  assistantCommands: AssistantCommands,
+) =>
+  Effect.all(
+    plan.removals.map((removal) => Effect.either(applyRemoval(removal, assistantCommands))),
+  ).pipe(
     Effect.map((attempts) =>
       attempts.flatMap((attempt) => (Either.isLeft(attempt) ? [attempt.left.message] : [])),
     ),
   );
 
 const removalSubject = (removal: GlobalRemoval) =>
-  removal.kind === 'mcp' ? removal.name : removal.path;
+  removal.kind === 'mcp' || removal.kind === 'codexMcp' ? removal.name : removal.path;
 
 export const formatUninstallPlan = (plan: GlobalUninstallPlan): string[] =>
   [...new Set(plan.removals.map((removal) => removal.group))].map((group) => {
@@ -363,12 +429,12 @@ const printLines = (lines: readonly string[]) =>
 
 /**
  * `vybekiit uninstall [--yes] [--dry-run]`: remove the skills, assistant instructions, Claude
- * Code tool connections, and files global setup added. Buyer apps and the CLI itself stay.
+ * Code and Codex tool connections, and files global setup added. Buyer apps and the CLI stay.
  */
 export const runGlobalUninstall = async (
   commandArguments: readonly string[],
   interactiveTerminal: boolean,
-  claude: ExecFn = makeExec('claude'),
+  assistantCommands: AssistantCommands = { claude: makeExec('claude'), codex: makeExec('codex') },
 ): Promise<number> => {
   const confirmedUpfront = commandArguments.includes('--yes') || commandArguments.includes('-y');
   const dryRun = commandArguments.includes('--dry-run');
@@ -381,7 +447,7 @@ export const runGlobalUninstall = async (
     plainLanguageGuide: paths.bundledLanguageGuide,
   });
   const uninstallProgram = Effect.gen(function* () {
-    const plan = yield* planGlobalUninstall(settings, claude);
+    const plan = yield* planGlobalUninstall(settings, assistantCommands);
     const keptLines = noteLines('Not removed:', plan.keptNotes);
     const repairLines = noteLines('Needs your attention:', plan.repairNotes);
     const needsRepair = plan.repairNotes.length > 0;
@@ -413,7 +479,7 @@ export const runGlobalUninstall = async (
         return 0;
       }
     }
-    const failures = yield* applyGlobalUninstall(plan, claude);
+    const failures = yield* applyGlobalUninstall(plan, assistantCommands);
     const headline =
       failures.length === 0
         ? '✅ VybeKiit was removed from this computer.'

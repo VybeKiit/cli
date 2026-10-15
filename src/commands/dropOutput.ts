@@ -103,7 +103,7 @@ const getAgentConfigsForTemplate = (): Record<string, string> => ({
   'Claude Code': '.claude/settings.json + hooks/',
   Kiro: '.kiro/steering/vybekiit.md',
   Cursor: '.cursor/rules/vybekiit.mdc',
-  Codex: 'AGENTS.md',
+  Codex: 'AGENTS.md + .codex/hooks.json',
   Gemini: 'GEMINI.md',
   Copilot: '.github/copilot-instructions.md',
   Windsurf: '.windsurfrules',

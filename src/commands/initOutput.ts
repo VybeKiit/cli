@@ -31,9 +31,9 @@ export const writeInitSuccess = (pm: PackageManager): void => {
   process.stdout.write(`   Next: run \`${pm} install\` then \`${pm} run verify\`\n`);
   process.stdout.write('\n');
   process.stdout.write('   Platform configs generated:\n');
-  process.stdout.write('     .kiro/steering/vybekiit.md   -> Kiro\n');
-  process.stdout.write('     .cursor/rules/vybekiit.mdc   -> Cursor\n');
-  process.stdout.write('     AGENTS.md                    -> OpenAI Codex\n');
-  process.stdout.write('     GEMINI.md                    -> Gemini CLI\n');
-  process.stdout.write('     AGENTS.md + .claude/hooks/   -> Claude Code\n');
+  process.stdout.write('     .kiro/steering/vybekiit.md    -> Kiro\n');
+  process.stdout.write('     .cursor/rules/vybekiit.mdc    -> Cursor\n');
+  process.stdout.write('     AGENTS.md + .codex/hooks.json -> OpenAI Codex\n');
+  process.stdout.write('     GEMINI.md                     -> Gemini CLI\n');
+  process.stdout.write('     AGENTS.md + .claude/hooks/    -> Claude Code\n');
 };

@@ -157,6 +157,14 @@ describe('scaffoldKitWorkspace happy path', () => {
     const appSettingsText = JSON.stringify(appSettings);
     await mkdir(join(kitRoot, 'templates', 'web', '.claude'), { recursive: true });
     await writeFile(join(kitRoot, 'templates', 'web', '.claude', 'settings.json'), appSettingsText);
+    const codexRouterCommand =
+      'hook="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/hooks/skill-router.mjs"; [ ! -f "$hook" ] || node "$hook"';
+    const appCodexHooks = {
+      hooks: { UserPromptSubmit: [{ hooks: [{ type: 'command', command: codexRouterCommand }] }] },
+    };
+    const appCodexHooksText = JSON.stringify(appCodexHooks);
+    await mkdir(join(kitRoot, 'templates', 'web', '.codex'), { recursive: true });
+    await writeFile(join(kitRoot, 'templates', 'web', '.codex', 'hooks.json'), appCodexHooksText);
 
     const result = await scaffoldKitWorkspace({
       template: 'web',
@@ -181,6 +189,15 @@ describe('scaffoldKitWorkspace happy path', () => {
     expect(routerGroup?.hooks[0]?.command).toBe(
       'node "$CLAUDE_PROJECT_DIR"/templates/web/.claude/hooks/skill-router.mjs',
     );
+    const workspaceCodexHooksText = await readFile(join(emptyDest, '.codex', 'hooks.json'), 'utf8');
+    const workspaceCodexHooks = JSON.parse(workspaceCodexHooksText) as typeof appCodexHooks;
+    const [codexRouterGroup] = workspaceCodexHooks.hooks.UserPromptSubmit;
+    expect(codexRouterGroup?.hooks[0]?.command).toBe(
+      'hook="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/templates/web/.claude/hooks/skill-router.mjs"; [ ! -f "$hook" ] || node "$hook"',
+    );
+    await expect(
+      readFile(join(emptyDest, 'templates', 'web', '.codex', 'hooks.json'), 'utf8'),
+    ).resolves.toBe(appCodexHooksText);
     await expect(readFile(join(emptyDest, 'GEMINI.md'), 'utf8')).resolves.toBe('@AGENTS.md\n');
 
     const rootPkg = JSON.parse(await readFile(join(emptyDest, 'package.json'), 'utf8')) as {

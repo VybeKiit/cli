@@ -16,6 +16,7 @@ import { checkEntitlement, type EntitlementResult, formatEntitlementBlock } from
 import { makeExec } from './exec';
 import { globalInstallPaths } from './globalPaths';
 import { readGlobalStatus } from './globalStatus';
+import { type CodexMcpInstallation, installCodexMcp } from './installCodexMcp';
 import { installGlobalMcp, isVybekiitMcpReady, type McpInstallResult } from './installGlobalMcp';
 import { installGlobalSkills } from './installGlobalSkills';
 import { readInstallState, writeInstallState } from './installState';
@@ -37,6 +38,7 @@ export type GlobalInstallSummary = {
   readonly mcpNeedsKey: readonly string[];
   readonly mcpFailed: readonly string[];
   readonly claudeMissing: boolean;
+  readonly codexMcp: CodexMcpInstallation;
   readonly commandInstalled: boolean;
   /** CLI version that just provisioned (from package.json / npm@latest). */
   readonly version: string;
@@ -50,12 +52,32 @@ export const shouldRunSessionOneOnInstall = (
   isFirstInstall: boolean,
 ): boolean => isFirstInstall || args.includes('--session-one');
 
-/** Claude-specific MCP is optional when the buyer uses another coding agent. */
+/** Each assistant's MCP is optional when the buyer does not have that assistant installed. */
 export const globalSetupComplete = (
   managedFilesReady: boolean,
   mcpInstallation: McpInstallResult,
+  codexMcpInstallation: CodexMcpInstallation,
 ): boolean =>
-  managedFilesReady && (mcpInstallation.claudeMissing || isVybekiitMcpReady(mcpInstallation));
+  managedFilesReady &&
+  (mcpInstallation.claudeMissing || isVybekiitMcpReady(mcpInstallation)) &&
+  (codexMcpInstallation.codexMissing || isVybekiitMcpReady(codexMcpInstallation));
+
+const codexMcpLines = (codexMcp: CodexMcpInstallation): string[] => {
+  if (codexMcp.codexMissing) {
+    return [];
+  }
+  const enabledLabel =
+    codexMcp.enabled.length > 0 ? codexMcp.enabled.join(', ') : 'none newly added';
+  return [
+    `  • Codex    ${enabledLabel} (the same tool connections in Codex)`,
+    ...(codexMcp.refreshed.length > 0
+      ? [`             refreshed: ${codexMcp.refreshed.join(', ')}`]
+      : []),
+    ...(codexMcp.failed.length > 0
+      ? [`             failed to register: ${codexMcp.failed.join(', ')}`]
+      : []),
+  ];
+};
 
 /**
  * Format the success banner shown after a global install. Written for the non-technical
@@ -120,6 +142,7 @@ export const formatGlobalInstallSummary = (summary: GlobalInstallSummary): strin
       lines.push(`             failed to register: ${summary.mcpFailed.join(', ')}`);
     }
   }
+  lines.push(...codexMcpLines(summary.codexMcp));
   if (skillsEmpty) {
     lines.push('');
   } else {
@@ -214,6 +237,9 @@ export const runGlobalInstall = async (
     env: process.env,
     forceRefresh: isRerun,
   });
+  const codexMcp = await Effect.runPromise(
+    installCodexMcp({ codex: makeExec('codex'), environment: process.env, forceRefresh: isRerun }),
+  );
   const awareness = await installAwareness(paths);
   const agentInstallations = await Effect.runPromise(
     installAgentGuidance(agentSettings, detectedAgents, paths.skillsDir, skills.installed, version),
@@ -250,6 +276,7 @@ export const runGlobalInstall = async (
     mcpNeedsKey: mcp.needsKey,
     mcpFailed: mcp.failed,
     claudeMissing: mcp.claudeMissing,
+    codexMcp,
     commandInstalled: awareness.commandWritten,
     version,
     previousVersion: previous?.version ?? null,
@@ -257,9 +284,9 @@ export const runGlobalInstall = async (
 
   // Hard fail: never stamp install-state when Claude has nothing to load. Doctor will also
   // exit 1 until a later run lands managed skills.
-  if (!globalSetupComplete(postStatus.skillCount > 0 && usableAgent, mcp)) {
+  if (!globalSetupComplete(postStatus.skillCount > 0 && usableAgent, mcp, codexMcp)) {
     process.stderr.write(
-      'VybeKiit setup is incomplete: the managed files or an available Claude Code connection could not be prepared.\n',
+      'VybeKiit setup is incomplete: the managed files or the VybeKiit connection in Claude Code or Codex could not be prepared.\n',
     );
     return 1;
   }
