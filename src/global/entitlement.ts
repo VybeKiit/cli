@@ -2,10 +2,16 @@ import process from 'node:process';
 import { readGateIdentity } from '@vybekiit/core';
 import { type AccessProblem, accessHelpLines } from '../doctor/accessHelp';
 import { acceptRepositoryInvites } from '../doctor/repositoryInvites';
+import { locateUnzippedKit } from '../lib/unzippedKit';
 import { type ExecFn, makeExec } from './exec';
 
 /** Why the gate allowed or blocked the install. */
-export type EntitlementReason = 'entitled' | 'gh-missing' | 'not-authenticated' | 'no-access';
+export type EntitlementReason =
+  | 'entitled'
+  | 'kit-zip'
+  | 'gh-missing'
+  | 'not-authenticated'
+  | 'no-access';
 
 /** Outcome of the buyer-entitlement check. */
 export type EntitlementResult = {
@@ -17,12 +23,13 @@ export type EntitlementResult = {
   readonly via?: string;
 };
 
-/** Injected `gh` runner, defaulting to the real binary. Swapped in tests. */
+/** Injected `gh` runner and unzipped-kit lookup, defaulting to the real ones. Swapped in tests. */
 export type EntitlementDeps = {
   readonly exec: ExecFn;
+  readonly unzippedKit: () => Promise<string | null>;
 };
 
-const defaultDeps: EntitlementDeps = { exec: makeExec('gh') };
+const defaultDeps: EntitlementDeps = { exec: makeExec('gh'), unzippedKit: locateUnzippedKit };
 
 const ACCESS_PROBLEM_BY_REASON: Readonly<Partial<Record<EntitlementReason, AccessProblem>>> = {
   'gh-missing': 'gh-missing',
@@ -61,13 +68,15 @@ const firstReadableRepo = async (
   }, Promise.resolve(undefined));
 
 /**
- * Confirm the caller is an entitled VybeKiit buyer by reusing the access gate: read access to
- * one private delivery repo from {@link readGateIdentity}. Pending repo invites from the org are
- * accepted first, so a buyer who never opened the invite email still passes.
+ * Confirm the caller is an entitled VybeKiit buyer by reusing the access gate: an unzipped kit
+ * from the ZIP download, or read access to one private delivery repo from {@link readGateIdentity}.
+ * Pending repo invites from the org are accepted first, so a buyer who never opened the invite
+ * email still passes.
  *
- * Fail-closed: a missing `gh`, a signed-out `gh`, or no readable repo all block the install.
+ * Fail-closed: without an unzipped kit, a missing `gh`, a signed-out `gh`, or no readable repo
+ * all block the install.
  *
- * @param deps - Injected `gh` runner (defaults to the real binary).
+ * @param deps - Injected `gh` runner and unzipped-kit lookup (default to the real ones).
  * @returns Whether to proceed, with a machine-readable reason + resolved login.
  * @example
  * const gate = await checkEntitlement();
@@ -76,7 +85,10 @@ const firstReadableRepo = async (
 export const checkEntitlement = async (
   deps: EntitlementDeps = defaultDeps,
 ): Promise<EntitlementResult> => {
-  const { exec } = deps;
+  const { exec, unzippedKit } = deps;
+  if ((await unzippedKit()) !== null) {
+    return { entitled: true, reason: 'kit-zip' };
+  }
   if ((await exec(['--version'])).code === 127) {
     return { entitled: false, reason: 'gh-missing' };
   }

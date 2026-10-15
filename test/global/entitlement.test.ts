@@ -8,10 +8,22 @@ import type { ExecResult } from '../../src/global/exec';
 
 const ok: ExecResult = { code: 0, stdout: '', stderr: '' };
 const fail: ExecResult = { code: 1, stdout: '', stderr: '' };
+const noUnzippedKit = async (): Promise<string | null> => null;
 
 describe('checkEntitlement', () => {
+  it('allows a ZIP buyer with an unzipped kit without asking gh', async () => {
+    const exec = vi.fn(async (): Promise<ExecResult> => fail);
+    const result = await checkEntitlement({
+      exec,
+      unzippedKit: async () => '/Users/buyer/Downloads/vybekiit-kit',
+    });
+    expect(result).toMatchObject({ entitled: true, reason: 'kit-zip' });
+    expect(exec).not.toHaveBeenCalled();
+  });
+
   it('blocks when gh is not installed', async () => {
     const result = await checkEntitlement({
+      unzippedKit: noUnzippedKit,
       exec: async () => ({ code: 127, stdout: '', stderr: 'gh not found' }),
     });
     expect(result).toMatchObject({ entitled: false, reason: 'gh-missing' });
@@ -19,6 +31,7 @@ describe('checkEntitlement', () => {
 
   it('blocks when gh is not signed in', async () => {
     const result = await checkEntitlement({
+      unzippedKit: noUnzippedKit,
       exec: async (args) => (args[0] === '--version' ? ok : fail),
     });
     expect(result).toMatchObject({ entitled: false, reason: 'not-authenticated' });
@@ -26,6 +39,7 @@ describe('checkEntitlement', () => {
 
   it('allows a buyer who can read a private surface mirror', async () => {
     const result = await checkEntitlement({
+      unzippedKit: noUnzippedKit,
       exec: async (args) => {
         if (args[0] === '--version') return ok;
         if (args[1] === 'user') return { code: 0, stdout: 'octocat\n', stderr: '' };
@@ -42,7 +56,7 @@ describe('checkEntitlement', () => {
       if (args[1] === 'user/repository_invitations') return { code: 0, stdout: '7\n', stderr: '' };
       return ok;
     });
-    await checkEntitlement({ exec });
+    await checkEntitlement({ exec, unzippedKit: noUnzippedKit });
     const calledArguments = exec.mock.calls.map(([args]) => args.join(' '));
     const acceptIndex = calledArguments.indexOf(
       'api -X PATCH user/repository_invitations/7 --silent',
@@ -60,13 +74,14 @@ describe('checkEntitlement', () => {
       if (args[1] === 'user') return { code: 0, stdout: 'octocat', stderr: '' };
       return ok;
     });
-    await checkEntitlement({ exec });
+    await checkEntitlement({ exec, unzippedKit: noUnzippedKit });
     const repoProbes = exec.mock.calls.filter((call) => call[0][1]?.startsWith('repos/'));
     expect(repoProbes).toHaveLength(1);
   });
 
   it('blocks a signed-in non-buyer with no mirror access', async () => {
     const result = await checkEntitlement({
+      unzippedKit: noUnzippedKit,
       exec: async (args) => {
         if (args[0] === '--version') return ok;
         if (args[1] === 'user') return { code: 0, stdout: 'stranger', stderr: '' };
