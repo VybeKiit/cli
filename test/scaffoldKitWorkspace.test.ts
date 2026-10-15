@@ -100,7 +100,7 @@ const writeFakeKit = async (kitRoot: string): Promise<void> => {
     ].join('\n'),
   );
   await writePkg(kitRoot, {
-    name: 'vybekiit',
+    name: 'vybekiit-kit',
     private: true,
     packageManager: 'pnpm@10.33.2',
     devDependencies: {
@@ -382,7 +382,7 @@ describe('scaffoldKitWorkspace failures', () => {
     const destParent = await mkdtemp(join(tmpdir(), 'vybekiit-kit-dest-'));
     const dest = join(destParent, 'app');
     await mkdir(join(kitRoot, 'packages'), { recursive: true });
-    await writePkg(kitRoot, { name: 'vybekiit', private: true });
+    await writePkg(kitRoot, { name: 'vybekiit-kit', private: true });
 
     await expect(scaffoldKitWorkspace({ template: 'web', kitRoot, dest })).rejects.toBeInstanceOf(
       ScaffoldError,
